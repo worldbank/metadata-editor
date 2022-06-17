@@ -1,0 +1,560 @@
+{
+    "type": "template",
+    "title": "Microdata Variable template",
+    "items": [
+        {
+            "type": "section",
+            "id": "overview",
+            "title": "Overview",
+            "class": "mandatory recommended",
+            "expanded": true,
+            "items": [                
+                {
+                    "key": "vid",
+                    "title": "Variable unqiue ID",
+                    "type": "text",
+                    "class": "required",
+                    "required": true,
+                    "help_text": "Variable unique identifier",
+                    "rules":"required|idno|alpha_dash|min:2|max:80"
+                },
+                {
+                    "key": "name",
+                    "title": "Name",
+                    "type": "text",
+                    "class": "required",
+                    "required": true,
+                    "help_text": "Name",
+                    "rules":"required|max:100"
+                },
+                {
+                    "key": "labl",
+                    "title": "Labl",
+                    "type": "text",
+                    "class": "required",
+                    "required": true,
+                    "help_text": "Variable label",
+                    "rules":"required|max:300"
+                },
+                {
+                    "key": "var_intrvl",
+                    "title": "Interval type",
+                    "help_text":"Indicates the interval type; options are discrete or continuous",
+                    "type": "text"
+                },
+                {
+                    "key": "var_dcml",
+                    "title": "Variable decimal points",
+                    "type": "text"
+                },
+                {
+                    "key": "var_wgt",
+                    "title": "Indicates whether the variable is a weight",
+                    "type": "dropdown",
+                    "class": "recommended",
+                    "enum": {
+                        "0": "No",
+                        "1": "Yes"
+                    }
+                },
+                
+                {
+                    "key": "loc_start_pos",
+                    "title": "Variable start position",
+                    "type": "text"
+                },
+
+                {
+                    "key": "loc_end_pos",
+                    "title": "Variable end position",
+                    "type": "text"
+                },
+
+                {
+                    "key": "loc_width",
+                    "title": "Variable end position",
+                    "type": "text"
+                },
+
+                {
+                    "key": "loc_rec_seg_no",
+                    "title": "Record segment number",
+                    "type": "text",
+                    "help_text":"Record segment number, deck or card number the variable is located on"
+                },
+            ]
+        },
+        {
+            "type": "section",
+            "id": "version",
+            "title": "Version",
+            "class": "recommended",
+            "items": [
+                {
+                    "key": "study_desc.version_statement.version",
+                    "title": "Version information",
+                    "type": "text"
+                },
+                {
+                    "key": "study_desc.version_statement.version_date",
+                    "title": "Version date",
+                    "help_text": "Version date in YYYY-MM-DD format",
+                    "type": "text"
+                },
+                {
+                    "key": "study_desc.version_statement.version_notes",
+                    "title": "Notes",
+                    "type": "text"
+                }
+            ]
+        },
+        {
+            "type": "section",
+            "id": "overview",
+            "title": "Overview",
+            "items": [
+                {
+                    "key": "study_desc.study_info.abstract",
+                    "title": "Abstract",
+                    "type": "textarea"
+                },
+                {
+                    "key": "study_desc.study_info.data_kind",
+                    "title": "Kind of data",
+                    "type": "dropdown",
+                    "enum": {
+                        "sample survey data[ssd]": "Sample survey data"
+                    }
+                },
+                {
+                    "key": "study_desc.study_info.analysis_unit",
+                    "title": "Unit of analysis",
+                    "type": "textarea"
+                }
+            ]
+        },
+        {
+            "type": "section",
+            "id": "scope",
+            "title": "Scope",
+            "items": [
+                {
+                    "key": "study_desc.study_info.notes",
+                    "title": "Description of scope",
+                    "type": "textarea"
+                }
+            ]
+        },
+        {
+            "type": "section",
+            "id": "coverage",
+            "title": "Coverage",
+            "class": "mandatory",
+            "items": [
+                {
+                    "key": "study_desc.study_info.nation",
+                    "title": "Country",
+                    "type": "array",
+                    "class": "required",
+                    "props": {
+                        "name": {
+                            "key": "name",
+                            "title": "Name",
+                            "type": "text",
+                            "rules":"required",
+                            "name": "Country name"
+                        },
+                        "abbreviation": {
+                            "key": "abbreviation",
+                            "title": "Abbreviation",
+                            "type": "text"
+                        }
+                    }
+                },
+                {
+                    "key": "study_desc.study_info.geog_coverage",
+                    "title": "Geographic coverage",
+                    "type": "text"
+                },
+                {
+                    "key": "study_desc.study_info.universe",
+                    "title": "Universe",
+                    "type": "textarea"
+                }
+            ]
+        },
+        {
+            "type": "section",
+            "id": "producers_sponsors",
+            "title": "Producers and sponsors",
+            "items": [
+                {
+                    "key": "study_desc.authoring_entity",
+                    "title": "Primary investigator",
+                    "type": "array",
+                    "props": {
+                        "name": {
+                            "key": "name",
+                            "title": "Name",
+                            "type": "text"
+                        },
+                        "affiliation": {
+                            "key": "affiliation",
+                            "title": "Affiliation",
+                            "type": "text"
+                        }
+                    }
+                },
+                {
+                    "key": "study_desc.production_statement.producers",
+                    "title": "Other producers",
+                    "type": "array",
+                    "props": {
+                        "name": {
+                            "key": "name",
+                            "title": "Name",
+                            "type": "text"
+                        },
+                        "abbreviation": {
+                            "key": "abbreviation",
+                            "title": "Abbreviation",
+                            "type": "text"
+                        },
+                        "affiliation": {
+                            "key": "affiliation",
+                            "title": "Affiliation",
+                            "type": "text"
+                        },
+                        "role": {
+                            "key": "role",
+                            "title": "Role",
+                            "type": "text"
+                        }
+                    }
+                },
+                {
+                    "key": "study_desc.production_statement.funding_agencies",
+                    "title": "Funding",
+                    "type": "array",
+                    "props": {
+                        "name": {
+                            "key": "name",
+                            "title": "Name",
+                            "type": "text"
+                        },
+                        "abbr": {
+                            "key": "abbr",
+                            "title": "Abbreviation",
+                            "type": "text"
+                        },
+                        "grant": {
+                            "key": "grant",
+                            "title": "Grant number",
+                            "type": "text"
+                        },
+                        "role": {
+                            "key": "role",
+                            "title": "Role",
+                            "type": "text"
+                        }
+                    }
+                },
+                {
+                    "key": "study_desc.oth_id",
+                    "title": "Other acknowledgements",
+                    "type": "array",
+                    "props": {
+                        "name": {
+                            "key": "name",
+                            "title": "Name",
+                            "type": "text"
+                        },
+                        "affiliation": {
+                            "key": "affiliation",
+                            "title": "Affiliation",
+                            "type": "text"
+                        },
+                        "role": {
+                            "key": "role",
+                            "title": "Role",
+                            "type": "text"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "type": "section",
+            "id": "sampling",
+            "title": "Sampling",
+            "items": [
+                {
+                    "key": "study_desc.method.data_collection.sampling_procedure",
+                    "title": "Sampling procedure",
+                    "type": "textarea"
+                },
+                {
+                    "key": "study_desc.method.data_collection.sampling_deviation",
+                    "title": "Deviations from sample design",
+                    "type": "textarea"
+                },
+                {
+                    "key": "study_desc.method.analysis_info.response_rate",
+                    "title": "Response rates",
+                    "type": "textarea"
+                },
+                {
+                    "key": "study_desc.method.data_collection.weight",
+                    "title": "Weighting",
+                    "type": "textarea"
+                }
+            ]
+        },
+        {
+            "type": "section",
+            "id": "datacollection",
+            "title": "Data collection",
+            "items": [
+                {
+                    "key": "study_desc.study_info.coll_dates",
+                    "title": "Dates of data collection",
+                    "type": "array",
+                    "props": {
+                        "start": {
+                            "key": "start",
+                            "title": "Start",
+                            "type": "text"
+                        },
+                        "end": {
+                            "key": "end",
+                            "title": "End",
+                            "type": "text"
+                        },
+                        "cycle": {
+                            "key": "cycle",
+                            "title": "Cycle",
+                            "type": "text"
+                        }
+                    }
+                },
+                {
+                    "key": "study_desc.study_info.time_periods",
+                    "title": "Time periods",
+                    "type": "array",
+                    "props": {
+                        "start": {
+                            "key": "start",
+                            "title": "Start",
+                            "type": "text"
+                        },
+                        "end": {
+                            "key": "end",
+                            "title": "End",
+                            "type": "text"
+                        },
+                        "cycle": {
+                            "key": "cycle",
+                            "title": "Cycle",
+                            "type": "text"
+                        }
+                    }
+                },
+                {
+                    "key": "study_desc.method.data_collection.coll_mode",
+                    "title": "Mode of data collection",
+                    "type": "simple_array"
+                },
+                {
+                    "key": "study_desc.method.data_collection.coll_situation",
+                    "title": "Notes on data collection",
+                    "type": "textarea"
+                },
+                {
+                    "key": "study_desc.method.data_collection.research_instrument",
+                    "title": "Questionnaires",
+                    "type": "textarea"
+                },
+                {
+                    "key": "study_desc.method.data_collection.data_collectors",
+                    "title": "Data collectors",
+                    "type": "array",
+                    "props": {
+                        "name": {
+                            "key": "name",
+                            "title": "Name",
+                            "type": "text"
+                        },
+                        "abbr": {
+                            "key": "abbr",
+                            "title": "Abbreviation",
+                            "type": "text"
+                        },
+                        "affiliation": {
+                            "key": "affiliation",
+                            "title": "Affiliation",
+                            "type": "text"
+                        }
+                    }
+                },
+                {
+                    "key": "study_desc.method.data_collection.act_min",
+                    "title": "Supervision",
+                    "type": "textarea"
+                }
+            ]
+        },
+        {
+            "type": "section",
+            "id": "dataprocessing",
+            "title": "Data processing",
+            "items": [
+                {
+                    "key": "study_desc.method.data_collection.cleaning_operations",
+                    "title": "Data editing",
+                    "type": "textarea"
+                },
+                {
+                    "key": "study_desc.method.method_notes",
+                    "title": "Other processing",
+                    "type": "textarea"
+                }
+            ]
+        },
+        {
+            "type": "section",
+            "id": "dataappraisal",
+            "title": "Data appraisal",
+            "items": [
+                {
+                    "key": "study_desc.method.data_collection.analysis_info.sampling_error_estimates",
+                    "title": "Data editing",
+                    "type": "textarea"
+                },
+                {
+                    "key": "study_desc.method.data_collection.analysis_info.data_appraisal",
+                    "title": "Other forms of data appraisal",
+                    "type": "textarea"
+                }
+            ]
+        },
+        {
+            "type": "section",
+            "id": "data_access",
+            "title": "Data access",
+            "items": [
+                {
+                    "key": "study_desc.data_access.dataset_use.contact",
+                    "title": "Access authority",
+                    "type": "array",
+                    "props": {
+                        "name": {
+                            "key": "name",
+                            "title": "Name",
+                            "type": "text"
+                        },
+                        "affiliation": {
+                            "key": "affiliation",
+                            "title": "Affiliation",
+                            "type": "text"
+                        },
+                        "uri": {
+                            "key": "uri",
+                            "title": "URI",
+                            "type": "text"
+                        },
+                        "email": {
+                            "key": "email",
+                            "title": "Email",
+                            "type": "text"
+                        }
+                    }
+                },
+                {
+                    "key": "study_desc.data_access.dataset_use.conf_dec",
+                    "title": "Confidentiality",
+                    "type": "array",
+                    "props": {
+                        "txt": {
+                            "key": "txt",
+                            "title": "Confidentiality text",
+                            "type": "text"
+                        },
+                        "required": {
+                            "key": "required",
+                            "title": "Is required?",
+                            "type": "text"
+                        },
+                        "form_no": {
+                            "key": "form_no",
+                            "title": "Form#",
+                            "type": "text"
+                        },
+                        "uri": {
+                            "key": "uri",
+                            "title": "URL",
+                            "type": "text"
+                        }
+                    }
+                },
+                {
+                    "key": "study_desc.data_access.dataset_use.conditions",
+                    "title": "Access conditions",
+                    "type": "textarea"
+                },
+                {
+                    "key": "study_desc.data_access.dataset_use.cit_req",
+                    "title": "Citation requirements",
+                    "type": "textarea"
+                }
+            ]
+        },
+        {
+            "type": "section",
+            "id": "disclaimer_copyrights",
+            "title": "Disclaimer and copyright",
+            "items": [
+                {
+                    "key": "study_desc.data_access.dataset_use.disclaimer",
+                    "title": "Confidentiality",
+                    "type": "textarea"
+                },
+                {
+                    "key": "study_desc.production_statement.copyright",
+                    "title": "Copyright",
+                    "type": "textarea"
+                }
+            ]
+        },
+        
+        
+        {
+            "type": "section",
+            "id": "contact",
+            "title": "Contacts",
+            "items": [
+                {
+                    "key": "study_desc.distribution_statement.contact",
+                    "title": "Contact persons",
+                    "type": "array",
+                    "props": {
+                        "name": {
+                            "key": "name",
+                            "title": "Name",
+                            "type": "text"
+                        },
+                        "affiliation": {
+                            "key": "affiliation",
+                            "title": "Affiliation",
+                            "type": "text"
+                        },
+                        "email": {
+                            "key": "email",
+                            "title": "Email",
+                            "type": "text"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

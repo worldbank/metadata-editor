@@ -761,12 +761,13 @@ class Datasets extends MY_REST_Controller
 			$sid=$this->get_sid_from_idno($idno);
 			$user_id=$this->get_api_user_id();        
 			$survey=$this->dataset_manager->get_row($sid);
+			$variable_detailed=(int)$this->input->get("detailed");
 
 			if(!$survey){
 				throw new exception("STUDY_NOT_FOUND");
 			}
 
-			$survey_variables=$this->Variable_model->list_by_dataset($sid,$file_id);
+			$survey_variables=$this->Variable_model->list_by_dataset($sid,$file_id,$variable_detailed);
 			
 			$response=array(
 				'variables'=>$survey_variables

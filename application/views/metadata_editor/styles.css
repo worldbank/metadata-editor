@@ -1,0 +1,257 @@
+.bg-light-2{
+    background:#e9ecef!important;
+}
+.section-container-title{
+  padding:10px;
+  background:#f3f3f3;
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15);
+  border:1px solid gainsboro;
+}
+.v-expansion-panel-header{
+  font-weight:bold;
+}
+/*.metadata-form-container .field-type-section,*/
+.metadata-form-container .nested-section-row{
+    border:0px;
+    margin-bottom:5px;
+    background:#f3f3f3;
+    padding-bottom:5px;
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important
+}
+
+.metadata-form-container .required-label{
+    font-weight:bold;
+    color:red;
+}
+
+.metadata-form-container .form-field-textarea{
+    min-height:200px;
+}
+
+/*.grid-button-delete,
+.section-toggle-icon
+{
+    margin-top:4px;
+}*/
+
+.form-field-table{
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-right: 15px
+}
+
+.form-field-table th{
+    font-size:12px;
+}
+
+.metadata-form-container .form-field{
+    margin-left:15px;
+    margin-right:15px;
+    margin-top:15px;
+    margin-bottom:30px;
+}
+
+/*.metadata-form-container .field-type-section .field-type-section{
+    margin-left:15px;
+    margin-right:15px;
+}*/
+
+.form-node .form-node,
+.form-tree .form-tree,
+.tree-menu .tree-menu {
+    margin-left: 15px;            
+}
+
+.tree-node{
+    cursor:pointer;
+}
+
+.form-container{
+    border:1px solid #0062cc;
+}
+
+/*.form-section {
+    background: #03A9F4;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 10px;
+}*/
+
+label{
+    font-size: 14px;
+        font-weight: bold;
+        margin-bottom: .1rem;
+    }
+
+
+/*.sidebar{            
+    border:1px solid gainsboro;
+    padding-left:10px;
+}*/
+
+.sidebar-content{
+    padding:15px;
+}
+
+.sidebar-header{
+    padding:10px;
+    background: #F1F1F1;
+    border-bottom:1px solid gainsboro;            
+}
+
+.main-content{
+    /*overflow-y: scroll;*/
+    height:100%;
+    padding-top:10px;
+}
+
+.form-tree{
+    color:#545b62;
+}
+.form-tree .active{
+    color:#0062cc;            
+}
+
+.lvl-0 .field-type-section{
+    margin-top:15px;
+}
+
+.field-type-nested_array{
+    margin:15px;
+}        
+
+.error{
+    background:transparent;
+    color:red;
+    border:0px;
+}
+
+.grid-component{
+    background:white;
+    padding:5px;
+}
+
+html,body {
+    height: 100%;
+}
+.container-fluid {
+    height: 100vh;
+}
+
+.nav-link{
+    color:black;
+}
+.nav-active{
+    font-weight:bold;
+    color:#007bff;
+}
+
+.sub-header{
+    display:none;
+}
+
+/* .metadata-form-container .field-type-section {
+    border: 1px solid gainsboro;
+    margin-bottom: 5px;
+    background: transparent;
+    padding-bottom: 0px;
+}
+
+
+.form-section {
+    background: #f6f8fa;
+    color: #000000;
+    font-size: 14px;
+    border-bottom: 1px solid gainsboro;
+    font-weight: bold;
+    padding: 10px;
+}*/
+
+.list-group-item{
+    padding:.3rem 1.25rem;
+    font-size:14px;
+}
+
+.sticky-offset {
+    top: 56px;
+}
+
+
+
+#sidebar-container .list-group .list-group-item[aria-expanded="false"] .submenu-icon .fa-caret-right{
+    display:none;
+}
+#sidebar-container .list-group .list-group-item[aria-expanded="true"] .submenu-icon .fa-caret-down{
+    display:none;
+}
+
+.sidebar-submenu{
+    font-size:smaller;
+}
+
+.text-link{
+  color:blue;
+  cursor:pointer;          
+}
+
+.v-icon.v-icon{
+    font-size:18px;
+}
+
+.v-treeview-node__content, .v-treeview-node__label {
+    flex-shrink: 1;
+  }
+  .v-treeview-node__root {
+    height: auto;
+  }
+
+  .v-treeview-node__label{
+    white-space: normal !important;
+  }  
+
+
+  .resource-icon{
+    font-size:32px;
+    color:#007bff;
+    margin-right:15px;
+}            
+
+.resource-row{
+    padding-top:10px;
+    padding-bottom:10px;
+    border-bottom:1px solid gainsboro;
+}
+
+.nav-sidebar>.nav-item{
+    width:100%;
+}
+
+.v-treeview--dense .v-treeview-node__root
+{
+    min-height:25px;
+}
+
+.v-treeview-node__level {
+    width: 10px;
+}
+
+.v-treeview-node__children .v-treeview-node__children .v-treeview-node__content {
+    margin-left: 16px;
+}
+
+.table-variables td, .table-variables th {
+    border: 1px solid rgb(0 0 0 / 12%);
+}
+
+.table-responsive-sticky{
+    height:400px;  
+    overflow:scroll;
+  }
+.table-responsive-sticky thead tr:nth-child(1) th{
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: gainsboro;
+    border-bottom: 1px solid rgb(0 0 0 / 12%);
+    }

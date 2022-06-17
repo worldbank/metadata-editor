@@ -1,0 +1,77 @@
+{
+    "type": "template",
+    "title": "Timeseries database",
+    "items":
+[    
+    {
+        "type": "section",
+        "id": "database_description",
+        "title": "Database Description",
+        "class": "mandatory recommended",
+        "expanded": true,
+        "items": [
+            {
+                "key": "database_description.title_statement.idno",
+                "title": "IDNO",
+                "type": "text",
+                "class": "required",
+                "required": true,
+                "rules":"required|idno|alpha_dash|min:5|max:80"
+            },
+            {
+                "key": "database_description.title_statement.title",
+                "type": "text",
+                "class": "name",
+                "title": "Title"
+            },
+            {
+                "key": "database_description.authoring_entity",
+                "title": "Authoring entity",
+                "type": "array",
+                "props": {
+                    "name": {
+                        "key": "name",
+                        "title": "Name",
+                        "type": "text",
+                        "rules":"required",
+                        "name": "Authoring entity name"
+                    },
+                    "role": {
+                        "key": "role",
+                        "title": "Role",
+                        "type": "text",
+                        "name": "role"
+                    },
+                    "affiliation": {
+                        "key": "affiliation",
+                        "title": "Affiliation",
+                        "type": "text",
+                        "name": "affiliation"
+                    },
+                    "abbreviation": { 
+                        "key": "abbreviation",
+                        "title": "Abbreviation",
+                        "type": "text"
+                    },
+                    "email": { 
+                        "key": "email",
+                        "title": "Email",
+                        "type": "text"
+                    }
+                }
+            },
+            {
+                "key": "database_description.abstract",
+                "type": "text",
+                "title": "Abstract"
+            }
+            
+            
+
+            
+        ]
+    }
+    
+]
+
+}

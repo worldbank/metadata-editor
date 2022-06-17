@@ -43,7 +43,14 @@
                 </div>
                 
             </div>
-
+            
+            <router-link to="/datafiles/<?php echo $survey['id'];?>">
+                <div class="d-flex w-100 justify-content-start align-items-center">                    
+                    <span class="fas fa-file-alt mr-3"></span>
+                    <span class="menu-collapsed">Data files</span>
+                     <!--<span class="ml-auto badge badge-pill badge-secondary ml-2">5</span>-->
+                </div>
+            </router-link>
 
             <a href="<?php echo site_url('admin/catalog/edit/'.$survey['id'].'/resources');?>" class="bg-light list-group-item list-group-item-action">
                 <div class="d-flex w-100 justify-content-start align-items-center">                    

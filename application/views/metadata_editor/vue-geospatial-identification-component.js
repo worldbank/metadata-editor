@@ -1,17 +1,16 @@
-///// nested-section
-Vue.component('nested-section', {
-    props:['value','columns','path','title'],
+//
+Vue.component('identification-section', {
+    props:['value','columns','path'],
     data: function () {    
         return {
             field_data: this.value,
-            key_path: this.path,
-            active_sections:[]
+            key_path: this.path
         }
     },
     watch: { 
         field_data: function(newVal, oldVal) {
-            console.log('Prop changed: ', newVal, ' | was: ', oldVal)
-            console.log('key path:',this.key_path);
+            console.log('=========Prop changed: ', newVal, ' | was: ', oldVal)
+            console.log('=========key path:',this.key_path);
             this.$vueSet (this.$store.state.formData, this.key_path, newVal);
         }
     },
@@ -22,49 +21,30 @@ Vue.component('nested-section', {
             
         }
     },
+
     computed: {
         localColumns(){
             return this.columns;
-        }               
+        }
     },  
     template: `
-            <div class="nested-section">   {{path}}                                         
+            <div class="nested-section-identification">                                            
                 <template  v-for="(item,index) in field_data">
-
-                <div :class="'nested-section-row nested-section-'+index" > 
-                    <div class="label-wrapper" @click="toggleChildren(index)">
-                        <div class="tree-node form-section nested-form-section" >{{ title }}
-                            <button type="button"  class="btn btn-sm btn-link" v-on:click="remove(index)">Remove <i class="fa fa-trash-o" aria-hidden="true"></i></button>
-                            <span class="float-right section-toggle-icon"><i class="fas" :class="toggleClasses(index)"></i></span>
-                        </div>
-                    </div>
-
-                    <div v-show="showChildren(index)">
-                    <div v-for="(column,idx_col) in localColumns" scope="row" >
+                    <div v-for="(column,idx_col) in localColumns" scope="row">
                         
-                            <div v-if="column.type=='nested_array'">
-                                <label :for="'field-' + normalizeClassID(column.key)">{{column.title}}</label>
-                                <nested-section 
-                                    :value="field_data[index][column.key]"                                         
-                                    :columns="column.props"
-                                    :title="column.title"
-                                    :path="path + '.' + index + '.' + column.key">
-                                </nested-section>  
-                            </div>
-                            
-                            <div  v-if="column.type!=='array' && column.type!=='nested_array'">
+                            <div  v-if="column.type!=='array'">
 
                                 <div class="form-group form-field" :class="['field-' + column.key] ">
-                                    <label :for="'field-' + normalizeClassID(path + '-' + column.key)">{{column.title}}                                        
+                                    <label :for="'field-' + normalizeClassID(path + '-' + column.key)">                                        
                                         <span class="small" v-if="column.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(path + ' ' + column.key)" ><i class="far fa-question-circle"></i></span>
                                         <span v-if="column.required==true" class="required-label"> * </span>
-                                    </label> 
+                                    </label>
                                     <input type="text"
                                         :value="getData(index+'.'+column.key)"
                                         @input="setData(index+'.'+column.key, $event.target.value)"
                                         class="form-control" 
                                         :id="'field-' + normalizeClassID(path + '-' + column.key)"                                     
-                                    >                                                                       
+                                    >                                      
                                     <small :id="'field-toggle-' + normalizeClassID(path + '-' + column.key)" class="collapse help-text form-text text-muted">{{column.help_text}}</small>                            
                                 </div>
                                 
@@ -83,14 +63,14 @@ Vue.component('nested-section', {
                             </div>
                         
                     </div>    
-                    </div>
-                    
+                    <div>        
+                        <button type="button"  class="btn btn-sm btn-danger float-right" v-on:click="remove(index)">remove <i class="fa fa-trash-o" aria-hidden="true"></i></button>
                     </div>
                 </template>
 
-                <div class="d-flex justify-content-center">
-                    <button type="button" class="btn btn-light btn-block btn-sm" @click="addRow" >Add row</button>    
-                </div>
+            <div class="d-flex justify-content-center">
+                <button type="button" class="btn btn-light btn-block btn-sm" @click="addRow" >Add row</button>    
+            </div>
 
             </div>  `,
     methods:{
@@ -108,30 +88,12 @@ Vue.component('nested-section', {
             return _.get(this.field_data, field_xpath)
         },
         setData: function (field_xpath,event){
+            //alert(data,field_xpath);
             console.log(field_xpath,event);
             _.set(this.field_data,field_xpath,event);
             console.log(this.field_data);
             Vue.set(this.field_data, 0, this.field_data[0]);
-        },
-        toggleChildren(index) {
-            if (!this.active_sections.includes(index)) {
-                this.active_sections.push(index);
-            }else{
-                this.active_sections = this.active_sections.filter(function(e) { return e !== index })
-            }
-        },
-        showChildren(index)
-        {
-            if (this.active_sections.includes(index)) {
-                return true;
-            }
-            return false;
-        },
-        toggleClasses(index) {
-            return {
-                'fa-angle-down': !this.showChildren(index),
-                'fa-angle-up': this.showChildren(index)
-            }
-        } 
+
+        }    
     }
 })

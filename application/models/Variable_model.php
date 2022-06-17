@@ -244,7 +244,7 @@ class Variable_model extends CI_Model {
 
         $variables=$this->db->get("variables")->result_array();
 
-        $exclude_metadata=array(
+        /*$exclude_metadata=array(
             'var_format',
             'var_sumstat',
             'var_val_range',
@@ -252,8 +252,9 @@ class Variable_model extends CI_Model {
             'loc_end_pos',
             'loc_width',
             'loc_rec_seg_no',
+        );*/
 
-        );
+        $exclude_metadata=[];
 
         if ($metadata_detailed==true){
             foreach($variables as $key=>$variable){
