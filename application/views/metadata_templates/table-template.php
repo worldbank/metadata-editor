@@ -9,6 +9,12 @@
  **/
 ?>
 
+<style>
+    .field-metadata__table_description__time_periods .field-value{
+        max-height:300px;
+        overflow-y:auto;
+    }    
+</style>
 
 <?php 
     //rendered html for all sections

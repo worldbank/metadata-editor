@@ -11,6 +11,15 @@ Vue.component('form-main', {
       beforeUpdate () {
         console.log('beforeUpdate:', this.field)
       },
+      watch: {
+        formData: {
+          deep: true,      // detecting nested changes in objects
+          immediate: true, // triggering the handler immediately with the current value
+          handler(newValue, oldValue) {
+            console.log("value cahnged",newValue);
+          }
+        }
+      },
     computed: {
         formData () {
             return this.$deepModel('formData')

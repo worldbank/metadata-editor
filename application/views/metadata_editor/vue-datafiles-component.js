@@ -7,16 +7,15 @@ Vue.component('datafiles', {
             dataset_type:project_type,
             form_errors:[],
             schema_errors:[],
-            data_files:[],
             page_action:'list',
             edit_item:null
         }
     }, 
     mounted: function () {
-        this.loadDataFiles();
+        //this.loadDataFiles();
     },   
     methods: {
-        loadDataFiles: function() {
+        /*loadDataFiles: function() {
             vm=this;
             let url=CI.base_url + '/api/datasets/datafiles/'+vm.dataset_idno;
             axios.get(url)
@@ -24,15 +23,10 @@ Vue.component('datafiles', {
                 console.log(response);
                 vm.data_files=[];
                 if(response.data.datafiles){
-                    //vm.data_files=response.data.datafiles;
-                    window._files=response.data.datafiles;
-                    //this.$store.state.data_files=response.data.datafiles;
                     Object.keys(response.data.datafiles).forEach(function(element, index) { 
                         vm.data_files.push(response.data.datafiles[element]);
                     })
                     vm.$store.state.data_files=vm.data_files;
-                    console.log(vm.data_files);
-                    console.log(vm.data_files);
                 }
             })
             .catch(function (error) {
@@ -41,7 +35,7 @@ Vue.component('datafiles', {
             .then(function () {
                 console.log("request completed");
             });
-        },
+        },*/
         editFile:function(file_id){
             this.page_action="edit";
             this.edit_item=file_id;
@@ -49,13 +43,16 @@ Vue.component('datafiles', {
         addFile:function(){
             this.page_action="edit";
             console.log(this.data_files);
-            let new_idx=this.data_files.push({file_name:""}) -1;
-            this.edit_item=new_idx;
+            //let new_idx=this.data_files.push({file_name:""}) -1;
+            this.$store.commit('data_files_add',{file_name:'untitled'});
+            newIdx=this.data_files.length -1;
+            this.edit_item=newIdx;
         },
         saveFile: function(data)
         {
             console.log("saving file",this.data_files[this.edit_item]);
-            this.$set(this.data_files, this.edit_item, data);            
+            this.$set(this.data_files, this.edit_item, data);      
+            
         },
         exitEditMode: function()
         {
@@ -64,41 +61,54 @@ Vue.component('datafiles', {
         }
     },
     computed: {
+        data_files(){
+            return this.$store.state.data_files;
+          },
     },
     template: `
         <div>
+
+        <v-container>
+
             <h1>Data files</h1>            
             <div v-show="page_action=='list'">
 
 
             <v-row>
                 <v-col md="8"><strong>{{data_files.length}}</strong> files </v-col>
-                <v-col md="4" class="d-flex justify-end">
-                    <button type="button" class="btn btn-link" @click="addFile">Add file</button> | 
-                    <button type="button" class="btn btn-link" @click="loadDataFiles">Refresh page</button>                    
+                <v-col md="4" align="right" class="mb-2">
+                    <button type="button" class="btn btn-sm btn-outline-primary" @click="addFile">Create file</button>
+                    <router-link class="btn btn-sm btn-outline-primary" :to="'datafiles/import'">Import file</router-link> 
                 </v-col>
             </v-row>
 
+            <v-container>
+            <v-row v-for="(data_file, index) in data_files" class="bg-white mb-3">
+                <v-col md="1" align="center">                
+                <v-icon x-large color="grey lighten-1">mdi-file-table-outline</v-icon>                
+                </v-col>
+                <v-col md="11">
+                        <div><h3>{{data_file.file_name}}</h3></div>
+                        <div class="subtitle-1 mb-3">{{data_file.file_id}}</div>
+                        <div class="subtitle-2">{{data_file.description}}</div>
+                        
+                        <div class="mt-2 pt-3">
+                            <button type="button" class="btn btn-sm btn-outline-secondary" @click="editFile(index)"><i class="far fa-edit" title="Edit"></i></button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary"><i class="fas fa-trash-alt" title="Delete"></i></button>
+                            <router-link :to="'/variables/' + data_file.file_id"><button type="button" class="btn btn-sm btn-outline-primary"><i class="fas fa-table"></i> Variables</button></router-link>
+                        </div>
+                </v-col>
+            </v-row>
+            </v-container>
+                
                 
 
-                <v-simple-table class="table table-striped table-bordered">
-                <template v-slot:default>
-                <body>
-                <tr v-for="(data_file, index) in data_files">
-                    <td>
-                        <button type="button" class="btn btn-link" @click="editFile(index)">Edit</button>
-                        <button type="button" class="btn btn-link">Delete</button>
-                        <router-link :to="'/variables/' + data_file.file_id">Variables</router-link>
-                    </td>
-                    <td>
-                        <div class="font-weight-bold">{{data_file.file_name}}</div>
-                        <div>{{data_file.description}}</div>                        
-                    </td>                    
-                </tr>
-                </body>
-                </template>
-                </v-simple-table>
+                
+
+
             </div>
+
+
 
             <div v-show="page_action=='edit'" >
                 <div v-if="data_files[edit_item]">
@@ -106,10 +116,7 @@ Vue.component('datafiles', {
                 </div>
             </div>
 
-            <pre>
-            {{data_files}}
-            </pre>
-
+        </v-container>
         </div>
     `
 })

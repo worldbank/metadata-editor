@@ -254,4 +254,20 @@ html,body {
       z-index: 10;
       background: gainsboro;
     border-bottom: 1px solid rgb(0 0 0 / 12%);
-    }
+}
+
+.table-variables:hover{
+    cursor:pointer;    
+}
+
+.activeRow td{
+    background:rgb(0 0 0 / 12%);
+}
+
+.datafile-card {
+    flex-direction: row;
+  }
+  .datafile-card .card-icon {
+    width: 100px;
+  }
+  

@@ -135,7 +135,7 @@
 <?php $output['data_processing']= render_group('data_processing',
     $fields=array(
             "metadata.study_desc.method.data_collection.cleaning_operations"=>'text',
-            "metadata.study_desc.method.method_notes"=>'text'
+            "metadata.study_desc.method.data_collection.method_notes"=>'text'
             ),
     $metadata);
 ?>

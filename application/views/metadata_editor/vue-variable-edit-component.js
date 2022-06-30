@@ -168,7 +168,7 @@ Vue.component('variable-edit', {
                     <div style="max-height:400px;overflow-y: scroll;padding:10px;font-size:smaller;">
 
                     <strong>Summary</strong>
-                    <table class="table table-sm">
+                    <table class="table table-sm" v-if="variable.var_catgry">
                         <tr>
                             <th>Value</th>
                             <th>Label</th>
@@ -215,11 +215,16 @@ Vue.component('variable-edit', {
                 </v-tab-item>
                 <v-tab-item value="documentation">
 
-                    <div style="max-height:400px;overflow-y: scroll;padding:10px;">
+                    <div style="overflow-y: scroll;padding:10px;margin-bottom:50px;">
                 
                         <div class="form-group form-field">
-                        <label>Name</label> 
-                        <span><input type="text" class="form-control form-control-sm" v-model="variable.name"/></span> 
+                            <label>Variable ID</label> 
+                            <span><input type="text" class="form-control form-control-sm" v-model="variable.vid"/></span> 
+                        </div>
+
+                        <div class="form-group form-field">
+                            <label>Name</label> 
+                            <span><input type="text" class="form-control form-control-sm" v-model="variable.name"/></span> 
                         </div>
             
                         <div class="form-group form-field">
@@ -236,51 +241,51 @@ Vue.component('variable-edit', {
 
                         <div class="form-group form-field">
                             <label>Definition</label> 
-                            <span><input type="text" class="form-control form-control-sm" v-model="variable.var_txt"/></span> 
+                            <span><textarea class="form-control form-control-sm" v-model="variable.var_txt"/></span>
                         </div>
 
                         <div class="form-group form-field">
                             <label>Universe</label> 
-                            <span><input type="text" class="form-control form-control-sm" v-model="variable.var_universe"/></span> 
+                            <span><textarea class="form-control form-control-sm" v-model="variable.var_universe"/></span>
                         </div>
 
                         <div class="form-group form-field">
                             <label>Source of information</label> 
-                            <span><input type="text" class="form-control form-control-sm" v-model="variable.var_resp_unit"/></span> 
+                            <span><textarea class="form-control form-control-sm" v-model="variable.var_resp_unit"/></span>
                         </div>
 
                         <div class="mb-2"><strong class="text-secondary mb-2">Question</strong></div>
 
                         <div class="form-group form-field">
-                            <label>Pre-Question text</label> 
-                            <span><input type="text" class="form-control form-control-sm" v-model="variable.var_qstn_preqtxt"/></span> 
+                            <label>Pre-Question text</label>
+                            <span><textarea class="form-control form-control-sm" v-model="variable.var_qstn_preqtxt"/></span>
                         </div>
 
                         <div class="form-group form-field">
                             <label>Literal question</label> 
-                            <span><input type="text" class="form-control form-control-sm" v-model="variable.var_qstn_qstnlit"/></span> 
+                            <span><textarea class="form-control form-control-sm" v-model="variable.var_qstn_qstnlit"/></span>
                         </div>
 
                         <div class="form-group form-field">
                             <label>Post-Question text</label> 
-                            <span><input type="text" class="form-control form-control-sm" v-model="variable.var_qstn_postqtxt"/></span> 
+                            <span><textarea class="form-control form-control-sm" v-model="variable.var_qstn_postqtxt"/></span>  
                         </div>
 
                         <div class="form-group form-field">
                             <label>Interviewer instructions</label> 
-                            <span><input type="text" class="form-control form-control-sm" v-model="variable.var_qstn_ivuinstr"/></span> 
+                            <span><textarea class="form-control form-control-sm" v-model="variable.var_qstn_ivuinstr"/></span> 
                         </div>
 
                         <div class="mb-2"><strong class="text-secondary mb-2">Imputation and Derivation</strong></div>
 
                         <div class="form-group form-field">
                             <label>Imputation</label> 
-                            <span><input type="text" class="form-control form-control-sm" v-model="variable.var_imputation"/></span> 
+                            <span><textarea class="form-control form-control-sm" v-model="variable.var_imputation"/></span> 
                         </div>
 
                         <div class="form-group form-field">
                             <label>Recoding and derivation</label> 
-                            <span><input type="text" class="form-control form-control-sm" v-model="variable.var_codinstr"/></span> 
+                            <span><textarea class="form-control form-control-sm" v-model="variable.var_codinstr"/></span>                            
                         </div>
 
                                 

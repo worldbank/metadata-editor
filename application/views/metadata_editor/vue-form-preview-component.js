@@ -1,6 +1,6 @@
 //v-form
 Vue.component('v-form-preview', {
-    props: ['title', 'items', 'depth', 'css_class','path', 'field'],
+    props: ['title', 'items', 'depth', 'css_class','path', 'field','value'],
     data() {
         return {
         }
@@ -16,7 +16,7 @@ Vue.component('v-form-preview', {
         },
     },
     created() {
-        this.field= this.$store.state.treeActiveNode;
+        this.value= this.$store.state.treeActiveNode;
       },
 
     /*created(){

@@ -9,6 +9,7 @@
   <script src="https://adminlte.io/themes/v3/plugins/jquery/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
 </head>
 
@@ -66,11 +67,28 @@
     <script src="https://cdn.jsdelivr.net/npm/vue-scrollto"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vee-validate/3.4.0/vee-validate.full.min.js" integrity="sha512-owFJQZWs4l22X0UAN9WRfdJrN+VyAZozkxlNtVtd9f/dGd42nkS+4IBMbmVHdmTd+t6hFXEVm65ByOxezV/Qxg==" crossorigin="anonymous"></script>
 
+    <script src="https://unpkg.com/splitpanes@2.1"></script>
+  <link href="https://unpkg.com/splitpanes/dist/splitpanes.css" rel="stylesheet">
+
+
+
+<!-- CDNJS :: Sortable (https://cdnjs.com/) -->
+<script src="//cdn.jsdelivr.net/npm/sortablejs@1.8.4/Sortable.min.js"></script>
+<!-- CDNJS :: Vue.Draggable (https://cdnjs.com/) -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.20.0/vuedraggable.umd.min.js"></script>
+
+
+
   <?php echo $this->load->view("metadata_editor/index_vuetify_main_app",null,true);?>
 
+  
   <script>
+    
+//    const { Splitpanes, Pane } = splitpanes;
+
     vue_app=new Vue({
       el: '#app',
+  //    components:{Splitpanes, Pane},
       vuetify: new Vuetify(),
       router:router,
       store,
@@ -83,6 +101,9 @@
           dataset_type:project_type,
           form_template: form_template,
           metadata_schema: metadata_schema,
+          is_loading:false,
+          vuex_is_loaded:false,
+          loading_status:null,
           /*dialog_box_option:{
               'title': '',
               'content': '',
@@ -90,7 +111,7 @@
           },*/
           form_errors:[],
           schema_errors:[],
-          initiallyOpen: ['public'],
+          initiallyOpen: [],
           files: {
             html: 'mdi-language-html5',
             js: 'mdi-nodejs',
@@ -102,52 +123,68 @@
             xls: 'mdi-file-excel',
             folder:'mdi-folder-multiple',
             file:'mdi-file-document-outline',
-            database:'mdi-database',
+            database:'mdi-folder-table',
             table:'mdi-table',
+            datafile:'mdi-database',
+            variable:'mdi-file-table-outline'
           },
         tree: [],
         items: [],
       },
+      created: async function(){
+       //this.initializeStore();
+       console.log("craeted started");
+       await this.$store.dispatch('initData',{dataset_idno:this.dataset_idno});
+        //this.$store.dispatch('loadDataFiles',{dataset_idno:this.dataset_idno});
+        //this.$store.dispatch('loadAllVariables',{dataset_idno:this.dataset_idno});
+       this.init_tree_data();
+       console.log("craeted ended");
+      }
+      ,
       mounted: function(){
-        this.loadExternalResources();
-        //this.initSchemaValidator();
+        
       },
-      computed:{   
-        get_tree_data(){
-          let tree_data=this.form_template.items;
-          if (this.dataset_type=='survey'){
-            tree_data.push({
-              title: 'Datasets',
-              type:'datasets',
-              file: 'database',
-              items:this.get_data_files
-            });
-          }
-
-          tree_data.push({
-              title: 'External resources',
-              type: 'resources',
-              file: 'datasets',
-              items:this.ExternalResourcesTreeNodes
-            });
-
-            this.items=tree_data;
-        },             
-        get_data_files(){
-          //return this.test_data_files;          
-          let dataFiles=[
-            {
-              'title':'test file 1',
-            }
-          ];
-          return dataFiles;
-        }, 
+      computed:{        
         ProjectMetadata(){
           return this.$store.state.formData;
         },
         ExternalResources()
         {
-          return this.$store.state.external_resources;          
+          return this.$store.state.external_resources;
+        },
+        DataFiles(){
+          return this.$store.state.data_files;
+        },
+        DataFilesTreeNodes(){
+          if (this.DataFiles.length==0){
+            return [];
+          }
+
+          let datafiles_nodes=[];
+
+          i=0;
+          for (let file of this.DataFiles) {
+            datafiles_nodes.push(
+              {
+                title: file.file_name + ' [' + file.file_id + ']',
+                type:'datafile',
+                index:i,
+                file: 'datafile',
+                datafile:  file,
+                items:[{
+                    title:'Variables',
+                    type: 'variables',
+                    file: 'variable',
+                    datafile: file
+                }]
+              }
+            );
+            i++;
+          }
+          console.log("data file nodes:",datafiles_nodes);
+          return datafiles_nodes;
+          
+
         },
         ExternalResourcesTreeNodes(){
           let resources=this.$store.state.external_resources;
@@ -177,23 +214,75 @@
       watch: {
       '$store.state.data_files': function() {
         //console.log(this.$store.state.drawer)
-        this.test_data_files=this.$store.state.data_files;
-        this.get_tree_data;
-        console.log("update updated");
+        //this.test_data_files=this.$store.state.data_files;
+          this.update_tree();
       }
       },
       methods:{
+        initializeStore: async function(){
+          vm=this;
+          if (this.vuex_is_loaded==true){return false;}
+          window.store_=this.$store;
+          this.is_loading=true;
+          alert("loading state");
+          await Promise.all([this.loadExternalResources(), this.loadDataFiles()]).then((values) => {
+            console.log("finished load",vm.DataFiles);
+            vm.init_tree_data();
+            vm.loadAllVariables();
+            vm.is_loading=false;
+            vm.vuex_is_loaded=true;
+            alert("finished loading all data");
+          });
+        },
+        init_tree_data: function() {
+          this.is_loading=true;
+          this.items=[];
+          let tree_data=this.form_template.items;
+
+          if (this.dataset_type=='survey'){
+            tree_data.push({
+              title: 'Datasets',
+              type:'datasets',
+              file: 'database',
+              key: 'datasets',
+              items:this.DataFilesTreeNodes
+            });
+          }
+
+          tree_data.push({
+              title: 'External resources',
+              type: 'resources',
+              file: 'datasets',
+              items:this.ExternalResourcesTreeNodes
+          });
+
+          this.items=tree_data;
+          this.initiallyOpen= ["study_description","datasets" ];
+          console.log('tree_data',tree_data);
+        },
+        update_tree: function()
+        {
+          if (this.items.length<1){return;}
+
+          k=0;
+          for(k=0;k<=this.items.length;k++){
+            if (this.items[k]["title"]=="Datasets"){
+              this.items[k]["items"]=this.DataFilesTreeNodes
+            }
+          }
+        },
         loadExternalResources: function() {
             vm=this;
 
             let url=CI.base_url + '/api/datasets/'+vm.dataset_idno + '/resources';
-            axios.get(url)
+            this.loading_status="Loading external resources...";
+            return axios
+            .get(url)
             .then(function (response) {
                 console.log(response);
                 if(response.data.resources){
                     //vm.$store.state.external_resources=response.data.resources;
                     vm.$store.commit('external_resources',response.data.resources);
-                    vm.get_tree_data;
                 }
             })
             .catch(function (error) {
@@ -201,7 +290,63 @@
             })
             .then(function () {
                 console.log("request completed");
+                this.loading_status="";
             });
+        },
+        loadDataFiles: function() {
+            vm=this;
+            let url=CI.base_url + '/api/datasets/datafiles/'+vm.dataset_idno;
+            this.loading_status="Loading data files...";
+            return axios
+            .get(url)
+            .then(function (response) {
+                console.log(response);
+                let data_files_=[];
+                if(response.data.datafiles){
+                    Object.keys(response.data.datafiles).forEach(function(element, index) { 
+                        data_files_.push(response.data.datafiles[element]);
+                    })
+                    //vm.$store.state.data_files=vm.data_files;
+                    vm.$store.commit('data_files',data_files_);
+                    console.log(data_files_);
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+            .then(function () {
+                console.log("request completed");
+                this.loading_status="";
+            });
+        },
+        loadAllVariables: function()
+        {
+          i=0;
+          for (let file of this.DataFiles) {
+            this.loadVariables(this.dataset_idno,file.file_id);
+          }
+        },
+        loadVariables: function(dataset_idno,fid) {
+            vm=this;
+            let url=CI.base_url + '/api/datasets/variables/'+dataset_idno + '/'+ fid + '?detailed=1';
+            this.loading_status="Loading variables [" + fid + "]...";
+            return axios
+              .get(url)
+              .then(function (response) {
+                  if(response.data.variables.length>0){
+                      vm.$store.commit('variables',{
+                        'variables':response.data.variables,
+                        'fid':fid
+                      });
+                  }
+              })
+              .catch(function (error) {
+                  console.log(error);
+              })
+              .then(function () {
+                  console.log("request completed");
+                  vm.loading_status="";
+              });
         },
         templateToTree: function (){
           window.template=this.form_template;
@@ -222,8 +367,18 @@
 
           //store.commit('tree_active_node',node);
 
+          if (node.type=='datafile'){
+            router.push('/datafile/'+node.datafile.file_id);
+            return;
+          }
+
           if (node.type=='datasets'){
             router.push('/datafiles');
+            return;
+          }
+
+          if (node.type=='variables'){
+            router.push('/variables/'+ node.datafile.file_id);
             return;
           }
 

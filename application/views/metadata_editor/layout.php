@@ -8,9 +8,11 @@
             </li>
         </ul>
 
+        <div>{{this.loading_status}}</div>
+
         <ul class="navbar-nav ml-auto">
 
-           
+        <v-icon>mdi-alpha-t-box</v-icon>
 
             <li class="nav-item dropdown">
                 <a class="mt-1 btn btn-primary btn-sm" data-toggle="dropdown" href="#">
@@ -68,7 +70,21 @@
                         </router-link>
                     <ul class="nav nav-treeview" style="display: block;">
                     <div style="font-size:small">
-                    <v-treeview dark v-model="tree" @update:open="treeOnUpdate" :open="initiallyOpen" :items="items" activatable dense item-key="key" item-text="title" open-on-click item-children="items">
+                    <v-treeview 
+                        dark 
+                        v-model="tree" 
+                        @update:open="treeOnUpdate" 
+                        :open.sync="initiallyOpen" 
+                        :items="items" 
+                        activatable dense 
+                        item-key="key" 
+                        item-text="title" 
+                        open-on-click 
+                        expand-icon="mdi-chevron-down"
+                        indeterminate-icon="mdi-bookmark-minus"
+                        on-icon="mdi-bookmark"
+                        off-icon="mdi-bookmark-outline"
+                        item-children="items">
 
                         <template #label="{ item }">
                             <span @click="treeClick(item)">{{item.title}}</span>
@@ -76,10 +92,13 @@
 
 
                         <template v-slot:prepend="{ item, open }">
-                            <v-icon v-if="item.items">
+                            <v-icon v-if="item.file" style="color:#949698">
+                                {{ files[item.file] }}
+                            </v-icon>    
+                            <v-icon v-else-if="item.items" style="color:#949698">
                                 {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
                             </v-icon>
-                            <v-icon v-else>
+                            <v-icon v-else style="color:#949698">
                                 {{ files['file'] }}
                             </v-icon>
                         </template>
@@ -87,7 +106,6 @@
                 </div>
                     </ul>
                 </li>
-
 
                 <li class="nav-item menu-is-opening menu-open">
                         <router-link class="nav-link" :to="'/external-resources/'" >
@@ -114,7 +132,7 @@
     <div class="content-wrapper">
         <section class="content">
             <!-- Provides the application the proper gutter -->
-            <div class="container-fluid">
+            <div class="container-fluid" style="overflow:auto;">
                 <?php //route path: {{$route.fullPath}} ?>
                 <div v-if="active_form_field">active_form_field.key:{{active_form_field.key}}</div>
 
@@ -141,6 +159,7 @@
                         </div>
                 </div>
 
+
                 <validation-observer ref="form" v-slot="{ invalid }">                
 
                 <keep-alive include="datafiles">
@@ -160,6 +179,17 @@
     <div class="p-3">
       <!-- Content of the sidebar goes here -->
       control side bar
+
+<div>something</div>
+<div>something</div>
+<div>something</div>
+<div>something</div>
+<div>something</div>
+<div>something</div>
+<div>something</div>
+
+
+
     </div>
   </aside>
   <!-- /.control-sidebar -->
