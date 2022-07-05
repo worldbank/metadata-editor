@@ -1,6 +1,6 @@
 //vue-main-form-component ///////////////////////////////////////////////////
 Vue.component('form-main', {
-    props: ['title', 'items', 'depth', 'css_class','path', 'field'],
+    props: ['title', 'items', 'depth', 'css_class','path'],
     data() {
         return {            
         }
@@ -38,7 +38,7 @@ Vue.component('form-main', {
 
         <!-- form-section -->
         <div v-if="formField.type=='section_container'"  class="form-section" >
-            <h1>Summary</h1>
+            <h5>Summary</h5>
             <div class="mb-2">
                 Project type: {{this.$store.state.project_type}}
             </div>
@@ -56,7 +56,7 @@ Vue.component('form-main', {
 
         <!-- form-section -->
         <div v-if="formField.type=='section'"  class="form-section" >
-        <h1>{{formField.title}}</h1>
+        <h5 class="mt-3">{{formField.title}}</h5>
             <v-form                                    
                     :items="formField.items" 
                     :title="formField.title"

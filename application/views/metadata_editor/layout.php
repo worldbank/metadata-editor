@@ -8,35 +8,37 @@
             </li>
         </ul>
 
+        <div>
+            <div><strong>{{Title}}</strong></div>
+            <div style="font-size:small;color:gray;">{{dataset_type}} - {{StudyIDNO}}</div>
+        </div>
         <div>{{this.loading_status}}</div>
 
         <ul class="navbar-nav ml-auto">
 
-        <v-icon>mdi-alpha-t-box</v-icon>
+            
 
             <li class="nav-item dropdown">
-                <a class="mt-1 btn btn-primary btn-sm" data-toggle="dropdown" href="#">
-                    <i class="fas fa-save"></i> Save <i class="fas fa-angle-down"></i>                    
-                </a>
+                
+                <div class="mt-1 btn btn-primary btn-sm" data-toggle="dropdown" href="#">
+                    <v-icon>mdi-alpha-t-box</v-icon> <i class="fas fa-angle-down"></i>
+                </div>
+
                 <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                     
                     <div class="dropdown-divider"></div>
                     <a href="#" class="dropdown-item">
-                        <button type="button" class="btn btn-primary btn-sm" @click="saveProject">Save</button>                        
+                        <i class="fas fa-users mr-2"></i> Microdata Template
+                        <span class="float-right text-muted text-sm">V1.0</span>
                     </a>
                     <div class="dropdown-divider"></div>
                     <a href="#" class="dropdown-item">
-                        <i class="fas fa-users mr-2"></i> 8 friend requests
-                        <span class="float-right text-muted text-sm">12 hours</span>
+                        <i class="fas fa-file mr-2"></i> IHSN Template
+                        <span class="float-right text-muted text-sm">1.0</span>
                     </a>
                     <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-item">
-                        <i class="fas fa-file mr-2"></i> 3 new reports
-                        <span class="float-right text-muted text-sm">2 days</span>
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
-                </div>
+                    <a href="#" class="dropdown-item dropdown-footer">View more</a>
+                </div>                
             </li>
             <li class="nav-item">
                 <a class="nav-link" data-widget="fullscreen" href="#" role="button">
@@ -64,10 +66,10 @@
          <ul class="nav nav-pills nav-sidebar flex-column nav-collapse-hide-child" data-widget="treeview" role="menu" data-accordion="false">
 
                 <li class="nav-item menu-is-opening menu-open">
-                <router-link class="nav-link" :to="'/'" >
+                    <router-link class="nav-link" :to="'/'" >
                         <i class="nav-icon fas fa-copy"></i>
-                        <p>{{dataset_type}} <i class="fas fa-angle-left right"></i></p>
-                        </router-link>
+                        <p>Editor <i class="fas fa-angle-left right"></i></p>
+                    </router-link>
                     <ul class="nav nav-treeview" style="display: block;">
                     <div style="font-size:small">
                     <v-treeview 
@@ -90,7 +92,6 @@
                             <span @click="treeClick(item)">{{item.title}}</span>
                         </template>
 
-
                         <template v-slot:prepend="{ item, open }">
                             <v-icon v-if="item.file" style="color:#949698">
                                 {{ files[item.file] }}
@@ -107,6 +108,7 @@
                     </ul>
                 </li>
 
+                <?php /*
                 <li class="nav-item menu-is-opening menu-open">
                         <router-link class="nav-link" :to="'/external-resources/'" >
                         <i class="nav-icon fas fa-copy"></i>
@@ -122,6 +124,7 @@
 
                     </ul>
                 </li>
+                */ ?>
                 
             </ul>
 

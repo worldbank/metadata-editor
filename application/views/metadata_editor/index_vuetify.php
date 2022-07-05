@@ -144,7 +144,17 @@
       mounted: function(){
         
       },
-      computed:{        
+      computed:{
+        Title(){
+          if (this.dataset_type=='survey'){
+            return this.ProjectMetadata.study_desc.title_statement.title;
+          }
+        },
+        StudyIDNO(){
+          if (this.dataset_type=='survey'){
+            return this.ProjectMetadata.study_desc.title_statement.idno;
+          }
+        },
         ProjectMetadata(){
           return this.$store.state.formData;
         },
@@ -175,6 +185,12 @@
                     title:'Variables',
                     type: 'variables',
                     file: 'variable',
+                    datafile: file
+                },
+                {
+                    title:'Data',
+                    type: 'variable_data',
+                    file: 'table',
                     datafile: file
                 }]
               }
@@ -212,11 +228,16 @@
         }
       },
       watch: {
-      '$store.state.data_files': function() {
-        //console.log(this.$store.state.drawer)
-        //this.test_data_files=this.$store.state.data_files;
-          this.update_tree();
-      }
+        '$store.state.data_files': function() {
+            this.update_tree();
+        },
+        ProjectMetadata: 
+        {
+            deep:true,
+            handler(val){
+              this.saveProjectDebounce(val);
+            }
+        }
       },
       methods:{
         initializeStore: async function(){
@@ -382,6 +403,12 @@
             return;
           }
 
+          if (node.type=='variable_data'){
+            router.push('/data-explorer/'+ node.datafile.file_id);
+            return;
+          }
+          
+
           if (node.type=='resources'){
             router.push('/external-resources');
             return;
@@ -410,6 +437,9 @@
             
             console.log(node); 
         },
+        saveProjectDebounce: _.debounce(function(data) {
+            this.saveProject(data);
+        }, 500),
         saveProject: function(){
           vm=this;          
           let url=CI.base_url + '/api/datasets/update/'+vm.dataset_type+'/' + vm.dataset_idno;
@@ -472,7 +502,7 @@
               console.log(response);
               vm.dataset_id=response.data.dataset.id;
               vm.dataset_idno=response.data.dataset.idno;
-              alert("Your changes were saved");
+              //alert("Your changes were saved");
           })
           .catch(function (error) {
               console.log(error);

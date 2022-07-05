@@ -3,6 +3,9 @@ use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 
+use League\Csv\Reader;
+use League\Csv\Statement;
+
 require(APPPATH.'/libraries/MY_REST_Controller.php');
 
 class R extends MY_REST_Controller
@@ -155,7 +158,6 @@ class R extends MY_REST_Controller
 
 	public function generate_csv_get($idno=null,$fileid=null,$filename=null)
 	{
-
 		$sid=$this->get_sid_from_idno($idno);
 
 		try{            
@@ -212,6 +214,82 @@ class R extends MY_REST_Controller
 				'code' => $api_response->getStatusCode(),// 200
 				'reason' => $api_response->getReasonPhrase() // OK
 			), $response);
+
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}	
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}	
+	}
+
+
+	public function read_csv_get($idno=null,$fileid=null)
+	{
+		$sid=$this->get_sid_from_idno($idno);
+		$this->load->model("Data_file_model");
+
+		try{            
+			$survey_folder=$this->Catalog_model->get_survey_path_full($sid);
+		
+			if (!file_exists($survey_folder)){
+				throw new Exception('SURVEY_FOLDER_NOT_FOUND');
+			}
+
+			$survey_folder=FCPATH.$survey_folder;
+
+			//get filename by FID
+			$datafile=$this->Data_file_model->get_file_by_id($sid,$fileid);
+			
+			if (!$datafile){
+				throw new Exception("DATAFILE_NOT_FOUND");
+			}
+
+			$filename=$datafile['file_name'];			
+
+			$data_file_path=$survey_folder.'/'.$filename;
+
+			$ext=pathinfo($filename, PATHINFO_EXTENSION);
+
+			$csv_file_path=$survey_folder.'/'.str_replace(".".$ext,".csv",$filename);
+
+			if (!file_exists($data_file_path)){
+				throw new Exception("DATA_FILE_NOT_FOUND: ".$data_file_path);
+			}
+
+			if (!file_exists($csv_file_path)){
+				throw new Exception("CSV_FILE_NOT_FOUND: ".$csv_file_path);
+			}
+
+			$csv = Reader::createFromPath($csv_file_path, 'r');
+			$csv->setHeaderOffset(0); //set the CSV header offset
+			$offset=(int)$this->input->get("offset");
+			$limit=(int)$this->input->get("limit");
+
+			if ($limit <1 || $limit>100){
+				$limit=100;
+			}
+
+			$stmt = Statement::create()
+				->offset($offset)
+				->limit($limit)
+			;
+
+			$records = $stmt->process($csv);
+			/*foreach ($records as $record) {
+				//do something here
+			}*/
+
+			$response=array(
+				'csv'=>$csv_file_path,
+				'total'=>count($csv),
+				'offset'=>$offset,
+				'limit'=>$limit,
+				'records'=>$records
+			);
 
 			$this->set_response($response, REST_Controller::HTTP_OK);
 		}	

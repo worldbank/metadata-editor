@@ -12,7 +12,7 @@ Vue.component('variables', {
             //variables:[],
             page_action:'list',
             edit_item:0,
-            edit_item_copy:[],//copy of the variable before any editing
+            variable_copy:{},//copy of the variable before any editing
             fid:this.file_id,
             //variables:[]
         }
@@ -26,10 +26,34 @@ Vue.component('variables', {
         this.editVariable(0);
     },
     watch: {
-        /*'fid': function() {
-          alert("fid",this.fid);
+        /*activeVariable: function(val) {          
             //this.loadData();
-        },
+            console.log("value changed");
+            //this.saveVariable(val);
+        },*/
+
+        activeVariable: {            
+            deep: true,
+            handler(val,oldVal){
+                if (this.page_action!="edit"){
+                    return;
+                }
+              //console.log('The list of data has changed!',_.cloneDeep(val),_.cloneDeep(oldVal));
+
+              if (JSON.stringify(val)==JSON.stringify(this.variable_copy)){
+                  console.log("no change detected");
+              }
+              else{
+                console.log("CHANGE DETECTED");
+                this.saveVariableDebounce(val);
+              }
+
+              console.log("watch changes", this.variable_copy,val);
+              window._copy=this.variable_copy;
+              window._val=val;
+            }
+          }
+        /*
         '$store.state.variables': function() {
             alert(1);
         }*/
@@ -56,31 +80,6 @@ Vue.component('variables', {
                 vm.editVariable(0);
             });
         },*/
-        getMaxVariableId: function(){
-            return this.getMaxVariableIdGlobal();
-            /*var max_var=0;
-            for(i=0;i<=this.variables.length -1;i++){
-                if(parseInt(this.variables[i].vid.substr(1))>max_var){
-                    max_var=this.variables[i].vid.substr(1);
-                }else{
-                    console.log("not greater",this.variables[i].vid);
-                }
-            }
-            return parseInt(max_var);*/
-        },
-        getMaxVariableIdGlobal: function(){
-            var max_var=0;
-            let variables=this.$store.state.variables;
-            let datafiles=Object.keys(variables);
-            datafiles.forEach(function (fid) {
-                variables[fid].forEach(function (variable){
-                    if(parseInt(variable.vid.substr(1))>max_var){
-                        max_var=variable.vid.substr(1);
-                    }
-                });
-            });
-            return parseInt(max_var);
-        },
         updateVariable: function(variable) {
             console.log("before local variable",this.variables[this.edit_item]);
             this.$set(this.variables, this.edit_item, variable);
@@ -91,13 +90,14 @@ Vue.component('variables', {
             this.$nextTick().then(() => {
                 this.page_action="edit";
                 this.edit_item=index;
-                //this.edit_item_copy=_.cloneDeep(this.variables[index]);
+                this.variable_copy=_.cloneDeep(this.variables[index]);
             });
         },
         addVariable:function(){
             this.page_action="edit";
-            let new_idx=this.variables.push({
-                "vid": "V" + (this.getMaxVariableId()+1),
+            //let new_idx=this.variables.push() -1;;
+                new_var={
+                "vid": "V" + (this.MaxVariableID+1),
                 "sid": this.dataset_id,
                 "file_id": this.fid,
                 "name": "untitled",
@@ -106,12 +106,18 @@ Vue.component('variables', {
                     "type":null
                 },
                 "var_catgry": []
-              }) -1;
-            this.edit_item=new_idx;
+              }
+
+            this.$store.commit('variable_add',{fid:this.fid, variable:new_var});
+            newIdx=this.variables.length -1;
+            //this.edit_item=newIdx;
             this.editVariable(new_idx);
         },
-        saveVariable: function(data)
-        {
+        saveVariableDebounce: _.debounce(function(data) {
+            this.saveVariable(data);
+            this.variable_copy=_.cloneDeep(this.variables[this.edit_item]);
+        }, 500),
+        saveVariable: function(data){///_.debounce(function(data) {
             console.log("variable saved in db", data);
             vm=this;
             let url=CI.base_url + '/api/datasets/variables/'+vm.dataset_idno;
@@ -123,23 +129,16 @@ Vue.component('variables', {
             )
             .then(function (response) {
                 console.log("saveVariable", response);
-                alert("Your changes were saved");
             })
             .catch(function (error) {
                 console.log(error);
-                //vm.schema_errors=error.response.data.errors;
-                
-                /*console.log(error.response.data);
-                vm.dialog_box_option.title=error;
-                vm.dialog_box_option.errors=error.response.data;
-                $('#app_dialog').modal('show');
-                */
             })
             .then(function () {
-                // always executed
                 console.log("request completed");
             });
-        },
+        }
+        //}, 100)
+        ,
         exitEditMode: function()
         {
             if (this.edit_item==null){
@@ -154,7 +153,7 @@ Vue.component('variables', {
             this.edit_item=null;
         },
         hasDataChanged: function(){
-            return JSON.stringify(this.variables[this.edit_item])!==JSON.stringify(this.edit_item_copy);
+            return JSON.stringify(this.variables[this.edit_item])!==JSON.stringify(this.variable_copy);
         }
 
     },
@@ -162,27 +161,37 @@ Vue.component('variables', {
         activeVariable: function(){
             return this.variables[this.edit_item];
         },
-        variables(){
-            //x=JSON.stringify(this.$store.state.variables);
-            //console.log("variales vound",x, this.fid);
-            return this.$store.getters.getVariablesByFid(this.fid);            
-          //  return this.$store.getters.getVariablesAll;
+        MaxVariableID(){
+            return this.$store.getters["getMaxVariableId"];
         },
-        maxVarID(){
-            return this.getMaxVariableIdGlobal();
+        variables(){
+            
+            //x=JSON.stringify(this.$store.state.variables);
+            console.log("variales vound",this.$store.getters.getVariablesByFid(this.fid));
+            //return [];
+            vars=this.$store.getters.getVariablesByFid(this.fid);
+            
+            if (vars==undefined){
+                return [];
+            }
+
+            return vars;
+
+          //  return this.$store.getters.getVariablesAll;
         }
     },
     template: `
         <div style="height: 100vh;margin-top:5px;" >
-            <splitpanes class="default-theme" v-if="variables">
+
+            <splitpanes class="default-theme" >
             <pane max-size="90" size="70">
                 <splitpanes horizontal>
                     <pane min-size="5" >
                     <!--variables-start-->
-                    <div v-if="variables" style="height:100%;background:white" xstyle="height:40%;overflow-y: scroll;background:white;font-size:small" class="border">
+                    <div style="height:100%;background:white" xstyle="height:40%;overflow-y: scroll;background:white;font-size:small" class="border">
                             <div class="section-title p-1 bg-primary" style="font-size:small;" >
                                 <strong>Variables</strong>
-                                <span class="badge badge-light">{{variables.length}}</span>
+                                <span v-if="variables" class="badge badge-light">{{variables.length}}</span>
                                 <div class="pull-right float-right">
                                     <button type="button" >
                                         <i class="fas fa-plus-square mr-2" title="Add new variable" @click="addVariable"></i>

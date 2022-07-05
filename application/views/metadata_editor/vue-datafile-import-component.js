@@ -17,13 +17,16 @@ Vue.component('datafile-import', {
     },
     watch: { 
         MaxFileID(newVal){
-            if (this.file_id==''){
+            if ('F' + newVal==this.file_id){return;}
+            //if (this.file_id==''){
                 this.file_id='F'+(newVal+1);
-            }
+            //}
         }
     },    
     mounted: function () {
-        
+        if (this.file_id==''){
+            this.file_id='F'+(this.MaxFileID+1);
+        }        
     },
     computed: {
         IDNO(){
@@ -31,11 +34,14 @@ Vue.component('datafile-import', {
         },
         MaxFileID(){
             return this.$store.getters["getMaxFileId"];
+        },
+        MaxVariableID(){
+            return this.$store.getters["getMaxVariableId"];
         }
     },  
     template: `
             <div class="datafile-import-component">
-
+{{MaxVariableID}}
             <v-container>
 
                 <h3>Import data file</h3>
@@ -101,13 +107,15 @@ Vue.component('datafile-import', {
                         >
                         {{update_status}}
                         </v-col>
-                        <v-col cols="6">
+                        <v-col cols="12">
+                            <v-app>
                             <v-progress-linear 
                             color="deep-purple accent-4"
                             indeterminate
                             rounded
                             height="6"
                             ></v-progress-linear>
+                            </v-app>
                         </v-col>
                         </v-row>
                     </v-container>
@@ -135,6 +143,9 @@ Vue.component('datafile-import', {
             this.update_status="Loading data dictionary";
             //generate data dictionary
             await this.getDataDictionaryFromR();
+
+            this.update_status="Exporting data to CSV";
+            await this.generateCSVFromR();
 
             if (this.errors){
                 return false;
@@ -176,6 +187,7 @@ Vue.component('datafile-import', {
         importVariables: async function(){
             let url=CI.base_url + '/api/datasets/variables/'+this.IDNO;
             this.update_status="Updating data dictionary...";
+            this.UpdateVariablesVID();
             vm=this;
             return axios.post(url,
                 this.data_dictionary.variables,
@@ -196,35 +208,12 @@ Vue.component('datafile-import', {
                 vm.update_status="Data dictionary import failed";
             });
         },
-        /*uploadForm: function (){    
-            let formData = new FormData();
-            formData.append('filepath', this.file);
-            formData.append("freqLimit",50);
-            formData.append("type","'DTA'");
-            formData.append("fileId","'"+this.file_id + "'");
-
-            vm=this;
-
-            url='http://localhost:8004/ocpu/library/mde/R/import/json?force=true&auto_unbox=true&digits=22';
-            //url='http://localhost:2121/ocpu/library/mde/R/import/json?force=true&auto_unbox=true&digits=22'
-            axios.post( url,
-                formData,
-                {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                }
-            ).then(function(response){
-                console.log('SUCCESS!!',response);
-                window.response_=response;
-                vm.data_dictionary=response.data;
-                vm.ImportData();
-            })
-            .catch(function(){
-                console.log('FAILURE!!');
-            });
-            
-        }, */
+        UpdateVariablesVID: function(){
+            max_var_id=this.MaxVariableID;            
+            for(i=0;i<this.data_dictionary.variables.length;i++){
+                this.data_dictionary.variables[i].vid='V'+(max_var_id++);
+            }
+        },
         uploadDataFile: function (){            
             let formData = new FormData();
             formData.append('file', this.file);

@@ -28,6 +28,7 @@
             echo $this->load->view("metadata_editor/vue-datafile-edit-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-datafile-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-datafile-import-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-datafile-data-explorer-component.js",null,true);
 
             echo $this->load->view("metadata_editor/vue-variables-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-variable-edit-component.js",null,true);
@@ -76,8 +77,9 @@
         const _main = {props: ['active_section'],template: '<div><study-metadata/></div>' }
         const Datafiles ={template: '<div><datafiles/></div>'}
         const Datafile = {props: ['file_id'],template: '<div><datafile/></div>' }
+        const DatafileExplorer = {props: ['file_id'],template: '<div><datafile-data-explorer/></div>' }
         const DatafileImport = {template: '<div><datafile-import/></div>' }
-        const Variables ={props: ['file_id'],template: '<div><variables v-if="$store.state.variables"/></div>'}
+        const Variables ={props: ['file_id'],template: '<div><variables xv-if="$store.state.variables"/> </div>'}
         const ResourcesComp ={props: ['index'],template: '<div><external-resources /></div>'}
         const ResourcesEditComp ={props: ['index'],template: '<div><external-resources-edit /></div>'}
 
@@ -93,8 +95,9 @@
                 name: 'home',
             },
             { path: '/publish', component: PublishProject },
-            {path: '/study/:element_id', component: main, name: 'study',props: true },
+            { path: '/study/:element_id', component: main, name: 'study',props: true },
             { path: '/datafile/:file_id', component: Datafile, props:true },
+            { path: '/data-explorer/:file_id', component: DatafileExplorer, props:true },
             { path: '/datafiles', component: Datafiles },
             { path: '/datafiles/import', component: DatafileImport },
             { path: '/variables/:file_id', component: Variables, props: true },
@@ -162,7 +165,7 @@
                     return state.variables;
                 },
                 getVariablesByFid: (state) => (fid) => {
-                    console.log("getvariablesbyfid", fid, state.variables);
+                    console.log("getvariablesbyfid", fid, state.variables[fid]);
                     return state.variables[fid];
                 },
                 getMaxFileId: function(state){
@@ -175,12 +178,26 @@
                             max_file_id=file_id.substr(1);
                         }
                     }
-                    
+
                     return parseInt(max_file_id);
                 },
-                /*getVariableMaxId(state){
-                    
-                }*/
+                getMaxVariableId: function(state){
+                    var max_var=0;
+                    let variables=state.variables;
+                    let datafile_names=Object.keys(variables);
+
+                    for(k=0;k<datafile_names.length;k++){
+                        fid=datafile_names[k];
+                        
+                        for(i=0;i<variables[fid].length;i++){
+                            variable=variables[fid][i];
+                            if(parseInt(variable.vid.substr(1))>max_var){
+                                max_var=variable.vid.substr(1);
+                            }
+                        }
+                    }
+                    return parseInt(max_var);
+                },
             },
             actions: {               
                 async initData({commit},options) {
@@ -225,11 +242,18 @@
                     }
                 },
                 async loadVariables({commit}, options) {//options {dataset_idno,fid}
-                console.log("loadVariables",options);
+                    console.log("loadVariables",options);
                     let url=CI.base_url + '/api/datasets/variables/'+options.dataset_idno + '/'+ options.fid + '?detailed=1';
                     return axios
                     .get(url)
                     .then(function (response) {
+                        console.log("variable level data loaded",options.fid, response.data.variables)
+                        
+                        if(response.data.variables.length==0){
+                            
+                            
+                        }
+
                         if(response.data.variables.length>0){
                             commit('variables',{
                                 'variables':response.data.variables,
@@ -273,6 +297,15 @@
                 variables(state,data){
                     //state.variables[data.fid]=data.variables;
                     Vue.set(state.variables, data.fid, data.variables);
+                },
+                variable_add(state,data){
+                    if (state.variables[data.fid]==undefined){
+                        Vue.set(state.variables,data.fid,[]);
+                        Vue.set(state.variables[data.fid],data.fid,{});
+                    }
+
+                    let new_idx=state.variables[data.fid].push(data.variable)-1;
+                    //Vue.set(state.variables, data.fid, data.variable);
                 }
             })
             /*: {
