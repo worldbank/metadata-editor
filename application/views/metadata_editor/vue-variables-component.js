@@ -14,6 +14,7 @@ Vue.component('variables', {
             edit_item:0,
             variable_copy:{},//copy of the variable before any editing
             fid:this.file_id,
+            variable_search:''
             //variables:[]
         }
     }, 
@@ -80,6 +81,57 @@ Vue.component('variables', {
                 vm.editVariable(0);
             });
         },*/
+        clearVariableSearch: function(){
+            this.variable_search='';
+        },
+        scrollToVariableBottom: function(){
+            document.getElementById('variables-container').scrollTop= document.getElementById('variables-container').scrollHeight;
+        },
+        scrollToVariable: function(idx=0){
+            var id='v-'+this.edit_item;
+
+            if (idx>0){
+                id='v-'+this.idx;    
+            }
+            /*document.getElementById(id).scrollIntoView({
+                behavior: "smooth",
+              });
+            */
+
+            var myElement = document.getElementById(id);
+            var topPos = myElement.offsetTop - 100;
+
+            document.getElementById('variables-container').scrollTop = topPos;
+
+        },
+        varNavigate: function(direction){
+            if (direction=='first'){
+                this.edit_item=0;
+            }
+
+            total_vars=this.variables.length-1;
+
+            switch(direction) {
+                case 'first':
+                  this.edit_item=0;
+                  break;
+                case 'prev':
+                  if (this.edit_item>0){
+                      this.edit_item=this.edit_item-1;
+                  }
+                  break;
+                case 'next':
+                    if (this.edit_item<total_vars){
+                        this.edit_item=this.edit_item+1;
+                    }
+                    break;  
+                case 'last':                    
+                    this.edit_item=total_vars;
+                    break;  
+              }
+            
+            this.scrollToVariable();
+        },
         updateVariable: function(variable) {
             console.log("before local variable",this.variables[this.edit_item]);
             this.$set(this.variables, this.edit_item, variable);
@@ -94,7 +146,9 @@ Vue.component('variables', {
             });
         },
         addVariable:function(){
+            this.variable_search="";
             this.page_action="edit";
+            this.scrollToVariableBottom();
             //let new_idx=this.variables.push() -1;;
                 new_var={
                 "vid": "V" + (this.MaxVariableID+1),
@@ -110,8 +164,7 @@ Vue.component('variables', {
 
             this.$store.commit('variable_add',{fid:this.fid, variable:new_var});
             newIdx=this.variables.length -1;
-            //this.edit_item=newIdx;
-            this.editVariable(new_idx);
+            this.editVariable(newIdx);            
         },
         saveVariableDebounce: _.debounce(function(data) {
             this.saveVariable(data);
@@ -164,15 +217,24 @@ Vue.component('variables', {
         MaxVariableID(){
             return this.$store.getters["getMaxVariableId"];
         },
-        variables(){
-            
-            //x=JSON.stringify(this.$store.state.variables);
-            console.log("variales vound",this.$store.getters.getVariablesByFid(this.fid));
-            //return [];
+        variables(){            
             vars=this.$store.getters.getVariablesByFid(this.fid);
             
             if (vars==undefined){
                 return [];
+            }
+
+            if (this.variable_search!==''){
+                let tmpVars = vars;
+        
+                tmpVars = tmpVars.filter((item) => {
+                    //return (item.name == this.variable_search)
+                    return (item.name + item.labl)
+                        .toUpperCase()
+                        .includes(this.variable_search.toUpperCase())
+                })
+                
+                return tmpVars;
             }
 
             return vars;
@@ -189,18 +251,43 @@ Vue.component('variables', {
                     <pane min-size="5" >
                     <!--variables-start-->
                     <div style="height:100%;background:white" xstyle="height:40%;overflow-y: scroll;background:white;font-size:small" class="border">
-                            <div class="section-title p-1 bg-primary" style="font-size:small;" >
-                                <strong>Variables</strong>
-                                <span v-if="variables" class="badge badge-light">{{variables.length}}</span>
-                                <div class="pull-right float-right">
-                                    <button type="button" >
-                                        <i class="fas fa-plus-square mr-2" title="Add new variable" @click="addVariable"></i>
-                                    </button>
-                                    <button type="button" class="mr-3" title="Refresh variables"><i class="fas fa-sync"></i></button>
-                                    <i class="fas fa-ellipsis-v" ></i>
+                            <div class="row section-title p-1 bg-primary" style="font-size:small;">
+                                <div class="col-2">
+                                    <strong>Variables</strong>
+                                    <span v-if="variables" class="badge badge-light">{{variables.length}}</span>
                                 </div>
+
+                                <div class="col-3">
+                                    <div class="input-group">
+                                        <input type="text" class="bg-light form-control form-control-xs" placeholder="Search variables" v-model="variable_search">
+                                        <div class="input-group-append">
+                                        <button class="btn btn-secondary btn-sm btn-xs" type="button">
+                                            <i class="fa fa-search"></i>
+                                        </button>
+
+                                        <button class="btn btn-link-outline btn-sm btn-xs" type="button" v-show="variable_search.length>0" @click="clearVariableSearch">
+                                            Clear
+                                        </button>
+                                        
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="col">
+                                    <div class="float-right">
+                                        <button type="button" class="btn btn-xs btn-primary" @click="addVariable">
+                                            <i class="fas fa-plus-square" title="Add new variable"></i>
+                                        </button>
+                                        
+                                        <i class="fas fa-ellipsis-v" ></i>
+                                    </div>
+                                </div>
+
                             </div>
-                            <div style="padding-bottom:50px;height:inherit;overflow-y: scroll;background:white;font-size:small">
+
+                            
+                            <div style="padding-bottom:50px;height:inherit;overflow-y: scroll;background:white;font-size:small" id="variables-container">
                                 <table class="table table-striped table-bordered table-sm table-hover table-variables">
                                     <?php /*<thead>
                                         <tr>
@@ -211,7 +298,7 @@ Vue.component('variables', {
                                         </tr> 
                                     </thead> */ ?>
                                     <tbody is="draggable" :list="variables" tag="tbody">
-                                    <tr v-for="(variable, index) in variables" @click="editVariable(index)" :class="{'activeRow' : edit_item == index} ">
+                                    <tr v-for="(variable, index) in variables" @click="editVariable(index)" :class="{'activeRow' : edit_item == index} " :id="'v-'+index">
                                         <td class="bg-secondary">{{variable.vid}}</td>
                                         <td>
                                             <div class="text-link" @click="editVariable(index)">{{variable.name}}</div>                                                
@@ -232,7 +319,25 @@ Vue.component('variables', {
                     <pane size="30">
                     <!--documentation-->
                     <div class="container-fluid-x border " style="height: 100%;font-size:small;">
-                            <div class="section-title p-1 bg-primary"><strong>Documentation</strong></div>
+
+                        <div class="section-title p-1 bg-primary">
+                            <div class="row">
+                                <div class="col">
+                                    <strong>Documentation</strong>
+                                </div>
+                                <div class="col-6">
+                                    <span v-if="activeVariable">{{activeVariable.name}} - {{activeVariable.labl.substring(0,50)}} </span>
+                                </div>
+                                <div class="col-2">
+                                    <div class="float-right">
+                                        <button class="btn btn-xs btn-primary" @click="varNavigate('first')"><i class="fas fa-angle-double-left"></i></button>
+                                        <button class="btn btn-xs btn-primary" @click="varNavigate('prev')"><i class="fas fa-angle-left"></i></button>
+                                        <button class="btn btn-xs btn-primary" @click="varNavigate('next')"><i class="fas fa-angle-right"></i></button>
+                                        <button class="btn btn-xs btn-primary" @click="varNavigate('last')"><i class="fas fa-angle-double-right"></i></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                             <div class="p3" style="height:inherit;overflow:auto;background:white;">
                                 <div v-show="page_action=='edit'" >
                                     <div v-if="variables[edit_item]">

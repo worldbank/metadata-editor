@@ -176,7 +176,7 @@
           for (let file of this.DataFiles) {
             datafiles_nodes.push(
               {
-                title: file.file_name + ' [' + file.file_id + ']',
+                title: file.file_id + ' - ' + file.file_name, //+ ' [' + file.file_id + ']',
                 type:'datafile',
                 index:i,
                 file: 'datafile',
@@ -185,13 +185,15 @@
                     title:'Variables',
                     type: 'variables',
                     file: 'variable',
-                    datafile: file
+                    datafile: file,
+                    key:'v'+i
                 },
                 {
                     title:'Data',
                     type: 'variable_data',
                     file: 'table',
-                    datafile: file
+                    datafile: file,
+                    key:'d'+i
                 }]
               }
             );

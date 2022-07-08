@@ -260,8 +260,12 @@ html,body {
     cursor:pointer;    
 }
 
-.activeRow td{
-    background:rgb(0 0 0 / 12%);
+.activeRow td,
+.activeRow a,
+.activeRow .text-link
+ {
+    background: #3f6791;
+    color: white;
 }
 
 .datafile-card {
@@ -271,3 +275,11 @@ html,body {
     width: 100px;
   }
   
+
+  .form-control-xs {
+    height: calc(1em + .375rem + 7px) !important;
+    padding: .125rem .25rem !important;
+    font-size: .75rem !important;
+    line-height: 1.5;
+    border-radius: .2rem;
+}

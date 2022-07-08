@@ -165,7 +165,6 @@
                     return state.variables;
                 },
                 getVariablesByFid: (state) => (fid) => {
-                    console.log("getvariablesbyfid", fid, state.variables[fid]);
                     return state.variables[fid];
                 },
                 getMaxFileId: function(state){
