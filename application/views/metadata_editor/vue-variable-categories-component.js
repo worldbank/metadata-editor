@@ -29,11 +29,11 @@ Vue.component('variable-categories', {
         }
     },*/   
     template: `
-        <div class="variable-categories-edit-component" style="height:100vh">
+        <div class="variable-categories-edit-component" style="height:inherit">
             <!--categories-->
-            <div style="font-size:small;" class="border mb-2">                    
+            <div style="font-size:small;" class="mb-2">
                 <div class="section-title p-1 bg-primary"><strong>Categories</strong></div>
-                <div style="height: 250px;overflow-y: scroll;">
+                <div>
                     <table-component v-model="variable.var_catgry" :columns="catgry_columns" class="border m-2 pb-2"/>
                 </div>
             </div>

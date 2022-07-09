@@ -275,12 +275,22 @@ Vue.component('variables', {
 
 
                                 <div class="col">
+                                
                                     <div class="float-right">
                                         <button type="button" class="btn btn-xs btn-primary" @click="addVariable">
                                             <i class="fas fa-plus-square" title="Add new variable"></i>
                                         </button>
                                         
-                                        <i class="fas fa-ellipsis-v" ></i>
+                                        <span class="dropdown dropleft">
+                                        <button class="btn btn-primary btn-xs" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="font-size:small;">
+                                            <a class="dropdown-item" href="#"><i class="fas fa-spell-check"></i> Change case</a>
+                                            <a class="dropdown-item" href="#"><i class="fas fa-clone"></i> Spread metadata</a>
+                                            <a class="dropdown-item" href="#"><i class="fas fa-file-download"></i> Export variable(s)</a>
+                                        </div>
+                                        </span>
                                     </div>
                                 </div>
 
@@ -304,7 +314,7 @@ Vue.component('variables', {
                                             <div class="text-link" @click="editVariable(index)">{{variable.name}}</div>                                                
                                         </td>
                                         <td>
-                                            <div>{{variable.labl}}</div>
+                                            <div><input class="var-labl-edit" type="text" v-model="variable.labl"/></div>
                                         </td>
                                         <td>
                                             {{variable.var_format.type}}
@@ -355,11 +365,15 @@ Vue.component('variables', {
                 <splitpanes horizontal>
                 <pane size="60" min-size="10">
                     <!--categories-->
+                    <div style="height:100%;overflow:auto;background:white;" class="border">
                     <variable-categories v-if="variables[edit_item]" :edit_index="edit_item"  :value="variables[edit_item]" @updateVariable="updateVariable"/>
+                    </div>
                     <!--categories-end-->
                 </pane>
                 <pane size="40" min-size="10">
-                    <variable-info v-if="variables[edit_item]" :edit_index="edit_item"  :value="variables[edit_item]" @updateVariable="updateVariable"/>
+                    <div style="height:100%;overflow:auto;" >
+                        <variable-info v-if="variables[edit_item]" :edit_index="edit_item"  :value="variables[edit_item]" @updateVariable="updateVariable"/>
+                    </div>
                 </pane>
                 </splitpanes>
             </pane>

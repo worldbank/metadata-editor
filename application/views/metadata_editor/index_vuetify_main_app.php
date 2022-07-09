@@ -143,7 +143,8 @@
                     "F1":{}
                 },
                 variables_loaded:false,
-                variables_isloading:false
+                variables_isloading:false,
+                variables_active_tab:"documentation"
             },
             getters: {
                 getIDNO(state){
@@ -197,6 +198,9 @@
                     }
                     return parseInt(max_var);
                 },
+                getVariablesActiveTab: function(state){
+                    return state.variables_active_tab;
+                }
             },
             actions: {               
                 async initData({commit},options) {
@@ -305,6 +309,9 @@
 
                     let new_idx=state.variables[data.fid].push(data.variable)-1;
                     //Vue.set(state.variables, data.fid, data.variable);
+                },
+                variables_active_tab(state,data){
+                    state.variables_active_tab=data;
                 }
             })
             /*: {

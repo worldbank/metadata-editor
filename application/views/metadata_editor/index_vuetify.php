@@ -92,7 +92,7 @@
       vuetify: new Vuetify(),
       router:router,
       store,
-      data:{
+      data:{          
           active_section:null,
           active_form_field:null,
           schema_validator: null,

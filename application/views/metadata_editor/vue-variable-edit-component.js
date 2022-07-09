@@ -3,7 +3,7 @@ Vue.component('variable-edit', {
     props:['value','index_key'],
     data: function () {    
         return {
-            variable: this.value,
+            variable: this.value,            
             //variable:{},
             form_local:{},
             concept_columns:[
@@ -123,6 +123,14 @@ Vue.component('variable-edit', {
        }*/
     },
     computed: {
+        active_tab: {
+            get() {
+              return this.$store.getters["getVariablesActiveTab"];
+            },
+            set(newValue) {
+              return this.$store.commit("variables_active_tab", newValue);
+            },
+          },
     },
     methods: {
         /*loadData: function() {   
@@ -157,13 +165,13 @@ Vue.component('variable-edit', {
     template: `
         <div class="variable-edit-component">            
         <template>
-            <v-tabs>
-                <v-tab href="#statistics">Statistics</v-tab>
-                <v-tab href="#weights">Weights</v-tab>
-                <v-tab href="#documentation">Documentation</v-tab>
-                <v-tab href="#json">JSON</v-tab>
+            <v-tabs v-model="active_tab">
+                <v-tab key="statistics" href="#statistics">Statistics</v-tab>
+                <v-tab key="weights" href="#weights">Weights</v-tab>
+                <v-tab key="documentation" href="#documentation">Documentation</v-tab>
+                <v-tab key="json" href="#json">JSON</v-tab>
 
-                <v-tab-item value="statistics">
+                <v-tab-item key="statistics" value="statistics">
                 
                     <div style="max-height:400px;overflow-y: scroll;padding:10px;font-size:smaller;">
 
@@ -207,13 +215,13 @@ Vue.component('variable-edit', {
                     </div>
                 
                 </v-tab-item>
-                <v-tab-item value="weights">
+                <v-tab-item key="weights" value="weights">
                     weights
                 </v-tab-item>
-                <v-tab-item value="json">
+                <v-tab-item key="json" value="json">
                     <pre>{{variable}}</pre>
                 </v-tab-item>
-                <v-tab-item value="documentation">
+                <v-tab-item key="documentation" value="documentation">
 
                     <div style="overflow-y: scroll;padding:10px;margin-bottom:50px;">
                 

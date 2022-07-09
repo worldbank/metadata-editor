@@ -264,8 +264,12 @@ html,body {
 .activeRow a,
 .activeRow .text-link
  {
-    background: #3f6791;
+    background: #1f2d3d;
     color: white;
+}
+
+.activeRow .bg-secondary{
+    background: #1f2d3d !important;
 }
 
 .datafile-card {
@@ -282,4 +286,16 @@ html,body {
     font-size: .75rem !important;
     line-height: 1.5;
     border-radius: .2rem;
+}
+
+
+.var-labl-edit{
+    width:100%;
+    outline-style: none;
+    box-shadow: none;
+    border-color: transparent;
+}
+
+.activeRow .var-labl-edit{
+    color:white;
 }
