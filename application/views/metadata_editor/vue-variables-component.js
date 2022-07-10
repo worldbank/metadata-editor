@@ -88,36 +88,36 @@ Vue.component('variables', {
             document.getElementById('variables-container').scrollTop= document.getElementById('variables-container').scrollHeight;
         },
         scrollToVariable: function(idx=0){
-            var id='v-'+this.edit_item;
+            var id=this.edit_item;
 
             if (idx>0){
-                id='v-'+this.idx;    
+                id=idx;    
             }
+
+            this.editVariable(id);
+            
             /*document.getElementById(id).scrollIntoView({
                 behavior: "smooth",
               });
             */
 
-            var myElement = document.getElementById(id);
+            var myElement = document.getElementById('v-'+id);
             var topPos = myElement.offsetTop - 100;
 
             document.getElementById('variables-container').scrollTop = topPos;
 
         },
-        varNavigate: function(direction){
-            if (direction=='first'){
-                this.edit_item=0;
-            }
-
+        varNavigate: function(direction)
+        {
             total_vars=this.variables.length-1;
 
             switch(direction) {
                 case 'first':
-                  this.edit_item=0;
+                    this.edit_item=0;
                   break;
                 case 'prev':
                   if (this.edit_item>0){
-                      this.edit_item=this.edit_item-1;
+                    this.edit_item=this.edit_item-1;
                   }
                   break;
                 case 'next':
@@ -125,7 +125,7 @@ Vue.component('variables', {
                         this.edit_item=this.edit_item+1;
                     }
                     break;  
-                case 'last':                    
+                case 'last':
                     this.edit_item=total_vars;
                     break;  
               }
