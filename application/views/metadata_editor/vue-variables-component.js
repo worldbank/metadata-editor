@@ -14,7 +14,10 @@ Vue.component('variables', {
             edit_item:0,
             variable_copy:{},//copy of the variable before any editing
             fid:this.file_id,
-            variable_search:''
+            variable_search:'',
+            changeCaseDialog: false,
+            dialogm1: '',
+            changeCaseFields:[]
             //variables:[]
         }
     }, 
@@ -244,7 +247,6 @@ Vue.component('variables', {
     },
     template: `
         <div style="height: 100vh;margin-top:5px;" >
-
             <splitpanes class="default-theme" >
             <pane max-size="90" size="70">
                 <splitpanes horizontal>
@@ -277,9 +279,22 @@ Vue.component('variables', {
                                 <div class="col">
                                 
                                     <div class="float-right">
-                                        <button type="button" class="btn btn-xs btn-primary" @click="addVariable">
-                                            <i class="fas fa-plus-square" title="Add new variable"></i>
+
+                                        <button type="button" class="btn btn-xs btn-primary" @click="changeCaseDialog=true" title="Change case">
+                                            <v-icon aria-hidden="false" style="color:white">mdi-format-letter-case</v-icon>
                                         </button>
+
+                                        <button type="button" class="btn btn-xs btn-primary" @click="addVariable" title="Add new variable">
+                                            <i class="fas fa-plus-square" ></i>
+                                        </button>
+
+
+                                        <button type="button" class="btn btn-xs btn-primary" @click="addVariable" title="Add new variable">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                        
+                                        
+
                                         
                                         <span class="dropdown dropleft">
                                         <button class="btn btn-primary btn-xs" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-expanded="false">
@@ -310,8 +325,12 @@ Vue.component('variables', {
                                     <tbody is="draggable" :list="variables" tag="tbody">
                                     <tr v-for="(variable, index) in variables" @click="editVariable(index)" :class="{'activeRow' : edit_item == index} " :id="'v-'+index">
                                         <td class="bg-secondary">{{variable.vid}}</td>
-                                        <td>
+                                        <td class="var-name-edit">
+                                            <?php
+                                            /*
                                             <div class="text-link" @click="editVariable(index)">{{variable.name}}</div>                                                
+                                            */ ?>
+                                            <div><input class="var-labl-edit" type="text" v-model="variable.name" /></div>
                                         </td>
                                         <td>
                                             <div><input class="var-labl-edit" type="text" v-model="variable.labl"/></div>
@@ -378,6 +397,8 @@ Vue.component('variables', {
                 </splitpanes>
             </pane>
             </splitpanes>
+
+            <?php echo $this->load->view("metadata_editor/modal-dialog-changecase",null,true); ?>
         </div>
     `
 })

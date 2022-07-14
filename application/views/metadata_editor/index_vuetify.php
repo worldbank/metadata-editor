@@ -47,7 +47,7 @@
         let metadata_schema=<?php echo $metadata_schema;?>;        
     </script>
 
-  <div id="app">
+  <div id="app" data-app>
     <?php echo $this->load->view("metadata_editor/layout.php",null,true); ?>
   </div>
 

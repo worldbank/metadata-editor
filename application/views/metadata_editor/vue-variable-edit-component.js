@@ -3,6 +3,8 @@ Vue.component('variable-edit', {
     props:['value','index_key'],
     data: function () {    
         return {
+            drawer: true,       
+            drawer_mini: true,
             variable: this.value,            
             //variable:{},
             form_local:{},
@@ -56,60 +58,116 @@ Vue.component('variable-edit', {
                     },
                 ]
             }],
-            /*variable_template:{
+            variable_template:{
                 "title":"Variable",
                 "key":"variable",
-                "items": [                
+                "items":[
                     {
-                        "key": "variable.name",
-                        "title": "Name",
-                        "type": "text",
-                        "class": "required",
-                        "required": true,
-                        "help_text": "Variable name",
-                        "rules":"required|max:80"
+                        "type": "section",
+                        "key": "variable_description",
+                        "title": "Description",
+                        "expanded": true,
+                        "items": [
+                            {
+                                "key": "var_txt",
+                                "title": "Definition",
+                                "type": "textarea",
+                                "class": "required",
+                                "required": false,
+                                "help_text": "Definition help text",
+                                "rules":"max:1000",
+                                "enabled":true
+                            },
+                            {
+                                "key": "var_universe",
+                                "title": "Universe",
+                                "type": "text",
+                                "class": "required",
+                                "required": false,
+                                "help_text": "Universe help text",
+                                "rules":"max:3000",
+                                "enabled": true
+                            },                            
+                            {
+                                "key": "var_concept",
+                                "title": "Concepts",
+                                "type": "array",
+                                "class": "required",
+                                "props": {
+                                    "title": {
+                                        "key": "title",
+                                        "title": "Title",
+                                        "type": "text",
+                                        "rules":"required",
+                                        "name": "Concept title"
+                                    },
+                                    "vocab": {
+                                        "key": "vocab",
+                                        "title": "Vocabulary",
+                                        "type": "text"
+                                    },
+                                    "uri": {
+                                        "key": "uri",
+                                        "title": "Vocabulary URI",
+                                        "type": "text"
+                                    }
+                                }
+                            },
+                        ]
                     },
                     {
-                        "key": "variable.labl",
-                        "title": "Label",
-                        "type": "text",
-                        "class": "required",
-                        "required": true,
-                        "help_text": "Variable label",
-                        "rules":"required|max:300"
+                        "type": "section",
+                        "key": "variable_question",
+                        "title": "Question",
+                        "expanded": true,
+                        "items": [
+                            {
+                                "key": "var_qstn_preqtxt",
+                                "title": "Pre-Question text",
+                                "type": "text"
+                            },
+                            {
+                                "key": "var_qstn_qstnlit",
+                                "title": "Literal question",
+                                "type": "text"
+                            },
+                            {
+                                "key": "var_qstn_postqtxt",
+                                "title": "Post-Question text",
+                                "type": "text"
+                            },
+                            {
+                                "key": "variable.var_qstn_ivuinstr",
+                                "title": "Interviewer instructions",
+                                "type": "text"
+                            }
+                        ]
                     },
                     {
-                        "key": "variable.var_imputation",
-                        "title": "Imputation",
-                        "type": "text"
-                    },
-                    {
-                        "key": "variable.var_security",
-                        "title": "Security",
-                        "type": "text"
-                    },
-                    {
-                        "key": "variable.var_resp_unit",
-                        "title": "Responsible unit",
-                        "type": "text"
-                    },
-                    {
-                        "key": "variable.var_intrvl",
-                        "title": "Interval",
-                        "type": "dropdown",
-                        "class": "recommended",
-                        "enum": {
-                            "contin": "Continuous",
-                            "other": "Other value"
-                        }
-                    },
-                    {
-                        "key": "variable.var_analysis_unit",
-                        "title": "Analysis unit",
-                        "type": "textarea"
-                    }
+                        "type": "section",
+                        "key": "variable_imputation",
+                        "title": "Imputation and derivation",
+                        "expanded": true,
+                        "items": [
+                            {
+                                "key": "variable.var_resp_unit",
+                                "title": "Source of information",
+                                "type": "textarea"
+                            },                            
+                            {
+                                "key": "variable.var_imputation",
+                                "title": "Imputation",
+                                "type": "text"
+                            },
+                            {
+                                "key": "variable.var_codinstr",
+                                "title": "Recoding and derivation",
+                                "type": "text"
+                            }
+                        ]
+                    }                    
                 ]
-            }*/
+            }
             
         }        
     },
@@ -121,6 +179,9 @@ Vue.component('variable-edit', {
        }else{
            this.variable= Object.assign({}, this.variable_);
        }*/
+       if (this.variable.var_concept==undefined){
+           this.variable.var_concept=[{}];
+       }
     },
     computed: {
         active_tab: {
@@ -133,34 +194,20 @@ Vue.component('variable-edit', {
           },
     },
     methods: {
-        /*loadData: function() {   
-            vm=this;
-            let url=CI.base_url + '/api/datasets/variable/'+this.variable_.sid + '/'+ this.variable_.vid+'?id_format=id';
-            axios.get(url)
-            .then(function (response) {
-                console.log(response);
-                vm.variable=[];
-                if(response.data.variable.metadata){
-                    vm.variable=response.data.variable.metadata;
+        sectionEnabled: function(section){
+            console.log("section",section);
+            
+            if (section.items==undefined){
+                return false;
+            }
+
+            for(i=0;i<section.items.length;i++){
+                if (section.items[i].enabled){
+                    return true;
                 }
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
-            .then(function () {
-                console.log("request completed");
-            });
-        }  ,        
-        saveForm: function (){    
-            this.variable_ = Object.assign({}, this.variable_, this.variable);
-            this.$emit('input', this.variable);
-            //this.$emit("exit-edit", true);
-        },
-        cancelForm: function (){
-            this.form_local = Object.assign({}, this.field_data);
-            this.$emit("exit-edit", false);
-        } 
-        */
+            }
+            return false;
+        }
     },
     template: `
         <div class="variable-edit-component">            
@@ -223,13 +270,91 @@ Vue.component('variable-edit', {
                 </v-tab-item>
                 <v-tab-item key="documentation" value="documentation">
 
-                    <div style="overflow-y: scroll;padding:10px;margin-bottom:50px;">
+                    <div xstyle="overflow-y: scroll;padding:10px;margin-bottom:50px;" class="mb-5">
+
+                    
+
+                    <div class="row mt-1">
+                    <div class="col-auto">
+                    <template>
+                    
+                      <v-navigation-drawer
+                        v-model="drawer"
+                        :mini-variant.sync="drawer_mini"
+                        permanent                        
+                        bottom
+                        
+                      >
+                        <v-list-item class="px-2">
+                        <v-app-bar-nav-icon></v-app-bar-nav-icon>
+
+                  
+                          <v-list-item-title>Settings</v-list-item-title>
+                  
+                          <v-btn
+                            icon
+                            @click.stop="drawer_mini = !drawer_mini"
+                          >
+                            <v-icon>mdi-chevron-left</v-icon>
+                          </v-btn>
+                        </v-list-item>
+                  
+                        <v-divider></v-divider>
+                  
+                        <v-list dense v-if="!drawer_mini">
+                          <v-list-item
+                            v-for="section in variable_template.items"
+                            :key="section.key"
+                            link
+                          >
+                            <v-list-item-content>                            
+                              <v-list-item-title>{{ section.title }}</v-list-item-title>
+                               
+                              <div v-for="subitem in section.items" :key="subitem.key">
+                                <input type="checkbox" v-model="subitem.enabled"/> {{subitem.title}}
+                              </div>
+                            </v-list-item-content>
+                          </v-list-item>
+                        </v-list>
+                      </v-navigation-drawer>
+                    
+                  </template>
+                    </div>
+
+
+
+
+
+                    <div class="col">
+
+                        <template v-for="section in variable_template.items">
+
+                            <div class="mb-2" v-if="sectionEnabled(section)"><strong class="text-secondary mb-2">{{section.title}}</strong></div>
+
+                            <template v-for="var_field in section.items">
+
+                                <div v-if="var_field.enabled" class="form-group form-field">
+                                    <label>{{var_field.title}}</label> 
+                                    <span v-if="var_field.type!='array'"><textarea class="form-control form-control-sm" v-model="variable[var_field.key]"/></span>
+                                    <table-component v-if="var_field.type=='array'" v-model="variable[var_field.key]" :columns="var_field.props"/>
+                                </div>
+
+                            </template>
+
+                        
+
+
+                        </template>
+
+
+
+                    <?php /*
                 
                         <div class="form-group form-field">
                             <label>Variable ID</label> 
-                            <span><input type="text" class="form-control form-control-sm" v-model="variable.vid"/></span> 
+                            <span><input disabled="disabled" type="text" class="form-control form-control-sm" v-model="variable.vid"/></span> 
                         </div>
-
+                        
                         <div class="form-group form-field">
                             <label>Name</label> 
                             <span><input type="text" class="form-control form-control-sm" v-model="variable.name"/></span> 
@@ -238,13 +363,10 @@ Vue.component('variable-edit', {
                         <div class="form-group form-field">
                             <label>Label</label> 
                             <span><input type="text" class="form-control form-control-sm" v-model="variable.labl"/></span> 
-                        </div>                
-                        
-                        <div class="form-group form-field">
-                            <label>Concept</label> 
-                            <table-component v-model="variable.var_concept" :columns="concept_columns"/>
                         </div>
-
+                        */ ?>                
+                        
+                        <?php /*
                         <div class="mb-2"><strong class="text-secondary mb-2">Description</strong></div>
 
                         <div class="form-group form-field">
@@ -296,7 +418,17 @@ Vue.component('variable-edit', {
                             <span><textarea class="form-control form-control-sm" v-model="variable.var_codinstr"/></span>                            
                         </div>
 
-                                
+                        <div class="form-group form-field">
+                            <label>Concept</label> 
+                            <table-component v-model="variable.var_concept" :columns="concept_columns"/>
+                        </div>  
+                        
+                        */ ?>
+                        
+                        
+                        </div>
+                        </div>
+                        
                     </div>
 
                 </v-tab-item>
