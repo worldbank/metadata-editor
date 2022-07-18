@@ -17,8 +17,47 @@ Vue.component('variables', {
             variable_search:'',
             changeCaseDialog: false,
             dialogm1: '',
-            changeCaseFields:[]
-            //variables:[]
+            changeCaseFields:["name"],
+            changeCaseType:"title",
+            changeCaseUpdateStatus:'',
+            edit_items_multiple:[], //items edited in multiple edit_mode,
+            variableMultiple:{
+                "name": "NaN",
+                "labl": "Multiple selected",
+                "var_valrng": {
+                  "range": {                    
+                  }
+                },
+                "var_sumstat": [
+                  {}
+                ],
+                "var_catgry": [                  
+                  {}
+                ],
+                "var_format": {                  
+                },
+                "var_type": "",
+                "var_concept": [
+                  []
+                ],
+                "var_txt": "",
+                "var_universe": "",
+                "time_stamp":0
+              },
+            variableMultipleUpdateFields: //fields to be updated for multiple selection
+            [
+                "var_txt",
+                "var_universe",
+                "var_concept",
+                "var_qstn_postqtxt",
+                "var_qstn_preqtxt",
+                "var_qstn_qstnlit",
+                "var_codinstr",
+                "var_imputation",
+                "var_qstn_ivuinstr",
+                "var_resp_unit"
+            ],
+            showSpreadMetadataDialog: false
         }
     }, 
     created: async function(){
@@ -42,7 +81,6 @@ Vue.component('variables', {
                 if (this.page_action!="edit"){
                     return;
                 }
-              //console.log('The list of data has changed!',_.cloneDeep(val),_.cloneDeep(oldVal));
 
               if (JSON.stringify(val)==JSON.stringify(this.variable_copy)){
                   console.log("no change detected");
@@ -57,33 +95,8 @@ Vue.component('variables', {
               window._val=val;
             }
           }
-        /*
-        '$store.state.variables': function() {
-            alert(1);
-        }*/
     },
-    methods: {
-        /*loadData: function() {
-            alert("load data");
-            vm=this;
-            let url=CI.base_url + '/api/datasets/variables/'+vm.dataset_idno + '/'+ this.fid + '?detailed=1';
-            axios.get(url)
-            .then(function (response) {
-                console.log("vars",response.data.variables);
-                vm.variables=[];
-                if(response.data.variables.length>0){
-                    vm.variables=response.data.variables;
-                    window.variables_=vm.variables;
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
-            .then(function () {
-                console.log("request completed");
-                vm.editVariable(0);
-            });
-        },*/
+    methods: {        
         clearVariableSearch: function(){
             this.variable_search='';
         },
@@ -135,10 +148,60 @@ Vue.component('variables', {
             
             this.scrollToVariable();
         },
-        updateVariable: function(variable) {
+        /*updateVariable: function(variable) 
+        {
             console.log("before local variable",this.variables[this.edit_item]);
             this.$set(this.variables, this.edit_item, variable);
             console.log("after local variable",this.variables[this.edit_item]);
+        },*/
+        changeCase: function()
+        {
+            var_count=this.variables.length;
+            for(i=0;i<var_count;i++){
+                for(f=0;f<this.changeCaseFields.length;f++){
+                    field_=this.changeCaseFields[f];
+                    if (this.changeCaseType=='title'){
+                        this.variables[i][field_]=this.titleCase(this.variables[i][field_]);
+                    } else if (this.changeCaseType=='upper'){
+                        this.variables[i][field_]=this.variables[i][field_].toUpperCase();
+                    } else if (this.changeCaseType=='lower'){
+                        this.variables[i][field_]=this.variables[i][field_].toLowerCase();
+                    }
+                }
+
+                this.changeCaseUpdateStatus="Updating " + (i + 1) + " of " + var_count;
+                this.saveVariable(this.variables[i]);
+            }
+
+            this.changeCaseUpdateStatus="";
+            this.changeCaseDialog=false;
+        },
+        editVariableMultiple: function(index)
+        {
+            //if (!this.isVariableSelected(this.edit_item)){
+                //this.edit_items_multiple.push(this.edit_item);
+            //}
+            if (this.edit_item!=-1){
+                this.edit_items_multiple.push(this.edit_item);
+                this.edit_item=-1;
+            }
+
+            if (!this.isVariableSelected(index)){
+                this.edit_items_multiple.push(index);                
+            }
+
+            this.variableMultiple.time_stamp++;
+        },
+        isVariableSelected: function(index)
+        { 
+            if(this.edit_item==index){
+                return true;
+            }
+            
+            if (this.edit_items_multiple.includes(index)){
+                return true;
+            }
+            return false;
         },
         editVariable:function(index){
             this.exitEditMode();
@@ -169,7 +232,34 @@ Vue.component('variables', {
             newIdx=this.variables.length -1;
             this.editVariable(newIdx);            
         },
+        saveMultiSelectedVariables: function()
+        {
+            if(this.edit_items_multiple.length==0){
+                return;
+            }
+
+            for(i=0;i<this.edit_items_multiple.length;i++){
+                variable_=this.variables[this.edit_items_multiple[i]];
+                //update key/values
+                for(k=0;k<this.variableMultipleUpdateFields.length;k++){
+                    field_name=this.variableMultipleUpdateFields[k];
+                    //key exists
+                    if(this.variableMultiple[field_name]){
+                        variable_[field_name]=this.variableMultiple[field_name];
+                    }
+                }
+                this.saveVariable(variable_);
+            }
+        },
         saveVariableDebounce: _.debounce(function(data) {
+            
+            //multiple variables selected
+            if(this.edit_items_multiple.length>0){
+                this.saveMultiSelectedVariables();
+                return false;
+            }
+
+            //single variable
             this.saveVariable(data);
             this.variable_copy=_.cloneDeep(this.variables[this.edit_item]);
         }, 500),
@@ -207,14 +297,35 @@ Vue.component('variables', {
             
             this.page_action="list";
             this.edit_item=null;
+            this.edit_items_multiple=[];
         },
         hasDataChanged: function(){
             return JSON.stringify(this.variables[this.edit_item])!==JSON.stringify(this.variable_copy);
+        },
+        titleCase: function(str) {
+            return str.replace(
+              /\w\S*/g,
+              function(txt) {
+                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+              }
+            );
+        },        
+        deleteVariable: function()
+        {
+            alert("Not implemented");
+        },
+        spreadMetadata: function()
+        {
+            alert("Not implemented");
         }
 
     },
     computed: {
         activeVariable: function(){
+            if (this.edit_items_multiple.length>0){                
+                return this.variableMultiple;
+            }
+
             return this.variables[this.edit_item];
         },
         MaxVariableID(){
@@ -253,9 +364,9 @@ Vue.component('variables', {
                     <pane min-size="5" >
                     <!--variables-start-->
                     <div style="height:100%;background:white" xstyle="height:40%;overflow-y: scroll;background:white;font-size:small" class="border">
-                            <div class="row section-title p-1 bg-primary" style="font-size:small;">
+                            <div class="row section-title p-1 bg-primary" style="font-size:small;position:relative;">
                                 <div class="col-2">
-                                    <strong>Variables</strong>
+                                    <strong>Variables</strong> {{edit_items_multiple}}
                                     <span v-if="variables" class="badge badge-light">{{variables.length}}</span>
                                 </div>
 
@@ -284,12 +395,16 @@ Vue.component('variables', {
                                             <v-icon aria-hidden="false" style="color:white">mdi-format-letter-case</v-icon>
                                         </button>
 
+                                        <button type="button" class="btn btn-xs btn-primary" @click="showSpreadMetadataDialog=true" title="Spread Metadata">
+                                            <i class="fas fa-clone"></i>
+                                        </button>
+
                                         <button type="button" class="btn btn-xs btn-primary" @click="addVariable" title="Add new variable">
                                             <i class="fas fa-plus-square" ></i>
                                         </button>
 
 
-                                        <button type="button" class="btn btn-xs btn-primary" @click="addVariable" title="Add new variable">
+                                        <button type="button" class="btn btn-xs btn-primary" @click="deleteVariable" title="Delete selected variable(s)">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
                                         
@@ -311,8 +426,13 @@ Vue.component('variables', {
 
                             </div>
 
+
                             
-                            <div style="padding-bottom:50px;height:inherit;overflow-y: scroll;background:white;font-size:small" id="variables-container">
+
+
+                            
+                            <div style="position:relative;padding-bottom:50px;height:inherit;overflow-y: scroll;background:white;font-size:small" id="variables-container" >
+                               
                                 <table class="table table-striped table-bordered table-sm table-hover table-variables">
                                     <?php /*<thead>
                                         <tr>
@@ -323,13 +443,9 @@ Vue.component('variables', {
                                         </tr> 
                                     </thead> */ ?>
                                     <tbody is="draggable" :list="variables" tag="tbody">
-                                    <tr v-for="(variable, index) in variables" @click="editVariable(index)" :class="{'activeRow' : edit_item == index} " :id="'v-'+index">
+                                    <tr v-for="(variable, index) in variables" @click.shift.exact="editVariableMultiple(index)" @click.exact="editVariable(index)" :class="{'activeRow' : isVariableSelected(index)} " :id="'v-'+index" >
                                         <td class="bg-secondary">{{variable.vid}}</td>
                                         <td class="var-name-edit">
-                                            <?php
-                                            /*
-                                            <div class="text-link" @click="editVariable(index)">{{variable.name}}</div>                                                
-                                            */ ?>
                                             <div><input class="var-labl-edit" type="text" v-model="variable.name" /></div>
                                         </td>
                                         <td>
@@ -337,10 +453,13 @@ Vue.component('variables', {
                                         </td>
                                         <td>
                                             {{variable.var_format.type}}
-                                        </td>
+                                        </td>                                        
                                     </tr>
                                     </tbody>
                                 </table>
+
+                                <spread-metadata v-if="showSpreadMetadataDialog" v-model="showSpreadMetadataDialog"></spread-metadata>
+
                             </div>
                         </div>
                     <!--variables-end-->
@@ -368,9 +487,9 @@ Vue.component('variables', {
                             </div>
                         </div>
                             <div class="p3" style="height:inherit;overflow:auto;background:white;">
-                                <div v-show="page_action=='edit'" >
-                                    <div v-if="variables[edit_item]">
-                                        <variable-edit  :value="variables[edit_item]" :index_key="edit_item" @updateVariable="updateVariable" ></variable-edit>
+                                <div v-show="page_action=='edit' " >
+                                    <div v-if="activeVariable">
+                                        <variable-edit  :variable="activeVariable" :multi_key="edit_items_multiple"  :index_key="edit_item" ></variable-edit>
                                     </div>
                                 </div>                                
                             </div>
@@ -385,13 +504,13 @@ Vue.component('variables', {
                 <pane size="60" min-size="10">
                     <!--categories-->
                     <div style="height:100%;overflow:auto;background:white;" class="border">
-                    <variable-categories v-if="variables[edit_item]" :edit_index="edit_item"  :value="variables[edit_item]" @updateVariable="updateVariable"/>
+                    <variable-categories v-if="variables[edit_item]" :edit_index="edit_item"  :value="variables[edit_item]" />
                     </div>
                     <!--categories-end-->
                 </pane>
                 <pane size="40" min-size="10">
                     <div style="height:100%;overflow:auto;" >
-                        <variable-info v-if="variables[edit_item]" :edit_index="edit_item"  :value="variables[edit_item]" @updateVariable="updateVariable"/>
+                        <variable-info v-if="variables[edit_item]" :edit_index="edit_item"  :value="variables[edit_item]" />
                     </div>
                 </pane>
                 </splitpanes>

@@ -1,11 +1,11 @@
 ///variable edit form
 Vue.component('variable-edit', {
-    props:['value','index_key'],
+    props:['variable','index_key','multi_key'],
     data: function () {    
         return {
             drawer: true,       
             drawer_mini: true,
-            variable: this.value,            
+            //variable: this.value,            
             //variable:{},
             form_local:{},
             concept_columns:[
@@ -150,17 +150,17 @@ Vue.component('variable-edit', {
                         "expanded": true,
                         "items": [
                             {
-                                "key": "variable.var_resp_unit",
+                                "key": "var_resp_unit",
                                 "title": "Source of information",
                                 "type": "textarea"
                             },                            
                             {
-                                "key": "variable.var_imputation",
+                                "key": "var_imputation",
                                 "title": "Imputation",
                                 "type": "text"
                             },
                             {
-                                "key": "variable.var_codinstr",
+                                "key": "var_codinstr",
                                 "title": "Recoding and derivation",
                                 "type": "text"
                             }
@@ -179,6 +179,7 @@ Vue.component('variable-edit', {
        }else{
            this.variable= Object.assign({}, this.variable_);
        }*/
+       //this.variable=this.value;
        if (this.variable.var_concept==undefined){
            this.variable.var_concept=[{}];
        }
@@ -210,7 +211,8 @@ Vue.component('variable-edit', {
         }
     },
     template: `
-        <div class="variable-edit-component">            
+        <div class="variable-edit-component">
+        {{multi_key}}          
         <template>
             <v-tabs v-model="active_tab">
                 <v-tab key="statistics" href="#statistics">Statistics</v-tab>
@@ -327,6 +329,7 @@ Vue.component('variable-edit', {
 
                     <div class="col">
 
+
                         <template v-for="section in variable_template.items">
 
                             <div class="mb-2" v-if="sectionEnabled(section)"><strong class="text-secondary mb-2">{{section.title}}</strong></div>
@@ -347,83 +350,7 @@ Vue.component('variable-edit', {
                         </template>
 
 
-
-                    <?php /*
-                
-                        <div class="form-group form-field">
-                            <label>Variable ID</label> 
-                            <span><input disabled="disabled" type="text" class="form-control form-control-sm" v-model="variable.vid"/></span> 
-                        </div>
-                        
-                        <div class="form-group form-field">
-                            <label>Name</label> 
-                            <span><input type="text" class="form-control form-control-sm" v-model="variable.name"/></span> 
-                        </div>
-            
-                        <div class="form-group form-field">
-                            <label>Label</label> 
-                            <span><input type="text" class="form-control form-control-sm" v-model="variable.labl"/></span> 
-                        </div>
-                        */ ?>                
-                        
-                        <?php /*
-                        <div class="mb-2"><strong class="text-secondary mb-2">Description</strong></div>
-
-                        <div class="form-group form-field">
-                            <label>Definition</label> 
-                            <span><textarea class="form-control form-control-sm" v-model="variable.var_txt"/></span>
-                        </div>
-
-                        <div class="form-group form-field">
-                            <label>Universe</label> 
-                            <span><textarea class="form-control form-control-sm" v-model="variable.var_universe"/></span>
-                        </div>
-
-                        <div class="form-group form-field">
-                            <label>Source of information</label> 
-                            <span><textarea class="form-control form-control-sm" v-model="variable.var_resp_unit"/></span>
-                        </div>
-
-                        <div class="mb-2"><strong class="text-secondary mb-2">Question</strong></div>
-
-                        <div class="form-group form-field">
-                            <label>Pre-Question text</label>
-                            <span><textarea class="form-control form-control-sm" v-model="variable.var_qstn_preqtxt"/></span>
-                        </div>
-
-                        <div class="form-group form-field">
-                            <label>Literal question</label> 
-                            <span><textarea class="form-control form-control-sm" v-model="variable.var_qstn_qstnlit"/></span>
-                        </div>
-
-                        <div class="form-group form-field">
-                            <label>Post-Question text</label> 
-                            <span><textarea class="form-control form-control-sm" v-model="variable.var_qstn_postqtxt"/></span>  
-                        </div>
-
-                        <div class="form-group form-field">
-                            <label>Interviewer instructions</label> 
-                            <span><textarea class="form-control form-control-sm" v-model="variable.var_qstn_ivuinstr"/></span> 
-                        </div>
-
-                        <div class="mb-2"><strong class="text-secondary mb-2">Imputation and Derivation</strong></div>
-
-                        <div class="form-group form-field">
-                            <label>Imputation</label> 
-                            <span><textarea class="form-control form-control-sm" v-model="variable.var_imputation"/></span> 
-                        </div>
-
-                        <div class="form-group form-field">
-                            <label>Recoding and derivation</label> 
-                            <span><textarea class="form-control form-control-sm" v-model="variable.var_codinstr"/></span>                            
-                        </div>
-
-                        <div class="form-group form-field">
-                            <label>Concept</label> 
-                            <table-component v-model="variable.var_concept" :columns="concept_columns"/>
-                        </div>  
-                        
-                        */ ?>
+                       
                         
                         
                         </div>

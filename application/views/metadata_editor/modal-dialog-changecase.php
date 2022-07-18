@@ -11,27 +11,28 @@
         <v-divider></v-divider>
         <v-card-text>
 
+        {{changeCaseFields}} - {{variables.length}}
 
         <div class="form-group">
-            <label for="exampleFormControlSelect1">Type</label>
-            <select class="form-control" id="exampleFormControlSelect1">
-            <option>Sentence case</option>
-            <option>Title Case</option>
-            <option>UPPERCASE</option>
-            <option>LOWERCASE</option>      
+            <label for="ChangeCaseType">Type</label>
+            <select class="form-control" id="ChangeCaseType" v-model="changeCaseType">
+                <option value="title">Title Case</option>
+                <option value="upper">UPPERCASE</option>
+                <option value="lower">LOWERCASE</option>      
             </select>
+            {{changeCaseType}}
         </div>
 
         <div>
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="defaultCheck1" >
+                <input class="form-check-input" type="checkbox" value="name" id="defaultCheck1" v-model="changeCaseFields" >
                 <label class="form-check-label" for="defaultCheck1">
                     Name
                 </label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="defaultCheck1" >
-                <label class="form-check-label" for="defaultCheck1">
+                <input class="form-check-input" type="checkbox" value="labl" id="defaultCheck2" v-model="changeCaseFields" >
+                <label class="form-check-label" for="defaultCheck2">
                     Label
                 </label>
             </div>
@@ -39,8 +40,11 @@
 
         </v-card-text>
         <v-divider></v-divider>
-        <v-card-actions>            
-            <button type="button" @click="changeCaseDialog = false" class="btn btn-block btn-primary btn-sm mb-2">Apply</button>
+        <v-card-actions  style="flex-direction:column;align-items: stretch;">
+            <div style="text-align:center;margin-bottom:10px;">{{changeCaseUpdateStatus}}</div>
+            <div>
+                <button :disabled="changeCaseFields.length==0" type="button" @click="changeCase" class="btn btn-block btn-primary btn-sm mb-2">Apply</button>
+            </div>
         </v-card-actions>
       </v-card>
     </v-dialog>

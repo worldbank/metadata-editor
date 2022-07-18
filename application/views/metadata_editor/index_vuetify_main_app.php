@@ -15,6 +15,7 @@
         
         <?php 
             
+            echo $this->load->view("metadata_editor/vue-spreadmetadata-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-form-main-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-form-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-form-preview-component.js",null,true);
