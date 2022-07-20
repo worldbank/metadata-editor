@@ -163,6 +163,13 @@
                         }
                     }
                 },
+                getDataFileNameById: (state) => (fid) => {
+                    for(i=0;i<state.data_files.length;i++){
+                        if(state.data_files[i].file_id==fid){
+                            return state.data_files[i].file_name;
+                        }
+                    }
+                },
                 getVariablesAll(state) {                
                     return state.variables;
                 },

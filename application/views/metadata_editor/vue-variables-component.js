@@ -154,6 +154,10 @@ Vue.component('variables', {
             this.$set(this.variables, this.edit_item, variable);
             console.log("after local variable",this.variables[this.edit_item]);
         },*/
+        spreadMetadata: function ()
+        {
+            this.showSpreadMetadataDialog=true;
+        },        
         changeCase: function()
         {
             var_count=this.variables.length;
@@ -313,10 +317,6 @@ Vue.component('variables', {
         deleteVariable: function()
         {
             alert("Not implemented");
-        },
-        spreadMetadata: function()
-        {
-            alert("Not implemented");
         }
 
     },
@@ -327,6 +327,20 @@ Vue.component('variables', {
             }
 
             return this.variables[this.edit_item];
+        },
+        selectedVariablesList: function(){
+            if (this.edit_items_multiple.length>0){                
+                return this.edit_items_multiple;
+            }
+
+            return [this.edit_item];
+        },
+        selectedVariablesDetail: function(){
+            let variables=[];
+            this.selectedVariablesList.forEach((variable_idx)=>{
+                variables.push(this.variables[variable_idx]);
+            });
+            return variables;
         },
         MaxVariableID(){
             return this.$store.getters["getMaxVariableId"];
@@ -366,7 +380,7 @@ Vue.component('variables', {
                     <div style="height:100%;background:white" xstyle="height:40%;overflow-y: scroll;background:white;font-size:small" class="border">
                             <div class="row section-title p-1 bg-primary" style="font-size:small;position:relative;">
                                 <div class="col-2">
-                                    <strong>Variables</strong> {{edit_items_multiple}}
+                                    <strong>Variables</strong>
                                     <span v-if="variables" class="badge badge-light">{{variables.length}}</span>
                                 </div>
 
@@ -395,7 +409,7 @@ Vue.component('variables', {
                                             <v-icon aria-hidden="false" style="color:white">mdi-format-letter-case</v-icon>
                                         </button>
 
-                                        <button type="button" class="btn btn-xs btn-primary" @click="showSpreadMetadataDialog=true" title="Spread Metadata">
+                                        <button type="button" class="btn btn-xs btn-primary" @click="spreadMetadata" title="Spread Metadata">
                                             <i class="fas fa-clone"></i>
                                         </button>
 
@@ -432,7 +446,7 @@ Vue.component('variables', {
 
                             
                             <div style="position:relative;padding-bottom:50px;height:inherit;overflow-y: scroll;background:white;font-size:small" id="variables-container" >
-                               
+
                                 <table class="table table-striped table-bordered table-sm table-hover table-variables">
                                     <?php /*<thead>
                                         <tr>
@@ -458,7 +472,7 @@ Vue.component('variables', {
                                     </tbody>
                                 </table>
 
-                                <spread-metadata v-if="showSpreadMetadataDialog" v-model="showSpreadMetadataDialog"></spread-metadata>
+                                <spread-metadata v-if="showSpreadMetadataDialog" v-model="showSpreadMetadataDialog" :variables="selectedVariablesDetail"></spread-metadata>
 
                             </div>
                         </div>

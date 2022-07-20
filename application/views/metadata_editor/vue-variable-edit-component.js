@@ -137,7 +137,7 @@ Vue.component('variable-edit', {
                                 "type": "text"
                             },
                             {
-                                "key": "variable.var_qstn_ivuinstr",
+                                "key": "var_qstn_ivuinstr",
                                 "title": "Interviewer instructions",
                                 "type": "text"
                             }
@@ -212,7 +212,6 @@ Vue.component('variable-edit', {
     },
     template: `
         <div class="variable-edit-component">
-        {{multi_key}}          
         <template>
             <v-tabs v-model="active_tab">
                 <v-tab key="statistics" href="#statistics">Statistics</v-tab>
