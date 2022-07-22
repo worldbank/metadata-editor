@@ -381,7 +381,7 @@ Vue.component('variables', {
                             <div class="row section-title p-1 bg-primary" style="font-size:small;position:relative;">
                                 <div class="col-2">
                                     <strong>Variables</strong>
-                                    <span v-if="variables" class="badge badge-light">{{variables.length}}</span>
+                                    <span v-if="variables" class="badge badge-light">{{variables.length}}</span> {{edit_items_multiple}}
                                 </div>
 
                                 <div class="col-3">
@@ -450,15 +450,18 @@ Vue.component('variables', {
                                 <table class="table table-striped table-bordered table-sm table-hover table-variables">
                                     <?php /*<thead>
                                         <tr>
+                                            <th></th>
                                             <th>#</th>
                                             <th>Name</th>
                                             <th>Label</th>
                                             <th>Format</th>
                                         </tr> 
                                     </thead> */ ?>
-                                    <tbody is="draggable" :list="variables" tag="tbody">
+                                    <tbody>
                                     <tr v-for="(variable, index) in variables" @click.shift.exact="editVariableMultiple(index)" @click.exact="editVariable(index)" :class="{'activeRow' : isVariableSelected(index)} " :id="'v-'+index" >
-                                        <td class="bg-secondary">{{variable.vid}}</td>
+                                        <td class="bg-secondary"><input type="checkbox" :value="index" v-model="edit_items_multiple"/></td>
+                                        <td class="bg-secondary">V{{index+1}}</td>                                        
+
                                         <td class="var-name-edit">
                                             <div><input class="var-labl-edit" type="text" v-model="variable.name" /></div>
                                         </td>
