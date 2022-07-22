@@ -318,3 +318,12 @@ html,body {
   */
 
   .form-check-label{font-weight:normal}
+
+  .move-row{
+    font-size: 12px;
+    padding-top: 5px;
+    color: rgb(0 0 0 / 12%);
+    font-weight: normal;
+    display: block;
+    cursor: pointer;
+  }

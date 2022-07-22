@@ -80,6 +80,7 @@ Vue.component('table-component', {
             <table class="table table-striped table-sm">
                 <thead class="thead-light">
                 <tr>
+                    <th></th>
                     <th v-for="(column,idx_col) in columns" scope="col">
                         <span @click="sortColumn(column.key)" role="button" title="Click to sort">
                             {{column.title}} 
@@ -94,8 +95,9 @@ Vue.component('table-component', {
                 </thead>
 
                 <!--start-v-for-->
-                <tbody>
+                <tbody is="draggable" :list="field_data" tag="tbody">
                 <tr  v-for="(item,index) in field_data">
+                    <td><span class="move-row" ><i class="fas fa-grip-vertical"></i></span></td>
                     <td v-for="(column,idx_col) in localColumns" scope="row">
                         <div>
                             <div v-if="column.type!=='table'">
@@ -104,12 +106,6 @@ Vue.component('table-component', {
                                 class="form-control form-control-sm"                                 
                             >
                             </div>
-                            <!--<div v-if="column.type=='table'">
-                                <table-component 
-                                    v-model="field_data[index][column.key]" 
-                                    :columns="column.props"/>
-                            </div>-->
-
                         </div>
                     </td>
                     <td scope="row">        
