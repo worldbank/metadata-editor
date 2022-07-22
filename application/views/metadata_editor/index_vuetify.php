@@ -67,8 +67,14 @@
     <script src="https://cdn.jsdelivr.net/npm/vue-scrollto"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vee-validate/3.4.0/vee-validate.full.min.js" integrity="sha512-owFJQZWs4l22X0UAN9WRfdJrN+VyAZozkxlNtVtd9f/dGd42nkS+4IBMbmVHdmTd+t6hFXEVm65ByOxezV/Qxg==" crossorigin="anonymous"></script>
 
+    <!--
     <script src="https://unpkg.com/splitpanes@2.1"></script>
-  <link href="https://unpkg.com/splitpanes/dist/splitpanes.css" rel="stylesheet">
+    <link href="https://unpkg.com/splitpanes/dist/splitpanes.css" rel="stylesheet">
+  -->
+
+    <script src="<?php echo base_url();?>javascript/splitpanes.umd.min.js"></script>
+    <link href="<?php echo base_url();?>javascript/splitpanes.css" rel="stylesheet">
+
 
 
 

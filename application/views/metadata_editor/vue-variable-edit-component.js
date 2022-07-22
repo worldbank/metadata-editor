@@ -57,129 +57,12 @@ Vue.component('variable-edit', {
                         "type": "text"
                     },
                 ]
-            }],
-            variable_template:{
-                "title":"Variable",
-                "key":"variable",
-                "items":[
-                    {
-                        "type": "section",
-                        "key": "variable_description",
-                        "title": "Description",
-                        "expanded": true,
-                        "items": [
-                            {
-                                "key": "var_txt",
-                                "title": "Definition",
-                                "type": "textarea",
-                                "class": "required",
-                                "required": false,
-                                "help_text": "Definition help text",
-                                "rules":"max:1000",
-                                "enabled":true
-                            },
-                            {
-                                "key": "var_universe",
-                                "title": "Universe",
-                                "type": "text",
-                                "class": "required",
-                                "required": false,
-                                "help_text": "Universe help text",
-                                "rules":"max:3000",
-                                "enabled": true
-                            },                            
-                            {
-                                "key": "var_concept",
-                                "title": "Concepts",
-                                "type": "array",
-                                "class": "required",
-                                "props": {
-                                    "title": {
-                                        "key": "title",
-                                        "title": "Title",
-                                        "type": "text",
-                                        "rules":"required",
-                                        "name": "Concept title"
-                                    },
-                                    "vocab": {
-                                        "key": "vocab",
-                                        "title": "Vocabulary",
-                                        "type": "text"
-                                    },
-                                    "uri": {
-                                        "key": "uri",
-                                        "title": "Vocabulary URI",
-                                        "type": "text"
-                                    }
-                                }
-                            },
-                        ]
-                    },
-                    {
-                        "type": "section",
-                        "key": "variable_question",
-                        "title": "Question",
-                        "expanded": true,
-                        "items": [
-                            {
-                                "key": "var_qstn_preqtxt",
-                                "title": "Pre-Question text",
-                                "type": "text"
-                            },
-                            {
-                                "key": "var_qstn_qstnlit",
-                                "title": "Literal question",
-                                "type": "text"
-                            },
-                            {
-                                "key": "var_qstn_postqtxt",
-                                "title": "Post-Question text",
-                                "type": "text"
-                            },
-                            {
-                                "key": "var_qstn_ivuinstr",
-                                "title": "Interviewer instructions",
-                                "type": "text"
-                            }
-                        ]
-                    },
-                    {
-                        "type": "section",
-                        "key": "variable_imputation",
-                        "title": "Imputation and derivation",
-                        "expanded": true,
-                        "items": [
-                            {
-                                "key": "var_resp_unit",
-                                "title": "Source of information",
-                                "type": "textarea"
-                            },                            
-                            {
-                                "key": "var_imputation",
-                                "title": "Imputation",
-                                "type": "text"
-                            },
-                            {
-                                "key": "var_codinstr",
-                                "title": "Recoding and derivation",
-                                "type": "text"
-                            }
-                        ]
-                    }                    
-                ]
-            }
-            
+            }]
         }        
     },
     watch: { 
     },    
     created: function () {
-       /*if (this.variable_.vid){
-        this.loadData();
-       }else{
-           this.variable= Object.assign({}, this.variable_);
-       }*/
-       //this.variable=this.value;
        if (this.variable.var_concept==undefined){
            this.variable.var_concept=[{}];
        }
@@ -193,10 +76,12 @@ Vue.component('variable-edit', {
               return this.$store.commit("variables_active_tab", newValue);
             },
           },
+        variable_template: function(){
+            return this.$store.getters["getVariableDocumentationTemplate"];
+        }
     },
     methods: {
         sectionEnabled: function(section){
-            console.log("section",section);
             
             if (section.items==undefined){
                 return false;

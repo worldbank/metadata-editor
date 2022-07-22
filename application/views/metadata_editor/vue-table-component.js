@@ -3,30 +3,33 @@ Vue.component('table-component', {
     props:['value','columns','path', 'field'],
     data: function () {    
         return {
-            field_data: this.value,
+            //field_data: this.value,
             sort_field:'',
             sort_asc:true
         }
     },
-    watch: { 
-        field_data: function(newVal, oldVal) {
-            console.log('Prop changed: ', newVal, ' | was: ', oldVal)
-            //console.log(this.key_path);                    
-            //this.$vueSet (this.$store.state.formData, this.key_path, newVal);
-        }
-    
+    watch: {
     },
     
     mounted: function () {
         //set data to array if empty or not set
         if (!this.field_data){
-            this.field_data=[];
-            this.field_data.push({});
+            this.field_data=[{}];
+            //this.field_data.push({});
         }
     },
     computed: {
         localColumns(){
             return this.columns;
+        },
+        field_data:
+        {
+            get(){
+                return this.value;
+            },
+            set(val){
+                this.$emit('update:value', val);
+            }
         }
     },
     methods:{
@@ -76,7 +79,6 @@ Vue.component('table-component', {
     },  
     template: `
             <div class="table-component">
-
             <table class="table table-striped table-sm">
                 <thead class="thead-light">
                 <tr>

@@ -145,7 +145,125 @@
                 },
                 variables_loaded:false,
                 variables_isloading:false,
-                variables_active_tab:"documentation"
+                variables_active_tab:"documentation",
+                variable_documentation_template:{
+                    "title":"Variable",
+                    "key":"variable",
+                    "items":[
+                        {
+                            "type": "section",
+                            "key": "variable_description",
+                            "title": "Description",
+                            "expanded": true,
+                            "items": [
+                                {
+                                    "key": "var_txt",
+                                    "title": "Definition",
+                                    "type": "textarea",
+                                    "class": "required",
+                                    "required": false,
+                                    "help_text": "Definition help text",
+                                    "rules":"max:1000",
+                                    "enabled":true
+                                },
+                                {
+                                    "key": "var_universe",
+                                    "title": "Universe",
+                                    "type": "text",
+                                    "class": "required",
+                                    "required": false,
+                                    "help_text": "Universe help text",
+                                    "rules":"max:3000",
+                                    "enabled": true
+                                },                            
+                                {
+                                    "key": "var_concept",
+                                    "title": "Concepts",
+                                    "type": "array",
+                                    "class": "required",
+                                    "enabled":true,
+                                    "props": {
+                                        "title": {
+                                            "key": "title",
+                                            "title": "Title",
+                                            "type": "text",
+                                            "rules":"required",
+                                            "name": "Concept title"
+                                        },
+                                        "vocab": {
+                                            "key": "vocab",
+                                            "title": "Vocabulary",
+                                            "type": "text"
+                                        },
+                                        "uri": {
+                                            "key": "uri",
+                                            "title": "Vocabulary URI",
+                                            "type": "text"
+                                        }
+                                    }
+                                },
+                            ]
+                        },
+                        {
+                            "type": "section",
+                            "key": "variable_question",
+                            "title": "Question",
+                            "expanded": true,
+                            "items": [
+                                {
+                                    "key": "var_qstn_preqtxt",
+                                    "title": "Pre-Question text",
+                                    "type": "text",
+                                    "enabled":true
+                                },
+                                {
+                                    "key": "var_qstn_qstnlit",
+                                    "title": "Literal question",
+                                    "type": "text",
+                                    "enabled":true
+                                },
+                                {
+                                    "key": "var_qstn_postqtxt",
+                                    "title": "Post-Question text",
+                                    "type": "text",
+                                    "enabled":true
+                                },
+                                {
+                                    "key": "var_qstn_ivuinstr",
+                                    "title": "Interviewer instructions",
+                                    "type": "text",
+                                    "enabled":true
+                                }
+                            ]
+                        },
+                        {
+                            "type": "section",
+                            "key": "variable_imputation",
+                            "title": "Imputation and derivation",
+                            "expanded": true,
+                            "items": [
+                                {
+                                    "key": "var_resp_unit",
+                                    "title": "Source of information",
+                                    "type": "textarea",
+                                    "enabled":true
+                                },                            
+                                {
+                                    "key": "var_imputation",
+                                    "title": "Imputation",
+                                    "type": "text",
+                                    "enabled":true
+                                },
+                                {
+                                    "key": "var_codinstr",
+                                    "title": "Recoding and derivation",
+                                    "type": "text",
+                                    "enabled":true
+                                }
+                            ]
+                        }                    
+                    ]
+                }
             },
             getters: {
                 getIDNO(state){
@@ -169,6 +287,9 @@
                             return state.data_files[i].file_name;
                         }
                     }
+                },
+                getVariableDocumentationTemplate(state){
+                    return state.variable_documentation_template;
                 },
                 getVariablesAll(state) {                
                     return state.variables;

@@ -10,8 +10,7 @@ Vue.component('variables', {
             schema_errors:[],
             data_files:[],
             //variables:[],
-            page_action:'list',
-            edit_item:0,
+            page_action:'list',            
             variable_copy:{},//copy of the variable before any editing
             fid:this.file_id,
             variable_search:'',
@@ -20,8 +19,9 @@ Vue.component('variables', {
             changeCaseFields:["name"],
             changeCaseType:"title",
             changeCaseUpdateStatus:'',
-            edit_items_multiple:[], //items edited in multiple edit_mode,
-            variableMultiple:{
+            edit_item:0,
+            edit_items:[],            
+            variableMultipleTemplate:{
                 "name": "NaN",
                 "labl": "Multiple selected",
                 "var_valrng": {
@@ -44,6 +44,7 @@ Vue.component('variables', {
                 "var_universe": "",
                 "time_stamp":0
               },
+              variableMultiple:{},
             variableMultipleUpdateFields: //fields to be updated for multiple selection
             [
                 "var_txt",
@@ -67,14 +68,9 @@ Vue.component('variables', {
     mounted: function () {
         //this.loadData();     
         this.editVariable(0);
+        //this.initializeMultiVariable();
     },
     watch: {
-        /*activeVariable: function(val) {          
-            //this.loadData();
-            console.log("value changed");
-            //this.saveVariable(val);
-        },*/
-
         activeVariable: {            
             deep: true,
             handler(val,oldVal){
@@ -82,17 +78,24 @@ Vue.component('variables', {
                     return;
                 }
 
+                if (this.variableSelectedCount()>1){
+                    if (JSON.stringify(val)==JSON.stringify(this.variableMultipleTemplate)){
+                        console.log("multi-variable no change detected");
+                    }
+                    else{
+                      console.log("multi-variable CHANGE DETECTED",val);
+                      this.saveVariableDebounce(val);
+                    }
+                    return;
+                }
+
               if (JSON.stringify(val)==JSON.stringify(this.variable_copy)){
                   console.log("no change detected");
               }
               else{
-                console.log("CHANGE DETECTED");
+                console.log("CHANGE DETECTED",val);
                 this.saveVariableDebounce(val);
               }
-
-              console.log("watch changes", this.variable_copy,val);
-              window._copy=this.variable_copy;
-              window._val=val;
             }
           }
     },
@@ -104,7 +107,7 @@ Vue.component('variables', {
             document.getElementById('variables-container').scrollTop= document.getElementById('variables-container').scrollHeight;
         },
         scrollToVariable: function(idx=0){
-            var id=this.edit_item;
+            var id=this.edit_items[0];
 
             if (idx>0){
                 id=idx;    
@@ -112,11 +115,6 @@ Vue.component('variables', {
 
             this.editVariable(id);
             
-            /*document.getElementById(id).scrollIntoView({
-                behavior: "smooth",
-              });
-            */
-
             var myElement = document.getElementById('v-'+id);
             var topPos = myElement.offsetTop - 100;
 
@@ -129,31 +127,25 @@ Vue.component('variables', {
 
             switch(direction) {
                 case 'first':
-                    this.edit_item=0;
+                    this.edit_items=[0];
                   break;
                 case 'prev':
-                  if (this.edit_item>0){
-                    this.edit_item=this.edit_item-1;
+                  if (this.edit_items[0]>0){
+                    this.edit_items[0]=this.edit_items[0]-1;
                   }
                   break;
                 case 'next':
-                    if (this.edit_item<total_vars){
-                        this.edit_item=this.edit_item+1;
+                    if (this.edit_items[0]<total_vars){
+                        this.edit_items[0]=this.edit_items[0]+1;
                     }
                     break;  
                 case 'last':
-                    this.edit_item=total_vars;
+                    this.edit_items[0]=total_vars;
                     break;  
               }
             
             this.scrollToVariable();
         },
-        /*updateVariable: function(variable) 
-        {
-            console.log("before local variable",this.variables[this.edit_item]);
-            this.$set(this.variables, this.edit_item, variable);
-            console.log("after local variable",this.variables[this.edit_item]);
-        },*/
         spreadMetadata: function ()
         {
             this.showSpreadMetadataDialog=true;
@@ -180,42 +172,61 @@ Vue.component('variables', {
             this.changeCaseUpdateStatus="";
             this.changeCaseDialog=false;
         },
-        editVariableMultiple: function(index)
+        editVariableMultiple: function(index,isShift=0)
         {
-            //if (!this.isVariableSelected(this.edit_item)){
-                //this.edit_items_multiple.push(this.edit_item);
-            //}
-            if (this.edit_item!=-1){
-                this.edit_items_multiple.push(this.edit_item);
-                this.edit_item=-1;
-            }
+            if (isShift==1){
+                start=this.getSelectionLastVariableIndex;
+                end=index;
 
-            if (!this.isVariableSelected(index)){
-                this.edit_items_multiple.push(index);                
-            }
+                if (start>end){
+                    start=index;
+                    end=this.getSelectionLastVariableIndex;
+                }
 
-            this.variableMultiple.time_stamp++;
+                for(i=start;i<=end;i++){
+                    this.edit_items.push(i);
+                }
+
+                //remove duplicates
+                this.edit_items = [...new Set(this.edit_items)];
+            }else{
+                if (!this.isVariableSelected(index)){
+                    this.edit_items.push(index);                
+                }else{
+                    if (this.edit_items.length>1){
+                        this.removeVariableFromSelection(index);
+                    }
+                }
+            }
+            if(this.edit_items.length>1){
+                this.initializeMultiVariable();
+            }
+        },
+        removeVariableFromSelection: function(item_idx)
+        {
+            const item = this.edit_items.indexOf(item_idx);
+            if (item > -1) {
+                this.edit_items.splice(item, 1);
+            }
         },
         isVariableSelected: function(index)
         { 
-            if(this.edit_item==index){
-                return true;
-            }
-            
-            if (this.edit_items_multiple.includes(index)){
+            if (this.edit_items.includes(index)){
                 return true;
             }
             return false;
         },
-        editVariable:function(index){
+        editVariable:function(index)
+        {
             this.exitEditMode();
             this.$nextTick().then(() => {
                 this.page_action="edit";
-                this.edit_item=index;
+                this.edit_items=[index];
                 this.variable_copy=_.cloneDeep(this.variables[index]);
             });
         },
-        addVariable:function(){
+        addVariable:function()
+        {
             this.variable_search="";
             this.page_action="edit";
             this.scrollToVariableBottom();
@@ -224,6 +235,7 @@ Vue.component('variables', {
                 "vid": "V" + (this.MaxVariableID+1),
                 "sid": this.dataset_id,
                 "file_id": this.fid,
+                "fid":this.fid,
                 "name": "untitled",
                 "labl": "untitled",
                 "var_format":{
@@ -238,12 +250,12 @@ Vue.component('variables', {
         },
         saveMultiSelectedVariables: function()
         {
-            if(this.edit_items_multiple.length==0){
+            if(this.edit_items.length<=1){
                 return;
             }
 
-            for(i=0;i<this.edit_items_multiple.length;i++){
-                variable_=this.variables[this.edit_items_multiple[i]];
+            for(i=0;i<this.edit_items.length;i++){
+                variable_=this.variables[this.edit_items[i]];
                 //update key/values
                 for(k=0;k<this.variableMultipleUpdateFields.length;k++){
                     field_name=this.variableMultipleUpdateFields[k];
@@ -258,7 +270,7 @@ Vue.component('variables', {
         saveVariableDebounce: _.debounce(function(data) {
             
             //multiple variables selected
-            if(this.edit_items_multiple.length>0){
+            if(this.edit_items.length>1){
                 this.saveMultiSelectedVariables();
                 return false;
             }
@@ -291,7 +303,7 @@ Vue.component('variables', {
         ,
         exitEditMode: function()
         {
-            if (this.edit_item==null){
+            if (!this.edit_items[0]){
                 return;
             }
 
@@ -300,8 +312,7 @@ Vue.component('variables', {
             }*/
             
             this.page_action="list";
-            this.edit_item=null;
-            this.edit_items_multiple=[];
+            this.edit_items=[];
         },
         hasDataChanged: function(){
             return JSON.stringify(this.variables[this.edit_item])!==JSON.stringify(this.variable_copy);
@@ -317,27 +328,48 @@ Vue.component('variables', {
         deleteVariable: function()
         {
             alert("Not implemented");
+        },
+        variableSelectedCount: function()
+        {
+            return this.edit_items.length;
+        },
+        initializeMultiVariable: function(){
+            this.variableMultiple=JSON.parse(JSON.stringify(this.variableMultipleTemplate));
+            console.log("init variableMultiple",this.variableMultiple);
         }
 
     },
     computed: {
-        activeVariable: function(){
-            if (this.edit_items_multiple.length>0){                
+        isSingleVariableSelected: function()
+        {
+            if (this.edit_items.length==1){
+                return true;
+            }
+            return false;
+        },
+        getSelectionLastVariableIndex: function(){
+            return this.edit_items[this.edit_items.length -1];
+        },
+        SingleVariableIndex: function()
+        {
+            if (this.edit_items.length==1){
+                return this.edit_items[0];
+            }
+        },
+        activeVariable: function()
+        {
+            if (this.edit_items.length>1){
                 return this.variableMultiple;
             }
 
-            return this.variables[this.edit_item];
-        },
-        selectedVariablesList: function(){
-            if (this.edit_items_multiple.length>0){                
-                return this.edit_items_multiple;
+            //for single variable selected
+            if (this.edit_items.length==1){
+                return this.variables[this.edit_items[0]];
             }
-
-            return [this.edit_item];
-        },
-        selectedVariablesDetail: function(){
+        },        
+        selectedVariables: function(){
             let variables=[];
-            this.selectedVariablesList.forEach((variable_idx)=>{
+            this.edit_items.forEach((variable_idx)=>{
                 variables.push(this.variables[variable_idx]);
             });
             return variables;
@@ -356,7 +388,6 @@ Vue.component('variables', {
                 let tmpVars = vars;
         
                 tmpVars = tmpVars.filter((item) => {
-                    //return (item.name == this.variable_search)
                     return (item.name + item.labl)
                         .toUpperCase()
                         .includes(this.variable_search.toUpperCase())
@@ -366,8 +397,6 @@ Vue.component('variables', {
             }
 
             return vars;
-
-          //  return this.$store.getters.getVariablesAll;
         }
     },
     template: `
@@ -381,7 +410,7 @@ Vue.component('variables', {
                             <div class="row section-title p-1 bg-primary" style="font-size:small;position:relative;">
                                 <div class="col-2">
                                     <strong>Variables</strong>
-                                    <span v-if="variables" class="badge badge-light">{{variables.length}}</span> {{edit_items_multiple}}
+                                    <span v-if="variables" class="badge badge-light">{{variables.length}}</span>
                                 </div>
 
                                 <div class="col-3">
@@ -442,24 +471,18 @@ Vue.component('variables', {
 
 
                             
-
-
-                            
                             <div style="position:relative;padding-bottom:50px;height:inherit;overflow-y: scroll;background:white;font-size:small" id="variables-container" >
 
-                                <table class="table table-striped table-bordered table-sm table-hover table-variables">
-                                    <?php /*<thead>
-                                        <tr>
-                                            <th></th>
-                                            <th>#</th>
-                                            <th>Name</th>
-                                            <th>Label</th>
-                                            <th>Format</th>
-                                        </tr> 
-                                    </thead> */ ?>
+                                <table class="table table-striped table-bordered table-sm table-hover table-variables">                                    
                                     <tbody>
-                                    <tr v-for="(variable, index) in variables" @click.shift.exact="editVariableMultiple(index)" @click.exact="editVariable(index)" :class="{'activeRow' : isVariableSelected(index)} " :id="'v-'+index" >
-                                        <td class="bg-secondary"><input type="checkbox" :value="index" v-model="edit_items_multiple"/></td>
+                                    <tr v-for="(variable, index) in variables"  
+                                        @click.alt.exact="editVariableMultiple(index)" 
+                                        @click.ctrl.exact="editVariableMultiple(index)" 
+                                        @click.shift.exact="editVariableMultiple(index,1)" 
+                                        @click.exact="editVariable(index)" 
+                                        :class="{'activeRow' : isVariableSelected(index)} " 
+                                        :id="'v-'+index"
+                                    >
                                         <td class="bg-secondary">V{{index+1}}</td>                                        
 
                                         <td class="var-name-edit">
@@ -475,7 +498,7 @@ Vue.component('variables', {
                                     </tbody>
                                 </table>
 
-                                <spread-metadata v-if="showSpreadMetadataDialog" v-model="showSpreadMetadataDialog" :variables="selectedVariablesDetail"></spread-metadata>
+                                <spread-metadata v-if="showSpreadMetadataDialog" v-model="showSpreadMetadataDialog" :variables="selectedVariables"></spread-metadata>
 
                             </div>
                         </div>
@@ -506,7 +529,7 @@ Vue.component('variables', {
                             <div class="p3" style="height:inherit;overflow:auto;background:white;">
                                 <div v-show="page_action=='edit' " >
                                     <div v-if="activeVariable">
-                                        <variable-edit  :variable="activeVariable" :multi_key="edit_items_multiple"  :index_key="edit_item" ></variable-edit>
+                                        <variable-edit  :variable="activeVariable" :multi_key="edit_items"  :index_key="SingleVariableIndex" ></variable-edit>
                                     </div>
                                 </div>                                
                             </div>
@@ -521,13 +544,13 @@ Vue.component('variables', {
                 <pane size="60" min-size="10">
                     <!--categories-->
                     <div style="height:100%;overflow:auto;background:white;" class="border">
-                    <variable-categories v-if="variables[edit_item]" :edit_index="edit_item"  :value="variables[edit_item]" />
+                    <variable-categories v-if="isSingleVariableSelected" :edit_index="SingleVariableIndex"  :value="activeVariable" ></variable-categories>
                     </div>
                     <!--categories-end-->
                 </pane>
                 <pane size="40" min-size="10">
                     <div style="height:100%;overflow:auto;" >
-                        <variable-info v-if="variables[edit_item]" :edit_index="edit_item"  :value="variables[edit_item]" />
+                        <variable-info v-if="isSingleVariableSelected" :edit_index="SingleVariableIndex"  :value="activeVariable" />
                     </div>
                 </pane>
                 </splitpanes>

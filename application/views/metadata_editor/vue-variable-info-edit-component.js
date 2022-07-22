@@ -3,7 +3,7 @@ Vue.component('variable-info', {
     props:['value'],
     data: function () {    
         return {   
-            variable:this.value,            
+            //variable:this.value,            
             variable_formats:{
                 "numeric": "Numeric",
                 "fixed": "Fixed string"
@@ -15,7 +15,13 @@ Vue.component('variable-info', {
             console.log("emitting variable change",this.value);
           this.$emit('updateVariable', this.value);
         }
-    },*/   
+    },*/
+    computed: {
+        variable: function()
+        {
+            return this.value;
+        }
+    },
     template: `
         <div class="variable-categories-edit-component" style="height:100vh">
             <!--var-format-->

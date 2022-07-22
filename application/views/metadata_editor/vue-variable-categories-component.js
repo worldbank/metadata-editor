@@ -3,7 +3,7 @@ Vue.component('variable-categories', {
     props:['value'],
     data: function () {    
         return {   
-            variable:this.value,
+            //variable:this.value,
             catgry_columns:[
                 {
                     "key": "value",
@@ -22,6 +22,37 @@ Vue.component('variable-categories', {
             }
         }
     },
+    created: function(){        
+        //this.variable=this.value;
+    },
+    mounted: function () {
+        //this.variable=this.value;
+        /*if (!this.variable.var_catgry){
+            this.variable.var_catgry=[{}];
+            //this.field_data.push({});
+        }*/
+    },
+    computed: {        
+        variable:
+        {
+            get(){
+                /*if (!this.value.var_catgry){
+                    this.value.var_catgry=[{}];
+                }*/
+                return this.value;
+            },
+            set(val){
+                this.$emit('update:value', val);
+            }
+        },
+        variableCategories: function()
+        {
+            if (!this.variable.var_catgry){
+                this.variable.var_catgry=[];
+            }
+            return this.variable
+        }
+    },
     /*methods: {
         updateValue: function () {
             console.log("emitting variable change",this.value);
@@ -30,7 +61,7 @@ Vue.component('variable-categories', {
     },*/   
     template: `
         <div class="variable-categories-edit-component" style="height:inherit">
-            <!--categories-->
+            <!--categories--> 
             <div style="font-size:small;" class="mb-2">
                 <div class="section-title p-1 bg-primary"><strong>Categories</strong></div>
                 <div>
