@@ -5,51 +5,42 @@ Vue.component('v-form-preview', {
         return {
         }
     },
-    mounted:function(){
-    },
-    methods: {
-        showFieldError(field,error){
-            //field_parts=field.split("-");
-            //field_name=field_parts[field_parts.length-1];
-            //return error.replace(field,field_name);
-            return error.replace(field,'');
-        },
-    },
     created() {
         this.field= this.$store.state.treeActiveNode;
-      },
+    },    
+    methods:{
+        isEmpty: function(data){
+            let tmp=JSON.parse(JSON.stringify(data));
+            this.removeEmpty(tmp);
 
-    /*created(){
-        vm=this;
-        EventBus.$on('activeSection', function(data) {
-            console.log("active",data,vm.active_section);
-            vm.activeSection(data);
-        });
-    },*/
-    computed: {
-        toggleClasses() {
-            return {
-                'fa-angle-down': !this.showChildren,
-                'fa-angle-up': this.showChildren
-            }
+            return tmp;
         },
-        hasChildrenClass() {
-            return {
-                'has-children': this.nodes
+        removeEmpty: function (obj) {
+            vm=this;
+            try {
+            $.each(obj, function(key, value){
+                if (value === "" || value === null || ($.isArray(value) && value.length === 0) ){
+                    delete obj[key];
+                } else if (JSON.stringify(value) == '[{}]' || JSON.stringify(value) == '[[]]'){
+                    delete obj[key];
+                } else if (Object.prototype.toString.call(value) === '[object Object]') {
+                    vm.removeEmpty(value);
+                } else if ($.isArray(value)) {
+                    $.each(value, function (k,v) { vm.removeEmpty(v); });
+                }
+            });
+            }catch (error) {
+                console.error(error);
             }
-        },
+        }
+    },
+    computed: {       
         formData () {
             return this.$deepModel('formData')
         }
     },
-    /*watch: {
-        '$store.state.active_section': function() {
-            alert("state",this.$store.state.active_section);
-            //console.log(this.$store.state.drawer)
-        }
-    },*/
     template: `
-        <div :class="'v-form ' + css_class"   >
+        <div :class="'v-form ' + css_class"   style="background:white;padding:5px;">
 
             <template v-for="item in items">
 
@@ -75,12 +66,12 @@ Vue.component('v-form-preview', {
                 <div v-if="item.type=='section'"  class="form-section mb-3" >
                     <div>
                     <template>
-                        <v-expansion-panels :value="0">
-                            <v-expansion-panel>
-                            <v-expansion-panel-header>
-                                {{item.title}}
-                            </v-expansion-panel-header>
-                            <v-expansion-panel-content>
+                        <div class="card-x">
+                            
+                            <div class="card-header-x border-bottom ml-3">
+                                <h5>{{item.title}}</h5>
+                            </div>
+                            <div class="card-body">
                                 <v-form-preview
                                         :items="item.items" 
                                         :title="item.title"
@@ -90,9 +81,9 @@ Vue.component('v-form-preview', {
                                         :css_class="'lvl-' + depth"
                                     >
                                 </v-form-preview>
-                            </v-expansion-panel-content>
-                            </v-expansion-panel>
-                        </v-expansion-panels>
+                            </div>
+                            
+                        </div>
                     </template>
                     </div>
                 </div>
@@ -107,7 +98,7 @@ Vue.component('v-form-preview', {
                             <span v-if="item.required==true" class="required-label"> * </span>
                         </label>
 
-                        <div>{{formData[item.key]}}</div>
+                        <div class="text-block">{{formData[item.key]}}</div>
                    
                     </div>
 
@@ -116,22 +107,21 @@ Vue.component('v-form-preview', {
 
 
             <div v-if="item.type=='array'">                
-            <div class="form-group form-field form-field-table" v-if="formData[item.key].length>0">
-                <label :for="'field-' + normalizeClassID(item.key)">{{item.title}}</label>
-                <grid-preview-component                    
-                    :id="'field-' + normalizeClassID(item.key)" 
-                    :value="formData[item.key]"
-                    :columns="item.props"
-                    :path="item.key"
-                    :field="item"
-                    >
-                </grid-preview-component>  
-            </div>    
-        </div>
+                <div class="form-group form-field form-field-table" v-if="formData[item.key]">                    
+                    <grid-preview-component                    
+                        :id="'field-' + normalizeClassID(item.key)" 
+                        :value="formData[item.key]"
+                        :columns="item.props"
+                        :path="item.key"
+                        :field="item"
+                        >
+                    </grid-preview-component>  
+                </div>    
+            </div>
 
         <div v-if="item.type=='simple_array'">
             <div class="form-group form-field form-field-table">
-                <label :for="'field-' + normalizeClassID(path)">{{title}}</label>
+                <label :for="'field-' + normalizeClassID(item.key)">{{item.title}}</label>
                 {{formData[item.key]}}
                 {{item.props}}
             </div>    
@@ -139,12 +129,12 @@ Vue.component('v-form-preview', {
 
         <div v-if="item.type=='nested_array'">
             <label :for="'field-' + normalizeClassID(item.key)">{{item.title}}</label>
-            <nested-section 
+            <nested-section-preview 
                 :value="formData[item.key]"                                         
                 :columns="item.props"
                 :title="item.title"
                 :path="item.key">
-            </nested-section>  
+            </nested-section-preview>  
         </div>
 
         <div v-if="item.type=='identification_section'">
@@ -160,7 +150,7 @@ Vue.component('v-form-preview', {
 
 
 
-            </template> 
+        </template> 
 
             
         </div>

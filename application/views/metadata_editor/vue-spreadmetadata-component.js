@@ -9,6 +9,9 @@ Vue.component('spread-metadata', {
             variable_matches:[],
             options:['documentation','question','categories'],
             options_fields:{
+                'info':[
+                    'labl'
+                ],
                 'documentation':[
                     'var_txt',
                     'var_universe',
@@ -236,7 +239,7 @@ Vue.component('spread-metadata', {
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="weight" id="weights" v-model="options">
+                                <input class="form-check-input" type="checkbox" value="weight" id="weights" v-model="options" disabled="disabled">
                                 <label class="form-check-label" for="weights">
                                     Weights
                                 </label>
@@ -247,8 +250,8 @@ Vue.component('spread-metadata', {
                         </v-card-text>
                         <v-divider></v-divider>
                         <v-card-actions>
-                        <v-btn text color="red" @click="spreadMetadata">Spread metadata</v-btn>
-                        <v-btn text color="red" @click.native="$emit('input', false)">Close</v-btn>
+                        <button type="button" class="btn btn-sm btn-primary" @click="spreadMetadata">Spread metadata</button>
+                        <button type="button" class="btn btn-sm btn-link" @click="$emit('input', false)">Cancel</button>
                         
                         </v-card-actions>
                     </v-card>

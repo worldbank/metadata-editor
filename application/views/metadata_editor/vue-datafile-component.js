@@ -20,18 +20,22 @@ Vue.component('datafile', {
     template: `
             <div class="datafile-component">
             <div v-for="file in dataFiles">
-                <div v-if="file.file_id==fid">
+                <div v-if="file.file_id==fid" class="mt-3 p-2">
+
+                <div>
+                    File name: <strong>{{file.file_name}}</strong>
+                </div>
 
                 <div>
                     {{file.file_id}}
                 </div>
 
                 <div>
-                    {{file.file_name}}
+                    {{file.description}}
                 </div>
 
-                <div>
-                    {{file.description}}
+                <div class="mt-3">
+                    <router-link :to="'/variables/' + file.file_id"><button type="button" class="btn btn-sm btn-outline-primary"><i class="fas fa-table"></i> Variables <span v-if="file.var_count>0">({{file.var_count}})</span></button></router-link>
                 </div>
 
                 </div>

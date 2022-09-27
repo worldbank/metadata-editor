@@ -16,6 +16,7 @@ class R extends MY_REST_Controller
 		require_once 'modules/guzzle/vendor/autoload.php';
 
 		$this->load->model("Catalog_model");				
+		$this->load->model("Editor_model");
 		//$this->is_admin_or_die();
 	}
     
@@ -82,33 +83,44 @@ class R extends MY_REST_Controller
 	}
 
 
-	public function data_dictionary_get($idno=null,$fileid=null,$filename=null,$filetype=null)
+	public function data_dictionary_post($sid=null)
 	{
+		$options=$this->raw_json_input();		
 
-		$sid=$this->get_sid_from_idno($idno);
+		try{
 
-		try{            
-			$client = new Client([
-				'base_uri' => 'http://localhost:2121/ocpu/library/mde/R/import/json??force=true&auto_unbox=true&digits=22'
-			]);
+			$exists=$this->Editor_model->check_id_exists($sid);
 
-			/*
-			$this->config->load('doi');
-			$doi_options=$this->config->item("doi");
-
-			$username=$doi_options['user'];
-			$password=$doi_options['password'];
-			*/
-
-			$survey_folder=$this->Catalog_model->get_survey_path_full($sid);
-		
-			if (!file_exists($survey_folder)){
-				throw new Exception('SURVEY_FOLDER_NOT_FOUND');
+			if(!$exists){
+				throw new Exception("Project not found");
+			}
+			
+			$required_params=array("fileid","filename","filetype");
+			foreach($required_params as $param){
+				if(!isset($options[$param])){
+					throw new Exception("Required parameter is missing: " . $param);
+				}
 			}
 
-			$survey_folder=FCPATH.$survey_folder;
+			$fileid=$options["fileid"];
+			$filename=$options["filename"];
+			$filetype=$options["filetype"];
+			
 
-			$data_file_path=$survey_folder.'/'.$filename;
+			$client = new Client([
+				//'base_uri' => 'http://localhost:2121/ocpu/library/mde/R/import/json??force=true&auto_unbox=true&digits=22'
+				'base_uri' => 'http://localhost:2121/ocpu/library/nadar/R/datafile_dictionary/json?force=true&auto_unbox=true&digits=22'
+			]);
+			
+			$project_folder=$this->Editor_model->get_project_folder($sid);
+		
+			if (!file_exists($project_folder)){
+				throw new Exception('PROJECT_FOLDER_NOT_FOUND');
+			}
+
+			$project_folder=realpath($project_folder);
+
+			$data_file_path=$project_folder.'/data/'.$filename;
 
 			if (!file_exists($data_file_path)){
 				throw new Exception("DATA_FILE_NOT_FOUND: ".$data_file_path);
@@ -138,7 +150,7 @@ class R extends MY_REST_Controller
 
 			$response=array_merge(array(
 				'status'=>'success',
-				'folder_path'=>$survey_folder,
+				'folder_path'=>$project_folder,
 				//'options'=>$body_options,
 				'code' => $api_response->getStatusCode(),// 200
 				'reason' => $api_response->getReasonPhrase() // OK
@@ -156,36 +168,31 @@ class R extends MY_REST_Controller
 	}
 
 
-	public function generate_csv_get($idno=null,$fileid=null,$filename=null)
+	public function generate_csv_get($sid=null,$fileid=null,$filename=null)
 	{
-		$sid=$this->get_sid_from_idno($idno);
-
 		try{            
+
+			$exists=$this->Editor_model->check_id_exists($sid);
+
+			if(!$exists){
+				throw new Exception("Project not found");
+			}
+			
 			$client = new Client([
-				'base_uri' => 'http://localhost:2121/ocpu/library/mde/R/writeCSV/json??force=true&auto_unbox=true&digits=22'
+				//'base_uri' => 'http://localhost:2121/ocpu/library/mde/R/writeCSV/json?force=true&auto_unbox=true&digits=22'
+				'base_uri' => 'http://localhost:2121/ocpu/library/nadar/R/datafile_write_csv/json?force=true&auto_unbox=true&digits=22'
 			]);
 
-			/*
-			$this->config->load('doi');
-			$doi_options=$this->config->item("doi");
-
-			$username=$doi_options['user'];
-			$password=$doi_options['password'];
-			*/
-
-			$survey_folder=$this->Catalog_model->get_survey_path_full($sid);
+			$project_folder=$this->Editor_model->get_project_folder($sid);
 		
-			if (!file_exists($survey_folder)){
-				throw new Exception('SURVEY_FOLDER_NOT_FOUND');
+			if (!file_exists($project_folder)){
+				throw new Exception('PROJECT_FOLDER_NOT_FOUND');
 			}
 
-			$survey_folder=FCPATH.$survey_folder;
-
-			$data_file_path=$survey_folder.'/'.$filename;
-
+			$project_folder=realpath($project_folder);
+			$data_file_path=$project_folder.'/data/'.$filename;
 			$ext=pathinfo($filename, PATHINFO_EXTENSION);
-
-			$csv_file_path=$survey_folder.'/'.str_replace(".".$ext,".csv",$filename);
+			$csv_file_path=$project_folder.'/data/'.str_replace(".".$ext,".csv",$filename);
 
 			if (!file_exists($data_file_path)){
 				throw new Exception("DATA_FILE_NOT_FOUND: ".$data_file_path);
@@ -209,7 +216,7 @@ class R extends MY_REST_Controller
 			$response=json_decode($api_response->getBody()->getContents(),true);
 			$response=array_merge(array(
 				'status'=>'success',
-				'folder_path'=>$survey_folder,
+				'folder_path'=>$data_file_path,
 				//'options'=>$body_options,
 				'code' => $api_response->getStatusCode(),// 200
 				'reason' => $api_response->getReasonPhrase() // OK
@@ -227,38 +234,40 @@ class R extends MY_REST_Controller
 	}
 
 
-	public function read_csv_get($idno=null,$fileid=null)
+	public function read_csv_get($sid=null,$fileid=null)
 	{
-		$sid=$this->get_sid_from_idno($idno);
-		$this->load->model("Data_file_model");
+		try{
+			$exists=$this->Editor_model->check_id_exists($sid);
 
-		try{            
-			$survey_folder=$this->Catalog_model->get_survey_path_full($sid);
-		
-			if (!file_exists($survey_folder)){
-				throw new Exception('SURVEY_FOLDER_NOT_FOUND');
+			if(!$exists){
+				throw new Exception("Project not found");
 			}
 
-			$survey_folder=FCPATH.$survey_folder;
+			$project_folder=$this->Editor_model->get_project_folder($sid);			
+		
+			if (!file_exists($project_folder)){
+				throw new Exception('PROJECT_FOLDER_NOT_FOUND');
+			}
+
+			$project_folder=realpath($project_folder);
 
 			//get filename by FID
-			$datafile=$this->Data_file_model->get_file_by_id($sid,$fileid);
+			$datafile=$this->Editor_model->data_file_by_id($sid,$fileid);
 			
 			if (!$datafile){
 				throw new Exception("DATAFILE_NOT_FOUND");
 			}
 
-			$filename=$datafile['file_name'];			
+			$filename=$datafile['file_name'];
+			
+			//$data_file_path=$project_folder.'/data/'.$filename;
+			//$ext=pathinfo($filename, PATHINFO_EXTENSION);
 
-			$data_file_path=$survey_folder.'/'.$filename;
+			$csv_file_path=$project_folder.'/data/'.$filename.'.csv';
 
-			$ext=pathinfo($filename, PATHINFO_EXTENSION);
-
-			$csv_file_path=$survey_folder.'/'.str_replace(".".$ext,".csv",$filename);
-
-			if (!file_exists($data_file_path)){
+			/*if (!file_exists($data_file_path)){
 				throw new Exception("DATA_FILE_NOT_FOUND: ".$data_file_path);
-			}
+			}*/
 
 			if (!file_exists($csv_file_path)){
 				throw new Exception("CSV_FILE_NOT_FOUND: ".$csv_file_path);

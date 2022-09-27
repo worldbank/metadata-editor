@@ -139,7 +139,7 @@ Vue.component('v-form', {
                         <span v-if="errors[0]" class="error">{{errors[0]}}</span>
                     </validation-provider>
                         
-                        <small :id="'field-toggle-' + normalizeClassID(item.key)" class="collapse help-text form-text text-muted">{{item.help_text}}</small>                            
+                        <small :id="'field-toggle-' + normalizeClassID(item.key)" class="collapse help-text form-text text-muted">{{item.help_text}}</small>
                     </div>
 
                 </div>
@@ -149,6 +149,8 @@ Vue.component('v-form', {
             <div v-if="item.type=='array'">                
             <div class="form-group form-field form-field-table">
                 <label :for="'field-' + normalizeClassID(item.key)">{{item.title}}</label>
+                <span class="small" v-if="item.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(item.key)" ><i class="far fa-question-circle"></i></span>
+                <small :id="'field-toggle-' + normalizeClassID(item.key)" class="collapse help-text form-text text-muted">{{item.help_text}}</small>
                 <grid-component
                     :id="'field-' + normalizeClassID(item.key)" 
                     :value="formData[item.key]"                                         
@@ -162,12 +164,12 @@ Vue.component('v-form', {
 
         <div v-if="item.type=='simple_array'">
             <div class="form-group form-field form-field-table">
-                <label :for="'field-' + normalizeClassID(path)">{{title}}</label>
+                <label :for="'field-' + normalizeClassID(path)">{{item.title}}</label>
                 <simple-array-component
-                    :id="'field-' + normalizeClassID(path)" 
-                    :value="formData[field.key]"                            
-                    :path="field.key"
-                    :field="field"
+                    :id="'field-' + normalizeClassID(item.key)" 
+                    :value="formData[item.key]"
+                    :path="item.key"
+                    :field="item"
                     >
                 </simple-array-component>  
             </div>    

@@ -1,5 +1,5 @@
 ///// nested-section
-Vue.component('nested-section', {
+Vue.component('nested-section-preview', {
     props:['value','columns','path','title'],
     data: function () {    
         return {
@@ -33,8 +33,7 @@ Vue.component('nested-section', {
 
                 <div :class="'nested-section-row nested-section-'+index" > 
                     <div class="label-wrapper" @click="toggleChildren(index)">
-                        <div class="tree-node form-section nested-form-section" >[{{index}}] - {{ title }}
-                            <button type="button"  class="btn btn-sm btn-link" v-on:click="remove(index)">Remove <i class="fa fa-trash-o" aria-hidden="true"></i></button>
+                        <div class="tree-node form-section nested-form-section" >[{{index}}] - {{ title }}                            
                             <span class="float-right section-toggle-icon"><i class="fas" :class="toggleClasses(index)"></i></span>
                         </div>
                     </div>
@@ -44,57 +43,40 @@ Vue.component('nested-section', {
                         
                             <div v-if="column.type=='nested_array'">
                                 <label :for="'field-' + normalizeClassID(column.key)">{{column.title}}</label>
-                                <nested-section 
+                                <nested-section-preview 
                                     :value="field_data[index][column.key]"                                         
                                     :columns="column.props"
                                     :title="column.title"
                                     :path="path + '.' + index + '.' + column.key">
-                                </nested-section>  
+                                </nested-section-preview>
                             </div>
 
-                            <!-- textarea-->
-                            <div v-if="column.type=='textarea'">
 
-                                <div class="form-group form-field" :class="['field-' + column.key, column.class] ">
-                                    <label :for="'field-' + normalizeClassID(column.key)">{{column.title}}</label>
-                                    <textarea
-                                        :value="getData(index+'.'+column.key)"
-                                        @input="setData(index+'.'+column.key, $event.target.value)"
-                                        class="form-control form-field-textarea" 
-                                        :id="'field-' + normalizeClassID(column.key)"
-                                    ></textarea>
-                                    <small class="help-text form-text text-muted">{{column.help_text}}</small>                            
-                                </div>
-
-                            </div> 
-                            
-                            <div  v-if="column.type=='text' || column.type=='string'">
-
-                                <div class="form-group form-field" :class="['field-' + column.key] ">
-                                    <label :for="'field-' + normalizeClassID(path + '-' + column.key)">{{column.title}}                                        
-                                        <span class="small" v-if="column.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(path + ' ' + column.key)" ><i class="far fa-question-circle"></i></span>
+                            <div v-if="column.type=='text' || column.type=='string' || column.type=='textarea' || column.type=='dropdown'">
+                                <div v-if="getData(index+'.'+column.key)" class="form-group form-field" :class="['field-' + column.key, column.class] ">
+                                    <label :for="'field-' + normalizeClassID(column.key)">
+                                        {{column.title}} 
+                                        <span class="small" v-if="column.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(column.key)" ><i class="far fa-question-circle"></i></span>
                                         <span v-if="column.required==true" class="required-label"> * </span>
-                                    </label> 
-                                    <input type="text"
-                                        :value="getData(index+'.'+column.key)"
-                                        @input="setData(index+'.'+column.key, $event.target.value)"
-                                        class="form-control" 
-                                        :id="'field-' + normalizeClassID(path + '-' + column.key)"                                     
-                                    >                                                                       
-                                    <small :id="'field-toggle-' + normalizeClassID(path + '-' + column.key)" class="collapse help-text form-text text-muted">{{column.help_text}}</small>                            
+                                    </label>
+
+                                    <div class="text-block">{{getData(index+'.'+column.key)}} </div>
+                            
                                 </div>
-                                
+
                             </div>
+
+                            
 
                             <div v-if="column.type=='array'">
                                 <div class="form-group form-field form-field-table">
                                     <label :for="'field-' + path">{{column.title}}</label>                                      
-                                    <grid-component 
+                                    <grid-preview-component 
                                         :value="field_data[index][column.key]"   
                                         :columns="column.props"
                                         :path="path + '['+index+']'+ column.key"
                                         >
-                                    </grid-component>  
+                                    </grid-preview-component>  
                                 </div>
                             </div>
                         
@@ -103,10 +85,6 @@ Vue.component('nested-section', {
                     
                     </div>
                 </template>
-
-                <div class="d-flex justify-content-center">
-                    <button type="button" class="btn btn-light btn-block btn-sm" @click="addRow" >Add row</button>    
-                </div>
 
             </div>  `,
     methods:{

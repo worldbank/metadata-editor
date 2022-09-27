@@ -212,20 +212,19 @@ Vue.component('metadata-form', {
                 <!--end-text-field-->
 
 
-                <div v-if="field.type=='array'">
-                dddddddddddd
-            <div class="form-group form-field form-field-table">
-                <label :for="'field-' + normalizeClassID(field.key)">{{title}}</label>
-                <grid-component
-                    :id="'field-' + normalizeClassID(field.key)" 
-                    :value="formData[field.key]"                                         
-                    :columns="field.props"
-                    :path="field.key"
-                    :field="field"
-                    >
-                </grid-component>  
-            </div>    
-        </div>
+                <div v-if="field.type=='array'">                
+                    <div class="form-group form-field form-field-table">
+                        <label :for="'field-' + normalizeClassID(field.key)">{{title}}</label>
+                        <grid-component
+                            :id="'field-' + normalizeClassID(field.key)" 
+                            :value="formData[field.key]"                                         
+                            :columns="field.props"
+                            :path="field.key"
+                            :field="field"
+                            >
+                        </grid-component>  
+                    </div>    
+                </div>
 
         <div v-if="field.type=='simple_array'">
             <div class="form-group form-field form-field-table">

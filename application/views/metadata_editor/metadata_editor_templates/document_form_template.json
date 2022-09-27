@@ -1,579 +1,581 @@
 {
-    "type": "template",
-    "title": "Document project",
-    "items":
-[
-    {
-        "type": "section",
-        "id": "document_description",
-        "title": "Document description",
-        "class": "recommended",                
-            "items": [
-                {
-                    "key": "document_description.title_statement.idno",
-                    "title": "IDNo (Unique study ID)",
-                    "help_text": "The ID number of a dataset is a unique number that is used to identify a particular survey. Define and use a consistent scheme to use. Such an ID could be constructed as follows: country-producer-survey-year-version where \n - country is the 3-letter ISO country abbreviation \n - producer is the abbreviation of the producing agency \n - survey is the survey abbreviation \n - year is the reference year (or the year the survey started) \n - version is the number dataset version number (see Version Description below)",
-                    "type": "text",
-                    "class": "required",
-                    "rules": "required|idno|alpha_dash|min:5|max:80",
-                    "required": true,
-                    "name": "idno"
-                },                       
-                {
-                    "key": "document_description.title_statement.title",
-                    "title": "Title",
-                    "type": "text",
-                    "class": "required",
-                    "required": true,
-                    "rules": "required|max:300",
-                    "name": "title"
-                },
-                {
-                    "key": "document_description.title_statement.sub_title",
-                    "title": "Subtitle",
-                    "type": "text"
-                },
-                {
-                    "key": "document_description.title_statement.alternate_title",
-                    "title": "Alternate title",
-                    "type": "text"
-                },
-                {
-                    "key": "document_description.title_statement.abbreviated_title",
-                    "title": "Abbreviated Title",
-                    "help_text": "Title as abbreviated for indexing or identification.",
-                    "type": "text"
-                },
-
-                {
-                    "key": "document_description.type",
-                    "title": "Document type",
-                    "type": "dropdown",
-                    "class": "recommended",
-                    "help_text": "Document type e.g. article, book, journal, etc",
-                    "enum": {
-                        "article":"Article",
-                        "book": "Book",
-                        "booklet":"Booklet",
-                        "collection": "Collection",
-                        "conference": "Conference",
-                        "inbook": "In book",
-                        "incollection": "In collection" ,
-                        "inproceeding": "In proceeding",
-                        "manual" : "Manual",
-                        "masterthesis": "Master thesis",
-                        "patent": "Patent",
-                        "phdthesis" : "PhD thesis",
-                        "proceedings" : "Proceedings",
-                        "techreport" : "Technical report",
-                        "working-paper": "Working paper",
-                        "website": "Website",
-                        "other": "Other"
-                    }
-                },
-                {
-                    "key": "document_description.description",
-                    "title": "Description",
-                    "type": "textarea",
-                    "class": "recommended",
-                    "help_text": "Description"
-                },
-                {
-                    "key": "document_description.toc",
-                    "title": "Table of contents",
-                    "type": "textarea"
-                },
-                {
-                    "key": "document_description.toc_structured",
-                    "title": "Table of contents (structured)",
-                    "type": "array",
-                    "props": {
-                        "id": {
-                            "key": "id",
-                            "title": "ID",
-                            "type": "text"
-                        },
-                        "parent_id": {
-                            "key": "parent_id",
-                            "title": "Parent ID",
-                            "type": "text"
-                        },
-                        "name": {
-                            "key": "name",
-                            "title": "Name",
-                            "type": "text"
-                        }
-                    }
-                },
-                {
-                    "key": "document_description.abstract",
-                    "title": "Abstract",
-                    "type": "textarea"
-                },
-                {
-                    "key": "document_description.notes",
-                    "title": "Notes",
-                    "type": "array",
-                    "props": {
-                        "note": {
-                            "key": "note",
-                            "title": "Note",
-                            "type": "text"
-                        }
-                    }
-                },
-                {
-                    "key": "document_description.scope",
-                    "title": "Scope",
-                    "help_text": "The extent or scope of the content of the resource. This fields maps to Dublin Core's coverage field",
-                    "type": "textarea"
-                },
-
-                {
-                    "key": "document_description.ref_country",
-                    "title": "Countries",
-                    "help_text": "Referenced countries",
-                    "type": "array",
-                    "props": {
-                        "name": {
-                            "key": "name",
-                            "title": "Country Name",
-                            "type": "text",
-                            "help_text": "Country name",
-                            "rules":"required"
-                        },
-                        "code": {
-                            "key": "code",
-                            "title": "Country ISO 3 code",
-                            "type": "text",
-                            "help_text": "Country ISO 3 code"
-                        }
-                    }
-                },
-
-                {
-                    "key": "document_description.date_published",
-                    "title": "Date published",
-                    "type": "text",
-                    "class": "recommended",
-                    "help_text": "Date document is published"
-                },
-
-
-                {
-                    "key": "document_description.id_numbers",
-                    "title": "Identifiers (ISSN/ISBN/DOI)",
-                    "type": "array",
-                    "props": {
-                        "type": {
-                            "key": "type",
-                            "title": "ID Type",
-                            "type": "text",
-                            "help_text": "ID number type such as ISSN, ISBN, DOI"
-                        },
-                        "value": {
-                            "key": "value",
-                            "title": "Value",
-                            "type": "text"
-                        }
-                    }
-                },
-
-                {
-                    "key": "document_description.publication_frequency",
-                    "title": "Publication frequency",
-                    "type": "text"
-                },
-
-                {
-                    "key": "document_description.bibliographic_citation",
-                    "title": "Bibliographic citation",
-                    "type": "array",
-                    "props": {
-                        "style": {
-                            "key": "style",
-                            "title": "Citation style",
-                            "type": "text",
-                            "help_text": "Citation style e.g. APA"
-                        },                    
-                        "citation": {
-                            "key": "citation",
-                            "title": "Citation",
-                            "type": "textarea"
-                        }
-                    }
-                    
-                },
-
-                {
-                    "key": "document_description.chapter",
-                    "title": "Chapter number",
-                    "type": "text"
-                },
-
-                {
-                    "key": "document_description.edition",
-                    "title": "Edition",
-                    "type": "text"
-                },
-
-                {
-                    "key": "document_description.institution",
-                    "title": "Institution name",
-                    "type": "text"
-                },
-
-                {
-                    "key": "document_description.journal",
-                    "title": "Journal name",
-                    "type": "text"
-                },
-
-                {
-                    "key": "document_description.volume",
-                    "title": "Volume",
-                    "type": "text"
-                },
-
-                {
-                    "key": "document_description.issue",
-                    "title": "Issue",
-                    "type": "text"
-                },
-
-                {
-                    "key": "document_description.pages",
-                    "title": "Pages",
-                    "type": "text"
-                },
-
-                {
-                    "key": "document_description.series",
-                    "title": "Series name",
-                    "type": "text",
-                    "class": "recommended",
-                    "help_text": "The name given to a series or set of books. When citing an entire book, the title field gives its title and the optional series field gives the name of a series in which the book was published."
-                },
-
-                {
-                    "key": "document_description.creator",
-                    "title": "Creator",
-                    "type": "text"
-                },
-
-                {
-                    "key": "document_description.authors",
-                    "title": "Authors",
-                    "help_text": "Document authors",
-                    "type": "array",
-                    "props": {
-                        "first_name": {
-                            "key": "first_name",
-                            "title": "First Name",
-                            "type": "text",
-                            "help_text": "First name"
-                        },
-                        "initial": {
-                            "key": "initial",
-                            "title": "Initial",
-                            "type": "text",
-                            "help_text": "Name initial"
-                        },
-                        "last_name": {
-                            "key": "last_name",
-                            "title": "Last name",
-                            "type": "text",
-                            "help_text": "Last name"
-                        },
-                        "affiliation": {
-                            "key": "affiliation",
-                            "title": "Affiliation",
-                            "type": "text"
-                        }
-                    }
-                },
-
-                {
-                    "key": "document_description.contributors",
-                    "title": "Contributors",
-                    "help_text": "Document contributors",
-                    "type": "array",
-                    "props": {
-                        "first_name": {
-                            "key": "first_name",
-                            "title": "First Name",
-                            "type": "text",
-                            "help_text": "First name"
-                        },
-                        "initial": {
-                            "key": "initial",
-                            "title": "Initial",
-                            "type": "text",
-                            "help_text": "Name initial"
-                        },
-                        "last_name": {
-                            "key": "last_name",
-                            "title": "Last name",
-                            "type": "text",
-                            "help_text": "Last name"
-                        },
-                        "affiliation": {
-                            "key": "affiliation",
-                            "title": "Affiliation",
-                            "type": "text"
-                        }
-                    }
-                },
-                                
-                {
-                    "key": "document_description.languages",
-                    "title": "Languages",
-                    "help_text": "Languages",
-                    "type": "array",
-                    "props": {
-                        "name": {
-                            "key": "name",
-                            "title": "Language Name",
-                            "type": "text",
-                            "help_text": "Language name"
-                        },
-                        "code": {
-                            "key": "code",
-                            "title": "Language code",
-                            "type": "text",
-                            "help_text": "Language code"
-                        }
-                    }
-                },
-
-                {
-                    "key": "document_description.rights",
-                    "title": "Rights",
-                    "type": "textarea"
-                },
-
-                {
-                    "key": "document_description.copyright",
-                    "title": "Copyrights",
-                    "type": "text"
-                },
-                {
-                    "key": "document_description.keywords",
-                    "type": "array",
-                    "title": "Keywords",
-                    "props": {
-                        "name": {
-                            "key": "name",
-                            "title": "Keyword",
-                            "type": "text"
-                        },
-                        "vocabulary": {
-                            "key": "vocabulary",
-                            "title": "Vocabulary",
-                            "type": "text"
-                        },
-                        "uri": {
-                            "key": "uri",
-                            "title": "URL",
-                            "type": "text"
-                        }
-                    }
-                },
-                {
-                    "key": "document_description.themes",
-                    "type": "array",
-                    "title": "Themes",
-                    "props": {
-                        "name": {
-                            "key": "name",
-                            "title": "Theme",
-                            "type": "text"
-                        },
-                        "vocabulary": {
-                            "key": "vocabulary",
-                            "title": "Vocabulary",
-                            "type": "text"
-                        },
-                        "uri": {
-                            "key": "uri",
-                            "title": "URL",
-                            "type": "text"
-                        }
-                    }
-                },
-                {
-                    "key": "document_description.topics",
-                    "type": "array",
-                    "title": "Topics",
-                    "props": {
-                        "id": {
-                            "key": "id",
-                            "title": "ID",
-                            "type": "text"
-                        },
-                        "name": {
-                            "key": "name",
-                            "title": "Topic",
-                            "type": "text"
-                        },
-                        "parent_id": {
-                            "key": "parent_id",
-                            "title": "Parent topic Identifier",
-                            "help_text": "For subtopics, provide the ID of the parent topic",
-                            "type": "text"
-                        },
-                        "vocabulary": {
-                            "key": "vocabulary",
-                            "title": "Vocabulary",
-                            "type": "text"
-                        },
-                        "uri": {
-                            "key": "uri",
-                            "title": "URL",
-                            "type": "text"
-                        }
-                    }
-                },
-                {
-                    "key": "document_description.disciplines",
-                    "type": "array",
-                    "title": "Disciplines",
-                    "props": {
-                        "name": {
-                            "key": "name",
-                            "title": "Name",
-                            "type": "text"
-                        },
-                        "vocabulary": {
-                            "key": "vocabulary",
-                            "title": "Vocabulary",
-                            "type": "text"
-                        },
-                        "uri": {
-                            "key": "uri",
-                            "title": "URL",
-                            "type": "text"
-                        }
-                    }
-                },
-                {
-                    "key": "document_description.relations",
-                    "title": "Relations",
-                    "help_text": "Related tables",
-                    "type": "array",
-                    "props": {
-                        "name": {
-                            "key": "name",
-                            "title": "Name",
-                            "type": "string"
-                        },
-                        "type": {
-                            "key": "type",
-                            "title": "Type",
-                            "type": "string",
-                            "enum": [
-                                "isPartOf",
-                                "hasPart",
-                                "isVersionOf",
-                                "isFormatOf",
-                                "hasFormat",
-                                "references",
-                                "isReferencedBy",
-                                "isBasedOn",
-                                "isBasisFor",
-                                "requires",
-                                "isRequiredBy"
-                            ]
-                        }
-                    }
-                }
-            ]
-    },    
-
-    {
-        "type": "section",
-        "id": "document_tags",
-        "title": "Tags",
-        "class": "recommended",
-        "items": [
-            {
-                "key": "tags",
-                "title": "Tags",
-                "type": "array",
-                "props": {
-                    "tag_group": {
-                        "key": "tag_group",
-                        "title": "Tag group",
-                        "type": "string"
-                    },
-                    "tag": {
-                        "key": "tag",
-                        "title": "Tag",
-                        "type": "string"
-                    }
-                }
-            }
-        ]
-    },   
-    {
-        "type": "section",
-        "id": "metadata_information",
-        "title": "Metadata Description",
-        "class": "mandatory recommended",
-        "expanded": true,
-        "items": [
-            {
-                "key": "metadata_information.idno",
-                "type": "text",
-                "class": "idno",
-                "title": "Unique ID"
-            },
-            {
-                "key": "metadata_information.producers",
-                "class": "required",
-                "title": "Producers",
-                "type": "array",
-                "props": {
-                    "name": {
-                        "key": "name",
-                        "title": "Name",
-                        "type": "text",
-                        "help_text": "Name (required)",
-                        "class": "required"
-                    },
-                    "abbr": {
-                        "key": "abbreviation",
-                        "title": "Abbreviation",
-                        "type": "text"
-                    },
-                    "affiliation": {
-                        "key": "affiliation",
-                        "type": "string",
-                        "title": "Affiliation"
-                    },
-                    "role": {
-                        "key": "role",
-                        "title": "Role",
-                        "type": "string"
-                    }
-                }
-            },
-            {
-                "key": "metadata_information.production_date",
-                "type": "text",
-                "class": "required",
-                "title": "Date of Production",
-                "help_text": "Document production date using format(YYYY-MM-DD)"
-            },
-            {
-                "key": "metadata_information.version",
-                "type": "text",
-                "class": "required",
-                "title": "Document version",
-                "help_text": "Identify and describe the current version of the document",
-            }
-        ]
-    }
-]
-
+	"type": "template",
+	"title": "Document project",
+	"items": [
+		{
+			"type": "section_container",
+			"key": "document",
+			"title": "Document",
+			"class": "mandatory recommended",
+			"expanded": true,
+			"items": [
+				{
+					"type": "section",
+					"key": "overview",
+					"title": "Overview",
+					"class": "recommended",
+					"items": [
+						{
+							"key": "document_description.title_statement.idno",
+							"title": "IDNo",
+							"help_text": "The ID number of a dataset is a unique number that is used to identify a particular survey. Define and use a consistent scheme to use. Such an ID could be constructed as follows: country-producer-survey-year-version where \n - country is the 3-letter ISO country abbreviation \n - producer is the abbreviation of the producing agency \n - survey is the survey abbreviation \n - year is the reference year (or the year the survey started) \n - version is the number dataset version number (see Version Description below)",
+							"type": "text",
+							"class": "required",
+							"rules": "required|idno|alpha_dash|min:5|max:80",
+							"required": true,
+							"name": "idno"
+						},
+						{
+							"key": "document_description.identifiers",
+							"title": "Other Identifiers",
+							"type": "array",
+							"help_text": "Identifiers such as ISSN, ISBN, DOI",
+							"props": {
+								"type": {
+									"key": "type",
+									"title": "ID Type",
+									"type": "text",
+									"help_text": "Identifiers such as ISSN, ISBN, DOI"
+								},
+								"identifier": {
+									"key": "identifier",
+									"title": "Identifier",
+									"type": "text"
+								}
+							}
+						},
+						{
+							"key": "document_description.type",
+							"title": "Document type",
+							"type": "dropdown",
+							"class": "recommended",
+							"help_text": "Document type e.g. article, book, journal, etc",
+							"enum": {
+								"article": "Article",
+								"book": "Book",
+								"booklet": "Booklet",
+								"collection": "Collection",
+								"conference": "Conference",
+								"inbook": "In book",
+								"incollection": "In collection",
+								"inproceeding": "In proceeding",
+								"manual": "Manual",
+								"masterthesis": "Master thesis",
+								"patent": "Patent",
+								"phdthesis": "PhD thesis",
+								"proceedings": "Proceedings",
+								"techreport": "Technical report",
+								"working-paper": "Working paper",
+								"website": "Website",
+								"other": "Other"
+							}
+						},
+						{
+							"key": "document_description.title_statement.title",
+							"title": "Title",
+							"type": "text",
+							"class": "required",
+							"required": true,
+							"rules": "required|max:300",
+							"name": "title"
+						},
+						{
+							"key": "document_description.title_statement.sub_title",
+							"title": "Subtitle",
+							"type": "text",
+							"rules": "max:300"
+						},
+						{
+							"key": "document_description.title_statement.alternate_title",
+							"title": "Alternate title",
+							"type": "text"
+						},
+						{
+							"key": "document_description.title_statement.abbreviated_title",
+							"title": "Abbreviated Title",
+							"help_text": "Title as abbreviated for indexing or identification.",
+							"type": "text"
+						}
+					]
+				},				
+				{
+					"type": "section",
+					"key": "document_description",
+					"title": "Description",
+					"class": "recommended",
+					"items": [						
+						{
+							"key": "document_description.description",
+							"title": "Description",
+							"type": "textarea",
+							"class": "recommended",
+							"help_text": "Description"
+						},
+						{
+							"key": "document_description.toc",
+							"title": "Table of contents",
+							"type": "textarea"
+						},
+						{
+							"key": "document_description.toc_structured",
+							"title": "Table of contents (structured)",
+							"type": "array",
+							"props": {
+								"id": {
+									"key": "id",
+									"title": "ID",
+									"type": "text"
+								},
+								"parent_id": {
+									"key": "parent_id",
+									"title": "Parent ID",
+									"type": "text"
+								},
+								"name": {
+									"key": "name",
+									"title": "Name",
+									"type": "text"
+								}
+							}
+						},
+						{
+							"key": "document_description.abstract",
+							"title": "Abstract",
+							"type": "textarea"
+						},
+						{
+							"key": "document_description.notes",
+							"title": "Notes",
+							"type": "array",
+							"props": {
+								"note": {
+									"key": "note",
+									"title": "Note",
+									"type": "text"
+								}
+							}
+						},
+						{
+							"key": "document_description.scope",
+							"title": "Scope",
+							"help_text": "The extent or scope of the content of the resource. This fields maps to Dublin Core's coverage field",
+							"type": "textarea"
+						},
+						{
+							"key": "document_description.ref_country",
+							"title": "Countries",
+							"help_text": "Referenced countries",
+							"type": "array",
+							"props": {
+								"name": {
+									"key": "name",
+									"title": "Country Name",
+									"type": "text",
+									"help_text": "Country name",
+									"rules": "required"
+								},
+								"code": {
+									"key": "code",
+									"title": "Country ISO 3 code",
+									"type": "text",
+									"help_text": "Country ISO 3 code"
+								}
+							}
+						},
+						{
+							"key": "document_description.date_published",
+							"title": "Date published",
+							"type": "text",
+							"class": "recommended",
+							"help_text": "Date document is published"
+						},
+						{
+							"key": "document_description.publication_frequency",
+							"title": "Publication frequency",
+							"type": "text"
+						},
+						{
+							"key": "document_description.bibliographic_citation",
+							"title": "Bibliographic citation",
+							"type": "array",
+							"props": {
+								"style": {
+									"key": "style",
+									"title": "Citation style",
+									"type": "text",
+									"help_text": "Citation style e.g. APA"
+								},
+								"citation": {
+									"key": "citation",
+									"title": "Citation",
+									"type": "textarea"
+								}
+							}
+						},
+						{
+							"key": "document_description.chapter",
+							"title": "Chapter number",
+							"type": "text"
+						},
+						{
+							"key": "document_description.edition",
+							"title": "Edition",
+							"type": "text"
+						},
+						{
+							"key": "document_description.institution",
+							"title": "Institution name",
+							"type": "text"
+						},
+						{
+							"key": "document_description.journal",
+							"title": "Journal name",
+							"type": "text"
+						},
+						{
+							"key": "document_description.volume",
+							"title": "Volume",
+							"type": "text"
+						},
+						{
+							"key": "document_description.issue",
+							"title": "Issue",
+							"type": "text"
+						},
+						{
+							"key": "document_description.pages",
+							"title": "Pages",
+							"type": "text"
+						},
+						{
+							"key": "document_description.series",
+							"title": "Series name",
+							"type": "text",
+							"class": "recommended",
+							"help_text": "The name given to a series or set of books. When citing an entire book, the title field gives its title and the optional series field gives the name of a series in which the book was published."
+						},
+						{
+							"key": "document_description.creator",
+							"title": "Creator",
+							"type": "text"
+						},
+						{
+							"key": "document_description.languages",
+							"title": "Languages",
+							"help_text": "Languages",
+							"type": "array",
+							"props": {
+								"name": {
+									"key": "name",
+									"title": "Language Name",
+									"type": "text",
+									"help_text": "Language name"
+								},
+								"code": {
+									"key": "code",
+									"title": "Language code",
+									"type": "text",
+									"help_text": "Language code"
+								}
+							}
+						},
+						{
+							"key": "document_description.rights",
+							"title": "Rights",
+							"type": "textarea"
+						},
+						{
+							"key": "document_description.copyright",
+							"title": "Copyrights",
+							"type": "text"
+						},
+						{
+							"key": "document_description.keywords",
+							"type": "array",
+							"title": "Keywords",
+							"props": {
+								"name": {
+									"key": "name",
+									"title": "Keyword",
+									"type": "text"
+								},
+								"vocabulary": {
+									"key": "vocabulary",
+									"title": "Vocabulary",
+									"type": "text"
+								},
+								"uri": {
+									"key": "uri",
+									"title": "URL",
+									"type": "text"
+								}
+							}
+						},
+						{
+							"key": "document_description.themes",
+							"type": "array",
+							"title": "Themes",
+							"props": {
+								"name": {
+									"key": "name",
+									"title": "Theme",
+									"type": "text"
+								},
+								"vocabulary": {
+									"key": "vocabulary",
+									"title": "Vocabulary",
+									"type": "text"
+								},
+								"uri": {
+									"key": "uri",
+									"title": "URL",
+									"type": "text"
+								}
+							}
+						},
+						{
+							"key": "document_description.topics",
+							"type": "array",
+							"title": "Topics",
+							"props": {
+								"id": {
+									"key": "id",
+									"title": "ID",
+									"type": "text"
+								},
+								"name": {
+									"key": "name",
+									"title": "Topic",
+									"type": "text"
+								},
+								"parent_id": {
+									"key": "parent_id",
+									"title": "Parent topic Identifier",
+									"help_text": "For subtopics, provide the ID of the parent topic",
+									"type": "text"
+								},
+								"vocabulary": {
+									"key": "vocabulary",
+									"title": "Vocabulary",
+									"type": "text"
+								},
+								"uri": {
+									"key": "uri",
+									"title": "URL",
+									"type": "text"
+								}
+							}
+						},
+						{
+							"key": "document_description.disciplines",
+							"type": "array",
+							"title": "Disciplines",
+							"props": {
+								"name": {
+									"key": "name",
+									"title": "Name",
+									"type": "text"
+								},
+								"vocabulary": {
+									"key": "vocabulary",
+									"title": "Vocabulary",
+									"type": "text"
+								},
+								"uri": {
+									"key": "uri",
+									"title": "URL",
+									"type": "text"
+								}
+							}
+						},
+						{
+							"key": "document_description.relations",
+							"title": "Relations",
+							"help_text": "Related tables",
+							"type": "array",
+							"props": {
+								"name": {
+									"key": "name",
+									"title": "Name",
+									"type": "string"
+								},
+								"type": {
+									"key": "type",
+									"title": "Type",
+									"type": "string",
+									"enum": [
+										"isPartOf",
+										"hasPart",
+										"isVersionOf",
+										"isFormatOf",
+										"hasFormat",
+										"references",
+										"isReferencedBy",
+										"isBasedOn",
+										"isBasisFor",
+										"requires",
+										"isRequiredBy"
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"type": "section",
+					"key": "authors",
+					"title": "Authors and Contributors",
+					"class": "recommended",
+					"items": [
+						{
+							"key": "document_description.authors",
+							"title": "Authors",
+							"help_text": "Document authors",
+							"type": "array",
+							"props": {
+								"first_name": {
+									"key": "first_name",
+									"title": "First Name",
+									"type": "text",
+									"help_text": "First name"
+								},
+								"initial": {
+									"key": "initial",
+									"title": "Initial",
+									"type": "text",
+									"help_text": "Name initial"
+								},
+								"last_name": {
+									"key": "last_name",
+									"title": "Last name",
+									"type": "text",
+									"help_text": "Last name"
+								},
+								"affiliation": {
+									"key": "affiliation",
+									"title": "Affiliation",
+									"type": "text"
+								}
+							}
+						},
+						{
+							"key": "document_description.contributors",
+							"title": "Contributors",
+							"help_text": "Document contributors",
+							"type": "array",
+							"props": {
+								"first_name": {
+									"key": "first_name",
+									"title": "First Name",
+									"type": "text",
+									"help_text": "First name"
+								},
+								"initial": {
+									"key": "initial",
+									"title": "Initial",
+									"type": "text",
+									"help_text": "Name initial"
+								},
+								"last_name": {
+									"key": "last_name",
+									"title": "Last name",
+									"type": "text",
+									"help_text": "Last name"
+								},
+								"affiliation": {
+									"key": "affiliation",
+									"title": "Affiliation",
+									"type": "text"
+								}
+							}
+						}
+					]
+				},
+				{
+					"type": "section",
+					"key": "document_tags",
+					"title": "Tags",
+					"class": "recommended",
+					"items": [
+						{
+							"key": "tags",
+							"title": "Tags",
+							"type": "array",
+							"props": {
+								"tag_group": {
+									"key": "tag_group",
+									"title": "Tag group",
+									"type": "string"
+								},
+								"tag": {
+									"key": "tag",
+									"title": "Tag",
+									"type": "string"
+								}
+							}
+						}
+					]
+				},
+				{
+					"type": "section",
+					"key": "metadata_information",
+					"title": "Metadata Description",
+					"class": "mandatory recommended",
+					"expanded": true,
+					"items": [
+						{
+							"key": "metadata_information.idno",
+							"type": "text",
+							"class": "idno",
+							"title": "Unique ID"
+						},
+						{
+							"key": "metadata_information.producers",
+							"class": "required",
+							"title": "Producers",
+							"type": "array",
+							"props": {
+								"name": {
+									"key": "name",
+									"title": "Name",
+									"type": "text",
+									"help_text": "Name (required)",
+									"class": "required"
+								},
+								"abbr": {
+									"key": "abbreviation",
+									"title": "Abbreviation",
+									"type": "text"
+								},
+								"affiliation": {
+									"key": "affiliation",
+									"type": "string",
+									"title": "Affiliation"
+								},
+								"role": {
+									"key": "role",
+									"title": "Role",
+									"type": "string"
+								}
+							}
+						},
+						{
+							"key": "metadata_information.production_date",
+							"type": "text",
+							"class": "required",
+							"title": "Date of Production",
+							"help_text": "Document production date using format(YYYY-MM-DD)"
+						},
+						{
+							"key": "metadata_information.version",
+							"type": "text",
+							"class": "required",
+							"title": "Document version",
+							"help_text": "Identify and describe the current version of the document"
+						}
+					]
+				}
+			]
+		}
+	]
 }

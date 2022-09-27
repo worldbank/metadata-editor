@@ -25,7 +25,7 @@
                             "class": "required",
                             "required": true,
                             "help_text": "help text for idno",
-                            "rules":"required|idno|alpha_dash|min:5|max:80"
+                            "rules":"required|alpha_dash|min:5|max:80"
                         },
                         {
                             "key": "study_desc.title_statement.title",
@@ -462,7 +462,7 @@
                 },
                 {
                     "type": "section",
-                    "id": "data_access",
+                    "key": "data_access",
                     "title": "Data access",
                     "items": [
                         {
@@ -534,6 +534,7 @@
                 {
                     "type": "section",
                     "id": "disclaimer_copyrights",
+                    "key": "disclaimer_copyrights",
                     "title": "Disclaimer and copyright",
                     "items": [
                         {

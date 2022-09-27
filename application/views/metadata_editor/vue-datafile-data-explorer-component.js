@@ -4,7 +4,6 @@ Vue.component('datafile-data-explorer', {
     data: function () {    
         return {
             field_data: this.value,
-            dataset_idno:project_idno,
             form_local:{},
             fid:this.file_id,
             variable_data:[]
@@ -21,12 +20,15 @@ Vue.component('datafile-data-explorer', {
         },
         activeDataFile(){
             return this.$store.getters.getDataFileById(this.fid);
-        }
+        },
+        ProjectID(){
+            return this.$store.state.project_id;
+        },
     },
     methods:{
         loadData: function() {
             vm=this;
-            let url=CI.base_url + '/api/R/read_csv/'+vm.dataset_idno+'/'+this.fid;
+            let url=CI.base_url + '/api/R/read_csv/'+this.ProjectID+'/'+this.fid;
             axios.get(url)
             .then(function (response) {
                 if(response.data){                    
@@ -43,7 +45,7 @@ Vue.component('datafile-data-explorer', {
     },  
     template: `
             <div class="datafile-component" v-if="activeDataFile">
-            {{fid}} - {{dataset_idno}}
+            {{fid}}
 
             <h5>Data</h5>
 

@@ -10,21 +10,34 @@
 .v-expansion-panel-header{
   font-weight:bold;
 }
+
+.metadata-form .nested-section{
+    background:white;
+    border:1px solid #dee2e6;
+}
+
+.metadata-form .nested-section .nested-section-body{
+    padding:10px;
+}
+
+.metadata-form .nested-section .section-toggle-icon{
+    padding:5px 10px;
+}
+
 /*.metadata-form-container .field-type-section,*/
-.metadata-form-container .nested-section-row{
+.metadata-form .nested-section-row{
+    margin:10px;
     border:0px;
-    margin-bottom:5px;
-    background:#f3f3f3;
     padding-bottom:5px;
     box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important
 }
 
-.metadata-form-container .required-label{
+.metadata-form .required-label{
     font-weight:bold;
     color:red;
 }
 
-.metadata-form-container .form-field-textarea{
+.metadata-form .form-field-textarea{
     min-height:200px;
 }
 
@@ -327,3 +340,12 @@ html,body {
     display: block;
     cursor: pointer;
   }
+
+  .text-block {
+    white-space: pre-wrap;    
+}
+
+/*vuetify pagination active*/
+.theme--light.v-pagination .v-pagination__item--active{
+    background:#007bff;
+}

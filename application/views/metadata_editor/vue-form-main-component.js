@@ -7,19 +7,7 @@ Vue.component('form-main', {
     },
     created() {        
         this.field=this.activeSection;
-      },
-      beforeUpdate () {
-        console.log('beforeUpdate:', this.field)
-      },
-      watch: {
-        formData: {
-          deep: true,      // detecting nested changes in objects
-          immediate: true, // triggering the handler immediately with the current value
-          handler(newValue, oldValue) {
-            console.log("value cahnged",newValue);
-          }
-        }
-      },
+    },
     computed: {
         formData () {
             return this.$deepModel('formData')
@@ -37,18 +25,13 @@ Vue.component('form-main', {
         <div :class="'metadata-form'" >
 
         <!-- form-section -->
-        <div v-if="formField.type=='section_container'"  class="form-section" >
-            <h5>Summary</h5>
-            <div class="mb-2">
-                Project type: {{this.$store.state.project_type}}
-            </div>
-            <v-form-preview                                    
+        <div v-if="formField.type=='section_container'"  class="form-section m-3" >
+            
+            <v-form-preview                         
                     :items="formField.items" 
                     :title="formField.title"
-                    :depth="depth + 1"
                     :path="formField.key"
                     :field="formField"
-                    :css_class="'lvl-' + depth"
                 >
             </v-form-preview>
         </div>

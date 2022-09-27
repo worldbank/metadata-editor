@@ -18,7 +18,7 @@
             <select class="form-control" id="ChangeCaseType" v-model="changeCaseType">
                 <option value="title">Title Case</option>
                 <option value="upper">UPPERCASE</option>
-                <option value="lower">LOWERCASE</option>      
+                <option value="lower">lowercase</option>      
             </select>
             {{changeCaseType}}
         </div>

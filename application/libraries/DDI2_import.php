@@ -275,7 +275,7 @@ class DDI2_Import{
     
     
     //transform structure of ddi fields  to survey type fields
-    private function transform_ddi_fields($metadata)
+    function transform_ddi_fields($metadata)
     {
         //mappings from DDI to NADA SURVEY type
         $ddi_mappings=$this->ci->config->item('survey',"metadata_parser",TRUE);

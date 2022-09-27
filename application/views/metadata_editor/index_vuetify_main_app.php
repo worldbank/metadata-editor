@@ -19,6 +19,7 @@
             echo $this->load->view("metadata_editor/vue-form-main-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-form-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-form-preview-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-nested-section-preview-component.js",null,true);
             
             echo $this->load->view("metadata_editor/vue-external-resources-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-external-resources-edit-component.js",null,true);
@@ -53,28 +54,34 @@
             echo $this->load->view("metadata_editor/vue-table-component.js",null,true);
 
             echo $this->load->view("metadata_editor/vue-geospatial-identification-component.js",null,true);
+
+            echo $this->load->view("metadata_editor/vue-import-options-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-publish-options-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-external-resources-import-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-configure-catalog-component.js",null,true);
         ?>
 
-        
         <?php if (empty($metadata)):?>
             var project_metadata={};
         <?php else:?>
             var project_metadata=<?php echo json_encode($metadata);?>;
         <?php endif;?>
 
-        <?php if (empty($survey)):?>
+        <?php if (empty($sid)):?>
             var project_sid=null;
         <?php else:?>
-            var project_sid=<?php echo isset($survey['id']) ? $survey['id'] : 'null';?>;
+            var project_sid=<?php echo $sid;?>;
         <?php endif;?>
 
         let project_idno='<?php echo isset($survey['idno']) ? $survey['idno'] : '';?>';
-        let project_type='<?php echo isset($survey['type']) ? $survey['type'] : '';?>';
+        let project_type='<?php echo isset($type) ? $type : '';?>';
 
         // 1. Define route components.
         const main = {props:['element_id'],template: '<div><form-main/></div>' }
         const Home = { template: '<div>Home -todo </div>' }        
-        const PublishProject = { template: '<div>Publish options -todo </div>' }
+        const PublishProject = { template: '<div><publish-options/> </div>' }
+        const ConfigureCatalog = { template: '<div><configure-catalog/> </div>' }
+        const ImportOptions = { template: '<div><import-options/> </div>' }
         const _main = {props: ['active_section'],template: '<div><study-metadata/></div>' }
         const Datafiles ={template: '<div><datafiles/></div>'}
         const Datafile = {props: ['file_id'],template: '<div><datafile/></div>' }
@@ -82,6 +89,7 @@
         const DatafileImport = {template: '<div><datafile-import/></div>' }
         const Variables ={props: ['file_id'],template: '<div><variables xv-if="$store.state.variables"/> </div>'}
         const ResourcesComp ={props: ['index'],template: '<div><external-resources /></div>'}
+        const ResourcesImport ={template: '<div> <external-resources-import /></div>'}
         const ResourcesEditComp ={props: ['index'],template: '<div><external-resources-edit /></div>'}
 
 
@@ -96,6 +104,8 @@
                 name: 'home',
             },
             { path: '/publish', component: PublishProject },
+            { path: '/configure-catalog', component: ConfigureCatalog },
+            { path: '/import', component: ImportOptions },
             { path: '/study/:element_id', component: main, name: 'study',props: true },
             { path: '/datafile/:file_id', component: Datafile, props:true },
             { path: '/data-explorer/:file_id', component: DatafileExplorer, props:true },
@@ -103,6 +113,7 @@
             { path: '/datafiles/import', component: DatafileImport },
             { path: '/variables/:file_id', component: Variables, props: true },
             { path: '/external-resources', component: ResourcesComp, props: true},
+            { path: '/external-resources/import', component: ResourcesImport},
             { path: '/external-resources/:index', component: ResourcesEditComp, props: true}
         ]
 
@@ -131,6 +142,7 @@
                 active_section: "not set",
                 project_type:project_type,
                 idno:project_idno,
+                project_id:project_sid,
                 formData: project_metadata,
                 formTemplate:form_template,
                 formTemplateParts:form_template_parts,
@@ -269,6 +281,12 @@
                 getIDNO(state){
                     return state.idno;
                 },
+                getProjectID(state){
+                    return state.project_id;
+                },
+                getProjectType(state){
+                    return state.project_type;
+                },
                 getDataFiles(state) {
                     return state.data_files;
                 },
@@ -334,15 +352,31 @@
             actions: {               
                 async initData({commit},options) {
                     store.state.variables_isloading=true;
-                    await store.dispatch('loadDataFiles',{dataset_idno:options.dataset_idno});
-                    await store.dispatch('loadAllVariables',{dataset_idno:options.dataset_idno});
+                    await store.dispatch('loadDataFiles',{dataset_id:options.dataset_id});
+                    await store.dispatch('loadAllVariables',{dataset_id:options.dataset_id});
+                    await store.dispatch('loadExternalResources',{dataset_id:options.dataset_id});
                     store.state.variables_loaded=true;
                     store.state.variables_isloading=false;
                     window._store=store.state;
                 },
+                async loadProject({commit},options) {
+                    let url=CI.base_url + '/api/editor/'+options.dataset_id;
+                    return axios
+                    .get(url)
+                    .then(function (response) {
+                        console.log(response);
+                        store.state.formData=response.data.project.metadata;                        
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    })
+                    .then(function () {
+                        console.log("vuex request completed");
+                    });
+                    console.log("3. should run after");
+                },
                 async loadDataFiles({commit},options) {
-                    console.log("1. vuex load data files");
-                    let url=CI.base_url + '/api/datasets/datafiles/'+options.dataset_idno;
+                    let url=CI.base_url + '/api/editor/datafiles/'+options.dataset_id;
                     return axios
                     .get(url)
                     .then(function (response) {
@@ -353,9 +387,6 @@
                                 data_files_.push(response.data.datafiles[element]);
                             })
                             commit('data_files',data_files_);
-                            console.log(data_files_);
-                            console.log("2. Data files are loaded");
-                            window._data_files=data_files_;
                         }
                     })
                     .catch(function (error) {
@@ -363,27 +394,22 @@
                     })
                     .then(function () {
                         console.log("vuex request completed");
-                    });
-                    console.log("3. should run after");
+                    });                    
                 },
                 async loadAllVariables({commit,state},options) {
                     i=0;
                     console.log("state",state.data_files);
                     for (let file of state.data_files) {
-                        store.dispatch('loadVariables',{dataset_idno:options.dataset_idno, fid:file.file_id});
+                        store.dispatch('loadVariables',{dataset_id:options.dataset_id, fid:file.file_id});
                     }
                 },
                 async loadVariables({commit}, options) {//options {dataset_idno,fid}
                     console.log("loadVariables",options);
-                    let url=CI.base_url + '/api/datasets/variables/'+options.dataset_idno + '/'+ options.fid + '?detailed=1';
+                    let url=CI.base_url + '/api/editor/variables/'+options.dataset_id + '/'+ options.fid + '?detailed=1';
                     return axios
                     .get(url)
                     .then(function (response) {
-                        console.log("variable level data loaded",options.fid, response.data.variables)
-                        
-                        if(response.data.variables.length==0){
-                            
-                            
+                        if(response.data.variables.length==0){                            
                         }
 
                         if(response.data.variables.length>0){
@@ -400,12 +426,30 @@
                         console.log("request completed");
                     });
                 },
+                async loadExternalResources({commit}, options) {
+                    let url=CI.base_url + '/api/editor/resources/'+options.dataset_id;
+                    return axios
+                    .get(url)
+                    .then(function (response) {
+                        console.log("external resources",response);
+                        if(response.data.resources){
+                            commit('external_resources',response.data.resources);
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    })
+                    .then(function () {
+                        console.log("request completed");
+                        this.loading_status="";
+                    });
+                },
             },
             mutations: VueDeepSet.extendMutation({
                 // other mutations
                 data_model (state,data) {
                     //this.$vuexSet('testing',"another value");
-                    console.log("value added");                    
+                    console.log("value added");
                 },
                 tree_active_node(state,node){
                     state.treeActiveNode=state.formTemplateParts[node];
@@ -517,5 +561,4 @@
     Vue.component("pane", Pane);
     Vue.component("splitpanes", Splitpanes);
     //Vue.component("draggable", draggable);
-
 </script>

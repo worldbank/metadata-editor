@@ -12,30 +12,8 @@ Vue.component('datafiles', {
         }
     }, 
     mounted: function () {
-        //this.loadDataFiles();
     },   
     methods: {
-        /*loadDataFiles: function() {
-            vm=this;
-            let url=CI.base_url + '/api/datasets/datafiles/'+vm.dataset_idno;
-            axios.get(url)
-            .then(function (response) {
-                console.log(response);
-                vm.data_files=[];
-                if(response.data.datafiles){
-                    Object.keys(response.data.datafiles).forEach(function(element, index) { 
-                        vm.data_files.push(response.data.datafiles[element]);
-                    })
-                    vm.$store.state.data_files=vm.data_files;
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
-            .then(function () {
-                console.log("request completed");
-            });
-        },*/
         editFile:function(file_id){
             this.page_action="edit";
             this.edit_item=file_id;
@@ -50,9 +28,56 @@ Vue.component('datafiles', {
         },
         saveFile: function(data)
         {
-            console.log("saving file",this.data_files[this.edit_item]);
-            this.$set(this.data_files, this.edit_item, data);      
+            console.log("saving file",data);
+            //this.$set(this.data_files, this.edit_item, data);
             
+            vm=this;
+            let url=CI.base_url + '/api/editor/datafiles/'+vm.dataset_id;
+            form_data=data;
+
+            axios.post(url, 
+                form_data
+                /*headers: {
+                    "name" : "value"
+                }*/
+            )
+            .then(function (response) {
+                vm.$set(vm.data_files, vm.edit_item, data);
+            })
+            .catch(function (error) {
+                console.log(error);
+                alert("Failed to add data file: "+ error.message);
+            })
+            .then(function () {
+                console.log("request completed");
+            });
+        },
+        deleteFile:function(file_idx)
+        {
+            let data_file=this.data_files[file_idx];
+            alert("Are you sure you want to delete file " + data_file.file_id + "?");
+
+            vm=this;
+            let url=CI.base_url + '/api/editor/datafiles_delete/'+vm.dataset_id + '/'+ data_file.file_id;
+            form_data={};
+
+            axios.post(url, 
+                form_data
+                /*headers: {
+                    "name" : "value"
+                }*/
+            )
+            .then(function (response) {
+                vm.data_files.splice(file_idx, 1);
+            })
+            .catch(function (error) {
+                console.log(error);
+                alert("Failed to delete: "+ error.message);
+            })
+            .then(function () {
+                console.log("request completed");
+            });
+
         },
         exitEditMode: function()
         {
@@ -73,42 +98,39 @@ Vue.component('datafiles', {
             <h1>Data files</h1>            
             <div v-show="page_action=='list'">
 
+                <v-row>
+                    <v-col md="8"><strong>{{data_files.length}}</strong> files </v-col>
+                    <v-col md="4" align="right" class="mb-2">
+                        <button type="button" class="btn btn-sm btn-outline-primary" @click="addFile">Create file</button>
+                        <router-link class="btn btn-sm btn-outline-primary" :to="'datafiles/import'">Import file</router-link> 
+                    </v-col>
+                </v-row>
 
-            <v-row>
-                <v-col md="8"><strong>{{data_files.length}}</strong> files </v-col>
-                <v-col md="4" align="right" class="mb-2">
-                    <button type="button" class="btn btn-sm btn-outline-primary" @click="addFile">Create file</button>
-                    <router-link class="btn btn-sm btn-outline-primary" :to="'datafiles/import'">Import file</router-link> 
-                </v-col>
-            </v-row>
-
-            <v-container>
-            <v-row v-for="(data_file, index) in data_files" class="bg-white mb-3">
-                <v-col md="1" align="center">                
-                <v-icon x-large color="grey lighten-1">mdi-file-table-outline</v-icon>                
-                </v-col>
-                <v-col md="11">
-                        <div><h3>{{data_file.file_name}}</h3></div>
-                        <div class="subtitle-1 mb-3">{{data_file.file_id}}</div>
-                        <div class="subtitle-2">{{data_file.description}}</div>
-                        
-                        <div class="mt-2 pt-3">
-                            <button type="button" class="btn btn-sm btn-outline-secondary" @click="editFile(index)"><i class="far fa-edit" title="Edit"></i></button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary"><i class="fas fa-trash-alt" title="Delete"></i></button>
-                            <router-link :to="'/variables/' + data_file.file_id"><button type="button" class="btn btn-sm btn-outline-primary"><i class="fas fa-table"></i> Variables</button></router-link>
-                        </div>
-                </v-col>
-            </v-row>
-            </v-container>
+                <v-container>
+                <table class="table table-striped">
+                    <tr>
+                        <th>File ID</th>
+                        <th>File name</th>
+                        <th>Variables</th>
+                        <th>&nbsp;</th>
+                    </tr>
+                    <tr v-for="(data_file, index) in data_files">
+                        <td><i class="far fa-file-alt"></i> {{data_file.file_id}}</td>
+                        <td>{{data_file.file_name}}</td>
+                        <td>{{data_file.var_count}}</td>
+                        <td>
+                            <div>
+                                <button type="button" class="btn btn-sm btn-link" @click="editFile(index)"><i class="far fa-edit" title="Edit"></i></button>
+                                <button type="button" class="btn btn-sm btn-link" @click="deleteFile(index)"><i class="fas fa-trash-alt" title="Delete"></i></button>
+                                <router-link :to="'/variables/' + data_file.file_id"><button type="button" class="btn btn-sm btn-link"><i class="fas fa-table"></i> Variables</button></router-link>
+                                <router-link :to="'/data-explorer/' + data_file.file_id"><button type="button" class="btn btn-sm btn-link"><i class="fas fa-table"></i> Data</button></router-link>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+                </v-container>
                 
-                
-
-                
-
-
             </div>
-
-
 
             <div v-show="page_action=='edit'" >
                 <div v-if="data_files[edit_item]">

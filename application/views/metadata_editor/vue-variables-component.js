@@ -80,20 +80,20 @@ Vue.component('variables', {
 
                 if (this.variableSelectedCount()>1){
                     if (JSON.stringify(val)==JSON.stringify(this.variableMultipleTemplate)){
-                        console.log("multi-variable no change detected");
+                        //console.log("multi-variable no change detected");
                     }
                     else{
-                      console.log("multi-variable CHANGE DETECTED",val);
+                      //console.log("multi-variable CHANGE DETECTED",val);
                       this.saveVariableDebounce(val);
                     }
                     return;
                 }
 
               if (JSON.stringify(val)==JSON.stringify(this.variable_copy)){
-                  console.log("no change detected");
+                  //console.log("no change detected");
               }
               else{
-                console.log("CHANGE DETECTED",val);
+                //console.log("CHANGE DETECTED",val);
                 this.saveVariableDebounce(val);
               }
             }
@@ -245,6 +245,7 @@ Vue.component('variables', {
               }
 
             this.$store.commit('variable_add',{fid:this.fid, variable:new_var});
+            this.saveVariable(new_var);
             newIdx=this.variables.length -1;
             this.editVariable(newIdx);            
         },
@@ -282,7 +283,7 @@ Vue.component('variables', {
         saveVariable: function(data){///_.debounce(function(data) {
             console.log("variable saved in db", data);
             vm=this;
-            let url=CI.base_url + '/api/datasets/variables/'+vm.dataset_idno;
+            let url=CI.base_url + '/api/editor/variables/'+vm.dataset_id;
             axios.post(url, 
                 data
                 /*headers: {
@@ -514,7 +515,7 @@ Vue.component('variables', {
                                     <strong>Documentation</strong>
                                 </div>
                                 <div class="col-6">
-                                    <span v-if="activeVariable">{{activeVariable.name}} - {{activeVariable.labl.substring(0,50)}} </span>
+                                    <span v-if="activeVariable">{{activeVariable.name}} - <span v-if="activeVariable.labl">{{activeVariable.labl.substring(0,50)}}</span> </span>
                                 </div>
                                 <div class="col-2">
                                     <div class="float-right">

@@ -219,7 +219,8 @@ class Schema_util
                     $output[$parent_path]=array(
                         'type'=>@$value->type,
                         'title'=>@$value->title,
-                        //'description'=>@$value->description
+                        'description'=>@$value->description,
+                        '_ddi_xpath'=>@$value->_ddi_xpath
                     );
                 }
                 
@@ -255,7 +256,8 @@ class Schema_util
             'timeseries',
             'resource',
             'video',
-            'script'
+            'script',
+            'variable'
         );
 
         if(!in_array($schema_name,$schemas)){
