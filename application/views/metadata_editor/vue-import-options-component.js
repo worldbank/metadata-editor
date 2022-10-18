@@ -20,7 +20,7 @@ Vue.component('import-options', {
 
             vm=this;
             this.errors='';
-            let url=CI.base_url + '/api/editor/import_ddi/'+ this.ProjectID;
+            let url=CI.base_url + '/api/editor/import_metadata/'+ this.ProjectID;
 
             axios.post( url,
                 formData,
@@ -32,6 +32,7 @@ Vue.component('import-options', {
             ).then(function(response){
                 vm.$store.dispatch('loadProject',{dataset_id:vm.ProjectID});
                 vm.$store.dispatch('initData',{dataset_id:vm.ProjectID});
+                router.push('/study/study_description');
             })
             .catch(function(response){
                 vm.errors=response;
@@ -45,6 +46,10 @@ Vue.component('import-options', {
     computed: {
         ProjectID(){
             return this.$store.state.project_id;
+        },
+        ProjectType()
+        {
+            return this.$store.state.project_type;
         }
     },  
     template: `
@@ -56,17 +61,20 @@ Vue.component('import-options', {
 
                 <div class="bg-white p-3" >
 
-                    <h4>Import DDI</h4>                    
+                    <h4>Import metadata from file</h4>                    
                     <div class="form-container-x" >
 
-                        <div class="text-primary mb-3">Import metadata from DDI. This will overwrite any existing study level metadata.</div>
+                        <div class="text-primary mb-3">
+                            <span v-if="ProjectType=='survey'">This will overwrite any existing study level, data files and variable metadata.</span>
+                        </div>
 
                         <div class="file-group form-field mb-3">
-                            <label class="l" for="customFile">Choose file (DDI/XML)</label>
+                            <label class="l" for="customFile">
+                                <span v-if="ProjectType=='survey'">Choose DDI/XML or a JSON file</span></label>
+                                <span v-if="ProjectType!='survey'">Choose a JSON file</span></label>
                             <input type="file" class="form-control" id="customFile" @change="handleFileUpload( $event )">                
                         </div>
-                        
-                    
+
                         <button type="button" class="btn btn-primary" @click="importDDI">Import file</button>
                         <button type="button" class="btn btn-danger" >Cancel</button>
 
@@ -81,7 +89,7 @@ Vue.component('import-options', {
                     <v-row class="mt-3 text-center" v-if="update_status=='completed' && errors==''">
                         <v-col class="text-center" >
                             <i class="far fa-check-circle" style="font-size:24px;color:green;"></i> Update completed,
-                            <router-link :to="'/variables/' + file_id">view variables</router-link>
+                            <router-link :to="'/study/study_description/'">view documentation</router-link>
                         </v-col>
                     </v-row>
             

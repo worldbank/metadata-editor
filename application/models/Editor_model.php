@@ -31,6 +31,7 @@ class Editor_model extends CI_Model {
 		'id',
 		'sid',
 		'file_id',
+		'file_uri',
 		'file_name',
 		'description', 
 		'case_count',
@@ -884,6 +885,12 @@ class Editor_model extends CI_Model {
     }
 
 
+	function importJSON($sid,$type,$json_data,$validate=true)
+	{
+		return $this->update_project($type,$sid,$json_data,$validate);
+	}
+
+
 	/**
 	 * 
 	 * 
@@ -1013,6 +1020,24 @@ class Editor_model extends CI_Model {
 		//return $output;
 		
 	}
+
+	
+	/*function download_project_thumbnail($sid)
+	{				
+		$project_folder=$this->get_project_folder($sid);
+
+		if (!$project_folder || !file_exists($project_folder)){
+			throw new Exception("Project folder not found");
+		}
+
+		$thumbnail_path=$project_folder.'/'
+
+		if(file_exists($ddi_path)){
+			$this->load->helper("download");
+			force_download2($ddi_path);
+		}
+	}*/
+
 
 	function download_project_ddi($sid)
 	{		

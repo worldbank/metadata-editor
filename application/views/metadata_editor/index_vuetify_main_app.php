@@ -59,6 +59,9 @@
             echo $this->load->view("metadata_editor/vue-publish-options-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-external-resources-import-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-configure-catalog-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-summary-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-summary-files-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-thumbnail-component.js",null,true);
         ?>
 
         <?php if (empty($metadata)):?>
@@ -78,7 +81,7 @@
 
         // 1. Define route components.
         const main = {props:['element_id'],template: '<div><form-main/></div>' }
-        const Home = { template: '<div>Home -todo </div>' }        
+        const Home = { template: '<div><summary-component/> </div>' }
         const PublishProject = { template: '<div><publish-options/> </div>' }
         const ConfigureCatalog = { template: '<div><configure-catalog/> </div>' }
         const ImportOptions = { template: '<div><import-options/> </div>' }
@@ -99,10 +102,11 @@
         // either be an actual component constructor created via
         // `Vue.extend()`, or just a component options object.
         const routes = [
-            {path: '/', component: main,
+            /*{path: '/', component: main,
                 redirect: '/study/<?php echo isset($metadata_template_arr['items'][0]['key']) ? $metadata_template_arr['items'][0]['key'] : 'study_description' ;?>',
                 name: 'home',
-            },
+            },*/
+            { path: '/', component: Home },
             { path: '/publish', component: PublishProject },
             { path: '/configure-catalog', component: ConfigureCatalog },
             { path: '/import', component: ImportOptions },

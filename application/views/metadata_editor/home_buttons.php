@@ -1,8 +1,11 @@
-<div class="row mt-3 mb-3">
-    <div class="col"><h3>Projects</h3></div>
-    <div class="col-3">
-        <div class="btn-group float-right">
-            <button type="button" class="btn btn-default">Create new project</button>
+<div class="mt-3 mb-5">
+    
+
+        <h3>Projects</h3>
+    
+        <?php /*
+        <div class="btn-group mt-2">
+            <button type="button" class="btn btn-primary" @click="dialog_create_project=true">Create new project</button>
             <button type="button" class="btn btn-default dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-expanded="false">
                 <span class="sr-only">Toggle Dropdown</span>
             </button>
@@ -14,6 +17,11 @@
                 <a class="dropdown-item" href="#">Import from URL</a>
             </div>
         </div>
-    </div>
+        */?>
+
+        <button type="button" class="btn btn-outline-primary" @click="dialog_create_project=true">Create new project</button>
+        <button type="button" class="btn btn-outline-primary">Open project</button>
+        <button type="button" class="btn btn-outline-primary">Import from data deposit</button>
+    
 </div>
 

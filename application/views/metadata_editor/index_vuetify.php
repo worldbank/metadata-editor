@@ -112,6 +112,23 @@ Vue.config.errorHandler = (err, vm, info) => {
         return text.slice(0, stop) + (stop < text.length ? clamp || '...' : '')
     });
 
+    Vue.filter('kb', val => {
+      return Math.floor(val/1024);  
+    });
+
+    Vue.filter('mb', val => {
+      //return Math.floor(val/1024);  
+      return (val / (1024*1024)).toFixed(2);
+    });
+
+    Vue.filter('kbmb', val => {
+      if (val<1024*1024){
+        return Math.floor(val/1024) + ' KB';  
+      }
+
+      return (val / (1024*1024)).toFixed(2) + ' MB';
+    });
+
     vue_app=new Vue({
       el: '#app',
   //    components:{Splitpanes, Pane},
@@ -165,7 +182,6 @@ Vue.config.errorHandler = (err, vm, info) => {
       }
       ,
       mounted: function(){
-        
       },
       computed:{
         Title(){
@@ -272,7 +288,8 @@ Vue.config.errorHandler = (err, vm, info) => {
             this.update_tree();
         },
         $route(to, from) {
-          //console.log("route changed to", to, from);
+          console.log("route changed to", to, from);
+          this.setTreeActiveNode(to.path);
         },
         ProjectMetadata: 
         {
@@ -283,10 +300,35 @@ Vue.config.errorHandler = (err, vm, info) => {
         }
       },
       methods:{
+        setTreeActiveNode: function(path)
+        {
+          this.tree_active_items=[];
+          this.tree_active_items.push(path.substring(1));
+
+          let path_arr=path.substring(1).split("/");
+
+          //expand datafile
+          if(path_arr[0]=='variables'){
+            this.initiallyOpen.push("datafile/"+path_arr[1]);
+          }
+
+          if (path.substring(1)==""){
+            this.tree_active_items.push("home");
+          }else{          
+            this.initiallyOpen.push(path.substring(1));
+          }
+        },
         init_tree_data: function() {
           this.is_loading=true;
           this.items=[];
           let tree_data=this.form_template.items;
+
+          tree_data.unshift({
+              title: 'Home',
+              type:'home',
+              file: 'database',
+              key: 'home'              
+            });
 
           if (this.dataset_type=='survey'){
             tree_data.push({
@@ -302,12 +344,13 @@ Vue.config.errorHandler = (err, vm, info) => {
               title: 'External resources',
               type: 'resources',
               file: 'resource',
-              key:'resources',
+              key:'external-resources',
               items:this.ExternalResourcesTreeNodes
           });
 
           this.items=tree_data;
           this.initiallyOpen= ["study_description","datasets","document"];
+          this.setTreeActiveNode(this.$route.path);
           
           //set active tree node
           //this.tree_active_items=["datafile/F22"];
@@ -348,6 +391,11 @@ Vue.config.errorHandler = (err, vm, info) => {
 
           //expand tree node          
           this.initiallyOpen.push(node.key);
+
+          if (node.type=='home'){
+            router.push('/');
+            return;
+          }
 
           if (node.type=='datafile'){
             router.push('/datafile/'+node.datafile.file_id);

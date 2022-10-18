@@ -289,22 +289,21 @@ class Editor extends MY_REST_Controller
 		}
 	}
 
-	function validate_post($type=null)
+	function validate_get($sid=null)
 	{
-		if($type=='timeseries-db' || $type=='timeseriesdb'){
-			//return $this->update_timeseries_database($idno);
-			throw new Exception("NOT IMPLEMENTED YET");
-		}
-
 		try{
-			$options=$this->raw_json_input();
+			$project=$this->Editor_model->get_row($sid);
+
+			if (!$project){
+				throw new exception("project not found");
+			}
+
 			$user_id=$this->get_api_user_id();
 			
 			//$this->has_dataset_access('edit',$sid);
 
-			
 			//validate & update project
-			$this->Editor_model->validate_schema($type,$options);
+			$this->Editor_model->validate_schema($project['type'],$project['metadata']);
 
 			$response=array(
 				'status'=>'success'				
@@ -443,16 +442,22 @@ class Editor extends MY_REST_Controller
 			$user_id=$this->get_api_user_id();
 			$options['created_by']=$user_id;
 			$options['changed_by']=$user_id;
-
 			$options['sid']=$sid;
+
+			/*$required_fields=array("file_id","file_name");
+
+			foreach($required_fields as $field_){
+				if(!isset($options[$field_])){
+					throw new Exception("Required field is missing: ".$field_);
+				}
+			}*/
 
 			//validate 
 			if ($this->Editor_model->validate_data_file($options)){
+				$options['file_uri']=$options['file_name'];
+				$options['file_name']=$this->Editor_model->data_file_filename_part($options['file_name']);
 
-				$file_id=$options['file_id'];
-
-				//check if file already exists				
-				$data_file=$this->Editor_model->data_file_by_id($sid,$file_id);
+				$data_file=$this->Editor_model->data_file_by_name($sid,$options['file_name']);
 
 				if (!$data_file){
 					$this->Editor_model->data_file_insert($sid,$options);
@@ -644,7 +649,7 @@ class Editor extends MY_REST_Controller
 				throw new Exception("Project not found");
 			}
 
-			$result=$this->Editor_resource_model->files($sid);
+			$result=$this->Editor_resource_model->files_summary($sid);
 
 			$output=array(
 				'files'=>$result
@@ -661,7 +666,7 @@ class Editor extends MY_REST_Controller
 	/**
 	 * 
 	 * upload file
-	 * @file_type data | documentation
+	 * @file_type data | documentation | thumbnail
 	 * 
 	 **/ 
 	function files_post($sid=null,$file_type='documentation')
@@ -673,7 +678,11 @@ class Editor extends MY_REST_Controller
 				throw new Exception("Project not found");
 			}
 
-			$result=$this->Editor_resource_model->upload_file($sid,$file_type,$file_field_name='file', $remove_spaces=false);
+			if ($file_type=='thumbnail'){
+				$result=$this->Editor_resource_model->upload_thumbnail($sid,$file_field_name='file');
+			}else{
+				$result=$this->Editor_resource_model->upload_file($sid,$file_type,$file_field_name='file', $remove_spaces=false);
+			}
 
 			$uploaded_file_name=$result['file_name'];
 			$uploaded_path=$result['full_path'];
@@ -728,6 +737,56 @@ class Editor extends MY_REST_Controller
 			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
+
+
+
+	function import_metadata_post($sid=null)
+	{		
+		try{
+			$project=$this->Editor_model->get_basic_info($sid);
+
+			if(!$project){
+				throw new Exception("Project not found");
+			}
+			
+			$allowed_file_types="json|xml";
+			$uploaded_filepath=$this->Editor_resource_model->upload_temporary_file($allowed_file_types,$file_field_name='file',$temp_upload_folder=null);
+
+			if (!file_exists($uploaded_filepath)){
+				throw new Exception("Failed to upload file");
+			}
+
+			$file_info=pathinfo($uploaded_filepath);
+			$file_ext=strtolower($file_info['extension']);
+
+			$result=$file_info;
+
+			if ($file_ext=='xml'){
+				if ($project['type']=='survey'){
+					$result=$this->Editor_model->importDDI($sid);		
+				}
+			}else{
+				$json_data=json_decode(file_get_contents($uploaded_filepath),true);
+				
+				if (!$json_data){
+					throw new Exception("Failed to read/decode JSON file");
+				}
+
+				$result=$this->Editor_model->importJSON($sid,$type=$project['type'],$json_data,$validate=true);
+			}
+
+			$output=array(
+				'status'=>'success',
+				'result'=>$result
+			);
+
+			$this->set_response($output, REST_Controller::HTTP_OK);			
+		}
+		catch(Exception $e){
+			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
 
 	function convert_ddi_post($sid=null)
 	{		
@@ -1198,6 +1257,22 @@ class Editor extends MY_REST_Controller
 				'message'=>$e->getMessage()
 			);
 			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * 
+	 * Project thumbnail
+	 * 
+	 */
+	function thumbnail_get($sid=null)
+	{		
+		try{
+			$this->Editor_model->download_project_thumbnail($sid);
+			die();
+		}
+		catch(Exception $e){
+			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
 

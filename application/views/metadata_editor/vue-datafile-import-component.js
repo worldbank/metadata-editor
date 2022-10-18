@@ -2,6 +2,7 @@
 Vue.component('datafile-import', {
     data: function () {    
         return {
+            files:[],
             file:'',
             file_id:'',
             file_exists:false,
@@ -14,7 +15,8 @@ Vue.component('datafile-import', {
                 "DTA": "Stata (DTA)",
                 "SAV": "SPSS (SAV)",
                 "CSV": "CSV"
-            }
+            },
+            allowed_file_types:["dta","sav","csv"]
         }
     },
     watch: { 
@@ -30,7 +32,7 @@ Vue.component('datafile-import', {
         if (this.file_id==''){
             this.file_id='F'+(this.MaxFileID+1);
         }        
-    },
+    },   
     computed: {
         ProjectID(){
             return this.$store.state.project_id;
@@ -41,52 +43,212 @@ Vue.component('datafile-import', {
         MaxVariableID(){
             return this.$store.getters["getMaxVariableId"];
         },
-        validateFilename: function(){            
-            if (!this.file){
+        FilesCount: function(){            
+            return this.files.length;
+        },
+    },
+    methods:{
+        validateFilename: function(file){
+            return /^[a-zA-Z0-9\.\-_ ()]*$/.test(file.name);
+        },   
+        checkFileDuplicate(name){
+            for(i=0;i<this.files.length;i++){
+                if (this.files[i].name==name){
+                    return true;
+                }
+            }
+            return false;
+        }, 
+        addFile(e) {
+            let droppedFiles = e.dataTransfer.files;
+            if(!droppedFiles) return;
+            // this tip, convert FileList to array, credit: https://www.smashingmagazine.com/2018/01/drag-drop-file-uploader-vanilla-js/
+            ([...droppedFiles]).forEach(f => {
+                if (!this.checkFileDuplicate(f.name) && this.isAllowedFileType(f.name)){
+                    this.files.push(f);
+                }
+            });
+        },
+        isAllowedFileType(name){
+            if (_.includes(this.allowed_file_types,this.fileExtension(name))){
                 return true;
             }
 
-            return /^[a-zA-Z0-9\.\-_ ()]*$/.test(this.file.name);
+            return false;
         },
-    },  
+        removeFile(file_idx){
+            /*this.files = this.files.filter(f => {
+              return f != file;
+            });*/
+            Vue.delete(this.files,file_idx);      
+            this.files.splice(file_idx, 0);
+        },
+        processImport: async function(){
+            await this.uploadDatafiles();
+
+            this.update_status="completed";
+            this.is_processing=false;
+            vm.$store.dispatch('initData',{dataset_id:this.ProjectID});
+        },
+        uploadDatafiles: async function(){
+            this.errors='';
+
+            for(i=0;i<this.files.length;)
+            {
+                await this.uploadDataFile(i);
+                i++;
+
+                if (this.errors!=''){
+                    return false;
+                }
+            }
+        },
+        uploadDataFile: async function (fileIdx)
+        {            
+            let formData = new FormData();
+            formData.append('file', this.files[fileIdx]);
+
+            if (this.errors!=''){
+                return false;
+            }
+
+            let vm=this;
+            let url=CI.base_url + '/api/editor/files/'+ this.ProjectID + '/data';
+
+            await axios.post( url,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
+            ).then(function(response){
+                vm.importDataFile(fileIdx);
+                return true;
+            })
+            .catch(function(response){
+                vm.errors=response;
+                return false;
+            });            
+        }, 
+        importDataFile: async function(fileIdx){
+            this.is_processing=true;
+            this.update_status="Importing data dictionary " + this.files[fileIdx].name;
+
+            let formData = {
+                "filename":this.files[fileIdx].name
+            }
+            
+            vm=this;            
+            let url=CI.base_url + '/api/R/import_data_file/'+this.ProjectID;
+            
+            try{
+                let resp = await axios.post(url, formData,{
+                    headers: {
+                        'Content-Type': 'application/json'
+                      }
+                });
+
+                this.update_status="";
+
+            }catch(error){
+                vm.errors=error;
+                console.log(Object.keys(error), error.message);
+            }
+        },
+        generateCSVFromR: async function (file)
+        {
+            let formData = new FormData();
+            //formData.append('fileid', this.file_id);
+            formData.append("filename",file.name)
+
+            vm=this;
+            this.update_status="Generating CSV...";
+            let url=CI.base_url + '/api/R/generate_csv/'+this.ProjectID + '/' +  file.name;
+
+            axios.get( url,formData,{}
+            ).then(function(response){
+                console.log('SUCCESS!!',response);
+                vm.update_status="CSV file generated...";
+            })
+            .catch(function(){
+                console.log('FAILURE!!');
+            });            
+        },  
+        handleFileUpload(event)
+        {
+            this.file = event.target.files[0];
+            this.errors='';
+            this.checkFileExists();
+        },
+        handleMultiFileUpload(event)
+        {
+            let files = event.target.files;
+            for(let i = 0; i<files.length; i++)
+            {
+                if (!this.checkFileDuplicate(files[i].name) && this.isAllowedFileType(files[i].name)){
+                    this.files.push(files[i]);
+                }
+            }
+        },
+        checkFileExists: async function()
+        {
+            let url=CI.base_url + '/api/editor/datafile_by_name/'+this.ProjectID+'?filename='+this.file.name;
+            this.errors='';
+            vm=this;
+
+            try {
+                const resp = await axios.get(url);
+                console.log(resp.data);
+                vm.errors="File with the name already exists.";
+                return false;
+            } catch (err) {
+                console.error(err);
+                return true;
+            }
+        },
+        fileExtension: function(name){
+            return name.split(".").pop().toLowerCase();
+        }
+    },
     template: `
             <div class="datafile-import-component">
             <v-container>
 
-                <h3>Import data file</h3>
+                <h3>Import data</h3>
 
                 <div class="bg-white p-3" >
 
                     <div class="form-container-x" >
 
-                        <div class="form-group form-field">
-                            <label for="file">file ID*</label> 
-                            <span><input type="text" id="file" class="form-control" v-model="file_id"/></span> 
+                        
+                        <h5>Upload data</h5>
+                        <p>Upload one or more data files. Supported file types are: Stata(.dta), SPSS(.sav) and CSV</p>
+
+                        <div @drop.prevent="addFile" @dragover.prevent class="border p-2 mb-2 bg-light text-center">
+                            <div class="p-4"><i style="font-size:40px;color:gray;" class="fas fa-upload"></i></div>
+                            <strong>Drag and drop data files here</strong>
+
+                            <div class="mt-3">or</div>
+                            
+                            <div class="custom-file" style="max-width:300px;">
+                                <input type="file" class="custom-file-input" id="customFile" multiple @change="handleMultiFileUpload( $event )">
+                                <label class="custom-file-label" for="customFile">Choose files</label>
+                            </div>
+
                         </div>
 
-                        <div class="form-group form-field">
-                            <label>File type *</label>
-                            <select 
-                                v-model="file_type" 
-                                class="form-control  form-control-sm form-field-dropdown"
-                                id="var_format_type">
+                        <div class="files-container mt-3 mb-3 p-2" v-if="files.length>0" >
+                            <h5 class="mb-1">{{files.length}} files selected</h5>
+                            <div class="border row mt-2" v-for="(file,file_index) in files" :key="file.name">
+                                <div class="col-10" style="font-size:small;"><strong>{{ file.name }}</strong>  <div class="text-secondary">{{ file.size | kbmb }}</div> {{file.type}}</div>
+                                <div class="col-2"><button class="float-right" @click="removeFile(file_index)" title="Remove"><i class="fas fa-trash"></i></button> </div>
+                            </div>
 
-                                <option value="">Select</option>
-                                <option v-for="(option_key,option_value) in file_types" v-bind:value="option_value">
-                                    {{ option_key }}
-                                </option>
-                            </select>
-                            <small class="help-text form-text text-muted">{{file_type}}</small>                    
                         </div>
-                        
-                        <div class="file-group form-field mb-3">
-                            <label class="l" for="customFile">Choose file</label>
-                            <input type="file" class="form-control" id="customFile" @change="handleFileUpload( $event )">
-                            <small v-if="validateFilename==false" class="text-danger">Special characters in file names are not allowed</small>
-                        </div>
-                        
-                        <div v-if="update_status==''">                         
-                            <button type="button" :disabled="!validateFilename" class="btn btn-primary" @click="uploadDataFile">Import file</button>
+                                                
+                        <div xv-if="update_status==''">
+                            <button type="button" :disabled="!FilesCount>0" class="btn btn-primary" @click="processImport">Import files</button>
                         </div>
 
                     </div>
@@ -104,7 +266,7 @@ Vue.component('datafile-import', {
                         </v-col>
                     </v-row>
             
-
+{{update_status}} {{errors}}
                     <v-container v-if="update_status!='completed' && errors=='' ">                    
                         <v-row v-if="is_processing"
                         class="fill-height"
@@ -137,196 +299,5 @@ Vue.component('datafile-import', {
             </v-container>
 
             </div>          
-            `,
-    methods:{        
-        saveForm: function (){    
-            this.field_data = Object.assign({}, this.field_data, this.form_local);
-            this.$emit('input', this.field_data);
-            this.$emit("exit-edit", true);
-        },
-        cancelForm: function (){
-            this.form_local = Object.assign({}, this.field_data);
-            this.$emit("exit-edit", false);
-        },
-        ImportData: async function(){
-            this.is_processing=true;
-            this.update_status="Loading data dictionary";
-
-            await this.getDataDictionaryFromR();
-
-            if (this.errors){
-                return false;
-            }
-
-            if (this.file_type!=='CSV'){
-                this.update_status="Exporting data to CSV";
-                await this.generateCSVFromR();
-
-                if (this.errors){
-                    return false;
-                }
-            }
-
-            this.update_status="Creating data file";
-            await this.createDataFile();
-
-            if (this.errors){
-                return false;
-            }
-
-            this.update_status="Importing variables";
-            await this.importVariables();
-
-            this.update_status="completed";
-            this.is_processing=false;
-        },
-        createDataFile: async function(){
-            let url=CI.base_url + '/api/editor/datafiles/'+this.ProjectID;
-            let data={
-                file_id:this.file_id,
-                file_name:this.file.name,
-                var_count:this.data_dictionary.cnt
-            };
-                        
-            await axios.post(url,
-                data,
-                {
-                    /*headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }*/
-                }
-            ).then(function(response){
-                return true;
-            })
-            .catch(function(){
-                return false;
-            });
-        },
-        importVariables: async function()
-        {
-            let url=CI.base_url + '/api/editor/variables/'+this.ProjectID;
-            this.update_status="Updating data dictionary...";
-            this.UpdateVariablesVID();
-            vm=this;
-        
-            return axios.post(url,
-                this.data_dictionary.variables,
-                {
-                    /*headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }*/
-                }
-            ).then(function(response){
-                vm.update_status="Data dictionary imported!!!!";
-                vm.$store.dispatch('initData',{dataset_id:vm.ProjectID});
-                router.push('/variables/'+ vm.file_id);
-            })
-            .catch(function(){
-                vm.update_status="Data dictionary import failed";
-            });
-        },
-        UpdateVariablesVID: function()
-        {
-            max_var_id=this.MaxVariableID;
-
-            for(i=0;i<this.data_dictionary.variables.length;i++){
-                this.data_dictionary.variables[i].vid='V'+(max_var_id++);
-            }
-        },
-        uploadDataFile: function ()
-        {
-            let formData = new FormData();
-            formData.append('file', this.file);
-
-            if (this.errors!=''){
-                return false;
-            }
-
-            vm=this;
-            let url=CI.base_url + '/api/editor/files/'+ this.ProjectID + '/data';
-
-            axios.post( url,
-                formData,
-                {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                }
-            ).then(function(response){
-                vm.ImportData();
-            })
-            .catch(function(response){
-                vm.errors=response;
-            });            
-        }, 
-        getDataDictionaryFromR: async function ()
-        {
-            let formData = {
-                "fileid": this.file_id,
-                "filename":this.file.name,
-                "filetype":this.file_type
-            }
-            
-            vm=this;
-            this.update_status="Generating data dictionary...";
-            let url=CI.base_url + '/api/R/data_dictionary/'+this.ProjectID;
-            
-            try{
-                let resp = await axios.post(url, formData,{
-                    headers: {
-                        'Content-Type': 'application/json'
-                      }
-                });
-
-                if (!resp.data.variables){
-                    throw new Error("Data dictionary import failed");
-                }
-
-                vm.data_dictionary=resp.data;
-                vm.update_status="Data dictionary completed...";
-            }catch(error){
-                vm.errors=error;
-                console.log(Object.keys(error), error.message);
-            }
-        },
-        generateCSVFromR: function ()
-        {
-            let formData = new FormData();
-            formData.append('fileid', this.file_id);
-            formData.append("filename",this.file.name)
-
-            vm=this;
-            this.update_status="Generating CSV...";
-            let url=CI.base_url + '/api/R/generate_csv/'+this.ProjectID + '/' + this.file_id + '/' + this.file.name;
-
-            axios.get( url,formData,{}
-            ).then(function(response){
-                console.log('SUCCESS!!',response);
-                vm.update_status="CSV file generated...";
-            })
-            .catch(function(){
-                console.log('FAILURE!!');
-            });            
-        },  
-        handleFileUpload( event ){
-            this.file = event.target.files[0];
-            this.errors='';
-            this.checkFileExists();
-        },
-        checkFileExists: async function(){
-            let url=CI.base_url + '/api/editor/datafile_by_name/'+this.ProjectID+'?filename='+this.file.name;
-            this.errors='';
-            vm=this;
-
-            try {
-                const resp = await axios.get(url);
-                console.log(resp.data);
-                vm.errors="File with the name already exists.";
-                return false;
-            } catch (err) {
-                console.error(err);
-                return true;
-            }
-        },
-    }
+            `    
 })

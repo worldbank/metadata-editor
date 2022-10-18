@@ -579,6 +579,31 @@
                             }
                         }
                     ]
+                },
+                {
+                    "type": "section",
+                    "id": "tags",
+                    "key": "tags",
+                    "title": "Tags",
+                    "items": [
+                        {
+                            "key": "tags",
+                            "title": "Tags",
+                            "type": "array",
+                            "props": {
+                                "tag_group": {
+                                    "key": "tag_group",
+                                    "title": "Tag group",
+                                    "type": "text"
+                                },
+                                "tag": {
+                                    "key": "tag",
+                                    "title": "Tag",
+                                    "type": "text"
+                                }
+                            }
+                        }
+                    ]
                 }
             ]
         }

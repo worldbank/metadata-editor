@@ -36,8 +36,8 @@
         <ul class="navbar-nav ml-auto">
 
             <li class="nav-item">
-                <a class="nav-link" data-widget="fullscreen" href="#" role="button">
-                    <i class="fas fa-expand-arrows-alt"></i>
+                <a class="nav-link" href="#" role="button">
+                  <i class="fas fa-user"></i> <?php echo $user=strtoupper($this->session->userdata('username'));?>
                 </a>
             </li>
         </ul>
@@ -124,30 +124,30 @@
 
 
 
-                  <div class="search-box mb-3 pb-3 mr-5 border-bottom">
-
-                    <div class="col-12 col-md-12 text-center">
-                      <div class="input-group mb-3">
-                          <input type="text" class="form-control" placeholder="Keywords..." aria-label="Search" aria-describedby="search-box" v-model="search_keywords">
-                          <span class="input-group-text" id="search-box" @click="search(true)">Search</span>            
-                      </div>
-                    </div>
-
-                    </div>
-
-
-
                   <div>
                     <div v-if="!Projects"> There are no projects!</div>
 
-                    <div class="row mb-2" >
+                    <div class="row mb-2 border-bottom border-top" >
                       <div class="col-2">
                         <div class="p-2" v-if="Projects">
                           <strong>{{parseInt(projects.offset) +1}}</strong> - <strong>{{parseInt(projects.found)}}</strong> of <strong>{{projects.total}}</strong> projects
                         </div>
                       </div>
 
-                      <div class="col-10">
+                      <div class="col-4">
+                        <div class="search-box">
+
+                        <div class="col-12 col-md-12 text-center">
+                          <div class="input-group mb-3">
+                              <input type="text" class="form-control" placeholder="Keywords..." aria-label="Search" aria-describedby="search-box" v-model="search_keywords">
+                              <span class="input-group-text" id="search-box" @click="search(true)">Search</span>            
+                          </div>
+                        </div>
+
+                        </div>
+                      </div>
+
+                      <div class="col">
                       <template>
                         <div class="float-right">
                           <v-pagination
@@ -178,9 +178,6 @@
                     </div>
 
 
-                    
-                    
-
                   </div>
 
                 </div>
@@ -192,6 +189,46 @@
       </div>
 
     </div>
+
+
+    <template class="create-new-project">
+      <div class="text-center">
+        <v-dialog
+          v-model="dialog_create_project"
+          width="500"
+        >
+
+          <v-card>
+            <v-card-title class="text-h5 grey lighten-2">
+              Create new Project
+            </v-card-title>
+
+            <v-card-text>
+              <div>
+                    <a class="dropdown-item" href="#" @click="createProject('survey')">Microdata</a>
+                    <a class="dropdown-item" href="#" @click="createProject('document')">Document</a>
+                    <a class="dropdown-item" href="#" @click="createProject('table')">Table</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#">Import from URL</a>
+                </div>
+            </v-card-text>
+
+            <v-divider></v-divider>
+
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn
+                color="primary"
+                text
+                @click="dialog_create_project = false"
+              >
+                Close
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </div>
+    </template>
 
 
   </div>
@@ -263,6 +300,7 @@
           form_errors:[],
           facet_panel:[],
           pagination_page:1,
+          dialog_create_project:false,
           search_keywords:'',
           project_types_icons:
             {

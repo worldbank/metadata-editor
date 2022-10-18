@@ -17,6 +17,7 @@ class R extends MY_REST_Controller
 
 		$this->load->model("Catalog_model");				
 		$this->load->model("Editor_model");
+		$this->load->library("Rutils");
 		//$this->is_admin_or_die();
 	}
     
@@ -82,7 +83,61 @@ class R extends MY_REST_Controller
 		}	
 	}
 
+	private function get_file_extension($name)
+	{		
+		$file_info=pathinfo($name);
+		return strtoupper($file_info['extension']);
+	}
 
+	private function is_allowed_data_type($ext)
+	{
+		$allowed_types=array('DTA','SAV','CSV');
+		if (in_array($ext,$allowed_types)){
+			return true;
+		}
+		return false;
+	}
+
+
+	public function import_data_file_post($sid=null)
+	{		
+		$options=$this->raw_json_input();		
+
+		try{
+
+			$exists=$this->Editor_model->check_id_exists($sid);
+
+			if(!$exists){
+				throw new Exception("Project not found");
+			}
+			
+			$filename=$options["filename"];
+			$response=$this->rutils->generate_data_dictionary($sid,$filename);
+
+			if (!isset($response["variables"])){
+				throw new Exception("Failed to export data dictionary from data file");	
+			}
+
+			$response['imported_variables']=$this->rutils->import_data_dictionary($sid,$response["file_id"],$filename,$response["variables"]);
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}	
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}	
+	}
+
+
+	/**
+	 * 
+	 * 
+	 * Generate data dictionary from Data (SPSS, Stata, etc)
+	 * @filename - data file name
+	 * 
+	 */
 	public function data_dictionary_post($sid=null)
 	{
 		$options=$this->raw_json_input();		
@@ -102,16 +157,18 @@ class R extends MY_REST_Controller
 				}
 			}
 
-			$fileid=$options["fileid"];
 			$filename=$options["filename"];
-			$filetype=$options["filetype"];
-			
 
-			$client = new Client([
-				//'base_uri' => 'http://localhost:2121/ocpu/library/mde/R/import/json??force=true&auto_unbox=true&digits=22'
-				'base_uri' => 'http://localhost:2121/ocpu/library/nadar/R/datafile_dictionary/json?force=true&auto_unbox=true&digits=22'
-			]);
-			
+			//generate a new file ID e.g. F1...
+			$fileid=$this->Editor_model->data_file_generate_fileid($sid);
+
+			//file type 
+			$filetype=$this->get_file_extension($filename);
+
+			if (!$this->is_allowed_data_type($filetype)){
+				throw  new Exception("Invalid data file type");
+			}			
+
 			$project_folder=$this->Editor_model->get_project_folder($sid);
 		
 			if (!file_exists($project_folder)){
@@ -119,13 +176,16 @@ class R extends MY_REST_Controller
 			}
 
 			$project_folder=realpath($project_folder);
-
 			$data_file_path=$project_folder.'/data/'.$filename;
 
 			if (!file_exists($data_file_path)){
 				throw new Exception("DATA_FILE_NOT_FOUND: ".$data_file_path);
 			}
 
+			$client = new Client([
+				'base_uri' => 'http://localhost:2121/ocpu/library/nadar/R/datafile_dictionary/json?force=true&auto_unbox=true&digits=22'
+			]);
+			
 			$request_body=[
 				"freqLimit"=>50,
 				"fileId"=>$fileid,
@@ -133,7 +193,6 @@ class R extends MY_REST_Controller
 				"filepath"=> $data_file_path
 			];
 			  
-
 			$api_response = $client->request('POST', '', [
 				//'auth' => [$username, $password],
 				'json' => 
@@ -168,7 +227,7 @@ class R extends MY_REST_Controller
 	}
 
 
-	public function generate_csv_get($sid=null,$fileid=null,$filename=null)
+	public function generate_csv_get($sid=null,$filename=null)
 	{
 		try{            
 
@@ -179,7 +238,6 @@ class R extends MY_REST_Controller
 			}
 			
 			$client = new Client([
-				//'base_uri' => 'http://localhost:2121/ocpu/library/mde/R/writeCSV/json?force=true&auto_unbox=true&digits=22'
 				'base_uri' => 'http://localhost:2121/ocpu/library/nadar/R/datafile_write_csv/json?force=true&auto_unbox=true&digits=22'
 			]);
 
@@ -200,7 +258,7 @@ class R extends MY_REST_Controller
 
 			$request_body=[
 				"csvPath"=>$csv_file_path,
-				"type"=>"dta",
+				"type"=>$this->get_file_extension($filename),
 				"filepath"=> $data_file_path
 			];
 			  

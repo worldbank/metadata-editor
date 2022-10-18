@@ -25,7 +25,7 @@
 
             <div class="dropdown">
                 <a class="btn btn-link dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fas fa-random"></i> Import / Export
+                <i class="fas fa-random"></i> Metadata
                 </a>
 
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
@@ -48,6 +48,12 @@
             <li class="nav-item">
                 <a class="nav-link" data-widget="fullscreen" href="#" role="button">
                     <i class="fas fa-expand-arrows-alt"></i>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="#" role="button" title="<?php echo $user=strtoupper($this->session->userdata('username'));?>">
+                  <i class="fas fa-user"></i> 
                 </a>
             </li>
 
@@ -103,7 +109,7 @@
                         <p>Editor <i class="fas fa-angle-left right"></i></p>
                     </router-link>
                     <ul class="nav nav-treeview" style="display: block;">
-                    <div style="font-size:small" class="mb-5">{{tree_active_items}}
+                    <div style="font-size:small" class="mb-5">
                     <v-treeview 
                         dark 
                         color="warning"

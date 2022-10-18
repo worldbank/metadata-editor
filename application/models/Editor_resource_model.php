@@ -140,6 +140,41 @@ class Editor_resource_model extends ci_model {
 		}
     }
 
+	function upload_thumbnail($sid,$file_field_name='file')
+	{
+        $survey_folder=$this->Editor_model->get_project_folder($sid);
+
+        if (!$survey_folder){
+            $this->Editor_model->create_project_folder($sid);
+            $survey_folder=$this->Editor_model->get_project_folder($sid); 
+        }
+		
+		if (!file_exists($survey_folder)){
+			throw new Exception('EDITOR_FOLDER_NOT_FOUND: '.$survey_folder);
+		}
+
+		//upload class configurations for RDF
+		$config['upload_path'] = $survey_folder;
+		$config['overwrite'] = true;
+		$config['encrypt_name']=false;
+		$config['remove_spaces'] = true;
+		$config['allowed_types'] = "jpg|jpeg|png|gif";
+		
+		$this->load->library('upload', $config);
+		$upload_result=$this->upload->do_upload($file_field_name);
+
+		if (!$upload_result){
+			throw new Exception($this->upload->display_errors());
+		}
+
+		$file_uploaded= $this->upload->data();
+		$thumbnail_path=$file_uploaded["file_path"].'thumbnail'.$file_uploaded['file_ext'];
+		rename($file_uploaded["full_path"],$thumbnail_path);
+		$file_uploaded['thumail_path']=$thumbnail_path;
+
+		return $file_uploaded;
+	}
+
     /**
 	*
 	* Import RDF file
@@ -492,13 +527,29 @@ class Editor_resource_model extends ci_model {
 	}
 
 
+	/**
+	 * 
+	 * Return all files for the project
+	 * 
+	 */
     function files($sid)
     {
         $this->load->helper("file");
         $project_folder=$this->Editor_model->get_project_folder($sid);
         $result=get_dir_recursive($project_folder,$make_relative_to=$project_folder);
+        return $result['files'];        
+    }
 
-        return $result['files'];
+
+	/**
+	 * 
+	 * Return all files with info
+	 * 
+	 * 
+	 */
+	function files_summary($sid)
+    {        
+        $result['files']=$this->files($sid);
 
         $files=array();
         foreach($result['files'] as $file){
@@ -510,27 +561,47 @@ class Editor_resource_model extends ci_model {
             }            
         }
 
-        sort($files['data']);
+		/*if (is_array($files['data'])){
+        	sort($files['data']);
+		}*/
 
+		// return $files;
+
+		//external resources
         $resources=$this->select_all($sid,$fields=null);
         $resources_by_filename=[];
         foreach($resources as $resource){
-                $resources_by_filename[$resource['filename']]=$resource;
+            $resources_by_filename[$resource['filename']]=$resource;
         }
 
         if (isset($files['documentation'])){
-            foreach($files['documentation'] as $key=>$file){
+            foreach($files['documentation'] as $key=>$file){				
                 if (array_key_exists($file,$resources_by_filename)){
                     $files['documentation'][$key]=array(
                         'file'=>$file,
                         'resource'=>$resources_by_filename[$file]
                     );
-                }
+                }else{
+					$files['documentation'][$key]=array(
+                        'file'=>$file,
+                        'resource'=>false
+                    );
+				}
             }
-            
         }
 
-        //$files['resources']=$resources;
+		$files['external_resources']=$resources;
+
+		//data files
+		$data_files=$this->Editor_model->data_files($sid);
+
+		$data_files_by_name=array();
+		foreach($data_files as $key=>$file){
+			$data_files_by_name[$file['file_name']]=$file;
+		}
+
+		$files['data_files']=$data_files_by_name;
+
        return $files;
     }
 
