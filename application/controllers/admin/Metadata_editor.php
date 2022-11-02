@@ -13,6 +13,8 @@ class Metadata_editor extends MY_Controller {
 	{
       	parent::__construct();
 		$this->load->model('Editor_model');
+		$this->load->model('Editor_template_model');
+
      	$this->load->model('Catalog_model');
 		$this->load->model('Licensed_model');
 		$this->load->model('Form_model');
@@ -34,6 +36,8 @@ class Metadata_editor extends MY_Controller {
 		$this->lang->load('catalog_admin');
 		$this->lang->load('permissions');
 		$this->lang->load('resource_manager');
+
+		
 
 		//$this->output->enable_profiler(TRUE);
 		//$this->acl->clear_active_repo();
@@ -156,7 +160,43 @@ class Metadata_editor extends MY_Controller {
 		$content= $this->load->view('metadata_editor/index_vuetify',$options,true);
 		echo $content;
 	}
+
+
+	function templates($uid=null)
+	{
+		if ($uid){
+			return $this->template_edit($uid);
+		}
+
+		$this->template->set_template('admin5');
+		echo $this->load->view('metadata_editor/templates_index',$options=array(),true);
+	}
+
+	function template_edit($uid)
+	{
+		$this->template->set_template('blank');
+		//echo "edit template" . $uid;
+
+		$user_template=$this->Editor_template_model->get_template_by_uid($uid);
+
+		if(!$user_template){
+			show_error("Template not found");
+		}
+
+		$core_template=$this->Editor_template_model->get_core_template_json($user_template['data_type']);
+
+		$options=array(
+			'user_template_info'=>$user_template,
+			'core_template'=>$core_template,
+			'user_template'=>$user_template
+		);
+
+		unset($options['user_template_info']['template']);
+
+		echo $this->load->view('template_manager/index',$options,true);
+	}
+
 	
 }
-/* End of file catalog.php */
-/* Location: ./controllers/admin/catalog.php */
+/* End of file metadata_editor.php */
+/* Location: ./controllers/admin/metadata_editor.php */

@@ -1497,3 +1497,116 @@ CREATE TABLE `data_access_whitelist` (
   `repository_id` int DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) AUTO_INCREMENT=1;
+
+
+
+CREATE TABLE `editor_catalogs` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `title` varchar(200) DEFAULT NULL,
+  `url` varchar(500) DEFAULT NULL,
+  `api_key` varchar(200) DEFAULT NULL,
+  `user_id` int DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) AUTO_INCREMENT=1;
+
+
+CREATE TABLE `editor_data_files` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `sid` int NOT NULL,
+  `file_id` varchar(100) CHARACTER SET utf8 DEFAULT NULL,
+  `file_name` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
+  `file_uri` varchar(300) CHARACTER SET utf8 DEFAULT NULL,
+  `description` text CHARACTER SET utf8,
+  `case_count` int DEFAULT NULL,
+  `var_count` int DEFAULT NULL,
+  `producer` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
+  `data_checks` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
+  `missing_data` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
+  `version` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
+  `notes` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
+  `metadata` varchar(5000) CHARACTER SET utf8 DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`)
+) AUTO_INCREMENT=1;
+
+
+CREATE TABLE `editor_projects` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `idno` varchar(200) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `type` varchar(15) CHARACTER SET utf8 DEFAULT NULL,
+  `title` varchar(255) CHARACTER SET utf8 NOT NULL DEFAULT '',
+  `abbreviation` varchar(45) CHARACTER SET utf8 DEFAULT NULL,
+  `authoring_entity` text CHARACTER SET utf8,
+  `nation` varchar(150) CHARACTER SET utf8 DEFAULT '',
+  `year_start` int DEFAULT '0',
+  `year_end` int DEFAULT '0',
+  `metafile` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
+  `dirpath` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
+  `varcount` int DEFAULT NULL,
+  `published` tinyint DEFAULT NULL,
+  `created` int DEFAULT NULL,
+  `changed` int DEFAULT NULL,
+  `created_by` int DEFAULT NULL,
+  `changed_by` int DEFAULT NULL,
+  `thumbnail` varchar(300) CHARACTER SET utf8 DEFAULT NULL,
+  `metadata` mediumtext CHARACTER SET utf8,
+  PRIMARY KEY (`id`)
+) AUTO_INCREMENT=1;
+
+CREATE TABLE `editor_resources` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `sid` int NOT NULL,
+  `dctype` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
+  `title` varchar(255) CHARACTER SET utf8 NOT NULL,
+  `subtitle` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
+  `author` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
+  `dcdate` varchar(45) CHARACTER SET utf8 DEFAULT NULL,
+  `country` varchar(45) CHARACTER SET utf8 DEFAULT NULL,
+  `language` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
+  `id_number` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
+  `contributor` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
+  `publisher` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
+  `rights` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
+  `description` text CHARACTER SET utf8,
+  `abstract` text CHARACTER SET utf8,
+  `toc` text CHARACTER SET utf8,
+  `subjects` varchar(45) CHARACTER SET utf8 DEFAULT NULL,
+  `filename` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
+  `dcformat` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
+  `changed` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`)
+) AUTO_INCREMENT=1;
+
+
+CREATE TABLE `editor_variables` (
+  `uid` int NOT NULL AUTO_INCREMENT,
+  `sid` int NOT NULL,
+  `fid` varchar(45) CHARACTER SET utf8 DEFAULT NULL,
+  `vid` varchar(45) CHARACTER SET utf8 DEFAULT '',
+  `name` varchar(100) CHARACTER SET utf8 DEFAULT '',
+  `labl` varchar(255) CHARACTER SET utf8 DEFAULT '',
+  `qstn` text CHARACTER SET utf8,
+  `catgry` text CHARACTER SET utf8,
+  `metadata` mediumtext CHARACTER SET utf8,
+  `keywords` text CHARACTER SET utf8,
+  PRIMARY KEY (`uid`)
+) AUTO_INCREMENT=1;
+
+
+CREATE TABLE `editor_templates` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `uid` varchar(45) DEFAULT NULL,
+  `data_type` varchar(45) NOT NULL,
+  `lang` varchar(45) DEFAULT NULL,
+  `name` varchar(100) NOT NULL,
+  `version` varchar(45) DEFAULT NULL,
+  `organization` varchar(300) DEFAULT NULL,
+  `author` varchar(100) DEFAULT NULL,
+  `description` varchar(1000) DEFAULT NULL,
+  `template` text,
+  `created` int DEFAULT NULL,
+  `changed` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uid_UNIQUE` (`uid`)
+) AUTO_INCREMENT=1;

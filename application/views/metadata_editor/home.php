@@ -29,13 +29,17 @@
 
       <nav class="main-header navbar navbar-expand-md navbar-light navbar-white">
 
-      <a href="#" class="navbar-brand"><i class="fas fa-compass"></i> <span class="brand-text font-weight-light">Metadata Editor</span></a>
+      <a href="<?php echo site_url('admin/metadata_editor');?>" class="navbar-brand"><i class="fas fa-compass"></i> <span class="brand-text font-weight-light">Metadata Editor</span></a>
 
         
 
         <ul class="navbar-nav ml-auto">
-
-            <li class="nav-item">
+            <li class="nav-item">                
+                <a class="nav-link" href="<?php echo site_url('admin/metadata_editor/templates');?>" role="button">
+                 Templates
+                </a>
+            </li>
+            <li class="nav-item">                
                 <a class="nav-link" href="#" role="button">
                   <i class="fas fa-user"></i> <?php echo $user=strtoupper($this->session->userdata('username'));?>
                 </a>

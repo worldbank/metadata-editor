@@ -62,7 +62,7 @@
         },
         {
             "type": "section",
-            "id": "metadata_information",
+            "id": "description",
             "title": "Description",
             "class": "recommended",
             "items": [
@@ -96,30 +96,244 @@
                     }
                 },
                 {
+                    "key": "description.parentIdentifier",
+                    "type": "text",
+                    "title": "Unique parent identifier",
+                    "help_text":"Global unique persistent identifier of the parent record, eg. a data collection that includes several datasets"
+                },
+
+                {
+                    "key": "description.hierarchyLevel",
+                    "type": "simple_array",
+                    "title": "Hierarchy level",
+                    "help_text": "List of Scope(s), or 'hierarchy level(s)'. e.g. dataset, service. Recommended code following the ISO/TS 19139 Scope codelist"
+                },
+
+                {
+                    "key": "description.hierarchyLevelName",
+                    "type": "text",
+                    "title": "Hierarchy level name",
+                    "help_text": "List of scope / hierarchy level names. Alternative to the use of 'hierarchyLevel' code items"
+                },
+
+                {
+                    "key": "description.contact",
+                    "type": "nested_array",
+                    "title": "Contact(s) associated to the metadata",
+                    "props":{
+                        "individualName": {
+                            "key": "individualName",
+                            "title": "Individual name",
+                            "type": "string"
+                        },
+                        "organisationName": {
+                            "key": "organisationName",
+                            "title": "Organisation name",
+                            "type": "string"
+                        },
+                        "positionName": {
+                            "key": "positionName",
+                            "title": "Position",
+                            "type": "string"
+                        },
+                        "contactInfo.phone.voice": {
+                            "key": "contactInfo.phone.voice",
+                            "title": "Voice",
+                            "type": "string"
+                        },
+                        "contactInfo.phone.facsimile": {
+                            "key": "contactInfo.phone.facsimile",
+                            "title": "Facsimile",
+                            "type": "string"
+                        },
+                        "contactInfo.address.deliveryPoint": {
+                            "key": "contactInfo.address.deliveryPoint",
+                            "title": "Delivery point",
+                            "type": "string"
+                        },
+                        "contactInfo.address.city": {
+                            "key": "contactInfo.address.city",
+                            "title": "City",
+                            "type": "string"
+                        },
+                        "contactInfo.address.postalCode": {
+                            "key": "contactInfo.address.postalCode",
+                            "title": "Postal code",
+                            "type": "string"
+                        },                        
+                        "contactInfo.address.country": {
+                            "key": "contactInfo.address.country",
+                            "title": "Country",
+                            "type": "string"
+                        },
+                        "contactInfo.address.elctronicMailAddress": {
+                            "key": "contactInfo.address.elctronicMailAddress",
+                            "title": "Email",
+                            "type": "string"
+                        },
+                        
+                        "role": {
+                            "key": "role",
+                            "title": "Role",
+                            "type": "string"
+                        }                                                
+                    }
+                },
+
+                {
+                    "key": "description.dateStamp",
+                    "type": "text",
+                    "title": "Date stamp",
+                    "help_text": "Date and time when the metadata record was created or updated. Requires an extended ISO 8601 formatted combined UTC date and time string (2009-11-17T10:00:00)"
+                },
+
+                {
+                    "key": "description.metadataStandardName",
+                    "type": "text",
+                    "title": "Metadata standard name",
+                    "help_text": "Standard name of the metadata standard used. Recommended value: ISO 19115:2003/19139"
+                },
+                
+                {
+                    "key": "description.metadataStandardVersion",
+                    "type": "text",
+                    "title": "Metadata standard version",
+                    "help_text": "Version of the metadata standard used. Optional for ISO/TC211 standard if the metadata standard name includes the inception year"
+                },
+                
+                {
                     "key": "description.dataSetURI",
                     "type": "text",
                     "title": "Dataset URI that uniquely identify the dataset"
-                }
-            ]
-        },
-        {
-            "type": "section",
-            "id": "description.identificationInfo",
-            "title": "Identification information",
-            "class": "recommended",
-            "items": [
+                },
+
                 {
-                    "key": "description.identificationInfo",
-                    "title": "Identification info",
+                    "key": "description.spatialRepresentationInfo",
                     "type": "nested_array",
-                    "props": {
-                        "abstract": {
-                            "key": "abstract",
-                            "title": "Abstract",
+                    "title": "Spatial representatio information",
+                    "props":{
+                        "vectorSpatialRepresentation.topologyLevel": {
+                            "key": "vectorSpatialRepresentation.topologyLevel",
+                            "title": "vectorSpatialRepresentation",
                             "type": "string"
+                        },
+                        "vectorSpatialRepresentation.geometricObjects": {
+                            "key": "vectorSpatialRepresentation.geometricObjects",
+                            "title": "Geometric object definition",
+                            "type": "array",
+                            "props":{
+                                "geometricObjectType":{
+                                    "key": "geometricObjectType",
+                                    "title": "Geometric Object type",
+                                    "type": "text"
+                                },
+                                "geometricObjectCount":{
+                                    "key": "geometricObjectCount",
+                                    "title": "Geometric Object count",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        "gridSpatialRepresentation": {
+                            "key": "gridSpatialRepresentation",
+                            "title": "gridSpatialRepresentation",
+                            "type": "nested_array",
+                            "props":{
+                                "numberOfDimensions": {
+                                    "key": "numberOfDimensions",
+                                    "title": "numberOfDimensions",
+                                    "type": "text"
+                                }
+                            }
                         }
-                        
                     }
+                },
+
+                {                    
+                    "title": "Identification info",
+                    "type": "section",
+                    "items":[                        
+                        {
+                            "key": "description.identificationInfo",
+                            "title": "Identification Information",
+                            "type": "nested_array",
+                            "props":{
+                                "title": {
+                                    "key": "citation.title",
+                                    "title": "Title",
+                                    "type": "string"
+                                },
+                                "date": {
+                                    "key": "citation.date",
+                                    "title": "Date",
+                                    "type": "array",
+                                    "props": {
+                                        "date": {
+                                            "key": "date",
+                                            "type": "text",
+                                            "title": "Date (YYYY-MM-DD)"
+                                        },
+                                        "type": {
+                                            "key": "type",
+                                            "type": "text",
+                                            "title": "Type",
+                                            "help_text": "Date type e.g. publication, revision, creation"
+                                        }
+                                    }
+                                },  
+                                "abstract": {
+                                    "key": "abstract",
+                                    "title": "Abstract",
+                                    "type": "string"
+                                },
+                                "extent":
+                                {
+                                    "key":"extent.geographicElement",
+                                    "title":"Extent",
+                                    "type":"nested_array",
+                                    "props":{
+                                        "title": {
+                                            "key": "geographicBoundingBox",
+                                            "title": "Bounding box",
+                                            "type": "array",
+                                            "props": {
+                                                "westBoundLongitude": {
+                                                    "key": "westBoundLongitude",
+                                                    "type": "text",
+                                                    "title": "westBoundLongitude"
+                                                },
+                                                "eastBoundLongitude": {
+                                                    "key": "eastBoundLongitude",
+                                                    "type": "text",
+                                                    "title": "eastBoundLongitude",
+                                                    "help_text": "East"
+                                                },
+                                                "southBoundLatitude": {
+                                                    "key": "southBoundLatitude",
+                                                    "type": "text",
+                                                    "title": "southBoundLatitude",
+                                                    "help_text": "South"
+                                                },
+                                                "northBoundLatitude": {
+                                                    "key": "northBoundLatitude",
+                                                    "type": "text",
+                                                    "title": "northBoundLatitude",
+                                                    "help_text": "North"
+                                                }                                                
+                                            }
+                                        },
+                                        "geographicDescription": {
+                                            "key": "geographicDescription",
+                                            "title": "Geographic description",
+                                            "type": "textarea"
+                                        }
+                                    }
+                                }
+                                
+                            }
+                        }
+                    
+                    ]
 
                 }
             ]

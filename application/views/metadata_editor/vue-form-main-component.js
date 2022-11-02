@@ -123,8 +123,8 @@ Vue.component('form-main', {
                     :id="'field-' + normalizeClassID(formField.key)" 
                 >
                     <option value="">Select</option>
-                    <option v-for="(option_key,option_value) in formField.enum" v-bind:value="option_value">
-                        {{ option_key }}
+                    <option v-for="enum_ in formField.enum" v-bind:key="enum_.key">
+                        {{ enum_.value }}
                     </option>
                 </select>
                 <small class="help-text form-text text-muted">{{formData[formField.key]}}</small>
