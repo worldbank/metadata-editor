@@ -105,7 +105,7 @@ Template manager</h5>
 
 
             </div>
-            <div class="col-1" style="background:#007bff;">
+            <div class="col-1" style="background:#dee2e6;">
               <div style="margin:-3px;">
 
                 <div>

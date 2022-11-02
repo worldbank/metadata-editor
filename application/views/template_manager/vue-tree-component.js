@@ -34,16 +34,16 @@ Vue.component('nada-treeview', {
             this.$store.state.active_node = newValue;
           }
         },
-        TreeActiveItems:{
+        /*TreeActiveItems:{
           get: function(){
             let items=[];
             items.push(this.ActiveNode.key);
             return items;
           },
           set: function(newValue){
-                
+              
           }
-        }
+        }*/
     },
     methods:{
       treeClick: function (node){
@@ -64,7 +64,7 @@ Vue.component('nada-treeview', {
                   color="warning"
                   v-model="value"                   
                   :open.sync="initiallyOpen" 
-                  :active.sync="TreeActiveItems" 
+                  :active.sync="tree_active_items" 
                   :items="Items" 
                   activatable dense 
                   item-key="key" 
