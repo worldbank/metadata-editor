@@ -48,23 +48,27 @@ Vue.component('nada-treeview', {
     methods:{
       treeClick: function (node){
         //store.commit('tree_active_node',node.key);
-        //console.log("treeClick",node);
+        console.log("treeClick",node);
 
         //expand tree node          
         this.initiallyOpen.push(node.key);
         store.commit('activeNode',node);        
       },
+      onTreeOpen: function (node){
+        console.log("tree node open");
+        
+      }
     },
     template: `
             <div class="nada-treeview-component">
             
             <template>
-            {{TreeActiveItems}}
               <v-treeview                   
                   color="warning"
                   v-model="value"                   
                   :open.sync="initiallyOpen" 
-                  :active.sync="tree_active_items" 
+                  :active.sync="tree_active_items"
+                  @update:open="onTreeOpen" 
                   :items="Items" 
                   activatable dense 
                   item-key="key" 
@@ -77,7 +81,7 @@ Vue.component('nada-treeview', {
               >
 
                 <template #label="{ item }" >
-                    <span @click="treeClick(item)" :title="item.title">
+                    <span @click="treeClick(item)" :title="item.title" class="tree-item-label">
                         <span v-if="item.type=='resource'" >{{item.title | truncate(23, '...') }}</span>
                         <span v-else>{{item.title}}</span>
                     </span>

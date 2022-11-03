@@ -20,6 +20,10 @@
 
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
 
+  <style>
+    .tree-item-label{display:block}
+  </style>
+
 </head>
 
 <body>
@@ -71,8 +75,10 @@
     <div class="header bg-dark p-1 pt-2" style="margin-bottom:12px;">
       <div class="row">
         <div class="col-md-10">
-          <h5 class="color-white"> <v-icon large color="#ffffff">mdi-alpha-t-box</v-icon>
-Template manager</h5>
+          <h5 class="color-white"> 
+            <v-icon large color="rgb(0 0 0 / 12%)">mdi-alpha-t-box</v-icon>
+            Template manager
+          </h5>
         </div>
         <div class="col-md-2">
           <div class="float-right">
@@ -109,29 +115,29 @@ Template manager</h5>
               <div style="margin:-3px;">
 
                 <div>
-                  <v-icon v-if="ActiveCoreNode.type" color="#ffffff" @click="addField()">mdi-chevron-left-box</v-icon>
-                  <v-icon v-else color="#3498db">mdi-chevron-left-box</v-icon>
+                  <v-icon v-if="ActiveCoreNode.type" color="#3498db" @click="addField()">mdi-chevron-left-box</v-icon>
+                  <v-icon v-else color="rgb(0 0 0 / 12%)">mdi-chevron-left-box</v-icon>
                 </div>
                 <div>
-                  <v-icon v-if="ActiveNodeIsField" color="#ffffff" @click="removeField()">mdi-chevron-right-box</v-icon>
-                  <v-icon v-else color="#3498db">mdi-chevron-right-box</v-icon>
+                  <v-icon v-if="ActiveNodeIsField" color="#3498db" @click="removeField()">mdi-chevron-right-box</v-icon>
+                  <v-icon v-else color="rgb(0 0 0 / 12%)">mdi-chevron-right-box</v-icon>
                 </div>
 
                 <div>
-                  <v-icon v-if="ActiveNode.type=='section'" color="#ffffff" @click="addSection()">mdi-plus-box</v-icon>
-                  <v-icon v-else color="#3498db">mdi-plus-box</v-icon>
+                  <v-icon v-if="ActiveNode.type=='section_container'" color="#3498db" @click="addSection()">mdi-plus-box</v-icon>
+                  <v-icon v-else color="rgb(0 0 0 / 12%)">mdi-plus-box</v-icon>
                 </div>
                 <div>
-                  <v-icon v-if="ActiveNode.type=='section'" color="#ffffff" @click="removeField()">mdi-minus-box</v-icon>
-                  <v-icon v-else color="#3498db">mdi-minus-box</v-icon>
+                  <v-icon v-if="ActiveNode.type=='section'" color="#3498db" @click="removeField()">mdi-minus-box</v-icon>
+                  <v-icon v-else color="rgb(0 0 0 / 12%)">mdi-minus-box</v-icon>
                 </div>
                 <div>
-                  <v-icon v-if="ActiveNodeIsField" color="#ffffff" @click="moveFieldUp()">mdi-arrow-up-bold-box</v-icon>
-                  <v-icon v-else color="#3498db">mdi-arrow-up-bold-box</v-icon>
+                  <v-icon v-if="ActiveNode.type!='section_container'  && ActiveNode.type" color="#3498db" @click="moveUp()">mdi-arrow-up-bold-box</v-icon>
+                  <v-icon v-else color="rgb(0 0 0 / 12%)">mdi-arrow-up-bold-box</v-icon>
                 </div>
                 <div>
-                  <v-icon v-if="ActiveNodeIsField" color="#ffffff" @click="moveFieldDown()">mdi-arrow-down-bold-box</v-icon>
-                  <v-icon v-else color="#3498db">mdi-arrow-down-bold-box</v-icon>
+                  <v-icon v-if="ActiveNode.type!='section_container' && ActiveNode.type" color="#3498db" @click="moveDown()">mdi-arrow-down-bold-box</v-icon>
+                  <v-icon v-else color="rgb(0 0 0 / 12%)">mdi-arrow-down-bold-box</v-icon>
                 </div>
               </div>
             </div>
@@ -371,9 +377,13 @@ Template manager</h5>
           this.ActiveNode.items.push(this.ActiveCoreNode);
           store.commit('activeCoreNode', {});
         },
-        addSection: function() {
-          parentNode = this.findNodeParent(this.UserTemplate, this.ActiveNode.key);
-          //parentNode.items.push({ "key": parentNode.key+".untitled", "title": "Untitled", "type": "section" });
+        addSection: function() 
+        {          
+          if (!this.ActiveNode.key=='section_container'){
+            return false;
+          }
+
+          parentNode = this.ActiveNode;
           new_node_key=parentNode.key + Date.now();
           parentNode.items.push ({
             "key": new_node_key,
@@ -384,6 +394,67 @@ Template manager</h5>
           });
 
           this.ActiveNode= parentNode.items[parentNode.items.length-1];
+        },
+        moveUp: function()
+        {
+          parentNode = this.findNodeParent(this.UserTemplate, this.ActiveNode.key);
+          //nodeIdx= 
+          console.log(parentNode);
+          nodeIdx=this.findNodePosition(parentNode,this.ActiveNode.key);
+          console.log("node index",nodeIdx);
+          if (nodeIdx >0 ){
+            this.array_move(parentNode.items,nodeIdx,nodeIdx-1);
+          }
+        },
+        moveDown: function()
+        {
+          parentNode = this.findNodeParent(this.UserTemplate, this.ActiveNode.key);
+          nodeIdx=this.findNodePosition(parentNode,this.ActiveNode.key);
+
+          parentNodeItemsCount=parentNode.items.length-1;
+          console.log("items in node",parentNodeItemsCount, nodeIdx);
+          
+          if (nodeIdx >-1 && nodeIdx<parentNodeItemsCount){
+            this.array_move(parentNode.items,nodeIdx,nodeIdx+1);
+          }
+        },
+        array_move: function (arr, old_index, new_index) {
+            if (new_index >= arr.length) {
+                var k = new_index - arr.length + 1;
+                while (k--) {
+                    arr.push(undefined);
+                }
+            }
+            arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
+        },
+        findNodePosition: function(node,key)
+        {
+          if (!node.items){
+            return false;
+          }
+
+          for(index=0;index < node.items.length;index++)
+          {
+              let item=node.items[index];
+              if (item.key && item.key == key) {
+                console.log("matched", index, item.key,key);
+                return index;
+              }
+          }
+
+          return -1;
+          
+          /*node.items.forEach(item => {
+            index++;
+            console.log("searching", index, item.key,key);
+            if (item.key) {
+              if (item.key == key) {
+                console.log("matched", index, item.key,key);
+                return index;
+              }
+            }
+          });
+          return index;*/
         },
         isItemInUse: function(item_key) {
           return _.includes(this.UserTreeUsedKeys, item_key);
