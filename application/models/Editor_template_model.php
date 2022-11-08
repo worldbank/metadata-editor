@@ -240,5 +240,31 @@ class Editor_template_model extends ci_model {
 		);
 	}
 
+	function get_template_parts_by_uid($uid)
+	{
+		$template=$this->get_template_by_uid($uid);
+
+		if($template)
+		{
+			$output=[];
+			$this->get_template_part($template,null,$output);
+			return $output;
+		}
+	}
+
+	function get_template_part($items, $parent = null, &$output)
+	{
+		foreach ($items as $item) {
+			if (isset($item['items'])) {
+				$parent_ = isset($item['key']) ? $item['key'] : null;
+				$this->get_template_part($item['items'], $parent_, $output);
+			}
+			if (isset($item['key'])) {
+				$item["parent"] = $parent;
+				$output[$item['key']] = $item;
+			}
+		}
+	}
+
     
 }

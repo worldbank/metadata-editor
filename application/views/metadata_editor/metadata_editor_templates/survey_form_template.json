@@ -1,7 +1,7 @@
 {
     "type": "template",
     "title": "Microdata Project",
-    "items": [    
+    "items": [
         {
             "type": "section_container",
             "id": "doc_description",
@@ -10,61 +10,148 @@
             "class": "mandatory recommended",
             "help_text": "",
             "expanded": true,
-            "items":[
+            "items": [
                 {
+                    "key": "doc_desc.title_statement",
+                    "title": "Title statement",
                     "type": "section",
-                    "id": "metadata_preparation",
-                    "key": "doc_description.metadata",
-                    "title": "Metadata preparation",
-                    "class": "mandatory recommended",
-                    "expanded": true,
-                    "items": [                
+                    "required": false,
+                    "help_text": "",
+                    "items": [
                         {
-                            "key": "doc_desc.title_statement.idno",
+                            "key": "doc_desc.title",
+                            "title": "Document title",
+                            "type": "text",
+                            "required": false,
+                            "help_text": ""
+                        },
+                        {
+                            "key": "doc_desc.idno",
                             "title": "IDNO",
                             "type": "text",
-                            "class": "required",
-                            "required": true,
-                            "help_text": "help text for idno",
-                            "rules":"required|alpha_dash|min:5|max:80"
+                            "required": false,
+                            "help_text": "Unique ID number for the document"
+                        },
+                        {
+                            "key": "doc_desc.producers",
+                            "title": "Producers",
+                            "type": "array",
+                            "required": false,
+                            "help_text": "List of producers",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "description": "Name (required)",
+                                    "type": "text"
+                                },
+                                "abbr": {
+                                    "key": "abbr",
+                                    "title": "Abbreviation",
+                                    "type": "text"
+                                },
+                                "affiliation": {
+                                    "key": "affiliation",
+                                    "type": "text",
+                                    "title": "Affiliation"
+                                },
+                                "role": {
+                                    "key": "role",
+                                    "title": "Role",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "doc_desc.prod_date",
+                            "title": "Date of production",
+                            "type": "text",
+                            "required": false,
+                            "help_text": "Document production date - YYYY-MM-DD"
+                        }
+                    ]
+                },
+                {
+                    "key": "doc_desc.version_statement",
+                    "title": "Version statement",
+                    "type": "section",
+                    "required": false,
+                    "help_text": "Version statement",
+                    "items": [
+                        {
+                            "key": "doc_desc.version_statement.version_date",
+                            "title": "Version date",
+                            "type": "text",
+                            "required": false,
+                            "help_text": ""
+                        },
+                        {
+                            "key": "doc_desc.version_statement.version_resp",
+                            "title": "Version responsibility statement",
+                            "type": "text",
+                            "required": false,
+                            "help_text": ""
+                        },
+                        {
+                            "key": "doc_desc.version_statement.version_notes",
+                            "title": "Version notes",
+                            "type": "text",
+                            "required": false,
+                            "help_text": ""
                         }
                     ]
                 }
             ]
-        },    
+        },
         {
             "type": "section_container",
-            "id": "study_description",
-            "key": "study_description",
+            "key": "study_desc",
             "title": "Study description",
             "class": "mandatory recommended",
             "expanded": true,
-            "items":[
+            "items": [
                 {
                     "type": "section",
-                    "id": "identification",
-                    "key": "study_description.identification",
-                    "title": "Identification",
+                    "key": "study_desc.title_statement",
+                    "title": "Title statement",
                     "class": "mandatory recommended",
                     "expanded": true,
-                    "items": [                
+                    "items": [
                         {
                             "key": "study_desc.title_statement.idno",
-                            "title": "IDNO",
+                            "title": "Unique IDNO",
                             "type": "text",
-                            "class": "required",
                             "required": true,
-                            "help_text": "help text for idno",
-                            "rules":"required|alpha_dash|min:5|max:80"
+                            "help_text": "The ID number of a dataset is a unique number that is used to identify a particular survey. Define and use a consistent scheme to use. Such an ID could be constructed as follows: country-producer-survey-year-version where \n - country is the 3-letter ISO country abbreviation \n - producer is the abbreviation of the producing agency \n - survey is the survey abbreviation \n - year is the reference year (or the year the survey started) \n - version is the number dataset version number (see Version Description below)",
+                            "rules": "required|alpha_dash|min:5|max:80"
+                        },
+                        {
+                            "key": "study_desc.title_statement.identifiers",
+                            "title": "Other identifiers",
+                            "type": "array",
+                            "required": true,
+                            "help_text": "",
+                            "props": {
+                                "type": {
+                                    "key": "type",
+                                    "title": "Identifier type",
+                                    "description": "Type of identifier e.g. `doi`, `handle`, `other`",
+                                    "type": "text"
+                                },
+                                "identifier": {
+                                    "key": "identifier",
+                                    "title": "Identifier",
+                                    "type": "text"
+                                }
+                            }
                         },
                         {
                             "key": "study_desc.title_statement.title",
                             "title": "Title",
                             "type": "text",
-                            "class": "required",
                             "required": true,
-                            "help_text": "help text for title",
-                            "rules":"required|max:300"
+                            "help_text": "The title is the official name of the survey as it is stated on the questionnaire or as it appears in the design documents. The following items should be noted:\n - Include the reference year(s) of the survey in the title. \n - Do not include the abbreviation of the survey name in the title. \n - As the survey title is a proper noun, the first letter of each word should be capitalized (except for prepositions or other conjunctions).\n - Including the country name in the title is optional.",
+                            "rules": "required|max:300"
                         },
                         {
                             "key": "study_desc.title_statement.sub_title",
@@ -74,13 +161,256 @@
                         {
                             "key": "study_desc.title_statement.alternate_title",
                             "title": "Alternate title",
-                            "type": "text"
+                            "type": "text",
+                            "help_text": "The abbreviation of a survey is usually the first letter of each word of the titled survey. The survey reference year(s) may be included."
                         },
                         {
                             "key": "study_desc.title_statement.translated_title",
                             "title": "Translated title",
                             "type": "text"
+                        }
+                    ]
+                },
+                {
+                    "type": "section",
+                    "key": "study_desc.resp_statement",
+                    "title": "Responsibility statement",
+                    "class": "mandatory recommended",
+                    "expanded": true,
+                    "items": [
+                        {
+                            "key": "study_desc.authoring_entity",
+                            "title": "Primary investigator",
+                            "type": "array",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text"
+                                },
+                                "affiliation": {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "text"
+                                }
+                            }
                         },
+                        {
+                            "key": "study_desc.oth_id",
+                            "title": "Other acknowledgements",
+                            "type": "array",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text"
+                                },
+                                "affiliation": {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "text"
+                                },
+                                "role": {
+                                    "key": "role",
+                                    "title": "Role",
+                                    "type": "text"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "type": "section",
+                    "key": "study_desc.production_statement",
+                    "title": "Production statement",
+                    "class": "mandatory recommended",
+                    "expanded": true,
+                    "items": [
+                        {
+                            "key": "study_desc.production_statement.producers",
+                            "title": "Other producers",
+                            "type": "array",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text"
+                                },
+                                "abbreviation": {
+                                    "key": "abbreviation",
+                                    "title": "Abbreviation",
+                                    "type": "text"
+                                },
+                                "affiliation": {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "text"
+                                },
+                                "role": {
+                                    "key": "role",
+                                    "title": "Role",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "study_desc.production_statement.copyright",
+                            "title": "Copyright",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "study_desc.production_statement.prod_date",
+                            "title": "Date of production",
+                            "type": "text",
+                            "required": false,
+                            "help_text": "Date when the marked-up document.marked-up document source.data collection.other material(s) were produced (not distributed or archived). The ISO standard for dates (YYYY-MM-DD) is recommended for use with the date attribute. Production date for data collection (2.1.3.3) maps to Dublin Core Date element."
+                        },
+                        {
+                            "key": "study_desc.production_statement.prod_place",
+                            "title": "roduction Place",
+                            "type": "text",
+                            "required": false,
+                            "help_text": "Address of the archive or organization that produced the work"
+                        },
+                        {
+                            "key": "study_desc.production_statement.funding_agencies",
+                            "title": "Funding",
+                            "help_text": "The source(s) of funds for production of the work. If different funding agencies sponsored different stages of the production process, use the 'role' attribute to distinguish them.",
+                            "type": "array",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text"
+                                },
+                                "abbr": {
+                                    "key": "abbr",
+                                    "title": "Abbreviation",
+                                    "type": "text"
+                                },
+                                "grant": {
+                                    "key": "grant",
+                                    "title": "Grant number",
+                                    "type": "text"
+                                },
+                                "role": {
+                                    "key": "role",
+                                    "title": "Role",
+                                    "type": "text"
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    "type": "section",
+                    "key": "study_desc.distribution_statement",
+                    "title": "Distribution statement",
+                    "class": "mandatory recommended",
+                    "expanded": true,
+                    "items": [
+                        {
+                            "key": "study_desc.distribution_statement.distributors",
+                            "title": "Distributors",
+                            "type": "array",
+                            "required": false,
+                            "help_text": "The organization designated by the author or producer to generate copies of the particular work including any necessary editions or revisions. Names and addresses may be specified and other archives may be co-distributors. A URI attribute is included to provide an URN or URL to the ordering service or download facility on a Web site.",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "description": "Organization name",
+                                    "type": "text"
+                                },
+                                "abbr": {
+                                    "key": "abbr",
+                                    "title": "Abbreviation",
+                                    "type": "text"
+                                },
+                                "affiliation": {
+                                    "key": "affiliation",
+                                    "type": "text",
+                                    "title": "Affiliation"
+                                },
+                                "role": {
+                                    "key": "role",
+                                    "title": "Role",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "study_desc.distribution_statement.contact",
+                            "title": "Contacts",
+                            "type": "array",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text"
+                                },
+                                "affiliation": {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "text"
+                                },
+                                "email": {
+                                    "key": "email",
+                                    "title": "Email",
+                                    "type": "text"
+                                },
+                                "uri": {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "study_desc.distribution_statement.depositor",
+                            "title": "Depositors",
+                            "type": "array",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text"
+                                },
+                                "abbr": {
+                                    "key": "abbr",
+                                    "title": "Abbreviation",
+                                    "type": "text"
+                                },
+                                "affiliation": {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "text"
+                                },
+                                "uri": {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "study_desc.distribution_statement.deposit_date",
+                            "title": "Date of deposit",
+                            "type": "text"
+                        },
+                        {
+                            "key": "study_desc.distribution_statement.distribution_date",
+                            "title": "Date of distribution",
+                            "type": "text"
+                        }
+                    ]
+                },
+                {
+                    "type": "section",
+                    "key": "study_description.series_statement",
+                    "title": "Series statement",
+                    "class": "recommended",
+                    "items": [
                         {
                             "key": "study_desc.series_statement.series_name",
                             "title": "Series type",
@@ -249,46 +579,46 @@
                                 }
                             ],
                             "enum_": {
-                                "1-2-3 Survey, phase 1": "1-2-3 Survey, phase 1",                        
+                                "1-2-3 Survey, phase 1": "1-2-3 Survey, phase 1",
                                 "1-2-3 Survey, phase 1 [hh/123-1]": "1-2-3 Survey, phase 1 [hh/123-1]",
                                 "1-2-3 Survey, phase 2 [hh/123-2]": "1-2-3 Survey, phase 2 [hh/123-2]",
-                                "1-2-3 Survey, phase 3 [hh/123-3]":"1-2-3 Survey, phase 3 [hh/123-3]",
+                                "1-2-3 Survey, phase 3 [hh/123-3]": "1-2-3 Survey, phase 3 [hh/123-3]",
                                 "Administrative Records, Health (ad/hea]": "Administrative Records, Health (ad/hea]",
-                                "Administrative Records, Education (ad/edu]":"Administrative Records, Education (ad/edu]",
-                                "Administrative Records, Other (ad/oth]":"Administrative Records, Other (ad/oth]",
-                                "Agricultural Census [ag/census]":"Agricultural Census [ag/census]",
-                                "Agricultural Survey [ag/oth]":"Agricultural Survey [ag/oth]",
-                                "Child Labor Survey [hh/cls]":"Child Labor Survey [hh/cls]",
-                                "Core Welfare Indicators Questionnaire [hh/cwiq]":"Core Welfare Indicators Questionnaire [hh/cwiq]",
-                                "Demographic and Health Survey [hh/dhs]":"Demographic and Health Survey [hh/dhs]",
-                                "Demographic and Health Survey, Round 1 [hh/dhs-1]":"Demographic and Health Survey, Round 1 [hh/dhs-1]",
-                                "Demographic and Health Survey, Round 2 [hh/dhs-2]":"Demographic and Health Survey, Round 2 [hh/dhs-2]",
-                                "Demographic and Health Survey, Round 3  [hh/dhs-3]":"Demographic and Health Survey, Round 3  [hh/dhs-3]",
-                                "Demographic and Health Survey, Round 4 [hh/dhs-4]":"Demographic and Health Survey, Round 4 [hh/dhs-4]",
-                                "Demographic and Health Survey, Interim [hh/dhs-int]":"Demographic and Health Survey, Interim [hh/dhs-int]",
-                                "Demographic and Health Survey, Special [hh/dhs-sp]":"Demographic and Health Survey, Special [hh/dhs-sp]",
-                                "Enterprise Survey [en/oth]":"Enterprise Survey [en/oth]",
-                                "Enterprise Census [en/census]":"Enterprise Census [en/census]",
-                                "Income/Expenditure/Household Survey [hh/ies]":"Income/Expenditure/Household Survey [hh/ies]",
-                                "Informal Sector Survey [hh/iss]":"Informal Sector Survey [hh/iss]",
-                                "Integrated Survey (non-LSMS) [hh/is]":"Integrated Survey (non-LSMS) [hh/is]",
-                                "Multiple Indicator Cluster Survey - Round 1 [hh/mics-1]":"Multiple Indicator Cluster Survey - Round 1 [hh/mics-1]",
-                                "Multiple Indicator Cluster Survey - Round 2 [hh/mics-2]":"Multiple Indicator Cluster Survey - Round 2 [hh/mics-2]",
-                                "Multiple Indicator Cluster Survey - Round 3 [hh/mics-3]":"Multiple Indicator Cluster Survey - Round 3 [hh/mics-3]",
-                                "Labor Force Survey [hh/lfs]":"Labor Force Survey [hh/lfs]",
-                                "Living Standards Measurement Study [hh/lsms]":"Living Standards Measurement Study [hh/lsms]",
-                                "Other Household Health Survey [hh/hea]":"Other Household Health Survey [hh/hea]",
-                                "Other Household Survey [hh/oth]":"Other Household Survey [hh/oth]",
-                                "Price Survey [hh/prc]":"Price Survey [hh/prc]",
-                                "Priority Survey (hh/ps]":"Priority Survey (hh/ps]",
-                                "Population and Housing Census [hh/popcen]":"Population and Housing Census [hh/popcen]",
-                                "Sample Frame, Households [sf/hh]":"Sample Frame, Households [sf/hh]",
-                                "Sample Frame, Enterprises [sf/en]":"Sample Frame, Enterprises [sf/en]",
-                                "Service Provision Assessments [hh/spa]":"Service Provision Assessments [hh/spa]",
-                                "Socio-Economic/Monitoring Survey [hh/sems]":"Socio-Economic/Monitoring Survey [hh/sems]",
-                                "Statistical Info. &amp; Monitoring Prog. [hh/simpoc]":"Statistical Info. &amp; Monitoring Prog. [hh/simpoc]",
-                                "World Fertility Survey [hh/wfs]":"World Fertility Survey [hh/wfs]",
-                                "World Health Survey [hh/whs]":"World Health Survey [hh/whs]"
+                                "Administrative Records, Education (ad/edu]": "Administrative Records, Education (ad/edu]",
+                                "Administrative Records, Other (ad/oth]": "Administrative Records, Other (ad/oth]",
+                                "Agricultural Census [ag/census]": "Agricultural Census [ag/census]",
+                                "Agricultural Survey [ag/oth]": "Agricultural Survey [ag/oth]",
+                                "Child Labor Survey [hh/cls]": "Child Labor Survey [hh/cls]",
+                                "Core Welfare Indicators Questionnaire [hh/cwiq]": "Core Welfare Indicators Questionnaire [hh/cwiq]",
+                                "Demographic and Health Survey [hh/dhs]": "Demographic and Health Survey [hh/dhs]",
+                                "Demographic and Health Survey, Round 1 [hh/dhs-1]": "Demographic and Health Survey, Round 1 [hh/dhs-1]",
+                                "Demographic and Health Survey, Round 2 [hh/dhs-2]": "Demographic and Health Survey, Round 2 [hh/dhs-2]",
+                                "Demographic and Health Survey, Round 3  [hh/dhs-3]": "Demographic and Health Survey, Round 3  [hh/dhs-3]",
+                                "Demographic and Health Survey, Round 4 [hh/dhs-4]": "Demographic and Health Survey, Round 4 [hh/dhs-4]",
+                                "Demographic and Health Survey, Interim [hh/dhs-int]": "Demographic and Health Survey, Interim [hh/dhs-int]",
+                                "Demographic and Health Survey, Special [hh/dhs-sp]": "Demographic and Health Survey, Special [hh/dhs-sp]",
+                                "Enterprise Survey [en/oth]": "Enterprise Survey [en/oth]",
+                                "Enterprise Census [en/census]": "Enterprise Census [en/census]",
+                                "Income/Expenditure/Household Survey [hh/ies]": "Income/Expenditure/Household Survey [hh/ies]",
+                                "Informal Sector Survey [hh/iss]": "Informal Sector Survey [hh/iss]",
+                                "Integrated Survey (non-LSMS) [hh/is]": "Integrated Survey (non-LSMS) [hh/is]",
+                                "Multiple Indicator Cluster Survey - Round 1 [hh/mics-1]": "Multiple Indicator Cluster Survey - Round 1 [hh/mics-1]",
+                                "Multiple Indicator Cluster Survey - Round 2 [hh/mics-2]": "Multiple Indicator Cluster Survey - Round 2 [hh/mics-2]",
+                                "Multiple Indicator Cluster Survey - Round 3 [hh/mics-3]": "Multiple Indicator Cluster Survey - Round 3 [hh/mics-3]",
+                                "Labor Force Survey [hh/lfs]": "Labor Force Survey [hh/lfs]",
+                                "Living Standards Measurement Study [hh/lsms]": "Living Standards Measurement Study [hh/lsms]",
+                                "Other Household Health Survey [hh/hea]": "Other Household Health Survey [hh/hea]",
+                                "Other Household Survey [hh/oth]": "Other Household Survey [hh/oth]",
+                                "Price Survey [hh/prc]": "Price Survey [hh/prc]",
+                                "Priority Survey (hh/ps]": "Priority Survey (hh/ps]",
+                                "Population and Housing Census [hh/popcen]": "Population and Housing Census [hh/popcen]",
+                                "Sample Frame, Households [sf/hh]": "Sample Frame, Households [sf/hh]",
+                                "Sample Frame, Enterprises [sf/en]": "Sample Frame, Enterprises [sf/en]",
+                                "Service Provision Assessments [hh/spa]": "Service Provision Assessments [hh/spa]",
+                                "Socio-Economic/Monitoring Survey [hh/sems]": "Socio-Economic/Monitoring Survey [hh/sems]",
+                                "Statistical Info. &amp; Monitoring Prog. [hh/simpoc]": "Statistical Info. &amp; Monitoring Prog. [hh/simpoc]",
+                                "World Fertility Survey [hh/wfs]": "World Fertility Survey [hh/wfs]",
+                                "World Health Survey [hh/whs]": "World Health Survey [hh/whs]"
                             }
                         },
                         {
@@ -300,7 +630,6 @@
                 },
                 {
                     "type": "section",
-                    "id": "version",
                     "key": "study_description.version",
                     "title": "Version",
                     "class": "recommended",
@@ -317,6 +646,12 @@
                             "type": "text"
                         },
                         {
+                            "key": "study_desc.version_statement.version_resp",
+                            "title": "Version Responsibility Statement",
+                            "help_text": "The organization or person responsible for the version of the work",
+                            "type": "text"
+                        },
+                        {
                             "key": "study_desc.version_statement.version_notes",
                             "title": "Notes",
                             "type": "textarea"
@@ -325,87 +660,89 @@
                 },
                 {
                     "type": "section",
-                    "key": "study_description.overview",
-                    "title": "Overview",
+                    "key": "study_description.bib_citation_section",
+                    "title": "Bibliographic citations",
+                    "help_text": "Complete bibliographic reference containing all of the standard elements of a citation that can be used to cite the work. The `'bib_citation_format'` field is provided to enable specification of the particular citation style used, e.g., APA, MLA, Chicago, etc.",
+                    "class": "recommended",
                     "items": [
                         {
-                            "key": "study_desc.study_info.abstract",
-                            "title": "Abstract",
-                            "type": "text"
+                            "key": "study_desc.bib_citation_format",
+                            "title": "Citation Format",
+                            "type": "text",
+                            "help_text": "Specification of the particular citation style used, e.g., `APA`, `MLA`, `Chicago`, etc."
                         },
                         {
-                            "key": "study_desc.study_info.data_kind",
-                            "title": "Kind of data",
-                            "type": "dropdown",
-                            "enum": {
-                                "sample survey data[ssd]": "Sample survey data"
-                            }
-                        },
-                        {
-                            "key": "study_desc.study_info.analysis_unit",
-                            "title": "Unit of analysis",
-                            "type": "textarea"
+                            "type": "textarea",
+                            "key": "study_description.bib_citation",
+                            "title": "Bibliographic citation",
+                            "help_text": "Complete bibliographic reference containing all of the standard elements of a citation that can be used to cite the work. The `'bib_citation_format'` field is provided to enable specification of the particular citation style used, e.g., APA, MLA, Chicago, etc."
                         }
                     ]
                 },
                 {
                     "type": "section",
-                    "key": "scope",
-                    "title": "Scope",
+                    "key": "study_description.holdings_section",
+                    "title": "Holdings information",
+                    "help_text": "Information concerning either the physical or electronic holdings of the cited work. Attributes include: location--The physical location where a copy is held; callno--The call number for a work at the location specified; and URI--A URN or URL for accessing the electronic copy of the cited work.",
                     "items": [
                         {
-                            "key": "study_desc.study_info.notes",
-                            "title": "Description of scope",
-                            "type": "textarea"
-                        }
-                    ]
-                },
-                {
-                    "type": "section",
-                    "key": "coverage",
-                    "title": "Coverage",
-                    "class": "mandatory",
-                    "items": [
-                        {
-                            "key": "study_desc.study_info.nation",
-                            "title": "Country",
+                            "key": "study_description.holdings",
+                            "title": "Holdings information",
+                            "help_text": "Information concerning either the physical or electronic holdings of the cited work. Attributes include: location--The physical location where a copy is held; callno--The call number for a work at the location specified; and URI--A URN or URL for accessing the electronic copy of the cited work.",
                             "type": "array",
-                            "class": "required",
                             "props": {
                                 "name": {
                                     "key": "name",
                                     "title": "Name",
-                                    "type": "text",
-                                    "rules":"required",
-                                    "name": "Country name"
+                                    "type": "text"
                                 },
-                                "abbreviation": {
-                                    "key": "abbreviation",
-                                    "title": "Abbreviation",
+                                "location": {
+                                    "key": "location",
+                                    "title": "Location",
+                                    "type": "text"
+                                },
+                                "callno": {
+                                    "key": "callno",
+                                    "title": "Callno",
+                                    "type": "text"
+                                },
+                                "uri": {
+                                    "key": "uri",
+                                    "title": "URI",
                                     "type": "text"
                                 }
                             }
-                        },
+                        }
+                    ]
+                },
+                {
+                    "type": "section",
+                    "key": "study_description.study_notes_section",
+                    "title": "Study notes",
+                    "items": [
                         {
-                            "key": "study_desc.study_info.geog_coverage",
-                            "title": "Geographic coverage",
-                            "type": "text"
-                        },
-                        {
-                            "key": "study_desc.study_info.universe",
-                            "title": "Universe",
+                            "key": "study_description.study_notes",
+                            "title": "Study notes",
+                            "help_text": "",
                             "type": "textarea"
                         }
                     ]
                 },
                 {
                     "type": "section",
-                    "key": "producers_sponsors",
-                    "title": "Producers and sponsors",
+                    "key": "study_description.study_authorization",
+                    "help_text": "Provides structured information on the agency that authorized the study, the date of authorization, and an authorization statement",
+                    "title": "Study authorization",
                     "items": [
                         {
-                            "key": "study_desc.authoring_entity",
-                            "title": "Primary investigator",
+                            "key": "study_desc.study_authorization.date",
+                            "title": "Authorization date",
+                            "help_text": "",
+                            "type": "text"
+                        },
+                        {
+                            "key": "study_desc.study_authorization.agency",
+                            "title": "Authorizing Agencies",
                             "type": "array",
                             "props": {
                                 "name": {
@@ -416,120 +753,107 @@
                                 "affiliation": {
                                     "key": "affiliation",
                                     "title": "Affiliation",
-                                    "type": "text"
-                                }
-                            }
-                        },
-                        {
-                            "key": "study_desc.production_statement.producers",
-                            "title": "Other producers",
-                            "type": "array",
-                            "props": {
-                                "name": {
-                                    "key": "name",
-                                    "title": "Name",
-                                    "type": "text"
-                                },
-                                "abbreviation": {
-                                    "key": "abbreviation",
-                                    "title": "Abbreviation",
-                                    "type": "text"
-                                },
-                                "affiliation": {
-                                    "key": "affiliation",
-                                    "title": "Affiliation",
-                                    "type": "text"
-                                },
-                                "role": {
-                                    "key": "role",
-                                    "title": "Role",
-                                    "type": "text"
-                                }
-                            }
-                        },
-                        {
-                            "key": "study_desc.production_statement.funding_agencies",
-                            "title": "Funding",
-                            "type": "array",
-                            "props": {
-                                "name": {
-                                    "key": "name",
-                                    "title": "Name",
                                     "type": "text"
                                 },
                                 "abbr": {
                                     "key": "abbr",
                                     "title": "Abbreviation",
                                     "type": "text"
-                                },
-                                "grant": {
-                                    "key": "grant",
-                                    "title": "Grant number",
-                                    "type": "text"
-                                },
-                                "role": {
-                                    "key": "role",
-                                    "title": "Role",
-                                    "type": "text"
                                 }
                             }
                         },
                         {
-                            "key": "study_desc.oth_id",
-                            "title": "Other acknowledgements",
+                            "key": "study_desc.study_authorization.authorization_statement",
+                            "title": "Authorization Statement",
+                            "help_text": "Authorization Statement",
+                            "type": "textarea"
+                        }
+                    ]
+                },
+                {
+                    "type": "section",
+                    "key": "study_description.study_info",
+                    "help_text": "This section contains information about the data collection's scope across several dimensions, including substantive content, geography, and time.",
+                    "title": "Study information",
+                    "items": [
+                        {
+                            "key": "study_desc.study_info.study_budget",
+                            "title": "Study budget",
+                            "help_text": "Provide a clear summary of the budget of the project in as much detail as needed.",
+                            "type": "text"
+                        },
+                        {
+                            "key": "study_desc.study_info.keywords",
+                            "title": "Keywords",
                             "type": "array",
                             "props": {
-                                "name": {
-                                    "key": "name",
-                                    "title": "Name",
+                                "keyword": {
+                                    "key": "keyword",
+                                    "title": "Keyword",
                                     "type": "text"
                                 },
-                                "affiliation": {
-                                    "key": "affiliation",
-                                    "title": "Affiliation",
+                                "vocab": {
+                                    "key": "vocab",
+                                    "title": "Vocabulary",
                                     "type": "text"
                                 },
-                                "role": {
-                                    "key": "role",
-                                    "title": "Role",
+                                "uri": {
+                                    "key": "uri",
+                                    "title": "URI",
                                     "type": "text"
                                 }
                             }
-                        }
-                    ]
-                },
-                {
-                    "type": "section",
-                    "key": "sampling",
-                    "title": "Sampling",
-                    "items": [
-                        {
-                            "key": "study_desc.method.data_collection.sampling_procedure",
-                            "title": "Sampling procedure",
-                            "type": "textarea"
                         },
                         {
-                            "key": "study_desc.method.data_collection.sampling_deviation",
-                            "title": "Deviations from sample design",
-                            "type": "textarea"
+                            "key": "study_desc.study_info.topics",
+                            "title": "Topics",
+                            "type": "array",
+                            "props": {
+                                "topic": {
+                                    "key": "topic",
+                                    "title": "Topic",
+                                    "type": "text"
+                                },
+                                "vocab": {
+                                    "key": "vocab",
+                                    "title": "Vocabulary",
+                                    "type": "text"
+                                },
+                                "uri": {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "text"
+                                }
+                            }
                         },
                         {
-                            "key": "study_desc.method.analysis_info.response_rate",
-                            "title": "Response rates",
-                            "type": "textarea"
+                            "key": "study_desc.study_info.abstract",
+                            "title": "Abstract",
+                            "type": "text"
                         },
                         {
-                            "key": "study_desc.method.data_collection.weight",
-                            "title": "Weighting",
-                            "type": "textarea"
-                        }
-                    ]
-                },
-                {
-                    "type": "section",
-                    "key": "datacollection",
-                    "title": "Data collection",
-                    "items": [
+                            "key": "study_desc.study_info.time_periods",
+                            "title": "Time periods",
+                            "help_text": "This field will usually be left empty. Time period differs from the dates of collection as they represent the period for which the data collected are applicable or relevant.",
+                            "type": "array",
+                            "props": {
+                                "start": {
+                                    "key": "start",
+                                    "title": "Start",
+                                    "type": "text"
+                                },
+                                "end": {
+                                    "key": "end",
+                                    "title": "End",
+                                    "type": "text"
+                                },
+                                "cycle": {
+                                    "key": "cycle",
+                                    "title": "Cycle",
+                                    "type": "text"
+                                }
+                            }
+                        },
                         {
                             "key": "study_desc.study_info.coll_dates",
                             "title": "Dates of data collection",
@@ -553,220 +877,638 @@
                             }
                         },
                         {
-                            "key": "study_desc.study_info.time_periods",
-                            "title": "Time periods",
+                            "key": "study_desc.study_info.nation",
+                            "title": "Country",
                             "type": "array",
+                            "class": "required",
                             "props": {
-                                "start": {
-                                    "key": "start",
-                                    "title": "Start",
-                                    "type": "text"
+                                "name": {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text",
+                                    "rules": "required",
+                                    "name": "Country name"
                                 },
-                                "end": {
-                                    "key": "end",
-                                    "title": "End",
-                                    "type": "text"
-                                },
-                                "cycle": {
-                                    "key": "cycle",
-                                    "title": "Cycle",
+                                "abbreviation": {
+                                    "key": "abbreviation",
+                                    "title": "Abbreviation",
                                     "type": "text"
                                 }
                             }
                         },
                         {
-                            "key": "study_desc.method.data_collection.coll_mode",
-                            "title": "Mode of data collection",
-                            "type": "simple_array"
-                        },
-                        {
-                            "key": "study_desc.method.data_collection.coll_situation",
-                            "title": "Notes on data collection",
-                            "type": "textarea"
-                        },
-                        {
-                            "key": "study_desc.method.data_collection.research_instrument",
-                            "title": "Questionnaires",
-                            "type": "textarea"
-                        },
-                        {
-                            "key": "study_desc.method.data_collection.data_collectors",
-                            "title": "Data collectors",
+                            "key": "study_desc.study_info.bbox",
+                            "title": "Geographic bounding box",
                             "type": "array",
+                            "class": "required",
+                            "props": {
+                                "west": {
+                                    "key": "west",
+                                    "title": "West",
+                                    "type": "text"
+                                },
+                                "east": {
+                                    "key": "east",
+                                    "title": "East",
+                                    "type": "text"
+                                },
+                                "south": {
+                                    "key": "south",
+                                    "title": "South",
+                                    "type": "text"
+                                },
+                                "north": {
+                                    "key": "north",
+                                    "title": "North",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "study_desc.study_info.bound_poly",
+                            "title": "Geographic Bounding Polygon",
+                            "help_text": "This field allows the creation of multiple polygons to describe in a more detailed manner the geographic area covered by the dataset. It should only be used to define the outer boundaries of a covered area. For example, in the United States, such polygons can be created to define boundaries for Hawaii, Alaska, and the continental United States, but not interior boundaries for the contiguous states. This field is used to refine a coordinate-based search, not to actually map an area. \nIf the boundPoly element is used, then geoBndBox MUST be present, and all points enclosed by the boundPoly MUST be contained within the geoBndBox. Elements westBL, eastBL, southBL, and northBL of the geoBndBox should each be represented in at least one point of the boundPoly description.",
+                            "type": "array",
+                            "class": "required",
+                            "props": {
+                                "lat": {
+                                    "key": "lat",
+                                    "title": "Latitude",
+                                    "help_text": "Latitude (y coordinate) of a point. Valid range expressed in decimal degrees is as follows: -90,0 to 90,0 degrees (latitude)",
+                                    "type": "text"
+                                },
+                                "lon": {
+                                    "key": "lon",
+                                    "title": "longitude",
+                                    "help_text": "Longitude (x coordinate) of a point. Valid range expressed in decimal degrees is as follows: -180,0 to 180,0 degrees (longitude)",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "study_desc.study_info.geog_coverage",
+                            "title": "Geographic coverage",
+                            "type": "text"
+                        },
+                        {
+                            "key": "study_desc.study_info.geog_coverage_notes",
+                            "title": "Geographic coverage notes",
+                            "type": "text"
+                        },
+                        {
+                            "key": "study_desc.study_info.geog_unit",
+                            "title": "Geographic unit",
+                            "type": "text",
+                            "help_text": "Lowest level of geographic aggregation covered by the data"
+                        },
+                        {
+                            "key": "study_desc.study_info.analysis_unit",
+                            "title": "Unit of analysis",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "study_desc.study_info.universe",
+                            "title": "Universe",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "study_desc.study_info.data_kind",
+                            "title": "Kind of data",
+                            "type": "dropdown",
+                            "enum": {
+                                "sample survey data[ssd]": "Sample survey data"
+                            }
+                        },
+                        {
+                            "key": "study_desc.study_info.notes",
+                            "title": "Description of scope",
+                            "type": "textarea"
+                        },
+                        {
+                            "type": "section",
+                            "key": "study_desc.study_info.quality_statement",
+                            "title": "Quality statement",
+                            "help_text": "The quality statement provides elements to describe compliance with quality standards in the form of a statement and an itemized list of standards complied with, and an element to provide other quality statement.",
+                            "items": [
+                                {
+                                    "key": "study_desc.study_info.quality_statement.compliance_description",
+                                    "title": "Standard compliance description",
+                                    "type": "textarea"
+                                },
+                                {
+                                    "key": "study_desc.study_info.quality_statement.standards",
+                                    "title": "Standards",
+                                    "help_text": "Standards",
+                                    "type": "array",
+                                    "class": "required",
+                                    "props": {
+                                        "name": {
+                                            "key": "name",
+                                            "title": "Name",
+                                            "type": "text"
+                                        },
+                                        "producer": {
+                                            "key": "producer",
+                                            "title": "Producer",
+                                            "type": "text"
+                                        }
+                                    }
+                                },
+                                {
+                                    "key": "study_desc.study_info.quality_statement.other_quality_statement",
+                                    "title": "Other quality statement",
+                                    "type": "textarea"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "section",
+                            "key": "study_desc.study_info.ex_post_evaluation",
+                            "title": "Ex-Post Evaluation",
+                            "help_text": "This structure consists of two parts, standardsCompliance and otherQualityStatements. In standardsCompliance list all specific standards complied with during the execution of this study. Note the standard name and producer and how the study complied with the standard. Enter any additional quality statements in otherQualityStatements.",
+                            "items": [
+                                {
+                                    "key": "study_desc.study_info.ex_post_evaluation.completion_date",
+                                    "title": "Evaluation completion date",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "study_desc.study_info.ex_post_evaluation.type",
+                                    "title": "Evaluation type",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "study_desc.study_info.ex_post_evaluation.evaluator",
+                                    "title": "Evaluators",
+                                    "help_text": "",
+                                    "type": "array",
+                                    "class": "required",
+                                    "props": {
+                                        "name": {
+                                            "key": "name",
+                                            "title": "Name",
+                                            "type": "text"
+                                        },
+                                        "abbr": {
+                                            "key": "abbr",
+                                            "title": "Abbreviation",
+                                            "type": "text"
+                                        },
+                                        "affiliation": {
+                                            "key": "affiliation",
+                                            "title": "Affiliation",
+                                            "type": "text"
+                                        },
+                                        "role": {
+                                            "key": "role",
+                                            "title": "Role",
+                                            "type": "text"
+                                        }
+                                    }
+                                },
+                                {
+                                    "key": "study_desc.study_info.ex_post_evaluation.evaluation_process",
+                                    "title": "Evaluation process",
+                                    "type": "textarea"
+                                },
+                                {
+                                    "key": "study_desc.study_info.ex_post_evaluation.outcomes",
+                                    "title": "Evaluation outcomes",
+                                    "type": "textarea"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "section_container",
+                    "key": "study_desc.study_development",
+                    "title": "Study Development",
+                    "help_text": "Describe the process of study development as a series of development activities. These activities can be typed using a controlled vocabulary. Describe the activity, listing participants with their role and affiliation, resources used (sources of information), and the outcome of the development activity.",
+                    "items": [
+                        {
+                            "key": "study_desc.study_development.development_activity",
+                            "title": "Development activity",
+                            "help_text": "",
+                            "type": "nested_array",
                             "props": {
                                 "name": {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "text"
                                 },
-                                "abbr": {
-                                    "key": "abbr",
-                                    "title": "Abbreviation",
+                                "activity_type": {
+                                    "key": "activity_type",
+                                    "title": "Development activity type",
                                     "type": "text"
                                 },
-                                "affiliation": {
-                                    "key": "affiliation",
-                                    "title": "Affiliation",
-                                    "type": "text"
+                                "activity_description": {
+                                    "key": "activity_description",
+                                    "title": "Development activity description",
+                                    "type": "text",
+                                    "_ddi_xpath": "stdyDscr.studyDevelopment.developmentActivity.description"
+                                },
+                                "participants": {
+                                    "key": "participants",
+                                    "title": "Participants",
+                                    "type": "array",
+                                    "props": {
+                                        "name": {
+                                            "key": "name",
+                                            "title": "Name",
+                                            "type": "text"
+                                        },
+                                        "affiliation": {
+                                            "key": "affiliation",
+                                            "title": "Affiliation",
+                                            "type": "text"
+                                        },
+                                        "role": {
+                                            "key": "role",
+                                            "title": "Role",
+                                            "type": "text"
+                                        }
+                                    }
+                                },
+                                "resources": {
+                                    "key": "resources",
+                                    "title": "Development activity resources",
+                                    "type": "array",
+                                    "_ddi_xpath": "stdyDscr.studyDevelopment.developmentActivity.resource",
+                                    "props": {
+                                        "name": {
+                                            "key": "name",
+                                            "title": "Name",
+                                            "type": "text"
+                                        },
+                                        "origin": {
+                                            "key": "origin",
+                                            "title": "Origin of resource",
+                                            "type": "text"
+                                        },
+                                        "characteristics": {
+                                            "key": "characteristics",
+                                            "title": "Characteristics",
+                                            "type": "text"
+                                        }
+                                    }
+                                },
+                                "outcome": {
+                                    "key": "outcome",
+                                    "title": "Development Activity Outcome",
+                                    "type": "textarea"
                                 }
                             }
-                        },
-                        {
-                            "key": "study_desc.method.data_collection.act_min",
-                            "title": "Supervision",
-                            "type": "textarea"
                         }
                     ]
                 },
                 {
                     "type": "section",
-                    "key": "dataprocessing",
-                    "title": "Data processing",
+                    "key": "study_desc.method",
+                    "title": "Methodology and Processing",
                     "items": [
                         {
-                            "key": "study_desc.method.data_collection.cleaning_operations",
-                            "title": "Data editing",
-                            "type": "textarea"
+                            "type": "section",
+                            "key": "study_desc.method.data_collection",
+                            "title": "Data collection",
+                            "items": [
+                                {
+                                    "key": "study_desc.method.data_collection.time_method",
+                                    "title": "Time Method",
+                                    "help_text": "The time method or time dimension of the data collection. Examples: `panel survey`, `h>cross-section`, `trend study`, `time-series`",
+                                    "type": "textarea"
+                                },
+                                {
+                                    "key": "study_desc.method.data_collection.data_collectors",
+                                    "title": "Data collectors",
+                                    "help_text": "The persons and.or agencies that took charge of the data collection. This element includes 3 fields: Name, Abbreviation and the Affiliation. In most cases, we will record here the name of the agency, not the name of interviewers. Only in the case of very small-scale surveys, with a very limited number of interviewers, the name of person will be included as well. The field Affiliation is optional and not relevant in all cases.",
+                                    "type": "array",
+                                    "props": {
+                                        "name": {
+                                            "key": "name",
+                                            "title": "Name",
+                                            "type": "text"
+                                        },
+                                        "affiliation": {
+                                            "key": "affiliation",
+                                            "title": "Affiliation",
+                                            "type": "text"
+                                        },
+                                        "abbr": {
+                                            "key": "abbr",
+                                            "title": "Abbreviation",
+                                            "type": "text"
+                                        },
+                                        "role": {
+                                            "key": "role",
+                                            "title": "Role",
+                                            "type": "text"
+                                        }
+                                    }
+                                },
+                                {
+                                    "key": "study_desc.method.data_collection.collector_training",
+                                    "title": "Collector training",
+                                    "help_text": "Describes the training provided to data collectors including interviewer training, process testing, compliance with standards etc. This is repeatable for language and to capture different aspects of the training process. The type attribute allows specification of the type of training being described.",
+                                    "type": "array",
+                                    "props": {
+                                        "type": {
+                                            "key": "type",
+                                            "title": "Type",
+                                            "type": "text"
+                                        },
+                                        "training": {
+                                            "key": "training",
+                                            "title": "Training",
+                                            "type": "text"
+                                        }
+                                    }
+                                },
+                                {
+                                    "key": "study_desc.method.data_collection.frequency",
+                                    "title": "Frequency of Data Collection",
+                                    "help_text": "For data collected at more than one point in time, the frequency with which the data were collected. Examples `monthly`, `quarterly`, `yearly`",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "study_desc.method.data_collection.sampling_procedure",
+                                    "title": "Sampling procedure",
+                                    "type": "textarea"
+                                },
+                                {
+                                    "type": "section",
+                                    "key": "study_desc.method.data_collection.sample_frame",
+                                    "title": "Sample frame",
+                                    "items": [
+                                        {
+                                            "key": "study_desc.method.data_collection.sample_frame.name",
+                                            "title": "Sample frame name",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "study_desc.method.data_collection.sample_frame.valid_period",
+                                            "title": "Valid periods (YYYY.MM.DD)",
+                                            "help_text": "Defines a time period for the validity of the sampling frame. Enter dates in YYYY-MM-DD format.",
+                                            "type": "array",
+                                            "props": {
+                                                "event": {
+                                                    "key": "event",
+                                                    "title": "Event",
+                                                    "type": "text",
+                                                    "help_text": "Event e.g. start, end"
+                                                },
+                                                "date": {
+                                                    "key": "date",
+                                                    "title": "Date",
+                                                    "type": "text"
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "key": "study_desc.method.data_collection.sample_frame.custodian",
+                                            "title": "Custodian",
+                                            "help_text": "Custodian identifies the agency or individual who is responsible for creating or maintaining the sample frame.",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "study_desc.method.data_collection.sample_frame.universe",
+                                            "title": "Universe",
+                                            "help_text": "The group of persons or other elements that are the object of research and to which any analytic results refer.",
+                                            "type": "textarea"
+                                        },
+                                        {
+                                            "type": "section",
+                                            "key": "study_desc.method.data_collection.sample_frame.frame_unit",
+                                            "title": "Frame unit",
+                                            "help_text": "Provides information about the sampling frame unit. The attribute `isPrimary` is boolean, indicating whether the unit is primary or not.",
+                                            "items": [
+                                                {
+                                                    "key": "study_desc.method.data_collection.sample_frame.frame_unit.is_primary",
+                                                    "title": "Is primary? (true/false)",
+                                                    "type": "text"
+                                                },
+                                                {
+                                                    "key": "study_desc.method.data_collection.sample_frame.frame_unit.unit_type",
+                                                    "title": "Unit type",
+                                                    "help_text": "Describes the type of sampling frame unit. The field `num_of_units` provides the number of units in the sampling frame.",
+                                                    "type": "text"
+                                                },
+                                                {
+                                                    "key": "study_desc.method.data_collection.sample_frame.frame_unit.num_of_units",
+                                                    "title": "Number of units",
+                                                    "help_text": "Number of units in the sampling frame",
+                                                    "type": "text"
+                                                },
+                                                {
+                                                    "key": "study_desc.method.data_collection.sample_frame.reference_period",
+                                                    "title": "Reference periods (YYYY.MM.DD)",
+                                                    "help_text": "Indicates the period of time in which the sampling frame was actually used for the study in question. Use ISO 8601 date.time formats to enter the relevant date(s).",
+                                                    "type": "array",
+                                                    "props": {
+                                                        "event": {
+                                                            "key": "event",
+                                                            "title": "Event",
+                                                            "type": "text",
+                                                            "help_text": "Event e.g. start, end"
+                                                        },
+                                                        "date": {
+                                                            "key": "date",
+                                                            "title": "Date",
+                                                            "type": "text"
+                                                        }
+                                                    }
+                                                },
+                                                {
+                                                    "key": "study_desc.method.data_collection.sample_frame.update_procedure",
+                                                    "title": "Update procedure",
+                                                    "help_text": "Description of how and with what frequency the sample frame is updated.",
+                                                    "type": "text"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "study_desc.method.data_collection.sampling_deviation",
+                                    "title": "Deviations from the Sample Design",
+                                    "help_text": "This field only applies to sample surveys.\nSometimes the reality of the field requires a deviation from the sampling design (for example due to difficulty to access to zones due to weather problems, political instability, etc). If for any reason, the sample design has deviated, this should be reported here. ",
+                                    "type": "textarea"
+                                },
+                                {
+                                    "key": "study_desc.method.data_collection.coll_mode",
+                                    "title": "Mode of data collection",
+                                    "help_text": "The mode of data collection is the manner in which the interview was conducted or information was gathered.  In most cases, the response will be 'face to face interview'. But for some specific kinds of datasets, such as for example data on rain fall, the response will be different.",
+                                    "type": "simple_array"
+                                },
+                                {
+                                    "key": "study_desc.method.data_collection.research_instrument",
+                                    "title": "Questionnaires",
+                                    "help_text": "The type of data collection instrument used. \n`Structured` indicates an instrument in which all respondents are asked the same questions.tests, possibly with precoded answers. If a small portion of such a questionnaire includes open-ended questions, provide appropriate comments. \n`Semi-structured` indicates that the research instrument contains mainly open-ended questions. \n`Unstructured` indicates that in-depth interviews were conducted.",
+                                    "type": "textarea"
+                                },                                
+                                {
+                                    "key": "study_desc.method.data_collection.instru_development",
+                                    "type": "text",
+                                    "title": "Instrument development",
+                                    "help_text": "Describe any development work on the data collection instrument. Type attribute allows for the optional use of a defined development type with or without use of a controlled vocabulary.",
+                                    "_ddi_xpath": "stdyDscr.method.dataColl.instrumentDevelopment"
+                                },
+                                {
+                                    "key": "study_desc.method.data_collection.instru_development_type",
+                                    "type": "text",
+                                    "title": "Instrument development type",
+                                    "help_text": "Instrument development type",
+                                    "_ddi_xpath": "stdyDscr.method.dataColl.instrumentDevelopment.@type"
+                                },
+                                {
+                                    "key": "study_desc.method.data_collection.sources",
+                                    "title": "Data collection sources",
+                                    "type": "array",
+                                    "_ddi_xpath": "stdyDscr.method.dataColl.sources",
+                                    "props": {
+                                        "name": {
+                                            "key": "name",
+                                            "title": "Name",
+                                            "type": "text"
+                                        },
+                                        "origin": {
+                                            "key": "origin",
+                                            "title": "Origin of resource",
+                                            "type": "text"
+                                        },
+                                        "characteristics": {
+                                            "key": "characteristics",
+                                            "title": "Characteristics",
+                                            "type": "text"
+                                        }
+                                    }
+                                },
+                                {
+                                    "key": "study_desc.method.data_collection.coll_situation",
+                                    "title": "Notes on data collection",
+                                    "help_text": "Description of noteworthy aspects of the data collection situation. Includes information on factors such as cooperativeness of respondents, duration of interviews, number of call-backs, etc.",
+                                    "type": "textarea"
+                                },
+                                {
+                                    "key": "study_desc.method.data_collection.act_min",
+                                    "title": "Supervision",
+                                    "help_text": "Summary of actions taken to minimize data loss. Includes information on actions such as follow-up visits, supervisory checks, historical matching, estimation, etc.",
+                                    "type": "textarea"
+                                },
+                                {
+                                    "key": "study_desc.method.data_collection.control_operations",
+                                    "type": "text",
+                                    "title": "Control Operations",
+                                    "help_text": " Methods to facilitate data control performed by the primary investigator or by the data archive. Specify any special programs used for such operations.",
+                                    "_ddi_xpath": "stdyDscr.method.dataColl.ConOps"
+                                },
+                                {
+                                    "key": "study_desc.method.data_collection.weight",
+                                    "title": "Weighting",
+                                    "type": "textarea",
+                                    "help_text": "The use of sampling procedures may make it necessary to apply weights to produce accurate statistical results. Describe here the criteria for using weights in analysis of a collection. If a weighting formula or coefficient was developed, provide this formula, define its elements, and indicate how the formula is applied to data.",
+                                    "_ddi_xpath": "stdyDscr.method.dataColl.weight"
+                                },
+                                {
+                                    "key": "study_desc.method.data_collection.cleaning_operations",
+                                    "title": "Data editing",
+                                    "type": "textarea"
+                                }
+                            ]
                         },
                         {
                             "key": "study_desc.method.method_notes",
                             "title": "Other processing",
                             "type": "textarea"
-                        }
-                    ]
-                },
-                {
-                    "type": "section",
-                    "key": "dataappraisal",
-                    "title": "Data appraisal",
-                    "items": [
-                        {
-                            "key": "study_desc.method.data_collection.analysis_info.sampling_error_estimates",
-                            "title": "Data editing",
-                            "type": "textarea"
                         },
                         {
-                            "key": "study_desc.method.data_collection.analysis_info.data_appraisal",
-                            "title": "Other forms of data appraisal",
-                            "type": "textarea"
-                        }
-                    ]
-                },
-                {
-                    "type": "section",
-                    "key": "data_access",
-                    "title": "Data access",
-                    "items": [
+                            "type": "section",
+                            "title": "Data Appraisal",
+                            "key": "study_desc.method.analysis_info",
+                            "help_text": "Information about Data Appraisal",
+                            "_ddi_xpath": "stdyDscr.method.anlyInfo",
+                            "items": [
+                                {
+                                    "key": "study_desc.method.analysis_info.response_rate",
+                                    "title": "Response rates",
+                                    "type": "textarea"
+                                },
+                                {
+                                    "key": "study_desc.method.data_collection.analysis_info.sampling_error_estimates",
+                                    "title": "Data editing",
+                                    "type": "textarea"
+                                },
+                                {
+                                    "key": "study_desc.method.data_collection.analysis_info.data_appraisal",
+                                    "title": "Other forms of data appraisal",
+                                    "type": "textarea"
+                                }
+                            ]
+                        },
                         {
-                            "key": "study_desc.data_access.dataset_use.contact",
-                            "title": "Access authority",
+                            "key": "study_desc.method.study_class",
+                            "type": "text",
+                            "title": "Class of the study",
+                            "help_text": "Generally used to give the data archive's class or study status number, which indicates the processing status of the study. May also be used as a text field to describe processing status. Example: `DDA Class C`, `Study is available from http:..example.com` ",
+                            "_ddi_xpath": "stdyDscr.method.stdyClas"
+                        },
+                        {
+                            "key": "study_desc.method.data_processing",
+                            "title": "Data Processing",
+                            "help_text": "Describes various data processing procedures not captured elsewhere in the documentation, such as topcoding, recoding, suppression, tabulation, etc. The `type` attribute supports better classification of this activity, including the optional use of a controlled vocabulary",
+                            "_ddi_xpath": "stdyDscr.method.dataProcessing",
                             "type": "array",
                             "props": {
-                                "name": {
-                                    "key": "name",
-                                    "title": "Name",
+                                "title": {
+                                    "key": "title",
+                                    "title": "Title",
                                     "type": "text"
                                 },
-                                "affiliation": {
-                                    "key": "affiliation",
-                                    "title": "Affiliation",
-                                    "type": "text"
-                                },
-                                "uri": {
-                                    "key": "uri",
-                                    "title": "URI",
-                                    "type": "text"
-                                },
-                                "email": {
-                                    "key": "email",
-                                    "title": "Email",
+                                "description": {
+                                    "key": "description",
+                                    "title": "Description",
                                     "type": "text"
                                 }
                             }
                         },
                         {
-                            "key": "study_desc.data_access.dataset_use.conf_dec",
-                            "title": "Confidentiality",
+                            "key": "study_desc.method.coding_instructions",
+                            "title": "Coding Instructions",
+                            "help_text": "Describe specific coding instructions used in data processing, cleaning, assession, or tabulation.",
+                            "_ddi_xpath": "stdyDscr.method.codingInstructions",
                             "type": "array",
                             "props": {
+                                "related_processes": {
+                                    "key": "related_processes",
+                                    "title": "Related processes",
+                                    "type": "text",
+                                    "_ddi_xpath": "stdyDscr.method.codingInstructions.@relatedProcesses"
+                                },
+                                "type": {
+                                    "key": "type",
+                                    "title": "Coding instructions type",
+                                    "type": "text",
+                                    "_ddi_xpath": "stdyDscr.method.codingInstructions.@type"
+                                },
                                 "txt": {
                                     "key": "txt",
-                                    "title": "Confidentiality text",
-                                    "type": "text"
+                                    "title": "Coding instructions text",
+                                    "type": "text",
+                                    "_ddi_xpath": "stdyDscr.method.codingInstructions.txt"
                                 },
-                                "required": {
-                                    "key": "required",
-                                    "title": "Is required?",
-                                    "type": "text"
+                                "command": {
+                                    "key": "command",
+                                    "title": "Command",
+                                    "help_text": "Provide command code for the coding instruction. The formalLanguage attribute identifies the language of the command code.",
+                                    "type": "text",
+                                    "_ddi_xpath": "stdyDscr.method.codingInstructions.command"
                                 },
-                                "form_no": {
-                                    "key": "form_no",
-                                    "title": "Form#",
-                                    "type": "text"
-                                },
-                                "uri": {
-                                    "key": "uri",
-                                    "title": "URL",
-                                    "type": "text"
-                                }
-                            }
-                        },
-                        {
-                            "key": "study_desc.data_access.dataset_use.conditions",
-                            "title": "Access conditions",
-                            "type": "textarea"
-                        },
-                        {
-                            "key": "study_desc.data_access.dataset_use.cit_req",
-                            "title": "Citation requirements",
-                            "type": "textarea"
-                        }
-                    ]
-                },
-                {
-                    "type": "section",
-                    "id": "disclaimer_copyrights",
-                    "key": "disclaimer_copyrights",
-                    "title": "Disclaimer and copyright",
-                    "items": [
-                        {
-                            "key": "study_desc.data_access.dataset_use.disclaimer",
-                            "title": "Confidentiality",
-                            "type": "textarea"
-                        },
-                        {
-                            "key": "study_desc.production_statement.copyright",
-                            "title": "Copyright",
-                            "type": "textarea"
-                        }
-                    ]
-                },
-                
-                
-                {
-                    "type": "section",
-                    "id": "contact",
-                    "title": "Contacts",
-                    "items": [
-                        {
-                            "key": "study_desc.distribution_statement.contact",
-                            "title": "Contact persons",
-                            "type": "array",
-                            "props": {
-                                "name": {
-                                    "key": "name",
-                                    "title": "Name",
-                                    "type": "text"
-                                },
-                                "affiliation": {
-                                    "key": "affiliation",
-                                    "title": "Affiliation",
-                                    "type": "text"
-                                },
-                                "email": {
-                                    "key": "email",
-                                    "title": "Email",
-                                    "type": "text"
+                                "formal_language": {
+                                    "key": "formal_language",
+                                    "title": "Identify the language of the command code",
+                                    "help_text": "Identifies the language of the command code. e.g. `SPSS`, `R`, `STATA` ",
+                                    "type": "text",
+                                    "_ddi_xpath": "stdyDscr.method.codingInstructions.command.@formalLanguage"
                                 }
                             }
                         }
@@ -774,32 +1516,247 @@
                 },
                 {
                     "type": "section",
-                    "id": "tags",
-                    "key": "tags",
-                    "title": "Tags",
+                    "key": "study_desc.data_access",
+                    "title": "Data Access",
+                    "_ddi_xpath": "stdyDscr.dataAccs.setAvail.dataAccs",
                     "items": [
                         {
-                            "key": "tags",
-                            "title": "Tags",
-                            "type": "array",
-                            "props": {
-                                "tag_group": {
-                                    "key": "tag_group",
-                                    "title": "Tag group",
-                                    "type": "text"
+                            "type": "section",
+                            "key": "study_desc.data_access.dataset_availability",
+                            "title": "Data Set Availability",
+                            "help_text": "Information on availability and storage of the collection",
+                            "_ddi_xpath": "stdyDscr.dataAccs.setAvail.dataAccs",
+                            "items": [
+                                {
+                                    "key": "study_desc.data_access.dataset_availability.access_place",
+                                    "type": "text",
+                                    "title": "Location of Data Collection",
+                                    "help_text": "Location where the data collection is currently stored. Use the URL field `access_place_url` to provide a URN or URL for the storage site or the actual address from which the data may be downloaded",
+                                    "_ddi_xpath": "stdyDscr.dataAccs.setAvail.accsPlac"
                                 },
-                                "tag": {
-                                    "key": "tag",
-                                    "title": "Tag",
-                                    "type": "text"
+                                {
+                                    "key": "study_desc.data_access.dataset_availability.access_place_url",
+                                    "type": "text",
+                                    "title": "URL for Location of Data Collection",
+                                    "help_text": "Location where the data collection is currently stored. Provide a URN or URL for the storage site or the actual address from which the data may be downloaded",
+                                    "_ddi_xpath": "stdyDscr.dataAccs.setAvail.accsPlac.@URI"
+                                },
+                                {
+                                    "key": "study_desc.data_access.dataset_availability.original_archive",
+                                    "type": "text",
+                                    "title": "Archive where study is originally stored",
+                                    "help_text": "Archive from which the data collection was obtained; the originating archive",
+                                    "_ddi_xpath": "stdyDscr.dataAccs.setAvail.origArch"
+                                },
+                                {
+                                    "key": "study_desc.data_access.dataset_availability.status",
+                                    "type": "text",
+                                    "title": "Availability Status",
+                                    "help_text": "Statement of collection availability. An archive may need to indicate that a collection is unavailable because it is embargoed for a period of time, because it has been superseded, because a new edition is imminent, etc.",
+                                    "_ddi_xpath": "stdyDscr.dataAccs.setAvail.avlStatus"
+                                },
+                                {
+                                    "key": "study_desc.data_access.dataset_availability.coll_size",
+                                    "type": "text",
+                                    "title": "Extent of Collection",
+                                    "help_text": "Summarizes the number of physical files that exist in a collection, recording the number of files that contain data and noting whether the collection contains machine-readable documentation and.or other supplementary files and information such as data dictionaries, data definition statements, or data collection instruments.",
+                                    "_ddi_xpath": "stdyDscr.dataAccs.setAvail.collSize"
+                                },
+                                {
+                                    "key": "study_desc.data_access.dataset_availability.complete",
+                                    "type": "text",
+                                    "title": "Completeness of Study Stored",
+                                    "help_text": "This item indicates the relationship of the data collected to the amount of data coded and stored in the data collection. Information as to why certain items of collected information were not included in the data file stored by the archive should be provided",
+                                    "_ddi_xpath": "stdyDscr.dataAccs.setAvail.complete"
+                                },
+                                {
+                                    "key": "study_desc.data_access.dataset_availability.file_quantity",
+                                    "type": "text",
+                                    "title": "Number of Files",
+                                    "help_text": "Total number of physical files associated with a collection",
+                                    "_ddi_xpath": "stdyDscr.dataAccs.setAvail.fileQnty"
+                                },
+                                {
+                                    "key": "study_desc.data_access.dataset_availability.notes",
+                                    "type": "text",
+                                    "title": "Notes",
+                                    "help_text": "Notes and comments",
+                                    "_ddi_xpath": "stdyDscr.dataAccs.setAvail.notes"
                                 }
-                            }
+                            ]
+                        },
+                        {
+                            "type": "section",
+                            "key": "study_desc.data_access.dataset_use",
+                            "title": "Dataset use",
+                            "help_text": " Information on terms of use for the data collection",
+                            "_ddi_xpath": "stdyDscr.dataAccs.useStmt",
+                            "items": [
+                                {
+                                    "key": "study_desc.data_access.dataset_use.conf_dec",
+                                    "type": "array",
+                                    "title": "Confidentiality Declaration",
+                                    "help_text": " This element is used to determine if signing of a confidentiality declaration is needed to access a resource.",
+                                    "props": {
+                                        "txt": {
+                                            "key": "txt",
+                                            "type": "text",
+                                            "title": "Confidentiality declaration text",
+                                            "help_text": "Confidentiality declaration text",
+                                            "_ddi_xpath": "stdyDscr.dataAccs.useStmt.confDec"
+                                        },
+                                        "required": {
+                                            "key": "required",
+                                            "type": "text",
+                                            "title": "Is signing of a confidentiality declaration required?",
+                                            "help_text": "Is signing of a confidentiality declaration required",
+                                            "_ddi_xpath": "stdyDscr.dataAccs.useStmt.confDec.@required"
+                                        },
+                                        "form_url": {
+                                            "key": "form_url",
+                                            "type": "text",
+                                            "title": "Confidentiality declaration form URL",
+                                            "help_text": "Provide a URN or URL for online access to a confidentiality declaration form.",
+                                            "_ddi_xpath": "stdyDscr.dataAccs.useStmt.confDec.@URI"
+                                        },
+                                        "form_id": {
+                                            "key": "form_id",
+                                            "type": "text",
+                                            "title": "Form ID",
+                                            "help_text": "Indicates the number or ID of the form that the user must fill out",
+                                            "_ddi_xpath": "stdyDscr.dataAccs.useStmt.confDec.@formNo"
+                                        }
+                                    }
+                                },
+                                {
+                                    "key": "study_desc.data_access.dataset_use.spec_perm",
+                                    "type": "array",
+                                    "title": "Special Permissions",
+                                    "help_text": "Determine if any special permissions are required to access a resource",
+                                    "_ddi_xpath": "stdyDscr.dataAccs.useStmt.specPerm",
+                                    "props": {
+                                        "txt": {
+                                            "key": "txt",
+                                            "type": "text",
+                                            "title": "Special permissions description",
+                                            "help_text": "Confidentiality declaration text"
+                                        },
+                                        "required": {
+                                            "key": "required",
+                                            "type": "text",
+                                            "title": "Indicate if special permissions are required to access a resource",
+                                            "help_text": "Indicate if special permissions are required to access a resource"
+                                        },
+                                        "form_url": {
+                                            "key": "form_url",
+                                            "type": "text",
+                                            "title": "Form URL",
+                                            "help_text": ""
+                                        },
+                                        "form_id": {
+                                            "key": "form_id",
+                                            "type": "text",
+                                            "title": "Form ID",
+                                            "help_text": "Indicates the number or ID of the form that the user must fill out"
+                                        }
+                                    }
+                                },
+                                {
+                                    "key": "study_desc.data_access.dataset_use.restrictions",
+                                    "type": "text",
+                                    "title": "Restrictions",
+                                    "help_text": "Any restrictions on access to or use of the collection such as privacy certification or distribution restrictions should be indicated here. These can be restrictions applied by the author, producer, or disseminator of the data collection. If the data are restricted to only a certain class of user, specify which type.",
+                                    "_ddi_xpath": "stdyDscr.dataAccs.useStmt.restrctn"
+                                },
+                                {
+                                    "key": "study_desc.data_access.dataset_use.contact",
+                                    "title": "Contacts",
+                                    "type": "array",
+                                    "props": {
+                                        "name": {
+                                            "key": "name",
+                                            "title": "Name",
+                                            "type": "text"
+                                        },
+                                        "affiliation": {
+                                            "key": "affiliation",
+                                            "title": "Affiliation",
+                                            "type": "text"
+                                        },
+                                        "uri": {
+                                            "key": "uri",
+                                            "title": "URI",
+                                            "type": "text"
+                                        },
+                                        "email": {
+                                            "key": "email",
+                                            "title": "Email",
+                                            "type": "text"
+                                        }
+                                    }
+                                },
+                                {
+                                    "key": "study_desc.data_access.dataset_use.cit_req",
+                                    "title": "Citation requirements",
+                                    "type": "textarea"
+                                },
+                                {
+                                    "key": "study_desc.data_access.dataset_use.deposit_req",
+                                    "type": "text",
+                                    "title": "Deposit requirement",
+                                    "help_text": "Information regarding user responsibility for informing archives of their use of data through providing citations to the published work or providing copies of the manuscripts.",
+                                    "_ddi_xpath": "stdyDscr.dataAccs.useStmt.deposReq"
+                                },
+                                {
+                                    "key": "study_desc.data_access.dataset_use.conditions",
+                                    "title": "Access conditions",
+                                    "type": "textarea",
+                                    "help_text": "Indicates any additional information that will assist the user in understanding the access and use conditions of the data collection.",
+                                    "_ddi_xpath": "stdyDscr.dataAccs.useStmt.conditions"
+                                },
+                                {
+                                    "key": "study_desc.data_access.dataset_use.disclaimer",
+                                    "title": "Disclaimer",
+                                    "help_text": "Information regarding responsibility for uses of the data collection",
+                                    "type": "textarea"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "study_desc.data_access.notes",
+                            "type": "textarea",
+                            "title": "Notes",
+                            "help_text": "Notes and comments",
+                            "_ddi_xpath": "stdyDscr.dataAccs.setAvail.notes"
                         }
                     ]
                 }
             ]
+        },
+        {
+            "type": "section",
+            "id": "tags",
+            "key": "tags",
+            "title": "Tags",
+            "items": [
+                {
+                    "key": "tags",
+                    "title": "Tags",
+                    "type": "array",
+                    "props": {
+                        "tag_group": {
+                            "key": "tag_group",
+                            "title": "Tag group",
+                            "type": "text"
+                        },
+                        "tag": {
+                            "key": "tag",
+                            "title": "Tag",
+                            "type": "text"
+                        }
+                    }
+                }
+            ]
         }
-        
-        
     ]
 }

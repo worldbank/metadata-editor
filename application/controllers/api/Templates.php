@@ -30,11 +30,11 @@ class Templates extends MY_REST_Controller
 	 * Return all templates
 	 * 
 	 */
-	function index_get($id=null)
+	function index_get($uid=null)
 	{
 		try{
-			if($id){
-				return $this->single_get($id);
+			if($uid){
+				return $this->template_get($uid);
 			}
 
 			//$this->has_dataset_access('view');
@@ -112,7 +112,7 @@ class Templates extends MY_REST_Controller
 
 			$response=array(
 				'status'=>'success',
-				'template'=>$result
+				'result'=>$result
 			);			
 			$this->set_response($response, REST_Controller::HTTP_OK);
 		}
@@ -126,29 +126,24 @@ class Templates extends MY_REST_Controller
 	}
 
 
-
-	/**
-	 * 
-	 * Get a single dataset
-	 * 
-	 */
-	function single_get($sid=null)
+	function template_parts_get($uid=null)
 	{
 		try{
 			//$this->has_dataset_access('view',$sid);
 
-			$result=$this->Editor_model->get_row($sid);
-			array_walk($result, 'unix_date_to_gmt_row',array('created','changed'));
-				
-			if(!$result){
-				throw new Exception("DATASET_NOT_FOUND");
+			if(!$uid){
+				throw new Exception("Missing parameter for `UID`");
 			}
 
-			//$result['metadata']=$this->dataset_manager->get_metadata($sid);
-			
+			$result=$this->Editor_template_model->get_template_parts_by_uid($uid);
+				
+			if(!$result){
+				throw new Exception("TEMPLATE_NOT_FOUND");
+			}
+
 			$response=array(
 				'status'=>'success',
-				'project'=>$result
+				'result'=>$result
 			);			
 			$this->set_response($response, REST_Controller::HTTP_OK);
 		}
@@ -160,6 +155,10 @@ class Templates extends MY_REST_Controller
 			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
+
+
+
+	
 
 
 	/**
