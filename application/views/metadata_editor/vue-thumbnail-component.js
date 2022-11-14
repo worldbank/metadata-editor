@@ -4,15 +4,21 @@ Vue.component('project-thumbnail', {
         return {
             show_dialog:false,
             file:'',
+            thumbnail:'',
+            image_error:false,
             errors:[]
         }
     },
     created: function(){
-        
+        this.thumbnail=CI.base_url + '/api/editor/thumbnail/'+ this.ProjectID;
     },
     methods:{
         handleFileUpload( event ){
             this.file = event.target.files[0];
+        },
+        imageLoadError: function()
+        {
+            this.image_error=true;
         },
         UploadThumbnail: function(){
             let formData = new FormData();
@@ -31,13 +37,14 @@ Vue.component('project-thumbnail', {
                 }
             ).then(function(response){
                 console.log("thumbnail uploaded",response);
-                alert(done);
+                vm.image_error=false;
+                vm.thumbnail=CI.base_url + '/api/editor/thumbnail/'+ vm.ProjectID + '/?_r=' + Date.now();
                 //router.push('/');
             })
             .catch(function(response){
                 vm.errors=response;
             });
-        } 
+        }   
     },
     
     computed: {
@@ -50,7 +57,8 @@ Vue.component('project-thumbnail', {
                 <h5>Project thumbnail</h5>
                 <div class="row">
                     <div class="col-4">
-                        <div><i class="far fa-image" style="font-size:125px;"></i></div>
+                        <div v-if="image_error==true"><i class="far fa-image" style="font-size:125px;"></i></div>
+                        <div v-if="image_error==false"><img class="img-fluid" style="max-width:150px;max-height:150px;" :src="thumbnail" @error="imageLoadError"/></div>
                         <button type="button"  @click="show_dialog=true" class="btn btn-default">Upload image</button>
                     </div>
                     <div class="col-auto">

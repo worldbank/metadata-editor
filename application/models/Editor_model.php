@@ -383,6 +383,24 @@ class Editor_model extends CI_Model {
 		$this->db->update('editor_projects',$options);
 	}
 
+	function set_project_options($sid,$options=array())
+	{
+		$valid_options=array(
+			"thumbnail",
+			"created",
+			"changed"			
+		);
+
+		foreach($options as $key=>$value){
+			if (!in_array($key,$valid_options)){
+				unset($options[$key]);
+			}
+		}
+
+		$this->db->where('id',$sid);
+		$this->db->update('editor_projects',$options);
+	}
+
 	function validate_schema($type,$data)
 	{
 		$schema_file="application/schemas/$type-schema.json";
@@ -1022,21 +1040,41 @@ class Editor_model extends CI_Model {
 	}
 
 	
-	/*function download_project_thumbnail($sid)
+	function download_project_thumbnail($sid)
 	{				
 		$project_folder=$this->get_project_folder($sid);
+		$thumbnail=$this->get_thumbnail($sid);
+
+		if(!$thumbnail){
+			return false;
+		}
 
 		if (!$project_folder || !file_exists($project_folder)){
 			throw new Exception("Project folder not found");
 		}
 
-		$thumbnail_path=$project_folder.'/'
+		$thumbnail_path=$project_folder.'/'.$thumbnail;
 
-		if(file_exists($ddi_path)){
-			$this->load->helper("download");
-			force_download2($ddi_path);
+		if(file_exists($thumbnail_path)){
+			header('Content-type: image/jpeg');
+			readfile($thumbnail_path);
+			die();
+			//$this->load->helper("download");
+			//force_download2($thumbnail_path);			
 		}
-	}*/
+	}
+
+
+	function get_thumbnail($sid)
+	{
+		$this->db->select("thumbnail");
+		$this->db->where('id',$sid);
+		$result=$this->db->get("editor_projects")->row_array();
+
+		if (isset($result['thumbnail'])){
+			return $result['thumbnail'];
+		}
+	}
 
 
 	function download_project_ddi($sid)

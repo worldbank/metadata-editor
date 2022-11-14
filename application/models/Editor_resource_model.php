@@ -168,11 +168,14 @@ class Editor_resource_model extends ci_model {
 		}
 
 		$file_uploaded= $this->upload->data();
-		$thumbnail_path=$file_uploaded["file_path"].'thumbnail'.$file_uploaded['file_ext'];
+		$thumbnail_path=$file_uploaded["file_path"].'thumbnail-'.$sid.$file_uploaded['file_ext'];
 		rename($file_uploaded["full_path"],$thumbnail_path);
-		$file_uploaded['thumail_path']=$thumbnail_path;
+		$file_uploaded['thumbnail_path']=$thumbnail_path;
 
-		return $file_uploaded;
+		return array(
+			'thumbnail_path'=>$thumbnail_path,
+			'thumbnail_filename'=>basename($thumbnail_path)
+		);
 	}
 
     /**
