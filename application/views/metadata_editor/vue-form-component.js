@@ -14,6 +14,9 @@ Vue.component('v-form', {
             //return error.replace(field,field_name);
             return error.replace(field,'');
         },
+        showActiveSection(field_key,active_section){
+            console.log("showActiveSection-vue-form-component",field_key,active_section);
+        }
     },
     created() {
         this.field= this.$store.state.treeActiveNode;

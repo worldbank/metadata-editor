@@ -318,10 +318,18 @@ Vue.config.errorHandler = (err, vm, info) => {
             this.initiallyOpen.push(path.substring(1));
           }
         },
+        filter_tree_items: function(items)
+        {
+          if (items.items){
+            items=this.filter_tree_items(items);
+          }
+
+          return items.filter(item => item.is_custom!==true);
+        },
         init_tree_data: function() {
           this.is_loading=true;
           this.items=[];
-          let tree_data=this.form_template.items;
+          let tree_data=this.filter_tree_items(this.form_template.template.items);
 
           tree_data.unshift({
               title: 'Home',

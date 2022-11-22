@@ -180,9 +180,16 @@ class Editor_model extends CI_Model {
 		if (empty($fields)){
 			$fields=$this->listing_fields;
 		}
+
+		foreach($fields as $idx=>$field){
+			$fields[$idx]="editor_projects.".$field;
+		}
+
+		$fields[]="users.username";
 		
 		$this->db->select(implode(",",$fields));
-		$this->db->order_by('changed','desc');
+		$this->db->order_by('editor_projects.changed','desc');
+		$this->db->join("users", "users.id=editor_projects.created_by");
 
 		if ($limit>0){
 			$this->db->limit($limit, $offset);
@@ -387,6 +394,7 @@ class Editor_model extends CI_Model {
 	{
 		$valid_options=array(
 			"thumbnail",
+			"template_uid",
 			"created",
 			"changed"			
 		);

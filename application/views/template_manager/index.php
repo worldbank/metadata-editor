@@ -312,14 +312,10 @@
           tree: [],
 
           tab: '',
-          enum_columns: [{
-              "key": "key",
-              "title": "Key",
-              "type": "text"
-            },
+          enum_columns: [
             {
               "key": "value",
-              "title": "Value/Label",
+              "title": "Label",
               "type": "text"
             }
           ]
@@ -357,8 +353,18 @@
           this.delete_tree_item(this.UserTreeItems, this.ActiveNode.key);
           this.ActiveNode = {};
         },
+        isItemContainer: function(item){
+          if (item.type=='section' || item.type=='section_container' || item.type=='nested_array_'){
+            return true;
+          }
+          return false;
+        },
         addField: function() {
           if (!this.ActiveCoreNode.key) {
+            return false;
+          }
+
+          if (this.isItemContainer(this.ActiveCoreNode)){
             return false;
           }
 

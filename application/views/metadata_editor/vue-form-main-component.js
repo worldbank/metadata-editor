@@ -135,6 +135,7 @@ Vue.component('form-main', {
 
         </div>
     `
-})
+});
+
 
 

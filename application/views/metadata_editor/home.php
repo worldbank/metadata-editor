@@ -9,6 +9,7 @@
   <script src="https://adminlte.io/themes/v3/plugins/jquery/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+  <script src="https://unpkg.com/moment@2.26.0/moment.js"></script>
 
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
 </head>
@@ -40,7 +41,7 @@
                 </a>
             </li>
             <li class="nav-item">                
-                <a class="nav-link" href="#" role="button">
+                <a class="nav-link capitalize" href="#" role="button">
                   <i class="fas fa-user"></i> <?php echo $user=strtoupper($this->session->userdata('username'));?>
                 </a>
             </li>
@@ -168,14 +169,18 @@
 
                     <div v-for="project in Projects">
                       <div class="info-box shadow-none" @click="EditProject(project.id)" >
-                        <span class="info-box-icon bg-warning" :title="project.type"><i :class="project_types_icons[project.type]"></i></span>
+                        <span class="info-box-icon bg-light" :title="project.type"><i :class="project_types_icons[project.type]"></i></span>
                         <div class="info-box-content">
-                          <a href="#" class="info-box-number" @click="EditProject(project.id)">{{project.title}}</a>
+                          <a href="#" class="info-box-number" @click="EditProject(project.id)">
+                            <span v-if="project.title.length>1">{{project.title}}</span>
+                            <span v-else>Untitled</span>
+                          </a>
                           <span class="info-box-text">{{project.idno}}</span>
-                            <div class="text-secondary">
-                                <span>Last updated: {{project.changed}}</span> | 
-                                <a @click="EditProject(project.id)" href="" >Edit</a>
-
+                            <div class="text-secondary" style="font-size:small;">
+                                <span class="mr-2">Last updated: {{momentDate(project.changed)}}</span>
+                                <span class="mr-2 capitalize">By: {{project.username}}</span>
+                                <a @click="EditProject(project.id)" href="#" >Edit</a> |
+                                <a @click="DeleteProject(project.id)" href="#" >Delete</a>
                             </div>
                         </div>                        
                       </div>
@@ -308,8 +313,9 @@
           search_keywords:'',
           project_types_icons:
             {
-            "survey":"fas fa-database",
-            "document":"fas fa-file-alt",
+            "document":"fa fa-file-code",
+            "survey":"fa fa-database",
+
             }
           
       },
@@ -339,7 +345,10 @@
             }
         }*/
       },
-      methods:{        
+      methods:{      
+        momentDate(date) {
+          return moment.utc(date).format("MMM d, YYYY")
+        },  
         loadProjects: function() {
             vm=this;
 

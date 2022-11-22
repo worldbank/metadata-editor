@@ -126,6 +126,33 @@ class Templates extends MY_REST_Controller
 	}
 
 
+	function list_get($type=null)
+	{
+		try{
+			//$this->has_dataset_access('view',$sid);
+
+			$result=$this->Editor_template_model->get_templates_by_type($type);
+				
+			if(!$result){
+				throw new Exception("TEMPLATE_NOT_FOUND");
+			}
+
+			$response=array(
+				'status'=>'success',
+				'result'=>$result
+			);			
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
 	function template_parts_get($uid=null)
 	{
 		try{
@@ -155,10 +182,6 @@ class Templates extends MY_REST_Controller
 			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
-
-
-
-	
 
 
 	/**
@@ -199,6 +222,27 @@ class Templates extends MY_REST_Controller
 			$output=array(
 				'status'=>'success',
 				'template'=>$result
+			);
+
+			$this->set_response($output, REST_Controller::HTTP_OK);			
+		}
+		catch(Exception $e){
+			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	function delete_post($uid=null)
+	{		
+		try{
+			if (!$uid){
+				throw new Exception("Missing parameter: UID");
+			}
+
+			$result=$this->Editor_template_model->delete($uid);
+
+			$output=array(
+				'status'=>'success'
 			);
 
 			$this->set_response($output, REST_Controller::HTTP_OK);			

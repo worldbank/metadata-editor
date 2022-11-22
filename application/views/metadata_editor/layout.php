@@ -18,7 +18,7 @@
         <ul class="navbar-nav ml-5 ml-auto">
 
             <li class="nav-item">
-                <a class="nav-link" data-widget="fullscreen" href="#" role="button">
+                <a class="nav-link"  href="<?php echo site_url('admin/metadata_editor/templates');?>" role="button">
                     <i class="far fa-file-alt"></i> Templates
                 </a>
             </li>
@@ -94,7 +94,7 @@
 
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
 
-        <a href="#" class="brand-link">
+        <a href="<?php echo site_url('admin/metadata_editor/');?>" class="brand-link">
             <i class="fas fa-compass"></i>
             <span class="brand-text font-weight-light">Metadata Editor</span>
         </a>        
@@ -128,15 +128,21 @@
                         item-children="items">
 
                         <template #label="{ item }" >
-                            <span @click="treeClick(item)" :title="item.title">
+                            <span @click="treeClick(item)" :title="item.title" class="tree-item-label">
                                 <span v-if="item.type=='resource'" >{{item.title | truncate(23, '...') }}</span>
                                 <span v-else>{{item.title}}</span>
                             </span>
                         </template>
 
                         <template v-slot:prepend="{ item, open }">
-                            <v-icon v-if="item.file" style="color:#949698">
-                                {{ files[item.file] }} 
+                            <v-icon v-if="item.type=='section_container'">
+                                {{ open ? 'mdi-dresser' : 'mdi-dresser' }}
+                            </v-icon> 
+                            <v-icon v-else-if="item.type=='section'">
+                                {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
+                            </v-icon> 
+                            <v-icon v-else-if="item.file" style="color:#949698">
+                                {{ files[item.file] }}
                             </v-icon>    
                             <v-icon v-else-if="item.items" style="color:#949698">
                                 {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
@@ -148,26 +154,7 @@
                     </v-treeview>
                 </div>
                     </ul>
-                </li>
-
-                <?php /*
-                <li class="nav-item menu-is-opening menu-open">
-                        <router-link class="nav-link" :to="'/external-resources/'" >
-                        <i class="nav-icon fas fa-copy"></i>
-                        <p>
-                            External resources
-                            <i class="fas fa-angle-left right"></i>                            
-                        </p>
-                        </router-link>
-                    <ul class="nav nav-treeview" style="display: block;font-size:small;margin-left:15px;">
-                        <li v-for="(resource, index) in ExternalResources" class="nav-item">
-                            <router-link class="nav-item" :to="'/external-resources/' + index"><i class="far fa-file-alt"></i> </i>{{resource.title}}</router-link>
-                        </li> 
-
-                    </ul>
-                </li>
-                */ ?>
-                
+                </li>                
             </ul>
 
         </div>
@@ -214,6 +201,7 @@
             </div>
 
            <?php // store_state:<pre>{{$store.state}}</pre> ?>
+           <?php // <pre>{{form_template}}</pre> ?>
         </section>
     </div>
 

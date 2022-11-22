@@ -47,7 +47,7 @@
       <div class="content-wrapper">
         <section class="content">
           <!-- Provides the application the proper gutter -->
-          <div class="container-fluid" style="overflow:auto;">
+          <div class="container" style="overflow:auto;">
 
             <div class="row">
 
@@ -55,16 +55,19 @@
 
                 <div class="mt-3 mb-5">
                     <h1>Templates</h1>
+                    <div class="pull-right float-right">
+                      <button type="button" class="btn btn-sm btn-outline-primary">Import Template</button>
+                    </div>
                 </div>
 
                 <div>
                   <div v-if="!templates"> There are no templates!</div>
 
                   <div v-for="(data_type_label,data_type) in data_types" class="mb-3">
-                    <h2 class="p-2">{{data_type_label}}</h2>
+                    <h4 class="p-2">{{data_type_label}}</h4>
 
-                    <table class="table table-bordered">
-                      <tr>
+                    <table class="table table-sm table-striped border bg-white mb-5">
+                      <tr class="bg-secondary">
                         <th>Type</th>
                         <th>Title</th>
                         <th>Version</th>
@@ -76,7 +79,6 @@
                           <tr>                           
                             <td>{{template.template_type}}</td>
                             <td>
-                              <v-icon>mdi-star</v-icon>
                               <span style="font-weight:bold;" href="#" >{{template.name}}</span>
                               <div>{{template.uid}}</div>
                             </td>
@@ -100,6 +102,7 @@
                             <td>
                               <button type="button" class="btn btn-sm btn-link" @click="duplicateTemplate(template.uid)" >Duplicate</button>
                               <button type="button" class="btn btn-sm btn-link" @click="editTemplate(template.uid)" >Edit</button>
+                              <button type="button" class="btn btn-sm btn-link" @click="exportTemplate(template.uid)" >Export</button>
                               <button type="button" class="btn btn-sm btn-link" @click="deleteTemplate(template.uid)" >Delete</button>    
                             </td>
                           </tr>  
@@ -271,7 +274,34 @@
           this.templates.core.forEach((template, index) => {
             this.data_types.push(template.data_type);
           });
-        },        
+        },
+        deleteTemplate: function (uid){
+          if (!confirm("Confirm to delete?")){
+            return false;
+          }
+
+          vm = this;
+          let form_data = {};
+          let url = CI.base_url + '/api/templates/delete/' + uid;
+
+          axios.post(url,
+              form_data
+              /*headers: {
+                  "xname" : "value"
+              }*/
+            )
+            .then(function(response) {
+              console.log(response);
+              vm.loadTemplates();              
+            })
+            .catch(function(error) {
+              console.log("error", error);
+              alert("Failed", error);
+            })
+            .then(function() {
+              console.log("request completed");
+            });
+        },
         duplicateTemplate: function(uid) 
         {
           vm = this;

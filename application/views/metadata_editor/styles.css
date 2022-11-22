@@ -349,3 +349,11 @@ html,body {
 .theme--light.v-pagination .v-pagination__item--active{
     background:#007bff;
 }
+
+.tree-item-label{
+    display:block;
+}
+
+.capitalize{
+    text-transform:capitalize;
+}

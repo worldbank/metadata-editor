@@ -150,6 +150,7 @@
                 formData: project_metadata,
                 formTemplate:form_template,
                 formTemplateParts:form_template_parts,
+                templates:[],//list of templates available                
                 treeActiveNode:null,
                 active_node: {
                     id: 'table_description.title_statement.table_number'
@@ -356,12 +357,29 @@
             actions: {               
                 async initData({commit},options) {
                     store.state.variables_isloading=true;
+                    await store.dispatch('loadTemplatesList',{});
                     await store.dispatch('loadDataFiles',{dataset_id:options.dataset_id});
                     await store.dispatch('loadAllVariables',{dataset_id:options.dataset_id});
                     await store.dispatch('loadExternalResources',{dataset_id:options.dataset_id});
                     store.state.variables_loaded=true;
                     store.state.variables_isloading=false;
                     window._store=store.state;
+                },
+                async loadTemplatesList({commit},options) {
+                    let url=CI.base_url + '/api/templates/list/'+store.state.project_type;;
+                    return axios
+                    .get(url)
+                    .then(function (response) {
+                        console.log("loading templates",response);
+                        store.state.templates=response.data.result;
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    })
+                    .then(function () {
+                        console.log("vuex request completed");
+                    });
+                    console.log("3. should run after");
                 },
                 async loadProject({commit},options) {
                     let url=CI.base_url + '/api/editor/'+options.dataset_id;

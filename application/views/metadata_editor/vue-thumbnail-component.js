@@ -39,7 +39,7 @@ Vue.component('project-thumbnail', {
                 console.log("thumbnail uploaded",response);
                 vm.image_error=false;
                 vm.thumbnail=CI.base_url + '/api/editor/thumbnail/'+ vm.ProjectID + '/?_r=' + Date.now();
-                //router.push('/');
+                vm.show_dialog=false;
             })
             .catch(function(response){
                 vm.errors=response;
@@ -56,10 +56,10 @@ Vue.component('project-thumbnail', {
             <div class="thumbnail-component p-3">
                 <h5>Project thumbnail</h5>
                 <div class="row">
-                    <div class="col-4">
+                    <div class="col-4" @click="show_dialog=true">
                         <div v-if="image_error==true"><i class="far fa-image" style="font-size:125px;"></i></div>
                         <div v-if="image_error==false"><img class="img-fluid" style="max-width:150px;max-height:150px;" :src="thumbnail" @error="imageLoadError"/></div>
-                        <button type="button"  @click="show_dialog=true" class="btn btn-default">Upload image</button>
+                        <button type="button"  @click="show_dialog=true" class="btn btn-link">Change image</button>
                     </div>
                     <div class="col-auto">
                         
@@ -81,20 +81,27 @@ Vue.component('project-thumbnail', {
                             </v-card-title>
 
                             <v-card-text>
-                                <div class="custom-file">
-                                    <input type="file" class="custom-file-input" id="customFile" @change="handleFileUpload( $event )">
-                                    <label class="custom-file-label" for="customFile">Choose file</label>
+                                <div class="xcustom-file">
+                                    <input type="file" class="border p-1" style="width:100%;" id="xcustomFile" @change="handleFileUpload( $event )">                                    
                                 </div>
+                                
                                 <div class="text-secondary">Allowed file types: jpg, jpeg, gif, png</div>
 
-                                {{errors}}
+                                <div v-if="errors.length>0">{{errors}}</div>
                             </v-card-text>
 
                             <v-divider></v-divider>
 
                             <v-card-actions>
                             <v-spacer></v-spacer>
-                            <v-btn
+                            <v-btn 
+                                color="secondary"
+                                text
+                                @click="show_dialog=false"
+                            >
+                                Cancel
+                            </v-btn>
+                            <v-btn :disabled="!file"
                                 color="primary"
                                 text
                                 @click="UploadThumbnail()"

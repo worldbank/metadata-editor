@@ -80,6 +80,12 @@ Vue.component('nada-treeview-field', {
       isItemInUse: function(item_key){
         return _.includes(this.UserTreeUsedKeys, item_key);
       },
+      isItemContainer: function(item){
+        if (item.type=='section' || item.type=='section_container' || item.type=='nested_array_'){
+          return true;
+        }
+        return false;
+      },
       addItem: function (item){
 
         if (this.isItemInUse(item.key)){
@@ -142,7 +148,7 @@ Vue.component('nada-treeview-field', {
 
                 <template #label="{ item }" >
                     <span @click="treeClick(item)" :title="item.title" >
-                        <span v-if="isItemInUse(item.key) && item.type!='section'" style="color:gray;">{{item.title}}</span>
+                        <span v-if="isItemInUse(item.key) && !isItemContainer(item)" style="color:gray;">{{item.title}}</span>
                         <span v-else>{{item.title}}</span>
                     </span>
                 </template>
@@ -157,7 +163,7 @@ Vue.component('nada-treeview-field', {
                 </template>
 
                 <template slot="prepend" slot-scope="{ item, open }" >
-                  <span v-if="item.type=='section' || item.type=='section_container'">
+                  <span v-if="isItemContainer(item)">
                     <v-icon v-if="!item.file">
                       {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
                     </v-icon>

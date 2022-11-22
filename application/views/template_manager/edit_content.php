@@ -37,10 +37,12 @@
     </div>
 </div>
 
-<div class="form-group" v-if="ActiveNode.type=='section'">
+{{ActiveNode}}
+<div class="form-group" v-if="ActiveNode.type=='section'  || ActiveNode.type=='nested_array'">
     <label for="name">Available items:</label>
-    <div class="border bg-light">
+    <div class="border bg-light">        
     <nada-treeview-field v-model="CoreTreeItems"></nada-treeview-field>
+    <pre>{{CoreTreeItems}}</pre>
     </div>
 </div>
 

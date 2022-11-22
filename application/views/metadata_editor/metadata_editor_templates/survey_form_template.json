@@ -7,7 +7,7 @@
             "id": "doc_description",
             "key": "doc_description",
             "title": "Document description",
-            "class": "mandatory recommended",
+            "class": "mandatory recommended",                        
             "help_text": "",
             "expanded": true,
             "items": [
@@ -1081,7 +1081,7 @@
                     ]
                 },
                 {
-                    "type": "section_container",
+                    "type": "section",
                     "key": "study_desc.study_development",
                     "title": "Study Development",
                     "help_text": "Describe the process of study development as a series of development activities. These activities can be typed using a controlled vocabulary. Describe the activity, listing participants with their role and affiliation, resources used (sources of information), and the outcome of the development activity.",
@@ -1734,9 +1734,343 @@
             ]
         },
         {
-            "type": "section",
+            "type": "section_container",
+            "key": "file_description",
+            "title": "File description",
+            "is_custom": false,
+            "items": [
+                {
+                "type": "section",
+                "key": "data_file",
+                "title": "Data files",
+                "items": [
+                    {
+                        "key": "data_file.file_id",
+                        "title": "File ID",
+                        "type": "string"
+                    },
+                    {
+                        "key": "data_file.file_name",
+                        "title": "File name",
+                        "type": "string"
+                    },
+                    {
+                        "key": "data_file.file_type",
+                        "title": "File type",
+                        "type": "string"
+                    },
+                    {
+                        "key": "data_file.description",
+                        "title": "Description",
+                        "type": "string"
+                    },
+                    {
+                        "key": "data_file.case_count",
+                        "title": "Case count",
+                        "type": "integer"
+                    },
+                    {
+                        "key": "data_file.var_count",
+                        "title": "Variable count",
+                        "type": "string"
+                    },
+                    {
+                        "key": "data_file.producer",
+                        "title": "Producer",
+                        "type": "string"
+                    },
+                    {
+                        "key": "data_file.data_checks",
+                        "title": "Processing checks",
+                        "type": "string"
+                    },
+                    {
+                        "key": "data_file.missing_data",
+                        "title": "Missing data",
+                        "type": "string"
+                    },
+                    {
+                        "key": "data_file.version",
+                        "title": "Version",
+                        "type": "string"
+                    },
+                    {
+                        "key": "data_file.notes",
+                        "title": "Notes",
+                        "type": "string"
+                    }
+                ]
+                }
+                
+            ]
+        },
+        {
+            "type": "section_container",
+            "key": "variable_description",
+            "title": "Variable description",
+            "is_custom": true,
+            "items": [
+                {
+                "type": "section",
+                "key": "variable",
+                "title": "Variable",
+                "items":[
+                    {
+                        "key": "variable.file_id",
+                        "title": "File ID",
+                        "type": "string"
+                    },
+                    {
+                        "key": "variable.vid",
+                        "title": "Variable IDNo",
+                        "type": "string"
+                    },
+                    {
+                        "key": "variable.name",
+                        "title": "Name",
+                        "type": "string"
+                    },
+                    {
+                        "key": "variable.labl",
+                        "title": "Label",
+                        "type": "string"
+                    },
+                    {
+                        "key": "variable.var_intrvl",
+                        "title": "Interval type",
+                        "help_text":"Indicates the interval type",
+                        "type": "string",
+                        "enum":{
+                            "discrete":"discrete",
+                            "contin":"contin"
+                        }
+                    },
+                    {
+                        "key": "variable.var_dcml",
+                        "title": "Decimal points",
+                        "type": "string",
+                        "help_text":"Number of decimal points in the variable"
+                    },
+                    {
+                        "key": "variable.var_wgt",
+                        "title": "Weight",
+                        "type": "integer",
+                        "help_text":"Indicates whether the variable is a weight",
+                        "default":0
+                    },
+                    {
+                        "key": "variable.loc_start_pos",
+                        "title": "Start position",
+                        "type": "integer",
+                        "help_text":"Variable start position"
+                    },
+                    {
+                        "key": "variable.loc_end_pos",
+                        "title": "End position",
+                        "type": "integer",
+                        "help_text":"Variable end position"
+                    },
+                    {
+                        "key": "variable.loc_width",
+                        "title": "Width",
+                        "type": "integer",
+                        "help_text":"Variable width"
+                    },
+                    {
+                        "key": "variable.loc_rec_seg_no",
+                        "title": "Record segment number",
+                        "type": "string",
+                        "help_text":"Record segment number, deck or card number the variable is located on (integer)"
+                    },
+                    {
+                        "key": "variable.var_imputation",
+                        "title": "Imputation",
+                        "type": "string",
+                        "help_text":""
+                    },
+                    {
+                        "key": "variable.var_derivation",
+                        "title": "Derivation",
+                        "type": "string",
+                        "help_text":""
+                    },
+                    {
+                        "key": "variable.var_security",
+                        "title": "Security",
+                        "type": "string",
+                        "help_text":""
+                    },
+                    {
+                        "key": "variable.var_respunit",
+                        "title": "Source of information",
+                        "type": "string",
+                        "help_text":""
+                    },
+                    {
+                        "key": "variable.var_qstn_preqtxt",
+                        "title": "Pre-question text",
+                        "type": "string",
+                        "help_text":""
+                    },
+                    {
+                        "key": "variable.var_qstn_qstnlit",
+                        "title": "Literal question",
+                        "type": "string",
+                        "help_text":""
+                    },
+                    {
+                        "key": "variable.var_qstn_postqtxt",
+                        "title": "Post question text",
+                        "type": "string",
+                        "help_text":""
+                    },
+                    {
+                        "key": "variable.var_forward",
+                        "title": "Forward skip",
+                        "type": "string",
+                        "help_text":""
+                    },
+                    {
+                        "key": "variable.var_backward",
+                        "title": "Backward skip",
+                        "type": "string",
+                        "help_text":""
+                    },
+                    {
+                        "key": "variable.var_qstn_ivulnstr",
+                        "title": "Interviewer instructions",
+                        "type": "string",
+                        "help_text":""
+                    },
+                    {
+                        "key": "variable.var_universe",
+                        "title": "Universe",
+                        "type": "string",
+                        "help_text":""
+                    },
+                    {
+                        "key": "variable.var_sumstat",
+                        "title": "Summary statistics",
+                        "type": "array",
+                        "help_text":"One or more statistical measures that describe the responses to a particular variable and may include one or more standard summaries, e.g., minimum and maximum values, median, mode, etc.",
+                        "props": {
+                            "type": {
+                                "key": "type",
+                                "title": "Type",
+                                "type": "text"
+                            },
+                            "value": {
+                                "key": "value",
+                                "title": "Value",
+                                "type": "text"
+                            },
+                            "wgtd": {
+                                "key": "tag",
+                                "title": "Weighted",
+                                "type": "text"
+                            }
+                        }
+                    },
+                    {
+                        "key": "variable.var_txt",
+                        "title": "Variable description",
+                        "type": "string",
+                        "help_text":""
+                    },
+                    {
+                        "key": "variable.var_std_catgry",
+                        "title": "Summary statistics",
+                        "type": "array",
+                        "help_text":"Standard category codes used in the variable, like industry codes, employment codes, or social class codes. The attribute date is provided to indicate the version of the code in place at the time of the study. The attribute URI is provided to indicate a URN or URL that can be used to obtain an electronic list of the category codes.",
+                        "props": {
+                            "name": {
+                                "key": "name",
+                                "title": "Name",
+                                "type": "text"
+                            },
+                            "source": {
+                                "key": "source",
+                                "title": "Source",
+                                "type": "text"
+                            },
+                            "date": {
+                                "key": "date",
+                                "title": "Date",
+                                "type": "text"
+                            },
+                            "uri": {
+                                "key": "uri",
+                                "title": "URI",
+                                "type": "text"
+                            }
+                        }
+                    },
+                    {
+                        "key": "variable.var_codinstr",
+                        "title": "Recoding and derivation",
+                        "type": "string",
+                        "help_text":""
+                    },
+                    {
+                        "key": "variable.var_concept",
+                        "title": "Concepts",
+                        "type": "array",
+                        "help_text":"",
+                        "props": {
+                            "title": {
+                                "key": "title",
+                                "title": "Title",
+                                "type": "text"
+                            },
+                            "vocab": {
+                                "key": "vocab",
+                                "title": "Vocabulary",
+                                "type": "text"
+                            },
+                            "uri": {
+                                "key": "uri",
+                                "title": "URI",
+                                "type": "text"
+                            }
+                        }
+                    },
+                    {
+                        "key": "variable.format",
+                        "title": "Format",
+                        "type": "section",
+                        "help_text":"",
+                        "items": [
+                            {
+                                "key": "variable.format.type",
+                                "title": "Type",
+                                "type": "text"
+                            },
+                            {
+                                "key": "variable.format.name",
+                                "title": "Name",
+                                "type": "text"
+                            },
+                            {
+                                "key": "variable.format.note",
+                                "title": "URI",
+                                "type": "text"
+                            }
+                        ]
+                    },
+                    {
+                        "key": "variable.var_notes",
+                        "title": "Notes",
+                        "type": "string",
+                        "help_text":""
+                    }
+                ]
+                }
+            ]
+        },
+        {
+            "type": "section_container",
             "id": "tags",
-            "key": "tags",
+            "key": "tags_container",
             "title": "Tags",
             "items": [
                 {

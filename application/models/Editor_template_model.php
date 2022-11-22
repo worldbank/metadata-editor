@@ -90,6 +90,22 @@ class Editor_template_model extends ci_model {
 		return $template;
 	}
 
+	function get_templates_by_type($type)
+	{
+		$fields=array_diff($this->fields,["template"]);
+		$fields[]="'custom' as template_type";
+		$this->db->select($fields);
+		$this->db->order_by('name','ASC');
+		$this->db->order_by('changed','DESC');
+		$this->db->where("data_type",$type);
+		$result= $this->db->get('editor_templates')->result_array();
+
+		$core[]=$this->get_core_template_by_data_type($type);
+
+		array_splice($result,0,0,$core);
+		return $result;
+	}
+
 	function get_core_template_by_data_type($data_type)
 	{
 		foreach($this->core_templates as $template){
@@ -225,7 +241,7 @@ class Editor_template_model extends ci_model {
 
 		//create template
 		$template_options=array(
-			"uid"=>$template['data_type'].'-'.mt_rand(),
+			"uid"=>md5($template['data_type'].'-'.mt_rand()),
 			"data_type"=>$template['data_type'],
 			"lang"=>'en', 
 			"name"=>$template['name']. ' - copy', 
