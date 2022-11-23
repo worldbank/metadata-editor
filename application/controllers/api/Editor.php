@@ -28,7 +28,7 @@ class Editor extends MY_REST_Controller
 		}
 		parent::_auth_override_check();
 	}
-	
+
 	
 	/**
 	 * 
@@ -289,6 +289,53 @@ class Editor extends MY_REST_Controller
 		}
 	}
 
+
+	/**
+	 * 
+	 * 
+	 * Update project options
+	 * set:
+	 * 	- template
+	 * 
+	 */
+	function options_post($sid=null)
+	{
+		try{
+			$this->has_dataset_access('edit');
+
+			$options=$this->raw_json_input();
+			$user_id=$this->get_api_user_id();
+			$options['created_by']=$user_id;
+			$options['changed_by']=$user_id;
+			$options['sid']=$sid;
+			
+			$this->Editor_model->set_project_options($sid,$options);
+
+			$response=array(
+					'status'=>'success'
+			);
+
+			$this->set_response($response, REST_Controller::HTTP_OK);			
+		}
+		catch(ValidationException $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage(),
+				'errors'=>$e->GetValidationErrors()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+
 	function validate_get($sid=null)
 	{
 		try{
@@ -318,6 +365,36 @@ class Editor extends MY_REST_Controller
 				'errors'=>$e->GetValidationErrors()
 			);
 			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	/**
+	 * 
+	 * 
+	 * Delete project
+	 * 
+	 */
+	function delete_post($sid=null)
+	{
+		try{
+			//$this->has_dataset_access('edit');
+
+			//delete
+			$this->Editor_model->delete($sid);
+				
+			$response=array(
+				'status'=>'success'					
+			);
+
+			$this->set_response($response, REST_Controller::HTTP_OK);
 		}
 		catch(Exception $e){
 			$error_output=array(
@@ -679,14 +756,20 @@ class Editor extends MY_REST_Controller
 			}
 
 			if ($file_type=='thumbnail'){
-				$result=$this->Editor_resource_model->upload_thumbnail($sid,$file_field_name='file');
+				$output=$this->Editor_resource_model->upload_thumbnail($sid,$file_field_name='file');
+				$this->Editor_model->set_project_options($sid,$options=array('thumbnail'=>$output['thumbnail_filename']));
 			}else{
 				$result=$this->Editor_resource_model->upload_file($sid,$file_type,$file_field_name='file', $remove_spaces=false);
+				$uploaded_file_name=$result['file_name'];
+				$uploaded_path=$result['full_path'];
+				
+				$output=array(
+					'status'=>'success',
+					'uploaded_file_name'=>$uploaded_file_name,
+					'base64'=>base64_encode($uploaded_file_name)				
+				);
 			}
-
-			$uploaded_file_name=$result['file_name'];
-			$uploaded_path=$result['full_path'];
-			
+						
 			//attach to resource if provided
 			/*if(is_numeric($resource_id)){
 				$options=array(
@@ -695,18 +778,14 @@ class Editor extends MY_REST_Controller
 				$this->Survey_resource_model->update($resource_id,$options);
 			}*/
 
-			$output=array(
-				'status'=>'success',
-				'uploaded_file_name'=>$uploaded_file_name,
-				'base64'=>base64_encode($uploaded_file_name)				
-			);
-
 			$this->set_response($output, REST_Controller::HTTP_OK);			
 		}
 		catch(Exception $e){
 			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
+
+	
 
 
 
