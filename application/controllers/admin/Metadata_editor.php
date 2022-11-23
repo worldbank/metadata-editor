@@ -105,6 +105,7 @@ class Metadata_editor extends MY_Controller {
 		//$this->acl_manager->has_access_or_die('study', 'edit',null,$survey['repositoryid']);
 				 
 		$template_file="{$project['type']}_form_template.json";
+
 		$template_path='';
 		
 		//locations to look for templates
@@ -151,6 +152,41 @@ class Metadata_editor extends MY_Controller {
 
 		$options['metadata_template']=file_get_contents($template_path);
 		$options['metadata_template_arr']=json_decode($options['metadata_template'],true);
+
+		//load template
+		if (isset($project['template_uid']) && !empty($project['template_uid'])){
+			$template=$this->Editor_template_model->get_template_by_uid($project['template_uid']);			
+		}else
+		{
+			//load default core template by type
+			$template=$this->Editor_template_model->get_template_by_uid('core-'.$project['type']);
+		}
+
+		$options['metadata_template']=json_encode($template);
+		$options['metadata_template_arr']=$template['template'];
+/*
+
+		$template_custom_parts=[];
+		$this->get_template_custom_parts($options['metadata_template_arr']["items"],$template_custom_parts);
+		//var_dump($template_custom_parts);
+		//print_r($template_custom_parts);
+
+		//remove elements with is_editable = false
+		$custom_sections=[];
+		$items_x=$options['metadata_template_arr']["items"];
+		$this->get_template_editable_parts($items_x);
+
+*/
+/*
+		echo '<pre>';
+		print_r($template_custom_parts);
+		echo "<HR>";
+		print_r($items_x);
+		die();
+*/
+		//$user_template=$this->Editor_template_model->get_template_by_uid($uid);
+
+
 		$options['metadata_schema']=file_get_contents($schema_path);
 		$options['post_url']=site_url('api/editor/update/'.$project['type'].'/'.$project['id']);
 		$options['sub_section']=$this->uri->segment(6);
@@ -159,6 +195,36 @@ class Metadata_editor extends MY_Controller {
 		//render
 		$content= $this->load->view('metadata_editor/index_vuetify',$options,true);
 		echo $content;
+	}
+
+	function get_template_custom_parts($items,&$output)
+	{
+		
+		foreach($items as $item){
+			if (isset($item['items'])){
+				$this->get_template_custom_parts($item['items'],$output);
+			}
+			if (isset($item['type']) 
+				&& $item['type']=='section_container' 
+				&& (isset($item['is_editable']) && $item['is_editable']==false)){				
+				$output[$item['key']]=$item;
+			}
+		}        
+	}
+
+	function get_template_editable_parts(&$items)
+	{
+		foreach($items as $key=>$item){
+			if (isset($item['items'])){
+				if (isset($item['is_editable']) && $item['is_editable']==false){
+					//delete
+					unset($items[$key]);
+				}else{
+					$this->get_template_editable_parts($item['items']);
+				}
+			}
+			
+		}
 	}
 
 
