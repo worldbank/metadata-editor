@@ -357,3 +357,18 @@ html,body {
 .capitalize{
     text-transform:capitalize;
 }
+
+.card-thumbnail-col {
+    justify-content: right;
+    display: flex;
+}
+
+.project-card-thumbnail {
+    object-fit: cover;
+    max-height: 180px;
+    width: 100%;
+}
+
+.text-small{
+    font-size:small;
+}

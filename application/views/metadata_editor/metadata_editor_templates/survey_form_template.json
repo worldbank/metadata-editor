@@ -637,7 +637,7 @@
                         {
                             "key": "study_desc.version_statement.version",
                             "title": "Version information",
-                            "type": "text"
+                            "type": "textarea"
                         },
                         {
                             "key": "study_desc.version_statement.version_date",
@@ -1737,7 +1737,7 @@
             "type": "section_container",
             "key": "file_description",
             "title": "File description",
-            "is_custom": false,
+            "is_custom": true,
             "items": [
                 {
                 "type": "section",

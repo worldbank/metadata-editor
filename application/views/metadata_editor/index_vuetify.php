@@ -228,7 +228,7 @@ Vue.config.errorHandler = (err, vm, info) => {
           for (let file of this.DataFiles) {
             datafiles_nodes.push(
               {
-                title: file.file_id + ' - ' + file.file_name, //+ ' [' + file.file_id + ']',
+                title: file.file_name, //file.file_id + ' - ' + file.file_name, //+ ' [' + file.file_id + ']',
                 type:'datafile',
                 index:i,
                 key:'datafile/'+file.file_id,
@@ -271,9 +271,9 @@ Vue.config.errorHandler = (err, vm, info) => {
               {
                 title: resource.title,
                 type:'resource',
-                index:i,
+                index:resource.id,
                 file: 'file',
-                key:resource.id,
+                key:'resource-'+resource.id,
                 resource:  resource
               }
             );

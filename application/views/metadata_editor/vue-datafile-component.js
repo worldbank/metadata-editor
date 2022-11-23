@@ -15,29 +15,56 @@ Vue.component('datafile', {
     computed: {
         dataFiles(){
             return this.$store.getters.getDataFiles;
+        },
+        ProjectID(){
+            return this.$store.state.project_id;
         }
-    },  
+    },
+    methods:{
+        exitEditMode: function()
+        {
+            router.push('/datafiles');
+        },
+        saveFile: function(data)
+        {
+            vm=this;
+            let url=CI.base_url + '/api/editor/datafiles/'+vm.ProjectID;
+            form_data=data;
+
+            axios.post(url, 
+                form_data
+                /*headers: {
+                    "name" : "value"
+                }*/
+            )
+            .then(function (response) {
+                vm.updateVuexDataFile(data);
+                router.push('/datafiles');
+            })
+            .catch(function (error) {
+                alert("Failed to add data file: "+ error.message);
+            })
+            .then(function () {
+                console.log("request completed");
+            });
+        },
+        updateVuexDataFile: function(data)
+        {
+            for(i=0;i<this.dataFiles.length;i++){
+                if (this.dataFiles[i].file_id==this.fid){
+                    this.dataFiles[i]
+                    vm.$set(this.dataFiles, i, data);
+                    return;
+                }
+            }
+        }
+    },
     template: `
             <div class="datafile-component">
             <div v-for="file in dataFiles">
                 <div v-if="file.file_id==fid" class="mt-3 p-2">
-
-                <div>
-                    File name: <strong>{{file.file_name}}</strong>
-                </div>
-
-                <div>
-                    {{file.file_id}}
-                </div>
-
-                <div>
-                    {{file.description}}
-                </div>
-
-                <div class="mt-3">
-                    <router-link :to="'/variables/' + file.file_id"><button type="button" class="btn btn-sm btn-outline-primary"><i class="fas fa-table"></i> Variables <span v-if="file.var_count>0">({{file.var_count}})</span></button></router-link>
-                </div>
-
+                    <h2>Edit file - {{file.file_name}} [{{file.file_id}}]</h2>
+                    <datafile-edit :value="file" @input="saveFile" @exit-edit="exitEditMode"></datafile-edit>                
                 </div>
             </div>
 

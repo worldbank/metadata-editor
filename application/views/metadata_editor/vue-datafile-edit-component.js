@@ -7,9 +7,6 @@ Vue.component('datafile-edit', {
             form_local:{}
         }
     },
-    watch: { 
-    },
-    
     mounted: function () {
         //set data to array if empty or not set
         if (!this.field_data){
@@ -23,6 +20,7 @@ Vue.component('datafile-edit', {
     },  
     template: `
             <div class="datafile-edit-component">
+            
             <div class="form-group form-field">
                 <label for="filename">file name</label> 
                 <span><input type="text" id="filename" class="form-control" v-model="form_local.file_name"/></span> 
