@@ -187,7 +187,7 @@
                         
                         </div>
 
-                        <div class="col-md-2  card-thumbnail-col  border-bottom">
+                        <div class="col-md-1  card-thumbnail-col  border-bottom">
                           <a href="#" @click="EditProject(project.id)">
                             <img :src="'<?php echo site_url('api/editor/thumbnail');?>/' + project.id" alt="" class="img-fluid img-thumbnail rounded shadow-sm project-card-thumbnail">
                           </a>
