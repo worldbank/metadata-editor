@@ -1453,4 +1453,38 @@ class Editor extends MY_REST_Controller
 	}
 
 
+	/**
+	 * 
+	 * Import data file
+	 * @fid - file id
+	 * @append 0=false, 1=true - if false, overwrite existing data
+	 * 
+	 **/ 
+	function import_data_post($sid=null, $fid=null, $append=0)
+	{		
+		try{
+			$exists=$this->Editor_model->check_id_exists($sid);
+
+			if(!$exists){
+				throw new Exception("Project not found");
+			}
+
+			$result=$this->Editor_resource_model->upload_data($sid,$fid,$file_field_name='file', $append);
+			$uploaded_file_name=$result['file_name'];
+			$uploaded_path=$result['full_path'];
+			
+			$output=array(
+				'status'=>'success',
+				'uploaded_file_name'=>$uploaded_file_name,
+				'base64'=>base64_encode($uploaded_file_name)				
+			);
+
+			$this->set_response($output, REST_Controller::HTTP_OK);			
+		}
+		catch(Exception $e){
+			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
 }

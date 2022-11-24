@@ -82,7 +82,7 @@ Vue.component('project-thumbnail', {
 
                             <v-card-text>
                                 <div class="xcustom-file">
-                                    <input type="file" class="border p-1" style="width:100%;" id="xcustomFile" @change="handleFileUpload( $event )">                                    
+                                    <input type="file" class="border p-1" style="width:100%;" id="xcustomFile" @change="handleFileUpload( $event )">
                                 </div>
                                 
                                 <div class="text-secondary">Allowed file types: jpg, jpeg, gif, png</div>

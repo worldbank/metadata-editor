@@ -178,6 +178,67 @@ class Editor_resource_model extends ci_model {
 		);
 	}
 
+	/**
+	 * 	
+	 *
+	 * Upload data 
+	 *
+	 * @sid - survey id
+     * @file_id file id
+	 * @append - 0=false, 1=true - if false, replace data
+	 *  
+	 **/ 
+	function upload_data($sid,$file_id,$file_field_name='file', $append=false)
+	{
+        $survey_folder=$this->Editor_model->get_project_folder($sid);
+
+        if (!$survey_folder){
+            $this->Editor_model->create_project_folder($sid);
+            $survey_folder=$this->Editor_model->get_project_folder($sid); 
+        }
+		
+		if (!file_exists($survey_folder)){
+			throw new Exception('EDITOR_FOLDER_NOT_FOUND: '.$survey_folder);
+		}
+
+		$datafile=$this->Editor_model->data_file_by_id($sid,$file_id);
+			
+		if (!$datafile){
+			throw new Exception("DATAFILE_NOT_FOUND: ".$file_id);
+		}
+
+		$filename=$datafile['file_name'];		
+
+        $survey_folder_type=$survey_folder.'/data';
+        @mkdir($survey_folder_type, 0777, $recursive=true);
+
+        if (!file_exists($survey_folder_type)){
+			throw new Exception('EDITOR_SUB_FOLDER_NOT_FOUND: '.$survey_folder_type);
+		}
+
+		$csv_file_path=$survey_folder.'/data/'.$filename.'.csv';
+
+		//upload class configurations for RDF
+		$config['upload_path'] = $survey_folder_type;
+		$config['overwrite'] = true;
+		$config['encrypt_name']=false;
+		$config['file_name']=$filename.'.csv';
+		$config['remove_spaces'] = true; //convert spaces or not
+		$config['allowed_types'] = str_replace(",","|",$this->config->item("allowed_resource_types"));
+		
+		$this->load->library('upload', $config);
+		//$this->upload->initialize($config);
+
+		//process uploaded rdf file
+		$upload_result=$this->upload->do_upload($file_field_name);
+
+		if (!$upload_result){
+			throw new Exception($this->upload->display_errors());
+		}
+
+		return $this->upload->data();		
+	}
+
     /**
 	*
 	* Import RDF file
