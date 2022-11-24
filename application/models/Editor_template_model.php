@@ -45,8 +45,12 @@ class Editor_template_model extends ci_model {
 		foreach($config as $key=>$template){
 			$template_json='';
 			$template_path=APPPATH.'/views/'.$template['template'];
+
 			if (file_exists($template_path)){
 				$template_json=$template['template'];//json_decode(file_get_contents($template_path),true);
+			}
+			else{
+				//throw new Exception("template not found" .$template_path);
 			}
 
 			$this->core_templates[]=array(

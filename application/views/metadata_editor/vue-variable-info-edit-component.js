@@ -7,6 +7,10 @@ Vue.component('variable-info', {
             variable_formats:{
                 "numeric": "Numeric",
                 "fixed": "Fixed string"
+            },
+            variable_intervals:{
+                "contin": "Continuous",
+                "discrete": "Discrete"
             }
         }
     },
@@ -31,12 +35,22 @@ Vue.component('variable-info', {
                 <div class="p-2">
 
                 <div class="form-group form-field">
-                    <label>var_intrvl</label> 
-                    <span><input type="text" class="form-control form-control-sm" v-model="variable.var_intrvl"/></span> 
+                    <label>Interval type</label>                     
+                    <select 
+                        v-model="variable.var_intrvl" 
+                        class="form-control  form-control-sm form-field-dropdown"
+                        id="variable_intervals" 
+                    >
+                        <option value="">Select</option>
+                        <option v-for="(option_key,option_value) in variable_intervals" v-bind:value="option_value">
+                            {{ option_key }}
+                        </option>
+                    </select>
+                    <small class="help-text form-text text-muted">{{variable.var_intrvl}}</small> 
                 </div>
 
                 <div class="form-group form-field">
-                    <label>var_dcml</label> 
+                    <label>Decimal points</label> 
                     <span><input type="text" class="form-control form-control-sm" v-model="variable.var_dcml"/></span> 
                 </div>
                 

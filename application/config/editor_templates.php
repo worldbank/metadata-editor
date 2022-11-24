@@ -21,8 +21,8 @@ $config['survey']=array(
 ); 
 
 $config['timeseries']=array(
-    'template' => 'metadata_templates/timeseries-template',
-    'language_translations'=>'fields_timeseries'
+    'template' => 'metadata_editor/metadata_editor_templates/timeseries_form_template.json',
+    'lang'=>'en'
 ); 
 
 $config['timeseriesdb']=array(
@@ -45,9 +45,9 @@ $config['geospatial']=array(
 
 //document
 $config['document']=array(
-    'template' => 'metadata_templates/document-template',
-    'language_translations'=>'fields_document'
-); 
+    'template' => 'metadata_editor/metadata_editor_templates/document_form_template.json',
+    'lang'=>'en'
+);
 
 //table
 $config['table']=array(

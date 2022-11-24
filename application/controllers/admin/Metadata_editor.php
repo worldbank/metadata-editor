@@ -155,9 +155,10 @@ class Metadata_editor extends MY_Controller {
 
 		//load template
 		if (isset($project['template_uid']) && !empty($project['template_uid'])){
-			$template=$this->Editor_template_model->get_template_by_uid($project['template_uid']);			
-		}else
-		{
+			$template=$this->Editor_template_model->get_template_by_uid($project['template_uid']);
+		}
+		
+		if (empty($template)){
 			//load default core template by type
 			$template=$this->Editor_template_model->get_template_by_uid('core-'.$project['type']);
 		}

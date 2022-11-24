@@ -62,12 +62,14 @@ Vue.component('variable-categories', {
     template: `
         <div class="variable-categories-edit-component" style="height:inherit">
             <!--categories--> 
-            <div style="font-size:small;" class="mb-2">
+            <div style="font-size:small;" class="mb-2" >
                 <div class="section-title p-1 bg-primary"><strong>Categories</strong></div>
-                <div>
+                <div v-if="variable.var_intrvl=='discrete'">
                     <table-component v-model="variable.var_catgry" :columns="catgry_columns" class="border m-2 pb-2"/>
                 </div>
+                <div v-else class="m-3 border text-align-center p-3 text-secondary">Only available for Discrete variables</div>
             </div>
+            
             <!--categories-end-->            
         </div>          
         `

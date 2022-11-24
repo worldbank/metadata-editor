@@ -93,10 +93,22 @@ Vue.component('variable-edit', {
                 }
             }
             return false;
+        },
+        sumStatCodeToLabel: function(code)
+        {
+            if (code=='vald'){
+                return 'Valid';
+            }
+            
+            if (code=='invd'){
+                return 'Invalid';
+            }
+
+            return code;
         }
     },
     template: `
-        <div class="variable-edit-component">
+        <div class="variable-edit-component pb-5">
         <template>
             <v-tabs v-model="active_tab">
                 <v-tab key="statistics" href="#statistics">Statistics</v-tab>
@@ -108,7 +120,8 @@ Vue.component('variable-edit', {
                 
                     <div style="max-height:400px;overflow-y: scroll;padding:10px;font-size:smaller;">
 
-                    <strong>Summary</strong>
+                    <div v-if="variable.var_catgry.length>0 && variable.var_intrvl=='discrete'">
+                    <h5>Frequencies</h5>
                     <table class="table table-sm" v-if="variable.var_catgry">
                         <tr>
                             <th>Value</th>
@@ -128,22 +141,28 @@ Vue.component('variable-edit', {
                             </td>
 
                             <!--wgt values -->
+                            <td>
                             <template v-for="stat in catgry.stats">
-                                <td v-if="stat.wgtd=='wgtd'">{{stat.value}}</td>
+                                <template v-if="stat.wgtd=='wgtd'">{{stat.value}}</template>
                             </template>                                
+                            </td>
                         </tr>
                     </table>
+                    </div>
 
                     <br/>
 
+                    <div v-if="variable.var_sumstat" class="pb-4">
+                    <h5 class="border-bottom">Summary statistics</h5>
                     <table>
-                    <template v-for="sumstat in variable.var_sumstat">                            
+                        <template v-for="sumstat in variable.var_sumstat">                            
                             <tr>
-                                <td><strong>{{sumstat.type}} <template v-if="sumstat.wgtd=='wgtd'"> (weighted)</template></strong></td>
+                                <td style="width:150px;"><strong>{{sumStatCodeToLabel(sumstat.type)}} <template v-if="sumstat.wgtd=='wgtd'"> (weighted)</template></strong></td>
                                 <td>{{sumstat.value}}</td>
                             </tr>                            
-                    </template>
+                        </template>
                     </table>
+                    </div>
                     
                     </div>
                 

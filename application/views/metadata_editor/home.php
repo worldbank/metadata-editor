@@ -219,6 +219,7 @@
             <v-card-text>
               <div>
                 <a class="dropdown-item" href="#" @click="createProject('survey')">Microdata</a>
+                <a class="dropdown-item" href="#" @click="createProject('timeseries')">Timeseries</a>
                 <a class="dropdown-item" href="#" @click="createProject('document')">Document</a>
                 <a class="dropdown-item" href="#" @click="createProject('table')">Table</a>
                 <div class="dropdown-divider"></div>
