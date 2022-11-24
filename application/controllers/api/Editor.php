@@ -386,9 +386,7 @@ class Editor extends MY_REST_Controller
 	{
 		try{
 			//$this->has_dataset_access('edit');
-
-			//delete
-			$this->Editor_model->delete($sid);
+			$this->Editor_model->delete_project($sid);
 				
 			$response=array(
 				'status'=>'success'					

@@ -377,7 +377,6 @@
           let url = CI.base_url + '/api/editor/create/' + type;
           this.loading_status = "Creating project...";
 
-
           axios.post(url,
               form_data
               /*headers: {
@@ -402,6 +401,24 @@
         },
         EditProject: function(id) {
           window.open(CI.base_url + '/admin/metadata_editor/edit/' + id);
+        },
+        DeleteProject: function (id)
+        {
+          if (!confirm("Are you sure you want to delete the project?")){
+            return false;
+          }
+          
+          vm = this;
+          let url = CI.base_url + '/api/editor/delete/' + id;
+
+          axios.post(url)
+            .then(function(response) {              
+              vm.loadProjects();              
+            })
+            .catch(function(error) {
+              console.log("error", error);
+              alert("Failed", error);
+            });            
         },
         getProjectIcon: function(type) {
           projectIcon = this.project_types_icons[type];

@@ -1241,6 +1241,29 @@ class Editor_model extends CI_Model {
 		return $this->db->insert_id();
 	}
 
+	function delete_project($sid)
+	{
+		$project_folder=$this->get_project_folder($sid);
+
+		$storage_root = $this->get_storage_path();
+
+		if ($storage_root !== $project_folder){
+			remove_folder($project_folder);
+		}
+		
+		$this->db->where('id',$sid);
+		$this->db->delete("editor_projects");
+
+		$this->db->where('sid',$sid);
+		$this->db->delete("editor_data_files");
+
+		$this->db->where('sid',$sid);
+		$this->db->delete("editor_resources");
+
+		$this->db->where('sid',$sid);
+		$this->db->delete("editor_variables");
+	}
+
 	
 }//end-class
 	
