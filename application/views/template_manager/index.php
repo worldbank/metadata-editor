@@ -77,7 +77,8 @@
         <div class="col-md-10">
           <h5 class="color-white"> 
             <v-icon large color="rgb(0 0 0 / 12%)">mdi-alpha-t-box</v-icon>
-            Template manager
+            Template manager - {{user_template_info.name}}
+            {{user_template_info.lang}}
           </h5>
         </div>
         <div class="col-md-2">
@@ -564,6 +565,18 @@
             return false;
           }
           return true;
+        },
+        ActiveNodeControlledVocabColumns(){
+          if (this.ActiveNode.props){
+            return this.ActiveNode.props;
+          }
+          return {
+              "type": {
+                "key": "value",
+                "title": "Value",                
+                "type": "text"
+              }
+          };
         }
       }
     });

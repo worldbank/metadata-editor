@@ -10,13 +10,15 @@ Vue.component('datafile-import', {
             is_processing:false,
             update_status:'',
             errors:'',
+            upload_report:[],
             file_type:'',
             file_types:{
                 "DTA": "Stata (DTA)",
                 "SAV": "SPSS (SAV)",
                 "CSV": "CSV"
             },
-            allowed_file_types:["dta","sav","csv"]
+            allowed_file_types:["dta","sav","csv"],
+            dialog_process:false
         }
     },
     watch: { 
@@ -48,6 +50,134 @@ Vue.component('datafile-import', {
         },
     },
     methods:{
+
+        dialogClose: function(){
+            this.dialog_process = false,
+            this.$router.go();
+        },
+
+        //on button import click
+        processImport: async function()
+        {
+            this.errors='';
+            this.is_processing=true;
+            this.upload_report=[];
+            this.dialog_process=true;
+
+            for(i=0;i<this.files.length;)
+            {
+                await this.processFile(i);
+                i++;
+
+                /*if (this.errors!=''){
+                    return false;
+                }*/
+            }
+
+            this.update_status="completed";
+            this.is_processing=false;
+            this.$store.dispatch('initData',{dataset_id:this.ProjectID});
+        },
+
+        /**
+         * 
+         *  - Upload file
+         *  - Generate data dictionary
+         *  - Generete CSV
+         *  - import data dictionary
+         *  - import csv
+         */
+        processFile: async function(fileIdx)
+        {
+            try{                
+                //upload file
+                console.log("processing file",fileIdx);
+                let resp=await this.uploadFile(fileIdx);
+                console.log("finished uploading file",fileIdx,resp);
+
+                //import
+                this.update_status="Importing data dictionary " + this.files[fileIdx].name;
+                let import_resp=await this.importDataFile(fileIdx);                
+                console.log("finished importing file",fileIdx,import_resp);
+
+                let csv_resp=await this.generateCSV(fileIdx);
+                console.log("finished generating csv file",fileIdx,csv_resp);
+
+                this.upload_report.push(
+                    {
+                        'file_name':this.files[fileIdx].name,
+                        'status': 'success'
+                    }
+                );
+
+            } catch (error) {
+                console.log(error);
+                this.errors="failed uploading file "  + fileIdx + ' with error: ' +error + ' message: ' + error.response.data.message;
+                this.upload_report.push({
+                        'file_name':this.files[fileIdx].name,
+                        'status': 'error',
+                        'error':error
+                });
+            }
+        },
+        uploadFile: async function (fileIdx)
+        {            
+            let formData = new FormData();
+            formData.append('file', this.files[fileIdx]);
+
+            /*if (this.errors!=''){
+                return false;
+            }*/
+
+            let vm=this;
+            let url=CI.base_url + '/api/editor/files/'+ this.ProjectID + '/data';
+
+            const resp=await axios.post( url,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
+            );
+
+            return resp.data;
+        },
+        importDataFile: async function(fileIdx)
+        {
+            let formData = {
+                "filename":this.files[fileIdx].name
+            }
+            
+            vm=this;            
+            let url=CI.base_url + '/api/R/import_data_file/'+this.ProjectID;
+            
+            let resp = await axios.post(url, formData,{
+                headers: {
+                    'Content-Type': 'application/json'
+                    }
+            });
+
+            return resp.data;                
+        }, 
+        generateCSV: async function(fileIdx)
+        {
+            let formData = {
+                "filename":this.files[fileIdx].name
+            }
+            
+            vm=this;            
+            let url=CI.base_url + '/api/R/generate_csv/'+this.ProjectID;
+            
+            let resp = await axios.post(url, formData,{
+                headers: {
+                    'Content-Type': 'application/json'
+                    }
+            });
+
+            return resp.data;                
+        }, 
+
         validateFilename: function(file){
             return /^[a-zA-Z0-9\.\-_ ()]*$/.test(file.name);
         },   
@@ -83,12 +213,12 @@ Vue.component('datafile-import', {
             Vue.delete(this.files,file_idx);      
             this.files.splice(file_idx, 0);
         },
-        processImport: async function(){
+        /*processImport: async function(){
             await this.uploadDatafiles();
 
             this.update_status="completed";
             this.is_processing=false;
-            vm.$store.dispatch('initData',{dataset_id:this.ProjectID});
+            this.$store.dispatch('initData',{dataset_id:this.ProjectID});
         },
         uploadDatafiles: async function(){
             this.errors='';
@@ -131,7 +261,7 @@ Vue.component('datafile-import', {
                 return false;
             });            
         }, 
-        importDataFile: async function(fileIdx){
+        importDataFile_old: async function(fileIdx){
             this.is_processing=true;
             this.update_status="Importing data dictionary " + this.files[fileIdx].name;
 
@@ -174,7 +304,7 @@ Vue.component('datafile-import', {
             .catch(function(){
                 console.log('FAILURE!!');
             });            
-        },  
+        },  */
         handleFileUpload(event)
         {
             this.file = event.target.files[0];
@@ -215,14 +345,11 @@ Vue.component('datafile-import', {
             <div class="datafile-import-component">
             <v-container>
 
-                <h3>Import data</h3>
-
+                <h3>Import data files</h3>                
                 <div class="bg-white p-3" >
 
                     <div class="form-container-x" >
 
-                        
-                        <h5>Upload data</h5>
                         <p>Upload one or more data files. Supported file types are: Stata(.dta), SPSS(.sav) and CSV</p>
 
                         <div @drop.prevent="addFile" @dragover.prevent class="border p-2 mb-2 bg-light text-center">
@@ -250,7 +377,7 @@ Vue.component('datafile-import', {
                         <div xv-if="update_status==''">
                             <button type="button" :disabled="!FilesCount>0" class="btn btn-primary" @click="processImport">Import files</button>
                         </div>
-
+                        
                     </div>
 
                     <div v-if="errors" class="p-3" style="color:red">
@@ -259,44 +386,81 @@ Vue.component('datafile-import', {
                         <div v-if="errors.response">{{errors.response.data.message}}</div>
                     </div>
 
-                    <v-row class="mt-3 text-center" v-if="update_status=='completed' && errors==''">
-                        <v-col class="text-center" >
-                            <i class="far fa-check-circle" style="font-size:24px;color:green;"></i> Update completed,
-                            <router-link :to="'/variables/' + file_id">view variables</router-link>
-                        </v-col>
-                    </v-row>
-            
-{{update_status}} {{errors}}
-                    <v-container v-if="update_status!='completed' && errors=='' ">                    
-                        <v-row v-if="is_processing"
-                        class="fill-height"
-                        align-content="center"
-                        justify="center"
-                        >
-                        <v-col
-                            class="text-subtitle-1 text-center"
-                            cols="12"
-                        >
-                        {{update_status}}
-                        </v-col>
-                        <v-col cols="12">
-                            <v-app>
-                            <v-progress-linear 
-                            color="deep-purple accent-4"
-                            indeterminate
-                            rounded
-                            height="6"
-                            ></v-progress-linear>
-                            </v-app>
-                        </v-col>
-                        </v-row>
-                    </v-container>
+                    
 
 
                 </div>
 
 
             </v-container>
+
+
+            <v-dialog v-model="dialog_process" width="700" height="600" persistent>
+                <v-card>
+                    <v-card-title class="text-h5 grey lighten-2">
+                    Importing data files
+                    </v-card-title>
+
+                    <v-card-text>
+                    <div>
+                        <!-- card text -->
+
+                        <v-row class="mt-3 text-center" v-if="update_status=='completed' && errors==''">
+                            <v-col class="text-center" >
+                                <i class="far fa-check-circle" style="font-size:24px;color:green;"></i> Data import completed                                
+                            </v-col>
+                        </v-row>
+                
+                        <v-container v-if="update_status!='completed' && errors=='' ">                    
+                            <v-row v-if="is_processing"                            
+                            align-content="center"
+                            justify="center"
+                            >
+                            <v-col
+                                class="text-subtitle-1 text-center"
+                                cols="12"
+                            >
+                            {{update_status}}
+                            </v-col>
+                            <v-col cols="12">
+                                <v-app class="border">
+                                <v-progress-linear 
+                                color="deep-purple accent-4"
+                                indeterminate
+                                rounded
+                                height="6"
+                                ></v-progress-linear>
+                                </v-app>
+                            </v-col>
+                            </v-row>
+                        </v-container>
+
+                        <div v-if="upload_report">
+                            <div v-for="report in upload_report" class="row border-top">
+                                <div class="col-md-3">{{report.file_name}}</div>
+                                <div class="col-md-2">{{report.status}}</div>
+                                <div class="col-md-auto">
+                                    <div style="color:red;" v-if="report.error">{{report.error.response.data.message}}</div>
+                                </div>                                
+                                <hr/>
+                            </div>
+                        </div>
+
+                        <!-- end card text -->
+
+                    </div>
+                    </v-card-text>
+
+                    <v-divider></v-divider>
+
+                    <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="primary" text @click="dialogClose()">
+                        Close
+                    </v-btn>
+                    </v-card-actions>
+                </v-card>
+                </v-dialog>
 
             </div>          
             `    

@@ -32,17 +32,16 @@
 
 <div class="form-group" v-if="ActiveNode.type!=='section_container' && ActiveNode.type!=='section'">
     <label for="controlled_vocab">Controlled vocabulary:</label>
-    <div class="border" style="max-height:300px;overflow:auto;">
-    <table-component @update:value="EnumUpdate" v-model="ActiveNode.enum" :columns="enum_columns" class="border m-2 pb-2" />
+    <div class="border bg-white" style="max-height:300px;overflow:auto;">
+    <table-component @update:value="EnumUpdate" v-model="ActiveNode.enum" :columns="ActiveNodeControlledVocabColumns" class="border m-2 pb-2" />
     </div>
 </div>
 
-{{ActiveNode}}
 <div class="form-group" v-if="ActiveNode.type=='section'  || ActiveNode.type=='nested_array'">
     <label for="name">Available items:</label>
     <div class="border bg-light">        
     <nada-treeview-field v-model="CoreTreeItems"></nada-treeview-field>
-    <pre>{{CoreTreeItems}}</pre>
+    <?php /* <pre>{{CoreTreeItems}}</pre> */ ?>
     </div>
 </div>
 

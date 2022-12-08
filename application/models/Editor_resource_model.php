@@ -660,8 +660,10 @@ class Editor_resource_model extends ci_model {
 		$data_files=$this->Editor_model->data_files($sid);
 
 		$data_files_by_name=array();
-		foreach($data_files as $key=>$file){
-			$data_files_by_name[$file['file_name']]=$file;
+		if (is_array($data_files)){
+			foreach($data_files as $key=>$file){
+				$data_files_by_name[$file['file_name']]=$file;
+			}
 		}
 
 		$files['data_files']=$data_files_by_name;

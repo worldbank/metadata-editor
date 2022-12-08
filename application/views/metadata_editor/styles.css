@@ -372,3 +372,7 @@ html,body {
 .text-small{
     font-size:small;
 }
+
+.v-application--wrap {
+    min-height: 0vh !important;
+  }
