@@ -270,9 +270,9 @@ class R extends MY_REST_Controller
 			}
 
 			$request_body=[
-				"csvPath"=>$csv_file_path,
+				"csvPath"=>realpath($csv_file_path),
 				"type"=>$this->get_file_extension($filename),
-				"filepath"=> $data_file_path
+				"filepath"=> realpath($data_file_path)
 			];
 			  
 			$api_response = $client->request('POST', '', [
@@ -293,7 +293,7 @@ class R extends MY_REST_Controller
 			$response=array_merge(array(
 				'status'=>'success',
 				'folder_path'=>$data_file_path,
-				'csv_path'=>realpath($csv_mv_path),
+				'csv_path'=>$csv_mv_path,
 				'code' => $api_response->getStatusCode(),// 200
 				'reason' => $api_response->getReasonPhrase() // OK
 			), $response);
