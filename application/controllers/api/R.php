@@ -10,6 +10,13 @@ require(APPPATH.'/libraries/MY_REST_Controller.php');
 
 class R extends MY_REST_Controller
 {
+
+	//R API base url
+	private $rApiUrl; //'http://localhost:2121/ocpu/library/';
+
+	//temporary storage for creating files via R
+	private $rStoragePath;	
+
 	public function __construct()
 	{
 		parent::__construct();
@@ -19,7 +26,14 @@ class R extends MY_REST_Controller
 		$this->load->model("Editor_model");
 		$this->load->library("Rutils");
 		//$this->is_admin_or_die();
+
+		$this->load->config("editor");
+
+		$this->rApiUrl = $this->config->item('r_api_url', 'editor');
+		$this->rStoragePath=$this->config->item('r_storage_path', 'editor');
 	}
+
+	
     
 	//override authentication to support both session authentication + api keys
 	function _auth_override_check()
@@ -39,25 +53,12 @@ class R extends MY_REST_Controller
 	{
 		try{
 
-			$url='http://localhost:2121/ocpu/library/mde/R/get_r_version/json';
-			
-            
 			$client = new Client([
-				'base_uri' => 'http://localhost:2121/ocpu/library/mde/R/get_r_version/json'
+				'base_uri' => $this->rApiUrl.'mde/R/get_r_version/json'
 			]);
 
-			/*
-			$this->config->load('doi');
-			$doi_options=$this->config->item("doi");
-
-			$username=$doi_options['user'];
-			$password=$doi_options['password'];
-			*/
-
 			$request_body=[];
-
 			$api_response = $client->request('POST', '', [
-				//'auth' => [$username, $password],
 				'json' => 
 					$request_body
 				,
@@ -66,7 +67,6 @@ class R extends MY_REST_Controller
 
 			$response=array(
 				'status'=>'success',
-				//'options'=>$body_options,
  				'api_response'=>json_decode($api_response->getBody()->getContents(),true),
 				'code' => $api_response->getStatusCode(),// 200
 				'reason' => $api_response->getReasonPhrase() // OK
@@ -99,6 +99,14 @@ class R extends MY_REST_Controller
 	}
 
 
+	/**
+	 * 
+	 *  Import a data file
+	 * 
+	 *  - generate data dictionary using R
+	 *  - import data dictionary to db
+	 * 
+	 */
 	public function import_data_file_post($sid=null)
 	{		
 		$options=$this->raw_json_input();		
@@ -140,7 +148,7 @@ class R extends MY_REST_Controller
 	 */
 	public function data_dictionary_post($sid=null)
 	{
-		$options=$this->raw_json_input();		
+		$options=$this->raw_json_input();
 
 		try{
 
@@ -183,7 +191,7 @@ class R extends MY_REST_Controller
 			}
 
 			$client = new Client([
-				'base_uri' => 'http://localhost:2121/ocpu/library/nadar/R/datafile_dictionary/json?force=true&auto_unbox=true&digits=22'
+				'base_uri' => $this->rApiUrl.'nadar/R/datafile_dictionary/json?force=true&auto_unbox=true&digits=22'
 			]);
 			
 			$request_body=[
@@ -194,7 +202,6 @@ class R extends MY_REST_Controller
 			];
 			  
 			$api_response = $client->request('POST', '', [
-				//'auth' => [$username, $password],
 				'json' => 
 					$request_body
 				,
@@ -210,7 +217,6 @@ class R extends MY_REST_Controller
 			$response=array_merge(array(
 				'status'=>'success',
 				'folder_path'=>$project_folder,
-				//'options'=>$body_options,
 				'code' => $api_response->getStatusCode(),// 200
 				'reason' => $api_response->getReasonPhrase() // OK
 			), $response);
@@ -227,18 +233,18 @@ class R extends MY_REST_Controller
 	}
 
 
-	public function generate_csv_get($sid=null,$filename=null)
+	public function generate_csv_post($sid=null)
 	{
-		try{            
-
+		try{
+			$options=$this->raw_json_input();
 			$exists=$this->Editor_model->check_id_exists($sid);
 
 			if(!$exists){
 				throw new Exception("Project not found");
-			}
+			}			
 			
 			$client = new Client([
-				'base_uri' => 'http://localhost:2121/ocpu/library/nadar/R/datafile_write_csv/json?force=true&auto_unbox=true&digits=22'
+				'base_uri' => $this->rApiUrl.'nadar/R/datafile_write_csv/json?force=true&auto_unbox=true&digits=22'
 			]);
 
 			$project_folder=$this->Editor_model->get_project_folder($sid);
@@ -247,10 +253,17 @@ class R extends MY_REST_Controller
 				throw new Exception('PROJECT_FOLDER_NOT_FOUND');
 			}
 
+			$filename=isset($options['filename']) ? $options['filename'] : '';
+
+			if (!$filename){
+				throw new Exception("parameter filename is missing");
+			}
+
 			$project_folder=realpath($project_folder);
 			$data_file_path=$project_folder.'/data/'.$filename;
 			$ext=pathinfo($filename, PATHINFO_EXTENSION);
-			$csv_file_path=$project_folder.'/data/'.str_replace(".".$ext,".csv",$filename);
+			
+			$csv_file_path=$this->rStoragePath.'/'.str_replace(".".$ext,".csv",$filename);
 
 			if (!file_exists($data_file_path)){
 				throw new Exception("DATA_FILE_NOT_FOUND: ".$data_file_path);
@@ -262,9 +275,7 @@ class R extends MY_REST_Controller
 				"filepath"=> $data_file_path
 			];
 			  
-
 			$api_response = $client->request('POST', '', [
-				//'auth' => [$username, $password],
 				'json' => 
 					$request_body
 				,
@@ -272,10 +283,17 @@ class R extends MY_REST_Controller
 			]);
 
 			$response=json_decode($api_response->getBody()->getContents(),true);
+
+			$csv_mv_path=dirname($data_file_path) . '/' .basename($csv_file_path);
+
+			if (isset($response['result']) && $response['result']=='ok'){				
+				rename($csv_file_path,$csv_mv_path);
+			}
+
 			$response=array_merge(array(
 				'status'=>'success',
 				'folder_path'=>$data_file_path,
-				//'options'=>$body_options,
+				'csv_path'=>$csv_mv_path,
 				'code' => $api_response->getStatusCode(),// 200
 				'reason' => $api_response->getReasonPhrase() // OK
 			), $response);
@@ -317,10 +335,6 @@ class R extends MY_REST_Controller
 			}
 
 			$filename=$datafile['file_name'];
-			
-			//$data_file_path=$project_folder.'/data/'.$filename;
-			//$ext=pathinfo($filename, PATHINFO_EXTENSION);
-
 			$csv_file_path=$project_folder.'/data/'.$filename.'.csv';
 
 			/*if (!file_exists($data_file_path)){
