@@ -270,9 +270,9 @@ class R extends MY_REST_Controller
 			}
 
 			$request_body=[
-				"csvPath"=>realpath($csv_file_path),
+				"csvPath"=>$csv_file_path,
 				"type"=>$this->get_file_extension($filename),
-				"filepath"=> realpath($data_file_path)
+				"filepath"=> $data_file_path
 			];
 			  
 			$api_response = $client->request('POST', '', [
