@@ -293,7 +293,7 @@ class R extends MY_REST_Controller
 			$response=array_merge(array(
 				'status'=>'success',
 				'folder_path'=>$data_file_path,
-				'csv_path'=>$csv_mv_path,
+				'csv_path'=>realpath($csv_mv_path),
 				'code' => $api_response->getStatusCode(),// 200
 				'reason' => $api_response->getReasonPhrase() // OK
 			), $response);
