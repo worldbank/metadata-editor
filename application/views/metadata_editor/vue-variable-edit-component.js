@@ -120,7 +120,7 @@ Vue.component('variable-edit', {
                 
                     <div style="max-height:400px;overflow-y: scroll;padding:10px;font-size:smaller;">
 
-                    <div v-if="variable.var_catgry.length>0 && variable.var_intrvl=='discrete'">
+                    <div v-if="variable.var_catgry && variable.var_intrvl=='discrete'">
                     <h5>Frequencies</h5>
                     <table class="table table-sm" v-if="variable.var_catgry">
                         <tr>

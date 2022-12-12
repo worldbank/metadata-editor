@@ -22,6 +22,10 @@
 
   <style>
     .tree-item-label{display:block}
+    .v-treeview-node__root:hover {
+      background: #ececec;
+      cursor:pointer;
+    }
   </style>
 
 </head>
@@ -214,6 +218,7 @@
     <?php echo include_once("vue-tree-component.js"); ?>
     <?php echo include_once("vue-tree-field-component.js"); ?>
     <?php echo include_once("vue-table-component.js"); ?>
+    <?php echo include_once("vue-validation-rules-component.js"); ?>
 
     Vue.mixin({
       methods: {}
@@ -313,12 +318,11 @@
           tree: [],
 
           tab: '',
-          enum_columns: [
-            {
-              "key": "value",
-              "title": "Label",
-              "type": "text"
-            }
+          field_types: [
+            "text",
+            "textarea",
+            "dropdown",
+            //"date"
           ]
         }
       },
@@ -350,6 +354,11 @@
             this.$set(this.ActiveNode, "enum", [{}]);
           }
         },
+        DefaultUpdate: function(e) {
+          if (!this.ActiveNode.default) {
+            this.$set(this.ActiveNode, "default", [{}]);
+          }
+        },
         removeField: function() {
           this.delete_tree_item(this.UserTreeItems, this.ActiveNode.key);
           this.ActiveNode = {};
@@ -359,6 +368,9 @@
             return true;
           }
           return false;
+        },
+        isControlField: function(field_type){          
+          return this.field_types.includes(field_type);
         },
         addField: function() {
           if (!this.ActiveCoreNode.key) {

@@ -4,38 +4,98 @@
 <div v-if="ActiveNode.key">
 
 <!--section container fields -->
-<div class="form-group" v-if="ActiveNode.key && coreTemplateParts[ActiveNode.key]">
-    <label for="name">Original label:</label>
-    <div class="text-secondary border p-1 font-small">{{coreTemplateParts[ActiveNode.key].title}}</div>
-</div>
-
 <div class="form-group">
     <label for="name">Custom label:</label>
     <input type="text" class="form-control" id="name" placeholder="Label" v-model="ActiveNode.title">
+    <div v-if="ActiveNode.key && coreTemplateParts[ActiveNode.key]" class="text-secondary font-small" style="margin-top:4px;font-size:small">Original label: {{coreTemplateParts[ActiveNode.key].title}}</div>
 </div>
 
 <div class="form-group form-check" v-if="ActiveNode.type!=='section' &&  ActiveNode.type!=='section_container'">
-    <input type="checkbox" class="form-check-input" id="required">
+    <input type="checkbox" class="form-check-input" id="required" v-model="ActiveNode.required">
     <label class="form-check-label" for="required">Mandatory</label>
 </div>
 
-<div class="form-group" v-if="ActiveNode.key && coreTemplateParts[ActiveNode.key]">
-    <label for="original_description">Original description:</label>
-    <div class="text-secondary border p-1 font-small" style="max-height:150px;">{{coreTemplateParts[ActiveNode.key].help_text}}</div>
-</div>
-
-<div class="form-group" v-if="ActiveNode.key">
+<div class="form-group mb-3" v-if="ActiveNode.key">
     <label >Custom description:</label>
     <textarea style="height:200px;" class="form-control"  v-model="ActiveNode.help_text"></textarea>
-</div>
-
-
-<div class="form-group" v-if="ActiveNode.type!=='section_container' && ActiveNode.type!=='section'">
-    <label for="controlled_vocab">Controlled vocabulary:</label>
-    <div class="border bg-white" style="max-height:300px;overflow:auto;">
-    <table-component @update:value="EnumUpdate" v-model="ActiveNode.enum" :columns="ActiveNodeControlledVocabColumns" class="border m-2 pb-2" />
+    <div class="text-secondary p-1" style="font-size:small;">
+        <div>Original description:</div>
+        <div v-if="coreTemplateParts[ActiveNode.key].help_text">            
+            <div style="white-space: pre-wrap;">{{coreTemplateParts[ActiveNode.key].help_text}}</div>            
+        </div>
+        <div v-else>N/A</div>
     </div>
 </div>
+
+<template v-if="ActiveNode.type!=='section_container' && ActiveNode.type!=='section'">
+    <v-tabs background-color="transparent" class="mb-5">
+        <v-tab v-if="ActiveNode.key && isControlField(ActiveNode.type) == true">Display</v-tab>
+        <v-tab>Controlled vocabulary</v-tab>
+        <v-tab>Default</v-tab>
+        <v-tab v-if="ActiveNode.type!=='array'">Validation rules</v-tab>
+
+        <v-tab-item class="p-3" v-if="ActiveNode.key && isControlField(ActiveNode.type) == true">
+            <!--display-->
+            <div class="form-group">
+                <label >Display:</label>
+                <div class="text-secondary">UI control to use for editing field value</div>
+                <select 
+                    v-model="ActiveNode.type" 
+                    class="form-control form-field-dropdown" >        
+                    <option v-for="field_type in field_types">
+                        {{field_type}}
+                    </option>
+                </select>
+
+                <div v-if="ActiveNode.type=='date'">
+                    <pre>{{ActiveNode}}</pre>
+                </div>
+            </div>
+            <!--end display -->
+        </v-tab-item>
+
+        <v-tab-item class="p-3">
+            <!-- controlled vocab -->
+            <template v-if="ActiveNode.type!=='section_container' && ActiveNode.type!=='section'">
+            <div class="form-group" >
+                <label for="controlled_vocab">Controlled vocabulary:</label>
+                <div class="border bg-white" style="max-height:300px;overflow:auto;">
+                <table-component @update:value="EnumUpdate" v-model="ActiveNode.enum" :columns="ActiveNodeControlledVocabColumns" class="border m-2 pb-2" />
+                </div>
+            </div>
+            </template>
+            <!-- end controlled vocab -->
+        </v-tab-item>
+        <v-tab-item class="p-3">
+            <!-- default -->
+            <template v-if="ActiveNode.type!=='section_container' && ActiveNode.type!=='section'">
+                <div class="form-group" >
+                    <label for="controlled_vocab">Default:</label>
+                    <div class="border bg-white" style="max-height:300px;overflow:auto;" v-if="ActiveNode.type=='array'">
+                        <table-component @update:value="DefaultUpdate" v-model="ActiveNode.default" :columns="ActiveNodeControlledVocabColumns" class="border m-2 pb-2" />
+                    </div>
+                    <div class="border bg-white" v-else>
+                        <div v-if="ActiveNode.type=='text' || ActiveNode.type=='dropdown' ">
+                            <input class="form-control" type="text" v-model="ActiveNode.default"/>
+                        </div>
+                        <div v-else-if="ActiveNode.type=='textarea'">
+                            <textarea class="form-control" style="height:200px;" v-model="ActiveNode.default"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </template>
+            <!-- end default -->
+        </v-tab-item>
+        <v-tab-item class="p-3" v-if="ActiveNode.type!=='array'">
+            <validation-rules-component @update:value="DefaultUpdate" v-model="ActiveNode.default" :columns="ActiveNodeControlledVocabColumns" class="border m-2 pb-2" />
+        </v-tab-item>
+    </v-tabs>
+
+</template>
+
+
+
+
 
 <div class="form-group" v-if="ActiveNode.type=='section'  || ActiveNode.type=='nested_array'">
     <label for="name">Available items:</label>
