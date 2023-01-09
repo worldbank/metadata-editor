@@ -262,8 +262,13 @@
                             "key": "study_desc.production_statement.prod_date",
                             "title": "Date of production",
                             "type": "text",
+                            "type_options":{
+                                "date_format":"YYYY-MM-DD",
+                                "date_parts":true,
+                                "is_utc":false
+                            },
                             "required": false,
-                            "help_text": "Date when the marked-up document.marked-up document source.data collection.other material(s) were produced (not distributed or archived). The ISO standard for dates (YYYY-MM-DD) is recommended for use with the date attribute. Production date for data collection (2.1.3.3) maps to Dublin Core Date element."
+                            "help_text": "Date when the marked-up document source, data collection, other material(s) were produced (not distributed or archived). The ISO standard for dates (YYYY-MM-DD) is recommended for use with the date attribute."
                         },
                         {
                             "key": "study_desc.production_statement.prod_place",

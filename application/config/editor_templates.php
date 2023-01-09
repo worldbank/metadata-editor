@@ -25,22 +25,22 @@ $config['timeseries']=array(
     'lang'=>'en'
 ); 
 
-$config['timeseriesdb']=array(
-    'template' => 'metadata_templates/timeseriesdb-template',
-    'language_translations'=>'fields_timeseriesdb'
+$config['timeseries-db']=array(
+    'template' => 'metadata_editor/metadata_editor_templates/timeseries-db_form_template.json',
+    'lang'=>'en'
 ); 
 
 
 $config['script']=array(
-    'template' => 'metadata_templates/script-template',
-    'language_translations'=>'fields_scripts'
+    'template' => 'metadata_editor/metadata_editor_templates/script_form_template.json',
+    'lang'=>'en'
 ); 
 
 
-//geospatial template/view
+//geospatial
 $config['geospatial']=array(
-        'template' => 'metadata_templates/geospatial-iso19139',
-        'language_translations'=>'iso19139_fields'
+        'template' => 'metadata_editor/metadata_editor_templates/geospatial_form_template.json',
+        'lang'=>'en'
 );
 
 //document
@@ -51,14 +51,14 @@ $config['document']=array(
 
 //table
 $config['table']=array(
-    'template' => 'metadata_templates/table-template',
-    'language_translations'=>'fields_table'
+    'template' => 'metadata_editor/metadata_editor_templates/table_form_template.json',
+    'lang'=>'en'
 ); 
 
 //image
 $config['image']=array(
-    'template' => 'metadata_templates/image-template',
-    'language_translations'=>'fields_image'
+    'template' => 'metadata_editor/metadata_editor_templates/image_form_template.json',
+    'language_translations'=>'en'
 ); 
 
 
@@ -70,6 +70,6 @@ $config['visualization']=array(
 
 //video
 $config['video']=array(
-    'template' => 'metadata_templates/video-template',
-    'language_translations'=>'fields_video'
+    'template' => 'metadata_editor/metadata_editor_templates/video_form_template.json',
+    'language_translations'=>'en'
 ); 

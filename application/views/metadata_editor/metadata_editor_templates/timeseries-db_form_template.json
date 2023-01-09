@@ -4,67 +4,641 @@
     "items":
 [    
     {
-        "type": "section",
-        "id": "database_description",
-        "title": "Database Description",
-        "class": "mandatory recommended",
-        "expanded": true,
+        "type": "section_container",
+        "key": "metadata_information",
+        "title": "Metadata information",
+        "class": "recommended",
         "items": [
             {
-                "key": "database_description.title_statement.idno",
-                "title": "IDNO",
-                "type": "text",
-                "class": "required",
-                "required": true,
-                "rules":"required|idno|alpha_dash|min:5|max:80"
-            },
-            {
-                "key": "database_description.title_statement.title",
-                "type": "text",
-                "class": "name",
-                "title": "Title"
-            },
-            {
-                "key": "database_description.authoring_entity",
-                "title": "Authoring entity",
-                "type": "array",
-                "props": {
-                    "name": {
-                        "key": "name",
-                        "title": "Name",
-                        "type": "text",
-                        "rules":"required",
-                        "name": "Authoring entity name"
+                "type": "section",
+                "key": "metadata_information_section",
+                "title": "Metadata information",
+                "class": "recommended",
+                "items": [
+                    {
+                        "key": "metadata_information.title",
+                        "title": "Document title",
+                        "type": "text"                    
                     },
-                    "role": {
-                        "key": "role",
-                        "title": "Role",
-                        "type": "text",
-                        "name": "role"
+                    {
+                        "key": "metadata_information.idno",
+                        "title": "Document IDNo",
+                        "type": "text"                    
                     },
-                    "affiliation": {
-                        "key": "affiliation",
-                        "title": "Affiliation",
-                        "type": "text",
-                        "name": "affiliation"
+                    {
+                        "key": "metadata_information.producers",
+                        "title": "Producers",
+                        "type": "array",
+                        "props": {
+                            "name": {
+                                "key": "name",
+                                "title": "Name",
+                                "type": "text",
+                                "rules_": "required"
+                            },
+                            "abbr": {
+                                "key": "abbr",
+                                "title": "Abbreviation",
+                                "type": "text"
+                            },
+                            "affiliation": {
+                                "key": "affiliation",
+                                "title": "Affiliation",
+                                "type": "text"
+                            },
+                            "role": {
+                                "key": "role",
+                                "title": "Role",
+                                "type": "text"
+                            }
+                        }
                     },
-                    "abbreviation": { 
-                        "key": "abbreviation",
-                        "title": "Abbreviation",
+                    {
+                        "key": "metadata_information.prod_date",
+                        "title": "Document production date",
                         "type": "text"
                     },
-                    "email": { 
-                        "key": "email",
-                        "title": "Email",
+                    {
+                        "key": "metadata_information.version",
+                        "title": "Document version",
                         "type": "text"
                     }
-                }
+                ]
+            }
+        ]
+    },
+    {
+        "type": "section_container",
+        "key": "database_description",
+        "title": "Database Description",
+        "items": [
+            {
+                "type": "section",
+                "key": "database_description_titlestatement",
+                "title": "Title statement",
+                "items": [
+                    {
+                        "key": "database_description.title_statement.idno",
+                        "title": "IDNO",
+                        "type": "text",
+                        "class": "required",
+                        "required": true,
+                        "rules":"required|alpha_dash|min:5"
+                    },
+                    {
+                        "key": "database_description.identifiers",
+                        "title": "Other Identifiers",
+                        "type": "array",
+                        "help_text": "Identifiers such as ISSN, ISBN, DOI",
+                        "props": {
+                            "type": {
+                                "key": "type",
+                                "title": "ID Type",
+                                "type": "text",
+                                "help_text": "Identifiers such as ISSN, ISBN, DOI"
+                            },
+                            "identifier": {
+                                "key": "identifier",
+                                "title": "Identifier",
+                                "type": "text"
+                            }
+                        }
+                    },
+                    {
+                        "key": "database_description.title_statement.title",
+                        "type": "text",
+                        "title": "Title"
+                    },
+                    {
+                        "key": "database_description.title_statement.sub_title",
+                        "type": "text",
+                        "title": "Subtitle"
+                    },
+                    {
+                        "key": "database_description.title_statement.alternate_title",
+                        "type": "text",
+                        "title": "Alternate title"
+                    },
+                    {
+                        "key": "database_description.title_statement.translated_title",
+                        "type": "text",
+                        "title": "Translated title"
+                    }                 
+                ]
             },
             {
-                "key": "database_description.abstract",
-                "type": "text",
-                "title": "Abstract"
+                "type": "section",
+                "key": "database_description_overview",
+                "title": "Description",
+                "items": [
+                    {
+                        "key": "database_description.authoring_entity",
+                        "title": "Authoring entity",
+                        "type": "array",
+                        "props": {
+                            "name": {
+                                "key": "name",
+                                "title": "Name",
+                                "type": "text"
+                            },
+                            "role": {
+                                "key": "role",
+                                "title": "Role",
+                                "type": "text",
+                                "name": "role"
+                            },
+                            "affiliation": {
+                                "key": "affiliation",
+                                "title": "Affiliation",
+                                "type": "text",
+                                "name": "affiliation"
+                            },
+                            "abbreviation": { 
+                                "key": "abbreviation",
+                                "title": "Abbreviation",
+                                "type": "text"
+                            },
+                            "email": { 
+                                "key": "email",
+                                "title": "Email",
+                                "type": "text"
+                            }
+                        }
+                    },
+                    {
+                        "key": "database_description.abstract",
+                        "type": "textarea",
+                        "title": "Abstract"
+                    },
+                    {
+                        "key": "database_description.url",
+                        "type": "text",
+                        "title": "Dataset URL"
+                    },
+                    {
+                        "key": "database_description.type",
+                        "type": "text",
+                        "title": "Dataset type"
+                    },
+                    {
+                        "key": "database_description.doi",
+                        "type": "text",
+                        "title": "DOI"
+                    },
+                    {
+                        "key": "database_description.date_created",
+                        "type": "text",
+                        "title": "Date created"
+                    },
+                    {
+                        "key": "database_description.date_published",
+                        "type": "text",
+                        "title": "Date published"
+                    },
+                    {
+                        "key": "database_description.version",
+                        "title": "Version",
+                        "type": "array",
+                        "props": {
+                            "version": {
+                                "key": "version",
+                                "title": "Version",
+                                "type": "text"                                
+                            },
+                            "date": {
+                                "key": "date",
+                                "title": "Date",
+                                "type": "text"                                
+                            },
+                            "responsibility": {
+                                "key": "responsibility",
+                                "title": "Responsibility",
+                                "type": "text"                                
+                            },
+                            "notes": {
+                                "key": "notes",
+                                "title": "Notes",
+                                "type": "text"                                
+                            }                            
+                        }
+                    },
+                    {
+                        "key": "database_description.update_frequency",
+                        "type": "text",
+                        "title": "Update frequency"
+                    },
+                    {
+                        "key": "database_description.update_schedule",
+                        "title": "Update schedule",
+                        "type": "array",
+                        "props": {
+                            "update": {
+                                "key": "update",
+                                "title": "Date (YYYY-MM-DD)",
+                                "type": "text"                                
+                            }                            
+                        }
+                    },
+                    {
+                        "key": "database_description.time_coverage",
+                        "title": "Time coverage",
+                        "type": "array",
+                        "props": {
+                            "start": {
+                                "key": "start",
+                                "title": "Start (YYYY-MM-DD)",
+                                "type": "text"                                
+                            },
+                            "end": {
+                                "key": "end",
+                                "title": "End (YYYY-MM-DD)",
+                                "type": "text"                                
+                            }                            
+                        }
+                    },
+                    {
+                        "key": "database_description.time_coverage_note",
+                        "type": "textarea",
+                        "title": "Time coverage note"
+                    },
+                    {
+                        "key": "database_description.periodicity",
+                        "title": "Periodicity",
+                        "type": "array",
+                        "props": {
+                            "period": {
+                                "key": "period",
+                                "title": "Period",
+                                "type": "text"                                
+                            }                            
+                        }
+                    },
+                    {
+                        "key": "database_description.themes",
+                        "type": "array",
+                        "title": "Themes",
+                        "props": {
+                            "name": {
+                                "key": "name",
+                                "title": "Theme",
+                                "type": "text"
+                            },
+                            "vocabulary": {
+                                "key": "vocabulary",
+                                "title": "Vocabulary",
+                                "type": "text"
+                            },
+                            "uri": {
+                                "key": "uri",
+                                "title": "URL",
+                                "type": "text"
+                            }
+                        }
+                    },
+                    {
+                        "key": "database_description.topics",
+                        "type": "array",
+                        "title": "Topics",
+                        "props": {
+                            "id": {
+                                "key": "id",
+                                "title": "ID",
+                                "type": "text"
+                            },
+                            "name": {
+                                "key": "name",
+                                "title": "Topic",
+                                "type": "text"
+                            },
+                            "parent_id": {
+                                "key": "parent_id",
+                                "title": "Parent topic Identifier",
+                                "help_text": "For subtopics, provide the ID of the parent topic",
+                                "type": "text"
+                            },
+                            "vocabulary": {
+                                "key": "vocabulary",
+                                "title": "Vocabulary",
+                                "type": "text"
+                            },
+                            "uri": {
+                                "key": "uri",
+                                "title": "URL",
+                                "type": "text"
+                            }
+                        }
+                    },
+                    {
+                        "key": "database_description.keywords",
+                        "type": "array",
+                        "title": "Keywords",
+                        "props": {
+                            "name": {
+                                "key": "name",
+                                "title": "Keyword",
+                                "type": "text"
+                            },
+                            "vocabulary": {
+                                "key": "vocabulary",
+                                "title": "Vocabulary",
+                                "type": "text"
+                            },
+                            "uri": {
+                                "key": "uri",
+                                "title": "URL",
+                                "type": "text"
+                            }
+                        }
+                    },
+                    {
+                        "key": "database_description.ref_country",
+                        "type": "array",
+                        "title": "Reference country",
+                        "props": {
+                            "name": {
+                                "key": "name",
+                                "title": "Country name",
+                                "type": "text"
+                            },
+                            "code": {
+                                "key": "code",
+                                "title": "Country code",
+                                "type": "text"
+                            }
+                        }
+                    },
+                    {
+                        "key": "database_description.geographic_units",
+                        "type": "array",
+                        "title": "Geographic locations",
+                        "help_text": "List of geographic units (regions, countries, states, provinces, etc.) for which data are available in the database.",
+                        "props": {
+                            "name": {
+                                "key": "name",
+                                "title": "Location name",
+                                "help_text": "Name of the geographic unit e.g. 'World', 'Africa', 'Afghanistan'",
+                                "type": "text"
+                            },
+                            "code": {
+                                "key": "code",
+                                "title": "Location code",
+                                "help_text": "Code of the geographic unit (for countries, preferred = ISO3 code)",
+                                "type": "text"
+                            },
+                            "type": {
+                                "key": "type",
+                                "title": "Type",
+                                "help_text": "Type of geographic unit e.g. country, state, region, province etc",
+                                "type": "text"
+                            }
+                        }
+                    },
+                    {
+                        "key": "database_description.geographic_coverage_note",
+                        "type": "textarea",
+                        "title": "Geographic coverage note"
+                    },
+                    {
+                        "key": "database_description.bbox",
+                        "title": "Geographic bounding box",
+                        "type": "array",
+                        "props": {
+                            "west": {
+                                "key": "west",
+                                "title": "West",
+                                "type": "text"
+                            },
+                            "east": {
+                                "key": "east",
+                                "title": "East",
+                                "type": "text"
+                            },
+                            "south": {
+                                "key": "south",
+                                "title": "South",
+                                "type": "text"
+                            },
+                            "north": {
+                                "key": "north",
+                                "title": "North",
+                                "type": "text"
+                            }
+                        }
+                    },
+                    {
+                        "key": "database_description.geographic_granularity",
+                        "type": "text",
+                        "title": "Geographic granularity"
+                    },
+                    {
+                        "key": "database_description.geographic_area_count",
+                        "type": "text",
+                        "title": "Geographic area count"
+                    },
+                    {
+                        "key": "database_description.sponsors",
+                        "title": "Sponsors",
+                        "help_text": "Sponsors",
+                        "type": "array",
+                        "props": {
+                            "name": {
+                                "key": "name",
+                                "title": "Name",
+                                "type": "text",
+                                "help_text": "name"
+                            },                                
+                            "abbr": {
+                                "key": "abbr",
+                                "title": "Abbreviation",
+                                "type": "text"
+                            },
+                            "grant": {
+                                "key": "grant",
+                                "title": "Grant",
+                                "type": "text"
+                            },
+                            "role": {
+                                "key": "role",
+                                "title": "Role",
+                                "type": "text",
+                                "help_text": "Role"
+                            }								
+                        }
+                    },
+                    {
+                        "key": "database_description.acknowledgments",
+                        "title": "Acknowledgments",
+                        "type": "array",
+                        "props": {
+                            "name": {
+                                "key": "name",
+                                "title": "Name",
+                                "type": "text",
+                                "help_text": "name"
+                            },                                
+                            "affiliation": {
+                                "key": "affiliation",
+                                "title": "Affiliation",
+                                "type": "text"
+                            },                            
+                            "role": {
+                                "key": "role",
+                                "title": "Role",
+                                "type": "text",
+                                "help_text": "Role"
+                            },
+                            "uri": {
+                                "key": "uri",
+                                "title": "URI",
+                                "type": "text"
+                            }								
+                        }
+                    },
+                    {
+                        "key": "database_description.acknowledgment_statement",
+                        "type": "textarea",
+                        "title": "Acknowledgment statement"
+                    },
+                    {
+                        "key": "database_description.contacts",
+                        "title": "Contacts",
+                        "type": "array",
+                        "props": {
+                            "name": {
+                                "key": "name",
+                                "title": "Name",
+                                "type": "string"
+                            },
+                            "role": {
+                                "key": "role",
+                                "title": "Role",
+                                "type": "string"
+                            },
+                            "affiliation": {
+                                "key": "affiliation",
+                                "title": "Affiliation",
+                                "type": "string"
+                            },
+                            "email": {
+                                "key": "email",
+                                "title": "Email",
+                                "type": "string"
+                            },
+                            "telephone": {
+                                "key": "telephone",
+                                "title": "Phone",
+                                "type": "string"
+                            },
+                            "uri": {
+                                "key": "uri",
+                                "title": "URI",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "key": "database_description.links",
+                        "title": "Links",
+                        "type": "array",
+                        "props": {                            
+                            "uri": {
+                                "key": "uri",
+                                "title": "URI",
+                                "type": "string"
+                            },
+                            "descriptino": {
+                                "key": "description",
+                                "title": "Description",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    {
+                        "key": "database_description.languages",
+                        "type": "array",
+                        "title": "Languages",
+                        "props": {
+                            "name": {
+                                "key": "name",
+                                "title": "Name",
+                                "type": "text"
+                            },
+                            "code": {
+                                "key": "code",
+                                "title": "Code",
+                                "type": "text"
+                            }
+                        }
+                    },
+                    {
+                        "key": "database_description.access_options",
+                        "type": "array",
+                        "title": "Access options",
+                        "props": {
+                            "type": {
+                                "key": "type",
+                                "title": "Type",
+                                "type": "text"
+                            },
+                            "uri": {
+                                "key": "uri",
+                                "title": "URI",
+                                "type": "string"
+                            },
+                            "note": {
+                                "key": "note",
+                                "title": "Note",
+                                "type": "text"
+                            }
+                        }
+                    },
+                    {
+                        "key": "database_description.license",
+                        "title": "License",
+                        "type": "array",
+                        "props": {
+                            "name": {
+                                "key": "name",
+                                "title": "Name",
+                                "type": "text"
+                            },
+                            "uri": {
+                                "key": "uri",
+                                "title": "URI",
+                                "type": "text"
+                            }
+                        }
+                    },
+                    {
+                        "key": "database_description.citation",
+                        "type": "textarea",
+                        "title": "Citation"
+                    },
+                    {
+                        "key": "database_description.notes",
+                        "title": "Notes",
+                        "type": "array",
+                        "props": {
+                            "note": {
+                                "key": "note",
+                                "title": "Note",
+                                "type": "text"
+                            }
+                        }
+                    },
+                    {
+                        "key": "database_description.disclaimer",
+                        "type": "textarea",
+                        "title": "Disclaimer"
+                    },
+                    {
+                        "key": "database_description.copyright",
+                        "type": "textarea",
+                        "title": "Copyright"
+                    }
+                ]
             }
+            
             
             
 

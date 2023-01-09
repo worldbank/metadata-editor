@@ -160,10 +160,10 @@ class Editor extends MY_REST_Controller
 	 */
 	function create_post($type=null)
 	{
-		if($type=='timeseries-db' || $type=='timeseriesdb'){
+		/*if($type=='timeseries-db' || $type=='timeseriesdb'){
 			throw new Exception("NOT IMPLEMENTED YET");
 			//return $this->create_timeseries_database($idno);
-		}
+		}*/
 
 		try{
 			//$options=$this->raw_json_input();
@@ -240,10 +240,10 @@ class Editor extends MY_REST_Controller
 	 */
 	function update_post($type=null,$id=null,$validate=false)
 	{
-		if($type=='timeseries-db' || $type=='timeseriesdb'){
+		/*if($type=='timeseries-db' || $type=='timeseriesdb'){
 			//return $this->update_timeseries_database($idno);
 			throw new Exception("NOT IMPLEMENTED YET");
-		}
+		}*/
 
 		try{			
 			$options=$this->raw_json_input();
@@ -858,6 +858,13 @@ class Editor extends MY_REST_Controller
 			);
 
 			$this->set_response($output, REST_Controller::HTTP_OK);			
+		}
+		catch(ValidationException $e){
+			$error_output=array(
+				'message'=>'VALIDATION_ERROR',
+				'errors'=>$e->GetValidationErrors()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}
 		catch(Exception $e){
 			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);

@@ -1,825 +1,33 @@
 {
     "type": "template",
     "title": "Timeseries project",
-    "items":
-[
-    {
-        "type": "section_container",
-        "key": "series_description_container",
-        "title": "Series Description",
-        "class": "mandatory recommended",
-        "expanded": true,
-        "items": [
-            {
-                "type": "section",
-                "key": "series_description",
-                "title": "Description",
-                "class": "mandatory recommended",
-                "expanded": true,
-                "items": [
-                    {
-                        "key": "series_description.idno",
-                        "title": "IDNO",
-                        "type": "text",
-                        "class": "required",
-                        "required": true,
-                        "rules_":"required|alpha_dash|min:5|max:80"
-                    },
-                    {
-                        "key": "series_description.doi",
-                        "title": "DOI handle",
-                        "type": "text"
-                    },
-                    {
-                        "key": "series_description.name",
-                        "type": "text",
-                        "class": "name",
-                        "title": "Series name"
-                    },
-                    {
-                        "key": "series_description.database_id",
-                        "type": "text",
-                        "class": "database_id",
-                        "title": "Database ID"
-                    },            
-                    {
-                        "key": "series_description.aliases",
-                        "title": "Aliases",
-                        "type": "array",
-                        "props": {
-                            "tag": {
-                                "key": "alias",
-                                "title": "Alias",
-                                "type": "string"
-                            }
-                        }
-                    },
-                    {
-                        "key": "series_description.alternate_identifiers",
-                        "title": "Alternate identifiers",
-                        "type": "array",
-                        "props": {
-                            "identifier": {
-                                "key": "identifier",
-                                "title": "Identifier",
-                                "type": "text",                                
-                                "name": "Identifier"
-                            },
-                            "name": {
-                                "key": "name",
-                                "title": "Name",
-                                "type": "text",                                
-                                "name": "Country name"
-                            },
-                            "database": {
-                                "key": "database",
-                                "title": "Database",
-                                "type": "text"
-                            },
-                            "uri": {
-                                "key": "uri",
-                                "title": "URI",
-                                "type": "text"
-                            },
-                            "notes": {
-                                "key": "notes",
-                                "title": "Notes",
-                                "type": "text"
-                            }
-                        }
-                    },
-                    {
-                        "key": "series_description.languages",
-                        "title": "Supported languages",
-                        "type": "array",
-                        "props": {
-                            "name": {
-                                "key": "name",
-                                "title": "Name",
-                                "type": "text"                                
-                            },
-                            "code": {
-                                "key": "code",
-                                "title": "Code",
-                                "type": "text"
-                            }
-                        }
-                    },
-                    {
-                        "key": "series_description.measurement_unit",
-                        "type": "text",
-                        "class": "measurement_unit",
-                        "title": "Measurement unit"
-                    },
-                    {
-                        "key": "series_description.dimensions",
-                        "title": "Dimensions",
-                        "type": "array",
-                        "props": {
-                            "label": {
-                                "key": "label",
-                                "title": "Label",
-                                "type": "text"                                
-                            },
-                            "description": {
-                                "key": "description",
-                                "title": "Description",
-                                "type": "text"
-                            }
-                        }
-                    },
-                    {
-                        "key": "series_description.periodicity",
-                        "type": "text",
-                        "class": "periodicity",
-                        "title": "Periodicity of data"
-                    },
-                    {
-                        "key": "series_description.base_period",
-                        "type": "text",
-                        "class": "base_period",
-                        "title": "Base period"
-                    },
-                    {
-                        "key": "series_description.definition_short",
-                        "type": "text",
-                        "class": "definition_short",
-                        "title": "Definition short"
-                    },
-                    {
-                        "key": "series_description.definition_long",
-                        "type": "text",
-                        "class": "definition_long",
-                        "title": "Definition long"
-                    },
-                    {
-                        "key": "series_description.definition_references",
-                        "title": "Definition references",
-                        "type": "array",
-                        "props": {
-                            "source": {
-                                "key": "source",
-                                "title": "Source",
-                                "type": "text",
-                                "name": "Source"
-                            },
-                            "uri": {
-                                "key": "uri",
-                                "title": "URI",
-                                "type": "text",
-                                "rules_":"required"
-                            },
-                            "note": {
-                                "key": "note",
-                                "title": "Note",
-                                "type": "text"
-                            }
-                        }
-                    },
-                    {
-                        "key": "series_description.statistical_concept",
-                        "type": "text",
-                        "class": "statistical_concept",
-                        "title": "Statistical concept"
-                    },
-                    {
-                        "key": "series_description.concepts",
-                        "title": "Related concepts",
-                        "type": "array",
-                        "props": {
-                            "name": {
-                                "key": "name",
-                                "title": "Name",
-                                "type": "text",
-                                "name": "Concept name",
-                                "rules_":"required"
-                            },
-                            "definition": {
-                                "key": "definition",
-                                "title": "Definition",
-                                "type": "text"
-                            },
-                            "uri": {
-                                "key": "uri",
-                                "title": "URI",
-                                "type": "text"                        
-                            }                    
-                        }
-                    },
-                    {
-                        "key": "series_description.methodology",
-                        "type": "text",
-                        "class": "methodology",
-                        "title": "Methodology"
-                    },
-                    {
-                        "key": "series_description.imputation",
-                        "type": "text",
-                        "class": "imputation",
-                        "title": "Imputation"
-                    },
-                    {
-                        "key": "series_description.missing",
-                        "type": "text",
-                        "class": "missing",
-                        "title": "Missing"
-                    },
-                    {
-                        "key": "series_description.quality_checks",
-                        "type": "text",
-                        "title": "Quality checks"
-                    },
-                    {
-                        "key": "series_description.quality_note",
-                        "type": "textarea",
-                        "title": "Quality notes"
-                    },
-                    {
-                        "key": "series_description.sources_discrepancies",
-                        "type": "textarea",
-                        "title": "Discrepency sources"
-                    },
-                    {
-                        "key": "series_description.series_break",
-                        "type": "text",
-                        "title": "Breaks in series"
-                    },
-                    {
-                        "key": "series_description.limitation",
-                        "type": "textarea",
-                        "title": "Limitations and exceptions"
-                    },
-                    {
-                        "key": "series_description.themes",
-                        "title": "Themes",
-                        "type": "array",
-                        "props": {
-                            "name": {
-                                "key": "name",
-                                "title": "Name",
-                                "type": "text",
-                                "name": "Theme name",
-                                "rules_":"required"
-                            },
-                            "vocabulary": {
-                                "key": "vocabulary",
-                                "title": "Vocabulary",
-                                "type": "text"
-                            },
-                            "uri": {
-                                "key": "uri",
-                                "title": "URI",
-                                "type": "text"                        
-                            }                    
-                        }
-                    },
-                    {
-                        "key": "series_description.topics",
-                        "title": "Topics",
-                        "type": "array",
-                        "props": {
-                            "id": {
-                                "key": "id",
-                                "title": "Unique Identifier",
-                                "type": "text",
-                                "rules_":"required"
-                            }, 
-                            "name": {
-                                "key": "name",
-                                "title": "Name",
-                                "type": "text",
-                                "name": "Topic name",
-                                "rules_":"required"
-                            },
-                            "parent_id": {
-                                "key": "parent_id",
-                                "title": "Parent topic identifier",
-                                "type": "text",
-                                "help_text": "For subtopics, provide the ID of the parent topic"
-                            }, 
-                            "vocabulary": {
-                                "key": "vocabulary",
-                                "title": "Vocabulary",
-                                "type": "text"
-                            },
-                            "uri": {
-                                "key": "uri",
-                                "title": "URI",
-                                "type": "text"                        
-                            }                    
-                        }
-                    },
-                    {
-                        "key": "series_description.disciplines",
-                        "title": "Disciplines",
-                        "type": "array",
-                        "help_text": "Disciplines e.g. Social sciences, economics, Natural sciences, biology",
-                        "props": {
-                            "name": {
-                                "key": "name",
-                                "title": "Name",
-                                "type": "text",
-                                "name": "Discipline name",
-                                "rules_":"required"
-                            },
-                            "vocabulary": {
-                                "key": "vocabulary",
-                                "title": "Vocabulary",
-                                "type": "text"
-                            },
-                            "uri": {
-                                "key": "uri",
-                                "title": "URI",
-                                "type": "text"                        
-                            }                    
-                        }
-                    },
-                    {
-                        "key": "series_description.relevance",
-                        "type": "text",
-                        "title": "Relevance"
-                    },
-                    {
-                        "key": "series_description.time_periods",
-                        "title": "Time periods",
-                        "type": "array",
-                        "props": {
-                            "start": {
-                                "key": "start",
-                                "title": "Start",
-                                "type": "text",
-                                "name": "time_periods.start",
-                                "rules_":"required"
-                            },
-                            "end": {
-                                "key": "end",
-                                "title": "End",
-                                "type": "text"
-                            }                    
-                        }
-                    },
-                    {
-                        "key": "series_description.ref_country",
-                        "title": "Reference countries",
-                        "help_text": "List of countries for which data are available",
-                        "type": "array",
-                        "props": {
-                            "name": {
-                                "key": "name",
-                                "title": "Name",
-                                "type": "text"                                
-                            },
-                            "code": {
-                                "key": "code",
-                                "title": "Code",
-                                "type": "text"
-                            }
-                        }
-                    },
-                    {
-                        "key": "series_description.geographic_units",
-                        "title": "Geographic units",
-                        "type": "array",
-                        "props": {
-                            "name": {
-                                "key": "name",
-                                "title": "Name",
-                                "type": "text",
-                                "name": "Geographic unit name",
-                                "rules_":"required"
-                            },
-                            "code": {
-                                "key": "code",
-                                "title": "Code",
-                                "type": "text"
-                            },
-                            "type": {
-                                "key": "type",
-                                "title": "Type (country, state, region, province)",
-                                "type": "text"
-                            }
-                        }
-                    },
-                    {
-                        "key": "series_description.bbox",
-                        "title": "Geographic bounding box",                        
-                        "type": "array",
-                        "props": {
-                            "west": {
-                                "key": "west",
-                                "title": "West",
-                                "type": "text"                                
-                            },
-                            "east": {
-                                "key": "east",
-                                "title": "East",
-                                "type": "text"
-                            },
-                            "south": {
-                                "key": "south",
-                                "title": "South",
-                                "type": "text"
-                            },
-                            "north": {
-                                "key": "north",
-                                "title": "North",
-                                "type": "text"
-                            }
-                        }
-                    },
-                    {
-                        "key": "series_description.aggregation_method",
-                        "type": "text",
-                        "title": "Aggregation method"
-                    },
-                    {
-                        "key": "series_description.disaggregation",
-                        "type": "text",
-                        "title": "Disaggregation"
-                    },
-                    
-        
-                    {
-                        "type": "section",
-                        "key": "series_description.license",
-                        "title": "License",
-                        "items": [
-                            {
-                                "key": "series_description.license.name",
-                                "title": "License",
-                                "type": "text"
-                            },
-                            {
-                                "key": "series_description.license.uri",
-                                "title": "URI",
-                                "type": "text"
-                            }
-                            
-                        ]
-                    },
-        
-        
-                    {
-                        "key": "series_description.confidentiality",
-                        "type": "text",
-                        "title": "Confidentiality statement"
-                    },
-                    {
-                        "key": "series_description.confidentiality_status",
-                        "type": "text",
-                        "title": "Confidentiality status"
-                    },
-                    {
-                        "key": "series_description.confidentiality_note",
-                        "type": "text",
-                        "title": "Confidentiality note"
-                    },
-                    {
-                        "key": "series_description.links",
-                        "title": "Links to APIs, Websites, etc",
-                        "type": "array",
-                        "props": {
-                            "uri": {
-                                "key": "uri",
-                                "title": "URI",
-                                "type": "text",
-                                "rules_":"required"
-                            },
-                            "type": {
-                                "key": "type",
-                                "title": "Link type (api, website)",
-                                "type": "text",
-                                "name": "Link type"
-                            },                    
-                            "description": {
-                                "key": "description",
-                                "title": "Description",
-                                "type": "text"
-                            }
-                        }
-                    },
-                    {
-                        "key": "series_description.api_documentation",
-                        "title": "API documentation",
-                        "type": "array",
-                        "props": {
-                            "description": {
-                                "key": "description",
-                                "title": "Description",
-                                "type": "text"
-                            },
-                            "uri": {
-                                "key": "uri",
-                                "title": "URI",
-                                "type": "text",
-                                "rules_":"required"
-                            }                                                
-                        }
-                    },
-                    {
-                        "key": "series_description.authoring_entity",
-                        "title": "Authoring entity",
-                        "type": "array",
-                        "props": {
-                            "name": {
-                                "key": "name",
-                                "title": "Name",
-                                "type": "text"
-                            },
-                            "affiliation": {
-                                "key": "affiliation",
-                                "title": "Affiliation",
-                                "type": "text"
-                            },
-                            "abbreviation": {
-                                "key": "abbreviation",
-                                "title": "Abbreviation",
-                                "type": "text"
-                            },  
-                            "email": {
-                                "key": "email",
-                                "title": "Email",
-                                "type": "text"
-                            },                          
-                            "uri": {
-                                "key": "uri",
-                                "title": "URI",
-                                "type": "text"
-                            }                                               
-                        }
-                    },
-                    {
-                        "key": "series_description.sources",
-                        "title": "Sources",
-                        "type": "array",
-                        "props": {
-                            "id": {
-                                "key": "id",
-                                "title": "ID",
-                                "type": "text"                        
-                            },
-                            "name": {
-                                "key": "name",
-                                "title": "Source name",
-                                "type": "text",
-                                "name": "Source name",
-                                "rules_":"required"
-                            },
-                            "organization": {
-                                "key": "organization",
-                                "title": "Organization",
-                                "type": "text"
-                            },
-                            "type": {
-                                "key": "type",
-                                "title": "Link type (api, website)",
-                                "type": "text",
-                                "name": "Link type"
-                            },                    
-                            "note": {
-                                "key": "note",
-                                "title": "Notes",
-                                "type": "text"
-                            }
-                        }
-                    },
-                    {
-                        "key": "series_description.sources_note",
-                        "type": "text",
-                        "title": "Notes from original source"
-                    },
-                    {
-                        "key": "series_description.keywords",
-                        "title": "Keywords",
-                        "type": "array",
-                        "props": {
-                            "name": {
-                                "key": "name",
-                                "title": "Source name",
-                                "type": "text",
-                                "name": "Source name",
-                                "rules_":"required"
-                            },
-                            "vocabulary": {
-                                "key": "vocabulary",
-                                "title": "Vocabulary",
-                                "type": "text"
-                            },
-                            "uri": {
-                                "key": "uri",
-                                "title": "URI",
-                                "type": "text"
-                            }
-                        }
-                    },
-                    {
-                        "key": "series_description.acronyms",
-                        "title": "Acronyms",
-                        "type": "array",
-                        "props": {
-                            "acronym": {
-                                "key": "acronym",
-                                "title": "Acronym/Abbreviation",
-                                "type": "text",
-                                "name": "Acronym",
-                                "rules_":"required"
-                            },
-                            "expansion": {
-                                "key": "expansion",
-                                "title": "Acronym expansion",
-                                "type": "text",
-                                "rules_":"required"
-                            },
-                            "occurence": {
-                                "key": "occurence",
-                                "title": "Number of occurence",
-                                "type": "text"
-                            }
-                        }
-                    },
-                    {
-                        "key": "series_description.notes",
-                        "title": "Notes",
-                        "type": "array",
-                        "props": {                   
-                            "note": {
-                                "key": "note",
-                                "title": "Note",
-                                "type": "text"
-                            }
-                        }
-                    },
-                    {
-                        "key": "series_description.related_indicators",
-                        "title": "Related indicators",
-                        "type": "array",
-                        "props": {
-                            "code": {
-                                "key": "code",
-                                "title": "Code",
-                                "type": "text"
-                            },
-                            "label": {
-                                "key": "label",
-                                "title": "Indicator name",
-                                "type": "text"
-                            },
-                            "uri": {
-                                "key": "uri",
-                                "title": "URI",
-                                "type": "text"
-                            }
-                        }
-                    },
-                    {
-                        "key": "series_description.compliance",
-                        "title": "Compliance with international resolution",
-                        "type": "array",
-                        "props": {
-                            "standard": {
-                                "key": "standard",
-                                "title": "Standard name",
-                                "type": "text",
-                                "rules_":"required"
-                            },
-                            "organization": {
-                                "key": "organization",
-                                "title": "Organization",
-                                "type": "text"
-                            },
-                            "uri": {
-                                "key": "uri",
-                                "title": "URI",
-                                "type": "text"
-                            }
-                        }
-                    },
-                    {
-                        "key": "series_description.framework",
-                        "title": "Framework",
-                        "type": "array",
-                        "props": {
-                            "name": {
-                                "key": "name",
-                                "title": "Name",
-                                "type": "text"
-                            },
-                            "abbreviation": {
-                                "key": "abbreviation",
-                                "title": "Abbreviation",
-                                "type": "text"
-                            },
-                            "custodian": {
-                                "key": "custodian",
-                                "title": "Custodian",
-                                "type": "text"
-                            },
-                            "description": {
-                                "key": "description",
-                                "title": "Description",
-                                "type": "text"
-                            },
-                            "goal_id": {
-                                "key": "goal_id",
-                                "title": "Goal ID",
-                                "type": "text"
-                            },
-                            "goal_name": {
-                                "key": "goal_name",
-                                "title": "Goal name",
-                                "type": "text"
-                            },
-                            "goal_description": {
-                                "key": "goal_description",
-                                "title": "Goal description",
-                                "type": "text"
-                            },
-                            "target_id": {
-                                "key": "target_id",
-                                "title": "Target ID",
-                                "type": "text"
-                            },
-                            "target_name": {
-                                "key": "target_name",
-                                "title": "Target name",
-                                "type": "text"
-                            },
-                            "target_description": {
-                                "key": "target_description",
-                                "title": "Target description",
-                                "type": "text"
-                            },
-                            "indicator_id": {
-                                "key": "indicator_id",
-                                "title": "Indicator ID",
-                                "type": "text"
-                            },
-                            "indicator_name": {
-                                "key": "indicator_name",
-                                "title": "Indicator name",
-                                "type": "text"
-                            },
-                            "indicator_description": {
-                                "key": "indicator_description",
-                                "title": "Indicator description",
-                                "type": "text"
-                            },
-                            "uri": {
-                                "key": "uri",
-                                "title": "URI",
-                                "type": "text"
-                            },
-                            "notes": {
-                                "key": "notes",
-                                "title": "Notes",
-                                "type": "text"
-                            }
-                        }
-                    },
-                    {
-                        "key": "series_description.series_groups",
-                        "title": "Series included in groups",
-                        "type": "array",
-                        "props": {
-                            "name": {
-                                "key": "name",
-                                "title": "Name",
-                                "type": "text",
-                                "rules_":"required"
-                            },
-                            "version": {
-                                "key": "version",
-                                "title": "Version",
-                                "type": "text"
-                            },
-                            "uri": {
-                                "key": "uri",
-                                "title": "URI",
-                                "type": "text"
-                            }
-                        }
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "type": "section_container",
-        "key": "metadata_creation",
-        "title": "Metadata creation",
-        "class": "recommended",                
+    "items": [
+        {
+            "type": "section_container",
+            "key": "metadata_information",
+            "title": "Metadata information",
+            "class": "recommended",
             "items": [
                 {
-                    "key": "metadata_creation.producers",
+                    "key": "metadata_information.title",
+                    "title": "Document title",
+                    "type": "text"                    
+                },
+                {
+                    "key": "metadata_information.idno",
+                    "title": "Document IDNo",
+                    "type": "text"                    
+                },
+                {
+                    "key": "metadata_information.producers",
                     "title": "Producers",
-                    "type": "array",                    
+                    "type": "array",
                     "props": {
                         "name": {
                             "key": "name",
                             "title": "Name",
                             "type": "text",
-                            "rules_":"required",
-                            "name": "Producer name"
+                            "rules_": "required"
                         },
                         "abbr": {
                             "key": "abbr",
@@ -839,20 +47,812 @@
                     }
                 },
                 {
-                    "key": "metadata_creation.prod_date",
+                    "key": "metadata_information.prod_date",
                     "title": "Document production date",
-                    "type": "text",
-                    "name": "prod_date"
+                    "type": "text"
                 },
                 {
-                    "key": "metadata_creation.version",
+                    "key": "metadata_information.version",
                     "title": "Document version",
-                    "type": "text",
-                    "name": "version"
+                    "type": "text"
                 }
-                
-            ]          
+            ]
         },
+        {
+            "type": "section_container",
+            "key": "series_description_container",
+            "title": "Series Description",
+            "class": "mandatory recommended",
+            "expanded": true,
+            "items": [
+                {
+                    "type": "section",
+                    "key": "series_description",
+                    "title": "Description",
+                    "class": "mandatory recommended",
+                    "expanded": true,
+                    "items": [
+                        {
+                            "key": "series_description.idno",
+                            "title": "IDNO",
+                            "type": "text",
+                            "class": "required",
+                            "required": true,
+                            "rules_": "required|alpha_dash|min:5|max:80"
+                        },
+                        {
+                            "key": "series_description.doi",
+                            "title": "DOI handle",
+                            "type": "text"
+                        },
+                        {
+                            "key": "series_description.name",
+                            "type": "text",
+                            "class": "name",
+                            "title": "Series name"
+                        },
+                        {
+                            "key": "series_description.database_id",
+                            "type": "text",
+                            "class": "database_id",
+                            "title": "Database ID"
+                        },
+                        {
+                            "key": "series_description.aliases",
+                            "title": "Aliases",
+                            "type": "array",
+                            "props": {
+                                "tag": {
+                                    "key": "alias",
+                                    "title": "Alias",
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        {
+                            "key": "series_description.alternate_identifiers",
+                            "title": "Alternate identifiers",
+                            "type": "array",
+                            "props": {
+                                "identifier": {
+                                    "key": "identifier",
+                                    "title": "Identifier",
+                                    "type": "text",
+                                    "name": "Identifier"
+                                },
+                                "name": {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text",
+                                    "name": "Country name"
+                                },
+                                "database": {
+                                    "key": "database",
+                                    "title": "Database",
+                                    "type": "text"
+                                },
+                                "uri": {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "text"
+                                },
+                                "notes": {
+                                    "key": "notes",
+                                    "title": "Notes",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "series_description.languages",
+                            "title": "Supported languages",
+                            "type": "array",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text"
+                                },
+                                "code": {
+                                    "key": "code",
+                                    "title": "Code",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "series_description.measurement_unit",
+                            "type": "text",
+                            "class": "measurement_unit",
+                            "title": "Measurement unit"
+                        },
+                        {
+                            "key": "series_description.dimensions",
+                            "title": "Dimensions",
+                            "type": "array",
+                            "props": {
+                                "label": {
+                                    "key": "label",
+                                    "title": "Label",
+                                    "type": "text"
+                                },
+                                "description": {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "series_description.periodicity",
+                            "type": "text",
+                            "class": "periodicity",
+                            "title": "Periodicity of data"
+                        },
+                        {
+                            "key": "series_description.base_period",
+                            "type": "text",
+                            "class": "base_period",
+                            "title": "Base period"
+                        },
+                        {
+                            "key": "series_description.definition_short",
+                            "type": "text",
+                            "class": "definition_short",
+                            "title": "Definition short"
+                        },
+                        {
+                            "key": "series_description.definition_long",
+                            "type": "text",
+                            "class": "definition_long",
+                            "title": "Definition long"
+                        },
+                        {
+                            "key": "series_description.definition_references",
+                            "title": "Definition references",
+                            "type": "array",
+                            "props": {
+                                "source": {
+                                    "key": "source",
+                                    "title": "Source",
+                                    "type": "text",
+                                    "name": "Source"
+                                },
+                                "uri": {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "text",
+                                    "rules_": "required"
+                                },
+                                "note": {
+                                    "key": "note",
+                                    "title": "Note",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "series_description.statistical_concept",
+                            "type": "text",
+                            "class": "statistical_concept",
+                            "title": "Statistical concept"
+                        },
+                        {
+                            "key": "series_description.concepts",
+                            "title": "Related concepts",
+                            "type": "array",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text",
+                                    "name": "Concept name",
+                                    "rules_": "required"
+                                },
+                                "definition": {
+                                    "key": "definition",
+                                    "title": "Definition",
+                                    "type": "text"
+                                },
+                                "uri": {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "series_description.methodology",
+                            "type": "text",
+                            "class": "methodology",
+                            "title": "Methodology"
+                        },
+                        {
+                            "key": "series_description.imputation",
+                            "type": "text",
+                            "class": "imputation",
+                            "title": "Imputation"
+                        },
+                        {
+                            "key": "series_description.missing",
+                            "type": "text",
+                            "class": "missing",
+                            "title": "Missing"
+                        },
+                        {
+                            "key": "series_description.quality_checks",
+                            "type": "text",
+                            "title": "Quality checks"
+                        },
+                        {
+                            "key": "series_description.quality_note",
+                            "type": "textarea",
+                            "title": "Quality notes"
+                        },
+                        {
+                            "key": "series_description.sources_discrepancies",
+                            "type": "textarea",
+                            "title": "Discrepency sources"
+                        },
+                        {
+                            "key": "series_description.series_break",
+                            "type": "text",
+                            "title": "Breaks in series"
+                        },
+                        {
+                            "key": "series_description.limitation",
+                            "type": "textarea",
+                            "title": "Limitations and exceptions"
+                        },
+                        {
+                            "key": "series_description.themes",
+                            "title": "Themes",
+                            "type": "array",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text",
+                                    "name": "Theme name",
+                                    "rules_": "required"
+                                },
+                                "vocabulary": {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulary",
+                                    "type": "text"
+                                },
+                                "uri": {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "series_description.topics",
+                            "title": "Topics",
+                            "type": "array",
+                            "props": {
+                                "id": {
+                                    "key": "id",
+                                    "title": "Unique Identifier",
+                                    "type": "text",
+                                    "rules_": "required"
+                                },
+                                "name": {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text",
+                                    "name": "Topic name",
+                                    "rules_": "required"
+                                },
+                                "parent_id": {
+                                    "key": "parent_id",
+                                    "title": "Parent topic identifier",
+                                    "type": "text",
+                                    "help_text": "For subtopics, provide the ID of the parent topic"
+                                },
+                                "vocabulary": {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulary",
+                                    "type": "text"
+                                },
+                                "uri": {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "series_description.disciplines",
+                            "title": "Disciplines",
+                            "type": "array",
+                            "help_text": "Disciplines e.g. Social sciences, economics, Natural sciences, biology",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text",
+                                    "name": "Discipline name",
+                                    "rules_": "required"
+                                },
+                                "vocabulary": {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulary",
+                                    "type": "text"
+                                },
+                                "uri": {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "series_description.relevance",
+                            "type": "text",
+                            "title": "Relevance"
+                        },
+                        {
+                            "key": "series_description.time_periods",
+                            "title": "Time periods",
+                            "type": "array",
+                            "props": {
+                                "start": {
+                                    "key": "start",
+                                    "title": "Start",
+                                    "type": "text",
+                                    "name": "time_periods.start",
+                                    "rules_": "required"
+                                },
+                                "end": {
+                                    "key": "end",
+                                    "title": "End",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "series_description.ref_country",
+                            "title": "Reference countries",
+                            "help_text": "List of countries for which data are available",
+                            "type": "array",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text"
+                                },
+                                "code": {
+                                    "key": "code",
+                                    "title": "Code",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "series_description.geographic_units",
+                            "title": "Geographic units",
+                            "type": "array",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text",
+                                    "name": "Geographic unit name",
+                                    "rules_": "required"
+                                },
+                                "code": {
+                                    "key": "code",
+                                    "title": "Code",
+                                    "type": "text"
+                                },
+                                "type": {
+                                    "key": "type",
+                                    "title": "Type (country, state, region, province)",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "series_description.bbox",
+                            "title": "Geographic bounding box",
+                            "type": "array",
+                            "props": {
+                                "west": {
+                                    "key": "west",
+                                    "title": "West",
+                                    "type": "text"
+                                },
+                                "east": {
+                                    "key": "east",
+                                    "title": "East",
+                                    "type": "text"
+                                },
+                                "south": {
+                                    "key": "south",
+                                    "title": "South",
+                                    "type": "text"
+                                },
+                                "north": {
+                                    "key": "north",
+                                    "title": "North",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "series_description.aggregation_method",
+                            "type": "text",
+                            "title": "Aggregation method"
+                        },
+                        {
+                            "key": "series_description.disaggregation",
+                            "type": "text",
+                            "title": "Disaggregation"
+                        },
+                        {
+                            "type": "section",
+                            "key": "series_description.license",
+                            "title": "License",
+                            "items": [
+                                {
+                                    "key": "series_description.license.name",
+                                    "title": "License",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "series_description.license.uri",
+                                    "title": "URI",
+                                    "type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "series_description.confidentiality",
+                            "type": "text",
+                            "title": "Confidentiality statement"
+                        },
+                        {
+                            "key": "series_description.confidentiality_status",
+                            "type": "text",
+                            "title": "Confidentiality status"
+                        },
+                        {
+                            "key": "series_description.confidentiality_note",
+                            "type": "text",
+                            "title": "Confidentiality note"
+                        },
+                        {
+                            "key": "series_description.links",
+                            "title": "Links to APIs, Websites, etc",
+                            "type": "array",
+                            "props": {
+                                "uri": {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "text",
+                                    "rules_": "required"
+                                },
+                                "type": {
+                                    "key": "type",
+                                    "title": "Link type (api, website)",
+                                    "type": "text",
+                                    "name": "Link type"
+                                },
+                                "description": {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "series_description.api_documentation",
+                            "title": "API documentation",
+                            "type": "array",
+                            "props": {
+                                "description": {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "text"
+                                },
+                                "uri": {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "text",
+                                    "rules_": "required"
+                                }
+                            }
+                        },
+                        {
+                            "key": "series_description.authoring_entity",
+                            "title": "Authoring entity",
+                            "type": "array",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text"
+                                },
+                                "affiliation": {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "text"
+                                },
+                                "abbreviation": {
+                                    "key": "abbreviation",
+                                    "title": "Abbreviation",
+                                    "type": "text"
+                                },
+                                "email": {
+                                    "key": "email",
+                                    "title": "Email",
+                                    "type": "text"
+                                },
+                                "uri": {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "series_description.sources",
+                            "title": "Sources",
+                            "type": "array",
+                            "props": {
+                                "id": {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "text"
+                                },
+                                "name": {
+                                    "key": "name",
+                                    "title": "Source name",
+                                    "type": "text",
+                                    "name": "Source name",
+                                    "rules_": "required"
+                                },
+                                "organization": {
+                                    "key": "organization",
+                                    "title": "Organization",
+                                    "type": "text"
+                                },
+                                "type": {
+                                    "key": "type",
+                                    "title": "Link type (api, website)",
+                                    "type": "text",
+                                    "name": "Link type"
+                                },
+                                "note": {
+                                    "key": "note",
+                                    "title": "Notes",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "series_description.sources_note",
+                            "type": "text",
+                            "title": "Notes from original source"
+                        },
+                        {
+                            "key": "series_description.keywords",
+                            "title": "Keywords",
+                            "type": "array",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Source name",
+                                    "type": "text",
+                                    "name": "Source name",
+                                    "rules_": "required"
+                                },
+                                "vocabulary": {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulary",
+                                    "type": "text"
+                                },
+                                "uri": {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "series_description.acronyms",
+                            "title": "Acronyms",
+                            "type": "array",
+                            "props": {
+                                "acronym": {
+                                    "key": "acronym",
+                                    "title": "Acronym/Abbreviation",
+                                    "type": "text",
+                                    "name": "Acronym",
+                                    "rules_": "required"
+                                },
+                                "expansion": {
+                                    "key": "expansion",
+                                    "title": "Acronym expansion",
+                                    "type": "text",
+                                    "rules_": "required"
+                                },
+                                "occurence": {
+                                    "key": "occurence",
+                                    "title": "Number of occurence",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "series_description.notes",
+                            "title": "Notes",
+                            "type": "array",
+                            "props": {
+                                "note": {
+                                    "key": "note",
+                                    "title": "Note",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "series_description.related_indicators",
+                            "title": "Related indicators",
+                            "type": "array",
+                            "props": {
+                                "code": {
+                                    "key": "code",
+                                    "title": "Code",
+                                    "type": "text"
+                                },
+                                "label": {
+                                    "key": "label",
+                                    "title": "Indicator name",
+                                    "type": "text"
+                                },
+                                "uri": {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "series_description.compliance",
+                            "title": "Compliance with international resolution",
+                            "type": "array",
+                            "props": {
+                                "standard": {
+                                    "key": "standard",
+                                    "title": "Standard name",
+                                    "type": "text",
+                                    "rules_": "required"
+                                },
+                                "organization": {
+                                    "key": "organization",
+                                    "title": "Organization",
+                                    "type": "text"
+                                },
+                                "uri": {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "series_description.framework",
+                            "title": "Framework",
+                            "type": "array",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text"
+                                },
+                                "abbreviation": {
+                                    "key": "abbreviation",
+                                    "title": "Abbreviation",
+                                    "type": "text"
+                                },
+                                "custodian": {
+                                    "key": "custodian",
+                                    "title": "Custodian",
+                                    "type": "text"
+                                },
+                                "description": {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "text"
+                                },
+                                "goal_id": {
+                                    "key": "goal_id",
+                                    "title": "Goal ID",
+                                    "type": "text"
+                                },
+                                "goal_name": {
+                                    "key": "goal_name",
+                                    "title": "Goal name",
+                                    "type": "text"
+                                },
+                                "goal_description": {
+                                    "key": "goal_description",
+                                    "title": "Goal description",
+                                    "type": "text"
+                                },
+                                "target_id": {
+                                    "key": "target_id",
+                                    "title": "Target ID",
+                                    "type": "text"
+                                },
+                                "target_name": {
+                                    "key": "target_name",
+                                    "title": "Target name",
+                                    "type": "text"
+                                },
+                                "target_description": {
+                                    "key": "target_description",
+                                    "title": "Target description",
+                                    "type": "text"
+                                },
+                                "indicator_id": {
+                                    "key": "indicator_id",
+                                    "title": "Indicator ID",
+                                    "type": "text"
+                                },
+                                "indicator_name": {
+                                    "key": "indicator_name",
+                                    "title": "Indicator name",
+                                    "type": "text"
+                                },
+                                "indicator_description": {
+                                    "key": "indicator_description",
+                                    "title": "Indicator description",
+                                    "type": "text"
+                                },
+                                "uri": {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "text"
+                                },
+                                "notes": {
+                                    "key": "notes",
+                                    "title": "Notes",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "series_description.series_groups",
+                            "title": "Series included in groups",
+                            "type": "array",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text",
+                                    "rules_": "required"
+                                },
+                                "version": {
+                                    "key": "version",
+                                    "title": "Version",
+                                    "type": "text"
+                                },
+                                "uri": {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "text"
+                                }
+                            }
+                        }
+                    ]
+                }
+            ]
+        },        
         {
             "type": "section_container",
             "id": "tags",
@@ -878,6 +878,5 @@
                 }
             ]
         }
-]
-
+    ]
 }

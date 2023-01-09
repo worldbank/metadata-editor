@@ -1,36 +1,29 @@
 //vue validation-rules component
 Vue.component('validation-rules-component', {
-    props:['value','path', 'field'],
+    props:['value'],
     data: function () {    
         return {
-            //field_data: this.value,
-            sort_field:'',
-            sort_asc:true,
-            columns:{
-                "rule":{
-                    "key":"rule",
-                    "title":"Rule"
-                },
-                "value":{
-                    "key":"value",
-                    "title":"Value"
-                }
-            }
-            ,
+            rule_selected:'',
             validation_rules:{
-                "regex_match":{
-                    "rule":"regex_match",
+                "required":{
+                    "rule":"required",
+                    "description":"Must have a value",
+                    "param":false,
+                    "value_type":"regex"
+                },
+                "regex":{
+                    "rule":"regex",
                     "description":"Regular expression - ",
                     "param":true,
                     "value_type":"regex"
                 },
-                "min_length":{
-                    "rule":"min_length",
+                "min":{
+                    "rule":"min",
                     "description":"Minimum length of text",
                     "param":true,
                     "value_type":"integer"
                 },
-                "max_length":{
+                "max":{
                     "rule":"max_length",
                     "description":"Maximum length of text",
                     "param":true,
@@ -41,54 +34,36 @@ Vue.component('validation-rules-component', {
                     "description":"Allow only alphabets",
                     "param":false
                 },
-                "alpha_numeric":{
-                    "rule":"alpha_numeric",
+                "alpha_num":{
+                    "rule":"alpha_num",
                     "description":"Allow only alphabets and numbers",
                     "param":false
-                }
+                },
+                "numeric":{
+                    "rule":"numeric",
+                    "description":"Allow only numeric values",
+                    "param":false
+                },
+                "is_uri":{
+                    "rule":"is_uri",
+                    "description":"Must be a valid URL",
+                    "param":false
+                },
+
+
+
             }
         }
-    },
-    
-    mounted: function () {
-        //set data to array if empty or not set
-        /*if (!this.field_data){
-            this.field_data=[{}];
-            //this.field_data.push({});
-        }*/
-    },
+    },    
     computed: {
-        localColumns(){
-            return this.columns;
-        },
-        field_data:
+        local()
         {
-            get(){
-                return this.value;
-            },
-            set(val){
-                this.$emit('update:value', val);
-            }
+            return this.value ? this.value : {};
         },
         ValidationRules()
         {
-            return this.validation_rules;
-            /*const filtered = Object.keys(this.validation_rules)
-                .filter(key => !this.isRuleInUse(key))
-                .reduce((obj, key) => {
-                    obj[key] = this.validation_rules[key];
-                    return obj;
-                }, {});
-
-            
-
-            console.log("valdiationRUles",filtered,this.validation_rules);
-
-            return filtered;
-            return this.validation_rules;
-            */
-
-            let filtered_={};
+            return this.validation_rules;            
+            /*let filtered_={};
             let keys_=Object.keys(this.validation_rules);
             for(i=0;i<keys_.length;i++)
             {
@@ -98,10 +73,13 @@ Vue.component('validation-rules-component', {
             }
             console.log("filtered",filtered_);
             return filtered_;
-
-        }          
+            */
+        }
     },
     methods:{
+        update(key, value) {
+            this.$emit('input', { ...this.value, [key]: value })
+        },
         validateRuleValue: function(idx)
         {
             if (!this.field_data[idx]['rule']){
@@ -124,148 +102,85 @@ Vue.component('validation-rules-component', {
 
         },
         isRuleInUse: function(rule_key){
-            for(i=0;i<this.field_data.length;i++)
+            for(i=0;i<Object.keys(this.local).length;i++)
             {
-                if (this.field_data[i]["rule"]==rule_key){
+                if (this.local["rule"]==rule_key){
                     return true;
                 }
             }
             return false;
         },
         ruleHasParam: function(rule){
-            console.log("rule name=",rule);
-
             if (this.validation_rules[rule] && this.validation_rules[rule].param){
                 return this.validation_rules[rule].param==true;
             }
 
             return false;
-            
         },
-        countRows: function(){
-            return this.field_data.length;
-        },
-        addRow: function (){
-            window._data=this.field_data;
-            console.log("adding row");
-            if (!this.field_data){
-                console.log("addRow !field_data")
-                this.field_data=[{}];
-            }else{                
-                this.field_data.push({});
-                console.log("addRow Elsefield_data")
-                this.$emit('adding-row', this.field_data);
-            }
-            console.log("adding row", this.field_data);
-        },
-        remove: function (index){
-            this.field_data.splice(index,1);
-        },
-        columnName: function(column,path)
-        {
-            if (typeof column.name ==='undefined'){
-                return column.title;
-            }else{
-                return column.name
-            }
-        },
-        sortColumn: function(column_key)
-        {
-            if (this.sort_field==column_key){
-                this.sort_asc=!this.sort_asc;
+        RuleDescription: function(rule){
+            console.log(this.validation_rules[rule]);
+            if (this.validation_rules[rule] && this.validation_rules[rule].description){
+                return this.validation_rules[rule].description;
             }
 
-            this.sort_field = column_key;
-
-            if (this.sort_asc==true){
-                this.field_data.sort(function (a, b) {
-                    return ('' + a[column_key]).localeCompare(b[column_key], undefined, {
-                        numeric: true,
-                        sensitivity: 'base'
-                      });
-                });                
-            }
-            else{
-                this.field_data.sort(function(a, b){
-                    return ('' + b[column_key]).localeCompare(a[column_key], undefined, {
-                        numeric: true,
-                        sensitivity: 'base'
-                      });
-                });                
-            }
-        }
+            return '';
+        },
+        remove: function (rule_name){
+            Vue.delete(this.value, rule_name);
+        },
+        addRule: function ()
+        {
+            rule_info=this.validation_rules[this.rule_selected];
+            this.local[this.rule_selected]=rule_info.param==true ? '' : true;
+            this.rule_selected='';
+        }        
+        
     },
     template: `
             <div class="validation-rules-component">
 
-            <table class="table table-striped table-sm">
+            <div class="p-2 mb-3 row justify-content-md-right">
+                <div class="col-md-6">
+                <div class="form-inline">
+                <select 
+                    v-model="rule_selected" 
+                    class="custom-select" 
+                >
+                    <option value="">Select rule</option>
+                    <option v-for="(rule in ValidationRules">
+                        {{ rule.rule }}
+                    </option>
+                </select>
+                <button type="button" class="ml-1 btn btn-primary" @click="addRule" :disabled="rule_selected==''">Add</button>
+                </div>
+                </div>
+            </div>
+
+            <table class="table table-striped table-sm ">
                 <thead class="thead-light">
                 <tr>
+                    <th>Rule</th>
+                    <th>Value</th>
                     <th></th>
-                    <th v-for="(column,idx_col) in columns" scope="col">
-                        <span @click="sortColumn(column.key)" role="button" title="Click to sort">
-                            {{column.title}} 
-                            <i v-if="sort_field==column.key && !sort_asc" class="fas fa-caret-down"></i>
-                            <i v-if="sort_field==column.key && sort_asc==true" class="fas fa-caret-up"></i>
-                        </span>
-                        <span v-if="column.rules" class="required-label"> * </span>
-                    </th>
-                    <th scope="col">               
-                    </th>
                 </tr>
                 </thead>
-
-                <!--start-v-for-->
-                <tbody is="draggable" :list="field_data" tag="tbody">
-                <tr  v-for="(item,index) in field_data">
-                    <td><span class="move-row" title="Drag to move">
-                        <i aria-hidden="true" class="v-icon notranslate mdi mdi-drag"></i>
-                    </span></td>
-                    <!-- 
-                    <td v-for="(column,idx_col) in localColumns" scope="row">
-                        <div>
-                            <div v-if="column.type!=='table'">
-                            <input type="text"
-                                v-model="field_data[index][column.key]"
-                                class="form-control form-control-sm"                                 
-                            >
-                            </div>
-                        </div>
-                    </td>
-                    -->
+                <tr v-for="(value_, name, index) in local">
                     <td>
-                        <select 
-                            v-model="field_data[index]['rule']" 
-                            class="form-control form-field-dropdown" 
-                        >
-                            <option v-for="(rule in ValidationRules">
-                                {{ rule.rule }}
-                            </option>
-                        </select>
-                        <small class="help-text form-text text-muted">{{field_data[index]['rule']}}</small>
+                        <div class="text-primary">{{name}}</div>
+                        <div class="text-secondary" style="font-size:small;margin-top:5px;">{{RuleDescription(name)}}</div>
                     </td>
-                    <td>
-                        <div v-if="ruleHasParam(field_data[index]['rule'])">
-                        <input type="text"
-                            v-model="field_data[index]['value']"
-                            class="form-control form-control-sm"                            
-                        >
+                    <td><div v-if="ruleHasParam(name)">
+                        <input type="text" :value="local[name]"  @input="update(name, $event.target.value)" class="form-control form-control-sm" />
                         </div>
-                        <!--<div>{{validateRuleValue(index)}}</div>-->
+                        <div v-else>{{local[name]}}</div>
                     </td>
                     <td scope="row">        
-                        <button type="button"  class="btn btn-sm btn-danger grid-button-delete float-right"  v-on:click="remove(index)">
-                        <i aria-hidden="true" class="v-icon notranslate mdi mdi-delete" style="font-size:18px;"></i>
+                        <button type="button"  class="btn btn-sm btn-danger grid-button-delete float-right"  v-on:click="remove(name)">
+                        <i aria-hidden="true" class="v-icon notranslate mdi mdi-delete" style="font-size:16px;"></i>
                         </button>
                     </td>
                 </tr>
-                <!--end-v-for -->
-                </tbody>
             </table>
-
-            <div class="d-flex justify-content-center">
-                <button type="button" class="btn btn-default btn-block btn-sm border m-2" @click="addRow" ><i class="fas fa-plus-square"></i> Add row</button>    
-            </div>
 
             </div>  `    
 });

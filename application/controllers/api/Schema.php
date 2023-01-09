@@ -39,6 +39,30 @@ class Schema extends MY_REST_Controller {
 		}
     }
 
+
+    function template_get($schema_name)
+    {
+        try{
+			$output=$this->schema_util->get_schema_template($schema_name);
+
+            $response=array(
+                'status'	=> 'success',            
+                'fields'	=> $output
+            );
+
+            $this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+            $error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);			
+		}
+    }
+
+
+    
  
     
     

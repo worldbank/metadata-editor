@@ -15,6 +15,9 @@
         
         <?php 
             
+            echo $this->load->view("metadata_editor/fields/vue-field-text.js",null,true);
+            echo $this->load->view("metadata_editor/fields/vue-field-date.js",null,true);
+
             echo $this->load->view("metadata_editor/vue-spreadmetadata-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-form-main-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-form-component.js",null,true);
@@ -560,6 +563,22 @@
                 return data.message;
             },
             message: 'Please enter a unique value.'
+        });
+
+        VeeValidate.extend('is_uri', {
+            validate(value){
+                var pattern = new RegExp('^(https?:\\/\\/)?'+ // protocol
+                        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
+                        '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
+                        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
+                        '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
+                        '(\\#[-a-z\\d_]*)?$','i'); // fragment locator
+                return !!pattern.test(value);
+            },
+            getMessage: (field, params, data) => {
+                return data.message;
+            },
+            message: 'Value must be a URL e.g. http://example.com'
         });
 
         //ignore validation if a required field is empty ('',null or undefined)

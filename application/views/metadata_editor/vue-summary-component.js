@@ -23,7 +23,10 @@ Vue.component('summary-component', {
         ProjectTemplate()
         {
             return this.$store.state.formTemplate;
-        }
+        },
+        ProjectType(state){
+            return this.$store.state.project_type;
+        },
     },
     methods:{
         validateProject: function() {
@@ -38,7 +41,7 @@ Vue.component('summary-component', {
             })
             .catch(function (error) {
                 console.log("validation errors",error);                
-                vm.validation_errors=error;
+                vm.validation_errors=error.response.data;
             })
             .then(function () {
                 console.log("request completed");
@@ -73,13 +76,13 @@ Vue.component('summary-component', {
     template: `
             <div class="summary-component mt-3">
 
-                <div class="row">
-                    <div class="col-6">
-                        <div class="thumbnail-container border bg-white">
+                <div class="row" >
+                    <div class="col-6" >
+                        <div v-if="ProjectType!=='timeseries-db'" class="thumbnail-container border bg-white mb-3">
                             <project-thumbnail/>
                         </div>
 
-                        <div class="template-selection-container border mt-3 p-3 bg-white">
+                        <div class="template-selection-container border mb-3 p-3 bg-white">
                             <h5><v-icon style="font-size:25px;">mdi-alpha-t-box</v-icon> Template</h5>
                             <div class="border p-1">
                                 <span class="float-right btn btn-link" @click="dialog_template=true">Switch template</span>
@@ -190,38 +193,23 @@ Vue.component('summary-component', {
 
 
                         <div class="project-validation-container border mt-3 p-3 bg-white">
-                            <h5>Project validation</h5>
-                            <div>Project metadata</div>
-                            <div class="progress mb-2">                                
-                                <div class="progress-bar bg-success" role="progressbar" style="width: 25%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
+                            <h5>Project validation</h5>                            
 
-                            <div>Data files</div>
-                            <div class="progress mb-2">                            
-                            <div class="progress-bar bg-info" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                            <div class="validation-errors mt-2 border" v-if="validation_errors!=''" style="color:red;font-size:small;" >
+                                <div class="border-bottom p-2 mb-2"><strong>Validation errors</strong></div>
+                                <ul v-for="error in validation_errors.errors" class="mb-2 ml-3">
+                                    <li><strong>{{error.message}}</strong><br/>
+                                    Property: {{error.property}}
+                                    </li>                                    
+                                </ul>
                             </div>
-
-                            <div>Variables</div>
-                            <div class="progress mb-2">
-                            <div class="progress-bar bg-warning" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-
-                            <div>External resources</div>
-                            <div class="progress">
-                            <div class="progress-bar bg-danger" role="progressbar" style="width: 100%" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-
-                            <div class="validation-errors mt-2 border" v-if="validation_errors!=''" style="color:red;" >
-                                <strong>Validation errors</strong>
-                                <pre>{{validation_errors}}</pre>
-                            </div>
-                            <div class="mt-3 border" v-else>No issues found</div>
+                            <div class="mt-3 p-2 border" style="color:green" v-else>No issues found</div>
                         </div>
 
 
                     </div>
                     <div class="col-6">
-                        <div class="files-container border bg-white p-3">
+                        <div class="files-container border bg-white p-3" v-if="ProjectType!=='timeseries-db'">
                             <summary-files></summary-files>
                         </div>
                     </div>

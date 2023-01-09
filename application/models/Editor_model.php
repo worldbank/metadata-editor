@@ -19,6 +19,7 @@ class Editor_model extends CI_Model {
         'survey'=>'microdata',
         'geospatial'=>'geospatial',
         'timeseries'=>'timeseries',
+		'timeseries-db'=>'timeseries-db',
         'document'=>'document',
         'image'=>'image',
         'video'=>'video',
@@ -432,6 +433,9 @@ class Editor_model extends CI_Model {
 			/*foreach ($validator->getErrors() as $error) {
 				echo sprintf("[%s] %s\n", $error['property'], $error['message']);
 			}*/
+
+//			var_dump($validator->getErrors());
+
 			throw new ValidationException("SCHEMA_VALIDATION_FAILED [{$type}]: ", $validator->getErrors());
 		}
 	}

@@ -10,18 +10,21 @@ Vue.component('simple-array-component', {
     },
     watch: { 
         field_data: function(newVal, oldVal) {
-            console.log('Prop changed: ', newVal, ' | was: ', oldVal)
-            //console.log(this.key_path);                    
+            console.log('simple array Prop changed: ', JSON.stringify(newVal), ' | was: ', JSON.stringify(oldVal));
             this.$vueSet (this.$store.state.formData, this.key_path, newVal);
         }
     
     },
     
     mounted: function () {
-        //set data to array if empty or not set
-        if (!this.field_data){
+        console.log("simple_array mounted", JSON.stringify(this.field_data));
+        /*if (!this.field_data){
             this.field_data=[];
-            this.field_data.push(null);
+            this.field_data.push("");
+            //this.field_data.push(null);
+        }*/
+        if (!Array.isArray(this.field_data)){
+            this.field_data=[];
         }
     },
     computed: {
@@ -31,7 +34,8 @@ Vue.component('simple-array-component', {
     },  
     template: `
             <!--vuejs template for simple-array -->
-            <div class="simple-array-component">
+            <div class="simple-array-component bg-white p-2 border" >
+            
             <table class="table table-striped table-sm">
                 <!--start-v-for-->
                 <tbody>

@@ -70,6 +70,7 @@
                       <tr class="bg-secondary">
                         <th>Type</th>
                         <th>Title</th>
+                        <th>Language</th>
                         <th>Version</th>
                         <th>Last updated</th>
                         <th></th>
@@ -82,6 +83,7 @@
                               <span style="font-weight:bold;" href="#" >{{template.name}}</span>
                               <div>{{template.uid}}</div>
                             </td>
+                            <td>{{template.lang}}</td>
                             <td>{{template.version}}</td>
                             <td>-</td>
                             <td><button type="button" class="btn btn-sm btn-link" @click="duplicateTemplate(template.uid)" >Duplicate</button></td>
@@ -97,6 +99,7 @@
                               <a href="#"  @click="editTemplate(template.uid)">{{template.name}}</a>
                               <div>{{template.uid}}</div>
                             </td>
+                            <td>{{template.lang}}</td>
                             <td>{{template.version}}</td>
                             <td>{{momentDate(template.changed)}}</td>
                             <td>

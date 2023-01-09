@@ -70,11 +70,14 @@
     <script src="https://cdn.jsdelivr.net/npm/vue-deepset@0.6.3/vue-deepset.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ajv/6.12.2/ajv.bundle.js" integrity="sha256-u9xr+ZJ5hmZtcwoxwW8oqA5+MIkBpIp3M2a4AgRNH1o=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/deepdash/browser/deepdash.standalone.min.js"></script>
+    <script src="https://unpkg.com/moment@2.26.0/moment.js"></script>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css" crossorigin="anonymous" />   
     
     <script src="https://cdn.jsdelivr.net/npm/vue-scrollto"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vee-validate/3.4.0/vee-validate.full.min.js" integrity="sha512-owFJQZWs4l22X0UAN9WRfdJrN+VyAZozkxlNtVtd9f/dGd42nkS+4IBMbmVHdmTd+t6hFXEVm65ByOxezV/Qxg==" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue-textarea-autosize@1.1.1/dist/vue-textarea-autosize.common.js" ></script>
 
     <!--
     <script src="https://unpkg.com/splitpanes@2.1"></script>
@@ -96,7 +99,6 @@
 
   <?php echo $this->load->view("metadata_editor/index_vuetify_main_app",null,true);?>
 
-  
   <script>
     
 //    const { Splitpanes, Pane } = splitpanes;
@@ -184,28 +186,53 @@ Vue.config.errorHandler = (err, vm, info) => {
       mounted: function(){
       },
       computed:{
-        Title(){
-          //return 'title';//this.ProjectMetadata._study_info.title;
-          if (this.dataset_type=='survey'){
-            //return 'TODO';
-            title_= _.get(this.ProjectMetadata, 'study_desc.title_statement.title');
+        Title(){          
+          let titles={
+            "survey":"study_desc.title_statement.title",
+            "timeseries-db":"database_description.title_statement.title",
+            "script":"project_desc.title_statement.title",
+            "video":"video_description.title",
+            "table":"table_description.title_statement.title",
+            "document":"document_description.title_statement.title",
+            "image":"image_description.dcmi.title"
+          };
+
+          //image IPTC?
+          if (this.dataset_type=='image'){
+            let iptc_title=_.get(this.ProjectMetadata, 'image_description.iptc.photoVideoMetadataIPTC.title')
+            if (iptc_title){
+              titles['image']='image_description.iptc.photoVideoMetadataIPTC.title';
+            }
+          }
+
+          if (titles[this.dataset_type]){
+            title_= _.get(this.ProjectMetadata, titles[this.dataset_type]);
             return _.truncate(title_, {
               'length': 60,
               'separator': ' '
             });
-            //return this.ProjectMetadata.study_desc.title_statement.title;
           }else{
             return 'TODO';
           }
-        },
-        StudyIDNO(){
-          //return this.dataset_idno;
-          if (this.dataset_type=='survey'){
-            return _.get(this.ProjectMetadata, 'study_desc.title_statement.idno'); 
-          }
 
-          return this.dataset_idno;
-          
+        },
+        StudyIDNO(){          
+          let idnos={
+            "survey":"study_desc.title_statement.idno",
+            "script":"project_desc.title_statement.idno",
+            "timeseries-db":"database_description.title_statement.idno",
+            "video":"video_description.idno",
+            "table":"table_description.title_statement.idno",
+            "document":"document_description.title_statement.idno",
+            "image":"image_description.idno"
+          };
+
+          if (idnos[this.dataset_type]){
+            idno_= _.get(this.ProjectMetadata, idnos[this.dataset_type]);
+            return idno_;
+          }else{
+            return 'TODO';
+          }
         },
         ProjectMetadata(){
           return this.$store.state.formData;
@@ -348,13 +375,15 @@ Vue.config.errorHandler = (err, vm, info) => {
             });
           }
 
-          tree_data.push({
-              title: 'External resources',
-              type: 'resources',
-              file: 'resource',
-              key:'external-resources',
-              items:this.ExternalResourcesTreeNodes
-          });
+          if (this.dataset_type!=='timeseries-db'){
+            tree_data.push({
+                title: 'External resources',
+                type: 'resources',
+                file: 'resource',
+                key:'external-resources',
+                items:this.ExternalResourcesTreeNodes
+            });
+          }
 
           this.items=tree_data;
           this.initiallyOpen= ["study_description","datasets","document"];

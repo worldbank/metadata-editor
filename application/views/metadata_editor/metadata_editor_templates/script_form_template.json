@@ -1,809 +1,1014 @@
 {
     "type": "template",
     "title": "Script Schema",
-    "items":
-[    
-    {
-        "type": "section",
-        "id": "doc_desc",
-        "title": "Document description",
-        "class": "mandatory recommended",
-        "expanded": true,
-        "items": [
-            {
-                "key": "doc_desc.title",                
-                "type": "text",
-                "class": "required",
-                "title": "Document title",
-                "help_text": "Document title"
-            },
-            {
-                "key": "doc_desc.idno",                
-                "type": "text",
-                "class": "required",
-                "title": "Unique ID number for the document"                
-            },
-            {
-                "key": "doc_desc.producers",                                
-                "class": "required",
-                "title": "Unique ID number for the document",                
-                "type": "array",
-                "props": {
-                    "name": {
-                        "key": "name",
-                        "title": "Name",
-                        "type": "text",
-                        "help_text": "Name (required)",
-                        "class": "required"
-                    },
-                    "abbr": {
-                        "key": "abbreviation",
-                        "title": "Abbreviation",
-                        "type": "text"
-                    },
-                    "affiliation": {
-                        "key": "affiliation",
-                        "type": "string",
-                        "title": "Affiliation"
-                    },
-                    "role": {
-                        "key": "role",
-                        "title": "Role",
-                        "type": "string"
-                    }
+    "items": [
+        {
+            "type": "section_container",
+            "key": "doc_desc_container",
+            "title": "Document description",
+            "expanded": true,
+            "items": [
+                {
+                    "type": "section",
+                    "key": "doc_desc_section",
+                    "title": "Document description",
+                    "expanded": true,
+                    "items": [
+                        {
+                            "key": "doc_desc.title",
+                            "type": "text",
+                            "class": "required",
+                            "title": "Document title",
+                            "help_text": "Document title"
+                        },
+                        {
+                            "key": "doc_desc.idno",
+                            "type": "text",
+                            "class": "required",
+                            "title": "Unique ID number for the document"
+                        },
+                        {
+                            "key": "doc_desc.producers",
+                            "class": "required",
+                            "title": "Unique ID number for the document",
+                            "type": "array",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text",
+                                    "help_text": "Name (required)",
+                                    "class": "required"
+                                },
+                                "abbr": {
+                                    "key": "abbreviation",
+                                    "title": "Abbreviation",
+                                    "type": "text"
+                                },
+                                "affiliation": {
+                                    "key": "affiliation",
+                                    "type": "string",
+                                    "title": "Affiliation"
+                                },
+                                "role": {
+                                    "key": "role",
+                                    "title": "Role",
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        {
+                            "key": "doc_desc.prod_date",
+                            "type": "text",
+                            "class": "required",
+                            "title": "Date of Production",
+                            "help_text": "Document production date using format(YYYY-MM-DD)"
+                        },
+                        {
+                            "key": "doc_desc.version",
+                            "type": "text",
+                            "class": "",
+                            "title": "Document version",
+                            "help_text": "Identify and describe the current version of the document"
+                        }
+                    ]
                 }
-            },
-            {
-                "key": "doc_desc.prod_date",                
-                "type": "text",
-                "class": "required",
-                "title": "Date of Production",
-                "help_text": "Document production date using format(YYYY-MM-DD)"
-            },
-
-            {
-                "key": "doc_desc.version",                
-                "type": "text",
-                "class": "",
-                "title": "Document version",
-                "help_text": "Identify and describe the current version of the document"
-            }
-        ]
-
-
-    },
-
-    {
-        "type": "section",
-        "id": "project_desc",
-        "title": "Project description",
-        "class": "recommended",
-        "items": [
-            {
-                "type": "section",
-                "id": "project_desc_title_statement",
-                "title": "Title statement",
-                "class": "recommended",
-                "items": [
-                    {
-                        "key": "project_desc.title_statement.idno",
-                        "title": "Unique user defined ID",
-                        "help_text": "The ID number of a dataset is a unique number that is used to identify a particular survey. Define and use a consistent scheme to use. Such an ID could be constructed as follows: country-producer-survey-year-version where \n - country is the 3-letter ISO country abbreviation \n - producer is the abbreviation of the producing agency \n - survey is the survey abbreviation \n - year is the reference year (or the year the survey started) \n - version is the number dataset version number (see Version Description below)",
-                        "type": "text"
-                    },
-
-                    {
-                        "key": "project_desc.title_statement.title",
-                        "title": "Title",
-                        "type": "text"
-                    },
-
-                    {
-                        "key": "project_desc.title_statement.sub_title",
-                        "title": "Subtitle",                
-                        "type": "text"
-                    },
-
-                    {
-                        "key": "project_desc.title_statement.alternate_title",
-                        "title": "Abbreviation or Acronym",                
-                        "type": "text"
-                    },
-
-                    {
-                        "key": "project_desc.title_statement.translated_title",
-                        "title": "Translated title",                
-                        "type": "text"
-                    }
-                    
-                    
-                ]
-            },
-            {
-                "type": "section",
-                "id": "project_desc_others",
-                "title": "Others",
-                "class": "recommended",
-                "items": [
-                    {
-                        "key": "project_desc.production_date",
-                        "title": "Date of production (YYYY-MM-DD)",
-                        "help_text": "Date when the project (dissemination-ready version) was implemented",
-                        "type": "text"
-                    },
-
-                    {
-                        "key": "project_desc.geographic_coverage",
-                        "title": "Geographic coverage",
-                        "help_text": "Information on the geographic areas (if any) covered by the scripts.project. This may be a list of countries, regions, etc",
-                        "type": "array_simple"                
-                    },
-
-                    {
-                        "key": "project_desc.authoring_entity",
-                        "title": "Authoring entity",
-                        "help_text": "The person, corporate body, or agency responsible for the work's substantive and intellectual content. Repeat the element for each author, and use 'affiliation' attribute if available. Invert first and last name and use commas.",
-                        "type": "array",
-                        "props": {
-                            "name": {
-                                "key": "name",
-                                "title": "Agency Name",
-                                "type": "text",
-                                "help_text": "Name of the person, corporate body, or agency responsible for the work's substantive and intellectual content. If a person, invert first and last name and use commas."
-                            },
-                            "role": {
-                                "key": "role",
-                                "title": "Role",
-                                "type": "text",
-                                "help_text": "Title of the person (if any) responsible for the work's substantive and intellectual content."
-                            },
-                            "affiliation": {
-                                "key": "affiliation",
-                                "title": "Affiliation",
-                                "type": "text"
-                            },
-                            "abbreviation": {
-                                "key": "abbreviation",
-                                "title": "Abbreviation",
-                                "help_text": "Abbreviation",
-                                "type": "text"
-                            },
-                            "email": {
-                                "key": "email",
-                                "type": "text",
-                                "title": "Email",
-                                "help_text": "Email"
+            ]
+        },
+        {
+            "type": "section_container",
+            "key": "project_desc_container",
+            "title": "Project description",
+            "class": "recommended",
+            "items": [
+                {
+                    "type": "section",
+                    "key": "project_desc_title_statement",
+                    "title": "Title statement",
+                    "class": "recommended",
+                    "items": [
+                        {
+                            "key": "project_desc.title_statement.idno",
+                            "title": "Unique user defined ID",
+                            "help_text": "The ID number of a dataset is a unique number that is used to identify a particular survey. Define and use a consistent scheme to use. Such an ID could be constructed as follows: country-producer-survey-year-version where \n - country is the 3-letter ISO country abbreviation \n - producer is the abbreviation of the producing agency \n - survey is the survey abbreviation \n - year is the reference year (or the year the survey started) \n - version is the number dataset version number (see Version Description below)",
+                            "type": "text"
+                        },
+                        {
+                            "key": "project_description.identifiers",
+                            "title": "Other Identifiers",
+                            "type": "array",
+                            "help_text": "Identifiers such as ISSN, ISBN, DOI",
+                            "props": {
+                                "type": {
+                                    "key": "type",
+                                    "title": "ID Type",
+                                    "type": "text",
+                                    "help_text": "Identifiers such as ISSN, ISBN, DOI"
+                                },
+                                "identifier": {
+                                    "key": "identifier",
+                                    "title": "Identifier",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "project_desc.title_statement.title",
+                            "title": "Title",
+                            "type": "text"
+                        },
+                        {
+                            "key": "project_desc.title_statement.sub_title",
+                            "title": "Subtitle",
+                            "type": "text"
+                        },
+                        {
+                            "key": "project_desc.title_statement.alternate_title",
+                            "title": "Abbreviation or Acronym",
+                            "type": "text"
+                        },
+                        {
+                            "key": "project_desc.title_statement.translated_title",
+                            "title": "Translated title",
+                            "type": "text"
+                        }
+                    ]
+                },
+                {
+                    "type": "section",
+                    "key": "project_desc_others",
+                    "title": "Description",
+                    "class": "recommended",
+                    "items": [
+                        {
+                            "key": "project_desc.abstract",
+                            "title": "Abstract",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "project_desc.review_board",
+                            "title": "Institutional review board",
+                            "help_text": "Information on whether and when the project was submitted, reviewed, and approved by an institutional review board (or independent ethics committee, ethical review board (ERB), research ethics board, or equivalent).",
+                            "type": "text"
+                        },
+                        {
+                            "key": "project_desc.output",
+                            "title": "Output",
+                            "help_text": "Description of outputs of the research project",
+                            "type": "array",
+                            "props": {
+                                "type": {
+                                    "key": "type",
+                                    "title": "Type",
+                                    "type": "text",
+                                    "help_text": "Type of outputs of the script/research project. Example: `Working paper`, `On-line interactive data visualization` (ideally, a controlled vocabulary should be used)"
+                                },
+                                "title": {
+                                    "key": "title",
+                                    "title": "Title",
+                                    "type": "text"
+                                },
+                                "authors": {
+                                    "key": "authors",
+                                    "title": "Authors",
+                                    "type": "text"
+                                },
+                                "description": {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "text"
+                                },
+                                "abstract": {
+                                    "key": "abstract",
+                                    "type": "text",
+                                    "title": "Abstract"
+                                },
+                                "uri": {
+                                    "key": "uri",
+                                    "type": "text",
+                                    "title": "URI"
+                                },
+                                "doi": {
+                                    "key": "doi",
+                                    "type": "text",
+                                    "title": "DOI"
+                                }
+                            }
+                        },
+                        {
+                            "key": "project_desc.approval_process",
+                            "title": "Approval process",
+                            "help_text": "Description of project output review process",
+                            "type": "array",
+                            "props": {
+                                "approval_phase": {
+                                    "key": "approval_phase",
+                                    "title": "Approval phase name",
+                                    "type": "text"
+                                },
+                                "approval_authority": {
+                                    "key": "approval_authority",
+                                    "title": "Approval authority",
+                                    "type": "text"
+                                },
+                                "submission_date": {
+                                    "key": "submission_date",
+                                    "title": "Date submitted",
+                                    "type": "text"
+                                },
+                                "reviewer": {
+                                    "key": "Reviewer",
+                                    "title": "Reviewer",
+                                    "type": "text"
+                                },
+                                "review_status": {
+                                    "key": "review_status",
+                                    "title": "Review status",
+                                    "type": "text"
+                                },
+                                "approval_date": {
+                                    "key": "approval_date",
+                                    "title": "Approval date",
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        {
+                            "key": "project_desc.project_website",
+                            "title": "Project website link",
+                            "help_text": "Project website link",
+                            "type": "array_simple"
+                        },
+                        {
+                            "key": "project_desc.language",
+                            "title": "Language",
+                            "help_text": "Documentation language e.g. English, French, etc.",
+                            "type": "array",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Language",
+                                    "type": "text"
+                                },
+                                "code": {
+                                    "key": "code",
+                                    "title": "Language code",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "project_desc.production_date",
+                            "title": "Date of production (YYYY-MM-DD)",
+                            "help_text": "Date when the project (dissemination-ready version) was implemented",
+                            "type": "simple_array"
+                        },
+                        {
+                            "type": "section",
+                            "key": "project_desc_version_statement",
+                            "title": "Version statement",
+                            "items": [
+                                {
+                                    "key": "project_desc.version_statement.version",
+                                    "title": "Version",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "project_desc.version_statement.version_date",
+                                    "title": "Version Date",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "project_desc.version_statement.version_resp",
+                                    "title": "Version Responsibility Statement",
+                                    "help_text": "The organization or person responsible for the version of the work",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "project_desc.version_statement.version_notes",
+                                    "title": "Version Notes",
+                                    "type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "project_desc.errata",
+                            "title": "Errata",
+                            "help_text": "List of corrected errors in data, scripts or output",
+                            "type": "array",
+                            "props": {
+                                "date": {
+                                    "key": "date",
+                                    "title": "Date of erratum (YYYY-MM-DD)",
+                                    "type": "text"
+                                },
+                                "description": {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "project_desc.process",
+                            "title": "Process",
+                            "help_text": "A description, following a logical sequence, of the various phases of the research project implementation. This field may be used to document explorations steps that may have resulted in dead ends, to document intermediary steps at which a project may have been reviewed and approved, etc.",
+                            "type": "array",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Phase name",
+                                    "type": "text"
+                                },
+                                "date_start": {
+                                    "key": "date_start",
+                                    "title": "Phase start date (YYYY-MM-DD)",
+                                    "type": "text"
+                                },
+                                "date_end": {
+                                    "key": "date_end",
+                                    "title": "Phase end date (YYYY-MM-DD)",
+                                    "type": "text"
+                                },
+                                "description": {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "project_desc.authoring_entity",
+                            "title": "Authoring entity",
+                            "help_text": "The person, corporate body, or agency responsible for the work's substantive and intellectual content. Repeat the element for each author, and use 'affiliation' attribute if available. Invert first and last name and use commas.",
+                            "type": "array",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Agency Name",
+                                    "type": "text",
+                                    "help_text": "Name of the person, corporate body, or agency responsible for the work's substantive and intellectual content. If a person, invert first and last name and use commas."
+                                },
+                                "role": {
+                                    "key": "role",
+                                    "title": "Role",
+                                    "type": "text",
+                                    "help_text": "Title of the person (if any) responsible for the work's substantive and intellectual content."
+                                },
+                                "affiliation": {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "text"
+                                },
+                                "abbreviation": {
+                                    "key": "abbreviation",
+                                    "title": "Abbreviation",
+                                    "help_text": "Abbreviation",
+                                    "type": "text"
+                                },
+                                "email": {
+                                    "key": "email",
+                                    "type": "text",
+                                    "title": "Email",
+                                    "help_text": "Email"
+                                }
+                            }
+                        },
+                        {
+                            "key": "project_desc.contributors",
+                            "title": "Contributor(s)",
+                            "help_text": "The person, corporate body, or agency who contributed to the project.",
+                            "type": "array",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Agency Name",
+                                    "type": "text",
+                                    "help_text": "Name of the person, corporate body, or agency responsible for the work's substantive and intellectual content. If a person, invert first and last name and use commas."
+                                },
+                                "role": {
+                                    "key": "role",
+                                    "title": "Role",
+                                    "type": "text",
+                                    "help_text": "Title of the person (if any) responsible for the work's substantive and intellectual content."
+                                },
+                                "affiliation": {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "text"
+                                },
+                                "abbreviation": {
+                                    "key": "abbreviation",
+                                    "title": "Abbreviation",
+                                    "help_text": "Abbreviation",
+                                    "type": "text"
+                                },
+                                "email": {
+                                    "key": "email",
+                                    "type": "text",
+                                    "title": "Email",
+                                    "help_text": "Email"
+                                },
+                                "url": {
+                                    "key": "url",
+                                    "type": "text",
+                                    "title": "URL"
+                                }
+                            }
+                        },
+                        {
+                            "key": "project_desc.sponsors",
+                            "title": "Sponsor",
+                            "help_text": "The source(s) of funds for production of the work. If different funding agencies sponsored different stages of the production process, use the 'role' attribute to distinguish them.",
+                            "type": "array",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string"
+                                },
+                                "abbr": {
+                                    "key": "abbr",
+                                    "title": "Abbreviation",
+                                    "type": "string"
+                                },
+                                "role": {
+                                    "key": "role",
+                                    "title": "Role",
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        {
+                            "key": "project_desc.curators",
+                            "title": "Curator(s)",
+                            "type": "array",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Agency Name",
+                                    "type": "text",
+                                    "help_text": "Name of the person, corporate body, or agency responsible for the work's substantive and intellectual content. If a person, invert first and last name and use commas."
+                                },
+                                "role": {
+                                    "key": "role",
+                                    "title": "Role",
+                                    "type": "text",
+                                    "help_text": "Title of the person (if any) responsible for the work's substantive and intellectual content."
+                                },
+                                "affiliation": {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "text"
+                                },
+                                "abbreviation": {
+                                    "key": "abbreviation",
+                                    "title": "Abbreviation",
+                                    "help_text": "Abbreviation",
+                                    "type": "text"
+                                },
+                                "email": {
+                                    "key": "email",
+                                    "type": "text",
+                                    "title": "Email",
+                                    "help_text": "Email"
+                                },
+                                "url": {
+                                    "key": "url",
+                                    "type": "text",
+                                    "title": "URL"
+                                }
+                            }
+                        },
+                        {
+                            "key": "project_desc.reviews_comments",
+                            "title": "Reviews and comments",
+                            "type": "array",
+                            "props": {
+                                "comment_date": {
+                                    "key": "comment_date",
+                                    "title": "Comment date (YYYY-MM-DD)",
+                                    "type": "text"
+                                },
+                                "comment_by": {
+                                    "key": "comment_by",
+                                    "title": "Comment provider",
+                                    "type": "text"
+                                },
+                                "comment_description": {
+                                    "key": "comment_description",
+                                    "title": "Comment description",
+                                    "type": "text"
+                                },
+                                "comment_response": {
+                                    "key": "comment_response",
+                                    "title": "Response on comment",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "project_desc.acknowledgements",
+                            "title": "Acknowledgments",
+                            "type": "array",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string"
+                                },
+                                "affiliation": {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "string"
+                                },
+                                "role": {
+                                    "key": "role",
+                                    "title": "Role",
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        {
+                            "key": "project_desc.acknowledgement_statement",
+                            "title": "Acknowledgment statement",
+                            "type": "textarea"
+                        },
+                        {
+                            "key": "project_desc.disclaimer",
+                            "type": "text",
+                            "title": "Disclaimer"
+                        },
+                        {
+                            "key": "project_desc.confidentiality",
+                            "type": "text",
+                            "title": "Confidentiality"
+                        },
+                        {
+                            "key": "project_desc.citation_requirement",
+                            "type": "text",
+                            "title": "Citation requirements"
+                        },
+                        {
+                            "key": "project_desc.related_projects",
+                            "title": "Related projects",
+                            "type": "array",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string"
+                                },
+                                "uri": {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "string"
+                                },
+                                "note": {
+                                    "key": "note",
+                                    "title": "Note",
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        {
+                            "key": "project_desc.geographic_units",
+                            "title": "Geograpic locations",
+                            "type": "array",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string"
+                                },
+                                "code": {
+                                    "key": "code",
+                                    "title": "Location code",
+                                    "type": "string"
+                                },
+                                "type": {
+                                    "key": "type",
+                                    "title": "Type",
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        {
+                            "key": "project_description.keywords",
+                            "type": "array",
+                            "title": "Keywords",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Keyword",
+                                    "type": "text"
+                                },
+                                "vocabulary": {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulary",
+                                    "type": "text"
+                                },
+                                "uri": {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "project_description.themes",
+                            "type": "array",
+                            "title": "Themes",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Theme",
+                                    "type": "text"
+                                },
+                                "vocabulary": {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulary",
+                                    "type": "text"
+                                },
+                                "uri": {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "project_description.topics",
+                            "type": "array",
+                            "title": "Topics",
+                            "props": {
+                                "id": {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "text"
+                                },
+                                "name": {
+                                    "key": "name",
+                                    "title": "Topic",
+                                    "type": "text"
+                                },
+                                "parent_id": {
+                                    "key": "parent_id",
+                                    "title": "Parent topic Identifier",
+                                    "help_text": "For subtopics, provide the ID of the parent topic",
+                                    "type": "text"
+                                },
+                                "vocabulary": {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulary",
+                                    "type": "text"
+                                },
+                                "uri": {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "project_description.disciplines",
+                            "type": "array",
+                            "title": "Disciplines",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text"
+                                },
+                                "vocabulary": {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulary",
+                                    "type": "text"
+                                },
+                                "uri": {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "project_desc.repository_uri",
+                            "title": "Source code repository",
+                            "help_text": "Source code repository",
+                            "type": "array",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Repository name",
+                                    "help_text": "Name of the repository where code is hosted. e.g. `Github`, `Bitbucket`, etc.",
+                                    "type": "text"
+                                },
+                                "type": {
+                                    "key": "type",
+                                    "title": "Type",
+                                    "type": "text",
+                                    "help_text": "Repo type e.g. `git`, `svn`, `other`"
+                                },
+                                "uri": {
+                                    "key": "uri",
+                                    "type": "text",
+                                    "title": "URI"
+                                }
+                            }
+                        },
+                        {
+                            "key": "project_desc.license",
+                            "title": "License",
+                            "type": "array",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text"
+                                },
+                                "uri": {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "project_desc.copyright",
+                            "title": "Copyright",
+                            "type": "text"
+                        },
+                        {
+                            "key": "project_desc.technology_environment",
+                            "title": "Technology environment",
+                            "help_text": "Notes about specific technology environment for the project",
+                            "type": "text"
+                        },
+                        {
+                            "key": "project_desc.technology_requirements",
+                            "title": "Technology requirements",
+                            "help_text": "Any specific software.hardware or other requirements",
+                            "type": "text"
+                        },
+                        {
+                            "key": "project_desc.reproduction_instructions",
+                            "title": "Reproduction instructions",
+                            "type": "text"
+                        },
+                        {
+                            "key": "project_desc.methods",
+                            "title": "Methods or algorithms applied",
+                            "help_text": "Methods or algorithms used",
+                            "type": "array",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Method",
+                                    "type": "text"
+                                },
+                                "note": {
+                                    "key": "note",
+                                    "title": "Note",
+                                    "type": "text"
+                                }
+                            }
+                        },
+                        {
+                            "key": "project_desc_software_section",
+                            "title": "Software",
+                            "type": "section",
+                            "items":[
+                                {
+                                    "key": "project_desc.software",
+                                    "title": "Software",
+                                    "help_text": "Software",
+                                    "type": "nested_array",
+                                    "props": {
+                                        "name": {
+                                            "key": "name",
+                                            "title": "Method",
+                                            "type": "text"
+                                        },
+                                        "version": {
+                                            "key": "version",
+                                            "title": "Version",
+                                            "type": "text"
+                                        },
+                                        "library": {
+                                            "key": "library",
+                                            "title": "Libraries or packages used",
+                                            "help_text": "Libraries or packages used",
+                                            "type": "simple_array"
+                                        }
+                                    }
+                                }
+                            ]
+                        },                        
+                        {
+                            "key": "project_desc_scripts_section",
+                            "title": "Scripts",                            
+                            "type": "section",
+                            "items":[
+                                {
+                                    "key": "project_desc.scripts",
+                                    "title": "Scripts",
+                                    "help_text": "Description of each script file",
+                                    "type": "nested_array",
+                                    "props": {
+                                        "file_name": {
+                                            "key": "file_name",
+                                            "title": "File name",
+                                            "type": "text"
+                                        },
+                                        "zip_package": {
+                                            "key": "zip_package",
+                                            "title": "Zip package",
+                                            "type": "text"
+                                        },
+                                        "title": {
+                                            "key": "title",
+                                            "title": "Title",
+                                            "type": "text"
+                                        },
+                                        "authors": {
+                                            "key": "authors",
+                                            "type": "array",
+                                            "title": "Authors",
+                                            "props": {
+                                                "name": {
+                                                    "key": "name",
+                                                    "title": "Person or Organization name",
+                                                    "type": "string"
+                                                },
+                                                "abbr": {
+                                                    "key": "abbr",
+                                                    "title": "Abbreviation",
+                                                    "type": "string"
+                                                },
+                                                "role": {
+                                                    "key": "role",
+                                                    "title": "Role",
+                                                    "type": "string"
+                                                }
+                                            }
+                                        },
+                                        "date": {
+                                            "key": "date",
+                                            "title": "Date",
+                                            "type": "string"
+                                        },
+                                        "format": {
+                                            "key": "format",
+                                            "title": "Format",
+                                            "type": "string"
+                                        },
+                                        "software": {
+                                            "key": "software",
+                                            "title": "software",
+                                            "type": "string"
+                                        },
+                                        "description": {
+                                            "key": "description",
+                                            "title": "Description",
+                                            "type": "textarea"
+                                        },
+                                        "methods": {
+                                            "key": "methods",
+                                            "title": "Methods",
+                                            "type": "textarea"
+                                        },
+                                        "dependencies": {
+                                            "key": "dependencies",
+                                            "title": "Dependencies",
+                                            "type": "textarea"
+                                        },
+                                        "instructions": {
+                                            "key": "instructions",
+                                            "title": "Instructions or note for running the script",
+                                            "type": "textarea"
+                                        },
+                                        "source_code_repo": {
+                                            "key": "source_code_repos",
+                                            "title": "Source code repositor",
+                                            "type": "string"
+                                        },
+                                        "notes": {
+                                            "key": "notes",
+                                            "title": "Notes",
+                                            "type": "string"
+                                        },
+                                        "license": {
+                                            "key": "license",
+                                            "title": "License",
+                                            "type": "array",
+                                            "props": {
+                                                "name": {
+                                                    "key": "name",
+                                                    "title": "Name",
+                                                    "type": "text"
+                                                },
+                                                "uri": {
+                                                    "key": "uri",
+                                                    "title": "URI",
+                                                    "type": "text"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        },
+                        
+                        {
+                            "key": "project_desc.data_statement",
+                            "title": "Data statement",
+                            "help_text": "Overall statement on data used by the project.",
+                            "type": "text"
+                        },
+                        {
+                            "key": "project_desc.datasets",
+                            "title": "Datasets",
+                            "help_text": "List and description of datasets used by the research project",
+                            "type": "nested_array",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Dataset name",
+                                    "type": "text"
+                                },
+                                "idno": {
+                                    "key": "idno",
+                                    "title": "Dataset IDNO",
+                                    "type": "text"
+                                },
+                                "note": {
+                                    "key": "note",
+                                    "title": "Note",
+                                    "type": "text"
+                                },
+                                "access_type": {
+                                    "key": "access_type",
+                                    "title": "Data access policy",
+                                    "type": "text"
+                                },
+                                "license": {
+                                    "key": "license",
+                                    "title": "License",
+                                    "type": "text"
+                                },
+                                "license_uri": {
+                                    "key": "license_uri",
+                                    "title": "License URI",
+                                    "type": "text"
+                                },
+                                "uri": {
+                                    "key": "uri",
+                                    "type": "text",
+                                    "title": "URL"
+                                }
+                            }
+                        },
+                        {
+                            "key": "project_desc.contacts",
+                            "title": "Contacts",
+                            "type": "array",
+                            "props": {
+                                "name": {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string"
+                                },
+                                "role": {
+                                    "key": "role",
+                                    "title": "Role",
+                                    "type": "string"
+                                },
+                                "affiliation": {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "string"
+                                },
+                                "email": {
+                                    "key": "email",
+                                    "title": "Email",
+                                    "type": "string"
+                                },
+                                "telephone": {
+                                    "key": "telephone",
+                                    "title": "Phone",
+                                    "type": "string"
+                                },
+                                "uri": {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "string"
+                                }
                             }
                         }
-                    },
-                    {
-                        "key": "project_desc.contributor",
-                        "title": "Contributor(s)",
-                        "help_text": "The person, corporate body, or agency who contributed to the project.",
-                        "type": "array",
-                        "props": {
-                            "name": {
-                                "key": "name",
-                                "title": "Agency Name",
-                                "type": "text",
-                                "help_text": "Name of the person, corporate body, or agency responsible for the work's substantive and intellectual content. If a person, invert first and last name and use commas."
-                            },
-                            "role": {
-                                "key": "role",
-                                "title": "Role",
-                                "type": "text",
-                                "help_text": "Title of the person (if any) responsible for the work's substantive and intellectual content."
-                            },
-                            "affiliation": {
-                                "key": "affiliation",
-                                "title": "Affiliation",
-                                "type": "text"
-                            },
-                            "abbreviation": {
-                                "key": "abbreviation",
-                                "title": "Abbreviation",
-                                "help_text": "Abbreviation",
-                                "type": "text"
-                            },
-                            "email": {
-                                "key": "email",
-                                "type": "text",
-                                "title": "Email",
-                                "help_text": "Email"
-                            },
-                            "url": {
-                                "key": "url",
-                                "type": "text",
-                                "title": "URL",                        
-                            }
-                        }
-                    },
-                    {
-                        "key": "project_desc.curator",
-                        "title": "Curator(s)",                        
-                        "type": "array",
-                        "props": {
-                            "name": {
-                                "key": "name",
-                                "title": "Agency Name",
-                                "type": "text",
-                                "help_text": "Name of the person, corporate body, or agency responsible for the work's substantive and intellectual content. If a person, invert first and last name and use commas."
-                            },
-                            "role": {
-                                "key": "role",
-                                "title": "Role",
-                                "type": "text",
-                                "help_text": "Title of the person (if any) responsible for the work's substantive and intellectual content."
-                            },
-                            "affiliation": {
-                                "key": "affiliation",
-                                "title": "Affiliation",
-                                "type": "text"
-                            },
-                            "abbreviation": {
-                                "key": "abbreviation",
-                                "title": "Abbreviation",
-                                "help_text": "Abbreviation",
-                                "type": "text"
-                            },
-                            "email": {
-                                "key": "email",
-                                "type": "text",
-                                "title": "Email",
-                                "help_text": "Email"
-                            },
-                            "url": {
-                                "key": "url",
-                                "type": "text",
-                                "title": "URL",                        
-                            }
-                        }
-                    },
-                    {
-                        "key": "project_desc.abstract",
-                        "title": "Abstract",
-                        "type": "textarea"
-                    },
-                    {
-                        "key": "project_desc.output_type",
-                        "title": "Output type",
-                        "help_text": "Type of output of the script.research project. Example: `On-line interactive data visualization`, `Working paper`",
-                        "type": "text"
-                    },
-                    {
-                        "key": "project_desc.publication_url",
-                        "title": "Publication URL",
-                        "help_text": "Link to the publication (output) to which the scripts are related. This will for example be the URL of a PDF working paper.",
-                        "type": "text"
-                    },
-                    {
-                        "key": "project_desc.doi",
-                        "title": "DOI",
-                        "help_text": "DOI handle",
-                        "type": "text"
-                    },
-
-    {
-        "key": "project_desc.repository_url",
-        "title": "Source code repository",
-        "help_text": "Source code repository",
-        "type": "array",
-        "props": {
-            "name": {
-                "key": "name",
-                "title": "Repository name",
-                "help_text": "Name of the repository where code is hosted. e.g. `Github`, `Bitbucket`, etc.",
-                "type": "text"                
-            },
-            "type": {
-                "key": "type",
-                "title": "Type",
-                "type": "text",  
-                "help_text": "Repo type e.g. `git`, `svn`, `other`"              
-            },
-            "uri": {
-                "key": "uri",
-                "type": "text",
-                "title": "URI"                
-            }
-        }
-    },
-
-
-    {
-        "key": "project_desc.project_website",
-        "title": "Project website link",
-        "help_text": "Project website link",
-        "type": "text"
-    },
-    {
-        "key": "project_desc.version_statement.version",
-        "title": "Version",        
-        "type": "text"
-    },
-
-    {
-        "key": "project_desc.version_statement.version_date",
-        "title": "Version Date",
-        "type": "text"
-    },
-
-    {
-        "key": "project_desc.version_statement.version_resp",
-        "title": "Version Responsibility Statement",
-        "help_text": "The organization or person responsible for the version of the work",
-        "type": "text"
-    },
-
-    {
-        "key": "project_desc.version_statement.version_notes",
-        "title": "Version Notes",        
-        "type": "text"
-    },
-    {
-        "key": "project_desc.language",
-        "title": "Language",
-        "help_text": "Documentation language e.g. English, French, etc.",
-        "type": "array",
-        "props": {
-            "name": {
-                "key": "name",
-                "title": "Language",
-                "type": "text"                
-            },
-            "code": {
-                "key": "code",
-                "title": "Language code",
-                "type": "text"
-            }
-        }
-    },
-    {
-        "key": "project_desc.methods",
-        "title": "Methods or algorithms applied",
-        "help_text": "Methods or algorithms used",
-        "type": "array",
-        "props": {
-            "name": {
-                "key": "name",
-                "title": "Method",
-                "type": "text"                
-            },
-            "note": {
-                "key": "note",
-                "title": "Note",
-                "type": "text"  
-            }
-        }
-    },
-
-    {
-        "key": "project_desc.software",
-        "title": "Software",
-        "help_text": "Software",
-        "type": "array",
-        "props": {
-            "name": {
-                "key": "name",
-                "title": "Method",
-                "type": "text"                
-            },
-            "version": {
-                "key": "version",
-                "title": "Version",
-                "type": "text"  
-            },
-            "library": {
-                "key": "library",
-                "title": "Libraries or packages used",
-                "help_text": "Libraries or packages used",
-                "type": "simple_array"  
-            }
-        }
-    },
-
-    {
-        "key": "project_desc.technology_environment",
-        "title": "Technology environment",
-        "help_text": "Notes about specific technology environment for the project",
-        "type": "text"  
-    },
-    {
-        "key": "project_desc.technology_requirements",
-        "title": "Technology requirements",
-        "help_text": "Any specific software.hardware or other requirements",
-        "type": "text"  
-    },
-
-    {
-        "key": "project_desc.reproduction_instructions",
-        "title": "Reproduction instructions",
-        "type": "text"  
-    },    
-    {
-        "key": "project_desc.license",
-        "title": "License",
-        "type": "array",
-        "props": {
-            "name": {
-                "key": "name",
-                "title": "Name",
-                "type": "text"                
-            },
-            "uri": {
-                "key": "uri",
-                "title": "URI",
-                "type": "text"  
-            }
-        }
-    },
-
-    {
-        "key": "project_desc.pub_research",
-        "title": "Published research",
-        "type": "array",
-        "props": {
-            "submit_date": {
-                "key": "submit_date",
-                "title": "Date submitted",
-                "type": "text"                
-            },
-            "reviewer": {
-                "key": "Reviewer",
-                "title": "Reviewer",
-                "type": "text"  
-            },
-            "review_status": {
-                "key": "review_status",
-                "title": "Review status",
-                "type": "string"
-            },
-            "review_date": {
-                "key": "review_date",
-                "title": "Review date",
-                "type": "string"
-            },
-            "approval_date": {
-                "key": "approval_date",
-                "title": "Approval date",
-                "type": "string"
-            },
-            "approval_authority": {
-                "key": "approval_authority",
-                "title": "Approval authority",
-                "type": "string"
-            },
-            "pub_date": {
-                "key": "pub_date",
-                "title": "Date published",
-                "type": "string"
-            }
-        }
-    },
-
-    {
-        "key": "project_desc.data_included",
-        "title": "Is data included with the script?",
-        "type": "boolean"
-    },
-
-    {
-        "key": "project_desc.data_url",
-        "title": "Link to an external website where data is available",
-        "type": "text"
-    },
-
-    {
-        "key": "project_desc.contact",
-        "title": "Contact",
-        "type": "array",
-        "props": {
-            "name": {
-                "key": "name",
-                "title": "Name",
-                "type": "text"                
-            },
-            "affiliation": {
-                "key": "affiliation",
-                "title": "Affiliation",
-                "type": "text"
-            },
-            "URI": {
-                "key": "URI",
-                "type": "text",
-                "title": "URL"                    
-            }
-        }
-    },
-
-    {
-        "key": "project_desc.disclaimer",
-        "type": "text",
-        "title": "Disclaimer"                    
-    },
-    {
-        "key": "project_desc.confidentiality",
-        "type": "text",
-        "title": "Confidentiality"                    
-    },
-    {
-        "key": "project_desc.citation_requirement",
-        "type": "text",
-        "title": "Citation requirements"                    
-    },
-    {
-        "key": "project_desc.data_desc",
-        "title": "Data description",
-        "type": "array",
-        "props": {
-            "name": {
-                "key": "name",
-                "title": "Dataset name",
-                "type": "text"
-            },
-            "idno": {
-                "key": "idno",
-                "title": "Dataset IDNO",
-                "type": "text"
-            },
-            "note": {
-                "key": "note",
-                "title": "Note",
-                "type": "text"
-            },
-            "access_type": {
-                "key": "access_type",
-                "title": "Data access policy",
-                "type": "text"
-            },
-            "URI": {
-                "key": "URI",
-                "type": "text",
-                "title": "URL"                    
-            }
-        }
-    },
-
-    {
-        "key": "project_desc.review_process",
-        "title": "Project Review Process",
-        "help_text": "Project review process that led to the publishing of the scripts",
-        "type": "array",
-        "props": {
-            "submit_date": {
-                "key": "submit_date",
-                "title": "Date submitted",
-                "type": "text"                
-            },
-            "reviewer": {
-                "key": "Reviewer",
-                "title": "Reviewer",
-                "type": "text"  
-            },
-            "review_status": {
-                "key": "review_status",
-                "title": "Review status",
-                "type": "string"
-            },
-            "review_date": {
-                "key": "review_date",
-                "title": "Review date",
-                "type": "string"
-            },
-            "approval_date": {
-                "key": "approval_date",
-                "title": "Approval date",
-                "type": "string"
-            },
-            "authority": {
-                "key": "authority",
-                "title": "Authority",
-                "help_text": "Identification of the person or organization having formally approved the scripts.project after comlpetion of the review process",
-                "type": "string"
-            }
-        }
-    },
-
-    {
-        "key": "project_desc.sponsor",
-        "title": "Sponsor",
-        "help_text": "The source(s) of funds for production of the work. If different funding agencies sponsored different stages of the production process, use the 'role' attribute to distinguish them.",
-        "type": "array",
-        "props": {
-            "name": {
-                "key": "name",
-                "title": "Name",
-                "type": "string"
-            },
-            "abbr": {
-                "key": "abbr",
-                "title": "Abbreviation",
-                "type": "string"
-            },
-            "role": {
-                "key": "role",
-                "title": "Role",
-                "type": "string"
-            }
-        }
-    },
-
-
-    {
-        "key": "project_desc.acknowledgements",
-        "title": "Acknowledgments",
-        "type": "array",
-        "props": {
-            "name": {
-                "key": "name",
-                "title": "Name",
-                "type": "string"
-            },
-            "affiliation": {
-                "key": "affiliation",
-                "title": "Affiliation",
-                "type": "string"
-            },
-            "role": {
-                "key": "role",
-                "title": "Role",
-                "type": "string"
-            }
-        }
-    },
-
-    {
-        "key": "project_desc.related_projects",
-        "title": "Related projects",
-        "type": "array",
-        "props": {
-            "name": {
-                "key": "name",
-                "title": "Name",
-                "type": "string"
-            },
-            "uri": {
-                "key": "uri",
-                "title": "URI",
-                "type": "string"
-            },
-            "note": {
-                "key": "note",
-                "title": "Note",
-                "type": "string"
-            }
-        }
-    },
-
-    {
-        "key": "project_desc.contacts",
-        "title": "Contacts",
-        "type": "array",
-        "props": {
-            "name": {
-                "key": "name",
-                "title": "Name",
-                "type": "string"
-            },
-            "affiliation": {
-                "key": "affiliation",
-                "title": "Affiliation",
-                "type": "string"
-            },
-            "uri": {
-                "key": "uri",
-                "title": "URI",
-                "type": "string"
-            },
-            "phone": {
-                "key": "phone",
-                "title": "Phone",
-                "type": "string"
-            }
-        }
-    }
-
-                ]
-            }
-        ]    
-    },
-
-    {
-        "type": "section",
-        "id": "script_files_section",
-        "title": "Files",
-        "class": "recommended",
-        "items": [
-
-    
-    {
-        "key": "project_desc.script_files",
-        "title": "Script files",
-        "type": "nested_array",
-        "props": {
-            "file_name": {
-                "key": "file_name",
-                "title": "File name",
-                "type": "string"
-            },
-            "title": {
-                "key": "title",
-                "title": "Title",
-                "type": "string"
-            },
-            "authors": {
-                "key": "authors",
-                "type": "array",
-                "title": "Authors",
-                "props": {                    
-                    "name": {
-                        "key": "name",
-                        "title": "Person or Organization name",
-                        "type": "string",
-                        "required":true,
-                        "rules":"required",
-                        "xname": "Script files / authors / name"
-                    },
-                    "abbr": {
-                        "key": "abbr",
-                        "title": "Abbreviation",
-                        "type": "string"
-                    },
-                    "role": {
-                        "key": "role",
-                        "title": "Role",
-                        "type": "string"
-                    }                    
+                    ]
                 }
-            },
-            "date": {
-                "key": "date",
-                "title": "Date",
-                "type": "string"
-            },
-            "format": {
-                "key": "format",
-                "title": "Format",
-                "type": "string"
-            },
-            "software": {
-                "key": "software",
-                "title": "software",
-                "type": "string"
-            },
-            "help_text": {
-                "key": "help_text",
-                "title": "help_text",
-                "type": "string"
-            },
-            "methods": {
-                "key": "methods",
-                "title": "Methods",
-                "type": "string"
-            },
-            "dependencies": {
-                "key": "dependencies",
-                "title": "Dependencies",
-                "type": "string"
-            },
-            "instructions": {
-                "key": "instructions",
-                "title": "Instructions or note for running the script",
-                "type": "string"
-            },
-            "source_code_repo": {
-                "key": "source_code_repos",
-                "title": "Source code repositor",
-                "type": "string"
-            },
-            "notes": {
-                "key": "notes",
-                "title": "Notes",
-                "type": "string"
-            }
+            ]
         }
-    }
-        ]
-    }
-]
+    ]
 }

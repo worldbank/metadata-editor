@@ -5,23 +5,34 @@
 
 <!--section container fields -->
 <div class="form-group">
-    <label for="name">Custom label:</label>
+    <label for="name">Label:</label>
     <input type="text" class="form-control" id="name" placeholder="Label" v-model="ActiveNode.title">
     <div v-if="ActiveNode.key && coreTemplateParts[ActiveNode.key]" class="text-secondary font-small" style="margin-top:4px;font-size:small">Original label: {{coreTemplateParts[ActiveNode.key].title}}</div>
 </div>
 
-<div class="form-group form-check" v-if="ActiveNode.type!=='section' &&  ActiveNode.type!=='section_container'">
-    <input type="checkbox" class="form-check-input" id="required" v-model="ActiveNode.required">
-    <label class="form-check-label" for="required">Mandatory</label>
+<div class="row">
+    <div class="col-auto">
+        <div class="form-group form-check" v-if="ActiveNode.type!=='section' &&  ActiveNode.type!=='section_container'">
+            <input type="checkbox" class="form-check-input" id="required" v-model="ActiveNode.is_required" >
+            <label class="form-check-label" for="required">Mandatory</label>
+        </div>
+    </div>
+
+    <div class="col-auto">
+        <div class="form-group form-check" v-if="ActiveNode.type!=='section' &&  ActiveNode.type!=='section_container'">
+            <input type="checkbox" class="form-check-input" id="recommended" v-model="ActiveNode.is_recommended">
+            <label class="form-check-label" for="recommended">Recommended</label>
+        </div>
+    </div>
 </div>
 
 <div class="form-group mb-3" v-if="ActiveNode.key">
-    <label >Custom description:</label>
+    <label >Description:</label>
     <textarea style="height:200px;" class="form-control"  v-model="ActiveNode.help_text"></textarea>
     <div class="text-secondary p-1" style="font-size:small;">
         <div>Original description:</div>
-        <div v-if="coreTemplateParts[ActiveNode.key].help_text">            
-            <div style="white-space: pre-wrap;">{{coreTemplateParts[ActiveNode.key].help_text}}</div>            
+        <div v-if="coreTemplatePartsHelpText(coreTemplateParts[ActiveNode.key])">            
+            <div style="white-space: pre-wrap;">{{coreTemplatePartsHelpText(coreTemplateParts[ActiveNode.key])}}</div>
         </div>
         <div v-else>N/A</div>
     </div>
@@ -87,7 +98,12 @@
             <!-- end default -->
         </v-tab-item>
         <v-tab-item class="p-3" v-if="ActiveNode.type!=='array'">
-            <validation-rules-component @update:value="DefaultUpdate" v-model="ActiveNode.default" :columns="ActiveNodeControlledVocabColumns" class="border m-2 pb-2" />
+            <div class="form-group" >
+                <label for="controlled_vocab">Validation rules:</label>
+                <div class="bg-white border">
+                    <validation-rules-component v-model="ActiveNode.rules"  class="m-2 pb-2" />
+                </div>
+            </div>
         </v-tab-item>
     </v-tabs>
 
@@ -104,6 +120,8 @@
     <?php /* <pre>{{CoreTreeItems}}</pre> */ ?>
     </div>
 </div>
+
+<?php /*  [<pre>{{ActiveNode}}</pre>] */ ?>
 
 </div>
 <!-- end item -->

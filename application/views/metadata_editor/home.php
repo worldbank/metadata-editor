@@ -174,7 +174,7 @@
                             </a>
                           </h5>
                           <div class="text-secondary text-small">
-                            {{project.idno}}
+                          {{project.type}} {{project.idno}}
                           </div>
                                                   
                           <div class="survey-stats mt-3 text-small">
@@ -220,8 +220,13 @@
               <div>
                 <a class="dropdown-item" href="#" @click="createProject('survey')">Microdata</a>
                 <a class="dropdown-item" href="#" @click="createProject('timeseries')">Timeseries</a>
+                <a class="dropdown-item" href="#" @click="createProject('timeseries-db')">Timeseries database</a>
                 <a class="dropdown-item" href="#" @click="createProject('document')">Document</a>
                 <a class="dropdown-item" href="#" @click="createProject('table')">Table</a>
+                <a class="dropdown-item" href="#" @click="createProject('image')">Image</a>
+                <a class="dropdown-item" href="#" @click="createProject('script')">Script</a>
+                <a class="dropdown-item" href="#" @click="createProject('video')">Video</a>
+                <a class="dropdown-item" href="#" @click="createProject('geospatial')">Geospatial</a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="#">Import from URL</a>
               </div>
@@ -318,6 +323,12 @@
         project_types_icons: {
           "document": "fa fa-file-code",
           "survey": "fa fa-database",
+          "geospatial": "fa fa-globe-americas",
+          "table": "fa fa-database",
+          "timeseries": "fa fa-chart-line",
+          "image": "fa fa-image",
+          "video": "fa fa-video",
+          "script": "fa fa-file-code",
 
         }
 

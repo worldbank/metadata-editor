@@ -75,7 +75,7 @@
     let user_template_parts = <?php echo json_encode($user_template_parts, JSON_PRETTY_PRINT); ?>;
   </script>
 
-  <div id="app">
+  <div id="app" data-app>
     <div class="header bg-dark p-1 pt-2" style="margin-bottom:12px;">
       <div class="row">
         <div class="col-md-10">
@@ -531,7 +531,21 @@
         },
         cancelTemplate: function() {
           window.location.href = CI.base_url + '/admin/metadata_editor/templates';
+        },
+        coreTemplatePartsHelpText: function(element)
+        {
+          if (element && element.help_text){
+            return element.help_text;
+          }
+          return '';
         }
+      },
+      watch:{
+        'ActiveNode.is_recommended': function (val) {
+          if (val==true){
+            this.ActiveNode.is_required=true;
+          }
+        },
       },
       computed: {
         UserTreeUsedKeys() {

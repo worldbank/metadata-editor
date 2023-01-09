@@ -1,6 +1,6 @@
 //v-form
 Vue.component('v-form', {
-    props: ['title', 'items', 'depth', 'css_class','path', 'field'],
+    props: ['title', 'items', 'depth', 'css_class','path', 'field','active_section'],
     data() {
         return {
         }
@@ -74,7 +74,7 @@ Vue.component('v-form', {
                 </div>
                 <!-- end-form-section-container -->
 
-                <!-- form-section -->
+                <!-- form-section --> 
                 <div v-if="item.type=='section'"  class="form-section" >
                     <!-- <div>item.key={{item.key}} - active_section={{active_section}} - {{showActiveSection(item.key,active_section)}}</div> -->
                     <div v-show="showActiveSection(item.key,active_section)">
@@ -104,18 +104,45 @@ Vue.component('v-form', {
 
                 <!-- textarea-->
                 <div v-if="item.type=='textarea'">
-
                     <div class="form-group form-field" :class="['field-' + item.key, item.class] ">
                         <label :for="'field-' + normalizeClassID(item.key)">{{item.title}}</label>
-                        <textarea
+                        <textarea-autosize
+                            :max-height="350"
                             v-model="formData[item.key]"        
                             class="form-control form-field-textarea" 
                             :id="'field-' + normalizeClassID(item.key)"                                     
-                        ></textarea>
+                        ></textarea-autosize>
                         <small class="help-text form-text text-muted">{{item.help_text}}</small>                            
                     </div>
 
                 </div> 
+
+
+                <template v-if="item.type=='date'">
+                <!--date-field-->
+                    <div class="form-group form-field" :class="['field-' + item.key, item.class] ">
+
+                        <label :for="'field-' + normalizeClassID(item.key)">
+                            {{item.title}}
+                            <span class="small" v-if="item.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(item.key)" ><i class="far fa-question-circle"></i></span>
+                            <span v-if="item.required==true" class="required-label"> * </span>
+                        </label>
+                        
+                        <validation-provider 
+                            :rules="item.rules" 
+                            :debounce=500
+                            v-slot="{ errors }"                            
+                            :name="item.title"
+                            >
+
+                        <editor-date-field v-model="formData[item.key]" :field="field"></editor-date-field>
+                        <span v-if="errors[0]" class="error">{{errors[0]}}</span>
+                    </validation-provider>
+                        
+                        <small :id="'field-toggle-' + normalizeClassID(item.key)" class="collapse help-text form-text text-muted">{{item.help_text}}</small>                            
+                    </div>
+                <!--end-date-field-->
+                </template>
 
                 <!--text-field-->
                 <div v-if="item.type=='text' || item.type=='string' ">
@@ -149,36 +176,38 @@ Vue.component('v-form', {
                 <!--end-text-field-->
 
 
-            <div v-if="item.type=='array'">                
-            <div class="form-group form-field form-field-table">
-                <label :for="'field-' + normalizeClassID(item.key)">{{item.title}}</label>
-                <span class="small" v-if="item.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(item.key)" ><i class="far fa-question-circle"></i></span>
-                <small :id="'field-toggle-' + normalizeClassID(item.key)" class="collapse help-text form-text text-muted">{{item.help_text}}</small>
-                <grid-component
-                    :id="'field-' + normalizeClassID(item.key)" 
-                    :value="formData[item.key]"                                         
-                    :columns="item.props"
-                    :path="item.key"
-                    :field="item"
-                    >
-                </grid-component>  
-            </div>    
-        </div>
+            <div v-if="item.type=='array'">
+                <div class="form-group form-field form-field-table">
+                    <label :for="'field-' + normalizeClassID(item.key)">{{item.title}}</label>
+                    <span class="small" v-if="item.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(item.key)" ><i class="far fa-question-circle"></i></span>
+                    <small :id="'field-toggle-' + normalizeClassID(item.key)" class="collapse help-text form-text text-muted">{{item.help_text}}</small>
+                    <grid-component
+                        :id="'field-' + normalizeClassID(item.key)" 
+                        :value="formData[item.key]"                                         
+                        :columns="item.props"
+                        :path="item.key"
+                        :field="item"
+                        >
+                    </grid-component>  
+                </div>    
+            </div>
 
         <div v-if="item.type=='simple_array'">
             <div class="form-group form-field form-field-table">
                 <label :for="'field-' + normalizeClassID(path)">{{item.title}}</label>
+                <span class="small" v-if="item.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(item.key)" ><i class="far fa-question-circle"></i></span>
                 <simple-array-component
                     :id="'field-' + normalizeClassID(item.key)" 
                     :value="formData[item.key]"
                     :path="item.key"
                     :field="item"
                     >
-                </simple-array-component>  
+                </simple-array-component>
+                <small :id="'field-toggle-' + normalizeClassID(item.key)" class="collapse help-text form-text text-muted">{{item.help_text}}</small>  
             </div>    
         </div>
 
-        <div v-if="item.type=='nested_array'">
+        <div v-if="item.type=='nested_array'" class="mt-2 mb-3">
             <label :for="'field-' + normalizeClassID(item.key)">{{item.title}}</label>
             <nested-section 
                 :value="formData[item.key]"                                         

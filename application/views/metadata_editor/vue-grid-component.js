@@ -10,8 +10,7 @@ Vue.component('grid-component', {
     },
     watch: { 
         field_data: function(newVal, oldVal) {
-            console.log('Prop changed: ', newVal, ' | was: ', oldVal)
-            //console.log(this.key_path);                    
+            console.log('Prop changed: ', JSON.stringify(newVal), ' | was: ', JSON.stringify(oldVal))
             this.$vueSet (this.$store.state.formData, this.key_path, newVal);
         }
     
@@ -23,6 +22,7 @@ Vue.component('grid-component', {
             this.field_data=[];
             this.field_data.push({});
         }
+        console.log("array-mounted  ",this.path,JSON.stringify(this.field_data), JSON.stringify(this.value));
     },
     computed: {
         localColumns(){
@@ -32,6 +32,7 @@ Vue.component('grid-component', {
     template: `
             <!--vuejs template for grid -->
             <div class="grid-component">
+
             <table class="table table-striped table-sm">
                 <thead class="thead-light">
                 <tr>
@@ -60,7 +61,7 @@ Vue.component('grid-component', {
                                 v-model="field_data[index][column.key]"
                                 class="form-control form-control-sm"                                 
                             >
-                            <span v-if="errors[0]" class="error">{{ errors[0] }}</span>
+                            <span v-if="errors[0]" class="error"><small>{{ errors[0] }}</small></span>
                         </validation-provider>
                             
                         </div>
