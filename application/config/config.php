@@ -385,10 +385,10 @@ $config['encryption_key'] = "CzYs1979";
 | except for 'cookie_prefix' and 'cookie_httponly', which are ignored here.
 |
 */
-$config['sess_driver'] = 'files';
+$config['sess_driver'] = 'database';
 $config['sess_cookie_name'] = 'ihsn_nada';
 $config['sess_expiration'] = 7200; //7200 default
-$config['sess_save_path'] = FCPATH.'files/sessions';
+$config['sess_save_path'] = 'ci_sessions';//FCPATH.'files/sessions';
 $config['sess_match_ip'] = FALSE;
 $config['sess_time_to_update'] = 0;
 $config['sess_regenerate_destroy'] = FALSE;
@@ -412,7 +412,7 @@ $config['cookie_prefix']	= '';
 $config['cookie_domain']	= '';
 $config['cookie_path']		= '/';
 $config['cookie_secure']	= FALSE;
-$config['cookie_httponly'] 	= FALSE;
+$config['cookie_httponly'] 	= TRUE;
 
 /*
 |--------------------------------------------------------------------------
@@ -778,7 +778,7 @@ $config['otp_verification']=0;
 $config['enable_access_policy_import']=false;
 
 //show tabs for each data type on search page
-$config['data_types_nav_bar']=false;
+$config['data_types_nav_bar']=true;
 
 //catalog search box location
 $config['search_box_orientation']='default'; //inline, default

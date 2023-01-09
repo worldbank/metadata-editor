@@ -31,7 +31,7 @@ $config['licensed_access']['dataset_access'] = false;
  * Enable or disable data classifications
  * 
  */
-$config['data_classifications_enabled']=true;
+$config['data_classifications_enabled']=false;
 
 
 /*
