@@ -26,7 +26,13 @@
       background: #ececec;
       cursor:pointer;
     }
+
+  .table-sm td,
+  .table-sm th{
+      font-size:small;
+  }
   </style>
+
 
 </head>
 
@@ -76,6 +82,7 @@
   </script>
 
   <div id="app" data-app>
+    <v-app>
     <div class="header bg-dark p-1 pt-2" style="margin-bottom:12px;">
       <div class="row">
         <div class="col-md-10">
@@ -198,6 +205,7 @@
       </div>
 
     </div>
+    </v-app>
   </div>
 
   <script>
@@ -416,11 +424,8 @@
         },
         moveUp: function()
         {
-          parentNode = this.findNodeParent(this.UserTemplate, this.ActiveNode.key);
-          //nodeIdx= 
-          console.log(parentNode);
+          parentNode = this.findNodeParent(this.UserTemplate, this.ActiveNode.key);          
           nodeIdx=this.findNodePosition(parentNode,this.ActiveNode.key);
-          console.log("node index",nodeIdx);
           if (nodeIdx >0 ){
             this.array_move(parentNode.items,nodeIdx,nodeIdx-1);
           }
@@ -431,7 +436,6 @@
           nodeIdx=this.findNodePosition(parentNode,this.ActiveNode.key);
 
           parentNodeItemsCount=parentNode.items.length-1;
-          console.log("items in node",parentNodeItemsCount, nodeIdx);
           
           if (nodeIdx >-1 && nodeIdx<parentNodeItemsCount){
             this.array_move(parentNode.items,nodeIdx,nodeIdx+1);
@@ -541,11 +545,6 @@
         }
       },
       watch:{
-        'ActiveNode.is_recommended': function (val) {
-          if (val==true){
-            this.ActiveNode.is_required=true;
-          }
-        },
       },
       computed: {
         UserTreeUsedKeys() {

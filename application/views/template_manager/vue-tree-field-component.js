@@ -15,22 +15,30 @@ Vue.component('nada-treeview-field', {
               txt: 'mdi-file-document-outline',
               xls: 'mdi-file-excel',
             },
-            selected_item:{},           
+            selected_item:{},
+            activeNode:{},
+            switchShowAll:false
         }
     },
-    created: function(){
-        
+    mounted: function(){
+      //this.initiallyOpen.push(this.Items[0].key);
+      window._items=this.Items;
     },
     
     computed: {
         Items(){
-          console.log("templateActiveNode",this.TemplateActiveNode);
           if (this.TemplateActiveNode){
             parent=this.findNodeParent(this.UserTemplate,this.TemplateActiveNode.key);
-            console.log("value matched",parent);
             return this.coreTemplateParts[parent.key].items;
           }
-          //return this.value;
+        },
+        filteredItems()
+        {
+          if (this.switchShowAll){
+            return this.Items;
+          }
+
+          return this.filterUnused(this.Items);          
         },
         coreTemplateParts(){
           return this.$store.state.core_template_parts;
@@ -58,6 +66,30 @@ Vue.component('nada-treeview-field', {
         },
     },
     methods:{
+       filterUnused: function(node)
+       {
+         let vm=this;
+         return node.reduce((acc,obj)=>{
+           
+           if (obj.items){
+            result={...obj, items: this.filterUnused(obj.items)};
+
+            if (result.items && result.items.length>0){
+              return [...acc, result];
+            }else{
+              return acc;
+            }
+           }
+           else if (!vm.isItemInUse(obj.key)){
+               return [...acc,obj];
+           }
+           else{
+             return acc;
+           }
+       
+         },[]);
+       },
+
       findNodeParent: function(tree,node_key)
           {
             found='';
@@ -116,8 +148,9 @@ Vue.component('nada-treeview-field', {
 
          return exists;
        },
-      treeClick: function (node){
-        //expand tree node          
+      treeClick: function (node)
+      {
+        this.activeNode=node;
         this.initiallyOpen.push(node.key);
 
         if (this.isItemInUse(node.key)){
@@ -130,55 +163,124 @@ Vue.component('nada-treeview-field', {
     template: `
             <div class="nada-treeview-component">
 
-            <template>
-              <v-treeview                   
-                  color="warning"
-                  v-model="Items"                   
-                  :open.sync="initiallyOpen" 
-                  :items="Items" 
-                  activatable dense 
-                  item-key="key" 
-                  item-text="title"                         
-                  expand-icon="mdi-chevron-down"
-                  indeterminate-icon="mdi-bookmark-minus"
-                  on-icon="mdi-bookmark"
-                  off-icon="mdi-bookmark-outline"
-                  item-children="items"
-              >
+            <div class="container-fluid p-1 pt-2">
+            
+            <v-switch
+              v-model="switchShowAll"
+              label="Show all elements"
+            ></v-switch>
+            
 
-                <template #label="{ item }" >
-                    <span @click="treeClick(item)" :title="item.title" >
-                        <span v-if="isItemInUse(item.key) && !isItemContainer(item)" style="color:gray;">{{item.title}}</span>
-                        <span v-else>{{item.title}}</span>
-                    </span>
-                </template>
+            <div class="row">
+              <div class="col-md-6" style="height: 100vh; overflow: auto;">
 
-                <template v-slot:prepend="{ item, open }">
-                  <v-icon v-if="!item.file">
-                    {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
-                  </v-icon>
-                  <v-icon v-else>
-                    {{ files[item.file] }}
-                  </v-icon>
-                </template>
+                <div class="p-3 border m-3 text-center" v-if="filteredItems.length==0">No elements are available</div>
 
-                <template slot="prepend" slot-scope="{ item, open }" >
-                  <span v-if="isItemContainer(item)">
+                <v-treeview                   
+                    color="warning"
+                    open-all
+                    :open.sync="initiallyOpen" 
+                    :items="filteredItems" 
+                    activatable dense 
+                    item-key="key" 
+                    item-text="title"                         
+                    expand-icon="mdi-chevron-down"
+                    indeterminate-icon="mdi-bookmark-minus"
+                    on-icon="mdi-bookmark"
+                    off-icon="mdi-bookmark-outline"
+                    item-children="items"
+                >
+
+                  <template #label="{ item }" >
+                      <span @click="treeClick(item)" :title="item.title" >
+                          <span v-if="isItemInUse(item.key) && !isItemContainer(item)" style="color:gray;">{{item.title}}</span>
+                          <span v-else>{{item.title}}</span>
+                      </span>
+                  </template>
+
+                  <template v-slot:prepend="{ item, open }">
                     <v-icon v-if="!item.file">
                       {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
                     </v-icon>
                     <v-icon v-else>
                       {{ files[item.file] }}
                     </v-icon>
-                  </span>
-                  <span v-else>
-                    <v-icon small color="#007bff" v-if="!isItemInUse(item.key)" @click="addItem(item)">mdi-plus-box</v-icon>
-                    <v-icon small v-if="isItemInUse(item.key)" @click="addItem(item)">mdi-checkbox-marked</v-icon>
-                  </span>
-                </template>
+                  </template>
 
-              </v-treeview>
-            </template>
+                  <template slot="prepend" slot-scope="{ item, open }" >
+                    <span v-if="isItemContainer(item)">
+                      <v-icon v-if="!item.file">
+                        {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
+                      </v-icon>
+                      <v-icon v-else>
+                        {{ files[item.file] }}
+                      </v-icon>
+                    </span>
+                    <span v-else>
+                      <v-icon small color="#007bff" v-if="!isItemInUse(item.key)" @click="addItem(item)">mdi-plus-box</v-icon>
+                      <v-icon small v-if="isItemInUse(item.key)" @click="addItem(item)">mdi-checkbox-marked</v-icon>
+                    </span>
+                  </template>
+
+                </v-treeview>
+              </div>
+              <div class="col-md-6" style="height: 100vh; overflow: auto;">
+                <div v-if="activeNode.key" class="p-3">
+                
+                  <div><strong>Element description</strong></div>
+                  <table class="table table-sm table-bordered table-striped">
+                    <tr>
+                      <td>Element</td>
+                      <td>{{activeNode.key}}</td>
+                    </tr>
+                    <tr>
+                      <td>Type</td>
+                      <td>{{activeNode.type}}</td>
+                    </tr>
+                    <tr>
+                      <td>Title</td>
+                      <td>{{activeNode.title}}</td>
+                    </tr>
+                    <tr>
+                      <td>Description</td>
+                      <td><div style="white-space: pre-wrap;">{{activeNode.help_text}}</div></td>
+                    </tr>                    
+                  </table>
+
+                  <div v-if="activeNode.props" >
+                      <strong>Array properties</strong>
+                      
+                          <table class="table table-sm">
+                            <thead>
+                            <tr>
+                              <th>Key</th>
+                              <th>Title</th>
+                              <th>Type</th>
+                              <th>Description</th>
+                            </tr>
+                          </thead>
+                          <template v-for="prop in activeNode.props">
+                            <tr>
+                              <td>{{prop.key}}</td>
+                              <td>{{prop.title}}</td>
+                              <td>{{prop.type}}</td>
+                              <td><div style="white-space: pre-wrap;">{{prop.help_text}}</div></td>
+                            </tr>
+                          </template>
+                          </table>
+                    </div>
+                
+                </div>
+                <div v-else class="p-3 border m-3 text-center">
+                  <template v-if="switchShowAll==true">Click on an element to view information</template>
+                </div>
+
+
+              </div>
+              </div>
+
+            </div>
+
 
             </div>          
             `    

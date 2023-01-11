@@ -57,7 +57,9 @@ Vue.component('project-thumbnail', {
                 <h5>Project thumbnail</h5>
                 <div class="row">
                     <div class="col-4" @click="show_dialog=true">
-                        <div v-if="image_error==true"><i class="far fa-image" style="font-size:125px;"></i></div>
+                        <div v-if="image_error==true">
+                            <i class="far fa-image" style="font-size:125px;"></i>                            
+                        </div>
                         <div v-if="image_error==false"><img class="img-fluid" style="max-width:150px;max-height:150px;" :src="thumbnail" @error="imageLoadError"/></div>
                         <button type="button"  @click="show_dialog=true" class="btn btn-link">Change image</button>
                     </div>

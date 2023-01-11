@@ -208,7 +208,7 @@
         data_types:{ 
           "survey": "Microdata", 
           "timeseries": "Timeseries", 
-          "timeseriesdb": "Timeseries Database", 
+          "timeseries-db": "Timeseries Database", 
           "script": "Script", 
           "geospatial": "Geospatial", 
           "document": "Document", 

@@ -32,7 +32,7 @@
 			]
 		},
 		"var_dcml": {
-			"type": "string",
+			"type": ["integer", "string"],
 			"title": "Variable decimal points",
 			"description": "Number of decimal points in the variable"
 		},
@@ -76,6 +76,34 @@
 			"type": "string",
 			"title": "Source of information"
 		},
+
+		"var_embargo": {
+			"type": "object",
+			"title": "Embargo",
+			"description": "Provides information on variables which are not currently available becuase of policies established by the principal investigators and/or data producers.",
+			"properties": {
+				"embargo": {
+					"type": "string",
+					"title": "Embargo description"
+				},
+				"event": {
+					"type": "string",
+					"title": "Event",
+					"default": "notBefore",
+					"enum": [
+						"notBefore",
+						"notAfter",
+						""
+					]
+				},
+				"date": {
+					"type": "string",
+					"title": "Date (YYYY-MM-DD)"
+				}				
+			}
+
+		},
+		
 		"var_qstn_preqtxt": {
 			"type": "string",
 			"title": "Pre-question text",
@@ -143,7 +171,7 @@
 				"type": "object",
 				"properties": {
 					"value": {
-						"type": "string",
+						"type": ["integer", "string"],
 						"title": "Value"
 					},
 					"label": {

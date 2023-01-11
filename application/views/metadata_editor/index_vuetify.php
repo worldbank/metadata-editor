@@ -10,6 +10,11 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
 
+
+  <script src="https://cdn.jsdelivr.net/npm/vue-toast-notification@0.6.3"></script>
+  <link href="https://cdn.jsdelivr.net/npm/vue-toast-notification@0.6.3/dist/theme-sugar.css" rel="stylesheet">
+
+
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
 </head>
 
@@ -77,7 +82,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue-scrollto"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vee-validate/3.4.0/vee-validate.full.min.js" integrity="sha512-owFJQZWs4l22X0UAN9WRfdJrN+VyAZozkxlNtVtd9f/dGd42nkS+4IBMbmVHdmTd+t6hFXEVm65ByOxezV/Qxg==" crossorigin="anonymous"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/vue-textarea-autosize@1.1.1/dist/vue-textarea-autosize.common.js" ></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue-textarea-autosize@1.1.1/dist/vue-textarea-autosize.umd.js"></script>
 
     <!--
     <script src="https://unpkg.com/splitpanes@2.1"></script>
@@ -119,7 +124,6 @@ Vue.config.errorHandler = (err, vm, info) => {
     });
 
     Vue.filter('mb', val => {
-      //return Math.floor(val/1024);  
       return (val / (1024*1024)).toFixed(2);
     });
 
@@ -133,7 +137,6 @@ Vue.config.errorHandler = (err, vm, info) => {
 
     vue_app=new Vue({
       el: '#app',
-  //    components:{Splitpanes, Pane},
       vuetify: new Vuetify(),
       router:router,
       store,
@@ -183,7 +186,7 @@ Vue.config.errorHandler = (err, vm, info) => {
        this.init_tree_data();
       }
       ,
-      mounted: function(){
+      mounted: function(){        
       },
       computed:{
         Title(){          

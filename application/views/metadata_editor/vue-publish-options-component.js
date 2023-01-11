@@ -25,8 +25,34 @@ Vue.component('publish-options', {
                         "0": "Draft",
                         "1": "Publish"
                     }
-                }
-            },
+                },
+                "data_access":{
+                    "title":"Data access",
+                    "value":6,
+                    "type":"text",
+                    "enum":{
+                        "1": "Direct access",
+                        "2": "Publich use files",
+                        "3": "Licensed data files",
+                        "4": "Data accessible only in data enclave",
+                        "5": "Data available from external repository",
+                        "6": "Data not available",
+                        "7": "Open access"
+                    }
+                },
+                "da_link":{
+                    "custom":true,
+                    "title":"Data access link",
+                    "value":'',
+                    "type":"text"
+                },
+                "repositoryid":{
+                    "custom":true,
+                    "title":"Collection",
+                    "value":'',
+                    "type":"text"
+                },
+            },            
             publish_processing_status:false,
             publish_processing:'',
             publish_errors:[],
@@ -35,7 +61,8 @@ Vue.component('publish-options', {
             update_status:'',
             errors:'',
             is_processing:false,
-            project_export_status:''
+            project_export_status:'',
+            collections:[]
         }
     },
     created: async function(){
@@ -262,6 +289,41 @@ Vue.component('publish-options', {
                 console.log("request completed");
             });
         },
+        getCollections: function() {
+            vm=this;
+            this.collections=[];
+
+            if (!this.catalog){
+                return;
+            }
+
+            let collection=this.catalog_connections[this.catalog];
+
+            if(!collection){
+                return;
+            }
+
+            let url=collection.url + '/index.php/api/catalog/collections';
+            axios.get(url)
+            .then(function (response) {
+                if(response.data.collections){
+                    vm.collections=response.data.collections;
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+        },
+        getCollectionByID:function(id)
+        {
+            for (i=0;i<this.catalog_connections.length;i++){
+                if (this.catalog_connections[i].id==id){
+                    return this.catalog_connections[i];
+                }
+            }
+
+            return [];
+        }
     },
     
     computed: {        
@@ -308,33 +370,54 @@ Vue.component('publish-options', {
 
                                         <div class="form-group">
                                             <label for="catalog_id">Select Catalog</label>
-                                            <select class="form-control" id="catalog_id" v-model="catalog">
+                                            <select class="form-control" id="catalog_id" v-model="catalog" @change="getCollections">
                                                 <option value="">-Select-</option>
                                                 <option v-for="option in catalog_connections" v-bind:value="option.id">
-                                                    {{ option.title }}
+                                                    {{ option.title }} - {{option.url}}
                                                 </option>                            
                                             </select>
+                                            <div v-if="catalog!=''" class="text-muted">{{getCollectionByID(catalog).url}}</div>
                                             <router-link class="btn btn-sm btn-link" to="/configure-catalog">Configure new catalog</router-link>                                        
                                         </div>
 
                                         <div class="mb-4">
-                                        <label>Parameters</label>
+                                        <label>Options</label>
                                         <table class="table table-sm table-bordered table-hover table-striped mb-0 pb-0">
                                             <tr>
-                                                <th>Key</th>
+                                                <th>Option</th>
                                                 <th>Value</th>
                                             </tr>
-                                            <tr v-for="(kv,kv_key) in publish_options">
-                                                <td>{{kv.title}}</td>
+                                            <template v-for="(kv,kv_key) in publish_options">                                            
+                                            <tr v-if="!kv.custom">
                                                 <td>
-                                                    <input v-if="!kv.enum" type="text" v-model="kv.value"/>
+                                                    {{kv.title}}
+                                                    <span v-if="kv_key=='repositoryid'">
+                                                    <v-icon @click="getCollections">mdi-reload</v-icon>
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <input v-if="!kv.enum" type="text" class="form-control" v-model="kv.value"/>
                                                     <select v-if="kv.enum" class="form-control" v-model="kv.value">
                                                         <option v-for="(enum_val,enum_key) in kv.enum" v-bind:value="enum_key">
                                                             {{ enum_val }}
                                                         </option>
                                                     </select>
                                                 </td>
+                                            </tr>                                            
+                                            </template>
+                                            <tr>
+                                                <td>Collection</td>
+                                                <td>
+                                                    <select v-if="collections" class="form-control" v-model="publish_options.repositoryid.value">
+                                                        <option value="">N/A</option>
+                                                        <option v-for="(collection,collection_index) in collections" v-bind:value="collection.repositoryid">
+                                                            [{{ collection.repositoryid }}] {{ collection.title }}
+                                                        </option>
+                                                    </select>
+                                                </td>
+
                                             </tr>
+                                            
                                         </table>
                                             <!-- <button type="button" class="btn btn-sm btn-link" @click="AddKvRow">Add row</button> -->
                                         </div>

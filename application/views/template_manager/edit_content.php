@@ -14,7 +14,7 @@
     <div class="col-auto">
         <div class="form-group form-check" v-if="ActiveNode.type!=='section' &&  ActiveNode.type!=='section_container'">
             <input type="checkbox" class="form-check-input" id="required" v-model="ActiveNode.is_required" >
-            <label class="form-check-label" for="required">Mandatory</label>
+            <label class="form-check-label" for="required">Required</label>
         </div>
     </div>
 
@@ -26,7 +26,7 @@
     </div>
 </div>
 
-<div class="form-group mb-3" v-if="ActiveNode.key">
+<div class="form-group mb-3" v-if="ActiveNode.key && ActiveNode.type!='section' && ActiveNode.type!='section_container'">
     <label >Description:</label>
     <textarea style="height:200px;" class="form-control"  v-model="ActiveNode.help_text"></textarea>
     <div class="text-secondary p-1" style="font-size:small;">

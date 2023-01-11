@@ -573,7 +573,7 @@
                         },
                         {
                             "key": "project_desc.geographic_units",
-                            "title": "Geograpic locations",
+                            "title": "Geographic locations",
                             "type": "array",
                             "props": {
                                 "name": {
@@ -787,7 +787,7 @@
                                     "props": {
                                         "name": {
                                             "key": "name",
-                                            "title": "Method",
+                                            "title": "Name",
                                             "type": "text"
                                         },
                                         "version": {

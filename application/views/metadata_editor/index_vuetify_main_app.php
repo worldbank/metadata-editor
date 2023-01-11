@@ -1,6 +1,8 @@
 <script>
         Vue.use(Vuex)
-        Vue.use(VueDeepSet)        
+        Vue.use(VueDeepSet)     
+        Vue.use(VueToast);
+   
 
         window.bus = new Vue();//todo remove?
         const EventBus = new Vue();
