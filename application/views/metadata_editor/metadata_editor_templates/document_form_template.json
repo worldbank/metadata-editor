@@ -4,6 +4,70 @@
 	"items": [
 		{
 			"type": "section_container",
+			"key": "metadata_information",
+			"title": "Metadata Description",
+			"class": "mandatory recommended",
+			"expanded": true,
+			"items": [
+				{
+					"key": "metadata_information.idno",
+					"type": "text",
+					"class": "idno",
+					"title": "Unique ID"
+				},
+				{
+					"key": "metadata_information.title",
+					"type": "text",
+					"title": "Title"
+				},
+				{
+					"key": "metadata_information.producers",
+					"class": "required",
+					"title": "Producers",
+					"type": "array",
+					"props": {
+						"name": {
+							"key": "name",
+							"title": "Name",
+							"type": "text",
+							"help_text": "Name (required)",
+							"class": "required"
+						},
+						"abbr": {
+							"key": "abbreviation",
+							"title": "Abbreviation",
+							"type": "text"
+						},
+						"affiliation": {
+							"key": "affiliation",
+							"type": "string",
+							"title": "Affiliation"
+						},
+						"role": {
+							"key": "role",
+							"title": "Role",
+							"type": "string"
+						}
+					}
+				},
+				{
+					"key": "metadata_information.production_date",
+					"type": "text",
+					"class": "required",
+					"title": "Date of Production",
+					"help_text": "Document production date using format(YYYY-MM-DD)"
+				},
+				{
+					"key": "metadata_information.version",
+					"type": "text",
+					"class": "required",
+					"title": "Document version",
+					"help_text": "Identify and describe the current version of the document"
+				}
+			]
+		},
+		{
+			"type": "section_container",
 			"key": "document",
 			"title": "Document",
 			"class": "mandatory recommended",
@@ -62,7 +126,7 @@
 							"key": "document_description.authors",
 							"title": "Authors",
 							"help_text": "Document authors",
-							"type": "array",
+							"type": "nested_array",
 							"props": {
 								"first_name": {
 									"key": "first_name",
@@ -86,6 +150,23 @@
 									"key": "affiliation",
 									"title": "Affiliation",
 									"type": "text"
+								},
+								"author_id": {
+									"key": "author_id",
+									"title": "Author ID",
+									"type": "array",
+									"props":{
+										"type": {
+											"key": "type",
+											"title": "Type",
+											"type": "text"
+										},
+										"id": {
+											"key": "id",
+											"title": "ID",
+											"type": "text"
+										}
+									}
 								}
 							}
 						},
@@ -321,14 +402,14 @@
 							"props": {
 								"name": {
 									"key": "name",
-									"title": "Country Name",
+									"title": "Name",
 									"type": "text",
 									"help_text": "Country name",
 									"_rules": "required"
 								},
 								"code": {
 									"key": "code",
-									"title": "Country ISO 3 code",
+									"title": "Code",
 									"type": "text",
 									"help_text": "Country ISO 3 code"
 								}
@@ -613,6 +694,11 @@
 									"key": "affiliation",
 									"title": "Affiliation",
 									"type": "text"
+								},
+								"contribution": {
+									"key": "contribution",
+									"title": "Contribution",
+									"type": "text"
 								}
 							}
 						},
@@ -690,23 +776,23 @@
 						},
 						{
 							"key": "document_description.sources",
-							"type": "array",
+							"type": "nested_array",
 							"title": "Sources",
 							"props": {
 								"source_origin": {
 									"key": "source_origin",
-									"title": "Origin of source",
+									"title": "Origin",
 									"type": "text"
 								},
 								"source_char": {
 									"key": "source_char",
-									"title": "Characteristics of source noted",
-									"type": "text"
+									"title": "Characteristics",
+									"type": "textarea"
 								},
 								"source_doc": {
 									"key": "source_doc",
-									"title": "Source documentation",
-									"type": "text"
+									"title": "Documentation",
+									"type": "textarea"
 								}
 							}
 						},
@@ -759,21 +845,35 @@
 							"type": "array",
 							"title": "Themes",
 							"props": {
-								"name": {
-									"key": "name",
-									"title": "Theme",
-									"type": "text"
-								},
-								"vocabulary": {
-									"key": "vocabulary",
-									"title": "Vocabulary",
-									"type": "text"
-								},
-								"uri": {
-									"key": "uri",
-									"title": "URL",
-									"type": "text"
-								}
+								"id": {
+                                    "key": "id",
+                                    "title": "Unique Identifier",
+                                    "type": "text",
+                                    "rules_": "required"
+                                },
+                                "name": {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text",
+                                    "name": "Name",
+                                    "rules_": "required"
+                                },
+                                "parent_id": {
+                                    "key": "parent_id",
+                                    "title": "Parent identifier",
+                                    "type": "text",
+                                    "help_text": "For subtopics, provide the ID of the parent topic"
+                                },
+                                "vocabulary": {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulary",
+                                    "type": "text"
+                                },
+                                "uri": {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "text"
+                                }
 							}
 						},
 						{
@@ -814,21 +914,35 @@
 							"type": "array",
 							"title": "Disciplines",
 							"props": {
-								"name": {
-									"key": "name",
-									"title": "Name",
-									"type": "text"
-								},
-								"vocabulary": {
-									"key": "vocabulary",
-									"title": "Vocabulary",
-									"type": "text"
-								},
-								"uri": {
-									"key": "uri",
-									"title": "URL",
-									"type": "text"
-								}
+								"id": {
+                                    "key": "id",
+                                    "title": "Unique Identifier",
+                                    "type": "text",
+                                    "rules_": "required"
+                                },
+                                "name": {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text",
+                                    "name": "Topic name",
+                                    "rules_": "required"
+                                },
+                                "parent_id": {
+                                    "key": "parent_id",
+                                    "title": "Parent identifier",
+                                    "type": "text",
+                                    "help_text": "For subtopics, provide the ID of the parent topic"
+                                },
+                                "vocabulary": {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulary",
+                                    "type": "text"
+                                },
+                                "uri": {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "text"
+                                }
 							}
 						},
 						{
@@ -838,7 +952,7 @@
 						},
 						{
 							"key": "document_description.mandate",
-							"title": "Audience",
+							"title": "Mandate",
 							"type": "text"
 						},
 						{
@@ -949,65 +1063,6 @@
 					]
 				}
 			]
-		},
-		{
-			"type": "section_container",
-			"key": "metadata_information",
-			"title": "Metadata Description",
-			"class": "mandatory recommended",
-			"expanded": true,
-			"items": [
-				{
-					"key": "metadata_information.idno",
-					"type": "text",
-					"class": "idno",
-					"title": "Unique ID"
-				},
-				{
-					"key": "metadata_information.producers",
-					"class": "required",
-					"title": "Producers",
-					"type": "array",
-					"props": {
-						"name": {
-							"key": "name",
-							"title": "Name",
-							"type": "text",
-							"help_text": "Name (required)",
-							"class": "required"
-						},
-						"abbr": {
-							"key": "abbreviation",
-							"title": "Abbreviation",
-							"type": "text"
-						},
-						"affiliation": {
-							"key": "affiliation",
-							"type": "string",
-							"title": "Affiliation"
-						},
-						"role": {
-							"key": "role",
-							"title": "Role",
-							"type": "string"
-						}
-					}
-				},
-				{
-					"key": "metadata_information.production_date",
-					"type": "text",
-					"class": "required",
-					"title": "Date of Production",
-					"help_text": "Document production date using format(YYYY-MM-DD)"
-				},
-				{
-					"key": "metadata_information.version",
-					"type": "text",
-					"class": "required",
-					"title": "Document version",
-					"help_text": "Identify and describe the current version of the document"
-				}
-			]
-		}
+		}		
 	]
 }

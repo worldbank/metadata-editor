@@ -7,7 +7,7 @@
 <div class="form-group">
     <label for="name">Label:</label>
     <input type="text" class="form-control" id="name" placeholder="Label" v-model="ActiveNode.title">
-    <div v-if="ActiveNode.key && coreTemplateParts[ActiveNode.key]" class="text-secondary font-small" style="margin-top:4px;font-size:small">Original label: {{coreTemplateParts[ActiveNode.key].title}}</div>
+    <div v-if="ActiveNode.key && coreTemplateParts[ActiveNode.key]" class="text-secondary font-small" style="margin-top:4px;font-size:small">Original label: {{coreTemplateParts[ActiveNode.key].title}} Name: {{ActiveNode.key}}</div>
 </div>
 
 <div class="row">

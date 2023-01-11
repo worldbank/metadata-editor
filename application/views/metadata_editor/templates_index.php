@@ -56,7 +56,7 @@
                 <div class="mt-3 mb-5">
                     <h1>Templates</h1>
                     <div class="pull-right float-right">
-                      <button type="button" class="btn btn-sm btn-outline-primary">Import Template</button>
+                      <button type="button" @click="dialog_import_template=true" class="btn btn-sm btn-outline-primary">Import Template</button>
                     </div>
                 </div>
 
@@ -128,22 +128,18 @@
     </div>
 
 
-    <template class="create-new-project">
+    <template class="import-template">
       <div class="text-center">
-        <v-dialog v-model="dialog_create_project" width="500">
+        <v-dialog v-model="dialog_import_template" width="500">
 
           <v-card>
             <v-card-title class="text-h5 grey lighten-2">
-              Create new Template
+              Import template
             </v-card-title>
 
             <v-card-text>
               <div>
-                <a class="dropdown-item" href="#" @click="createProject('survey')">Microdata</a>
-                <a class="dropdown-item" href="#" @click="createProject('document')">Document</a>
-                <a class="dropdown-item" href="#" @click="createProject('table')">Table</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#">Import from URL</a>
+                <textarea style="width:100%;height:300px;" v-model="import_template"></textarea>
               </div>
             </v-card-text>
 
@@ -151,7 +147,7 @@
 
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="primary" text @click="dialog_create_project = false">
+              <v-btn color="primary" text @click="dialog_import_template = false">
                 Close
               </v-btn>
             </v-card-actions>
@@ -227,7 +223,9 @@
         project_types_icons: {
           "survey": "fas fa-database",
           "document": "fas fa-file-alt",
-        }
+        },
+        dialog_import_template:false,
+        dialog_import:{}
 
       },
       created: async function() {
@@ -304,6 +302,9 @@
             .then(function() {
               console.log("request completed");
             });
+        },
+        exportTemplate: function(uid){
+          window.open(CI.base_url + '/api/templates/' + uid);
         },
         duplicateTemplate: function(uid) 
         {
