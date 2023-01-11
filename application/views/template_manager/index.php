@@ -31,6 +31,9 @@
   .table-sm th{
       font-size:small;
   }
+  .iscut{
+    color:#e56767;
+  }
   </style>
 
 
@@ -112,7 +115,7 @@
             <div class="col bg-light" style="height:100vh; overflow:auto;">
               <div @click="isEditingDescription=true" style="padding-left:33px;cursor:pointer;" class="border-bottom pb-2"><v-icon>mdi-ballot-outline</v-icon>Template Description</div>
               <div @click="isEditingDescription=false">
-                <nada-treeview  v-model="UserTreeItems" :initially_open="initiallyOpen"></nada-treeview>
+                <nada-treeview  v-model="UserTreeItems" :cut_fields="cut_fields" :initially_open="initiallyOpen"></nada-treeview>
               </div>
 
               <?php /*
@@ -134,7 +137,7 @@
                   <v-icon v-if="ActiveNodeIsField" color="#3498db" @click="removeField()">mdi-chevron-right-box</v-icon>
                   <v-icon v-else color="rgb(0 0 0 / 12%)">mdi-chevron-right-box</v-icon>
                 </div>
-
+                
                 <div>
                   <v-icon v-if="ActiveNode.type=='section_container'" color="#3498db" @click="addSection()">mdi-plus-box</v-icon>
                   <v-icon v-else color="rgb(0 0 0 / 12%)">mdi-plus-box</v-icon>
@@ -151,6 +154,18 @@
                   <v-icon v-if="ActiveNode.type!='section_container' && ActiveNode.type" color="#3498db" @click="moveDown()">mdi-arrow-down-bold-box</v-icon>
                   <v-icon v-else color="rgb(0 0 0 / 12%)">mdi-arrow-down-bold-box</v-icon>
                 </div>
+
+
+                <div class="mt-5" title="Move">
+                  <v-icon v-if="ActiveNodeIsField" color="#3498db" @click="cutField()">mdi-content-copy</v-icon>
+                  <v-icon v-else color="rgb(0 0 0 / 12%)">mdi-content-copy</v-icon>
+                </div>
+
+                <div class="mt-2" title="Paste">
+                  <v-icon v-if="ActiveNode.type=='section' && cut_fields.length>0" color="#3498db" @click="pasteField()">mdi-content-paste</v-icon>
+                  <v-icon v-else color="rgb(0 0 0 / 12%)">mdi-content-paste</v-icon>
+                </div>
+
               </div>
             </div>
           </div>
@@ -159,6 +174,7 @@
 
         <!--detail-->
         <div class="col bg-light" style="height:100vh; overflow:auto;">
+
             <div v-if="isEditingDescription==false">
               <?php echo $this->load->view('template_manager/edit_content',null,true);?>
             </div>
@@ -331,7 +347,8 @@
             "textarea",
             "dropdown",
             //"date"
-          ]
+          ],
+          cut_fields:[]
         }
       },
       created: function() {
@@ -370,6 +387,69 @@
         removeField: function() {
           this.delete_tree_item(this.UserTreeItems, this.ActiveNode.key);
           this.ActiveNode = {};
+        },
+        cutField: function() 
+        {
+          let active_container_key=this.getNodeContainerKey(this.UserTreeItems,this.ActiveNode.key);
+
+          //unselect cut field
+          for(i=0;i<this.cut_fields.length;i++){
+            if (active_container_key==this.cut_fields[i].container){
+              if (this.cut_fields[i].node.key == this.ActiveNode.key){
+                this.cut_fields.splice(i,1);
+                return;
+              }
+            }
+          }
+
+          this.cut_fields.push(
+            {
+              "node":this.ActiveNode,
+              "container": this.getNodeContainerKey(this.UserTreeItems,this.ActiveNode.key)
+            }
+          );
+          //this.removeField();
+        },
+        pasteField: function() {
+          if (this.cut_fields.length<1) {
+            return false;
+          }
+
+          if (this.isItemContainer(this.ActiveCoreNode)){
+            return false;
+          }
+
+          if (!this.ActiveNode.items) {
+              this.$set(this.ActiveNode, "items", []);
+          }
+
+          let active_container_key=this.getNodeContainerKey(this.UserTreeItems,this.ActiveNode.key);
+
+          for(i=0;i<this.cut_fields.length;i++){
+            if (active_container_key==this.cut_fields[i].container){
+              //remove existing item
+              this.delete_tree_item(this.UserTreeItems, this.cut_fields[i].node.key);
+              //add copied item
+              this.ActiveNode.items.push(this.cut_fields[i].node);
+            }
+          }
+          
+          this.cut_fields=[];
+          store.commit('activeCoreNode', {});
+        },
+        //check if an item is selected for cut/paste        
+        isItemCut: function(item)
+        {
+          let active_container_key=this.getNodeContainerKey(this.UserTreeItems, item.key);
+
+          for(i=0;i<this.cut_fields.length;i++){
+            if (active_container_key==this.cut_fields[i].container){
+               if (item.key==this.cut_fields[i].node.key){
+                return true;
+               }
+            }
+          }
+          return false;
         },
         isItemContainer: function(item){
           if (item.type=='section' || item.type=='section_container' || item.type=='nested_array_'){
@@ -460,7 +540,6 @@
           {
               let item=node.items[index];
               if (item.key && item.key == key) {
-                console.log("matched", index, item.key,key);
                 return index;
               }
           }
@@ -511,6 +590,25 @@
             }
           }
           return found;
+        },
+        getNodePath: function(arr,name)
+        {
+            if (!arr){
+              return false;
+            }
+
+            for(let item of arr){
+                if(item.key===name) return `/${item.key}`;
+                if(item.items) {
+                    const child = this.getNodePath(item.items, name);
+                    if(child) return `/${item.key}${child}`
+                }
+            }
+        },
+        getNodeContainerKey: function(tree,node_key)
+        {
+          let el_path=this.getNodePath(tree,node_key);
+          return el_path.split("/")[1];
         },
         saveTemplate: function() {
           vm = this;

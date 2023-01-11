@@ -1,6 +1,6 @@
 /// view treeview component
 Vue.component('nada-treeview', {
-    props:['value','initially_open'],
+    props:['value','initially_open','cut_fields'],
     data: function () {    
         return {
             template: this.value,
@@ -34,16 +34,9 @@ Vue.component('nada-treeview', {
             this.$store.state.active_node = newValue;
           }
         },
-        /*TreeActiveItems:{
-          get: function(){
-            let items=[];
-            items.push(this.ActiveNode.key);
-            return items;
-          },
-          set: function(newValue){
-              
-          }
-        }*/
+        UserTreeItems() {
+          return this.$store.state.user_tree_items;
+        }
     },
     methods:{
       treeClick: function (node){
@@ -57,11 +50,43 @@ Vue.component('nada-treeview', {
       onTreeOpen: function (node){
         console.log("tree node open");
         
-      }
+      },
+      getNodePath: function(arr,name)
+      {
+          if (!arr){
+            return false;
+          }
+
+          for(let item of arr){
+              if(item.key===name) return `/${item.key}`;
+              if(item.items) {
+                  const child = this.getNodePath(item.items, name);
+                  if(child) return `/${item.key}${child}`
+              }
+          }
+      },
+      getNodeContainerKey: function(tree,node_key)
+      {
+        let el_path=this.getNodePath(tree,node_key);
+        return el_path.split("/")[1];
+      },
+      //check if an item is selected for cut/paste        
+      isItemCut: function(item)
+      {
+        let active_container_key=this.getNodeContainerKey(this.UserTreeItems, item.key);
+
+        for(i=0;i<this.cut_fields.length;i++){
+          if (active_container_key==this.cut_fields[i].container){
+             if (item.key==this.cut_fields[i].node.key){
+              return true;
+             }
+          }
+        }
+        return false;
+      },
     },
     template: `
             <div class="nada-treeview-component">
-            
             <template>
               <v-treeview                   
                   color="warning"
@@ -81,9 +106,10 @@ Vue.component('nada-treeview', {
               >
 
                 <template #label="{ item }" >
-                    <span @click="treeClick(item)" :title="item.title" class="tree-item-label">
+                    <span @click="treeClick(item)" :title="item.title" class="tree-item-label" :class="{iscut: isItemCut(item)}">
                         <span v-if="item.type=='resource'" >{{item.title | truncate(23, '...') }}</span>
                         <span v-else>{{item.title}}</span>
+                        <span v-if="isItemCut(item)">*</span>                        
                     </span>
                 </template>
 
