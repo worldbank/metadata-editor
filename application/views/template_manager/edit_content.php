@@ -71,8 +71,14 @@
             <div class="form-group" >
                 <label for="controlled_vocab">Controlled vocabulary:</label>
                 <div class="border bg-white" style="max-height:300px;overflow:auto;">
-                <table-component @update:value="EnumUpdate" v-model="ActiveNode.enum" :columns="ActiveNodeControlledVocabColumns" class="border m-2 pb-2" />
+                    <template v-if="!ActiveNodeControlledVocabColumns">
+                        <list-component :key="ActiveNode.key" @update:value="EnumListUpdate" v-model="ActiveNode.enum" :columns="ActiveNodeControlledVocabColumns" class="border m-2 pb-2"/>
+                    </template>
+                    <template v-else>
+                        <table-component :key="ActiveNode.key"  @update:value="EnumUpdate" v-model="ActiveNode.enum" :columns="ActiveNodeControlledVocabColumns" class="border m-2 pb-2" />
+                    </template>
                 </div>
+
             </div>
             </template>
             <!-- end controlled vocab -->

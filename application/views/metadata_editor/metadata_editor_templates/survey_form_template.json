@@ -419,212 +419,48 @@
                         {
                             "key": "study_desc.series_statement.series_name",
                             "title": "Series type",
-                            "type": "dropdown",
-                            "class": "recommended",
+                            "type": "dropdown",                            
                             "enum": [
-                                {
-                                    "key": "1-2-3 Survey, phase 1",
-                                    "value": "1-2-3 Survey, phase 1"
-                                },
-                                {
-                                    "key": "1-2-3 Survey, phase 1 [hh/123-1]",
-                                    "value": "1-2-3 Survey, phase 1 [hh/123-1]"
-                                },
-                                {
-                                    "key": "1-2-3 Survey, phase 2 [hh/123-2]",
-                                    "value": "1-2-3 Survey, phase 2 [hh/123-2]"
-                                },
-                                {
-                                    "key": "1-2-3 Survey, phase 3 [hh/123-3]",
-                                    "value": "1-2-3 Survey, phase 3 [hh/123-3]"
-                                },
-                                {
-                                    "key": "Administrative Records, Health (ad/hea]",
-                                    "value": "Administrative Records, Health (ad/hea]"
-                                },
-                                {
-                                    "key": "Administrative Records, Education (ad/edu]",
-                                    "value": "Administrative Records, Education (ad/edu]"
-                                },
-                                {
-                                    "key": "Administrative Records, Other (ad/oth]",
-                                    "value": "Administrative Records, Other (ad/oth]"
-                                },
-                                {
-                                    "key": "Agricultural Census [ag/census]",
-                                    "value": "Agricultural Census [ag/census]"
-                                },
-                                {
-                                    "key": "Agricultural Survey [ag/oth]",
-                                    "value": "Agricultural Survey [ag/oth]"
-                                },
-                                {
-                                    "key": "Child Labor Survey [hh/cls]",
-                                    "value": "Child Labor Survey [hh/cls]"
-                                },
-                                {
-                                    "key": "Core Welfare Indicators Questionnaire [hh/cwiq]",
-                                    "value": "Core Welfare Indicators Questionnaire [hh/cwiq]"
-                                },
-                                {
-                                    "key": "Demographic and Health Survey [hh/dhs]",
-                                    "value": "Demographic and Health Survey [hh/dhs]"
-                                },
-                                {
-                                    "key": "Demographic and Health Survey, Round 1 [hh/dhs-1]",
-                                    "value": "Demographic and Health Survey, Round 1 [hh/dhs-1]"
-                                },
-                                {
-                                    "key": "Demographic and Health Survey, Round 2 [hh/dhs-2]",
-                                    "value": "Demographic and Health Survey, Round 2 [hh/dhs-2]"
-                                },
-                                {
-                                    "key": "Demographic and Health Survey, Round 3 [hh/dhs-3]",
-                                    "value": "Demographic and Health Survey, Round 3 [hh/dhs-3]"
-                                },
-                                {
-                                    "key": "Demographic and Health Survey, Round 4 [hh/dhs-4]",
-                                    "value": "Demographic and Health Survey, Round 4 [hh/dhs-4]"
-                                },
-                                {
-                                    "key": "Demographic and Health Survey, Interim [hh/dhs-int]",
-                                    "value": "Demographic and Health Survey, Interim [hh/dhs-int]"
-                                },
-                                {
-                                    "key": "Demographic and Health Survey, Special [hh/dhs-sp]",
-                                    "value": "Demographic and Health Survey, Special [hh/dhs-sp]"
-                                },
-                                {
-                                    "key": "Enterprise Survey [en/oth]",
-                                    "value": "Enterprise Survey [en/oth]"
-                                },
-                                {
-                                    "key": "Enterprise Census [en/census]",
-                                    "value": "Enterprise Census [en/census]"
-                                },
-                                {
-                                    "key": "Income/Expenditure/Household Survey [hh/ies]",
-                                    "value": "Income/Expenditure/Household Survey [hh/ies]"
-                                },
-                                {
-                                    "key": "Informal Sector Survey [hh/iss]",
-                                    "value": "Informal Sector Survey [hh/iss]"
-                                },
-                                {
-                                    "key": "Integrated Survey (non-LSMS) [hh/is]",
-                                    "value": "Integrated Survey (non-LSMS) [hh/is]"
-                                },
-                                {
-                                    "key": "Multiple Indicator Cluster Survey - Round 1 [hh/mics-1]",
-                                    "value": "Multiple Indicator Cluster Survey - Round 1 [hh/mics-1]"
-                                },
-                                {
-                                    "key": "Multiple Indicator Cluster Survey - Round 2 [hh/mics-2]",
-                                    "value": "Multiple Indicator Cluster Survey - Round 2 [hh/mics-2]"
-                                },
-                                {
-                                    "key": "Multiple Indicator Cluster Survey - Round 3 [hh/mics-3]",
-                                    "value": "Multiple Indicator Cluster Survey - Round 3 [hh/mics-3]"
-                                },
-                                {
-                                    "key": "Labor Force Survey [hh/lfs]",
-                                    "value": "Labor Force Survey [hh/lfs]"
-                                },
-                                {
-                                    "key": "Living Standards Measurement Study [hh/lsms]",
-                                    "value": "Living Standards Measurement Study [hh/lsms]"
-                                },
-                                {
-                                    "key": "Other Household Health Survey [hh/hea]",
-                                    "value": "Other Household Health Survey [hh/hea]"
-                                },
-                                {
-                                    "key": "Other Household Survey [hh/oth]",
-                                    "value": "Other Household Survey [hh/oth]"
-                                },
-                                {
-                                    "key": "Price Survey [hh/prc]",
-                                    "value": "Price Survey [hh/prc]"
-                                },
-                                {
-                                    "key": "Priority Survey (hh/ps]",
-                                    "value": "Priority Survey (hh/ps]"
-                                },
-                                {
-                                    "key": "Population and Housing Census [hh/popcen]",
-                                    "value": "Population and Housing Census [hh/popcen]"
-                                },
-                                {
-                                    "key": "Sample Frame, Households [sf/hh]",
-                                    "value": "Sample Frame, Households [sf/hh]"
-                                },
-                                {
-                                    "key": "Sample Frame, Enterprises [sf/en]",
-                                    "value": "Sample Frame, Enterprises [sf/en]"
-                                },
-                                {
-                                    "key": "Service Provision Assessments [hh/spa]",
-                                    "value": "Service Provision Assessments [hh/spa]"
-                                },
-                                {
-                                    "key": "Socio-Economic/Monitoring Survey [hh/sems]",
-                                    "value": "Socio-Economic/Monitoring Survey [hh/sems]"
-                                },
-                                {
-                                    "key": "Statistical Info. &amp; Monitoring Prog. [hh/simpoc]",
-                                    "value": "Statistical Info. &amp; Monitoring Prog. [hh/simpoc]"
-                                },
-                                {
-                                    "key": "World Fertility Survey [hh/wfs]",
-                                    "value": "World Fertility Survey [hh/wfs]"
-                                },
-                                {
-                                    "key": "World Health Survey [hh/whs]",
-                                    "value": "World Health Survey [hh/whs]"
-                                }
-                            ],
-                            "enum_": {
-                                "1-2-3 Survey, phase 1": "1-2-3 Survey, phase 1",
-                                "1-2-3 Survey, phase 1 [hh/123-1]": "1-2-3 Survey, phase 1 [hh/123-1]",
-                                "1-2-3 Survey, phase 2 [hh/123-2]": "1-2-3 Survey, phase 2 [hh/123-2]",
-                                "1-2-3 Survey, phase 3 [hh/123-3]": "1-2-3 Survey, phase 3 [hh/123-3]",
-                                "Administrative Records, Health (ad/hea]": "Administrative Records, Health (ad/hea]",
-                                "Administrative Records, Education (ad/edu]": "Administrative Records, Education (ad/edu]",
-                                "Administrative Records, Other (ad/oth]": "Administrative Records, Other (ad/oth]",
-                                "Agricultural Census [ag/census]": "Agricultural Census [ag/census]",
-                                "Agricultural Survey [ag/oth]": "Agricultural Survey [ag/oth]",
-                                "Child Labor Survey [hh/cls]": "Child Labor Survey [hh/cls]",
-                                "Core Welfare Indicators Questionnaire [hh/cwiq]": "Core Welfare Indicators Questionnaire [hh/cwiq]",
-                                "Demographic and Health Survey [hh/dhs]": "Demographic and Health Survey [hh/dhs]",
-                                "Demographic and Health Survey, Round 1 [hh/dhs-1]": "Demographic and Health Survey, Round 1 [hh/dhs-1]",
-                                "Demographic and Health Survey, Round 2 [hh/dhs-2]": "Demographic and Health Survey, Round 2 [hh/dhs-2]",
-                                "Demographic and Health Survey, Round 3  [hh/dhs-3]": "Demographic and Health Survey, Round 3  [hh/dhs-3]",
-                                "Demographic and Health Survey, Round 4 [hh/dhs-4]": "Demographic and Health Survey, Round 4 [hh/dhs-4]",
-                                "Demographic and Health Survey, Interim [hh/dhs-int]": "Demographic and Health Survey, Interim [hh/dhs-int]",
-                                "Demographic and Health Survey, Special [hh/dhs-sp]": "Demographic and Health Survey, Special [hh/dhs-sp]",
-                                "Enterprise Survey [en/oth]": "Enterprise Survey [en/oth]",
-                                "Enterprise Census [en/census]": "Enterprise Census [en/census]",
-                                "Income/Expenditure/Household Survey [hh/ies]": "Income/Expenditure/Household Survey [hh/ies]",
-                                "Informal Sector Survey [hh/iss]": "Informal Sector Survey [hh/iss]",
-                                "Integrated Survey (non-LSMS) [hh/is]": "Integrated Survey (non-LSMS) [hh/is]",
-                                "Multiple Indicator Cluster Survey - Round 1 [hh/mics-1]": "Multiple Indicator Cluster Survey - Round 1 [hh/mics-1]",
-                                "Multiple Indicator Cluster Survey - Round 2 [hh/mics-2]": "Multiple Indicator Cluster Survey - Round 2 [hh/mics-2]",
-                                "Multiple Indicator Cluster Survey - Round 3 [hh/mics-3]": "Multiple Indicator Cluster Survey - Round 3 [hh/mics-3]",
-                                "Labor Force Survey [hh/lfs]": "Labor Force Survey [hh/lfs]",
-                                "Living Standards Measurement Study [hh/lsms]": "Living Standards Measurement Study [hh/lsms]",
-                                "Other Household Health Survey [hh/hea]": "Other Household Health Survey [hh/hea]",
-                                "Other Household Survey [hh/oth]": "Other Household Survey [hh/oth]",
-                                "Price Survey [hh/prc]": "Price Survey [hh/prc]",
-                                "Priority Survey (hh/ps]": "Priority Survey (hh/ps]",
-                                "Population and Housing Census [hh/popcen]": "Population and Housing Census [hh/popcen]",
-                                "Sample Frame, Households [sf/hh]": "Sample Frame, Households [sf/hh]",
-                                "Sample Frame, Enterprises [sf/en]": "Sample Frame, Enterprises [sf/en]",
-                                "Service Provision Assessments [hh/spa]": "Service Provision Assessments [hh/spa]",
-                                "Socio-Economic/Monitoring Survey [hh/sems]": "Socio-Economic/Monitoring Survey [hh/sems]",
-                                "Statistical Info. &amp; Monitoring Prog. [hh/simpoc]": "Statistical Info. &amp; Monitoring Prog. [hh/simpoc]",
-                                "World Fertility Survey [hh/wfs]": "World Fertility Survey [hh/wfs]",
-                                "World Health Survey [hh/whs]": "World Health Survey [hh/whs]"
-                            }
+                                "1-2-3 Survey, phase 1 [hh/123-1]",
+                                "1-2-3 Survey, phase 2 [hh/123-2]",
+                                 "1-2-3 Survey, phase 3 [hh/123-3]",
+                                 "Administrative Records, Health (ad/hea]",
+                                "Administrative Records, Education (ad/edu]",
+                                 "Administrative Records, Other (ad/oth]",
+                                 "Agricultural Census [ag/census]",
+                                 "Agricultural Survey [ag/oth]",
+                                 "Child Labor Survey [hh/cls]",
+                                 "Core Welfare Indicators Questionnaire [hh/cwiq]",
+                                "Demographic and Health Survey [hh/dhs]",
+                                 "Demographic and Health Survey, Round 1 [hh/dhs-1]",
+                                "Demographic and Health Survey, Round 2 [hh/dhs-2]",
+                                 "Demographic and Health Survey, Round 3  [hh/dhs-3]",
+                                 "Demographic and Health Survey, Round 4 [hh/dhs-4]",
+                                "Demographic and Health Survey, Interim [hh/dhs-int]",
+                                "Demographic and Health Survey, Special [hh/dhs-sp]",
+                                "Enterprise Survey [en/oth]",
+                                 "Enterprise Census [en/census]",
+                                 "Income/Expenditure/Household Survey [hh/ies]",
+                                 "Informal Sector Survey [hh/iss]",
+                                 "Integrated Survey (non-LSMS) [hh/is]",
+                                 "Multiple Indicator Cluster Survey - Round 1 [hh/mics-1]",
+                                "Multiple Indicator Cluster Survey - Round 2 [hh/mics-2]",
+                                "Multiple Indicator Cluster Survey - Round 3 [hh/mics-3]",
+                                "Labor Force Survey [hh/lfs]",
+                              "Living Standards Measurement Study [hh/lsms]",
+                                "Other Household Health Survey [hh/hea]",
+                                "Other Household Survey [hh/oth]",
+                                "Price Survey [hh/prc]",
+                                "Priority Survey (hh/ps]",
+                                "Population and Housing Census [hh/popcen]",
+                                "Sample Frame, Households [sf/hh]",
+                                "Sample Frame, Enterprises [sf/en]",
+                                 "Service Provision Assessments [hh/spa]",
+                                "Socio-Economic/Monitoring Survey [hh/sems]",
+                                "Statistical Info. &amp; Monitoring Prog. [hh/simpoc]",
+                                "World Fertility Survey [hh/wfs]",
+                                "World Health Survey [hh/whs]"
+                            ]
                         },
                         {
                             "key": "study_desc.series_statement.series_info",
@@ -980,9 +816,9 @@
                             "key": "study_desc.study_info.data_kind",
                             "title": "Kind of data",
                             "type": "dropdown",
-                            "enum": {
-                                "sample survey data[ssd]": "Sample survey data"
-                            }
+                            "enum": [
+                                "sample survey data[ssd]"
+                            ]
                         },
                         {
                             "key": "study_desc.study_info.notes",
@@ -1845,10 +1681,10 @@
                         "title": "Interval type",
                         "help_text":"Indicates the interval type",
                         "type": "string",
-                        "enum":{
-                            "discrete":"discrete",
-                            "contin":"contin"
-                        }
+                        "enum":[
+                            "discrete",
+                            "contin"
+                        ]
                     },
                     {
                         "key": "variable.var_dcml",

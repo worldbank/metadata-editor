@@ -9,17 +9,6 @@ Vue.component('form-main', {
         this.field=this.activeSection;
     },
     methods:{
-        enumItems: function(enum_values)
-        {
-            let values=[];
-            for(i=0;i<enum_values.length;i++)
-            {
-                values.push(enum_values[i].value);
-            }
-
-            return values;
-            
-        }
     },
     computed: {
         formData () {
@@ -181,16 +170,17 @@ Vue.component('form-main', {
             <div class="form-group form-field" :class="['field-' + formField.key, formField.class] ">
                 <label :for="'field-' + normalizeClassID(formField.key)">{{formField.title}}</label>
 
-
                 <v-combobox
-                v-model="formData[formField.key]"
-                :items="enumItems(formField.enum)"
-                label=""                
-                outlined
-                dense
-              ></v-combobox>
+                    v-model="formData[formField.key]"
+                    :items="formField.enum"
+                    label=""                
+                    outlined
+                    dense
+                    clearable
+                    background-color="#FFFFFF"
+                ></v-combobox>
 
-
+                <?php /*
                 <select 
                     v-model="formData[formField.key]" 
                     class="form-control form-field-dropdown"
@@ -203,6 +193,7 @@ Vue.component('form-main', {
                 </select>
                 <small class="help-text form-text text-muted">{{formData[formField.key]}}</small>
                 <small class="help-text form-text text-muted">{{formField.help_text}}</small>
+                */ ?>
             </div>
 
         </div>  

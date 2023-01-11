@@ -242,6 +242,7 @@
     <?php echo include_once("vue-tree-component.js"); ?>
     <?php echo include_once("vue-tree-field-component.js"); ?>
     <?php echo include_once("vue-table-component.js"); ?>
+    <?php echo include_once("vue-list-component.js"); ?>
     <?php echo include_once("vue-validation-rules-component.js"); ?>
 
     Vue.mixin({
@@ -377,6 +378,11 @@
         EnumUpdate: function(e) {
           if (!this.ActiveNode.enum) {
             this.$set(this.ActiveNode, "enum", [{}]);
+          }
+        },
+        EnumListUpdate: function(e) {
+          if (!this.ActiveNode.enum) {
+            this.$set(this.ActiveNode, "enum", []);
           }
         },
         DefaultUpdate: function(e) {
@@ -693,13 +699,7 @@
           if (this.ActiveNode.props){
             return this.ActiveNode.props;
           }
-          return {
-              "type": {
-                "key": "value",
-                "title": "Value",                
-                "type": "text"
-              }
-          };
+          return false;
         }
       }
     });

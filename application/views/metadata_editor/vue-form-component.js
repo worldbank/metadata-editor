@@ -230,7 +230,19 @@ Vue.component('v-form', {
         <div v-if="item.type=='dropdown'">        
             <div class="form-group form-field" :class="['field-' + item.key, item.class] ">
                 <label :for="'field-' + normalizeClassID(item.key)">{{item.title}}</label>
-                <select 
+
+                <v-combobox
+                    v-model="formData[item.key]"
+                    :items="item.enum"
+                    label=""                
+                    outlined
+                    dense
+                    clearable
+                    background-color="#FFFFFF"
+                    :hint="formData[item.key]"
+                ></v-combobox>
+
+                <?php /*<select  
                     v-model="formData[item.key]" 
                     class="form-control form-field-dropdown"
                     :id="'field-' + normalizeClassID(item.key)" 
@@ -240,7 +252,8 @@ Vue.component('v-form', {
                         {{ option_key }}
                     </option>
                 </select>
-                <small class="help-text form-text text-muted">{{formData[item.key]}}</small>
+                */ ?>
+                
                 <small class="help-text form-text text-muted">{{item.help_text}}</small>
             </div>
         </div>  
