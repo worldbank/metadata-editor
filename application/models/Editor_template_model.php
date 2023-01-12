@@ -197,6 +197,35 @@ class Editor_template_model extends ci_model {
 		$result=$this->db->update('editor_templates', $update_arr); 		
 		return $result;		
 	}
+
+	function create_template($options)
+	{
+
+		$template_options=array();
+
+		foreach($options as $key=>$value){
+			if (in_array($key,$this->fields)){
+				$template_options[$key]=$value;
+			}
+		}
+
+		if (!isset($template_options['data_type'])){
+			throw new Exception("Template::Data type is not set");
+		}
+
+		if (isset($template_options['uid'])){
+			$template_options["uid"]=md5($template_options['data_type'].'-'.mt_rand());
+		}
+		
+		if (isset($template_options['template'])){
+			$template_options['template']=json_encode($template_options['template']);
+		}
+
+		$template_options["created"]=date("U");
+		$template_options["changed"]=date("U");
+
+		return $this->insert($template_options);
+	}
 	
 	
 	/**

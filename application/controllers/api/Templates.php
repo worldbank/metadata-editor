@@ -208,6 +208,24 @@ class Templates extends MY_REST_Controller
 	}
 
 
+	function create_post()
+	{		
+		try{
+			$options=$this->raw_json_input();
+			$result=$this->Editor_template_model->create_template($options);
+
+			$output=array(
+				'status'=>'success',
+				'template'=>$result
+			);
+
+			$this->set_response($output, REST_Controller::HTTP_OK);			
+		}
+		catch(Exception $e){
+			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
 
 	function update_post($uid=null)
 	{		
