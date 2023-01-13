@@ -7,7 +7,7 @@
 <div class="form-group">
     <label for="name">Label:</label>
     <input type="text" class="form-control" id="name" placeholder="Label" v-model="ActiveNode.title">
-    <div v-if="ActiveNode.key && coreTemplateParts[ActiveNode.key]" class="text-secondary font-small" style="margin-top:4px;font-size:small">Original label: {{coreTemplateParts[ActiveNode.key].title}} Name: {{ActiveNode.key}}</div>
+    <div v-if="ActiveNode.key && coreTemplateParts[ActiveNode.key]" class="text-secondary font-small" style="margin-top:4px;font-size:small">Original label: {{coreTemplateParts[ActiveNode.key].title}} <span class="pl-3">Name: {{ActiveNode.key}}</span></div>
 </div>
 
 <div class="row">
@@ -36,6 +36,12 @@
         </div>
         <div v-else>N/A</div>
     </div>
+</div>
+
+
+<div class="form-group mt-2 pb-5" v-if="ActiveNode.key && ActiveNode.props">
+    <div><label>Field properties:</label></div>
+    <props-treeview :key="ActiveNode.key" :parent_key="ActiveNode.key" v-model="ActiveNode.props" :core_props="coreTemplateParts[ActiveNode.key]"></props-treeview>
 </div>
 
 <template v-if="ActiveNode.type!=='section_container' && ActiveNode.type!=='section'">

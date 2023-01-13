@@ -32,30 +32,30 @@
                             "class": "required",
                             "title": "Unique ID number for the document",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "text",
                                     "help_text": "Name (required)",
                                     "class": "required"
                                 },
-                                "abbr": {
+                                {
                                     "key": "abbreviation",
                                     "title": "Abbreviation",
                                     "type": "text"
                                 },
-                                "affiliation": {
+                                {
                                     "key": "affiliation",
                                     "type": "string",
                                     "title": "Affiliation"
                                 },
-                                "role": {
+                                {
                                     "key": "role",
                                     "title": "Role",
                                     "type": "string"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "doc_desc.prod_date",
@@ -98,19 +98,19 @@
                             "title": "Other Identifiers",
                             "type": "array",
                             "help_text": "Identifiers such as ISSN, ISBN, DOI",
-                            "props": {
-                                "type": {
+                            "props": [
+                                {
                                     "key": "type",
                                     "title": "ID Type",
                                     "type": "text",
                                     "help_text": "Identifiers such as ISSN, ISBN, DOI"
                                 },
-                                "identifier": {
+                                {
                                     "key": "identifier",
                                     "title": "Identifier",
                                     "type": "text"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "project_desc.title_statement.title",
@@ -156,82 +156,82 @@
                             "title": "Output",
                             "help_text": "Description of outputs of the research project",
                             "type": "array",
-                            "props": {
-                                "type": {
+                            "props": [
+                                {
                                     "key": "type",
                                     "title": "Type",
                                     "type": "text",
                                     "help_text": "Type of outputs of the script/research project. Example: `Working paper`, `On-line interactive data visualization` (ideally, a controlled vocabulary should be used)"
                                 },
-                                "title": {
+                                {
                                     "key": "title",
                                     "title": "Title",
                                     "type": "text"
                                 },
-                                "authors": {
+                                 {
                                     "key": "authors",
                                     "title": "Authors",
                                     "type": "text"
                                 },
-                                "description": {
+                                {
                                     "key": "description",
                                     "title": "Description",
                                     "type": "text"
                                 },
-                                "abstract": {
+                                {
                                     "key": "abstract",
                                     "type": "text",
                                     "title": "Abstract"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "type": "text",
                                     "title": "URI"
                                 },
-                                "doi": {
+                                {
                                     "key": "doi",
                                     "type": "text",
                                     "title": "DOI"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "project_desc.approval_process",
                             "title": "Approval process",
                             "help_text": "Description of project output review process",
                             "type": "array",
-                            "props": {
-                                "approval_phase": {
+                            "props": [
+                                {
                                     "key": "approval_phase",
                                     "title": "Approval phase name",
                                     "type": "text"
                                 },
-                                "approval_authority": {
+                                {
                                     "key": "approval_authority",
                                     "title": "Approval authority",
                                     "type": "text"
                                 },
-                                "submission_date": {
+                                {
                                     "key": "submission_date",
                                     "title": "Date submitted",
                                     "type": "text"
                                 },
-                                "reviewer": {
+                                {
                                     "key": "Reviewer",
                                     "title": "Reviewer",
                                     "type": "text"
                                 },
-                                "review_status": {
+                                {
                                     "key": "review_status",
                                     "title": "Review status",
                                     "type": "text"
                                 },
-                                "approval_date": {
+                                {
                                     "key": "approval_date",
                                     "title": "Approval date",
                                     "type": "string"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "project_desc.project_website",
@@ -244,18 +244,18 @@
                             "title": "Language",
                             "help_text": "Documentation language e.g. English, French, etc.",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Language",
                                     "type": "text"
                                 },
-                                "code": {
+                                {
                                     "key": "code",
                                     "title": "Language code",
                                     "type": "text"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "project_desc.production_date",
@@ -296,238 +296,238 @@
                             "title": "Errata",
                             "help_text": "List of corrected errors in data, scripts or output",
                             "type": "array",
-                            "props": {
-                                "date": {
+                            "props": [
+                                {
                                     "key": "date",
                                     "title": "Date of erratum (YYYY-MM-DD)",
                                     "type": "text"
                                 },
-                                "description": {
+                                {
                                     "key": "description",
                                     "title": "Description",
                                     "type": "text"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "project_desc.process",
                             "title": "Process",
                             "help_text": "A description, following a logical sequence, of the various phases of the research project implementation. This field may be used to document explorations steps that may have resulted in dead ends, to document intermediary steps at which a project may have been reviewed and approved, etc.",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Phase name",
                                     "type": "text"
                                 },
-                                "date_start": {
+                                {
                                     "key": "date_start",
                                     "title": "Phase start date (YYYY-MM-DD)",
                                     "type": "text"
                                 },
-                                "date_end": {
+                                {
                                     "key": "date_end",
                                     "title": "Phase end date (YYYY-MM-DD)",
                                     "type": "text"
                                 },
-                                "description": {
+                                {
                                     "key": "description",
                                     "title": "Description",
                                     "type": "text"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "project_desc.authoring_entity",
                             "title": "Authoring entity",
                             "help_text": "The person, corporate body, or agency responsible for the work's substantive and intellectual content. Repeat the element for each author, and use 'affiliation' attribute if available. Invert first and last name and use commas.",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Agency Name",
                                     "type": "text",
                                     "help_text": "Name of the person, corporate body, or agency responsible for the work's substantive and intellectual content. If a person, invert first and last name and use commas."
                                 },
-                                "role": {
+                                {
                                     "key": "role",
                                     "title": "Role",
                                     "type": "text",
                                     "help_text": "Title of the person (if any) responsible for the work's substantive and intellectual content."
                                 },
-                                "affiliation": {
+                                {
                                     "key": "affiliation",
                                     "title": "Affiliation",
                                     "type": "text"
                                 },
-                                "abbreviation": {
+                                {
                                     "key": "abbreviation",
                                     "title": "Abbreviation",
                                     "help_text": "Abbreviation",
                                     "type": "text"
                                 },
-                                "email": {
+                                {
                                     "key": "email",
                                     "type": "text",
                                     "title": "Email",
                                     "help_text": "Email"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "project_desc.contributors",
                             "title": "Contributor(s)",
                             "help_text": "The person, corporate body, or agency who contributed to the project.",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Agency Name",
                                     "type": "text",
                                     "help_text": "Name of the person, corporate body, or agency responsible for the work's substantive and intellectual content. If a person, invert first and last name and use commas."
                                 },
-                                "role": {
+                                {
                                     "key": "role",
                                     "title": "Role",
                                     "type": "text",
                                     "help_text": "Title of the person (if any) responsible for the work's substantive and intellectual content."
                                 },
-                                "affiliation": {
+                                {
                                     "key": "affiliation",
                                     "title": "Affiliation",
                                     "type": "text"
                                 },
-                                "abbreviation": {
+                                {
                                     "key": "abbreviation",
                                     "title": "Abbreviation",
                                     "help_text": "Abbreviation",
                                     "type": "text"
                                 },
-                                "email": {
+                                {
                                     "key": "email",
                                     "type": "text",
                                     "title": "Email",
                                     "help_text": "Email"
                                 },
-                                "url": {
+                                {
                                     "key": "url",
                                     "type": "text",
                                     "title": "URL"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "project_desc.sponsors",
                             "title": "Sponsor",
                             "help_text": "The source(s) of funds for production of the work. If different funding agencies sponsored different stages of the production process, use the 'role' attribute to distinguish them.",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "string"
                                 },
-                                "abbr": {
+                                {
                                     "key": "abbr",
                                     "title": "Abbreviation",
                                     "type": "string"
                                 },
-                                "role": {
+                                {
                                     "key": "role",
                                     "title": "Role",
                                     "type": "string"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "project_desc.curators",
                             "title": "Curator(s)",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Agency Name",
                                     "type": "text",
                                     "help_text": "Name of the person, corporate body, or agency responsible for the work's substantive and intellectual content. If a person, invert first and last name and use commas."
                                 },
-                                "role": {
+                                {
                                     "key": "role",
                                     "title": "Role",
                                     "type": "text",
                                     "help_text": "Title of the person (if any) responsible for the work's substantive and intellectual content."
                                 },
-                                "affiliation": {
+                                {
                                     "key": "affiliation",
                                     "title": "Affiliation",
                                     "type": "text"
                                 },
-                                "abbreviation": {
+                                {
                                     "key": "abbreviation",
                                     "title": "Abbreviation",
                                     "help_text": "Abbreviation",
                                     "type": "text"
                                 },
-                                "email": {
+                                {
                                     "key": "email",
                                     "type": "text",
                                     "title": "Email",
                                     "help_text": "Email"
                                 },
-                                "url": {
+                                {
                                     "key": "url",
                                     "type": "text",
                                     "title": "URL"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "project_desc.reviews_comments",
                             "title": "Reviews and comments",
                             "type": "array",
-                            "props": {
-                                "comment_date": {
+                            "props": [
+                                {
                                     "key": "comment_date",
                                     "title": "Comment date (YYYY-MM-DD)",
                                     "type": "text"
                                 },
-                                "comment_by": {
+                                {
                                     "key": "comment_by",
                                     "title": "Comment provider",
                                     "type": "text"
                                 },
-                                "comment_description": {
+                                {
                                     "key": "comment_description",
                                     "title": "Comment description",
                                     "type": "text"
                                 },
-                                "comment_response": {
+                                {
                                     "key": "comment_response",
                                     "title": "Response on comment",
                                     "type": "text"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "project_desc.acknowledgements",
                             "title": "Acknowledgments",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "string"
                                 },
-                                "affiliation": {
+                                {
                                     "key": "affiliation",
                                     "title": "Affiliation",
                                     "type": "string"
                                 },
-                                "role": {
+                                {
                                     "key": "role",
                                     "title": "Role",
                                     "type": "string"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "project_desc.acknowledgement_statement",
@@ -553,186 +553,186 @@
                             "key": "project_desc.related_projects",
                             "title": "Related projects",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "string"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "title": "URI",
                                     "type": "string"
                                 },
-                                "note": {
+                                {
                                     "key": "note",
                                     "title": "Note",
                                     "type": "string"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "project_desc.geographic_units",
                             "title": "Geographic locations",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "string"
                                 },
-                                "code": {
+                                {
                                     "key": "code",
                                     "title": "Location code",
                                     "type": "string"
                                 },
-                                "type": {
+                                {
                                     "key": "type",
                                     "title": "Type",
                                     "type": "string"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "project_description.keywords",
                             "type": "array",
                             "title": "Keywords",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Keyword",
                                     "type": "text"
                                 },
-                                "vocabulary": {
+                                {
                                     "key": "vocabulary",
                                     "title": "Vocabulary",
                                     "type": "text"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "title": "URL",
                                     "type": "text"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "project_description.themes",
                             "type": "array",
                             "title": "Themes",
-                            "props": {
-                                "name": {
+                            "props": [
+                                 {
                                     "key": "name",
                                     "title": "Theme",
                                     "type": "text"
                                 },
-                                "vocabulary": {
+                                {
                                     "key": "vocabulary",
                                     "title": "Vocabulary",
                                     "type": "text"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "title": "URL",
                                     "type": "text"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "project_description.topics",
                             "type": "array",
                             "title": "Topics",
-                            "props": {
-                                "id": {
+                            "props": [
+                                {
                                     "key": "id",
                                     "title": "ID",
                                     "type": "text"
                                 },
-                                "name": {
+                                {
                                     "key": "name",
                                     "title": "Topic",
                                     "type": "text"
                                 },
-                                "parent_id": {
+                                {
                                     "key": "parent_id",
                                     "title": "Parent topic Identifier",
                                     "help_text": "For subtopics, provide the ID of the parent topic",
                                     "type": "text"
                                 },
-                                "vocabulary": {
+                                {
                                     "key": "vocabulary",
                                     "title": "Vocabulary",
                                     "type": "text"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "title": "URL",
                                     "type": "text"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "project_description.disciplines",
                             "type": "array",
                             "title": "Disciplines",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "text"
                                 },
-                                "vocabulary": {
+                                {
                                     "key": "vocabulary",
                                     "title": "Vocabulary",
                                     "type": "text"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "title": "URL",
                                     "type": "text"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "project_desc.repository_uri",
                             "title": "Source code repository",
                             "help_text": "Source code repository",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Repository name",
                                     "help_text": "Name of the repository where code is hosted. e.g. `Github`, `Bitbucket`, etc.",
                                     "type": "text"
                                 },
-                                "type": {
+                                {
                                     "key": "type",
                                     "title": "Type",
                                     "type": "text",
                                     "help_text": "Repo type e.g. `git`, `svn`, `other`"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "type": "text",
                                     "title": "URI"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "project_desc.license",
                             "title": "License",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "text"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "title": "URI",
                                     "type": "text"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "project_desc.copyright",
@@ -761,18 +761,18 @@
                             "title": "Methods or algorithms applied",
                             "help_text": "Methods or algorithms used",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Method",
                                     "type": "text"
                                 },
-                                "note": {
+                                {
                                     "key": "note",
                                     "title": "Note",
                                     "type": "text"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "project_desc_software_section",
@@ -784,24 +784,24 @@
                                     "title": "Software",
                                     "help_text": "Software",
                                     "type": "nested_array",
-                                    "props": {
-                                        "name": {
+                                    "props": [
+                                        {
                                             "key": "name",
                                             "title": "Name",
                                             "type": "text"
                                         },
-                                        "version": {
+                                        {
                                             "key": "version",
                                             "title": "Version",
                                             "type": "text"
                                         },
-                                        "library": {
+                                        {
                                             "key": "library",
                                             "title": "Libraries or packages used",
                                             "help_text": "Libraries or packages used",
                                             "type": "simple_array"
                                         }
-                                    }
+                                    ]
                                 }
                             ]
                         },                        
@@ -815,44 +815,45 @@
                                     "title": "Scripts",
                                     "help_text": "Description of each script file",
                                     "type": "nested_array",
-                                    "props": {
-                                        "file_name": {
+                                    "props": [
+                                        {
                                             "key": "file_name",
                                             "title": "File name",
                                             "type": "text"
                                         },
-                                        "zip_package": {
+                                        {
                                             "key": "zip_package",
                                             "title": "Zip package",
                                             "type": "text"
                                         },
-                                        "title": {
+                                        {
                                             "key": "title",
                                             "title": "Title",
                                             "type": "text"
                                         },
-                                        "authors": {
+                                        {
                                             "key": "authors",
                                             "type": "array",
                                             "title": "Authors",
-                                            "props": {
-                                                "name": {
+                                            "props": [
+                                                {
                                                     "key": "name",
                                                     "title": "Person or Organization name",
                                                     "type": "string"
                                                 },
-                                                "abbr": {
+                                                {
                                                     "key": "abbr",
                                                     "title": "Abbreviation",
                                                     "type": "string"
                                                 },
-                                                "role": {
+                                                {
                                                     "key": "role",
                                                     "title": "Role",
                                                     "type": "string"
                                                 }
-                                            }
-                                        },
+                                            ]
+                                        }
+                                    ],
                                         "date": {
                                             "key": "date",
                                             "title": "Date",
@@ -916,7 +917,6 @@
                                             }
                                         }
                                     }
-                                }
                             ]
                         },
                         
@@ -931,80 +931,80 @@
                             "title": "Datasets",
                             "help_text": "List and description of datasets used by the research project",
                             "type": "nested_array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Dataset name",
                                     "type": "text"
                                 },
-                                "idno": {
+                                {
                                     "key": "idno",
                                     "title": "Dataset IDNO",
                                     "type": "text"
                                 },
-                                "note": {
+                                {
                                     "key": "note",
                                     "title": "Note",
                                     "type": "text"
                                 },
-                                "access_type": {
+                                {
                                     "key": "access_type",
                                     "title": "Data access policy",
                                     "type": "text"
                                 },
-                                "license": {
+                                {
                                     "key": "license",
                                     "title": "License",
                                     "type": "text"
                                 },
-                                "license_uri": {
+                                {
                                     "key": "license_uri",
                                     "title": "License URI",
                                     "type": "text"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "type": "text",
                                     "title": "URL"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "project_desc.contacts",
                             "title": "Contacts",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "string"
                                 },
-                                "role": {
+                                {
                                     "key": "role",
                                     "title": "Role",
                                     "type": "string"
                                 },
-                                "affiliation": {
+                                {
                                     "key": "affiliation",
                                     "title": "Affiliation",
                                     "type": "string"
                                 },
-                                "email": {
+                                {
                                     "key": "email",
                                     "title": "Email",
                                     "type": "string"
                                 },
-                                "telephone": {
+                                {
                                     "key": "telephone",
                                     "title": "Phone",
                                     "type": "string"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "title": "URI",
                                     "type": "string"
                                 }
-                            }
+                            ]
                         }
                     ]
                 }

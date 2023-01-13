@@ -38,29 +38,29 @@
                             "type": "array",
                             "required": false,
                             "help_text": "List of producers",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Name",
-                                    "description": "Name (required)",
+                                    "help_text": "Name (required)",
                                     "type": "text"
                                 },
-                                "abbr": {
+                                {
                                     "key": "abbr",
                                     "title": "Abbreviation",
                                     "type": "text"
                                 },
-                                "affiliation": {
+                                {
                                     "key": "affiliation",
                                     "type": "text",
                                     "title": "Affiliation"
                                 },
-                                "role": {
+                                {
                                     "key": "role",
                                     "title": "Role",
                                     "type": "text"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "doc_desc.prod_date",
@@ -131,19 +131,19 @@
                             "type": "array",
                             "required": true,
                             "help_text": "",
-                            "props": {
-                                "type": {
+                            "props": [
+                                {
                                     "key": "type",
                                     "title": "Identifier type",
-                                    "description": "Type of identifier e.g. `doi`, `handle`, `other`",
+                                    "hlep_text": "Type of identifier e.g. `doi`, `handle`, `other`",
                                     "type": "text"
                                 },
-                                "identifier": {
+                                {
                                     "key": "identifier",
                                     "title": "Identifier",
                                     "type": "text"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "study_desc.title_statement.title",

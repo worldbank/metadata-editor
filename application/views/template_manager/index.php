@@ -117,14 +117,6 @@
               <div @click="isEditingDescription=false">
                 <nada-treeview  v-model="UserTreeItems" :cut_fields="cut_fields" :initially_open="initiallyOpen"></nada-treeview>
               </div>
-
-              <?php /*
-                <pre>
-                {{user_template_info}}
-                </pre>
-                */ ?>
-
-
             </div>
             <div class="col-1" style="background:#dee2e6;">
               <div style="margin:-3px;">
@@ -244,6 +236,8 @@
     <?php echo include_once("vue-table-component.js"); ?>
     <?php echo include_once("vue-list-component.js"); ?>
     <?php echo include_once("vue-validation-rules-component.js"); ?>
+    <?php echo include_once("vue-props-tree-component.js"); ?>
+
 
     Vue.mixin({
       methods: {}
@@ -349,7 +343,7 @@
             "dropdown",
             //"date"
           ],
-          cut_fields:[]
+          cut_fields:[]          
         }
       },
       created: function() {
