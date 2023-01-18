@@ -1447,10 +1447,9 @@
                             "type": "array",
                             "props": [
                                 {
-                                    "key": "title",
-                                    "title": "Title",
-                                    "type": "text",
-                                    "prop_key": "study_desc.method.data_processing.title"
+                                    "key": "type",
+                                    "title": "Type",
+                                    "type": "text"                                    
                                 },
                                 {
                                     "key": "description",
@@ -1995,7 +1994,7 @@
                             "enum": []
                         },
                         {
-                            "key": "variable.var_qstn_ivulnstr",
+                            "key": "variable.var_qstn_ivuinstr",
                             "title": "Interviewer instructions",
                             "type": "string",
                             "help_text": "Specific instructions to the individual conducting an interview. The content will typically be entered by copy/pasting instructions in the interviewer’s manual (or in the CAPI application). In cases where the same instructions relate to multiple variables, repeat the same information in the metadata for all these variables.",
@@ -2023,14 +2022,12 @@
                                 {
                                     "key": "value",
                                     "title": "Value",
-                                    "type": "text",
-                                    "prop_key": "variable.var_sumstat.value"
+                                    "type": "text"
                                 },
                                 {
-                                    "key": "tag",
+                                    "key": "wgtd",
                                     "title": "Weighted",
-                                    "type": "text",
-                                    "prop_key": "variable.var_sumstat.tag"
+                                    "type": "text"
                                 }
                             ]
                         },
@@ -2040,6 +2037,45 @@
                             "type": "string",
                             "help_text": "This element provides a space to describe the variable in detail. Not all variables require a definition.",
                             "enum": []
+                        },
+                        {
+                            "key": "variable.var_catgry",
+                            "title": "Variable categories",
+                            "type": "array",
+                            "props": [
+                                 {
+                                    "key": "value",
+                                    "title": "Value",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "label",
+                                    "title": "Label",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "stats",
+                                    "title": "Stats",
+                                    "type": "array",
+                                    "props":[
+                                        {
+                                            "key": "type",
+                                            "title": "Type",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "value",
+                                            "title": "Value",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "wgtd",
+                                            "title": "Weighted",
+                                            "type": "text"
+                                        }
+                                    ]
+                                }
+                            ]
                         },
                         {
                             "key": "variable.var_std_catgry",
