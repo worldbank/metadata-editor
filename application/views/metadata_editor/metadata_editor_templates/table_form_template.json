@@ -902,7 +902,7 @@
                             "type": "array",
                             "props": [
                                  {
-                                    "key": "name",
+                                    "key": "note",
                                     "title": "Note",
                                     "type": "string"
                                 }
