@@ -829,18 +829,18 @@
                             "key": "table_description.license",
                             "title": "License",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "text"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "title": "URI",
                                     "type": "text"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "table_description.citation",
@@ -863,63 +863,63 @@
                             "key": "table_description.contacts",
                             "title": "Contacts",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "string"
                                 },
-                                "role": {
+                                {
                                     "key": "role",
                                     "title": "Role",
                                     "type": "string"
                                 },
-                                "affiliation": {
+                                {
                                     "key": "affiliation",
                                     "title": "Affiliation",
                                     "type": "string"
                                 },
-                                "email": {
+                                {
                                     "key": "email",
                                     "title": "Email",
                                     "type": "string"
                                 },
-                                "telephone": {
+                                {
                                     "key": "telephone",
                                     "title": "Phone",
                                     "type": "string"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "title": "URI",
                                     "type": "string"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "table_description.notes",
                             "title": "Notes",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                 {
                                     "key": "name",
                                     "title": "Note",
                                     "type": "string"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "table_description.relations",
                             "title": "Relations",
                             "help_text": "Related tables",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                 {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "string"
                                 },
-                                "type": {
+                                {
                                     "key": "type",
                                     "title": "Type",
                                     "type": "string",
@@ -937,7 +937,7 @@
                                         "isRequiredBy"
                                     ]
                                 }
-                            }
+                            ]
                         }
                     ]
                 }
@@ -953,18 +953,18 @@
             "key": "table_description.tags",
             "title": "Tags",
             "type": "array",
-            "props": {
-                "tag_group": {
+            "props": [
+                {
                     "key": "tag_group",
                     "title": "Tag group",
                     "type": "string"
                 },
-                "tag": {
+                {
                     "key": "tag",
                     "title": "Tag",
                     "type": "string"
                 }
-            }
+            ]
         }]
         }
        
