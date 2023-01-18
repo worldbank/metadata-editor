@@ -1043,13 +1043,7 @@
                             "title": "Development activity",
                             "help_text": "This section is used to describe the process that led to the production of the final output of the study, from its inception/design to the dissemination of the final output.\nEach activity is documented separately. The Generic Statistical Business Process Model (GSBPM) provides a useful decomposition of such a process, which can be used to list the activities to be described. This is a repeatable set of metadata elements.\n\n- Activity type: The type of activity. A controlled vocabulary can be used, possibly comprising the main components of the GSBPM: {Needs specification, Design, Build, Collect, Process, Analyze, Disseminate, Evaluate}).\n- Description: A brief description of the activity.\n- Participants: A list of participants (persons or organizations) in the activity. This is a repeatable set of elements; each participant can be documented separately.\n  * Name: Name of the participating person or organization.\n   * Affiliation: Affiliation of the person or organization mentioned in name.\n   * Role: Specific role (participation) of the person or organization mentioned in name.\n- Resources: A description of the data sources and other resources used to implement the activity.\n   * Name: The name of the resource.\n   * Origin: The origin of the resource mentioned in name.\n   * Characteristics: The characteristics of the resource mentioned in name.\n- Outcome: Description of the main outcome of the activity.",
                             "type": "nested_array",
-                            "props": [
-                                {
-                                    "key": "name",
-                                    "title": "Name",
-                                    "type": "text",
-                                    "prop_key": "study_desc.study_development.development_activity.name"
-                                },
+                            "props": [                            
                                 {
                                     "key": "activity_type",
                                     "title": "Development activity type",
