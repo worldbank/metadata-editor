@@ -2149,19 +2149,19 @@
                             "help_text": "",
                             "items": [
                                 {
-                                    "key": "variable.format.type",
+                                    "key": "variable.var_format.type",
                                     "title": "Type",
                                     "type": "text",
                                     "help_text": "Indicates if the variable is numeric, fixed string, dynamic string, or date. Numeric variables are used to store any number, integer or floating point (decimals). A fixed string variable has a predefined length which enables the publisher to handle this data type more efficiently. Dynamic string variables can be used to store open-ended questions."
                                 },
                                 {
-                                    "key": "variable.format.name",
+                                    "key": "variable.var_format.name",
                                     "title": "Name",
                                     "type": "text",
                                     "help_text": "In some cases may provide the name of the particular, proprietary format used."
                                 },
                                 {
-                                    "key": "variable.format.note",
+                                    "key": "variable.var_format.note",
                                     "title": "Note",
                                     "type": "text",
                                     "help_text": "Additional information on the variable format."
