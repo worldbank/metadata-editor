@@ -30,7 +30,7 @@
                         {
                             "key": "doc_desc.producers",
                             "class": "required",
-                            "title": "Unique ID number for the document",
+                            "title": "Producers",
                             "type": "array",
                             "props": [
                                 {

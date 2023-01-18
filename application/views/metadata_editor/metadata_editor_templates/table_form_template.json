@@ -115,6 +115,11 @@
                             "type": "text"
                         },
                         {
+                            "key": "table_description.title_statement.translated_title",
+                            "title": "Alternate title",
+                            "type": "text"
+                        },
+                        {
                             "key": "table_description.title_statement.abbreviated_title",
                             "title": "Abbreviated Title",
                             "help_text": "Title as abbreviated for indexing or identification.",
@@ -179,6 +184,24 @@
                                     "key": "uri",
                                     "title": "URI",
                                     "type": "text"
+                                },
+                                {
+                                    "key": "author_id",
+                                    "type": "array",
+                                    "title": "Author ID",
+                                    "help_text": "Unique identifier of an author, which may be provided by services like ORCID or other",
+                                    "props":[
+                                        {
+                                            "key": "type",
+                                            "type": "text",
+                                            "title": "Type"
+                                        },
+                                        {
+                                            "key": "id",
+                                            "type": "text",
+                                            "title": "ID"
+                                        }
+                                    ]
                                 }
                             ]
                         },
@@ -303,7 +326,7 @@
                             "help_text": "List of table column names",
                             "props": [
                                 {
-                                    "key": "name",
+                                    "key": "var_name",
                                     "title": "Variable name",
                                     "help_text": "Variable name",
                                     "type": "text"
@@ -312,6 +335,12 @@
                                     "key": "label",
                                     "title": "Label",
                                     "type": "text"
+                                },
+                                {
+                                    "key": "dataset",
+                                    "title": "Dataset",
+                                    "type": "text",
+                                    "help_text":"Identifies the dataset that contains the variable reported in var_name"
                                 }
                             ]
                         },
@@ -328,7 +357,7 @@
                                     "is_required":true
                                 },
                                 {
-                                    "key": "name",
+                                    "key": "var_name",
                                     "title": "Variable name",
                                     "help_text": "Variable name",
                                     "type": "text"
@@ -340,6 +369,24 @@
                                     "help_text":"Identifies the dataset that contains the variable reported in var_name"
                                 }
                                 
+                            ]
+                        },
+                        {
+                            "key": "table_description.table_footnotes",
+                            "type": "array",
+                            "title": "Table footnotes",
+                            "help_text": "Table footnotes",
+                            "props": [
+                                {
+                                    "key": "number",
+                                    "title": "Number",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "text",
+                                    "title": "Text",                                    
+                                    "type": "text"
+                                }
                             ]
                         },
                         {
