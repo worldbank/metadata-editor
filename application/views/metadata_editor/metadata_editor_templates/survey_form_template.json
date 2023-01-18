@@ -79,6 +79,11 @@
                             "is_recommended": true
                         },
                         {
+                            "key": "doc_desc.version_statement.version",
+                            "title": "Version",
+                            "type": "text"                            
+                        },
+                        {
                             "key": "doc_desc.version_statement.version_date",
                             "title": "Version date",
                             "type": "text",
