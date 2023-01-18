@@ -254,14 +254,12 @@
                                 {
                                     "key": "name",
                                     "title": "Name",
-                                    "type": "text",
-                                    "prop_key": "study_desc.production_statement.producers.name"
+                                    "type": "text"
                                 },
                                 {
-                                    "key": "abbreviation",
+                                    "key": "abbr",
                                     "title": "Abbreviation",
-                                    "type": "text",
-                                    "prop_key": "study_desc.production_statement.producers.abbreviation"
+                                    "type": "text"                                    
                                 },
                                 {
                                     "key": "affiliation",
@@ -371,10 +369,9 @@
                                     "prop_key": "study_desc.distribution_statement.distributors.affiliation"
                                 },
                                 {
-                                    "key": "role",
-                                    "title": "Role",
-                                    "type": "text",
-                                    "prop_key": "study_desc.distribution_statement.distributors.role"
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "text"
                                 }
                             ]
                         },
