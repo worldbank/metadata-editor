@@ -236,8 +236,8 @@
                         {
                             "key": "project_desc.project_website",
                             "title": "Project website link",
-                            "help_text": "Project website link",
-                            "type": "array_simple"
+                            "help_text": "Project website",
+                            "type": "simple_array"
                         },
                         {
                             "key": "project_desc.language",
@@ -341,7 +341,7 @@
                             "key": "project_desc.authoring_entity",
                             "title": "Authoring entity",
                             "help_text": "The person, corporate body, or agency responsible for the work's substantive and intellectual content. Repeat the element for each author, and use 'affiliation' attribute if available. Invert first and last name and use commas.",
-                            "type": "array",
+                            "type": "nested_array",
                             "props": [
                                 {
                                     "key": "name",
@@ -371,6 +371,24 @@
                                     "type": "text",
                                     "title": "Email",
                                     "help_text": "Email"
+                                },
+                                {
+                                    "key": "author_id",
+                                    "type": "array",
+                                    "title": "Author ID",
+                                    "help_text": "Unique identifier of an author, which may be provided by services like ORCID or other",
+                                    "props":[
+                                        {
+                                            "key": "type",
+                                            "type": "text",
+                                            "title": "Type"
+                                        },
+                                        {
+                                            "key": "id",
+                                            "type": "text",
+                                            "title": "ID"
+                                        }
+                                    ]
                                 }
                             ]
                         },
@@ -435,6 +453,11 @@
                                 {
                                     "key": "role",
                                     "title": "Role",
+                                    "type": "string"
+                                },
+                                {
+                                    "key": "grant_no",
+                                    "title": "Grant#",
                                     "type": "string"
                                 }
                             ]
@@ -620,9 +643,20 @@
                             "type": "array",
                             "title": "Themes",
                             "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "title": "Parent Identifier",
+                                    "help_text": "For sub-themes, provide the ID of the parent theme",
+                                    "type": "text"
+                                },
                                  {
                                     "key": "name",
-                                    "title": "Theme",
+                                    "title": "Name",
                                     "type": "text"
                                 },
                                 {
@@ -675,6 +709,17 @@
                             "type": "array",
                             "title": "Disciplines",
                             "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "title": "Parent Identifier",
+                                    "help_text": "For sub-disciplines, provide the ID of the parent discipline",
+                                    "type": "text"
+                                },
                                 {
                                     "key": "name",
                                     "title": "Name",
@@ -852,54 +897,53 @@
                                                     "type": "string"
                                                 }
                                             ]
-                                        }
-                                    ],
-                                        "date": {
+                                        },
+                                        {
                                             "key": "date",
                                             "title": "Date",
                                             "type": "string"
                                         },
-                                        "format": {
+                                        {
                                             "key": "format",
                                             "title": "Format",
                                             "type": "string"
                                         },
-                                        "software": {
+                                        {
                                             "key": "software",
                                             "title": "software",
                                             "type": "string"
                                         },
-                                        "description": {
+                                        {
                                             "key": "description",
                                             "title": "Description",
                                             "type": "textarea"
                                         },
-                                        "methods": {
+                                        {
                                             "key": "methods",
                                             "title": "Methods",
                                             "type": "textarea"
                                         },
-                                        "dependencies": {
+                                        {
                                             "key": "dependencies",
                                             "title": "Dependencies",
                                             "type": "textarea"
                                         },
-                                        "instructions": {
+                                        {
                                             "key": "instructions",
                                             "title": "Instructions or note for running the script",
                                             "type": "textarea"
                                         },
-                                        "source_code_repo": {
+                                        {
                                             "key": "source_code_repos",
                                             "title": "Source code repositor",
                                             "type": "string"
                                         },
-                                        "notes": {
+                                        {
                                             "key": "notes",
                                             "title": "Notes",
                                             "type": "string"
                                         },
-                                        "license": {
+                                        {
                                             "key": "license",
                                             "title": "License",
                                             "type": "array",
@@ -916,6 +960,8 @@
                                                 }
                                             }
                                         }
+                                    ]
+                                        
                                     }
                             ]
                         },

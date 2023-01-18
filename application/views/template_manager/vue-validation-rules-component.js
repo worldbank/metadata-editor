@@ -54,7 +54,9 @@ Vue.component('validation-rules-component', {
 
             }
         }
-    },    
+    },
+    created: function () {           
+    },
     computed: {
         local()
         {
@@ -133,7 +135,8 @@ Vue.component('validation-rules-component', {
             rule_info=this.validation_rules[this.rule_selected];
             this.local[this.rule_selected]=rule_info.param==true ? '' : true;
             this.rule_selected='';
-        }        
+            this.$emit('update:value', this.local);
+        }
         
     },
     template: `

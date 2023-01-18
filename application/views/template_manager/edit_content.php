@@ -73,7 +73,7 @@
 
         <v-tab-item class="p-3">
             <!-- controlled vocab -->
-            <template v-if="ActiveNode.type!=='section_container' && ActiveNode.type!=='section'">
+            <template v-if="ActiveNode.type!=='section_container' && ActiveNode.type!=='section' ">
             <div class="form-group" >
                 <label for="controlled_vocab">Controlled vocabulary:</label>
                 <div class="border bg-white" style="max-height:300px;overflow:auto;">

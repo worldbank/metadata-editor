@@ -237,6 +237,7 @@
     <?php echo include_once("vue-list-component.js"); ?>
     <?php echo include_once("vue-validation-rules-component.js"); ?>
     <?php echo include_once("vue-props-tree-component.js"); ?>
+    <?php echo include_once("vue-prop-edit-component.js"); ?>
 
 
     Vue.mixin({
