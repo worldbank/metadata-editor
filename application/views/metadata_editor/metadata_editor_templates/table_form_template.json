@@ -410,8 +410,8 @@
                                     "type": "text"
                                 },
                                 {
-                                    "key": "help_text",
-                                    "title": "Help text",
+                                    "key": "description",
+                                    "title": "Description",
                                     "type": "text"
                                 }
                             ]
@@ -446,8 +446,28 @@
                             "title": "Data sources",
                             "props": [
                                 {
-                                    "key": "value",
-                                    "title": "Value",
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "abbreviation",
+                                    "title": "Abbreviation",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "source_id",
+                                    "title": "Source ID",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "note",
+                                    "title": "Note",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
                                     "type": "text"
                                 }
                             ]
@@ -587,7 +607,7 @@
                                     "type": "text"
                                 },
                                 {
-                                    "key": "help_text",
+                                    "key": "description",
                                     "title": "Help text",
                                     "type": "text"
                                 }
@@ -655,6 +675,17 @@
                             "title": "Themes",
                             "props": [
                                 {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "title": "Parent topic Identifier",
+                                    "help_text": "For subtopics, provide the ID of the parent topic",
+                                    "type": "text"
+                                },
+                                {
                                     "key": "name",
                                     "title": "Theme",
                                     "type": "text"
@@ -710,6 +741,17 @@
                             "title": "Disciplines",
                             "props": [
                                 {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "title": "Parent topic Identifier",
+                                    "help_text": "For subtopics, provide the ID of the parent topic",
+                                    "type": "text"
+                                },
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "text"
@@ -754,29 +796,29 @@
                             "type": "array",
                             "title": "Classifications",
                             "help_text": "Classifications used in the table",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "text"
                                 },
-                                "version": {
+                                {
                                     "key": "version",
                                     "title": "Version",
                                     "type": "text"
                                 },
-                                "organization": {
+                                {
                                     "key": "organization",
                                     "title": "Organization",
                                     "help_text": "Organization responsible for the classification",
                                     "type": "text"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "title": "URL",
                                     "type": "text"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "table_description.rights",
