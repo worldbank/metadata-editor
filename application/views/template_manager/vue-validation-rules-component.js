@@ -120,7 +120,6 @@ Vue.component('validation-rules-component', {
             return false;
         },
         RuleDescription: function(rule){
-            console.log(this.validation_rules[rule]);
             if (this.validation_rules[rule] && this.validation_rules[rule].description){
                 return this.validation_rules[rule].description;
             }

@@ -284,13 +284,11 @@
         getCoreTreeKeys: function(state) {
           let items = [];
           items = getTreeKeys(state.core_tree_items, items);
-          console.log("core tree keys", items);
           return items;
         },
         getUserTreeKeys: function(state) {
           let items = [];
           items = getTreeKeys(state.user_tree_items, items);
-          console.log("user tree keys", items);
           return items;
         }
 
@@ -350,10 +348,6 @@
       },
       created: function() {
         this.init_tree();
-        //this.init_core_template_keys();
-        //result=this.$store.getters.getUserTreeKeys;
-        //console.log("adklfjlaksdjfkajsdkfljasdlkjflkdsajfladsjf", result);
-        //return this.$store.getters.getDataFileById(this.fid);
       },
       methods: {
         init_tree: function() {
@@ -549,19 +543,7 @@
               }
           }
 
-          return -1;
-          
-          /*node.items.forEach(item => {
-            index++;
-            console.log("searching", index, item.key,key);
-            if (item.key) {
-              if (item.key == key) {
-                console.log("matched", index, item.key,key);
-                return index;
-              }
-            }
-          });
-          return index;*/
+          return -1;          
         },
         isItemInUse: function(item_key) {
           return _.includes(this.UserTreeUsedKeys, item_key);
