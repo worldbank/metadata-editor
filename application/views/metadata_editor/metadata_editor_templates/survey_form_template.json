@@ -2181,6 +2181,86 @@
                 }
             ]
         },
+
+        {
+            "type": "section_container",
+            "key": "variable_groups_container",
+            "title": "Variable groups",
+            "is_custom": true,
+            "items": [
+                {
+                    "type": "section",
+                    "key": "variable_groups",
+                    "title": "Variable groups",
+                    "items": [
+                        {
+                            "type": "text",
+                            "key": "variable_groups.vgid",
+                            "title": "vgid"
+                        },
+                        {
+                            "type": "text",
+                            "key": "variable_groups.variables",
+                            "title": "Variables"
+                        },
+                        {
+                            "type": "text",
+                            "key": "variable_groups.variable_groups",
+                            "title": "Variable groups"
+                        },
+                        {
+                            "type": "text",
+                            "key": "variable_groups.group_type",
+                            "title": "Group type",
+                            "enum":[
+                                "subject",
+                                "section",
+                                "multiResp",
+                                "grid",
+                                "display",
+                                "repetition",
+                                "version",
+                                "iteration",
+                                "analysis",
+                                "pragmatic",
+                                "record",
+                                "file",
+                                "randomized",
+                                "other"
+                            ]
+                        },
+                        {
+                            "type": "text",
+                            "key": "variable_groups.label",
+                            "title": "Label"
+                        },
+                        {
+                            "type": "text",
+                            "key": "variable_groups.universe",
+                            "title": "Universe"
+                        },
+                        {
+                            "type": "text",
+                            "key": "variable_groups.notes",
+                            "title": "Notes"
+                        },
+                        {
+                            "type": "text",
+                            "key": "variable_groups.txt",
+                            "title": "Text"
+                        },
+                        {
+                            "type": "text",
+                            "key": "variable_groups.definition",
+                            "title": "Definition"
+                        }
+                    ]
+                }
+            ]
+        },
+
+
+
         {
             "type": "section_container",
             "id": "tags",

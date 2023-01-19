@@ -1,11 +1,11 @@
 /// view treeview component
 Vue.component('nada-treeview', {
-    props:['value','initially_open','cut_fields'],
+    props:['value','initially_open','tree_active_items','cut_fields'],
     data: function () {    
         return {
             template: this.value,
             initiallyOpen:[],
-            tree_active_items:[],
+            //tree_active_items:[],
             files: {
               html: 'mdi-language-html5',
               js: 'mdi-nodejs',

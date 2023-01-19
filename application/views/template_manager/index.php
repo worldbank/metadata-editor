@@ -115,7 +115,7 @@
             <div class="col bg-light" style="height:100vh; overflow:auto;">
               <div @click="isEditingDescription=true" style="padding-left:33px;cursor:pointer;" class="border-bottom pb-2"><v-icon>mdi-ballot-outline</v-icon>Template Description</div>
               <div @click="isEditingDescription=false">
-                <nada-treeview  v-model="UserTreeItems" :cut_fields="cut_fields" :initially_open="initiallyOpen"></nada-treeview>
+                <nada-treeview  v-model="UserTreeItems" :cut_fields="cut_fields" :initially_open="initiallyOpen" :tree_active_items="tree_active_items"></nada-treeview>
               </div>
             </div>
             <div class="col-1" style="background:#dee2e6;">
@@ -131,7 +131,7 @@
                 </div>
                 
                 <div>
-                  <v-icon v-if="ActiveNode.type=='section_container'" color="#3498db" @click="addSection()">mdi-plus-box</v-icon>
+                  <v-icon v-if="ActiveNode.type=='section_container' || ActiveNode.type=='section'" color="#3498db" @click="addSection()">mdi-plus-box</v-icon>
                   <v-icon v-else color="rgb(0 0 0 / 12%)">mdi-plus-box</v-icon>
                 </div>
                 <div>
@@ -502,6 +502,9 @@
           });
 
           this.ActiveNode= parentNode.items[parentNode.items.length-1];
+          this.tree_active_items= new Array();
+          this.tree_active_items.push(new_node_key);
+          this.initiallyOpen.push(new_node_key);
         },
         moveUp: function()
         {
