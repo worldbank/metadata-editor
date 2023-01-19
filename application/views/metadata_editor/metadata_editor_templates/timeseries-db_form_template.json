@@ -718,6 +718,11 @@
                                     "title": "URI",
                                     "type": "text",
                                     "prop_key": "database_description.license.uri"
+                                },
+                                {
+                                    "key": "note",
+                                    "title": "Note",
+                                    "type": "text"                                    
                                 }
                             ],
                             "help_text": "This set of elements is used to describe the access license(s) attached to the database.\n\n- Type: The name of the license, for example “Creative Commons Attribution 4.0 International license (CC-BY 4.0)”.\n- URL: A URI to a description of the license, for example “https://creativecommons.org/licenses/by/4.0/”;\n- Note: Any additional information to qualify the license requirements."

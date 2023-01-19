@@ -531,7 +531,7 @@
                             ]
                         },
                         {
-                            "key": "project_desc.acknowledgements",
+                            "key": "project_desc.acknowledgments",
                             "title": "Acknowledgments",
                             "type": "array",
                             "props": [
@@ -553,7 +553,7 @@
                             ]
                         },
                         {
-                            "key": "project_desc.acknowledgement_statement",
+                            "key": "project_desc.acknowledgment_statement",
                             "title": "Acknowledgment statement",
                             "type": "textarea"
                         },
