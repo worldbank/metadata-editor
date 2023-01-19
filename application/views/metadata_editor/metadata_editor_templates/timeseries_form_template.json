@@ -545,12 +545,26 @@
                             "type": "array",
                             "props": [
                                 {
+                                    "key": "id",
+                                    "title": "Unique Identifier",
+                                    "type": "text",
+                                    "rules_": "required",
+                                    "prop_key": "series_description.topics.id"
+                                },
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "text",
-                                    "name": "Theme name",
+                                    "name": "Topic name",
                                     "rules_": "required",
-                                    "prop_key": "series_description.themes.name"
+                                    "prop_key": "series_description.topics.name"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "title": "Parent topic identifier",
+                                    "type": "text",
+                                    "help_text": "For subtopics, provide the ID of the parent topic",
+                                    "prop_key": "series_description.topics.parent_id"
                                 },
                                 {
                                     "key": "vocabulary",
@@ -616,12 +630,26 @@
                             "help_text": "Information on the academic disciplines related to the content of the document. A controlled vocabulary will preferably be used, for example the one provided by the list of academic fields in Wikipedia.\n\n- ID: The ID of the discipline, preferably taken from a controlled vocabulary.\n- Name: The name (label) of the discipline, preferably taken from a controlled vocabulary.\n- Parent ID: The parent ID of the discipline (ID of the item one level up in the hierarchy), if a hierarchical controlled vocabulary is used.\n- Vocabulary: The name (including version number) of the controlled vocabulary used, if any.\n- URL: The URL to the controlled vocabulary used, if any.",
                             "props": [
                                 {
+                                    "key": "id",
+                                    "title": "Unique Identifier",
+                                    "type": "text",
+                                    "rules_": "required",
+                                    "prop_key": "series_description.topics.id"
+                                },
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "text",
-                                    "name": "Discipline name",
+                                    "name": "Topic name",
                                     "rules_": "required",
-                                    "prop_key": "series_description.disciplines.name"
+                                    "prop_key": "series_description.topics.name"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "title": "Parent topic identifier",
+                                    "type": "text",
+                                    "help_text": "For subtopics, provide the ID of the parent topic",
+                                    "prop_key": "series_description.topics.parent_id"
                                 },
                                 {
                                     "key": "vocabulary",
