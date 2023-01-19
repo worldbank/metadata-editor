@@ -366,6 +366,7 @@
           tab: '',
           field_types: [
             "text",
+            "string",
             "textarea",
             "dropdown",
             //"date"
