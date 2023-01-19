@@ -527,10 +527,17 @@
                                     "prop_key": "database_description.sponsors.name"
                                 },
                                 {
-                                    "key": "abbr",
+                                    "key": "abbreviation",
                                     "title": "Abbreviation",
                                     "type": "text",
                                     "prop_key": "database_description.sponsors.abbr"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Role",
+                                    "type": "text",
+                                    "help_text": "Role",
+                                    "prop_key": "database_description.sponsors.role"
                                 },
                                 {
                                     "key": "grant",
@@ -539,12 +546,10 @@
                                     "prop_key": "database_description.sponsors.grant"
                                 },
                                 {
-                                    "key": "role",
-                                    "title": "Role",
-                                    "type": "text",
-                                    "help_text": "Role",
-                                    "prop_key": "database_description.sponsors.role"
-                                }
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "text"                                    
+                                }                                
                             ]
                         },
                         {
