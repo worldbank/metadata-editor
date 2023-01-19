@@ -117,13 +117,7 @@
                                     "prop_key": "database_description.identifiers.identifier"
                                 }
                             ]
-                        },
-                        {
-                            "key": "database_description.doi",
-                            "type": "text",
-                            "title": "DOI ?????????????",
-                            "help_text": "The Digital Object Identifier (DOI) for the database, if available. This complements the \"ID\" field (note that the DOI can be used as \"ID\"). DOIs provide a solution to guarantee the global uniqueness of an identifier. Their use is highly recommended. DOIs should be included in citation requirements."
-                        },
+                        },                        
                         {
                             "key": "database_description.title_statement.title",
                             "type": "text",
@@ -166,14 +160,7 @@
                                     "title": "Name",
                                     "type": "text",
                                     "prop_key": "database_description.authoring_entity.name"
-                                },
-                                {
-                                    "key": "role",
-                                    "title": "Role",
-                                    "type": "text",
-                                    "name": "role",
-                                    "prop_key": "database_description.authoring_entity.role"
-                                },
+                                },                                
                                 {
                                     "key": "affiliation",
                                     "title": "Affiliation",
@@ -192,6 +179,11 @@
                                     "title": "Email",
                                     "type": "text",
                                     "prop_key": "database_description.authoring_entity.email"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "text"                                    
                                 }
                             ],
                             "is_recommended": true,
