@@ -1061,6 +1061,13 @@
                                     "prop_key": "series_description.series_groups.name"
                                 },
                                 {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "text",
+                                    "rules_": "required",
+                                    "prop_key": "series_description.series_groups.name"
+                                },
+                                {
                                     "key": "version",
                                     "title": "Version",
                                     "type": "text",

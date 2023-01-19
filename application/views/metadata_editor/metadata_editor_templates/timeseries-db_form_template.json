@@ -1,651 +1,755 @@
 {
     "type": "template",
     "title": "Timeseries database",
-    "items":
-[    
-    {
-        "type": "section_container",
-        "key": "metadata_information",
-        "title": "Metadata information",
-        "class": "recommended",
-        "items": [
-            {
-                "type": "section",
-                "key": "metadata_information_section",
-                "title": "Metadata information",
-                "class": "recommended",
-                "items": [
-                    {
-                        "key": "metadata_information.title",
-                        "title": "Document title",
-                        "type": "text"                    
-                    },
-                    {
-                        "key": "metadata_information.idno",
-                        "title": "Document IDNo",
-                        "type": "text"                    
-                    },
-                    {
-                        "key": "metadata_information.producers",
-                        "title": "Producers",
-                        "type": "array",
-                        "props": {
-                            "name": {
-                                "key": "name",
-                                "title": "Name",
-                                "type": "text",
-                                "rules_": "required"
-                            },
-                            "abbr": {
-                                "key": "abbr",
-                                "title": "Abbreviation",
-                                "type": "text"
-                            },
-                            "affiliation": {
-                                "key": "affiliation",
-                                "title": "Affiliation",
-                                "type": "text"
-                            },
-                            "role": {
-                                "key": "role",
-                                "title": "Role",
-                                "type": "text"
-                            }
+    "items": [
+        {
+            "type": "section_container",
+            "key": "metadata_information",
+            "title": "Metadata information",
+            "class": "recommended",
+            "items": [
+                {
+                    "type": "section",
+                    "key": "metadata_information_section",
+                    "title": "Information on metadata",
+                    "class": "recommended",
+                    "items": [
+                        {
+                            "key": "metadata_information.title",
+                            "title": "Document title",
+                            "type": "text",
+                            "help_text": "The title of the metadata document containing the database metadata."
+                        },
+                        {
+                            "key": "metadata_information.idno",
+                            "title": "Document ID",
+                            "type": "text",
+                            "help_text": "A unique identifier of the database metadata document. It can be for example the identifier of the database preceded by a prefix identifying the metadata producer."
+                        },
+                        {
+                            "key": "metadata_information.producers",
+                            "title": "Producers",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text",
+                                    "rules_": "required",
+                                    "prop_key": "metadata_information.producers.name"
+                                },
+                                {
+                                    "key": "abbr",
+                                    "title": "Abbreviation",
+                                    "type": "text",
+                                    "prop_key": "metadata_information.producers.abbr"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "text",
+                                    "prop_key": "metadata_information.producers.affiliation"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Role",
+                                    "type": "text",
+                                    "prop_key": "metadata_information.producers.role"
+                                }
+                            ],
+                            "is_recommended": true,
+                            "help_text": "A list and description of the producers of the database metadata (not the producers of the database).\n\n- Name: The name of the person or organization who produced the metadata (or contributed to its production).\n- Abbreviation: The abbreviation (acronym) of the organization mentioned in name.\n- Affiliation: The affiliation of the person or organization mentioned in name.\n- Role: The specific role of the person or organization mentioned in name in the production of the metadata."
+                        },
+                        {
+                            "key": "metadata_information.prod_date",
+                            "title": "Production date",
+                            "type": "text",
+                            "is_recommended": true,
+                            "help_text": "The date when the metadata was produced, preferably entered in ISO 8601 format (YYYY-MM-DD)."
+                        },
+                        {
+                            "key": "metadata_information.version",
+                            "title": "Document version",
+                            "type": "text",
+                            "help_text": "The version of the metadata (not the version of the database)."
                         }
-                    },
-                    {
-                        "key": "metadata_information.prod_date",
-                        "title": "Document production date",
-                        "type": "text"
-                    },
-                    {
-                        "key": "metadata_information.version",
-                        "title": "Document version",
-                        "type": "text"
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        "type": "section_container",
-        "key": "database_description",
-        "title": "Database Description",
-        "items": [
-            {
-                "type": "section",
-                "key": "database_description_titlestatement",
-                "title": "Title statement",
-                "items": [
-                    {
-                        "key": "database_description.title_statement.idno",
-                        "title": "IDNO",
-                        "type": "text",
-                        "class": "required",
-                        "required": true,
-                        "rules":"required|alpha_dash|min:5"
-                    },
-                    {
-                        "key": "database_description.identifiers",
-                        "title": "Other Identifiers",
-                        "type": "array",
-                        "help_text": "Identifiers such as ISSN, ISBN, DOI",
-                        "props": {
-                            "type": {
-                                "key": "type",
-                                "title": "ID Type",
-                                "type": "text",
-                                "help_text": "Identifiers such as ISSN, ISBN, DOI"
-                            },
-                            "identifier": {
-                                "key": "identifier",
-                                "title": "Identifier",
-                                "type": "text"
-                            }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "key": "database_description",
+            "title": "Database description",
+            "items": [
+                {
+                    "type": "section",
+                    "key": "database_description_titlestatement",
+                    "title": "Title statement",
+                    "items": [
+                        {
+                            "key": "database_description.title_statement.idno",
+                            "title": "ID",
+                            "type": "text",
+                            "class": "required",
+                            "required": true,
+                            "rules": "required|alpha_dash|min:5",
+                            "is_required": true,
+                            "help_text": "A unique identifier of the database. For example, the World Bank’s World Development Indicators database published in April 2020 could have ID = “WB_WDI_APR_2020”."
+                        },
+                        {
+                            "key": "database_description.identifiers",
+                            "title": "Other Identifiers",
+                            "type": "array",
+                            "help_text": "This element is used to store database identifiers (IDs) other than the catalog ID entered in \"ID\". It can for example be a Digital Object Identifier (DOI). The \"ID\" can be repeated here (\"ID\" does not provide a type parameter; if a DOI or other standard reference ID is used as \"ID\", it is recommended to repeat it here with the identification of its type).\n\n- Type: The type of unique ID, e.g. “DOI”.\n- Value: The identifier itself.",
+                            "props": [
+                                {
+                                    "key": "type",
+                                    "title": "ID Type",
+                                    "type": "text",
+                                    "help_text": "Identifiers such as ISSN, ISBN, DOI",
+                                    "prop_key": "database_description.identifiers.type"
+                                },
+                                {
+                                    "key": "identifier",
+                                    "title": "Identifier",
+                                    "type": "text",
+                                    "prop_key": "database_description.identifiers.identifier"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "database_description.doi",
+                            "type": "text",
+                            "title": "DOI ?????????????",
+                            "help_text": "The Digital Object Identifier (DOI) for the database, if available. This complements the \"ID\" field (note that the DOI can be used as \"ID\"). DOIs provide a solution to guarantee the global uniqueness of an identifier. Their use is highly recommended. DOIs should be included in citation requirements."
+                        },
+                        {
+                            "key": "database_description.title_statement.title",
+                            "type": "text",
+                            "title": "Title",
+                            "is_required": true,
+                            "help_text": "The title is the name by which the database is formally known. It is good practice to include the year of production in the title (and possibly the month, or quarter, if a new version of the database is released more than once a year). For example, “World Development Indicators, April 2020”."
+                        },
+                        {
+                            "key": "database_description.title_statement.sub_title",
+                            "type": "text",
+                            "title": "Subtitle",
+                            "help_text": "The database subtitle can be used when there is a need to distinguish characteristics of a database. This element will rarely be used."
+                        },
+                        {
+                            "key": "database_description.title_statement.alternate_title",
+                            "type": "text",
+                            "title": "Alternate title",
+                            "help_text": "This can be an acronym, or an alternative name of the database. For example, “WDI April 2020”."
+                        },
+                        {
+                            "key": "database_description.title_statement.translated_title",
+                            "type": "text",
+                            "title": "Translated title",
+                            "help_text": "The title of the database in a secondary language (if more than one other language, they may be entered as one string, as this element is not repeatable)."
                         }
-                    },
-                    {
-                        "key": "database_description.title_statement.title",
-                        "type": "text",
-                        "title": "Title"
-                    },
-                    {
-                        "key": "database_description.title_statement.sub_title",
-                        "type": "text",
-                        "title": "Subtitle"
-                    },
-                    {
-                        "key": "database_description.title_statement.alternate_title",
-                        "type": "text",
-                        "title": "Alternate title"
-                    },
-                    {
-                        "key": "database_description.title_statement.translated_title",
-                        "type": "text",
-                        "title": "Translated title"
-                    }                 
-                ]
-            },
-            {
-                "type": "section",
-                "key": "database_description_overview",
-                "title": "Description",
-                "items": [
-                    {
-                        "key": "database_description.authoring_entity",
-                        "title": "Authoring entity",
-                        "type": "array",
-                        "props": {
-                            "name": {
-                                "key": "name",
-                                "title": "Name",
-                                "type": "text"
-                            },
-                            "role": {
-                                "key": "role",
-                                "title": "Role",
-                                "type": "text",
-                                "name": "role"
-                            },
-                            "affiliation": {
-                                "key": "affiliation",
-                                "title": "Affiliation",
-                                "type": "text",
-                                "name": "affiliation"
-                            },
-                            "abbreviation": { 
-                                "key": "abbreviation",
-                                "title": "Abbreviation",
-                                "type": "text"
-                            },
-                            "email": { 
-                                "key": "email",
-                                "title": "Email",
-                                "type": "text"
-                            }
+                    ]
+                },
+                {
+                    "type": "section",
+                    "key": "database_description_overview",
+                    "title": "Description",
+                    "items": [
+                        {
+                            "key": "database_description.authoring_entity",
+                            "title": "Authoring entity",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text",
+                                    "prop_key": "database_description.authoring_entity.name"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Role",
+                                    "type": "text",
+                                    "name": "role",
+                                    "prop_key": "database_description.authoring_entity.role"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "text",
+                                    "name": "affiliation",
+                                    "prop_key": "database_description.authoring_entity.affiliation"
+                                },
+                                {
+                                    "key": "abbreviation",
+                                    "title": "Abbreviation",
+                                    "type": "text",
+                                    "prop_key": "database_description.authoring_entity.abbreviation"
+                                },
+                                {
+                                    "key": "email",
+                                    "title": "Email",
+                                    "type": "text",
+                                    "prop_key": "database_description.authoring_entity.email"
+                                }
+                            ],
+                            "is_recommended": true,
+                            "is_required": false,
+                            "help_text": "This set of five elements is used to identify the organization(s) or person(s) who are the main producers/curators of the database. Note that a similar element is available at the indicator/series level.\n\n- Name: The name of the person or organization who maintains the contents of the database (back-end). Write the name in full (use the element \"Abbreviation\" to capture the acronym of the organization, if relevant).\n- Affiliation: The affiliation of the person or organization mentioned in name.\n- Abbreviation: Abbreviated name (acronym) of the organization mentioned in name.\n- Email: The public email contact of the person or organizations mentioned in name. It is good practice to provide a service account email address, not a personal one.\n- URL: A link (URL) to the website of the entity mentioned in name."
+                        },
+                        {
+                            "key": "database_description.abstract",
+                            "type": "textarea",
+                            "title": "Abstract",
+                            "help_text": "The abstract is a brief description of the database. It can for example include a short statement on the database scope and coverage (not in detail, as other fields are available for that purpose), objectives, history, and expected audience."
+                        },
+                        {
+                            "key": "database_description.url",
+                            "type": "text",
+                            "title": "Database URL",
+                            "help_text": "The link to the public interface of the database (home page)."
+                        },
+                        {
+                            "key": "database_description.type",
+                            "type": "text",
+                            "title": "Database type",
+                            "help_text": "The type of database."
+                        },
+                        {
+                            "key": "database_description.date_created",
+                            "type": "text",
+                            "title": "Date created",
+                            "help_text": "This is the date the database was created. The date should be entered in ISO 8601 format (YYY-MM-DD, or YYYY-MM, or YYYY)."
+                        },
+                        {
+                            "key": "database_description.date_published",
+                            "type": "text",
+                            "title": "Date published",
+                            "help_text": "This is the date the database was made public. The date should be entered in ISO 8601 format (YYY-MM-DD, or YYYY-MM, or YYYY)."
+                        },
+                        {
+                            "key": "database_description.version",
+                            "title": "Version",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "version",
+                                    "title": "Version",
+                                    "type": "text",
+                                    "prop_key": "database_description.version.version"
+                                },
+                                {
+                                    "key": "date",
+                                    "title": "Date",
+                                    "type": "text",
+                                    "prop_key": "database_description.version.date"
+                                },
+                                {
+                                    "key": "responsibility",
+                                    "title": "Responsibility",
+                                    "type": "text",
+                                    "prop_key": "database_description.version.responsibility"
+                                },
+                                {
+                                    "key": "notes",
+                                    "title": "Notes",
+                                    "type": "text",
+                                    "prop_key": "database_description.version.notes"
+                                }
+                            ],
+                            "help_text": "A database rarely remains static; it will be regularly updated and upgraded. The version element is a compound element and contains important information regarding the updating of the database. This includes any extension of the database (adding new series data), appending existing data, correcting existing data, etc.\n\n- Label: A label for the version. The version specification will be determined by a curator or a data manager under conventions determined by the authoring entity.\n- Date: The date the version was released. The date should be entered in ISO 8601 format (YYY-MM-DD, or YYYY-MM, or YYYY).\n- Responsibility: The organization or person in charge of this version of the database.\n- Note: Additional information on this version of the database. Notes can for example be used to document how this version differs from previous ones."
+                        },
+                        {
+                            "key": "database_description.update_frequency",
+                            "type": "text",
+                            "title": "Update frequency",
+                            "help_text": "Indicates at which frequency the database is updated (for example, “annual” or “quarterly”). The use of a controlled vocabulary is recommended. If a database contains many indicators, the update frequency may vary by indicator (e.g., some may be updated on a monthly or quarterly basis while others are only updated annually). The information provided in the update_frequency will correspond to the frequency of update for the indicators that are most frequently updated."
+                        },
+                        {
+                            "key": "database_description.update_schedule",
+                            "title": "Update schedule",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "update",
+                                    "title": "Date (YYYY-MM-DD)",
+                                    "type": "text",
+                                    "prop_key": "database_description.update_schedule.update"
+                                }
+                            ],
+                            "help_text": "The update schedule is intended to provide users with information on scheduled updates. This is a repeatable field that allows for capturing specific dates, but this information would then have to be regularly updated. Often a single description will be used, which would avoid having to regularly update the metadata. For example, “The database is updated in January, April, July, October of each year.”\n\n- Update: A description of the schedule of updates or a date entered in ISO 8601 format."
+                        },
+                        {
+                            "key": "database_description.time_coverage",
+                            "title": "Time coverage",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "start",
+                                    "title": "Start (YYYY-MM-DD)",
+                                    "type": "text",
+                                    "prop_key": "database_description.time_coverage.start"
+                                },
+                                {
+                                    "key": "end",
+                                    "title": "End (YYYY-MM-DD)",
+                                    "type": "text",
+                                    "prop_key": "database_description.time_coverage.end"
+                                }
+                            ],
+                            "help_text": "The time coverage is the time span of all the data contained in the database across all series.\n\n- Start: Indicates the start date of the period covered by the data (across all series) in the database. The date should be provided in ISO 8601 format (YYY-MM-DD, or YYYY-MM, or YYYY).\n- End: Indicates the end date of the period covered by the data (across all series) in the database. The date should be provided in ISO 8601 format (YYY-MM-DD, or YYYY-MM, or YYYY)."
+                        },
+                        {
+                            "key": "database_description.time_coverage_note",
+                            "type": "textarea",
+                            "title": "Time coverage note",
+                            "help_text": "The element is used to annotate and/or describe auxiliary information related to the time coverage described in \"Time coverage\"."
+                        },
+                        {
+                            "key": "database_description.periodicity",
+                            "title": "Periodicity",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "period",
+                                    "title": "Period",
+                                    "type": "text",
+                                    "prop_key": "database_description.periodicity.period"
+                                }
+                            ],
+                            "help_text": "The periodicity of the data describes the periodicity of the indicators contained in the database. A database can contain series covering different periods, in which case the information will be repeated for each type of periodicity. A controlled vocabulary should be used.\n\n- Period: Periodicity of the time series included in the database, for example, “annual”, “quarterly”, or “monthly”."
+                        },
+                        {
+                            "key": "database_description.themes",
+                            "type": "array",
+                            "title": "Themes",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Theme",
+                                    "type": "text",
+                                    "prop_key": "database_description.themes.name"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulary",
+                                    "type": "text",
+                                    "prop_key": "database_description.themes.vocabulary"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "text",
+                                    "prop_key": "database_description.themes.uri"
+                                }
+                            ],
+                            "help_text": "Themes provide a general idea of the research that might guide the creation and/or demand for the series. A theme is broad and is likely also subject to a community based definition or list. A controlled vocabulary should be used. This element will rarely be used (the element topics described below will be used more often).\n\n- ID: The unique identifier of the theme. It can be a sequential number, or the identifier of the theme in a controlled vocabulary.\n- Name: The label of the theme associated with the data.\n- Parent ID: When a hierarchical (nested) controlled vocabulary is used, the \"Parent ID\" field can be used to indicate a higher-level theme to which this theme belongs.\n- Vocabulary: The name of the controlled vocabulary used, if any.\n- URL: A link to the controlled vocabulary mentioned in field ‘vocabulary’."
+                        },
+                        {
+                            "key": "database_description.topics",
+                            "type": "array",
+                            "title": "Topics",
+                            "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "text",
+                                    "prop_key": "database_description.topics.id"
+                                },
+                                {
+                                    "key": "name",
+                                    "title": "Topic",
+                                    "type": "text",
+                                    "prop_key": "database_description.topics.name"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "title": "Parent topic Identifier",
+                                    "help_text": "For subtopics, provide the ID of the parent topic",
+                                    "type": "text",
+                                    "prop_key": "database_description.topics.parent_id"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulary",
+                                    "type": "text",
+                                    "prop_key": "database_description.topics.vocabulary"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "text",
+                                    "prop_key": "database_description.topics.uri"
+                                }
+                            ],
+                            "help_text": "The topics field indicates the broad substantive topic(s) that the indicator/series covers. A topic classification facilitates referencing and searches in electronic survey catalogs. Topics should be selected from a standard controlled vocabulary such as the Council of European Social Science Data Archives (CESSDA) topic classification.\n\n- ID: The unique identifier of the topic. It can be a sequential number, or the identifier of the topic in a controlled vocabulary.\n- Name: The label of the topic associated with the data.\n- Parent ID: When a hierarchical (nested) controlled vocabulary is used, the \"Parent ID\" field can be used to indicate a higher-level topic to which this topic belongs.\n- Vocabulary: The name of the controlled vocabulary used, if any.\n- URI: A link to the controlled vocabulary mentioned in field `vocabulary’."
+                        },
+                        {
+                            "key": "database_description.keywords",
+                            "type": "array",
+                            "title": "Keywords",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Keyword",
+                                    "type": "text",
+                                    "prop_key": "database_description.keywords.name"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulary",
+                                    "type": "text",
+                                    "prop_key": "database_description.keywords.vocabulary"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "text",
+                                    "prop_key": "database_description.keywords.uri"
+                                }
+                            ],
+                            "help_text": "Words or phrases that describe salient aspects of a data collection’s content. This can be used for building keyword indexes and for classification and retrieval purposes. Keywords can be selected from a standard thesaurus, preferably an international, multilingual thesaurus. The list of keywords can include keywords extracted from one or more controlled vocabularies and user-defined keywords.\n\n- Name: A keyword (or phrase).\n- Vocabulary: The name of the controlled vocabulary from which the keyword was extracted, if any.\n- URL: The URI of the controlled vocabulary used, if any."
+                        },
+                        {
+                            "key": "database_description.ref_country",
+                            "type": "array",
+                            "title": "Countries",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Country name",
+                                    "type": "text",
+                                    "prop_key": "database_description.ref_country.name"
+                                },
+                                {
+                                    "key": "code",
+                                    "title": "Country code",
+                                    "type": "text",
+                                    "prop_key": "database_description.ref_country.code"
+                                }
+                            ],
+                            "help_text": "A list of countries for which data are available in the database. This element is somewhat redundant with the next element (geographic_units) which may also contain a list of countries. Identifying geographic areas of type “country” is important to enable filters and facets in data catalogs (country names are among the most frequent queries submitted to catalogs).\n\n- Name: The name of the country.\n- Code: The code of the country. The use of the ISO 3166-1 alpha-3 codes is recommended.",
+                            "is_recommended": true
+                        },
+                        {
+                            "key": "database_description.geographic_units",
+                            "type": "array",
+                            "title": "Geographic areas",
+                            "help_text": "A list of geographic areas (regions, countries, states, provinces, etc.) for which data are available in the database. This list is not limited to countries; it can contain sub-national areas, supra-national regions, or non-administrative area names. The type element is used to indicate the type of geographic area. Countries may, but do not have to be repeated here if provided in the element \"Countries\".\n\n- Name: The name of the geographic area, e.g., ‘World’, ‘Sub-Saharan Africa’, ‘Afghanistan’, ‘Low-income countries’.\n- Code: The code of the geographic unit as found in the database. If no code is available in the database, a code still can be added to the metadata. In such case, using the ISO 3166-1 alpha-3 codes is recommended for countries.\n- Type: Type of geographic unit e.g. country, state, region, province, or other grouping.",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Location name",
+                                    "help_text": "Name of the geographic unit e.g. 'World', 'Africa', 'Afghanistan'",
+                                    "type": "text",
+                                    "prop_key": "database_description.geographic_units.name"
+                                },
+                                {
+                                    "key": "code",
+                                    "title": "Location code",
+                                    "help_text": "Code of the geographic unit (for countries, preferred = ISO3 code)",
+                                    "type": "text",
+                                    "prop_key": "database_description.geographic_units.code"
+                                },
+                                {
+                                    "key": "type",
+                                    "title": "Type",
+                                    "help_text": "Type of geographic unit e.g. country, state, region, province etc",
+                                    "type": "text",
+                                    "prop_key": "database_description.geographic_units.type"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "database_description.geographic_area_count",
+                            "type": "text",
+                            "title": "Geographic area count",
+                            "help_text": "The number of geographic areas for which data are provided in the database. The World Bank World Development Indicators for example provides data for 262 different areas (which includes countries and territories, geographic regions, and other country groupings)."
+                        },
+                        {
+                            "key": "database_description.geographic_granularity",
+                            "type": "text",
+                            "title": "Geographic granularity",
+                            "help_text": "Whereas the \"Geographic areas\" element lists the various geographic levels for which there is data in the database, the \"Geographic granularity\" element will provide information on the geographic levels for which information is available in the database. For example: “The database contains data at the national, provincial (admin 1) and district (admin 2) levels.”"
+                        },
+                        {
+                            "key": "database_description.bbox",
+                            "title": "Bounding boxes",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "west",
+                                    "title": "West",
+                                    "type": "text",
+                                    "prop_key": "database_description.bbox.west"
+                                },
+                                {
+                                    "key": "east",
+                                    "title": "East",
+                                    "type": "text",
+                                    "prop_key": "database_description.bbox.east"
+                                },
+                                {
+                                    "key": "south",
+                                    "title": "South",
+                                    "type": "text",
+                                    "prop_key": "database_description.bbox.south"
+                                },
+                                {
+                                    "key": "north",
+                                    "title": "North",
+                                    "type": "text",
+                                    "prop_key": "database_description.bbox.north"
+                                }
+                            ],
+                            "help_text": "Bounding boxes are typically used for geographic datasets to indicate the geographic coverage of the data, but can be provided for databases as well, although this will rarely be done. A geographic bounding box defines a rectangular geographic area.\n\n- West: Western geographic parameter of the bounding box.\n- East: Eastern geographic parameter of the bounding box.\n- South: Southern geographic parameter of the bounding box.\n- North: Northern geographic parameter of the bounding box.\n\n"
+                        },
+                        {
+                            "key": "database_description.geographic_coverage_note",
+                            "type": "textarea",
+                            "title": "Geographic coverage note",
+                            "help_text": "The note can be used to capture additional information on the geographic coverage of the database."
+                        },
+                        {
+                            "key": "database_description.sponsors",
+                            "title": "Sponsors",
+                            "help_text": "The source(s) of funds for the production and maintenance of the database. If different funding agencies sponsored different stages of the database development, use the role attribute to distinguish their respective contributions.\n\n- Name: Name of the funding agency/sponsor\n- Abbreviation: Abbreviation of the funding/sponsoring agency mentioned in name.\n- Role: Role of the funding/sponsoring agency mentioned in name.\n- Grant: Grant or award number. If an agency provided more than one grant, list all grants separated with a “;”.\n- URL: URI of the sponsor agency mentioned in name.",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text",
+                                    "help_text": "name",
+                                    "prop_key": "database_description.sponsors.name"
+                                },
+                                {
+                                    "key": "abbr",
+                                    "title": "Abbreviation",
+                                    "type": "text",
+                                    "prop_key": "database_description.sponsors.abbr"
+                                },
+                                {
+                                    "key": "grant",
+                                    "title": "Grant",
+                                    "type": "text",
+                                    "prop_key": "database_description.sponsors.grant"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Role",
+                                    "type": "text",
+                                    "help_text": "Role",
+                                    "prop_key": "database_description.sponsors.role"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "database_description.acknowledgments",
+                            "title": "Acknowledgments",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text",
+                                    "help_text": "name",
+                                    "prop_key": "database_description.acknowledgments.name"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "text",
+                                    "prop_key": "database_description.acknowledgments.affiliation"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Role",
+                                    "type": "text",
+                                    "help_text": "Role",
+                                    "prop_key": "database_description.acknowledgments.role"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "text",
+                                    "prop_key": "database_description.acknowledgments.uri"
+                                }
+                            ],
+                            "help_text": "An itemized list of person(s) and/or organization(s) other than sponsors and contributors already mentioned in metadata elements contributors and sponsors whose contribution to the database must be acknowledged. NOTE: Another element (\"Acknowledgment statement\") is available as an alternative to this itemized list of acknowledgments.\n\n- Name: The name of the person or agency being recognized for supporting the database.\n- Affiliation: Affiliation of the person or agency recognized or acknowledged for supporting the database.\n- Role: Role of the person or agency that is being recognized or acknowledged for supporting the database.\n- URL: Website URL or email of the person or organization being recognized or acknowledged for supporting the database."
+                        },
+                        {
+                            "key": "database_description.acknowledgment_statement",
+                            "type": "textarea",
+                            "title": "Acknowledgment statement",
+                            "help_text": "An overall statement of acknowledgment, which can be used as an alternative (or supplement) to the itemized list provided in \"Acknowledgments\"."
+                        },
+                        {
+                            "key": "database_description.contacts",
+                            "title": "Contacts",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "prop_key": "database_description.contacts.name"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Role",
+                                    "type": "string",
+                                    "prop_key": "database_description.contacts.role"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "string",
+                                    "prop_key": "database_description.contacts.affiliation"
+                                },
+                                {
+                                    "key": "email",
+                                    "title": "Email",
+                                    "type": "string",
+                                    "prop_key": "database_description.contacts.email"
+                                },
+                                {
+                                    "key": "telephone",
+                                    "title": "Phone",
+                                    "type": "string",
+                                    "prop_key": "database_description.contacts.telephone"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "string",
+                                    "prop_key": "database_description.contacts.uri"
+                                }
+                            ],
+                            "help_text": "The contacts element provides the public interface for questions associated with the development and maintenance of the database. There could be various contacts provided depending upon the organization.\n\n- Name: The name of the contact person that should be contacted. Instead of the name of an individual (which would be subject to change and require frequent update of the metadata), a title can be provided here (e.g. “data helpdesk”).\n- Role: The specific role of the contact person mentioned in name. This will be used when multiple contacts are listed, and is intended to help users direct their questions and requests to the right contact person.\n- Affiliation: The organization or affiliation of the contact person mentioned in name.\n- Email: The email address of the person or organization mentioned in name. Avoid using personal email accounts; the use of an anonymous email is recommended (e.g., “helpdesk@….org”)\n- Telephone: The phone number of the person or organization mentioned in name.\n- URL: The URI of the agency (typically, a URL to a “contact us” web page)"
+                        },
+                        {
+                            "key": "database_description.links",
+                            "title": "Links",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "string",
+                                    "prop_key": "database_description.links.uri"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "string",
+                                    "prop_key": "database_description.links.description"
+                                }
+                            ],
+                            "help_text": "This field allows for the association of auxiliary links referring to the database.\n\n- URL: The URI for the associated link.\n- Description: A brief description of the link, in relation to the database."
+                        },
+                        {
+                            "key": "database_description.languages",
+                            "type": "array",
+                            "title": "Languages",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text",
+                                    "prop_key": "database_description.languages.name"
+                                },
+                                {
+                                    "key": "code",
+                                    "title": "Code",
+                                    "type": "text",
+                                    "prop_key": "database_description.languages.code"
+                                }
+                            ],
+                            "help_text": "This set of elements is provided to list the languages that are supported in the database.\n\n- Name: The official name of the language being supported; it is recommended to use a name from the ISO 639-1 language name list.\n- Code: The code of the language mentioned in name, preferably the three letter ISO 639-1 code."
+                        },
+                        {
+                            "key": "database_description.access_options",
+                            "type": "array",
+                            "title": "Access modes",
+                            "props": [
+                                {
+                                    "key": "type",
+                                    "title": "Type",
+                                    "type": "text",
+                                    "prop_key": "database_description.access_options.type"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "string",
+                                    "prop_key": "database_description.access_options.uri"
+                                },
+                                {
+                                    "key": "note",
+                                    "title": "Note",
+                                    "type": "text",
+                                    "prop_key": "database_description.access_options.note"
+                                }
+                            ],
+                            "help_text": "This repeatable set of elements describes the different modes and formats in which the database is made accessible. When more than one mode of access is provided, describe them separately.\n\n- Type: The access type, e.g. “Application Programming Interface (API)”, “Bulk download in CSV format”, “On-line query interface”, etc.\n- URL: The URI corresponding to the access mode mentioned in type.\n- Note: This element allows for annotating any specific information associated with the access mode mentioned in type."
+                        },
+                        {
+                            "key": "database_description.license",
+                            "title": "License",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text",
+                                    "prop_key": "database_description.license.name"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "text",
+                                    "prop_key": "database_description.license.uri"
+                                }
+                            ],
+                            "help_text": "This set of elements is used to describe the access license(s) attached to the database.\n\n- Type: The name of the license, for example “Creative Commons Attribution 4.0 International license (CC-BY 4.0)”.\n- URL: A URI to a description of the license, for example “https://creativecommons.org/licenses/by/4.0/”;\n- Note: Any additional information to qualify the license requirements."
+                        },
+                        {
+                            "key": "database_description.citation",
+                            "type": "textarea",
+                            "title": "Citation",
+                            "help_text": "The citation requirement for the database (i.e. how users should cite the database in publications and reports)."
+                        },
+                        {
+                            "key": "database_description.notes",
+                            "title": "Notes",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "note",
+                                    "title": "Note",
+                                    "type": "text",
+                                    "prop_key": "database_description.notes.note"
+                                }
+                            ],
+                            "help_text": "This element is provided to add notes that are relevant for describing the database, that cannot be provided in other metadata elements.\n\n- Note: A free-text note."
+                        },
+                        {
+                            "key": "database_description.disclaimer",
+                            "type": "textarea",
+                            "title": "Disclaimer",
+                            "help_text": "If the agency responsible for managing the database has determined that there may be some liability as a result of the data, the element may be used to provide a disclaimer statement."
+                        },
+                        {
+                            "key": "database_description.copyright",
+                            "type": "text",
+                            "title": "Copyright",
+                            "help_text": "The copyright attached to the database, if any."
                         }
-                    },
-                    {
-                        "key": "database_description.abstract",
-                        "type": "textarea",
-                        "title": "Abstract"
-                    },
-                    {
-                        "key": "database_description.url",
-                        "type": "text",
-                        "title": "Dataset URL"
-                    },
-                    {
-                        "key": "database_description.type",
-                        "type": "text",
-                        "title": "Dataset type"
-                    },
-                    {
-                        "key": "database_description.doi",
-                        "type": "text",
-                        "title": "DOI"
-                    },
-                    {
-                        "key": "database_description.date_created",
-                        "type": "text",
-                        "title": "Date created"
-                    },
-                    {
-                        "key": "database_description.date_published",
-                        "type": "text",
-                        "title": "Date published"
-                    },
-                    {
-                        "key": "database_description.version",
-                        "title": "Version",
-                        "type": "array",
-                        "props": {
-                            "version": {
-                                "key": "version",
-                                "title": "Version",
-                                "type": "text"                                
-                            },
-                            "date": {
-                                "key": "date",
-                                "title": "Date",
-                                "type": "text"                                
-                            },
-                            "responsibility": {
-                                "key": "responsibility",
-                                "title": "Responsibility",
-                                "type": "text"                                
-                            },
-                            "notes": {
-                                "key": "notes",
-                                "title": "Notes",
-                                "type": "text"                                
-                            }                            
-                        }
-                    },
-                    {
-                        "key": "database_description.update_frequency",
-                        "type": "text",
-                        "title": "Update frequency"
-                    },
-                    {
-                        "key": "database_description.update_schedule",
-                        "title": "Update schedule",
-                        "type": "array",
-                        "props": {
-                            "update": {
-                                "key": "update",
-                                "title": "Date (YYYY-MM-DD)",
-                                "type": "text"                                
-                            }                            
-                        }
-                    },
-                    {
-                        "key": "database_description.time_coverage",
-                        "title": "Time coverage",
-                        "type": "array",
-                        "props": {
-                            "start": {
-                                "key": "start",
-                                "title": "Start (YYYY-MM-DD)",
-                                "type": "text"                                
-                            },
-                            "end": {
-                                "key": "end",
-                                "title": "End (YYYY-MM-DD)",
-                                "type": "text"                                
-                            }                            
-                        }
-                    },
-                    {
-                        "key": "database_description.time_coverage_note",
-                        "type": "textarea",
-                        "title": "Time coverage note"
-                    },
-                    {
-                        "key": "database_description.periodicity",
-                        "title": "Periodicity",
-                        "type": "array",
-                        "props": {
-                            "period": {
-                                "key": "period",
-                                "title": "Period",
-                                "type": "text"                                
-                            }                            
-                        }
-                    },
-                    {
-                        "key": "database_description.themes",
-                        "type": "array",
-                        "title": "Themes",
-                        "props": {
-                            "name": {
-                                "key": "name",
-                                "title": "Theme",
-                                "type": "text"
-                            },
-                            "vocabulary": {
-                                "key": "vocabulary",
-                                "title": "Vocabulary",
-                                "type": "text"
-                            },
-                            "uri": {
-                                "key": "uri",
-                                "title": "URL",
-                                "type": "text"
-                            }
-                        }
-                    },
-                    {
-                        "key": "database_description.topics",
-                        "type": "array",
-                        "title": "Topics",
-                        "props": {
-                            "id": {
-                                "key": "id",
-                                "title": "ID",
-                                "type": "text"
-                            },
-                            "name": {
-                                "key": "name",
-                                "title": "Topic",
-                                "type": "text"
-                            },
-                            "parent_id": {
-                                "key": "parent_id",
-                                "title": "Parent topic Identifier",
-                                "help_text": "For subtopics, provide the ID of the parent topic",
-                                "type": "text"
-                            },
-                            "vocabulary": {
-                                "key": "vocabulary",
-                                "title": "Vocabulary",
-                                "type": "text"
-                            },
-                            "uri": {
-                                "key": "uri",
-                                "title": "URL",
-                                "type": "text"
-                            }
-                        }
-                    },
-                    {
-                        "key": "database_description.keywords",
-                        "type": "array",
-                        "title": "Keywords",
-                        "props": {
-                            "name": {
-                                "key": "name",
-                                "title": "Keyword",
-                                "type": "text"
-                            },
-                            "vocabulary": {
-                                "key": "vocabulary",
-                                "title": "Vocabulary",
-                                "type": "text"
-                            },
-                            "uri": {
-                                "key": "uri",
-                                "title": "URL",
-                                "type": "text"
-                            }
-                        }
-                    },
-                    {
-                        "key": "database_description.ref_country",
-                        "type": "array",
-                        "title": "Reference country",
-                        "props": {
-                            "name": {
-                                "key": "name",
-                                "title": "Country name",
-                                "type": "text"
-                            },
-                            "code": {
-                                "key": "code",
-                                "title": "Country code",
-                                "type": "text"
-                            }
-                        }
-                    },
-                    {
-                        "key": "database_description.geographic_units",
-                        "type": "array",
-                        "title": "Geographic locations",
-                        "help_text": "List of geographic units (regions, countries, states, provinces, etc.) for which data are available in the database.",
-                        "props": {
-                            "name": {
-                                "key": "name",
-                                "title": "Location name",
-                                "help_text": "Name of the geographic unit e.g. 'World', 'Africa', 'Afghanistan'",
-                                "type": "text"
-                            },
-                            "code": {
-                                "key": "code",
-                                "title": "Location code",
-                                "help_text": "Code of the geographic unit (for countries, preferred = ISO3 code)",
-                                "type": "text"
-                            },
-                            "type": {
-                                "key": "type",
-                                "title": "Type",
-                                "help_text": "Type of geographic unit e.g. country, state, region, province etc",
-                                "type": "text"
-                            }
-                        }
-                    },
-                    {
-                        "key": "database_description.geographic_coverage_note",
-                        "type": "textarea",
-                        "title": "Geographic coverage note"
-                    },
-                    {
-                        "key": "database_description.bbox",
-                        "title": "Geographic bounding box",
-                        "type": "array",
-                        "props": {
-                            "west": {
-                                "key": "west",
-                                "title": "West",
-                                "type": "text"
-                            },
-                            "east": {
-                                "key": "east",
-                                "title": "East",
-                                "type": "text"
-                            },
-                            "south": {
-                                "key": "south",
-                                "title": "South",
-                                "type": "text"
-                            },
-                            "north": {
-                                "key": "north",
-                                "title": "North",
-                                "type": "text"
-                            }
-                        }
-                    },
-                    {
-                        "key": "database_description.geographic_granularity",
-                        "type": "text",
-                        "title": "Geographic granularity"
-                    },
-                    {
-                        "key": "database_description.geographic_area_count",
-                        "type": "text",
-                        "title": "Geographic area count"
-                    },
-                    {
-                        "key": "database_description.sponsors",
-                        "title": "Sponsors",
-                        "help_text": "Sponsors",
-                        "type": "array",
-                        "props": {
-                            "name": {
-                                "key": "name",
-                                "title": "Name",
-                                "type": "text",
-                                "help_text": "name"
-                            },                                
-                            "abbr": {
-                                "key": "abbr",
-                                "title": "Abbreviation",
-                                "type": "text"
-                            },
-                            "grant": {
-                                "key": "grant",
-                                "title": "Grant",
-                                "type": "text"
-                            },
-                            "role": {
-                                "key": "role",
-                                "title": "Role",
-                                "type": "text",
-                                "help_text": "Role"
-                            }								
-                        }
-                    },
-                    {
-                        "key": "database_description.acknowledgments",
-                        "title": "Acknowledgments",
-                        "type": "array",
-                        "props": {
-                            "name": {
-                                "key": "name",
-                                "title": "Name",
-                                "type": "text",
-                                "help_text": "name"
-                            },                                
-                            "affiliation": {
-                                "key": "affiliation",
-                                "title": "Affiliation",
-                                "type": "text"
-                            },                            
-                            "role": {
-                                "key": "role",
-                                "title": "Role",
-                                "type": "text",
-                                "help_text": "Role"
-                            },
-                            "uri": {
-                                "key": "uri",
-                                "title": "URI",
-                                "type": "text"
-                            }								
-                        }
-                    },
-                    {
-                        "key": "database_description.acknowledgment_statement",
-                        "type": "textarea",
-                        "title": "Acknowledgment statement"
-                    },
-                    {
-                        "key": "database_description.contacts",
-                        "title": "Contacts",
-                        "type": "array",
-                        "props": {
-                            "name": {
-                                "key": "name",
-                                "title": "Name",
-                                "type": "string"
-                            },
-                            "role": {
-                                "key": "role",
-                                "title": "Role",
-                                "type": "string"
-                            },
-                            "affiliation": {
-                                "key": "affiliation",
-                                "title": "Affiliation",
-                                "type": "string"
-                            },
-                            "email": {
-                                "key": "email",
-                                "title": "Email",
-                                "type": "string"
-                            },
-                            "telephone": {
-                                "key": "telephone",
-                                "title": "Phone",
-                                "type": "string"
-                            },
-                            "uri": {
-                                "key": "uri",
-                                "title": "URI",
-                                "type": "string"
-                            }
-                        }
-                    },
-                    {
-                        "key": "database_description.links",
-                        "title": "Links",
-                        "type": "array",
-                        "props": {                            
-                            "uri": {
-                                "key": "uri",
-                                "title": "URI",
-                                "type": "string"
-                            },
-                            "descriptino": {
-                                "key": "description",
-                                "title": "Description",
-                                "type": "string"
-                            }
-                        }
-                    },
-                    {
-                        "key": "database_description.languages",
-                        "type": "array",
-                        "title": "Languages",
-                        "props": {
-                            "name": {
-                                "key": "name",
-                                "title": "Name",
-                                "type": "text"
-                            },
-                            "code": {
-                                "key": "code",
-                                "title": "Code",
-                                "type": "text"
-                            }
-                        }
-                    },
-                    {
-                        "key": "database_description.access_options",
-                        "type": "array",
-                        "title": "Access options",
-                        "props": {
-                            "type": {
-                                "key": "type",
-                                "title": "Type",
-                                "type": "text"
-                            },
-                            "uri": {
-                                "key": "uri",
-                                "title": "URI",
-                                "type": "string"
-                            },
-                            "note": {
-                                "key": "note",
-                                "title": "Note",
-                                "type": "text"
-                            }
-                        }
-                    },
-                    {
-                        "key": "database_description.license",
-                        "title": "License",
-                        "type": "array",
-                        "props": {
-                            "name": {
-                                "key": "name",
-                                "title": "Name",
-                                "type": "text"
-                            },
-                            "uri": {
-                                "key": "uri",
-                                "title": "URI",
-                                "type": "text"
-                            }
-                        }
-                    },
-                    {
-                        "key": "database_description.citation",
-                        "type": "textarea",
-                        "title": "Citation"
-                    },
-                    {
-                        "key": "database_description.notes",
-                        "title": "Notes",
-                        "type": "array",
-                        "props": {
-                            "note": {
-                                "key": "note",
-                                "title": "Note",
-                                "type": "text"
-                            }
-                        }
-                    },
-                    {
-                        "key": "database_description.disclaimer",
-                        "type": "textarea",
-                        "title": "Disclaimer"
-                    },
-                    {
-                        "key": "database_description.copyright",
-                        "type": "textarea",
-                        "title": "Copyright"
-                    }
-                ]
-            }
-            
-            
-            
-
-            
-        ]
-    }
-    
-]
-
+                    ]
+                }
+            ]
+        }
+    ]
 }
