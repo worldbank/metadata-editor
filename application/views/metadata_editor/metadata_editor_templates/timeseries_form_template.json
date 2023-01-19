@@ -330,8 +330,13 @@
                                     "prop_key": "series_description.compliance.standard"
                                 },
                                 {
-                                    "key": "organization",
-                                    "title": "Organization",
+                                    "key": "abbreviation",
+                                    "title": "Abbreviation",
+                                    "type": "text"                                    
+                                },
+                                {
+                                    "key": "custodian",
+                                    "title": "Custodian",
                                     "type": "text",
                                     "prop_key": "series_description.compliance.organization"
                                 },
@@ -800,7 +805,7 @@
                         },
                         {
                             "key": "series_description.license",
-                            "title": "Supported languages",
+                            "title": "License",
                             "type": "array",
                             "props": [
                                 {
