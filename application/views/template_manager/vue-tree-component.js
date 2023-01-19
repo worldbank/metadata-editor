@@ -23,6 +23,14 @@ Vue.component('nada-treeview', {
     },
     
     computed: {
+        TreeActiveItems: {
+          get: function() {
+            return this.tree_active_items;
+          },
+          set: function(newValue) {
+            //todo
+          }          
+        },
         Items(){
             return this.value;
         },
@@ -92,7 +100,7 @@ Vue.component('nada-treeview', {
                   color="warning"
                   v-model="value"                   
                   :open.sync="initiallyOpen" 
-                  :active.sync="tree_active_items"
+                  :active.sync="TreeActiveItems"
                   @update:open="onTreeOpen" 
                   :items="Items" 
                   activatable dense 

@@ -325,6 +325,7 @@
           isEditingDescription: true,
           user_template_info: user_template_info,
           initiallyOpen: [],
+          tree_active_items:[],
           files: {
             html: 'mdi-language-html5',
             js: 'mdi-nodejs',
