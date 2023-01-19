@@ -367,6 +367,7 @@
           field_types: [
             "text",
             "string",
+            "integer",
             "textarea",
             "dropdown",
             //"date"
