@@ -947,18 +947,18 @@
                                             "key": "license",
                                             "title": "License",
                                             "type": "array",
-                                            "props": {
-                                                "name": {
+                                            "props": [
+                                                {
                                                     "key": "name",
                                                     "title": "Name",
                                                     "type": "text"
                                                 },
-                                                "uri": {
+                                                {
                                                     "key": "uri",
                                                     "title": "URI",
                                                     "type": "text"
                                                 }
-                                            }
+                                            ]
                                         }
                                     ]
                                         
