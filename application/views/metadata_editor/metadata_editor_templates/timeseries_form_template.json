@@ -11,45 +11,55 @@
                 {
                     "key": "metadata_information.title",
                     "title": "Document title",
-                    "type": "text"                    
+                    "type": "text",
+                    "help_text": "The title of the metadata document. This will usually be the same as the element \"Indicator name\" in the \"Indicator description / Identifiers and labels\" section."
                 },
                 {
                     "key": "metadata_information.idno",
-                    "title": "Document IDNo",
-                    "type": "text"                    
+                    "title": "Document ID",
+                    "type": "text",
+                    "help_text": "A unique identifier for the metadata document."
                 },
                 {
                     "key": "metadata_information.producers",
-                    "title": "Producers",
+                    "title": "Metadata producers",
                     "type": "array",
-                    "props": {
-                        "name": {
+                    "props": [
+                        {
                             "key": "name",
                             "title": "Name",
                             "type": "text",
-                            "rules_": "required"
+                            "rules_": "required",
+                            "prop_key": "metadata_information.producers.name"
                         },
-                        "abbr": {
+                        {
                             "key": "abbr",
                             "title": "Abbreviation",
-                            "type": "text"
+                            "type": "text",
+                            "prop_key": "metadata_information.producers.abbr"
                         },
-                        "affiliation": {
+                        {
                             "key": "affiliation",
                             "title": "Affiliation",
-                            "type": "text"
+                            "type": "text",
+                            "prop_key": "metadata_information.producers.affiliation"
                         },
-                        "role": {
+                        {
                             "key": "role",
                             "title": "Role",
-                            "type": "text"
+                            "type": "text",
+                            "prop_key": "metadata_information.producers.role"
                         }
-                    }
+                    ],
+                    "help_text": "A list of producers of the metadata. These can be persons or organizations. The following four elements are used to identify them and specify their specific role as and if relevant (this block of four elements is repeated for each contributor to the metadata):\n\n- Name: Name of the person or organization who documented the indicator.\n- Abbreviation: The abbreviation of the organization that is referenced under ‘Name’ above.\n- Affiliation: Affiliation of the person(s) or organization(s) who documented the indicator.\n- Role: This attribute is used to distinguish different types of involvement in the metadata production process.",
+                    "is_recommended": true
                 },
                 {
                     "key": "metadata_information.prod_date",
-                    "title": "Document production date",
-                    "type": "text"
+                    "title": "Production date",
+                    "type": "text",
+                    "help_text": "The date the metadata on this indicator was produced (not distributed or archived), preferably in ISO 8601 format (YYYY-MM-DD or YYY-MM).",
+                    "is_recommended": true
                 },
                 {
                     "key": "metadata_information.version",
@@ -61,436 +71,704 @@
         {
             "type": "section_container",
             "key": "series_description_container",
-            "title": "Series Description",
+            "title": "Indicator description",
             "class": "mandatory recommended",
             "expanded": true,
             "items": [
                 {
+                    "key": "series_description_container1673533435878",
+                    "title": "Identifiers and labels",
                     "type": "section",
-                    "key": "series_description",
-                    "title": "Description",
-                    "class": "mandatory recommended",
-                    "expanded": true,
                     "items": [
-                        {
-                            "key": "series_description.idno",
-                            "title": "IDNO",
-                            "type": "text",
-                            "class": "required",
-                            "required": true,
-                            "rules_": "required|alpha_dash|min:5|max:80"
-                        },
-                        {
-                            "key": "series_description.doi",
-                            "title": "DOI handle",
-                            "type": "text"
-                        },
                         {
                             "key": "series_description.name",
                             "type": "text",
                             "class": "name",
-                            "title": "Series name"
-                        },
-                        {
-                            "key": "series_description.database_id",
-                            "type": "text",
-                            "class": "database_id",
-                            "title": "Database ID"
+                            "title": "Name",
+                            "help_text": "The name (label) of the series. Note that a field alias is provided (see below) to capture alternative names for the series.",
+                            "is_required": true
                         },
                         {
                             "key": "series_description.aliases",
                             "title": "Aliases",
                             "type": "array",
-                            "props": {
-                                "tag": {
+                            "props": [
+                                {
                                     "key": "alias",
                                     "title": "Alias",
-                                    "type": "string"
+                                    "type": "string",
+                                    "prop_key": "series_description.aliases.alias"
                                 }
-                            }
+                            ],
+                            "help_text": "A series or an indicator can be referred to using different names. The aliases element is provided to capture the multiple names and labels that may be associated with (i.e., synonym of) the documented series or indicator.\n\n- Alias: An alternative name for the indicator or series being documented."
+                        },
+                        {
+                            "key": "series_description.idno",
+                            "title": "Primary identifier",
+                            "type": "text",
+                            "class": "required",
+                            "required": true,
+                            "rules_": "required|alpha_dash|min:5|max:80",
+                            "help_text": "A unique identifier (ID) for the series. Most agencies and databases will have a coherent coding convention to generate their series IDs. For example, the name of the series in the World Bank’s World Development Indicators series are composed of the following elements, separated by a dot:\n- Topic code (2 digits).\n- General subject code (3 digits)\n- Specific subject code (4 digits)\n- Extensions (2 digits each)\nFor example, the series with identifier “DT.DIS.PRVT.CD” is the series containing data on “External debt disbursements by private creditors in current US dollars” (for more information, see How does the World Bank code its indicators?.",
+                            "is_required": true
+                        },
+                        {
+                            "key": "series_description.doi",
+                            "title": "DOI",
+                            "type": "text",
+                            "help_text": "A Digital Object Identifier (DOI) for the the series."
                         },
                         {
                             "key": "series_description.alternate_identifiers",
                             "title": "Alternate identifiers",
                             "type": "array",
-                            "props": {
-                                "identifier": {
+                            "props": [
+                                {
                                     "key": "identifier",
                                     "title": "Identifier",
                                     "type": "text",
-                                    "name": "Identifier"
+                                    "name": "Identifier",
+                                    "prop_key": "series_description.alternate_identifiers.identifier"
                                 },
-                                "name": {
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "text",
-                                    "name": "Country name"
+                                    "name": "Country name",
+                                    "prop_key": "series_description.alternate_identifiers.name"
                                 },
-                                "database": {
+                                {
                                     "key": "database",
                                     "title": "Database",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.alternate_identifiers.database"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "title": "URI",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.alternate_identifiers.uri"
                                 },
-                                "notes": {
+                                {
                                     "key": "notes",
                                     "title": "Notes",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.alternate_identifiers.notes"
                                 }
-                            }
+                            ],
+                            "help_text": "The element \"Unique identifier\" is the reference unique identifier for the catalog in which the metadata is intended to be published. But the same indicator/metadata may be published in other catalogs. For example, a data catalog may publish metadata for series extracted from the World Bank World Development Indicators (WDI) database. And the WDI itself contains series generated and published by other organizations, such as the World Health Organization or UNICEF. Catalog administrators may want to assign a unique identifier specific to their catalog (the \"Unique identifier\" element), but keep track of the identifier of the series or indicator in other catalogs or databases. The \"Alternate identifiers\" element serves that purpose.\n\n- Identifier: An identifier for the series other than the identifier entered in \"Primary identifier\" (note that the identifier entered in \"Primary identifier\" can be included in this list, if it is useful to provide it with a type identifier (see name element below) which is not provided in \"Primary identifier\". This can be the identifier of the indicator in another database/catalog, or a global unique identifier.\n- Name: This element will be used to define the type of identifier. This will typically be used to flag DOIs by entering “Digital Object Identifier (DOI)”.\n- Database: The name of the database (or catalog) where this alternative identifier is used, e.g. “IMF, International Financial Statistics (IFS)”.\n- URL: A link (URL) to the database mentioned in database."
                         },
                         {
-                            "key": "series_description.languages",
-                            "title": "Supported languages",
+                            "key": "series_description.authoring_entity",
+                            "title": "Authoring entity",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Name",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.authoring_entity.name"
                                 },
-                                "code": {
-                                    "key": "code",
-                                    "title": "Code",
-                                    "type": "text"
-                                }
-                            }
-                        },
-                        {
-                            "key": "series_description.measurement_unit",
-                            "type": "text",
-                            "class": "measurement_unit",
-                            "title": "Measurement unit"
-                        },
-                        {
-                            "key": "series_description.dimensions",
-                            "title": "Dimensions",
-                            "type": "array",
-                            "props": {
-                                "label": {
-                                    "key": "label",
-                                    "title": "Label",
-                                    "type": "text"
+                                {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "text",
+                                    "prop_key": "series_description.authoring_entity.affiliation"
                                 },
-                                "description": {
-                                    "key": "description",
-                                    "title": "Description",
-                                    "type": "text"
+                                {
+                                    "key": "abbreviation",
+                                    "title": "Abbreviation",
+                                    "type": "text",
+                                    "prop_key": "series_description.authoring_entity.abbreviation"
+                                },
+                                {
+                                    "key": "email",
+                                    "title": "Email",
+                                    "type": "text",
+                                    "prop_key": "series_description.authoring_entity.email"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "text",
+                                    "prop_key": "series_description.authoring_entity.uri"
                                 }
-                            }
+                            ],
+                            "help_text": "This set of five elements is used to identify the organization(s) or person(s) who are the main producers/curators of the indicator. Note that a similar element is provided at the database level. The \"Authoring entity\" for the indicator can be different from the \"Authoring entity\" of the database. For example, the World Bank is the authoring entity for the World Development Indicators database, which contains indicators obtained from the International Monetary Fund, World Health Organization, and other organizations that are thus the authoring entities for specific indicators.\n\n- Name: The name of the person or organization who is responsible for the production of the indicator or series. Write the name in full (use the element \"Abbreviation\" to capture the acronym of the organization, if relevant).\n- Affiliation: The affiliation of the person or organization mentioned in name.\n- Abbreviation: Abbreviated name (acronym) of the organization mentioned in name.\n- Email: The public email contact of the person or organizations mentioned in name. It is good practice to provide a service account email address, not a personal one.\n- URL: A link (URL) to the website of the entity mentioned in name.",
+                            "is_recommended": true
                         },
                         {
-                            "key": "series_description.periodicity",
+                            "key": "series_description.database_id",
                             "type": "text",
-                            "class": "periodicity",
-                            "title": "Periodicity of data"
-                        },
-                        {
-                            "key": "series_description.base_period",
-                            "type": "text",
-                            "class": "base_period",
-                            "title": "Base period"
-                        },
+                            "class": "database_id",
+                            "title": "Database ID",
+                            "help_text": "The unique identifier of the database the series belongs to. This field must correspond to the element \"Database description\" > \"Title statement\" > \"ID\" of the database schema described above. This is the only field that is needed to establish the link between the database metadata and the indicator metadata."
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "series_description_container1673533506085",
+                    "title": "Concepts and methods",
+                    "type": "section",
+                    "items": [
                         {
                             "key": "series_description.definition_short",
-                            "type": "text",
+                            "type": "textarea",
                             "class": "definition_short",
-                            "title": "Definition short"
+                            "title": "Definition short",
+                            "help_text": "A short definition of the series. The short definition captures the essence of the series.",
+                            "is_recommended": true
                         },
                         {
                             "key": "series_description.definition_long",
-                            "type": "text",
+                            "type": "textarea",
                             "class": "definition_long",
-                            "title": "Definition long"
+                            "title": "Definition long",
+                            "help_text": "A long(er) version of the definition of the series. If only one definition is available (not a short/long version), it is recommended to capture it in the \"Definition short\" element. Alternatively, the same definition can be stored in both \"Definition short\" and \"Definition long\"."
                         },
                         {
                             "key": "series_description.definition_references",
                             "title": "Definition references",
                             "type": "array",
-                            "props": {
-                                "source": {
+                            "props": [
+                                {
                                     "key": "source",
                                     "title": "Source",
                                     "type": "text",
-                                    "name": "Source"
+                                    "name": "Source",
+                                    "prop_key": "series_description.definition_references.source"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "title": "URI",
                                     "type": "text",
-                                    "rules_": "required"
+                                    "rules_": "required",
+                                    "prop_key": "series_description.definition_references.uri"
                                 },
-                                "note": {
+                                {
                                     "key": "note",
                                     "title": "Note",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.definition_references.note"
                                 }
-                            }
+                            ],
+                            "help_text": "This element is provided to link to an external resources from which the definition was extracted.\n\n- Source: The source of the definition (title, or label).\n- URL: A link (URL) to the source of the definition.\n- Note: This element provides for annotating or explaining the reason the reference has been included as part of the metadata."
                         },
                         {
                             "key": "series_description.statistical_concept",
-                            "type": "text",
+                            "type": "textarea",
                             "class": "statistical_concept",
-                            "title": "Statistical concept"
+                            "title": "Statistical concept",
+                            "help_text": "This element allows to insert a reference of the series with content of a statistical character. This can include coding concepts or standards that are applied to render the data statistically relevant."
                         },
                         {
                             "key": "series_description.concepts",
                             "title": "Related concepts",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "text",
                                     "name": "Concept name",
-                                    "rules_": "required"
+                                    "rules_": "required",
+                                    "prop_key": "series_description.concepts.name"
                                 },
-                                "definition": {
+                                {
                                     "key": "definition",
                                     "title": "Definition",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.concepts.definition"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "title": "URI",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.concepts.uri"
                                 }
-                            }
+                            ],
+                            "help_text": "This repeatable element can be used to document concepts related to the indicators or time series (other than the main statistical concept that may have been entered in statisticsl_concept). For example, the concept of malnutrition could be documented in relation to the indicators “Prevalence of stunting” and “Prevalence of wasting”.\n\n- Name: A concise and standardized name (label) for the concept.\n- Definition: The definition of the concept.\n- URL: A link (URL) to a resource providing more detailed information on the concept."
                         },
                         {
                             "key": "series_description.methodology",
-                            "type": "text",
+                            "type": "textarea",
                             "class": "methodology",
-                            "title": "Methodology"
+                            "title": "Methodology",
+                            "help_text": "This element documents methodological details on the production of the series or indicator."
                         },
                         {
                             "key": "series_description.imputation",
-                            "type": "text",
+                            "type": "textarea",
                             "class": "imputation",
-                            "title": "Imputation"
+                            "title": "Imputation",
+                            "help_text": "Data may have been imputed to account for data gaps or for other reasons (harmonization/standardization, and others). If imputations have been made, this element provides the space for their description."
                         },
                         {
-                            "key": "series_description.missing",
-                            "type": "text",
-                            "class": "missing",
-                            "title": "Missing"
+                            "key": "series_description.aggregation_method",
+                            "type": "textarea",
+                            "title": "Aggregation method",
+                            "help_text": "The \"Aggregation method\" element describes how values can be aggregated from one geographic level (for example, a country) to a higher-level geographic area (for example, a group of country defined based on a geographic criteria (region, world) or another criteria (low/medium/high-income countries, island countries, OECD countries, etc.). The aggregation method can be simple (like “sum” or “population-weighted average”) or more complex, involving weighting of values."
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "series_description_container1673533684214",
+                    "title": "Standards and frameworks",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "series_description.compliance",
+                            "title": "Compliance with standards",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "standard",
+                                    "title": "Standard name",
+                                    "type": "text",
+                                    "prop_key": "series_description.compliance.standard"
+                                },
+                                {
+                                    "key": "organization",
+                                    "title": "Organization",
+                                    "type": "text",
+                                    "prop_key": "series_description.compliance.organization"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "text",
+                                    "prop_key": "series_description.compliance.uri"
+                                }
+                            ],
+                            "help_text": "For some indicators, international standards have been established. This is for example the case of indicators like the unemployment or unemployment rate, for which the International Conference of Labour Statisticians defines the standards concepts and methods. The compliance element is used to document the compliance of a series with one or multiple national or international standards.\n\n- Standard: The name of the standard that the series complies with. This name will ideally include a label and a version or a date. For example: “International Standard Industrial Classification of All Economic Activities (ISIC) Revision 4, published in 2007”\n- Abbreviation: The acronym of the standard that the series complies with.\n- Custodian: The organization that maintains the standard that is being used for compliance. For example: “United Nations Statistics Division”.\n- URL: A link to a public website site where information on the compliance standard can be obtained. "
                         },
+                        {
+                            "key": "series_description.framework",
+                            "title": "Indicators frameworks",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text",
+                                    "prop_key": "series_description.framework.name"
+                                },
+                                {
+                                    "key": "abbreviation",
+                                    "title": "Abbreviation",
+                                    "type": "text",
+                                    "prop_key": "series_description.framework.abbreviation"
+                                },
+                                {
+                                    "key": "custodian",
+                                    "title": "Custodian",
+                                    "type": "text",
+                                    "prop_key": "series_description.framework.custodian"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "text",
+                                    "prop_key": "series_description.framework.description"
+                                },
+                                {
+                                    "key": "goal_id",
+                                    "title": "Goal ID",
+                                    "type": "text",
+                                    "prop_key": "series_description.framework.goal_id"
+                                },
+                                {
+                                    "key": "goal_name",
+                                    "title": "Goal name",
+                                    "type": "text",
+                                    "prop_key": "series_description.framework.goal_name"
+                                },
+                                {
+                                    "key": "goal_description",
+                                    "title": "Goal description",
+                                    "type": "text",
+                                    "prop_key": "series_description.framework.goal_description"
+                                },
+                                {
+                                    "key": "target_id",
+                                    "title": "Target ID",
+                                    "type": "text",
+                                    "prop_key": "series_description.framework.target_id"
+                                },
+                                {
+                                    "key": "target_name",
+                                    "title": "Target name",
+                                    "type": "text",
+                                    "prop_key": "series_description.framework.target_name"
+                                },
+                                {
+                                    "key": "target_description",
+                                    "title": "Target description",
+                                    "type": "text",
+                                    "prop_key": "series_description.framework.target_description"
+                                },
+                                {
+                                    "key": "indicator_id",
+                                    "title": "Indicator ID",
+                                    "type": "text",
+                                    "prop_key": "series_description.framework.indicator_id"
+                                },
+                                {
+                                    "key": "indicator_name",
+                                    "title": "Indicator name",
+                                    "type": "text",
+                                    "prop_key": "series_description.framework.indicator_name"
+                                },
+                                {
+                                    "key": "indicator_description",
+                                    "title": "Indicator description",
+                                    "type": "text",
+                                    "prop_key": "series_description.framework.indicator_description"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "text",
+                                    "prop_key": "series_description.framework.uri"
+                                },
+                                {
+                                    "key": "notes",
+                                    "title": "Notes",
+                                    "type": "text",
+                                    "prop_key": "series_description.framework.notes"
+                                }
+                            ],
+                            "help_text": "Some national, regional, and international agencies develop monitoring frameworks, with goals, targets, and indicators. Some well-known examples are the Millennium Development Goals and the Sustainable Development Goals which establish international goals for human development, or the World Summit for Children (1990) which set international goals in the areas of child survival, development and protection, supporting sector goals such as women’s health and education, nutrition, child health, water and sanitation, basic education, and children in difficult circumstances. The framework element is used to link an indicator or series to the framework, goal, and target associated with it.\n\n- Name: The name of the framework.\n- Description: A brief description of the framework.\n- Custodian: The name of the organization that is the official custodian of the framework.\n- Goal ID: The identifier of the Goal that the indicator or series is associated with.\n- Goal name: The name (label) of the Goal that the indicator or series is associated with.\n- Goal description: A brief description of the Goal that the indicator or series is associated with.\n- Target ID: The identifier of the Target that the indicator or series is associated with.\n- Target name: The name (label) of the Target that the indicator or series is associated with.\n- Target description: A brief description of the Target that the indicator or series is associated with.\n- Indicator ID: The identifier of the indicator, as provided in the framework.\n- Indicator name: The name of the indicator, as provided in the framework (which may be different from the name provided in name)\n- Indicator description: A brief description of the indicator, as provided in the framework.\n- URL: A link to a website providing detailed information on the framework, its goals, targets, and indicators.\n- Notes: Any additional information on the relationship between the indicator/series and the framework.\n"
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "series_description_container1673533307656",
+                    "title": "Quality",
+                    "type": "section",
+                    "items": [
                         {
                             "key": "series_description.quality_checks",
-                            "type": "text",
-                            "title": "Quality checks"
+                            "type": "textarea",
+                            "title": "Quality checks",
+                            "help_text": "Data may have gone through data quality checks to assure that the values are reasonable and coherent, which can be described in this element. These quality checks may include checking for outlying values or other. A brief description of such quality control procedures will contribute to reinforcing the credibility of the data being disseminated."
                         },
                         {
                             "key": "series_description.quality_note",
                             "type": "textarea",
-                            "title": "Quality notes"
+                            "title": "Quality notes",
+                            "help_text": "Additional notes or an overall statement on data quality. These could for example cover non-standard quality notes and/or information on independent reviews on the data quality."
                         },
                         {
                             "key": "series_description.sources_discrepancies",
                             "type": "textarea",
-                            "title": "Discrepency sources"
-                        },
-                        {
-                            "key": "series_description.series_break",
-                            "type": "text",
-                            "title": "Breaks in series"
+                            "title": "Discrepancy sources",
+                            "help_text": "This element is used to describe and explain why the data in the series may be different from the data for the same series published in other sources. International organizations, for example, may apply different techniques to make data obtained from national sources comparable across countries, in which cases the data published in international databases may differ from the data published in national, official databases."
                         },
                         {
                             "key": "series_description.limitation",
                             "type": "textarea",
-                            "title": "Limitations and exceptions"
+                            "title": "Limitations",
+                            "help_text": "This element is used to communicate to the user any limitations or exceptions in using the data. The limitations may result from the methodology, from issues of quality or consistency in the data source, or other."
+                        },
+                        {
+                            "key": "series_description.missing",
+                            "type": "textarea",
+                            "class": "missing",
+                            "title": "Missing",
+                            "help_text": "Information on missing values in the series or indicator. This information can be related to treatment of missing values, to the cause(s) of missing values, and others."
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "type": "section",
+                    "key": "series_description",
+                    "title": "Description of the indicator",
+                    "class": "mandatory recommended",
+                    "expanded": true,
+                    "items": [
+                        {
+                            "key": "series_description.measurement_unit",
+                            "type": "text",
+                            "class": "measurement_unit",
+                            "title": "Measurement unit",
+                            "help_text": "The unit of measurement. Note that in many databases the measurement unit will be included in the series name/label. In the World Bank’s World Development Indicators for example, series are named as follows:\n- CO2 emissions (kg per 2010 US$ of GDP)\n- GDP per capita (current US$)\n- GDP per capita (current LCU)\n- Population density (people per sq. km of land area)\nIn such case, the name of the series should not be changed, but the measurement unit may be extracted from it and stored in element \"Measurement unit\".",
+                            "is_recommended": true
+                        },
+                        {
+                            "key": "series_description.dimensions",
+                            "title": "Dimensions",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "label",
+                                    "title": "Label",
+                                    "type": "text",
+                                    "prop_key": "series_description.dimensions.label"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "text",
+                                    "prop_key": "series_description.dimensions.description"
+                                }
+                            ],
+                            "help_text": "An indicator or time series can be made available at different levels of disaggregation. For example, an indicator containing estimates of the “Population” of a country by year can be available by sex. The data curators in such case will have two options: (i) create and document three separate indicators, namely “Population, Total”, “Population, Female”, and “Population, Male”; or create a single indicator “Population” and attach a dimension “sex” to it, with values “Total”, “Female”, and “Male”. The dimensions are features (or “variables”) that define the different levels of disaggregation within an indicator/series. The element dimensions is used to provide an itemized list of disaggregations that correspond exactly to the published data. Note that when an indicator is available at two “non-overlapping” levels of disaggregation, it should be split into two indicators. For example, if the Population indicator is available by male/female and by urban/rural, but not by male/urban/male/rural/female urban/female rural, it should be treated as two separate indicators (“Population by sex” with dimension sex = “male / female” and “Population by area of residence” with dimension area = “urban / rural”.) Note also that another element in the schema, disaggregation, is also provided, in which a narrative description of the actual or recommended disaggregation can be documented.\n\n- Label: The label of the disaggregation level, for example “sex”, or “urban/rural”.\n- Description: A description of the disaggregation level (for example, if the label was “age group”, the description can provide detailed information on the age groups, e.g. “The age groups in the database are 0-14, 15-49, 50-64, and 65+ years old”.)\n"
+                        },
+                        {
+                            "key": "series_description.periodicity",
+                            "type": "text",
+                            "class": "periodicity",
+                            "title": "Periodicity of data",
+                            "help_text": "The periodicity of the series. It is recommended to use a controlled vocabulary with values like annual, quarterly, monthly, daily, etc."
+                        },
+                        {
+                            "key": "series_description.base_period",
+                            "type": "text",
+                            "class": "base_period",
+                            "title": "Base period",
+                            "help_text": "The base period for the series. This field will only apply to series that require a base year (or other reference time) used as a benchmark, like a Consumer Price Index (CPI) which will have a value of 100 for a reference base year."
+                        },
+                        {
+                            "key": "series_description.series_break",
+                            "type": "text",
+                            "title": "Breaks in series",
+                            "help_text": "Breaks in statistical series occur when there is a change in the standards, sources of data, or reference year used in the compilation of a series. Breaks in series must be well documented. The documentation should include the reason(s) for the break, the time it occured, and information on the impact on comparability of data over time."
                         },
                         {
                             "key": "series_description.themes",
                             "title": "Themes",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "text",
                                     "name": "Theme name",
-                                    "rules_": "required"
+                                    "rules_": "required",
+                                    "prop_key": "series_description.themes.name"
                                 },
-                                "vocabulary": {
+                                {
                                     "key": "vocabulary",
                                     "title": "Vocabulary",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.themes.vocabulary"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "title": "URI",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.themes.uri"
                                 }
-                            }
+                            ],
+                            "help_text": "Themes provide a general idea of the research that might guide the creation and/or demand for the series. A theme is broad and is likely also subject to a community based definition or list. A controlled vocabulary should be used. This element will rarely be used (the element topics described below will be used more often).\n\n- ID: The unique identifier of the theme. It can be a sequential number, or the ID of the theme in a controlled vocabulary.\n- Name: The label of the theme associated with the data.\n- Parent ID: When a hierarchical (nested) controlled vocabulary is used, the \"Parent ID\" field can be used to indicate a higher-level theme to which this theme belongs.\n- Vocabulary: The name of the controlled vocabulary used, if any.\n- URL: A link to the controlled vocabulary mentioned in field `vocabulary’."
                         },
                         {
                             "key": "series_description.topics",
                             "title": "Topics",
                             "type": "array",
-                            "props": {
-                                "id": {
+                            "props": [
+                                {
                                     "key": "id",
                                     "title": "Unique Identifier",
                                     "type": "text",
-                                    "rules_": "required"
+                                    "rules_": "required",
+                                    "prop_key": "series_description.topics.id"
                                 },
-                                "name": {
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "text",
                                     "name": "Topic name",
-                                    "rules_": "required"
+                                    "rules_": "required",
+                                    "prop_key": "series_description.topics.name"
                                 },
-                                "parent_id": {
+                                {
                                     "key": "parent_id",
                                     "title": "Parent topic identifier",
                                     "type": "text",
-                                    "help_text": "For subtopics, provide the ID of the parent topic"
+                                    "help_text": "For subtopics, provide the ID of the parent topic",
+                                    "prop_key": "series_description.topics.parent_id"
                                 },
-                                "vocabulary": {
+                                {
                                     "key": "vocabulary",
                                     "title": "Vocabulary",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.topics.vocabulary"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "title": "URI",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.topics.uri"
                                 }
-                            }
+                            ],
+                            "help_text": "The topics field indicates the broad substantive topic(s) that the indicator/series covers. A topic classification facilitates referencing and searches in electronic survey catalogs. Topics should be selected from a standard controlled vocabulary such as the Council of European Social Science Data Archives (CESSDA) topics classification.\n\n- ID: The unique identifier of the topic. It can be a sequential number, or the ID of the topic in a controlled vocabulary.\n- Name: The label of the topic associated with the data.\n- Parent ID: When a hierarchical (nested) controlled vocabulary is used, the \"Parent ID\" field can be used to indicate a higher-level topic to which this topic belongs.\n- Vocabulary: The name of the controlled vocabulary used, if any.\n- URL: A link to the controlled vocabulary mentioned in field vocabulary."
                         },
                         {
                             "key": "series_description.disciplines",
                             "title": "Disciplines",
                             "type": "array",
-                            "help_text": "Disciplines e.g. Social sciences, economics, Natural sciences, biology",
-                            "props": {
-                                "name": {
+                            "help_text": "Information on the academic disciplines related to the content of the document. A controlled vocabulary will preferably be used, for example the one provided by the list of academic fields in Wikipedia.\n\n- ID: The ID of the discipline, preferably taken from a controlled vocabulary.\n- Name: The name (label) of the discipline, preferably taken from a controlled vocabulary.\n- Parent ID: The parent ID of the discipline (ID of the item one level up in the hierarchy), if a hierarchical controlled vocabulary is used.\n- Vocabulary: The name (including version number) of the controlled vocabulary used, if any.\n- URL: The URL to the controlled vocabulary used, if any.",
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "text",
                                     "name": "Discipline name",
-                                    "rules_": "required"
+                                    "rules_": "required",
+                                    "prop_key": "series_description.disciplines.name"
                                 },
-                                "vocabulary": {
+                                {
                                     "key": "vocabulary",
                                     "title": "Vocabulary",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.disciplines.vocabulary"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "title": "URI",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.disciplines.uri"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "series_description.relevance",
                             "type": "text",
-                            "title": "Relevance"
+                            "title": "Relevance",
+                            "help_text": "This field documents the relevance of an indicator or series in relation to a social imperative or policy objective."
                         },
                         {
                             "key": "series_description.time_periods",
                             "title": "Time periods",
                             "type": "array",
-                            "props": {
-                                "start": {
+                            "props": [
+                                {
                                     "key": "start",
                                     "title": "Start",
                                     "type": "text",
                                     "name": "time_periods.start",
-                                    "rules_": "required"
+                                    "rules_": "required",
+                                    "prop_key": "series_description.time_periods.start"
                                 },
-                                "end": {
+                                {
                                     "key": "end",
                                     "title": "End",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.time_periods.end"
                                 }
-                            }
+                            ],
+                            "help_text": "The time period covers the entire span of data available for the series. The time period has a start and an end and is reported according to the periodicity provided in a previous element.\n\n- Start: The initial date of the series in the dataset. The start date should be entered in ISO 8601 format (YYYY-MM-DD or YYYY-MM or YYYY).\n- End: The end date is the latest date for which an estimate for the indicator is available. The end date should be entered in ISO 8601 format (YYYY-MM-DD or YYYY-MM or YYYY)."
                         },
                         {
                             "key": "series_description.ref_country",
-                            "title": "Reference countries",
-                            "help_text": "List of countries for which data are available",
+                            "title": "Countries",
+                            "help_text": "A list of countries for which data are available in the series. This element is somewhat redundant with the next element (geographic_units) which may also contain a list of countries. Identifying geographic areas of type “country” is important to enable filters and facets in data catalogs (country names are among the most frequent queries submitted to catalogs).\n\n- Name: The name of the country.\n- Code: The code of the country. The use of the ISO 3166-1 alpha-3 codes is recommended.",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Name",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.ref_country.name"
                                 },
-                                "code": {
+                                {
                                     "key": "code",
                                     "title": "Code",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.ref_country.code"
                                 }
-                            }
+                            ],
+                            "is_recommended": true
                         },
                         {
                             "key": "series_description.geographic_units",
-                            "title": "Geographic units",
+                            "title": "Geographic areas",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "text",
                                     "name": "Geographic unit name",
-                                    "rules_": "required"
+                                    "rules_": "required",
+                                    "prop_key": "series_description.geographic_units.name"
                                 },
-                                "code": {
+                                {
                                     "key": "code",
                                     "title": "Code",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.geographic_units.code"
                                 },
-                                "type": {
+                                {
                                     "key": "type",
                                     "title": "Type (country, state, region, province)",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.geographic_units.type"
                                 }
-                            }
+                            ],
+                            "help_text": "List of geographic units (regions, countries, states, provinces, etc.) for which data are available for the series.\n\n- Name: Name of the geographic unit e.g. “World, ”Africa“, ”Afghanistan“, ”OECD countries“, ”Bangkok\".\n- Code: Code of the geographic unit. The ISO 3166-1 alpha-3 code is preferred when the unit is a country.\n- Type: Type of geographic unit e.g. “country”, “state”, “region”, “province”, “city”, etc."
                         },
                         {
                             "key": "series_description.bbox",
                             "title": "Geographic bounding box",
                             "type": "array",
-                            "props": {
-                                "west": {
+                            "props": [
+                                {
                                     "key": "west",
                                     "title": "West",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.bbox.west"
                                 },
-                                "east": {
+                                {
                                     "key": "east",
                                     "title": "East",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.bbox.east"
                                 },
-                                "south": {
+                                {
                                     "key": "south",
                                     "title": "South",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.bbox.south"
                                 },
-                                "north": {
+                                {
                                     "key": "north",
                                     "title": "North",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.bbox.north"
                                 }
-                            }
-                        },
-                        {
-                            "key": "series_description.aggregation_method",
-                            "type": "text",
-                            "title": "Aggregation method"
+                            ]
                         },
                         {
                             "key": "series_description.disaggregation",
                             "type": "text",
-                            "title": "Disaggregation"
+                            "title": "Disaggregation",
+                            "help_text": "This element is intended to inform users that an indicator or series is available at various levels of disaggregation. The related series should be listed (by name and/or identifier). For indicator “Population, total” for example, one may inform the user that the indicator is also available (in other series) by sex, urban/rural, and age group (in series “Population, male” and “Population, female”, etc.)."
+                        },
+                        {
+                            "key": "series_description.languages",
+                            "title": "Supported languages",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text",
+                                    "prop_key": "series_description.languages.name"
+                                },
+                                {
+                                    "key": "code",
+                                    "title": "Code",
+                                    "type": "text",
+                                    "prop_key": "series_description.languages.code"
+                                }
+                            ]
                         },
                         {
                             "type": "section",
@@ -499,12 +777,13 @@
                             "items": [
                                 {
                                     "key": "series_description.license.name",
-                                    "title": "License",
-                                    "type": "text"
+                                    "title": "License   [???? subfolder]",
+                                    "type": "text",
+                                    "help_text": "The license refers to the accessibility and terms of use associated with the data. Providing a license and a link to the terms of the license allows data users to determine, with full clarity, what they can and cannot do with the data.\n\n- Name: The name of the license, e.g. “Creative Commons Attribution 4.0 International license (CC-BY 4.0)”.\n- URL: The URL of a website where the licensed is described in detail, for example “https://creativecommons.org/licenses/by/4.0/”."
                                 },
                                 {
                                     "key": "series_description.license.uri",
-                                    "title": "URI",
+                                    "title": "URL",
                                     "type": "text"
                                 }
                             ]
@@ -512,347 +791,255 @@
                         {
                             "key": "series_description.confidentiality",
                             "type": "text",
-                            "title": "Confidentiality statement"
+                            "title": "Confidentiality statement",
+                            "help_text": "A statement of confidentiality for the series."
                         },
                         {
                             "key": "series_description.confidentiality_status",
                             "type": "text",
-                            "title": "Confidentiality status"
+                            "title": "Confidentiality status",
+                            "help_text": "This indicates a confidentiality status for the series. A controlled vocabulary should be used with possible options “public”, “official use only”, “confidential”, “strictly confidential”, \"unknown\". When all series are made publicly available, and belong to a database that has an open or public access policy, this element can be ignored.",
+                            "enum": [
+                                "public",
+                                "official use only",
+                                "confidential",
+                                "confidential",
+                                "strictly confidential",
+                                "unknown"
+                            ]
                         },
                         {
                             "key": "series_description.confidentiality_note",
                             "type": "text",
-                            "title": "Confidentiality note"
+                            "title": "Confidentiality note",
+                            "enum": [],
+                            "help_text": "This element is reserved for additional notes regarding confidentiality of the data. This could involve references to specific laws and circumstances regarding the use of data."
                         },
                         {
                             "key": "series_description.links",
-                            "title": "Links to APIs, Websites, etc",
+                            "title": "Links",
                             "type": "array",
-                            "props": {
-                                "uri": {
+                            "props": [
+                                {
                                     "key": "uri",
                                     "title": "URI",
                                     "type": "text",
-                                    "rules_": "required"
+                                    "rules_": "required",
+                                    "prop_key": "series_description.links.uri"
                                 },
-                                "type": {
+                                {
                                     "key": "type",
                                     "title": "Link type (api, website)",
                                     "type": "text",
-                                    "name": "Link type"
+                                    "name": "Link type",
+                                    "prop_key": "series_description.links.type"
                                 },
-                                "description": {
+                                {
                                     "key": "description",
                                     "title": "Description",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.links.description"
                                 }
-                            }
+                            ],
+                            "help_text": "This element provides links to online resources of any type that could be useful to the data users. This can be links to description of methods and reference documents, analytics tools, visualizations, data sources, or other.\n\n- Type: This element allows to classify the link that is provided.\n- Description: A description of the link that is provided.\n- URL: The link (URL) to the described resource."
                         },
                         {
                             "key": "series_description.api_documentation",
                             "title": "API documentation",
                             "type": "array",
-                            "props": {
-                                "description": {
+                            "props": [
+                                {
                                     "key": "description",
                                     "title": "Description",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.api_documentation.description"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "title": "URI",
                                     "type": "text",
-                                    "rules_": "required"
+                                    "rules_": "required",
+                                    "prop_key": "series_description.api_documentation.uri"
                                 }
-                            }
-                        },
-                        {
-                            "key": "series_description.authoring_entity",
-                            "title": "Authoring entity",
-                            "type": "array",
-                            "props": {
-                                "name": {
-                                    "key": "name",
-                                    "title": "Name",
-                                    "type": "text"
-                                },
-                                "affiliation": {
-                                    "key": "affiliation",
-                                    "title": "Affiliation",
-                                    "type": "text"
-                                },
-                                "abbreviation": {
-                                    "key": "abbreviation",
-                                    "title": "Abbreviation",
-                                    "type": "text"
-                                },
-                                "email": {
-                                    "key": "email",
-                                    "title": "Email",
-                                    "type": "text"
-                                },
-                                "uri": {
-                                    "key": "uri",
-                                    "title": "URI",
-                                    "type": "text"
-                                }
-                            }
+                            ],
+                            "help_text": "Increasingly, data are made accessible via Application Programming Interfaces (APIs). The API associated with a series must be documented. The documentation will usually not be specific to a series, but apply to all series in a same database.\n\n- Description: This element will not contain the API documentation itself, but information on what documentation is available.\n- URL: The URL of the API documentation."
                         },
                         {
                             "key": "series_description.sources",
-                            "title": "Sources",
+                            "title": "Sources of data",
                             "type": "array",
-                            "props": {
-                                "id": {
+                            "props": [
+                                {
                                     "key": "id",
                                     "title": "ID",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.sources.id"
                                 },
-                                "name": {
+                                {
                                     "key": "name",
                                     "title": "Source name",
                                     "type": "text",
                                     "name": "Source name",
-                                    "rules_": "required"
+                                    "rules_": "required",
+                                    "prop_key": "series_description.sources.name"
                                 },
-                                "organization": {
+                                {
                                     "key": "organization",
                                     "title": "Organization",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.sources.organization"
                                 },
-                                "type": {
+                                {
                                     "key": "type",
                                     "title": "Link type (api, website)",
                                     "type": "text",
-                                    "name": "Link type"
+                                    "name": "Link type",
+                                    "prop_key": "series_description.sources.type"
                                 },
-                                "note": {
+                                {
                                     "key": "note",
                                     "title": "Notes",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.sources.note"
                                 }
-                            }
+                            ],
+                            "help_text": "This element provides information on the source(s) of data that were used to generate the indicator. A source can refer to an organization (e.g., “Source: World Health Organization”), or to a dataset (e.g., for a national poverty headcount indicator, the sources will likely be a list of sample household surveys). In sources, we are mainly interested in the latter. When a series in a database is a series extracted from another database (e.g., when the World Bank World Development Indicators include a series from the World Health Organization in its database), the source organization should be mentioned in the \"Authoring entity\" element of the schema. The sources element is a repeatable element. In international databases where series cover many countries, a series may have a large number of sources (for example, the World Bank poverty headcount data are extracted from hundreds of different national household surveys). The content of this element can thus be quite large. This information is however useful, as it contributes to establish the traceability and credibility of the data.\n\n- ID: This element records the unique identifier of a source. It is a required element. If the source does not have a specific unique identifier, a sequential number can be used. If the source is a dataset or database that has its own unique identifier (possibly a DOI), this identifier should be used.\n- Name: The name (title, or label) of the source.\n- Organization: The organization responsible for the source data.\n- Type: The type of source, e.g. “household survey”, “administrative data”, or “external database”.\n- Note: This element can be used to provide additional information regarding the source data."
                         },
                         {
                             "key": "series_description.sources_note",
                             "type": "text",
-                            "title": "Notes from original source"
+                            "title": "Notes on data source",
+                            "help_text": "Additional information on the source(s) of data used to generate the series or indicator."
                         },
                         {
                             "key": "series_description.keywords",
                             "title": "Keywords",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Source name",
                                     "type": "text",
                                     "name": "Source name",
-                                    "rules_": "required"
+                                    "rules_": "required",
+                                    "prop_key": "series_description.keywords.name"
                                 },
-                                "vocabulary": {
+                                {
                                     "key": "vocabulary",
                                     "title": "Vocabulary",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.keywords.vocabulary"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "title": "URI",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.keywords.uri"
                                 }
-                            }
+                            ],
+                            "help_text": "Words or phrases that describe salient aspects of a data collection’s content. Can be used for building keyword indexes and for classification and retrieval purposes. A controlled vocabulary can be employed. Keywords should be selected from a standard thesaurus, preferably an international, multilingual thesaurus.\n\n- Name: Keyword (or phrase). Keywords summarize the content or subject matter of the study.\n- Vocabulary: Controlled vocabulary from which the keyword is extracted, if any.\n- URL: The URL of the controlled vocabulary used, if any.",
+                            "is_recommended": true
                         },
                         {
                             "key": "series_description.acronyms",
                             "title": "Acronyms",
                             "type": "array",
-                            "props": {
-                                "acronym": {
+                            "props": [
+                                {
                                     "key": "acronym",
                                     "title": "Acronym/Abbreviation",
                                     "type": "text",
                                     "name": "Acronym",
-                                    "rules_": "required"
+                                    "rules_": "required",
+                                    "prop_key": "series_description.acronyms.acronym"
                                 },
-                                "expansion": {
+                                {
                                     "key": "expansion",
                                     "title": "Acronym expansion",
                                     "type": "text",
-                                    "rules_": "required"
+                                    "rules_": "required",
+                                    "prop_key": "series_description.acronyms.expansion"
                                 },
-                                "occurence": {
+                                {
                                     "key": "occurence",
                                     "title": "Number of occurence",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.acronyms.occurence"
                                 }
-                            }
+                            ],
+                            "help_text": "The acronyms element is used to document the meaning of all acronyms used in the metadata of a series. If some acronyms are well known (like “GDP”, or “IMF” for example), others may be less obvious or could be uncertain (does “PPP” mean “public-private partnership”, or “purchasing power parity”?). In any case, providing a list of acronyms with their meaning will help users and make your metadata more discoverable. Note that acronyms should not include country codes used in the documentation of the geographic coverage of the data.\n\n- Acronym: An acronym referenced in the series metadata (e.g. “GDP”).\n- Expansion: The expansion of the acronym, i.e. the full name or title that it represents (e.g., “Gross Domestic Product”).\n- Occurrence: This numeric element can be used to indicate the number of times the acronym is mentioned in the metadata. The element will rarely be used."
                         },
                         {
                             "key": "series_description.notes",
                             "title": "Notes",
                             "type": "array",
-                            "props": {
-                                "note": {
+                            "props": [
+                                {
                                     "key": "note",
                                     "title": "Note",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.notes.note"
                                 }
-                            }
+                            ],
+                            "help_text": "This element is open and reserved for explanatory notes deemed useful to the users of the data. Notes should account for additional information that might help: replicate the series; access the data and research area, or discoverability in general.\n\n- Note: The note itself."
                         },
                         {
                             "key": "series_description.related_indicators",
                             "title": "Related indicators",
                             "type": "array",
-                            "props": {
-                                "code": {
+                            "props": [
+                                {
                                     "key": "code",
                                     "title": "Code",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.related_indicators.code"
                                 },
-                                "label": {
+                                {
                                     "key": "label",
                                     "title": "Indicator name",
-                                    "type": "text"
-                                },
-                                "uri": {
-                                    "key": "uri",
-                                    "title": "URI",
-                                    "type": "text"
-                                }
-                            }
-                        },
-                        {
-                            "key": "series_description.compliance",
-                            "title": "Compliance with international resolution",
-                            "type": "array",
-                            "props": {
-                                "standard": {
-                                    "key": "standard",
-                                    "title": "Standard name",
                                     "type": "text",
-                                    "rules_": "required"
+                                    "prop_key": "series_description.related_indicators.label"
                                 },
-                                "organization": {
-                                    "key": "organization",
-                                    "title": "Organization",
-                                    "type": "text"
-                                },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "title": "URI",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.related_indicators.uri"
                                 }
-                            }
-                        },
-                        {
-                            "key": "series_description.framework",
-                            "title": "Framework",
-                            "type": "array",
-                            "props": {
-                                "name": {
-                                    "key": "name",
-                                    "title": "Name",
-                                    "type": "text"
-                                },
-                                "abbreviation": {
-                                    "key": "abbreviation",
-                                    "title": "Abbreviation",
-                                    "type": "text"
-                                },
-                                "custodian": {
-                                    "key": "custodian",
-                                    "title": "Custodian",
-                                    "type": "text"
-                                },
-                                "description": {
-                                    "key": "description",
-                                    "title": "Description",
-                                    "type": "text"
-                                },
-                                "goal_id": {
-                                    "key": "goal_id",
-                                    "title": "Goal ID",
-                                    "type": "text"
-                                },
-                                "goal_name": {
-                                    "key": "goal_name",
-                                    "title": "Goal name",
-                                    "type": "text"
-                                },
-                                "goal_description": {
-                                    "key": "goal_description",
-                                    "title": "Goal description",
-                                    "type": "text"
-                                },
-                                "target_id": {
-                                    "key": "target_id",
-                                    "title": "Target ID",
-                                    "type": "text"
-                                },
-                                "target_name": {
-                                    "key": "target_name",
-                                    "title": "Target name",
-                                    "type": "text"
-                                },
-                                "target_description": {
-                                    "key": "target_description",
-                                    "title": "Target description",
-                                    "type": "text"
-                                },
-                                "indicator_id": {
-                                    "key": "indicator_id",
-                                    "title": "Indicator ID",
-                                    "type": "text"
-                                },
-                                "indicator_name": {
-                                    "key": "indicator_name",
-                                    "title": "Indicator name",
-                                    "type": "text"
-                                },
-                                "indicator_description": {
-                                    "key": "indicator_description",
-                                    "title": "Indicator description",
-                                    "type": "text"
-                                },
-                                "uri": {
-                                    "key": "uri",
-                                    "title": "URI",
-                                    "type": "text"
-                                },
-                                "notes": {
-                                    "key": "notes",
-                                    "title": "Notes",
-                                    "type": "text"
-                                }
-                            }
+                            ],
+                            "help_text": "This element allows to reference indicators that are often associated with the indicator being documented.\n\n- Code: The code for the indicator that is referenced in the document. It will likely be an ID that is used by that indicator.\n- Label: The name or label of the indicator that is associated with the indicator being documented.\n- URL: A link to the related indicator."
                         },
                         {
                             "key": "series_description.series_groups",
-                            "title": "Series included in groups",
+                            "title": "Indicator group",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "text",
-                                    "rules_": "required"
+                                    "rules_": "required",
+                                    "prop_key": "series_description.series_groups.name"
                                 },
-                                "version": {
+                                {
                                     "key": "version",
                                     "title": "Version",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.series_groups.version"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "title": "URI",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "series_description.series_groups.uri"
                                 }
-                            }
+                            ],
+                            "help_text": "This element allows organizing indicators and series by thematic or other groups. These groups are “virtual” and do not affect the data. One indicator/series can belong to more than one group.\n\n- Name: The name of the series group.\n- Description: A brief description of the series group.\n- Version: The version of the grouping.\n- URL: A URL to a site describing the grouping."
                         }
                     ]
                 }
             ]
-        },        
+        },
         {
             "type": "section_container",
             "id": "tags",
@@ -863,18 +1050,18 @@
                     "key": "tags",
                     "title": "Tags",
                     "type": "array",
-                    "props": {
-                        "tag_group": {
+                    "props": [
+                        {
                             "key": "tag_group",
                             "title": "Tag group",
                             "type": "text"
                         },
-                        "tag": {
+                        {
                             "key": "tag",
                             "title": "Tag",
                             "type": "text"
                         }
-                    }
+                    ]
                 }
             ]
         }
