@@ -799,23 +799,29 @@
                             ]
                         },
                         {
-                            "type": "section",
                             "key": "series_description.license",
-                            "title": "License",
-                            "items": [
+                            "title": "Supported languages",
+                            "type": "array",
+                            "props": [
                                 {
-                                    "key": "series_description.license.name",
-                                    "title": "License   [???? subfolder]",
-                                    "type": "text",
-                                    "help_text": "The license refers to the accessibility and terms of use associated with the data. Providing a license and a link to the terms of the license allows data users to determine, with full clarity, what they can and cannot do with the data.\n\n- Name: The name of the license, e.g. “Creative Commons Attribution 4.0 International license (CC-BY 4.0)”.\n- URL: The URL of a website where the licensed is described in detail, for example “https://creativecommons.org/licenses/by/4.0/”."
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text"                                    
                                 },
                                 {
-                                    "key": "series_description.license.uri",
+                                    "key": "uri",
                                     "title": "URL",
                                     "type": "text"
-                                }
+                                },
+                                {
+                                    "key": "note",
+                                    "title": "Note",
+                                    "type": "text"
+                                }                                
                             ]
                         },
+                        
+                        
                         {
                             "key": "series_description.confidentiality",
                             "type": "text",
