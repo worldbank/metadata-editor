@@ -318,6 +318,16 @@
                             "title": "Themes",
                             "props": [
                                 {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "title": "Parent ID",
+                                    "type": "text"
+                                },
+                                {
                                     "key": "name",
                                     "title": "Theme",
                                     "type": "text",
