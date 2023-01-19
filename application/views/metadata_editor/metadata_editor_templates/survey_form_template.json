@@ -81,7 +81,7 @@
                         {
                             "key": "doc_desc.version_statement.version",
                             "title": "Version",
-                            "type": "text"                            
+                            "type": "text"
                         },
                         {
                             "key": "doc_desc.version_statement.version_date",
@@ -254,12 +254,13 @@
                                 {
                                     "key": "name",
                                     "title": "Name",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "study_desc.production_statement.producers.name"
                                 },
                                 {
-                                    "key": "abbr",
-                                    "title": "Abbreviation",
-                                    "type": "text"                                    
+                                    "key": "abbreviation",
+                                    "title": "Abbr",
+                                    "type": "text"
                                 },
                                 {
                                     "key": "affiliation",
@@ -854,7 +855,7 @@
                             "type": "array",
                             "class": "required",
                             "props": [
-                                 {
+                                {
                                     "key": "lat",
                                     "title": "Latitude",
                                     "help_text": "Latitude (y coordinate) of a point. Valid range expressed in decimal degrees is as follows: -90,0 to 90,0 degrees (latitude)",
@@ -943,7 +944,7 @@
                                     "type": "array",
                                     "class": "required",
                                     "props": [
-                                         {
+                                        {
                                             "key": "name",
                                             "title": "Name",
                                             "type": "text",
@@ -990,7 +991,7 @@
                                     "type": "array",
                                     "class": "required",
                                     "props": [
-                                         {
+                                        {
                                             "key": "name",
                                             "title": "Name",
                                             "type": "text",
@@ -1043,7 +1044,7 @@
                             "title": "Development activity",
                             "help_text": "This section is used to describe the process that led to the production of the final output of the study, from its inception/design to the dissemination of the final output.\nEach activity is documented separately. The Generic Statistical Business Process Model (GSBPM) provides a useful decomposition of such a process, which can be used to list the activities to be described. This is a repeatable set of metadata elements.\n\n- Activity type: The type of activity. A controlled vocabulary can be used, possibly comprising the main components of the GSBPM: {Needs specification, Design, Build, Collect, Process, Analyze, Disseminate, Evaluate}).\n- Description: A brief description of the activity.\n- Participants: A list of participants (persons or organizations) in the activity. This is a repeatable set of elements; each participant can be documented separately.\n  * Name: Name of the participating person or organization.\n   * Affiliation: Affiliation of the person or organization mentioned in name.\n   * Role: Specific role (participation) of the person or organization mentioned in name.\n- Resources: A description of the data sources and other resources used to implement the activity.\n   * Name: The name of the resource.\n   * Origin: The origin of the resource mentioned in name.\n   * Characteristics: The characteristics of the resource mentioned in name.\n- Outcome: Description of the main outcome of the activity.",
                             "type": "nested_array",
-                            "props": [                            
+                            "props": [
                                 {
                                     "key": "activity_type",
                                     "title": "Development activity type",
@@ -1140,7 +1141,7 @@
                                     "help_text": "The entity (individual, agency, or institution) responsible for administering the questionnaire or interview or compiling the data.\n\n- Name: In most cases, we will record here the name of the agency, not the name of interviewers. Only in the case of very small-scale surveys, with a very limited number of interviewers, the name of persons will be included as well.\n- Affiliation: The affiliation of the data collector mentioned in name.\n- Abbreviation: The abbreviation given to the agency mentioned in name.\n- Role: The specific role of the person or agency mentioned in name.",
                                     "type": "array",
                                     "props": [
-                                         {
+                                        {
                                             "key": "name",
                                             "title": "Name",
                                             "type": "text",
@@ -1172,7 +1173,7 @@
                                     "help_text": "Describes the training provided to data collectors including interviewer training, process testing, compliance with standards etc. This set of elements is repeatable, to capture different aspects of the training process.\n\n- Type: The type of training being described. For example, “Training of interviewers”, “Training of controllers”, “Training of cartographers”, “Training on the use of tablets for data collection”, etc.\n- Training: A brief description of the training. This may include information on the dates and duration, audience, location, content, trainers, issues, etc.",
                                     "type": "array",
                                     "props": [
-                                         {
+                                        {
                                             "key": "type",
                                             "title": "Type",
                                             "type": "text",
@@ -1449,7 +1450,7 @@
                                 {
                                     "key": "type",
                                     "title": "Type",
-                                    "type": "text"                                    
+                                    "type": "text"
                                 },
                                 {
                                     "key": "description",
@@ -1591,7 +1592,7 @@
                                     "title": "Confidentiality declaration",
                                     "help_text": "This element is used to determine if signing of a confidentiality declaration is needed to access a resource. We may indicate here what Affidavit of Confidentiality must be signed before the data can be accessed. Another option is to include this information in the next element (Access conditions). If there is no confidentiality issue, this field can be left blank.\n\n- Text: A statement on confidentiality and limitations to data use. This statement does not replace a more comprehensive data agreement (see Access condition). \n- Required: The “Required” attribute is used to aid machine processing of this element. The default specification is “yes”.\n- Form URL: The \"Form URL\" element is used to provide a link to an online confidentiality declaration form.\n- Form ID: Indicates the number or ID of the confidentiality declaration form that the user must fill out.",
                                     "props": [
-                                         {
+                                        {
                                             "key": "txt",
                                             "type": "text",
                                             "title": "Confidentiality declaration text",
@@ -1632,7 +1633,7 @@
                                     "help_text": "This element is used to determine if any special permissions are required to access a resource.\n\n- Text: A statement on the special permissions required to access the dataset.\n- Required: The required is used to aid machine processing of this element. The default specification is “yes”.\n- Form URL: The \"Form URL\" is used to provide a link to a special on-line permissions form.\n- Form ID: The “Form ID” indicates the number or ID of the special permissions form that the user must fill out.",
                                     "_ddi_xpath": "stdyDscr.dataAccs.useStmt.specPerm",
                                     "props": [
-                                         {
+                                        {
                                             "key": "txt",
                                             "type": "text",
                                             "title": "Special permissions description",
@@ -1674,7 +1675,7 @@
                                     "title": "Contacts",
                                     "type": "array",
                                     "props": [
-                                         {
+                                        {
                                             "key": "name",
                                             "title": "Name",
                                             "type": "text",
@@ -2013,7 +2014,7 @@
                             "type": "array",
                             "help_text": "The DDI metadata standard provides multiple elements to capture various summary statistics such as minimum, maximum, or mean values (weighted and un-weighted) for each variable. The content of the \"Summary statistics\" section will be easy to fill out programmatically (using R or Python) or using a specialized DDI metadata editor, which can read the data file and generate the summary statistics.\n\n- Type: The type of statistics being shown: mean, median, mode, valid cases, invalid cases, minimum, maximum, or standard deviation.\n- Value: The value of the summary statistics mentioned in type.\n- Weighted: Indicates whether the statistics reported in value are weighted or not (for variables in sample surveys). Enter “weighted” if weighted, otherwise leave this element empty.\n",
                             "props": [
-                                 {
+                                {
                                     "key": "type",
                                     "title": "Type",
                                     "type": "text",
@@ -2022,7 +2023,8 @@
                                 {
                                     "key": "value",
                                     "title": "Value",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "variable.var_sumstat.value"
                                 },
                                 {
                                     "key": "wgtd",
@@ -2043,7 +2045,7 @@
                             "title": "Variable categories",
                             "type": "array",
                             "props": [
-                                 {
+                                {
                                     "key": "value",
                                     "title": "Value",
                                     "type": "text"
@@ -2057,7 +2059,7 @@
                                     "key": "stats",
                                     "title": "Stats",
                                     "type": "array",
-                                    "props":[
+                                    "props": [
                                         {
                                             "key": "type",
                                             "title": "Type",
