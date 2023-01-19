@@ -7,7 +7,7 @@
 <div class="form-group">
     <label for="name">Label:</label>
     <input type="text" class="form-control" id="name" placeholder="Label" v-model="ActiveNode.title">
-    <div v-if="ActiveNode.key && coreTemplateParts[ActiveNode.key]" class="text-secondary font-small" style="margin-top:4px;font-size:small">Original label: {{coreTemplateParts[ActiveNode.key].title}} <span class="pl-3">Name: {{ActiveNode.key}}</span></div>
+    <div v-if="ActiveNode.key && coreTemplateParts[ActiveNode.key]" class="text-secondary font-small" style="margin-top:4px;font-size:small">Original label: {{coreTemplateParts[ActiveNode.key].title}} <span class="pl-3">Name: {{ActiveNode.key}}</span> <span class="pl-3">Name: {{ActiveNode.type}}</span></div>
 </div>
 
 <div class="row">
@@ -98,7 +98,7 @@
                         <table-component @update:value="DefaultUpdate" v-model="ActiveNode.default" :columns="ActiveNodeControlledVocabColumns" class="border m-2 pb-2" />
                     </div>
                     <div class="border bg-white" v-else>
-                        <div v-if="ActiveNode.type=='text' || ActiveNode.type=='dropdown' ">
+                        <div v-if="ActiveNode.type=='string' || ActiveNode.type=='text' || ActiveNode.type=='dropdown' ">
                             <input class="form-control" type="text" v-model="ActiveNode.default"/>
                         </div>
                         <div v-else-if="ActiveNode.type=='textarea'">
@@ -113,7 +113,7 @@
             <div class="form-group" >
                 <label for="controlled_vocab">Validation rules:</label>
                 <div class="bg-white border">
-                    <validation-rules-component v-model="ActiveNode.rules"  class="m-2 pb-2" />
+                    <validation-rules-component @update:value="RulesUpdate"  v-model="ActiveNode.rules"  class="m-2 pb-2" />
                 </div>
             </div>
         </v-tab-item>

@@ -111,6 +111,7 @@ Vue.component('nada-treeview', {
                   on-icon="mdi-bookmark"
                   off-icon="mdi-bookmark-outline"
                   item-children="items"
+                  dark
               >
 
                 <template #label="{ item }" >

@@ -21,19 +21,27 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
 
   <style>
-    .tree-item-label{display:block}
-    .v-treeview-node__root:hover {
-      background: #ececec;
-      cursor:pointer;
+    .tree-item-label {
+      display: block
     }
 
-  .table-sm td,
-  .table-sm th{
-      font-size:small;
-  }
-  .iscut{
-    color:#e56767;
-  }
+    .v-treeview-node__root:hover {
+      background: #6c757d;
+      cursor: pointer;
+    }
+
+    .table-sm td,
+    .table-sm th {
+      font-size: small;
+    }
+
+    .iscut {
+      color: #e56767;
+    }
+
+    .disabled-button-color{
+      color:#6c757d;
+    }
   </style>
 
 
@@ -86,133 +94,152 @@
 
   <div id="app" data-app>
     <v-app>
-    <div class="header bg-dark p-1 pt-2" style="margin-bottom:12px;">
-      <div class="row">
-        <div class="col-md-10">
-          <h5 class="color-white"> 
-            <v-icon large color="rgb(0 0 0 / 12%)">mdi-alpha-t-box</v-icon>
-            Template manager - {{user_template_info.name}}
-            {{user_template_info.lang}}
-          </h5>
-        </div>
-        <div class="col-md-2">
-          <div class="float-right">
-            <button type="button" class="btn btn-sm btn-primary" @click="saveTemplate()">Save</button>
-            <button type="button" class="btn btn-sm btn-danger" @click="cancelTemplate()">Cancel</button>
-          </div>
-        </div>
-      </div>
 
-    </div>
+      <div class="container-fluid-x">
 
-    <div class="container-fluid" style="height: 100vh">
+        <div class="row no-gutters" style="height:100vh;">
 
-      <div class="row">
+          <div class="col-md-4 col-xl-2 bg-dark" style="height:100vh;">
 
-        <div class="col col-md-3" style="height:100vh;">
-
-          <div class="row">
-            <div class="col bg-light" style="height:100vh; overflow:auto;">
-              <div @click="isEditingDescription=true" style="padding-left:33px;cursor:pointer;" class="border-bottom pb-2"><v-icon>mdi-ballot-outline</v-icon>Template Description</div>
-              <div @click="isEditingDescription=false">
-                <nada-treeview  v-model="UserTreeItems" :cut_fields="cut_fields" :initially_open="initiallyOpen" :tree_active_items="tree_active_items"></nada-treeview>
-              </div>
+          <div class="color-white shadow branding-icon bg-dark sticky-top" style="height:62px;padding:10px;font-weight:bold;"> 
+              <v-icon large color="#f8f9fa">mdi-alpha-t-box</v-icon>
+              Template manager
             </div>
-            <div class="col-1" style="background:#dee2e6;">
-              <div style="margin:-3px;">
 
-                <div>
-                  <v-icon v-if="ActiveCoreNode.type" color="#3498db" @click="addField()">mdi-chevron-left-box</v-icon>
-                  <v-icon v-else color="rgb(0 0 0 / 12%)">mdi-chevron-left-box</v-icon>
+            <div class="row no-gutters pt-3" style="height:100vh;">
+              <div class="col bg-dark" style="height:100vh;overflow:auto;">
+                <div @click="isEditingDescription=true" style="padding-left:33px;cursor:pointer;" class="pb-2"><v-icon style="color:white;">mdi-ballot-outline</v-icon>Template Description</div>
+                <div @click="isEditingDescription=false">
+                  <nada-treeview v-model="UserTreeItems" :cut_fields="cut_fields" :initially_open="initiallyOpen" :tree_active_items="tree_active_items"></nada-treeview>
                 </div>
-                <div>
-                  <v-icon v-if="ActiveNodeIsField" color="#3498db" @click="removeField()">mdi-chevron-right-box</v-icon>
-                  <v-icon v-else color="rgb(0 0 0 / 12%)">mdi-chevron-right-box</v-icon>
-                </div>
-                
-                <div>
-                  <v-icon v-if="ActiveNode.type=='section_container' || ActiveNode.type=='section'" color="#3498db" @click="addSection()">mdi-plus-box</v-icon>
-                  <v-icon v-else color="rgb(0 0 0 / 12%)">mdi-plus-box</v-icon>
-                </div>
-                <div>
-                  <v-icon v-if="ActiveNode.type=='section'" color="#3498db" @click="removeField()">mdi-minus-box</v-icon>
-                  <v-icon v-else color="rgb(0 0 0 / 12%)">mdi-minus-box</v-icon>
-                </div>
-                <div>
-                  <v-icon v-if="ActiveNode.type!='section_container'  && ActiveNode.type" color="#3498db" @click="moveUp()">mdi-arrow-up-bold-box</v-icon>
-                  <v-icon v-else color="rgb(0 0 0 / 12%)">mdi-arrow-up-bold-box</v-icon>
-                </div>
-                <div>
-                  <v-icon v-if="ActiveNode.type!='section_container' && ActiveNode.type" color="#3498db" @click="moveDown()">mdi-arrow-down-bold-box</v-icon>
-                  <v-icon v-else color="rgb(0 0 0 / 12%)">mdi-arrow-down-bold-box</v-icon>
-                </div>
+              </div>
+              <div class="col-md-1 bg-dark col-xs-2" style="position:relative;" >
+                <div class="sticky-top pr-1" v-if="!isEditingDescription">
+
+                  <div>
+                    <v-icon v-if="ActiveCoreNode.type" color="#3498db" @click="addField()">mdi-chevron-left-box</v-icon>
+                    <v-icon v-else class="disabled-button-color">mdi-chevron-left-box</v-icon>
+                  </div>
+                  <div>
+                    <v-icon v-if="ActiveNodeIsField" color="#3498db" @click="removeField()">mdi-chevron-right-box</v-icon>
+                    <v-icon v-else class="disabled-button-color">mdi-chevron-right-box</v-icon>
+                  </div>
+
+                  <div>
+                    <v-icon v-if="ActiveNode.type=='section_container' || ActiveNode.type=='section'" color="#3498db" @click="addSection()">mdi-plus-box</v-icon>
+                    <v-icon v-else class="disabled-button-color">mdi-plus-box</v-icon>
+                  </div>
+                  <div>
+                    <v-icon v-if="ActiveNode.type=='section'" color="#3498db" @click="removeField()">mdi-minus-box</v-icon>
+                    <v-icon v-else class="disabled-button-color">mdi-minus-box</v-icon>
+                  </div>
+                  <div>
+                    <v-icon v-if="ActiveNode.type!='section_container'  && ActiveNode.type" color="#3498db" @click="moveUp()">mdi-arrow-up-bold-box</v-icon>
+                    <v-icon v-else class="disabled-button-color">mdi-arrow-up-bold-box</v-icon>
+                  </div>
+                  <div>
+                    <v-icon v-if="ActiveNode.type!='section_container' && ActiveNode.type" color="#3498db" @click="moveDown()">mdi-arrow-down-bold-box</v-icon>
+                    <v-icon v-else class="disabled-button-color">mdi-arrow-down-bold-box</v-icon>
+                  </div>
 
 
-                <div class="mt-5" title="Move">
-                  <v-icon v-if="ActiveNodeIsField" color="#3498db" @click="cutField()">mdi-content-copy</v-icon>
-                  <v-icon v-else color="rgb(0 0 0 / 12%)">mdi-content-copy</v-icon>
-                </div>
+                  <div class="mt-5" title="Move">
+                    <v-icon v-if="ActiveNodeIsField" color="#3498db" @click="cutField()">mdi-content-copy</v-icon>
+                    <v-icon v-else color="rgb(0 0 0 / 12%)">mdi-content-copy</v-icon>
+                  </div>
 
-                <div class="mt-2" title="Paste">
-                  <v-icon v-if="ActiveNode.type=='section' && cut_fields.length>0" color="#3498db" @click="pasteField()">mdi-content-paste</v-icon>
-                  <v-icon v-else color="rgb(0 0 0 / 12%)">mdi-content-paste</v-icon>
-                </div>
+                  <div class="mt-2" title="Paste">
+                    <v-icon v-if="ActiveNode.type=='section' && cut_fields.length>0" color="#3498db" @click="pasteField()">mdi-content-paste</v-icon>
+                    <v-icon v-else color="rgb(0 0 0 / 12%)">mdi-content-paste</v-icon>
+                  </div>
 
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
 
-        <!--detail-->
-        <div class="col bg-light" style="height:100vh; overflow:auto;">
+          <!--content section-->
+          <div class="col bg-light" style="height:100vh;">
 
-            <div v-if="isEditingDescription==false">
-              <?php echo $this->load->view('template_manager/edit_content',null,true);?>
-            </div>
-            <div v-if="isEditingDescription==true" class="pl-4 pt-2">
-            
-              <h5>Template description</h5>
+              <!-- header -->
+              <div class="header bg-light shadow p-1 pt-2 sticky-top" style="height:62px;" >
+                <div class="row">
+                  <div class="col-md-9">
+                    
+                    <div class="ml-5" style="font-size:small;"> 
+                      <div><strong>{{user_template_info.name}}</strong></div>
+                      <span class="pr-2">Type: {{user_template_info.data_type}}</span>
+                      <span class="pr-2">Language: {{user_template_info.lang}}</span>
+                      <span class="pr-2">Version: {{user_template_info.version}}</span>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="float-right">
+                      <button type="button" class="btn btn-sm btn-success" @click="saveTemplate()"><v-icon>mdi-content-save-check</v-icon> Save</button>
+                      <button type="button" class="btn btn-sm btn-default" @click="cancelTemplate()"><v-icon>mdi-exit-to-app</v-icon> Close</button>
+                    </div>
+                  </div>
+                </div>
 
-              <div class="form-group">
+              </div>
+
+              <!-- end header -->
+
+
+            <!-- content -->
+            <div class="main-content-container p-3" style="height:100vh;overflow:auto;">
+
+              <div v-if="isEditingDescription==false">
+                <?php echo $this->load->view('template_manager/edit_content', null, true); ?>
+              </div>
+              <div v-if="isEditingDescription==true" class="pl-4 pt-2">
+
+                <h5>Template description</h5>
+
+                <div class="form-group">
                   <label>Language:</label>
                   <input type="text" class="form-control" placeholder="EN" v-model="user_template_info.lang">
-              </div>
+                </div>
 
-              <div class="form-group">
+                <div class="form-group">
                   <label>Name:</label>
                   <input type="text" class="form-control" v-model="user_template_info.name">
-              </div>
+                </div>
 
-              <div class="form-group">
+                <div class="form-group">
                   <label>Version:</label>
                   <input type="text" class="form-control" v-model="user_template_info.version">
-              </div>
+                </div>
 
-              <div class="form-group">
+                <div class="form-group">
                   <label>Organization:</label>
                   <input type="text" class="form-control" v-model="user_template_info.organization">
-              </div>
+                </div>
 
-              <div class="form-group">
+                <div class="form-group">
                   <label>Author:</label>
                   <input type="text" class="form-control" v-model="user_template_info.author">
-              </div>
+                </div>
 
-              <div class="form-group">
+                <div class="form-group">
                   <label>Description:</label>
                   <textarea style="height:200px;" class="form-control" v-model="user_template_info.description"></textarea>
-              </div>
+                </div>
 
-            
-              <pre>{{user_template_info}}</pre>
+
+                <pre>{{user_template_info}}</pre>
+              </div>
             </div>
+
+          </div>
+          <!-- end content -->
+
+          <!--end content section-->
+
         </div>
-        <!--end detail-->
 
       </div>
-
-    </div>
     </v-app>
   </div>
 
@@ -323,7 +350,7 @@
           isEditingDescription: true,
           user_template_info: user_template_info,
           initiallyOpen: [],
-          tree_active_items:[],
+          tree_active_items: [],
           files: {
             html: 'mdi-language-html5',
             js: 'mdi-nodejs',
@@ -343,7 +370,7 @@
             "dropdown",
             //"date"
           ],
-          cut_fields:[]          
+          cut_fields: []
         }
       },
       created: function() {
@@ -380,80 +407,80 @@
             this.$set(this.ActiveNode, "default", [{}]);
           }
         },
+        RulesUpdate: function (e)
+        {
+          this.$set(this.ActiveNode, "rules", e);
+        },
         removeField: function() {
           this.delete_tree_item(this.UserTreeItems, this.ActiveNode.key);
           this.ActiveNode = {};
         },
-        cutField: function() 
-        {
-          let active_container_key=this.getNodeContainerKey(this.UserTreeItems,this.ActiveNode.key);
+        cutField: function() {
+          let active_container_key = this.getNodeContainerKey(this.UserTreeItems, this.ActiveNode.key);
 
           //unselect cut field
-          for(i=0;i<this.cut_fields.length;i++){
-            if (active_container_key==this.cut_fields[i].container){
-              if (this.cut_fields[i].node.key == this.ActiveNode.key){
-                this.cut_fields.splice(i,1);
+          for (i = 0; i < this.cut_fields.length; i++) {
+            if (active_container_key == this.cut_fields[i].container) {
+              if (this.cut_fields[i].node.key == this.ActiveNode.key) {
+                this.cut_fields.splice(i, 1);
                 return;
               }
             }
           }
 
-          this.cut_fields.push(
-            {
-              "node":this.ActiveNode,
-              "container": this.getNodeContainerKey(this.UserTreeItems,this.ActiveNode.key)
-            }
-          );
+          this.cut_fields.push({
+            "node": this.ActiveNode,
+            "container": this.getNodeContainerKey(this.UserTreeItems, this.ActiveNode.key)
+          });
           //this.removeField();
         },
         pasteField: function() {
-          if (this.cut_fields.length<1) {
+          if (this.cut_fields.length < 1) {
             return false;
           }
 
-          if (this.isItemContainer(this.ActiveCoreNode)){
+          if (this.isItemContainer(this.ActiveCoreNode)) {
             return false;
           }
 
           if (!this.ActiveNode.items) {
-              this.$set(this.ActiveNode, "items", []);
+            this.$set(this.ActiveNode, "items", []);
           }
 
-          let active_container_key=this.getNodeContainerKey(this.UserTreeItems,this.ActiveNode.key);
+          let active_container_key = this.getNodeContainerKey(this.UserTreeItems, this.ActiveNode.key);
 
-          for(i=0;i<this.cut_fields.length;i++){
-            if (active_container_key==this.cut_fields[i].container){
+          for (i = 0; i < this.cut_fields.length; i++) {
+            if (active_container_key == this.cut_fields[i].container) {
               //remove existing item
               this.delete_tree_item(this.UserTreeItems, this.cut_fields[i].node.key);
               //add copied item
               this.ActiveNode.items.push(this.cut_fields[i].node);
             }
           }
-          
-          this.cut_fields=[];
+
+          this.cut_fields = [];
           store.commit('activeCoreNode', {});
         },
         //check if an item is selected for cut/paste        
-        isItemCut: function(item)
-        {
-          let active_container_key=this.getNodeContainerKey(this.UserTreeItems, item.key);
+        isItemCut: function(item) {
+          let active_container_key = this.getNodeContainerKey(this.UserTreeItems, item.key);
 
-          for(i=0;i<this.cut_fields.length;i++){
-            if (active_container_key==this.cut_fields[i].container){
-               if (item.key==this.cut_fields[i].node.key){
+          for (i = 0; i < this.cut_fields.length; i++) {
+            if (active_container_key == this.cut_fields[i].container) {
+              if (item.key == this.cut_fields[i].node.key) {
                 return true;
-               }
+              }
             }
           }
           return false;
         },
-        isItemContainer: function(item){
-          if (item.type=='section' || item.type=='section_container' || item.type=='nested_array_'){
+        isItemContainer: function(item) {
+          if (item.type == 'section' || item.type == 'section_container' || item.type == 'nested_array_') {
             return true;
           }
           return false;
         },
-        isControlField: function(field_type){          
+        isControlField: function(field_type) {
           return this.field_types.includes(field_type);
         },
         addField: function() {
@@ -461,7 +488,7 @@
             return false;
           }
 
-          if (this.isItemContainer(this.ActiveCoreNode)){
+          if (this.isItemContainer(this.ActiveCoreNode)) {
             return false;
           }
 
@@ -480,70 +507,65 @@
           this.ActiveNode.items.push(this.ActiveCoreNode);
           store.commit('activeCoreNode', {});
         },
-        addSection: function() 
-        {          
-          if (!this.ActiveNode.key=='section_container'){
+        addSection: function() {
+          if (!this.ActiveNode.key == 'section_container') {
             return false;
           }
 
           parentNode = this.ActiveNode;
-          new_node_key=parentNode.key + Date.now();
-          parentNode.items.push ({
+          new_node_key = parentNode.key + Date.now();
+          parentNode.items.push({
             "key": new_node_key,
             "title": "Untitled",
             "type": "section",
             "items": [],
-            "help_text":""
+            "help_text": ""
           });
 
-          this.ActiveNode= parentNode.items[parentNode.items.length-1];
-          this.tree_active_items= new Array();
+          this.ActiveNode = parentNode.items[parentNode.items.length - 1];
+          this.tree_active_items = new Array();
           this.tree_active_items.push(new_node_key);
           this.initiallyOpen.push(new_node_key);
         },
-        moveUp: function()
-        {
-          parentNode = this.findNodeParent(this.UserTemplate, this.ActiveNode.key);          
-          nodeIdx=this.findNodePosition(parentNode,this.ActiveNode.key);
-          if (nodeIdx >0 ){
-            this.array_move(parentNode.items,nodeIdx,nodeIdx-1);
-          }
-        },
-        moveDown: function()
-        {
+        moveUp: function() {
           parentNode = this.findNodeParent(this.UserTemplate, this.ActiveNode.key);
-          nodeIdx=this.findNodePosition(parentNode,this.ActiveNode.key);
-
-          parentNodeItemsCount=parentNode.items.length-1;
-          
-          if (nodeIdx >-1 && nodeIdx<parentNodeItemsCount){
-            this.array_move(parentNode.items,nodeIdx,nodeIdx+1);
+          nodeIdx = this.findNodePosition(parentNode, this.ActiveNode.key);
+          if (nodeIdx > 0) {
+            this.array_move(parentNode.items, nodeIdx, nodeIdx - 1);
           }
         },
-        array_move: function (arr, old_index, new_index) {
-            if (new_index >= arr.length) {
-                var k = new_index - arr.length + 1;
-                while (k--) {
-                    arr.push(undefined);
-                }
-            }
-            arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
+        moveDown: function() {
+          parentNode = this.findNodeParent(this.UserTemplate, this.ActiveNode.key);
+          nodeIdx = this.findNodePosition(parentNode, this.ActiveNode.key);
+
+          parentNodeItemsCount = parentNode.items.length - 1;
+
+          if (nodeIdx > -1 && nodeIdx < parentNodeItemsCount) {
+            this.array_move(parentNode.items, nodeIdx, nodeIdx + 1);
+          }
         },
-        findNodePosition: function(node,key)
-        {
-          if (!node.items){
+        array_move: function(arr, old_index, new_index) {
+          if (new_index >= arr.length) {
+            var k = new_index - arr.length + 1;
+            while (k--) {
+              arr.push(undefined);
+            }
+          }
+          arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
+        },
+        findNodePosition: function(node, key) {
+          if (!node.items) {
             return false;
           }
 
-          for(index=0;index < node.items.length;index++)
-          {
-              let item=node.items[index];
-              if (item.key && item.key == key) {
-                return index;
-              }
+          for (index = 0; index < node.items.length; index++) {
+            let item = node.items[index];
+            if (item.key && item.key == key) {
+              return index;
+            }
           }
 
-          return -1;          
+          return -1;
         },
         isItemInUse: function(item_key) {
           return _.includes(this.UserTreeUsedKeys, item_key);
@@ -578,23 +600,21 @@
           }
           return found;
         },
-        getNodePath: function(arr,name)
-        {
-            if (!arr){
-              return false;
-            }
+        getNodePath: function(arr, name) {
+          if (!arr) {
+            return false;
+          }
 
-            for(let item of arr){
-                if(item.key===name) return `/${item.key}`;
-                if(item.items) {
-                    const child = this.getNodePath(item.items, name);
-                    if(child) return `/${item.key}${child}`
-                }
+          for (let item of arr) {
+            if (item.key === name) return `/${item.key}`;
+            if (item.items) {
+              const child = this.getNodePath(item.items, name);
+              if (child) return `/${item.key}${child}`
             }
+          }
         },
-        getNodeContainerKey: function(tree,node_key)
-        {
-          let el_path=this.getNodePath(tree,node_key);
+        getNodeContainerKey: function(tree, node_key) {
+          let el_path = this.getNodePath(tree, node_key);
           return el_path.split("/")[1];
         },
         saveTemplate: function() {
@@ -611,7 +631,8 @@
                 }*/
               }
             ).then(function(response) {
-              window.location.href = CI.base_url + '/admin/metadata_editor/templates';
+              //window.location.href = CI.base_url + '/admin/metadata_editor/templates';
+              alert("Your changes have been saved!");
             })
             .catch(function(response) {
               vm.errors = response;
@@ -621,16 +642,14 @@
         cancelTemplate: function() {
           window.location.href = CI.base_url + '/admin/metadata_editor/templates';
         },
-        coreTemplatePartsHelpText: function(element)
-        {
-          if (element && element.help_text){
+        coreTemplatePartsHelpText: function(element) {
+          if (element && element.help_text) {
             return element.help_text;
           }
           return '';
         }
       },
-      watch:{
-      },
+      watch: {},
       computed: {
         UserTreeUsedKeys() {
           return this.$store.getters.getUserTreeKeys;
@@ -676,8 +695,8 @@
           }
           return true;
         },
-        ActiveNodeControlledVocabColumns(){
-          if (this.ActiveNode.props){
+        ActiveNodeControlledVocabColumns() {
+          if (this.ActiveNode.props) {
             return this.ActiveNode.props;
           }
           return false;
