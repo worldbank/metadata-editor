@@ -11,8 +11,8 @@
 </div>
 
 <div class="form-group">
-    <label for="name">Name/Key:</label>
-    <input type="text" class="form-control" id="name" placeholder="Label" v-model="ActiveNode.key">    
+    <label for="name">Type:</label>
+    <input type="text" class="form-control" id="name" placeholder="Label" v-model="ActiveNode.type">    
 </div>
 
 <div class="row">
