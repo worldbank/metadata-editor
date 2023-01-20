@@ -58,7 +58,7 @@ $config['table']=array(
 //image
 $config['image']=array(
     'template' => 'metadata_editor/metadata_editor_templates/image_form_template.json',
-    'language_translations'=>'en'
+    'lang'=>'en'
 ); 
 
 
