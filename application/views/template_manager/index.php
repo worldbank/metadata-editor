@@ -26,7 +26,7 @@
     }
 
     .v-treeview-node__root:hover {
-      background: #6c757d;
+      background: gainsboro;
       cursor: pointer;
     }
 
@@ -40,8 +40,14 @@
     }
 
     .disabled-button-color{
-      color:#6c757d;
+      color:rgb(0 0 0 / 12%) !important;
     }
+
+    .isactive{
+      color:#fb8c00;
+      background:#fb8c0021
+    }
+
   </style>
 
 
@@ -97,24 +103,53 @@
 
       <div class="container-fluid-x">
 
-        <div class="row no-gutters" style="height:100vh;">
+        <div class="row no-gutters sticky-top shadow bg-white">
 
-          <div class="col-md-4 col-xl-2 bg-dark" style="height:100vh;">
-
-          <div class="color-white shadow branding-icon bg-dark sticky-top" style="height:62px;padding:10px;font-weight:bold;"> 
-              <v-icon large color="#f8f9fa">mdi-alpha-t-box</v-icon>
+          <div class="col-md-3">
+            <div class="color-white branding-icon" style="padding:5px;font-weight:bold;"> 
+              <v-icon large color="#000000">mdi-alpha-t-box</v-icon>
               Template manager
             </div>
+          </div>
 
-            <div class="row no-gutters pt-3" style="height:100vh;">
-              <div class="col bg-dark" style="height:100vh;overflow:auto;">
-                <div @click="isEditingDescription=true" style="padding-left:33px;cursor:pointer;" class="pb-2"><v-icon style="color:white;">mdi-ballot-outline</v-icon>Template Description</div>
+          <div class="col">
+          <!-- header -->
+          <div class="header" >
+                <div class="row">
+                  <div class="col-md-9">
+                    
+                    <div class="ml-5 pt-2" > 
+                      <div class="text-secodndary">{{user_template_info.name}}</div>                      
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="float-right pt-1 mr-5">
+                      <button type="button" class="btn btn-sm btn-success" @click="saveTemplate()"><v-icon style="color:white;">mdi-content-save-check</v-icon> Save</button>
+                      <button type="button" class="btn btn-sm btn-default" @click="cancelTemplate()"><v-icon>mdi-exit-to-app</v-icon> Close</button>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+              <!-- end header -->
+          </div>
+
+
+        </div>
+
+        <div class="row no-gutters" style="height:100vh;">
+
+          <div class="col-md-3" style="height:100vh;">
+
+            <div class="row no-gutters border-right pt-2" style="height:100vh;overflow:auto;">
+              <div class="col-md-11 bg-light" style="height:100vh;">
+                <div @click="isEditingDescription=true" style="padding:5px;padding-left:38px;cursor:pointer;" class="pb-2" :class="{isactive: isEditingDescription}" ><v-icon>mdi-ballot-outline</v-icon>Template Description</div>
                 <div @click="isEditingDescription=false">
                   <nada-treeview v-model="UserTreeItems" :cut_fields="cut_fields" :initially_open="initiallyOpen" :tree_active_items="tree_active_items"></nada-treeview>
                 </div>
               </div>
-              <div class="col-md-1 bg-dark col-xs-2" style="position:relative;" >
-                <div class="sticky-top pr-1" v-if="!isEditingDescription">
+              <div class="col-md-1 bg-light col-xs-2" style="position:relative;" >
+                <div class="pr-1" v-if="!isEditingDescription" style="position:fixed;">
 
                   <div>
                     <v-icon v-if="ActiveCoreNode.type" color="#3498db" @click="addField()">mdi-chevron-left-box</v-icon>
@@ -162,30 +197,7 @@
           <!--content section-->
           <div class="col bg-light" style="height:100vh;">
 
-              <!-- header -->
-              <div class="header bg-light shadow p-1 pt-2 sticky-top" style="height:62px;" >
-                <div class="row">
-                  <div class="col-md-9">
-                    
-                    <div class="ml-5" style="font-size:small;"> 
-                      <div><strong>{{user_template_info.name}}</strong></div>
-                      <span class="pr-2">Type: {{user_template_info.data_type}}</span>
-                      <span class="pr-2">Language: {{user_template_info.lang}}</span>
-                      <span class="pr-2">Version: {{user_template_info.version}}</span>
-                    </div>
-                  </div>
-                  <div class="col-md-3">
-                    <div class="float-right">
-                      <button type="button" class="btn btn-sm btn-success" @click="saveTemplate()"><v-icon>mdi-content-save-check</v-icon> Save</button>
-                      <button type="button" class="btn btn-sm btn-default" @click="cancelTemplate()"><v-icon>mdi-exit-to-app</v-icon> Close</button>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-
-              <!-- end header -->
-
+              
 
             <!-- content -->
             <div class="main-content-container p-3" style="height:100vh;overflow:auto;">
@@ -651,7 +663,14 @@
           return '';
         }
       },
-      watch: {},
+      watch: {
+        isEditingDescription: function(val)
+        {
+          if (val==true){
+            this.tree_active_items=new Array();
+          }
+        }
+      },
       computed: {
         UserTreeUsedKeys() {
           return this.$store.getters.getUserTreeKeys;

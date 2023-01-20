@@ -110,8 +110,7 @@ Vue.component('nada-treeview', {
                   indeterminate-icon="mdi-bookmark-minus"
                   on-icon="mdi-bookmark"
                   off-icon="mdi-bookmark-outline"
-                  item-children="items"
-                  dark
+                  item-children="items"                  
               >
 
                 <template #label="{ item }" >
