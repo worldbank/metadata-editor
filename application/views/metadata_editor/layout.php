@@ -80,7 +80,7 @@
     <div class="content-wrapper" style="margin-left:0px;">
 
         <section class="content-x">
-            <!-- Provides the application the proper gutter -->
+            
             <div class="container-fluid-" style="overflow:auto;">
 
 
@@ -176,7 +176,7 @@
 
 
                 <validation-observer ref="form" v-slot="{ invalid }">                
-                <div class="container-fluid p-3">
+                <div class="container-fluid p-3" style="overflow:auto;">
                     <keep-alive include="datafiles">
                         <router-view :key="$route.fullPath" />
                     </keep-alive>

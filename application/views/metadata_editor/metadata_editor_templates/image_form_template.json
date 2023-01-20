@@ -1441,6 +1441,41 @@
                 ]
             },
             {
+                "type": "section_container",
+                "key": "album",
+                "title": "Album",
+                "items": [
+                    {
+                        "key": "image_description.album",
+                        "title": "Album",
+                        "type": "array",
+                        "props": [
+                            {
+                                "key": "name",
+                                "title": "Name",
+                                "type": "text"
+                            },
+                            {
+                                "key": "description",
+                                "title": "Description",
+                                "type": "text"
+                            },
+                            {
+                                "key": "owner",
+                                "title": "Owner",
+                                "type": "text"
+                            },
+                            {
+                                "key": "uri",
+                                "title": "URI",
+                                "type": "text",
+                                "prop_key": "image_description.license.uri"
+                            }
+                        ]                        
+                    }
+                ]
+            },
+            {
                 "type": "section",
                 "key": "document_tags",
                 "title": "Tags",
