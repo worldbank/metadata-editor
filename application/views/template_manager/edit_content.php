@@ -10,6 +10,11 @@
     <div v-if="ActiveNode.key && coreTemplateParts[ActiveNode.key]" class="text-secondary font-small" style="margin-top:4px;font-size:small">Original label: {{coreTemplateParts[ActiveNode.key].title}} <span class="pl-3">Name: {{ActiveNode.key}}</span> <span class="pl-3">Type: {{ActiveNode.type}}</span>  </div>
 </div>
 
+<div class="form-group">
+    <label for="name">Name/Key:</label>
+    <input type="text" class="form-control" id="name" placeholder="Label" v-model="ActiveNode.key">    
+</div>
+
 <div class="row">
     <div class="col-auto">
         <div class="form-group form-check" v-if="ActiveNode.type!=='section' &&  ActiveNode.type!=='section_container'">
