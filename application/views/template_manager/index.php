@@ -113,7 +113,7 @@
         <div class="row no-gutters sticky-top shadow bg-white">
 
           <div class="col-md-3">
-            <div class="color-white branding-icon" style="padding:5px;font-weight:bold;"> 
+            <div class="color-white branding-icon" style="padding:5px;padding-left:30px;font-weight:bold;"> 
               <v-icon large color="#007bff">mdi-alpha-t-box</v-icon>
               Template manager
             </div>
@@ -149,13 +149,13 @@
           <div class="col-md-3" style="height:100vh;">
 
             <div class="row no-gutters border-right pt-2" style="height:100vh;overflow:auto;">
-              <div class="col-md-11 bg-light" style="height:100vh;">
+              <div class="col-md-11" style="height:100vh;">
                 <div @click="isEditingDescription=true" style="padding:5px;padding-left:38px;cursor:pointer;" class="pb-2" :class="{isactive: isEditingDescription}" ><v-icon>mdi-ballot-outline</v-icon>Template Description</div>
                 <div @click="isEditingDescription=false">
                   <nada-treeview v-model="UserTreeItems" :cut_fields="cut_fields" :initially_open="initiallyOpen" :tree_active_items="tree_active_items"></nada-treeview>
                 </div>
               </div>
-              <div class="col-md-1 bg-light col-xs-2" style="position:relative;" >
+              <div class="col-md-1 col-xs-2" style="position:relative;" >
                 <div class="pr-1" v-if="!isEditingDescription" style="position:fixed;">
 
                   <div>
