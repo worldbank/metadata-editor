@@ -86,7 +86,10 @@
                             <td>{{template.lang}}</td>
                             <td>{{template.version}}</td>
                             <td>-</td>
-                            <td><button type="button" class="btn btn-sm btn-link" @click="duplicateTemplate(template.uid)" >Duplicate</button></td>
+                            <td>
+                              <button type="button" class="btn btn-sm btn-link" @click="duplicateTemplate(template.uid)" >Duplicate</button>
+                              <button type="button" class="btn btn-sm btn-link" @click="exportTemplate(template.uid)" >Export</button>
+                            </td>
                           </tr>  
                         </template>
                       </template>
@@ -210,8 +213,9 @@
           "document": "Document", 
           "table": "Table", 
           "image": "Image", 
-          "visualization": "Visualization", 
-          "video": "Video"
+          //"visualization": "Visualization", 
+          "video": "Video",
+          "resource": "External resources"
         },
         is_loading: false,
         loading_status: null,

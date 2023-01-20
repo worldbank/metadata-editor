@@ -63,13 +63,19 @@ $config['image']=array(
 
 
 //visualization
-$config['visualization']=array(
+/*$config['visualization']=array(
     'template' => 'metadata_templates/visualization-template',
     'language_translations'=>'fields_visualization'
-); 
+);*/ 
 
 //video
 $config['video']=array(
     'template' => 'metadata_editor/metadata_editor_templates/video_form_template.json',
     'language_translations'=>'en'
+); 
+
+
+$config['resource']=array(
+    'template' => 'metadata_editor/metadata_editor_templates/resource_form_template.json',
+    'lang'=>'en'
 ); 
