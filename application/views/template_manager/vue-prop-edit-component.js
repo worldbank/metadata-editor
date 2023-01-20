@@ -91,7 +91,12 @@ Vue.component('prop-edit', {
 
                 <div class="form-group">
                     <label for="name">Type:</label>
-                    <textarea class="form-control" v-model="prop.type"/>
+                    <input type="text" class="form-control" v-model="prop.type">
+                </div>
+
+                <div class="form-group">
+                    <label for="name">Key/name:</label>
+                    <input type="text" class="form-control" v-model="prop.key">
                 </div>
               </div>
 
