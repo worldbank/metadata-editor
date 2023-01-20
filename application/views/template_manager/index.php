@@ -48,6 +48,13 @@
       background:#fb8c0021
     }
 
+    .text-crop{
+      max-width: 40em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    }
+
   </style>
 
 
@@ -107,7 +114,7 @@
 
           <div class="col-md-3">
             <div class="color-white branding-icon" style="padding:5px;font-weight:bold;"> 
-              <v-icon large color="#000000">mdi-alpha-t-box</v-icon>
+              <v-icon large color="#007bff">mdi-alpha-t-box</v-icon>
               Template manager
             </div>
           </div>
@@ -119,7 +126,7 @@
                   <div class="col-md-9">
                     
                     <div class="ml-5 pt-2" > 
-                      <div class="text-secodndary">{{user_template_info.name}}</div>                      
+                      <div class="text-crop">{{user_template_info.name}}</div>                      
                     </div>
                   </div>
                   <div class="col-md-3">
@@ -211,36 +218,34 @@
 
                 <div class="form-group">
                   <label>Language:</label>
-                  <input type="text" class="form-control" placeholder="EN" v-model="user_template_info.lang">
+                  <input type="text" class="form-control" placeholder="EN" v-model="user_template_info.lang"  maxlength="30">
                 </div>
 
                 <div class="form-group">
                   <label>Name:</label>
-                  <input type="text" class="form-control" v-model="user_template_info.name">
+                  <input type="text" class="form-control" v-model="user_template_info.name" maxlength="150">
                 </div>
 
                 <div class="form-group">
                   <label>Version:</label>
-                  <input type="text" class="form-control" v-model="user_template_info.version">
+                  <input type="text" class="form-control" v-model="user_template_info.version" maxlength="50">
                 </div>
 
                 <div class="form-group">
                   <label>Organization:</label>
-                  <input type="text" class="form-control" v-model="user_template_info.organization">
+                  <input type="text" class="form-control" v-model="user_template_info.organization"  maxlength="150">
                 </div>
 
                 <div class="form-group">
                   <label>Author:</label>
-                  <input type="text" class="form-control" v-model="user_template_info.author">
+                  <input type="text" class="form-control" v-model="user_template_info.author"  maxlength="150">
                 </div>
 
                 <div class="form-group">
                   <label>Description:</label>
-                  <textarea style="height:200px;" class="form-control" v-model="user_template_info.description"></textarea>
+                  <textarea style="height:200px;"  maxlength="1000" class="form-control" v-model="user_template_info.description"></textarea>
                 </div>
 
-
-                <pre>{{user_template_info}}</pre>
               </div>
             </div>
 
