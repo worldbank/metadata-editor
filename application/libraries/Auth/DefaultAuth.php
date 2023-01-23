@@ -20,7 +20,7 @@ class DefaultAuth implements AuthInterface
     	$this->ci->load->helper('admin_notifications');
 
     	$this->ci->template->set_template('default');
-    	$this->ci->template->write('sidebar', $this->_menu(),true);
+    	//$this->ci->template->write('sidebar', $this->_menu(),true);
 
 		$this->ci->lang->load('general');
 		$this->ci->lang->load('users');
@@ -70,8 +70,8 @@ class DefaultAuth implements AuthInterface
 
 		//check if user is logged in
 		$this->_is_logged_in();
-		$this->ci->load->model('Licensed_model');
-		$this->ci->lang->load("licensed_request");
+		//$this->ci->load->model('Licensed_model');
+		//$this->ci->lang->load("licensed_request");
 
 		//get user info
 		$data['user']= $this->ci->ion_auth->get_user($this->ci->session->userdata('user_id'));
@@ -80,7 +80,7 @@ class DefaultAuth implements AuthInterface
 		$data['api_keys']=$this->ci->ion_auth->get_api_keys($this->ci->session->userdata('user_id'));
 
 		//get user licensed requests
-		$data['lic_requests']=$this->ci->Licensed_model->get_user_requests($data['user']->id);
+		//$data['lic_requests']=$this->ci->Licensed_model->get_user_requests($data['user']->id);
 
 		$content=$this->ci->load->view('auth/profile_view',$data,TRUE);
 

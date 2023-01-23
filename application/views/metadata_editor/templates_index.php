@@ -32,15 +32,7 @@
 
     <div class="wrapper">
 
-      <nav class="main-header navbar navbar-expand-md navbar-light navbar-white">
-        <a href="<?php echo site_url('editor');?>" class="navbar-brand"><i class="fas fa-compass"></i> <span class="brand-text font-weight-light">Metadata Editor</span></a>
-        <ul class="navbar-nav ml-auto">
-
-          <li class="nav-item">
-              <?php echo $this->load->view('user_menu/user-menu',null,true);?>                        
-          </li>
-        </ul>
-      </nav>
+      <?php echo $this->load->view('editor_common/header',null,true);?>  
 
       <div class="content-wrapper">
         <section class="content">
@@ -51,8 +43,8 @@
 
               <div class="projects col">
 
-                <div class="mt-3 mb-5">
-                    <h1>Templates</h1>
+                <div class=" mb-5">
+                    <h2>Templates</h2>
                     <div class="pull-right float-right">
                       <button type="button" @click="dialog_import_template=true" class="btn btn-sm btn-outline-primary">Import Template</button>
                     </div>
@@ -361,7 +353,7 @@
               console.log(response);
               vm.loadTemplates();
               if (response.data.template.uid) {
-                window.open(CI.base_url + '/admin/metadata_editor/templates/' + response.data.template.uid);
+                window.open(CI.base_url + '/editor/templates/' + response.data.template.uid);
               }
             })
             .catch(function(error) {
@@ -374,7 +366,7 @@
             });
         },
         editTemplate: function(uid) {
-          window.open(CI.base_url + '/admin/metadata_editor/templates/' + uid);
+          window.open(CI.base_url + '/editor/templates/' + uid);
         },
         getProjectIcon: function(type) {
           projectIcon = this.project_types_icons[type];

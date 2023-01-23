@@ -650,7 +650,7 @@
                 }*/
               }
             ).then(function(response) {
-              //window.location.href = CI.base_url + '/admin/metadata_editor/templates';
+              //window.location.href = CI.base_url + '/editor/templates';
               alert("Your changes have been saved!");
             })
             .catch(function(response) {
@@ -659,7 +659,7 @@
             });
         },
         cancelTemplate: function() {
-          window.location.href = CI.base_url + '/admin/metadata_editor/templates';
+          window.location.href = CI.base_url + '/editor/templates';
         },
         coreTemplatePartsHelpText: function(element) {
           if (element && element.help_text) {

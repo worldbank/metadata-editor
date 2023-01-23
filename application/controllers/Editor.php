@@ -1,8 +1,7 @@
 <?php
 /**
- * Catalog Maintenance Controller
+ * Metadata editor
  *
- * handles all Catalog Maintenance pages
  *
  */
 class Editor extends MY_Controller {
@@ -14,67 +13,16 @@ class Editor extends MY_Controller {
       	parent::__construct();
 		$this->load->model('Editor_model');
 		$this->load->model('Editor_template_model');
-
-     	/*$this->load->model('Catalog_model');
-		$this->load->model('Licensed_model');
-		$this->load->model('Form_model');
-		$this->load->model('Data_classification_model');
-		$this->load->model('Repository_model');
-		$this->load->model('Citation_model');
-		$this->load->model('Search_helper_model');
-		$this->load->model('Catalog_admin_search_model');
-		$this->load->library('pagination');
-		$this->load->helper('querystring_helper','url');
-		$this->load->helper('form');
-		//$this->load->helper("catalog");
-		*/
-		//$this->template->set_template('admin'); 
-
-		/*
-		$this->load->library("Dataset_manager");
-
-		//load language file
-		$this->lang->load('general');
-		$this->lang->load('catalog_search');
-		$this->lang->load('catalog_admin');
-		$this->lang->load('permissions');
-		$this->lang->load('resource_manager');
-
-		*/
-		/*
-
-		//$this->output->enable_profiler(TRUE);
-		//$this->acl->clear_active_repo();
-
-		//set active repo
-		$repo_obj=(object)$this->Repository_model->select_single($this->Repository_model->user_active_repo());
-
-		if (empty($repo_obj) || $this->Repository_model->user_active_repo()==0){
-			//set active repo to CENTRAL
-			$data=$this->Repository_model->get_central_catalog_array();
-			$this->active_repo=(object)$data;
-		}
-		else{
-			//set active repo
-			$this->active_repo=$repo_obj;
-			$data=$this->Repository_model->get_repository_by_repositoryid($repo_obj->repositoryid);
-		}
-
-		//set collection sticky bar options
-		$collection=$this->load->view('repositories/repo_sticky_bar',$data,TRUE);
-		$this->template->add_variable($name='collection',$value=$collection);
-		*/
 	}
 
 	function index()
 	{
-		//$this->template->set_template('admin5');
+		$this->template->set_template('default');
 		echo $this->load->view('metadata_editor/home',$options=array(),true);
 
 		//$this->template->write('content', $content,true);
 		//$this->template->render();
 	}
-	
 
 	function edit($id=null)
 	{
@@ -217,22 +165,26 @@ class Editor extends MY_Controller {
 		if ($uid){
 			return $this->template_edit($uid);
 		}
-
+		
 		echo $this->load->view('metadata_editor/templates_index',$options=array(),true);
 	}
 
 	function template_edit($uid)
 	{
-		$this->template->set_template('blank');
-		//echo "edit template" . $uid;
-
+		$this->template->set_template('blank');		
 		$user_template=$this->Editor_template_model->get_template_by_uid($uid);
 
 		if(!$user_template){
 			show_error("Template not found");
 		}
 
-		$core_template=$this->Editor_template_model->get_core_template_json($user_template['data_type']);
+		$core_templates=$this->Editor_template_model->get_core_template_by_data_type($user_template['data_type']);
+
+		if (!$core_templates){
+			throw new Exception("No system templates found for type: " . $user_template['data_type']);
+		}
+
+		$core_template=$this->Editor_template_model->get_template_by_uid($core_templates[0]["uid"]);
 
 		$options=array(
 			'user_template_info'=>$user_template,
@@ -241,7 +193,6 @@ class Editor extends MY_Controller {
 		);
 
 		unset($options['user_template_info']['template']);
-
 		echo $this->load->view('template_manager/index',$options,true);
 	}
 

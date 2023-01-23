@@ -79,7 +79,5 @@
         </div>
     </div>
 
-    <?php $this->load->view('access_licensed/request_list', array('data' => $lic_requests)); ?>
-
 
 </div> <!-- /.container -->
