@@ -21,7 +21,7 @@
 
                         <?php /* text only */ ?>
                         <a href="<?php echo site_url();?>" style="color:white;padding-top:20px;" >
-                            <?php echo $this->config->item("website_title");?>
+                            Metadata Editor [beta]
                         </a>                        
                         <?php /* */?>
                         </div>
@@ -44,7 +44,7 @@
                                             if (year < 2000)
                                                 year = year + 1900 + ", ";
                                             document.write(year); // End -->
-                                        </script> <?php echo $this->config->item("website_title");?>, All Rights Reserved.
+                                        </script> Metadata editor, All Rights Reserved.
                                     </small>
 
                                 </p>

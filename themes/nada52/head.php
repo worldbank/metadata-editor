@@ -2,7 +2,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title><?php echo $title; ?></title>
+<title>Metadata editor [beta]</title>
 <?php /* <base href="<?php echo base_url(); ?>"> */ ?>
 <?php if (isset($_meta) ){ echo $_meta;} ?>
 

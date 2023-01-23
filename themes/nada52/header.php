@@ -18,11 +18,11 @@
     <?php //language bar ?>
     <?php require 'lang-bar.php';?>
 
-    <div class="container">
+    <div class="container-fluid px-0">
 
         <div class="row">
             <div class="col-12">
-                <nav class="navbar navbar-expand-md navbar-light rounded navbar-toggleable-md wb-navbar">
+                <nav class="navbar sticky-top shadow navbar-expand-md navbar-light rounded navbar-toggleable-md wb-navbar">
 
                     <?php /**
                      * 
@@ -48,8 +48,8 @@
                     <?php /**/ ?>
                     <div class="navbar-brand no-logo">
                         <div class="navbar-brand--sitename">
-                            <div><a class="nada-site-title" href="<?php echo site_url(); ?>"><?php echo $this->config->item("website_title"); ?></a></div>
-                            <div class="nada-site-subtitle">Data Catalog</div>
+                            <div><a class="nada-site-title" href="<?php echo site_url(); ?>">Metadata editor</a></div>
+                            <div class="nada-site-subtitle">Beta</div>
                         </div>
                     </div>
                     <?php /**/?>

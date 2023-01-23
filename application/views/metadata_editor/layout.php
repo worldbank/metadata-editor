@@ -4,7 +4,7 @@
 
     <div class="bg-dark  pt-3 pl-2" >
         <?php // <div class="float-right pt-0 pr-2"><v-icon dark small>mdi-cog</v-icon></div> ?>
-        <a href="<?php echo site_url('admin/metadata_editor/');?>" class="brand-link-editor pb-4" style="display:block;">
+        <a href="<?php echo site_url('editor/');?>" class="brand-link-editor pb-4" style="display:block;">
             <i class="fas fa-compass"></i>
             <span class="brand-text font-weight-light">Metadata Editor</span>
         </a>
@@ -137,10 +137,10 @@
                         </a>
                     </li>
 
+
+
                     <li class="nav-item">
-                        <a class="nav-link" href="#" role="button" title="<?php echo $user=strtoupper($this->session->userdata('username'));?>">
-                        <i class="fas fa-user"></i> 
-                        </a>
+                        <?php echo $this->load->view('user_menu/user-menu',null,true);?>                        
                     </li>
                 </ul>
             </nav>

@@ -6,8 +6,22 @@ $bootstrap_theme = 'themes/' . $this->template->theme();
 
 $data = array();
 //side menu
-$data['menus'] = $this->Menu_model->select_all();
-$sidebar = $this->load->view('default_menu', $data, true);
+$data['menus'] = [];//$this->Menu_model->select_all();
+
+$data['menus']=array(
+    array(
+        'title'=>'Projects',
+        'url'=>site_url('editor'),
+        'target'=>''
+    ),
+    array(
+        'title'=>'Templates',
+        'url'=>site_url('editor/templates'),
+        'target'=>''
+    )
+);
+
+$sidebar = '';//$this->load->view('default_menu', $data, true);
 
 // Inject current pages as classes in the body wrapper 
 $uri_ = $this->uri->segment_array();
@@ -41,21 +55,9 @@ $use_cdn = true;
     <?php include_once 'header.php'; ?>
 
     <!-- page body -->
-    <div class="wp-page-body <?php echo $content_wrap_class; ?>">
+    <div class="wp-page-body <?php echo $content_wrap_class; ?> mt-5">
 
         <div class="body-content-wrap theme-nada-2">
-
-            <!--breadcrumbs -->
-            <div class="container">
-                <?php $breadcrumbs_str = $this->breadcrumb->to_string(); ?>
-                <?php if ($breadcrumbs_str != '') : ?>
-                    <ol class="breadcrumb wb-breadcrumb">
-                        <?php echo $breadcrumbs_str; ?>
-                    </ol>
-                <?php endif; ?>
-            </div>
-            <!-- /breadcrumbs -->
-
             <?php echo isset($content) ? $content : ''; ?>
         </div>
     </div>

@@ -90,19 +90,6 @@ class Template {
 	 	$this->base_url=base_url();
 	 }
 	 
-	 //set cs/js version
-	 $this->version=date("mY");	
-	 
-	 if ($this->CI->config->item('js_css_version') )
-	 {
-	 	$this->version=$this->CI->config->item('js_css_version');
-	 }
-	 else
-	 {
-	 	//add key if not exist
-		$this->CI->load->model('Configurations_model');
-	 	$this->CI->Configurations_model->add($name='js_css_version', $value=date("U"),$label='JS/CSS version');		
-	 }
  }
    
    //returns the js/css version number

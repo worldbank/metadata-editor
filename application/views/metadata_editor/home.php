@@ -34,13 +34,13 @@
 
       <nav class="main-header navbar navbar-expand-md navbar-light navbar-white">
 
-        <a href="<?php echo site_url('admin/metadata_editor'); ?>" class="navbar-brand"><i class="fas fa-compass"></i> <span class="brand-text font-weight-light">Metadata Editor</span></a>
+        <a href="<?php echo site_url('editor'); ?>" class="navbar-brand"><i class="fas fa-compass"></i> <span class="brand-text font-weight-light">Metadata Editor</span></a>
 
 
 
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
-            <a class="nav-link" href="<?php echo site_url('admin/metadata_editor/templates'); ?>" role="button">
+            <a class="nav-link" href="<?php echo site_url('editor/templates'); ?>" role="button">
               Templates
             </a>
           </li>
@@ -398,7 +398,7 @@
               console.log(response);
               vm.loadProjects();
               if (response.data.project) {
-                window.open(CI.base_url + '/admin/metadata_editor/edit/' + response.data.project.id);
+                window.open(CI.base_url + '/editor/edit/' + response.data.project.id);
               }
             })
             .catch(function(error) {
@@ -411,7 +411,7 @@
             });
         },
         EditProject: function(id) {
-          window.open(CI.base_url + '/admin/metadata_editor/edit/' + id);
+          window.open(CI.base_url + '/editor/edit/' + id);
         },
         DeleteProject: function (id)
         {

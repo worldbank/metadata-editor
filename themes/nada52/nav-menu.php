@@ -3,7 +3,7 @@
 <div class="navbar-collapse collapse" id="containerNavbar" aria-expanded="false">
 <?php if (isset($menus)): ?>
     <?php $current_page=current_url();?>
-    <ul class="navbar-nav ml-auto">
+    <ul class="navbar-nav">
         <?php foreach($menus as $item):?>
             <?php
             if ($item['target']==1){
@@ -21,9 +21,10 @@
             <li class="nav-item">
                 <a <?php echo $target; ?> <?php echo ($item['url']==$current_page) ? 'class="nav-link active"' : ''; ?> class="nav-link" href="<?php echo html_escape($item['url']);?>"><?php echo $item['title'];?></a>
             </li>            
-        <?php endforeach; ?>
-
-        <?php require 'user-menu.php';?>
+        <?php endforeach; ?>        
+    </ul>
+    <ul  class="navbar-nav ml-auto">
+    <?php require 'user-menu.php';?>
     </ul>
 <?php endif;?>
 

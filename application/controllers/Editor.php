@@ -28,7 +28,7 @@ class Editor extends MY_Controller {
 		$this->load->helper('form');
 		//$this->load->helper("catalog");
 		*/
-		$this->template->set_template('admin'); 
+		//$this->template->set_template('admin'); 
 
 		/*
 		$this->load->library("Dataset_manager");
@@ -68,36 +68,13 @@ class Editor extends MY_Controller {
 
 	function index()
 	{
-		$this->template->set_template('admin5');
+		//$this->template->set_template('admin5');
 		echo $this->load->view('metadata_editor/home',$options=array(),true);
 
 		//$this->template->write('content', $content,true);
 		//$this->template->render();
 	}
-
-	function metadata_editor_files($id)
-	{
-		$survey=$this->dataset_manager->get_row($id);
-
-		if (!$survey){
-			show_error('Survey was not found');
-		}
-
-		$this->acl_manager->has_access_or_die('study', 'edit',null,$survey['repositoryid']);
-
-		$this->load->model("Data_file_model");
-
-		$options=array(
-			'survey'=>$survey,
-			'files'=>$this->Data_file_model->get_all_by_survey($id)
-		);
-
-		//render
-		$this->template->set_template('admin5');
-		$content= $this->load->view('metadata_editor/microdata_files',$options,true);
-		$this->template->write('content', $content,true);
-		$this->template->render();
-	}
+	
 
 	function edit($id=null)
 	{
@@ -142,10 +119,6 @@ class Editor extends MY_Controller {
 		$options['type']=$project['type'];		
 		$options['metadata']=$project['metadata'];
 
-		if($project['type']=='geospatial'){
-			//show_error('GEOSPATIAL-TYPE-NOT-SUPPORTED');
-		}
-
 		//fix schema elements with mixed types
 		if ($project['type']=='survey'){
 			//coll_mode
@@ -164,8 +137,13 @@ class Editor extends MY_Controller {
 		}
 		
 		if (empty($template)){
+			$core_templates_by_type=$this->Editor_template_model->get_core_templates_by_type($project['type']);
+			if (!$core_templates_by_type){
+				throw new Exception("Template not found for type", $project['type']);
+			}
+
 			//load default core template by type
-			$template=$this->Editor_template_model->get_template_by_uid('core-'.$project['type']);
+			$template=$this->Editor_template_model->get_template_by_uid($core_templates_by_type[0]["uid"]);
 		}
 
 		$options['metadata_template']=json_encode($template);
@@ -240,7 +218,6 @@ class Editor extends MY_Controller {
 			return $this->template_edit($uid);
 		}
 
-		$this->template->set_template('admin5');
 		echo $this->load->view('metadata_editor/templates_index',$options=array(),true);
 	}
 

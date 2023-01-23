@@ -33,13 +33,11 @@
     <div class="wrapper">
 
       <nav class="main-header navbar navbar-expand-md navbar-light navbar-white">
-        <a href="<?php echo site_url('admin/metadata_editor');?>" class="navbar-brand"><i class="fas fa-compass"></i> <span class="brand-text font-weight-light">Metadata Editor</span></a>
+        <a href="<?php echo site_url('editor');?>" class="navbar-brand"><i class="fas fa-compass"></i> <span class="brand-text font-weight-light">Metadata Editor</span></a>
         <ul class="navbar-nav ml-auto">
 
           <li class="nav-item">
-            <a class="nav-link" href="#" role="button">
-              <i class="fas fa-user"></i> <?php echo $user = strtoupper($this->session->userdata('username')); ?>
-            </a>
+              <?php echo $this->load->view('user_menu/user-menu',null,true);?>                        
           </li>
         </ul>
       </nav>
