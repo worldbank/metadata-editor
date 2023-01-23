@@ -3,31 +3,20 @@ Vue.component('list-component', {
     props:['value','columns','path', 'field'],
     data: function () {    
         return {
-            //field_data: this.value,
-            key_path: this.path,
-            store: this.$store,
             sort_asc:true
         }
     },
     watch: { 
-        /*field_data:
-        {
-            get(){
-                return this.value;
-            },
-            set(val){
-                this.$emit('update:value', val);
-            }
-        } */   
+        
+        /*field_data(new_, old_) {
+            console.log("watching ",old_, new_);    
+        }*/
+    
     },
     
-    created: function () {
-        if (!this.field_data){
-            this.field_data=new Array(1);
-        }
-        
-        if (!Array.isArray(this.field_data)){
-            this.field_data=new Array(1);
+    created: function () {           
+        if (!Array.isArray(this.value)){
+            this.$emit('update:value', []);
         }
     },
     computed: {
@@ -37,6 +26,9 @@ Vue.component('list-component', {
         field_data:
         {
             get(){
+                if (!Array.isArray(this.value)){
+                    return [""];
+                }
                 return this.value;
             },
             set(val){
@@ -62,7 +54,7 @@ Vue.component('list-component', {
                 </thead>
                 <!--start-v-for-->
                 <tbody is="draggable" :list="field_data" tag="tbody">
-                <tr  v-for="(item,index) in field_data">
+                <tr  v-for="(item,index) in field_data" :key="index">
                     <td><span class="move-row" title="Drag to move">
                         <i aria-hidden="true" class="v-icon notranslate mdi mdi-drag"></i>
                     </span></td>
@@ -94,6 +86,11 @@ Vue.component('list-component', {
             return this.field_data.length;
         },
         addRow: function (){
+            
+            if (!Array.isArray(this.field_data)){            
+                this.field_data=new Array();
+            }
+            
             this.field_data.push(undefined);
             this.$emit('update:value', this.field_data);
         },

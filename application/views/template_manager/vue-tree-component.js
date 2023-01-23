@@ -1,11 +1,11 @@
 /// view treeview component
 Vue.component('nada-treeview', {
-    props:['value','initially_open','cut_fields'],
+    props:['value','initially_open','tree_active_items','cut_fields'],
     data: function () {    
         return {
             template: this.value,
             initiallyOpen:[],
-            tree_active_items:[],
+            //tree_active_items:[],
             files: {
               html: 'mdi-language-html5',
               js: 'mdi-nodejs',
@@ -23,6 +23,14 @@ Vue.component('nada-treeview', {
     },
     
     computed: {
+        TreeActiveItems: {
+          get: function() {
+            return this.tree_active_items;
+          },
+          set: function(newValue) {
+            //todo
+          }          
+        },
         Items(){
             return this.value;
         },
@@ -92,7 +100,7 @@ Vue.component('nada-treeview', {
                   color="warning"
                   v-model="value"                   
                   :open.sync="initiallyOpen" 
-                  :active.sync="tree_active_items"
+                  :active.sync="TreeActiveItems"
                   @update:open="onTreeOpen" 
                   :items="Items" 
                   activatable dense 
@@ -102,7 +110,7 @@ Vue.component('nada-treeview', {
                   indeterminate-icon="mdi-bookmark-minus"
                   on-icon="mdi-bookmark"
                   off-icon="mdi-bookmark-outline"
-                  item-children="items"
+                  item-children="items"                  
               >
 
                 <template #label="{ item }" >

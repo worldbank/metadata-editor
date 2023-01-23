@@ -15,61 +15,77 @@
 |
 */
 
-$config['survey']=array(
+$config['survey'][]=array(
         'template' => 'metadata_editor/metadata_editor_templates/survey_form_template.json',
-        'lang'=>'en'
-); 
+        'lang'=>'en',        
+        'uid'=>'microdata-system-en'
+);
 
-$config['timeseries']=array(
+$config['timeseries'][]=array(
     'template' => 'metadata_editor/metadata_editor_templates/timeseries_form_template.json',
-    'lang'=>'en'
+    'lang'=>'en',
+    'uid'=>'timeseries-system-en'
 ); 
 
-$config['timeseries-db']=array(
+$config['timeseries-db'][]=array(
     'template' => 'metadata_editor/metadata_editor_templates/timeseries-db_form_template.json',
-    'lang'=>'en'
+    'lang'=>'en',
+    'uid'=>'timeseries-db-system-en'
 ); 
 
 
-$config['script']=array(
+$config['script'][]=array(
     'template' => 'metadata_editor/metadata_editor_templates/script_form_template.json',
-    'lang'=>'en'
+    'lang'=>'en',
+    'uid'=>'script-system-en'
 ); 
 
 
 //geospatial
-$config['geospatial']=array(
+$config['geospatial'][]=array(
         'template' => 'metadata_editor/metadata_editor_templates/geospatial_form_template.json',
-        'lang'=>'en'
+        'lang'=>'en',
+        'uid'=>'geospatial-system-en'
 );
 
 //document
-$config['document']=array(
+$config['document'][]=array(
     'template' => 'metadata_editor/metadata_editor_templates/document_form_template.json',
-    'lang'=>'en'
+    'lang'=>'en',
+    'uid'=>'document-system-en'
 );
 
 //table
-$config['table']=array(
+$config['table'][]=array(
     'template' => 'metadata_editor/metadata_editor_templates/table_form_template.json',
-    'lang'=>'en'
+    'lang'=>'en',
+    'uid'=>'table-system-en'
 ); 
 
 //image
-$config['image']=array(
+$config['image'][]=array(
     'template' => 'metadata_editor/metadata_editor_templates/image_form_template.json',
-    'language_translations'=>'en'
+    'lang'=>'en',
+    'uid'=>'image-system-en'
 ); 
 
 
 //visualization
-$config['visualization']=array(
+/*$config['visualization']=array(
     'template' => 'metadata_templates/visualization-template',
     'language_translations'=>'fields_visualization'
-); 
+);*/ 
 
 //video
-$config['video']=array(
+$config['video'][]=array(
     'template' => 'metadata_editor/metadata_editor_templates/video_form_template.json',
-    'language_translations'=>'en'
+    'lang'=>'en',
+    'uid'=>'video-system-en'
+); 
+
+
+$config['resource'][]=array(
+    'template' => 'metadata_editor/metadata_editor_templates/resource_form_template.json',
+    'lang'=>'en',
+    'uid'=>'resource-system-en'
 ); 

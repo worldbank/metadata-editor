@@ -41,25 +41,34 @@ class Editor_template_model extends ci_model {
 		if (!isset($config)){		
 			throw new Exception("config/editor_templates not loaded");
 		}
+
+		//echo "<pre>";
+		//print_r($config);
+		//die();
 		
-		foreach($config as $key=>$template){
-			$template_json='';
-			$template_path=APPPATH.'/views/'.$template['template'];
+		foreach($config as $key=>$templates){
 
-			if (file_exists($template_path)){
-				$template_json=$template['template'];//json_decode(file_get_contents($template_path),true);
-			}
-			else{
-				//throw new Exception("template not found" .$template_path);
-			}
+			foreach($templates as $idx=>$template){
 
-			$this->core_templates[]=array(
-				'uid'=>'core-'.$key,
-				'template_type'=>'core',
-				'name'=> $key. ' - default',
-				'data_type'=>$key,
-				'template'=>$template_json
-			);
+				$template_json='';
+				$template_path=APPPATH.'/views/'.$template['template'];
+
+				if (file_exists($template_path)){
+					$template_json=$template['template'];//json_decode(file_get_contents($template_path),true);
+				}
+				else{
+					//throw new Exception("template not found" .$template_path);
+				}
+
+				$this->core_templates[]=array(
+					'uid'=>$template['uid'],
+					'template_type'=>'core',
+					'name'=> $key. ' - default',
+					'data_type'=>$key,
+					'lang'=>$template['lang'],
+					'template'=>$template_json
+				);
+			}
 		}
 	}
 
@@ -72,6 +81,19 @@ class Editor_template_model extends ci_model {
 		}
 	}
 
+	function get_core_templates_by_type($type)
+	{
+		$templates_=array();
+		foreach($this->core_templates as $template_type=>$templates){			
+			if ($type==$template_type){
+				$templates_[]= $templates;
+			}
+		}
+
+		return $templates_;
+	}
+
+
 	function get_custom_template_by_uid($uid)
 	{
 		return $this->select_single($uid);
@@ -82,7 +104,7 @@ class Editor_template_model extends ci_model {
 		//check core
 		$template=$this->get_core_template_by_uid($uid);
 		if ($template){
-			$template['template']=$this->get_core_template_json($template['data_type']);
+			$template['template']=$this->get_core_template_json($template['uid']);
 			return $template;
 		}
 
@@ -104,7 +126,7 @@ class Editor_template_model extends ci_model {
 		$this->db->where("data_type",$type);
 		$result= $this->db->get('editor_templates')->result_array();
 
-		$core[]=$this->get_core_template_by_data_type($type);
+		$core=$this->get_core_template_by_data_type($type);
 
 		array_splice($result,0,0,$core);
 		return $result;
@@ -112,26 +134,28 @@ class Editor_template_model extends ci_model {
 
 	function get_core_template_by_data_type($data_type)
 	{
+		$core_=array();
 		foreach($this->core_templates as $template){
 			if ($template['data_type']==$data_type){
-				return $template;
+				$core_[]=$template;
 			}
 		}
 		
-		return false;
+		return $core_;
 	}
 
-	function get_core_template_json($data_type)
+	function get_core_template_json($uid)
 	{
-		$template=$this->get_core_template_by_data_type($data_type);
-		if($template!==false ){
-			$template_path=APPPATH.'/views/'.$template["template"];
-			if (file_exists($template_path)){
+		foreach($this->core_templates as $template){
+			if ($template['uid']==$uid){				
+				$template_path=APPPATH.'/views/'.$template["template"];
+				if (!file_exists($template_path)){
+					throw new Exception("Template not found:",$template['template']);
+				}
+
 				return json_decode(file_get_contents($template_path),true);
 			}
-		}
-
-		return false;
+		}		
 	}
 
     /**
@@ -148,8 +172,37 @@ class Editor_template_model extends ci_model {
 		$this->db->order_by('changed','DESC');
 		$result= $this->db->get('editor_templates')->result_array();
 
+		$default_templates=$this->get_all_default_templates();
+
+		$defaults=array();
+		foreach($default_templates as $row)
+		{
+			$defaults[$row['data_type']]=$row['template_uid'];
+		}
+
+		foreach($result as $idx=>$row)
+		{
+			if (isset($defaults[$row['data_type']]) && $defaults[$row['data_type']] == $row['uid']){				
+				$result[$idx]["default"]=true;
+			}else
+			{
+				$result[$idx]["default"]=false;
+			}
+		}
+
+		$core_templates=$this->core_templates;
+		foreach($core_templates as $idx=>$row)
+		{
+			if (isset($defaults[$row['data_type']]) && $defaults[$row['data_type']] == $row['uid']){				
+				$core_templates[$idx]["default"]=true;
+			}else
+			{
+				$core_templates[$idx]["default"]=false;
+			}
+		}	
+
 		return [
-			'core'=>$this->core_templates,
+			'core'=>$core_templates,
 			'custom'=>$result
 		];
 	}
@@ -265,7 +318,7 @@ class Editor_template_model extends ci_model {
 				$template['template']=json_decode($template['template'],true);
 			}
 		}else{
-			$template['template']=$this->get_core_template_json($template['data_type']);
+			$template['template']=$this->get_core_template_json($template['uid']);
 		}
 
 		if(!$template){
@@ -314,6 +367,39 @@ class Editor_template_model extends ci_model {
 			}
 		}
 	}
+
+
+	function get_all_default_templates()
+	{
+		$this->db->select("*");
+		return $this->db->get("editor_templates_default")->result_array();
+	}
+
+	function get_default_template($type)
+	{
+		$this->db->select("*");
+		return $this->db->where("data_type",$type)->row_array();
+	}
+
+	function set_default_template($type,$template_uid)
+	{
+		$this->remove_default_template($type);
+
+		$options=array(
+			'template_uid'=>$template_uid,
+			'data_type'=>$type
+		);
+
+		return $this->db->insert("editor_templates_default",$options);
+	}
+
+	function remove_default_template($type)
+	{
+		$this->db->where("data_type",$type);
+		return $this->db->delete("editor_templates_default");
+	}
+
+
 
     
 }

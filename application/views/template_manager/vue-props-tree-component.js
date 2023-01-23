@@ -56,7 +56,12 @@ Vue.component('props-treeview', {
     methods:{
       treeClick: function (node){
         this.initiallyOpen.push(node.key);
-        this.active_prop=node;                
+        this.active_prop=node;
+      },
+      EnumUpdate: function(e) {
+        if (!this.active_prop.enum) {
+          this.$set(this.active_prop, "enum", []);
+        }
       },
       onTreeOpen: function (node){
         console.log("tree node open");
@@ -67,7 +72,7 @@ Vue.component('props-treeview', {
 
         _.map(props_arr,function (d) {
             if (d.props){
-              d.prop_key=parent_key + "." + d.key;
+              d.prop_key=parent_key + "." + d.key;              
               return vm.getProps(d.props,parent_key + "." + d.key);
             }
             return d.prop_key=parent_key + "." + d.key;
@@ -254,7 +259,7 @@ Vue.component('props-treeview', {
             <div class="row">
               <div class="col-md-4 border">
                 <div class="row">
-                  <div class="col-md-11">
+                  <div class="col-md-11" style="min-height: 30vh; max-height:80vh; overflow: auto;">
 
                     <template>
                       <v-treeview                   
@@ -296,7 +301,7 @@ Vue.component('props-treeview', {
                 
                 </div>
                 <div  class="col-md-1">
-                  <div style="margin:-3px;" >
+                  <div style="margin:-3px;position:sticky;top:10px;" >
 
                     <div>
                       <v-icon v-if="active_prop.key" color="#3498db" @click="deleteProp()">mdi-minus-box</v-icon>
@@ -315,8 +320,9 @@ Vue.component('props-treeview', {
                 </div>
               </div>
 
-              <div class="mt-4" v-if="UnusedSiblings.length>0">
+              <div class="mt-5 border-top pt-5" style="min-height: 40vh; max-height:80vh; overflow: auto;">
                 <strong>Available items:</strong>
+                <div class="border p-3 m-3" v-if="UnusedSiblings.length==0">None</div>
                 <div v-for="(item,index) in UnusedSiblings" :key="item.prop_key" class="border-top mb-2">
                   <div @click="addSubItem(item)">
                     <div style="cursor:pointer">
@@ -333,22 +339,7 @@ Vue.component('props-treeview', {
             
             <div class="col-md-8 border">
               <div v-if="active_prop.key">
-                <div class="form-group">
-                    <label for="name">Label:</label>
-                    <input type="text" class="form-control" v-model="active_prop.title">
-                    <div class="text-secondary font-small" style="margin-top:4px;font-size:small"><span class="pl-3">Name: {{active_prop.key}}</span></div>
-                </div>
-
-                <div class="form-group">
-                    <label for="name">Description:</label>
-                    <textarea class="form-control" v-model="active_prop.help_text"/>
-                </div>
-
-                <div class="form-group">
-                    <label for="name">Type:</label>
-                    <input type="text" class="form-control" v-model="active_prop.type">
-                    <div class="text-secondary font-small" style="margin-top:4px;font-size:small"><span class="pl-3">Name: {{active_prop.key}}</span></div>
-                </div>
+                <prop-edit :key="active_prop.prop_key" v-model="active_prop"></prop-edit>
               </div>
               <div v-else class="border p-3">Click on an item to edit</div>
 

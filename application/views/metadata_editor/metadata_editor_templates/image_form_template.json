@@ -11,109 +11,119 @@
                 {
                     "type": "section",
                     "key": "metadata_information",
-                    "title": "Description",
+                    "title": "Metadata description",
                     "class": "recommended",
                     "items": [
                         {
                             "key": "metadata_information.title",
-                            "title": "Title",
+                            "title": "Document title",
                             "type": "text",
                             "class": "required",
-                            "help_text": "Document title"
+                            "help_text": "The title of the image metadata. This can be the same as the image title."
                         },
                         {
                             "key": "metadata_information.idno",
-                            "title": "IDNO",
+                            "title": "Document identifier",
                             "type": "text",
                             "class": "required",
-                            "help_text": "Unique ID number for the document"
+                            "help_text": "The unique identifier of the image metadata document (which can be different from the image identifier)."
                         },
                         {
                             "key": "metadata_information.producers",
-                            "title": "List of producers",
+                            "title": "Metadata producer",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "class": "required",
                                     "required": true,
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "metadata_information.producers.name"
                                 },
-                                "abbr": {
+                                {
                                     "key": "abbr",
                                     "title": "Abbrevation",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "metadata_information.producers.abbr"
                                 },
-                                "affiliation": {
+                                {
                                     "key": "affiliation",
                                     "title": "Affiliation",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "metadata_information.producers.affiliation"
                                 },
-                                "role": {
+                                {
                                     "key": "role",
                                     "title": "Role",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "metadata_information.producers.role"
                                 }
-                            }
+                            ],
+                            "is_recommended": true,
+                            "help_text": "A list of persons or organizations involved in the documentation (production of the metadata) of the image.\n\n- Name: The name of the person or agency that is responsible for the documentation of the image.\n- Abbreviation: Abbreviation (acronym) of the agency mentioned in name.\n- Affiliation: Affiliation of the person or agency mentioned in name.\n- Role: The specific role of the person or agency mentioned in name in the production of the metadata. This element will be used when more than one person or organization is listed in the producers element to distinguish the specific contribution of each metadata producer."
                         },
                         {
                             "key": "metadata_information.production_date",
-                            "title": "Date of Production",
+                            "title": "Production date",
                             "type": "text",
                             "class": "required",
-                            "help_text": "Document production date using format(YYYY-MM-DD)"
+                            "help_text": "The date the image metadata was generated (not the date the image was created), preferably entered in ISO 8601 format (YYYY-MM-DD or YYYY-MM or YYYY).",
+                            "is_recommended": true
                         },
                         {
                             "key": "metadata_information.version",
                             "title": "Document version",
                             "type": "text",
                             "class": "required",
-                            "help_text": "Identify and describe the current version of the document"
+                            "help_text": "The version of the metadata on this image. This element will rarely be used."
                         }
                     ]
-                }                
+                }
             ]
         },
         {
             "type": "section_container",
             "key": "identification",
-            "title": "Identification",
+            "title": "Image identifiers",
             "class": "recommended",
             "items": [
                 {
                     "key": "image_description.idno",
-                    "title": "IDNOx",
+                    "title": "Main identifier",
                     "type": "text",
                     "class": "required",
                     "required": true,
-                    "help_text": "Unique ID number for the image",
+                    "help_text": "The (main) unique identifier of the image, to be used for cataloguing purpose.",
                     "rules": {
-                        "required":true,
-                        "alpha_dash":true,
-                        "min":5,
-                        "max":800
-                    }
+                        "required": true,
+                        "alpha_dash": true,
+                        "min": 5,
+                        "max": 800
+                    },
+                    "is_required": true
                 },
                 {
                     "key": "image_description.identifiers",
                     "title": "Other identifiers",
                     "type": "array",
                     "required": true,
-                    "help_text": "",
-                    "props": {
-                        "type": {
+                    "help_text": "The repeatable element identifiers is used to list image identifiers other than the one used in idno. Some images may have unique identifiers assigned by different organizations or cataloguing systems; this element is used to document them.\n\nThis element is used to enter image identifiers (IDs) other than the catalog ID entered in the \"Main identifier\" element. It can for example be a Digital Object Identifier (DOI), or the EXIF identifier. Note that the ID entered in the \"Main identifier\" element can be repeated here (\"Main identifier\" does not provide a type parameter, that curators may want to document).\n\n- Type: The type of identifier. This could be for example “DOI”.\n- Identifier: The identifier itself.",
+                    "props": [
+                        {
                             "key": "type",
                             "title": "Identifier type",
                             "description": "Type of identifier e.g. `doi`, `handle`, `other`",
-                            "type": "text"
+                            "type": "text",
+                            "prop_key": "image_description.identifiers.type"
                         },
-                        "identifier": {
+                        {
                             "key": "identifier",
                             "title": "Identifier",
-                            "type": "text"
+                            "type": "text",
+                            "prop_key": "image_description.identifiers.identifier"
                         }
-                    }
+                    ]
                 }
             ]
         },
@@ -122,11 +132,11 @@
             "key": "iptc",
             "title": "IPTC",
             "class": "recommended",
-            "items":[
+            "items": [
                 {
                     "type": "section",
                     "key": "photoVideoMetadataIPTC",
-                    "title": "photoVideoMetadataIPTC",
+                    "title": "IPTC metadata",
                     "class": "recommended",
                     "items": [
                         {
@@ -134,892 +144,1015 @@
                             "title": "Title",
                             "type": "text",
                             "class": "required",
-                            "help_text": "A shorthand reference for the digital image. Title provides a short human readable name which can be a text and/or numeric reference. It is not the same as Headline."
+                            "help_text": "The title is a shorthand reference for the digital image. It provides a short verbal and human readable name which can be a text and/or a numeric reference. It is not the same as the Headline (see below). Some may use the title field to store the file name of the image, though the field may be used in many ways. This element should not be used to provide the unique identifier of the image."
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.imageSupplierImageId",
-                            "title": "Image Supplier Image ID",
+                            "title": "Image supplier image ID",
                             "type": "text",
-                            "help_text": "Optional identifier assigned by the Image Supplier to the image."
+                            "help_text": "A unique identifier assigned by the image supplier to the image."
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.registryEntries",
-                            "title": "Registry Entries",
-                            "help_text": "Both a Registry Item Id and a Registry Organisation Id to record any registration of this digital image with a registry.",
+                            "title": "Registry entries",
+                            "help_text": "A structured element used to provide cataloguing information (i.e. an entry in a registry). It includes the unique identifier for the image issued by the registry and the registry’s organization identifier.\n\n- Role: An identifier of the reason and/or purpose for this Registry Entry.\n- Asset Identifier: A unique identifier created by the registry and applied by the creator of the digital image. This value shall not be changed after being applied. This identifier is linked to a corresponding Registry Organization Identifier. Enter the unique identifier created by a registry and applied by the creator of the digital image. This value shall not be changed after being applied. This identifier may be globally unique by itself, but it must be unique for the issuing registry. An input to this field should be made mandatory.\n- Registry identifier: An identifier for the registry/organization which issued the corresponding Registry Image Id.",
                             "type": "array",
-                            "props": {
-                                "role": {
+                            "props": [
+                                {
                                     "key": "role",
                                     "title": "Role",
                                     "type": "text",
                                     "help_text": "An identifier of the reason and/or purpose for this Registry Entry.",
-                                    "rules":"is_uri"
+                                    "rules": "is_uri",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.registryEntries.role"
                                 },
-                                "assetIdentifier": {
+                                {
                                     "key": "assetIdentifier",
                                     "title": "Asset Identifier",
                                     "class": "required",
                                     "required": true,
                                     "type": "text",
-                                    "help_text": "Unique identifier of the video as issued by a registry"
+                                    "help_text": "Unique identifier of the video as issued by a registry",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.registryEntries.assetIdentifier"
                                 },
-                                "registryIdentifier": {
+                                {
                                     "key": "registryIdentifier",
                                     "title": "Registry Identifier",
                                     "required": true,
                                     "type": "text",
                                     "help_text": "An identifier for the registry which issued the identifier of the video.",
-                                    "rules":"is_uri"
+                                    "rules": "is_uri",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.registryEntries.registryIdentifier"
                                 }
-                            }
+                            ],
+                            "is_recommended": true
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.digitalImageGuid",
                             "title": "Digital Image GUID",
                             "type": "text",
-                            "help_text": "Globally unique identifier for this digital image. It is created and applied by the creator of the digital image  at the time of its creation . This value shall not be changed after that time."
+                            "help_text": "A globally unique identifier for the image. This identifier is created and applied by the creator of the digital image at the time of its creation. This value shall not be changed after that time. The identifier can be generated using an algorithm that would guarantee that the created identifier is globally unique. Device that create digital images like digital or video cameras or scanners usually create such an identifier at the time of the creation of the digital data, and add it to the metadata embedded in the image file (e.g., the EXIF metadata).IPTC’s requirements for unique ids are as follows:\n- It must be globally unique. Algorithms for this purpose exist.\n- It should identify the camera body.\n- It should identify each individual photo from this camera body.\n- It should identify the date and time of the creation of the picture.\n- It should be secured against tampering."
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.dateCreated",
-                            "title": "Date Created",
+                            "title": "Date created",
                             "type": "date",
-                            "help_text": "Designates the date and optionally the time the content of the image was created rather than the date of the creation of the digital representation. Expected format YYYY-MM-DDThh:mm:ssZ or YYYY-MM-DDThh:mm:ss+hh:mm",                            
-                            "field_options":{
-                                "format":"datetime_iso"
-                            }
+                            "help_text": "Designates the date and optionally the time the content of the image was created. For a photo, this will be the date and time the photo was taken. When no information is available on the time, the time is set to 00:00:00. The preferred format for the \"Date created\" element is the truncated DateTime format, for example: 2021-02-22T21:24:06Z",
+                            "field_options": {
+                                "format": "datetime_iso"
+                            },
+                            "enum": []
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.headline",
                             "title": "Headline",
-                            "type": "text",                            
-                            "help_text": "A brief synopsis of the caption. Headline is not the same as Title."
+                            "type": "text",
+                            "help_text": "A brief publishable summary of the contents of the image. Note that a headline is not the same as a title."
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.eventName",
                             "title": "Event name",
                             "type": "textarea",
                             "class": "required",
-                            "help_text": "Names or describes the specific event at which the photo was taken."
+                            "help_text": "The name or a brief description of the event where the image was taken. If this is a sub-event of a larger event, mention both in the description. For example: “Opening statement, 1st International Conference on Metadata Standards, New York, November 2021”."
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.description",
                             "title": "Description",
                             "type": "textarea",
                             "class": "required",
-                            "help_text": "A textual description, including captions, of the image."
+                            "help_text": "A textual description, including captions, of the image. This describes the who, what, and why of what is happening in this image. This might include names of people, and/or their role in the action that is taking place within the image. Example: “The president of the Metadata Association delivers the keynote address”."
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.captionWriter",
-                            "title": "Description Writer",
+                            "title": "Caption writer",
                             "type": "text",
                             "class": "required",
-                            "help_text": "Identifier or the name of the person involved in writing, editing or correcting the description of the image."
+                            "help_text": "An identifier, or the name, of the person involved in writing, editing or correcting the description of the image."
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.keywords",
                             "title": "Keywords",
                             "type": "simple_array",
                             "class": "required",
-                            "help_text": "Keywords to express the subject of the image. Keywords may be free text and don't have to be taken from a controlled vocabulary. Codes from the controlled vocabulary IPTC Subject NewsCodes must go to the Subject Code field."
+                            "help_text": "Keywords (terms or phrases) to express the subject of the image. Keywords do not have to be taken from a controlled vocabulary.",
+                            "enum": []
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.sceneCodes",
-                            "title": "Scene Codes",
-                            "type": "simple_array",                            
-                            "help_text": "Describes the scene of a photo content. Specifies one ore more terms from the IPTC Scene-NewsCodes. Each Scene is represented as a string of 6 digits in an unordered list."                            
+                            "title": "Scene codes",
+                            "type": "simple_array",
+                            "help_text": "The \"Scene codes\" describe the scene of a photo content. The IPTC Scene-NewsCodes controlled vocabulary (published under a Creative Commons Attribution (CC BY) 4.0 license) should be used, where a scene is represented as a string of 6 digits.",
+                            "enum": []
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.sceneCodesLabelled",
                             "title": "Scene codes labelled",
                             "class": "required",
                             "type": "array",
-                            "help_text":"Describes the scene of a photo content. Specifies one ore more terms from the IPTC `Scene-NewsCodes`. Each Scene is represented as a string of 6 digits in an unordered list.",
-                            "props": {
-                                "code": {
+                            "help_text": "The \"Scene codes\" element described above only allows for the capture of codes. To improve discoverability (by indexing important keywords), not only the scene codes but also the scene description should be provided. The IPTC standard does not provide an element that allows the scene label and description to be entered. The \"Scene codes labelled\" is an element added to the IHSN schema. Ideally, curators will enter the scene codes in the element \"Scene codes\" to maintain full compatibility with the IPTC, and complement that information by also entering the codes and their description in the \"Scene codes labelled\" element.\n\n- Code: The code for the scene of a photo content. The IPTC Scene-NewsCodes controlled vocabulary (published under a Creative Commons Attribution (CC BY) 4.0 license) should be used, where a scene is represented as a string of 6 digits. See table above.\n- Label: The label of the scene. See table above for examples.\n- Description: A more detailed description of the scene. See table above for examples.",
+                            "props": [
+                                {
                                     "key": "code",
                                     "title": "Scene code (6 digits)",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.sceneCodesLabelled.code"
                                 },
-                                "label": {
+                                {
                                     "key": "label",
                                     "title": "Label",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.sceneCodesLabelled.label"
                                 },
-                                "description": {
+                                {
                                     "key": "description",
                                     "title": "Description",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.sceneCodesLabelled.description"
                                 }
-                            }
-                        }, 
+                            ]
+                        },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.subjectCodes",
-                            "title": "Subject Codes",
+                            "title": "Subject codes",
                             "type": "simple_array",
                             "class": "required",
-                            "help_text": "Specifies one or more Subjects from the IPTC Subject-NewsCodes taxonomy to categorise the image. Each Subject is represented as a string of 8 digits in an unordered list."
+                            "help_text": "Specifies one or more subjects from the IPTC Subject-NewsCodes controlled vocabulary to categorize the image. Each Subject is represented as a string of 8 digits. The vocabulary consists of about 1400 terms organized into 3 levels (users can decide to use only the first, or the first two levels; the more detail is provided, the better the discoverability of the image).",
+                            "enum": []
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.subjectCodesLabelled",
                             "title": "Subject codes labelled",
                             "class": "required",
                             "type": "array",
-                            "help_text":"Specifies one or more Subjects from the IPTC Subject-NewsCodes taxonomy to categorise the image. Each Subject is represented as a string of 8 digits in an unordered list.",
-                            "props": {
-                                "code": {
+                            "help_text": "The \"Subject codes\" element described above only allows for the capture of codes. To improve discoverability (by indexing important keywords), not only the subject codes but also the subject description should be provided. The IPTC standard does not provide an element that allows the subject label and description to be entered. The \"Subject codes labelled\"  is an element that was added to the IHSN schema. Ideally, curators will enter the subject codes in the element \"Subject codes\" to maintain full compatibility with the IPTC, and complement that information by also entering the codes and their description in the \"Subject codes labelled\" element.\n\n- Code: Specifies one or more subjects from the IPTC Subject-NewsCodes controlled vocabulary to categorize the image. Each Subject is represented as a string of 8 digits. The vocabulary consists of about 1400 terms organized into 3 levels (users can decide to use only the first, or the first two levels; the more detail is provided, the better the discoverability of the image). See examples in the table above.\n- Label: The label of the subject. See table above for examples.\n- Description: A more detailed description of the subject. See table above for examples.",
+                            "props": [
+                                {
                                     "key": "code",
-                                    "title": "Scene code (6 digits)",
-                                    "type": "text"
+                                    "title": "Subject code (6 digits)",
+                                    "type": "text",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.subjectCodesLabelled.code"
                                 },
-                                "label": {
+                                {
                                     "key": "label",
                                     "title": "Label",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.subjectCodesLabelled.label"
                                 },
-                                "description": {
+                                {
                                     "key": "description",
                                     "title": "Description",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.subjectCodesLabelled.description"
                                 }
-                            }
-                        }, 
+                            ]
+                        },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.creatorNames",
-                            "title": "Creator Names",
+                            "title": "Creator name",
                             "type": "simple_array",
                             "class": "required",
-                            "help_text": "Contains the name of the photographer, but in cases where the photographer should not be identified the name of a company or organisation may be appropriate."
+                            "help_text": "Enter details about the creator or creators of this image. The Image Creator must often be attributed in association with any use of the image. The Image Creator, Copyright Owner, Image Supplier and Licensor may be the same or different entities.",
+                            "enum": [],
+                            "is_recommended": true
                         },
-
                         {
                             "key": "image_description.creatorContactInfo",
-                            "title": "Creator contact",
+                            "title": "Contact information ",
                             "class": "required",
                             "type": "array",
-                            "props": {
-                                "country": {
+                            "props": [
+                                {
                                     "key": "country",
                                     "title": "Country",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "image_description.creatorContactInfo.country"
                                 },
-                                "emailwork": {
+                                {
                                     "key": "emailwork",
                                     "title": "Email (work)",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "image_description.creatorContactInfo.emailwork"
                                 },
-                                "region": {
+                                {
                                     "key": "region",
                                     "title": "Region (State/ province)",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "image_description.creatorContactInfo.region"
                                 },
-                                "phonework": {
+                                {
                                     "key": "phonework",
                                     "title": "Phone (work)",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "image_description.creatorContactInfo.phonework"
                                 },
-                                "weburlwork": {
+                                {
                                     "key": "weburlwork",
                                     "title": "URL",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "image_description.creatorContactInfo.weburlwork"
                                 },
-                                "address": {
+                                {
                                     "key": "address",
                                     "title": "Address",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "image_description.creatorContactInfo.address"
                                 },
-                                "city": {
+                                {
                                     "key": "city",
                                     "title": "City",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "image_description.creatorContactInfo.city"
                                 },
-                                "postalCode": {
+                                {
                                     "key": "postalCode",
                                     "title": "Postal code",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "image_description.creatorContactInfo.postalCode"
                                 }
-                                
-                            }
-                        },  
+                            ],
+                            "help_text": "The creator’s contact information provides all necessary information to get in contact with the creator of this image and comprises a set of elements for proper addressing. Note that if the creator is also the licensor, his or her contact information should be provided in the licensor fields.\n\n- Country: The country name for the address of the person that created this image.\n- Email work: The work email address(es) for the creator of the image. Multiple email addresses can be given, in which case they should be separated by a comma.\n- Region: The state or province for the address of the creator of the image.\n- Phone work: The work phone number(s) for the creator of the image. Use the international format including the country code, such as +1 (123) 456789. Multiple numbers can be given, in which case they should be separated by a comma.\n- URL work: The work web address for the creator of the image. Multiple addresses can be given, in which case they should be separated by a comma.\n- Address: The address of the creator of the image. This may comprise a company name.\n- City: The city for the address of the person that created the image.\n- Postal code: Enter the local postal code for the address of the person who created the image."
+                        },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.creditLine",
-                            "title": "Credit Line",
+                            "title": "Credit",
                             "type": "text",
                             "class": "required",
-                            "help_text": "The credit to person(s) and/or organisation(s) required by the supplier of the image to be used when published. This is a free-text field."
+                            "help_text": "The credit to person(s) and/or organization(s) required by the supplier of the image to be used when published. This is a free-text field."
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.digitalSourceType",
-                            "title": "Digital Source Type",
+                            "title": "Digital source type",
                             "type": "text",
-                            "help_text": "The type of the source of this digital image",
-                            "rules":{"is_uri":true}
+                            "help_text": "The type of the source of this digital image. \nMust be URL.\nOne value should be selected from the IPTC controlled vocabulary (published under a Creative Commons Attribution (CC BY) 4.0 license license) that contains the following values (type/source/description):\n\n- digitalCapture | Original digital capture of a real life scene | The digital image is the original and only instance and was taken by a digital camera\n- negativeFilm | Digitized from a negative on film | The digital image was digitized from a negative on film on any other transparent medium\n- positiveFilm | Digitized from a positive on film | The digital image was digitized from a positive on a transparency or any other transparent medium\n- print | Digitized from a print on non-transparent medium | The digital image was digitized from an image printed on a non-transparent medium\n- softwareImage | Created by software | The digital image was created by computer software",
+                            "rules": {
+                                "is_uri": true
+                            },
+                            "enum": [
+                                "digitalCapture",
+                                "negativeFilm",
+                                "positiveFilm ",
+                                "print ",
+                                "softwareImage"
+                            ]
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.jobid",
-                            "title": "Job Id",
+                            "title": "Job ID",
                             "type": "text",
                             "class": "required",
-                            "help_text": "Number or identifier for the purpose of improved workflow handling. This is a user created identifier related to the job for which the image is supplied."
+                            "help_text": "Number or identifier for the purpose of improved workflow handling (control or tracking). This is a user created identifier related to the job for which the image is supplied.\nNote: As this identifier references a job of the receiver’s workflow it must first be issued by the receiver, then transmitted to the creator or provider of the news object and finally added by the creator to this field.",
+                            "enum": []
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.jobtitle",
-                            "title": "Creators Job title",
+                            "title": "Creator job title",
                             "type": "text",
                             "class": "required",
-                            "help_text": "Contains the job title of the photographer. As this is sort of a qualifier the Creator element has to be filled in as mandatory prerequisite for using Creator's Jobtitle."
+                            "help_text": "The job title of the photographer (the person listed in \"Creator name\"). The use of this element implies that the photographer information (\"Creator name\" is not empty).",
+                            "enum": []
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.source",
                             "title": "Source",
                             "type": "textarea",
                             "class": "required",
-                            "help_text": "The name of a person or party who has a role in the content supply chain. This could be an agency, a member of an agency, an individual or a combination. Source could be different from Creator and from the entities in the Copyright Notice."
+                            "help_text": "The name of a person or party who has a role in the content supply chain. The source can be different from the creator and from the entities listed in the Copyright Notice.",
+                            "enum": []
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.locationsShown",
-                            "title": "Location Shown",
+                            "title": "Location shown",
                             "class": "required",
-                            "help_text": "The location the photo was taken.",
+                            "help_text": "This block of elements is used to document the location shown in the image. This information should be provided with as much detail as possible. It contains elements that can be used to provide a “nested” description of the location, from a high geographic level (world region) down to a very specific location (city and sub-location within a city).\n\n- Name: The full name of the location.\n- Identifier: A globally unique identifier of the location shown.\n- World region: The name of a world region. This element is at the first (top) level of the top-down geographical hierarchy.\n- Country name: The name of a country of a location. This element is at the second level of a top-down geographical hierarchy.\n- Country code: The ISO code of the country mentioned in \"Country name\".\n- Subregion: The name of a sub-region of the country - for example a province or a state name. This element is at the third level of a top-down geographical hierarchy.\n- City: The name of the city. This element is at the fourth level of a top-down geographical hierarchy.\n- Sublocation: The sublocation name could either be the name of a sublocation to a city or the name of a well known location or (natural) monument outside a city. This element is at the fifth (lowest) level of a top-down geographical hierarchy.\n- GPS altitude: The altitude in meters of a WGS84 based position of this location.\n- GPS latitude: Latitude of a WGS84 based position of this location (in some cases, this information may be contained in the EXIF metadata).\n- GPS longitude: Longitude of a WGS84 based position of this location (in some cases, this information may be contained in the EXIF metadata).",
                             "type": "array",
-                            "props": {
-                                "city": {
-                                    "key": "city",
-                                    "title": "City",
-                                    "type": "text",
-                                    "help_text": "Name of the city the Location is located in"
-                                },
-                                "countryCode": {
-                                    "key": "countryCode",
-                                    "title": "Country ISO Code",
-                                    "type": "text",
-                                    "help_text": "ISO code of the country the Location is located in"
-                                },
-                                "countryName": {
-                                    "key": "countryName",
-                                    "title": "Country Name",
-                                    "type": "text",
-                                    "help_text": "Name of the country the Location is located in"
-                                },
-                                "gpsAltitude": {
-                                    "key": "gpsAltitude",
-                                    "title": "GPS-Altitude",
-                                    "type": "text",
-                                    "help_text": "Altitude in meters of a WGS84 based position of this Location"
-                                },
-                                "gpsLatitude": {
-                                    "key": "gpsLatitude",
-                                    "title": "GPS-Lattitude",
-                                    "type": "text",
-                                    "help_text": "Lattitude of a WGS84 based position of this Location"
-                                },
-                                "gpsLongitude": {
-                                    "key": "gpsLongitude",
-                                    "title": "GPS-Longitude",
-                                    "type": "text",
-                                    "help_text": "Longitude of a WGS84 based position of this Location"
-                                },
-                                "identifiers": {
-                                    "key": "identifiers",
-                                    "title": "Identifiers",
-                                    "type": "text",
-                                    "help_text": "Globally unique identifier of the location"
-                                },
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Location Name",
                                     "type": "text",
-                                    "help_text": "Full name of the location"
+                                    "help_text": "Full name of the location",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.locationsShown.name"
                                 },
-                                "provinceState": {
-                                    "key": "provinceState",
-                                    "title": "Province State",
+                                {
+                                    "key": "identifiers",
+                                    "title": "Identifiers",
                                     "type": "text",
-                                    "help_text": "Name of the state or province the Location is located in"
+                                    "help_text": "Globally unique identifier of the location",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.locationsShown.identifiers"
                                 },
-                                "sublocation": {
-                                    "key": "sublocation",
-                                    "title": "Sub Location",
-                                    "type": "text",
-                                    "help_text": "Name of a sub location the Location is located in"
-                                },
-                                "worldRegion": {
+                                {
                                     "key": "worldRegion",
                                     "title": "World Region",
                                     "type": "text",
-                                    "help_text": "Name of the world region the Location is located in"
+                                    "help_text": "Name of the world region the Location is located in",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.locationsShown.worldRegion"
+                                },
+                                {
+                                    "key": "countryName",
+                                    "title": "Country Name",
+                                    "type": "text",
+                                    "help_text": "Name of the country the Location is located in",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.locationsShown.countryName"
+                                },
+                                {
+                                    "key": "countryCode",
+                                    "title": "Country code",
+                                    "type": "text",
+                                    "help_text": "ISO code of the country the Location is located in",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.locationsShown.countryCode"
+                                },
+                                {
+                                    "key": "provinceState",
+                                    "title": "Province State",
+                                    "type": "text",
+                                    "help_text": "Name of the state or province the Location is located in",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.locationsShown.provinceState"
+                                },
+                                {
+                                    "key": "city",
+                                    "title": "City",
+                                    "type": "text",
+                                    "help_text": "Name of the city the Location is located in",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.locationsShown.city"
+                                },
+                                {
+                                    "key": "sublocation",
+                                    "title": "Sub Location",
+                                    "type": "text",
+                                    "help_text": "Name of a sub location the Location is located in",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.locationsShown.sublocation"
+                                },
+                                {
+                                    "key": "gpsAltitude",
+                                    "title": "GPS-Altitude",
+                                    "type": "text",
+                                    "help_text": "Altitude in meters of a WGS84 based position of this Location",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.locationsShown.gpsAltitude"
+                                },
+                                {
+                                    "key": "gpsLatitude",
+                                    "title": "GPS-Lattitude",
+                                    "type": "text",
+                                    "help_text": "Lattitude of a WGS84 based position of this Location",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.locationsShown.gpsLatitude"
+                                },
+                                {
+                                    "key": "gpsLongitude",
+                                    "title": "GPS-Longitude",
+                                    "type": "text",
+                                    "help_text": "Longitude of a WGS84 based position of this Location",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.locationsShown.gpsLongitude"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.imageRating",
-                            "title": "Image Rating",
+                            "title": "Image rating",
                             "type": "text",
                             "class": "required",
-                            "help_text": "Rating of the image by its user or supplier. e.g. a number between 1 - 5",
+                            "help_text": "Rating of the image by its user or supplier. The value shall be -1 or in the range 0 to 5. -1 indicates “rejected” and 0 “unrated”. If an explicit value is not provided, the default value is 0 will be assumed.",
                             "rules_": "numeric|min_value:1|max_value:5",
-                            "rules":{
-                                "numeric":true,
-                                "min_value":1,
-                                "max_value":5
-                            }
+                            "rules": {
+                                "numeric": true,
+                                "max_value": 5
+                            },
+                            "enum": []
                         },
-
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.supplier",
                             "title": "Supplier",
                             "class": "required",
-                            "help_text": "Identifies the most recent supplier of the image, who is not necessarily its owner or creator.",
+                            "help_text": "Identifies the most recent supplier of the image, who is not necessarily its owner or creator.\n\n- Name: The name of the supplier of the image (person or organization).\n- Identifier: The identifier for the most recent supplier of this image. This will not necessarily be the creator or the owner of the image.",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "text",
-                                    "help_text": "Full name of the entity/concept"
+                                    "help_text": "Full name of the entity/concept",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.supplier.name"
                                 },
-                                "identifiers": {
+                                {
                                     "key": "identifiers",
-                                    "title": "Identifier",
+                                    "title": "Identifiers",
                                     "class": "required",
-                                    "type": "text",
-                                    "help_text": "Globally unique identifier of the entity/concept"
+                                    "type": "simple_array",
+                                    "help_text": "Globally unique identifier of the entity/concept",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.supplier.identifiers",
+                                    "enum": []
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.copyrightNotice",
-                            "title": "Copyright Notice",
+                            "title": "Copyright notice",
                             "type": "text",
                             "class": "required",
-                            "help_text": "Contains any necessary copyright notice for claiming the intellectual property for this photograph and should identify the current owner of the copyright for the photograph. Other entities like the creator of the photograph may be added in the corresponding field. Notes on usage rights should be provided in Rights usage terms."
+                            "help_text": "Contains any necessary copyright notice for claiming the intellectual property for this photograph and should identify the current owner of the copyright for the photograph. Other entities like the creator of the photograph may be added in the corresponding field. Notes on usage rights should be provided in “Rights usage terms”. Example: ©2008 Jane Doe. If the copyright ownership must be expressed in a more controlled manner, use the fields “Copyright Owner”, “Copyright Owner ID”, “Copyright Owner Name” described below instead of the \"Copyright notice\" element.",
+                            "enum": []
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.copyrightOwners",
-                            "title": "Copyright Owners",
+                            "title": "Copyright owners",
                             "class": "required",
-                            "help_text": "Owner or owners of the copyright in the licensed image.",
+                            "help_text": "Owner or owners of the copyright in the licensed image, described in a structured format (as an alternative to the element \"Copyright notice\"). This block serves the same purpose of identifying the rights holder/s for the image. The Copyright Owner, Image Creator and Licensor may be the same or different entities.\n\n- Name: The name of the owner of the copyright in the licensed image.\n- Role: The role the entity.\n- Identifier: The identifier of the owner of the copyright in the licensed image.",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "class": "required",
                                     "type": "text",
-                                    "help_text": "Full name of the entity/concept"
+                                    "help_text": "Full name of the entity/concept",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.copyrightOwners.name"
                                 },
-                                "role": {
+                                {
                                     "key": "role",
                                     "title": "Role",
-                                    "type": "text",
-                                    "help_text": "Identifier of the role the entity has in the context of the metadata property"
+                                    "type": "simple_array",
+                                    "help_text": "Identifier of the role the entity has in the context of the metadata property",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.copyrightOwners.role",
+                                    "enum": []
                                 },
-                                "identifiers": {
+                                {
                                     "key": "identifiers",
                                     "title": "Identifiers",
-                                    "type": "text",
-                                    "help_text": "Globally unique identifier of the entity/concept"
+                                    "type": "simple_array",
+                                    "help_text": "Globally unique identifier of the entity/concept",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.copyrightOwners.identifiers",
+                                    "enum": []
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.usageTerms",
-                            "title": "Usage Terms",
-                            "type": "text",
+                            "title": "Usage terms",
+                            "type": "textarea",
                             "class": "required",
-                            "help_text": "The licensing parameters of the image expressed in free-text."
+                            "help_text": "The licensing parameters of the image expressed in free-text. Enter instructions on how this image can legally be used. The PLUS fields of the IPTC Extension can be used in parallel to express the licensed usage in more controlled terms.",
+                            "enum": []
                         },
-
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.embdEncRightsExpr",
-                            "title":"Rights expression",
-                            "help_text": "An embedded rights expression using any rights expression language",
+                            "title": "Rights expression",
+                            "help_text": "An embedded rights expression using a rights expression language which is encoded as a string. Embedded Encoded Rights Expression (EERE) structure A structure providing details of an embedded encoded rights expression\n\n- encRightsExpr: Rights Expression Language ID. An identifier of the rights expression language used by the rights expression.\n- rightsExprEncType: The encoding type of the rights expression, identified by an IANA Media Type.\n- rightsExprLangId: An embedded rights expression using any rights expression language.",
                             "class": "required",
                             "required": false,
                             "type": "array",
-                            "props": {
-                                "encRightsExpr": {
+                            "props": [
+                                {
                                     "key": "encRightsExpr",
                                     "title": "Encoded Rights Expression",
                                     "class": "required",
                                     "required": true,
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.embdEncRightsExpr.encRightsExpr"
                                 },
-                                "rightsExprEncType": {
+                                {
                                     "key": "rightsExprEncType",
                                     "title": "Encoding type",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.embdEncRightsExpr.rightsExprEncType"
                                 },
-                                "rightsExprLangId": {
+                                {
                                     "key": "rightsExprLangId",
                                     "title": "Rights Expression Language ID",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.embdEncRightsExpr.rightsExprLangId"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.linkedEncRightsExpr",
-                            "title": "Linked Enc Rights Expression",
+                            "title": "Linked rights expression",
                             "class": "required",
-                            "help_text": "A linked rights expression using any rights expression language.",
+                            "help_text": "Link to encoded rights expression.\n\n- linkedRightsExpr: The link to a web resource representing an encoded rights expression.\n- rightsExprEncType: The encoding type of the rights expression, identified by an IANA Media Type.\n- rightsExprLangId: The identifier of the rights expression language used by the rights expression.",
                             "type": "array",
-                            "props": {
-                                "linkedRightsExpr": {
+                            "props": [
+                                {
                                     "key": "linkedRightsExpr",
                                     "title": "Link to Encoded Rights Expression",
                                     "class": "required",
                                     "required": true,
                                     "type": "text",
-                                    "help_text": "Link to a rights expression using a rights expression language."
+                                    "help_text": "Link to a rights expression using a rights expression language.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.linkedEncRightsExpr.linkedRightsExpr"
                                 },
-                                "rightsExprEncType": {
+                                {
                                     "key": "rightsExprEncType",
                                     "title": "Encoding type",
                                     "type": "text",
                                     "class": "required",
                                     "required": true,
-                                    "help_text": "Encoding type of the rights expression, identified by an IANA Media Type."
+                                    "help_text": "Encoding type of the rights expression, identified by an IANA Media Type.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.linkedEncRightsExpr.rightsExprEncType"
                                 },
-                                "rightsExprLangId": {
+                                {
                                     "key": "rightsExprLangId",
                                     "title": "Rights Expression Language ID",
                                     "type": "text",
                                     "class": "required",
                                     "required": true,
-                                    "help_text": "Identifier of the rights expression language used by the rights expression."
+                                    "help_text": "Identifier of the rights expression language used by the rights expression.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.linkedEncRightsExpr.rightsExprLangId"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.webstatementRights",
-                            "title": "Web Statement Rights",
+                            "title": "Web statement rights",
                             "type": "text",
                             "class": "required",
-                            "help_text": "URL referencing a web resouce providing a statement of the copyright ownership and usage rights of the image."
+                            "help_text": "URL referencing a web resource providing a statement of the copyright ownership and usage rights of the image.",
+                            "enum": []
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.instructions",
-                            "title": "Instructions",
+                            "title": "Instructions to users",
                             "type": "text",
                             "class": "required",
-                            "help_text": "Any of a number of instructions from the provider or creator to the receiver of the image which might include any of the following: embargoes (NewsMagazines OUT) and other restrictions not covered by the Rights Usage Terms field; information regarding the original means of capture (scanning notes, colourspace info) or other specific text information that the user may need for accurate reproduction; additional permissions required when publishing; credits for publishing if they exceed the IIM length of the credit field"
+                            "help_text": "Any of a number of instructions from the provider or creator to the receiver of the image which might include any of the following: embargoes and other restrictions not covered by the “Rights Usage Terms” field; information regarding the original means of capture (scanning notes, colourspace info) or other specific text information that the user may need for accurate reproduction; additional permissions required when publishing; credits for publishing if they exceed the IIM length of the credit field.",
+                            "enum": []
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.genres",
                             "title": "Genres",
-                            "help_text": "Artistic, style, journalistic, product or other genre(s) of the image (expressed by a term from any Controlled Vocabulary)",
+                            "help_text": "Artistic, style, journalistic, product or other genre(s) of the image (expressed by a term from any Controlled Vocabulary)\n\n- cvId: The globally unique identifier of the Controlled Vocabulary the term is from.\n- cvTermName: The natural language name of the term from a Controlled Vocabulary.\n- cvTermId: The globally unique identifier of the term from a Controlled Vocabulary.\n- cvTermRefinedAbout: Optionally enter a refinement of the ‘about’ relationship of the term with the content of the image. This must be a globally unique identifier from a Controlled Vocabulary. May be used to refine the generic about relationship.\n",
                             "class": "required",
                             "type": "array",
-                            "props": {
-                                "cvId": {
+                            "props": [
+                                {
                                     "key": "cvId",
                                     "title": "CV-Term CV ID",
                                     "type": "text",
-                                    "help_text": "The globally unique identifier of the Controlled Vocabulary the term is from."
+                                    "help_text": "The globally unique identifier of the Controlled Vocabulary the term is from.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.genres.cvId"
                                 },
-                                "cvTermName": {
+                                {
                                     "key": "cvTermName",
                                     "title": "CV-Term Name",
                                     "type": "text",
-                                    "help_text": "The natural language name of the term from a Controlled Vocabulary."
+                                    "help_text": "The natural language name of the term from a Controlled Vocabulary.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.genres.cvTermName"
                                 },
-                                "cvTermId": {
+                                {
                                     "key": "cvTermId",
                                     "title": "CV-Term ID",
                                     "type": "text",
-                                    "help_text": "The globally unique identifier of the term from a Controlled Vocabulary."
+                                    "help_text": "The globally unique identifier of the term from a Controlled Vocabulary.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.genres.cvTermId"
                                 },
-                                "cvTermRefinedAbout": {
+                                {
                                     "key": "cvTermRefinedAbout",
                                     "title": "About",
                                     "type": "text",
-                                    "help_text": "The refined 'about' relationship of the term with the content."
+                                    "help_text": "The refined 'about' relationship of the term with the content.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.genres.cvTermRefinedAbout"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.intellectualGenre",
-                            "title": "Intellectual Genre",
+                            "title": "Intellectual genre",
                             "type": "text",
                             "class": "required",
-                            "help_text": "Describes the nature, intellectual, artistic or journalistic characteristic of an image."
+                            "help_text": "A term to describe the nature of the image in terms of its intellectual or journalistic characteristics (for example “actuality”, “interview”, “background”, “feature”, “summary”, “wrapup” for journalistic genres, or “daybook”, “obituary”, “press release”, “transcript” for news category related genres. It is advised to use terms from a controlled vocabulary such as the NewsCodes Scheme published by the IPTC under a Creative Commons Attribution (CC BY) 4.0 license.",
+                            "enum": []
                         },
-
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects",
-                            "title": "Art Work or Object",
+                            "title": "Art work or object",
                             "class": "required",
-                            "help_text": "A set of metadata about artwork or an object in the image",
+                            "help_text": "This block provides a set of metadata elements to be used to describe the object or artwork shown in the image.\n\n- Title: A human readable name of the object or artwork shown in the image.\n- Content description: A textual description of the content depicted in the object or artwork.\n- Physical description: A textual description of the physical characteristics of the artwork or object, without reference to the content depicted. This would be used to describe the object type, materials, techniques, and measurements.\n- Creator names: The name of the person(s) (possibly an organization) who created the object or artwork shown in the image.\n- Creator identifiers: One or multiple globally unique identifier(s) for the artist who created the artwork or object shown in the image. This could be an identifier issued by an online registry of persons or companies. Make sure to enter these identifiers in the exact same sequence as the names entered in the field \"Creator names\".\n- Contribution description: A description of any contributions made to the artwork or object. It should include the type, date and location of contribution, and details about the contributor.\n- Style period: The style, historical or artistic period, movement, group, or school whose characteristics are represented in the artwork or object. It is advised to take the terms from a Controlled Vocabulary.\n- Date created: The date and optionally the time the artwork or object shown in the image was created.\n- Circa date created: The approximate date or range of dates associated with the creation and production of an artwork or object or its components.\n- Source: The name of the organization or body holding and registering the artwork or object in this image for inventory purposes.\n- Source inventory No: The inventory number issued by the organization or body holding and registering the artwork or object in the image.\n- Source inventory URL: A reference URL for the metadata record of the inventory maintained by the Source.\n- Current copyright owner name: The name of the current owner of the copyright of the artwork or object.\n- Current copyright owner identifier: A globally unique identifier for the current copyright owner e.g. issued by an online registry of persons or companies.\n- Copyright notice: Any necessary copyright notice for claiming the intellectual property for artwork or an object in the image and should identify the current owner of the copyright of this work with associated intellectual property rights.\n- Current licensor name: Name of the current licensor of the artwork or object.\n- Current licensor identifier: A globally unique identifier for the current licensor e.g. issued by an online registry of persons or companies.",
                             "type": "nested_array",
-                            "props": {
-                                "circaDateCreated": {
-                                    "key": "circaDateCreated",
-                                    "title": "Circa Date Created",
-                                    "class": "required",
+                            "props": [
+                                {
+                                    "key": "title",
+                                    "title": "Title",
                                     "type": "text",
-                                    "help_text": "Approximate date or range of dates associated with the creation and production of an artwork or object or its components."
+                                    "help_text": "A reference for the artwork or object in the image.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.title"
                                 },
-                                "contentDescription": {
+                                {
                                     "key": "contentDescription",
                                     "title": "Content Description",
                                     "type": "textarea",
-                                    "help_text": "A textual description of the content depicted in the artwork or object."
+                                    "help_text": "A textual description of the content depicted in the artwork or object.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.contentDescription"
                                 },
-                                "contributionDescription": {
-                                    "key": "contributionDescription",
-                                    "title": "Contribution Description",
+                                {
+                                    "key": "physicalDescription",
+                                    "title": "Physical Description",
                                     "type": "textarea",
-                                    "help_text": "A textual description about a contribution made to an artwork or an object."
+                                    "help_text": "A textual description of the physical characteristics of the artwork or object, without reference to the content depicted.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.physicalDescription"
                                 },
-                                "copyrightNotice": {
-                                    "key": "copyrightNotice",
-                                    "title": "Copyright Notice",
-                                    "type": "textarea",
-                                    "help_text": "Contains any necessary copyright notice for claiming the intellectual property for artwork or an object in the image and should identify the current owner of the copyright of this work with associated intellectual property rights."
-                                },
-                                "creatorIdentifiers": {
-                                    "key": "creatorIdentifiers",
-                                    "title": "Creator Identifier",
-                                    "type": "text",
-                                    "help_text": "Globally unique identifier for the creator of artwork or object."
-                                },
-                                "creatorNames": {
+                                {
                                     "key": "creatorNames",
                                     "title": "Creator Name",
                                     "type": "simple_array",
-                                    "help_text": "Contains the name of the artist who has created artwork or an object in the image. In cases where the artist could or should not be identified the name of a company or organisation may be appropriate."
+                                    "help_text": "Contains the name of the artist who has created artwork or an object in the image. In cases where the artist could or should not be identified the name of a company or organisation may be appropriate.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.creatorNames",
+                                    "enum": []
                                 },
-                                "currentCopyrightOwnerIdentifier": {
-                                    "key": "currentCopyrightOwnerIdentifier",
-                                    "title": "Current Copyright Owner",
-                                    "type": "text",
-                                    "help_text": "Globally unique identifier for the current owner of the copyright of the artwork or object."
+                                {
+                                    "key": "creatorIdentifiers",
+                                    "title": "Creator Identifier",
+                                    "type": "simple_array",
+                                    "help_text": "Globally unique identifier for the creator of artwork or object.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.creatorIdentifiers",
+                                    "enum": []
                                 },
-                                "currentCopyrightOwnerName": {
-                                    "key": "currentCopyrightOwnerName",
-                                    "title": "Current Copyright Owner Name",
-                                    "type": "text",
-                                    "help_text": "Name of the current owner of the copyright of the artwork or object."
+                                {
+                                    "key": "contributionDescription",
+                                    "title": "Contribution Description",
+                                    "type": "textarea",
+                                    "help_text": "A textual description about a contribution made to an artwork or an object.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.contributionDescription"
                                 },
-                                "currentLicensorIdentifier": {
-                                    "key": "currentLicensorIdentifier",
-                                    "title": "Current Licensor ID",
-                                    "type": "text",
-                                    "help_text": "Globally unique identifier for the current licensor of the artwork or object."
+                                {
+                                    "key": "stylePeriod",
+                                    "title": "Style Period",
+                                    "type": "simple_array",
+                                    "help_text": "The style, historical or artistic period, movement, group, or school whose characteristics are represented in the artwork or object.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.stylePeriod",
+                                    "enum": []
                                 },
-                                "currentLicensorName": {
-                                    "key": "currentLicensorName",
-                                    "title": "Current Licensor Name",
-                                    "type": "text",
-                                    "help_text": "Name of the current licensor of the artwork or object."
-                                },
-                                "dateCreated": {
+                                {
                                     "key": "dateCreated",
                                     "title": "Date Created",
                                     "type": "date",
                                     "help_text": "Designates the date and optionally the time the artwork or object in the image was created. This relates to artwork or objects with associated intellectual property rights. Expected format YYYY-MM-DDThh:mm:ssZ or YYYY-MM-DDThh:mm:ss+hh:mm",
-                                    "display_options":{
-                                        "format":"datetime_iso"
-                                    }
+                                    "display_options": {
+                                        "format": "datetime_iso"
+                                    },
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.dateCreated"
                                 },
-                                "physicalDescription": {
-                                    "key": "physicalDescription",
-                                    "title": "Physical Description",
-                                    "type": "textarea",
-                                    "help_text": "A textual description of the physical characteristics of the artwork or object, without reference to the content depicted."
+                                {
+                                    "key": "circaDateCreated",
+                                    "title": "Circa Date Created",
+                                    "class": "required",
+                                    "type": "text",
+                                    "help_text": "Approximate date or range of dates associated with the creation and production of an artwork or object or its components.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.circaDateCreated"
                                 },
-                                "source": {
+                                {
                                     "key": "source",
                                     "title": "Source",
                                     "type": "textarea",
-                                    "help_text": "The organisation or body holding and registering the artwork or object in the image for inventory purposes."
+                                    "help_text": "The organisation or body holding and registering the artwork or object in the image for inventory purposes.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.source"
                                 },
-                                "sourceInventoryNr": {
+                                {
                                     "key": "sourceInventoryNr",
                                     "title": "Source Inventory Number",
                                     "type": "text",
-                                    "help_text": "The inventory number issued by the organisation or body holding and registering the artwork or object in the image."
+                                    "help_text": "The inventory number issued by the organisation or body holding and registering the artwork or object in the image.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.sourceInventoryNr"
                                 },
-                                "sourceInventoryUrl": {
+                                {
                                     "key": "sourceInventoryUrl",
                                     "title": "Source Inventory URL",
                                     "type": "text",
-                                    "help_text": "URL reference to the metadata record of the inventory maintained by the Source."
+                                    "help_text": "URL reference to the metadata record of the inventory maintained by the Source.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.sourceInventoryUrl",
+                                    "rules": {
+                                        "is_uri": true
+                                    }
                                 },
-                                "stylePeriod": {
-                                    "key": "stylePeriod",
-                                    "title": "Style Period",
+                                {
+                                    "key": "currentCopyrightOwnerName",
+                                    "title": "Current Copyright Owner Name",
                                     "type": "text",
-                                    "help_text": "The style, historical or artistic period, movement, group, or school whose characteristics are represented in the artwork or object."
+                                    "help_text": "Name of the current owner of the copyright of the artwork or object.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.currentCopyrightOwnerName"
                                 },
-                                "title": {
-                                    "key": "title",
-                                    "title": "Title",
+                                {
+                                    "key": "currentCopyrightOwnerIdentifier",
+                                    "title": "Current Copyright Owner",
                                     "type": "text",
-                                    "help_text": "A reference for the artwork or object in the image."
+                                    "help_text": "Globally unique identifier for the current owner of the copyright of the artwork or object.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.currentCopyrightOwnerIdentifier"
+                                },
+                                {
+                                    "key": "copyrightNotice",
+                                    "title": "Copyright Notice",
+                                    "type": "textarea",
+                                    "help_text": "Contains any necessary copyright notice for claiming the intellectual property for artwork or an object in the image and should identify the current owner of the copyright of this work with associated intellectual property rights.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.copyrightNotice"
+                                },
+                                {
+                                    "key": "currentLicensorName",
+                                    "title": "Current Licensor Name",
+                                    "type": "text",
+                                    "help_text": "Name of the current licensor of the artwork or object.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.currentLicensorName"
+                                },
+                                {
+                                    "key": "currentLicensorIdentifier",
+                                    "title": "Current Licensor ID",
+                                    "type": "text",
+                                    "help_text": "Globally unique identifier for the current licensor of the artwork or object.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.artworkOrObjects.currentLicensorIdentifier",
+                                    "rules": {
+                                        "is_uri": true
+                                    }
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.personInImageNames",
-                            "title": "Person Name in the image",
+                            "title": "Persons shown (names)",
                             "type": "simple_array",
                             "class": "required",
-                            "help_text": "Name of a person shown in the image."
+                            "help_text": "This repeatable block of elements is used to provide information on the person(s) shown in the image.",
+                            "enum": []
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.personsShown",
-                            "title": "Person Shown",
+                            "title": "Persons shown (detail)",
                             "class": "required",
-                            "help_text": "Details about a person the content is about.",
+                            "help_text": "Details about person(s) shown in the image. It is not required to list all, just those details which can be recognized.\n\n- Name: The name of a person shown in the image.\n- Description: A textual description of the person. For example, you may include actions taken, emotional expressions shown and more.\n- Identifiers: Globally Unique identifiers of the person, such as those from WikiData.\n- Characteristics: A property or trait of the person, provided as a term selected from a Controlled Vocabulary.\n- Vocabulary ID: The globally unique identifier of the Controlled Vocabulary the term is from.\n- cvTermName: The natural language name of the term from a Controlled Vocabulary.\n- cvTermId: The globally unique identifier of the term from a Controlled Vocabulary.\n- cvTermRefinedAbout: The refined ‘about’ relationship of the term with the content. Optionally enter a refinement of the ‘about’ relationship of the term with the content of the image. This must be a globally unique identifier from a Controlled Vocabulary.",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "text",
-                                    "help_text": "Name of the person"
+                                    "help_text": "Name of the person",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.personsShown.name"
                                 },
-                                "description": {
+                                {
                                     "key": "description",
                                     "title": "Description",
                                     "type": "text",
-                                    "help_text": "A textual description of the person"
+                                    "help_text": "A textual description of the person",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.personsShown.description"
                                 },
-                                "identifiers": {
+                                {
                                     "key": "identifiers",
                                     "title": "Identifiers",
-                                    "type": "text",
-                                    "help_text": "Globally unique identifier of the person"
+                                    "type": "simple_array",
+                                    "help_text": "Globally unique identifier of the person",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.personsShown.identifiers",
+                                    "enum": []
                                 },
-                                "characteristics": {
+                                {
                                     "key": "characteristics",
                                     "title": "Characterstics",
                                     "help_text": "A product the content is about.",
                                     "type": "array",
-                                    "props": {
-                                        "cvId": {
+                                    "props": [
+                                        {
                                             "key": "cvId",
                                             "title": "CV-Term CV ID {CV-Term detail}",
                                             "type": "text",
-                                            "help_text": "The globally unique identifier of the Controlled Vocabulary the term is from."
+                                            "help_text": "The globally unique identifier of the Controlled Vocabulary the term is from.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.personsShown.characteristics.cvId"
                                         },
-                                        "cvTermName": {
-                                            "key": "description",
+                                        {
+                                            "key": "cvTermName",
                                             "title": "CV-Term Name",
                                             "type": "text",
-                                            "help_text": "The natural language name of the term from a Controlled Vocabulary."
+                                            "help_text": "The natural language name of the term from a Controlled Vocabulary.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.personsShown.characteristics.cvTermName"
                                         },
-                                        "cvTermId": {
+                                        {
                                             "key": "cvTermId",
                                             "title": "CV-Term ID",
                                             "type": "text",
-                                            "help_text": "The globally unique identifier of the term from a Controlled Vocabulary."
+                                            "help_text": "The globally unique identifier of the term from a Controlled Vocabulary.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.personsShown.characteristics.cvTermId"
                                         },
-                                        "cvTermRefinedAbout": {
+                                        {
                                             "key": "cvTermRefinedAbout",
                                             "title": "Refined 'about' Relationship of the CV-Term {CV-Term detail}",
                                             "type": "text",
-                                            "help_text": "The refined 'about' relationship of the term with the content."
+                                            "help_text": "The refined 'about' relationship of the term with the content.",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.personsShown.characteristics.cvTermRefinedAbout"
                                         }
-                                    }
+                                    ],
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.personsShown.characteristics"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.modelAges",
-                            "title": "Model Ages",
+                            "title": "Model ages",
                             "type": "simple_array",
-                            "help_text": "Age of the human model(s) at the time this image was taken in a model released image."
+                            "help_text": "Age of the human model(s) at the time the image was taken. Be aware of any legal implications of providing ages for young models. Ages below 18 years should not be included.",
+                            "enum": []
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.additionalModelInfo",
-                            "title": "Additional Model Information",
+                            "title": "Additional model information",
                             "type": "text",
                             "class": "required",
-                            "help_text": "Information about the ethnicity and other facets of the model(s) in a model-released image."
+                            "help_text": "Information about other facets of the model(s).",
+                            "enum": []
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.minorModelAgeDisclosure",
-                            "title": "Minor Model Age Disclosure",
+                            "title": "Minor model age disclosure",
                             "type": "text",
                             "class": "required",
-                            "help_text": "Age of the youngest model pictured in the image, at the time that the image was made."
+                            "help_text": "The age of the youngest model pictured in the image, at the time the image was created. This information is not intended to be displayed publicly; it is intended to be used as a filter for inclusion/exclusion of images in catalogs and dissemination processes.",
+                            "enum": [],
+                            "rules": {
+                                "is_uri": true
+                            }
                         },
-
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.modelReleaseDocuments",
-                            "title": "Model Release Documents",
-                            "type": "text",
+                            "title": "Model release documents",
+                            "type": "simple_array",
                             "class": "required",
-                            "help_text": "Optional identifier associated with each Model Release."
+                            "help_text": "Identifier associated with each Model Release.",
+                            "enum": []
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.modelReleaseStatus",
-                            "title": "Model Release Status",
+                            "title": "Model release status",
                             "class": "required",
-                            "help_text": "Summarises the availability and scope of model releases authorising usage of the likenesses of persons appearing in the photograph",
+                            "help_text": "Summarizes the availability and scope of model releases authorizing usage of the likenesses of persons appearing in the photograph.\n\n- cvId: The globally unique identifier of the Controlled Vocabulary the term is from.\n- cvTermName: The natural language name of the term from a Controlled Vocabulary.\n- cvTermId: The globally unique identifier of the term from a Controlled Vocabulary.\n- cvTermRefinedAbout: The refined ‘about’ relationship of the term with the content. Optionally enter a refinement of the \"About\" relationship of the term with the content of the image. This must be a globally unique identifier from a Controlled Vocabulary. May be used to refine the generic about relationship.",
                             "type": "array",
-                            "props": {
-                                "cvId": {
+                            "props": [
+                                {
                                     "key": "cvId",
                                     "title": "CV-Term CV ID",
                                     "type": "text",
-                                    "help_text": "The globally unique identifier of the Controlled Vocabulary the term is from."
+                                    "help_text": "The globally unique identifier of the Controlled Vocabulary the term is from.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.modelReleaseStatus.cvId"
                                 },
-                                "cvTermName": {
+                                {
                                     "key": "cvTermName",
                                     "title": "CV-Term Name",
                                     "type": "text",
-                                    "help_text": "The natural language name of the term from a Controlled Vocabulary."
+                                    "help_text": "The natural language name of the term from a Controlled Vocabulary.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.modelReleaseStatus.cvTermName"
                                 },
-                                "cvTermId": {
+                                {
                                     "key": "cvTermId",
                                     "title": "CV-Term ID",
                                     "type": "text",
-                                    "help_text": "The globally unique identifier of the term from a Controlled Vocabulary."
+                                    "help_text": "The globally unique identifier of the term from a Controlled Vocabulary.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.modelReleaseStatus.cvTermId"
                                 },
-                                "cvTermRefinedAbout": {
+                                {
                                     "key": "cvTermRefinedAbout",
                                     "title": "About",
                                     "type": "text",
-                                    "help_text": "The refined 'about' relationship of the term with the content."
+                                    "help_text": "The refined 'about' relationship of the term with the content.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.modelReleaseStatus.cvTermRefinedAbout"
                                 }
-                            }
-                        },
-                        {
-                            "key": "image_description.iptc.photoVideoMetadataIPTC.organisationInImageCodes",
-                            "title": "Organization in Image Codes",
-                            "type": "simple_array",                            
-                            "help_text": "Code from a controlled vocabulary for identifying the organisation or company which is featured in the image."
+                            ]
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.organisationInImageNames",
-                            "title": "Organization Name",
+                            "title": "Organization in image name",
                             "type": "simple_array",
-                            "help_text": "Name of the organisation or company which is featured in the image."
+                            "help_text": "The name of the organization or company which is featured in the image.",
+                            "enum": []
                         },
-                        
+                        {
+                            "key": "image_description.iptc.photoVideoMetadataIPTC.organisationInImageCodes",
+                            "title": "Organization in image codes",
+                            "type": "simple_array",
+                            "help_text": "The code, extracted from a controlled vocabulary, used to identify the organization or company featured in the image. For example a stock ticker symbol may be used. Enter an identifier for the controlled vocabulary, then a colon, and finally the code from the vocabulary assigned to the organization (e.g. nasdaq:companyA)",
+                            "enum": []
+                        },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.productsShown",
-                            "title": "Products Shown",
+                            "title": "Products shown",
                             "class": "required",
-                            "help_text": "A product the content is about.",
+                            "help_text": "Details about a product shown in the image.\n\n- Description: A textual description of the product.\n- GTIN: The Global Trade Item Number (GTIN) of the product (GTIN-8 to GTIN-14 codes can be used).\n- Name: The name of the product.",
                             "type": "array",
-                            "props": {
-                                "description": {
+                            "props": [
+                                {
                                     "key": "description",
                                     "title": "Description",
                                     "type": "text",
-                                    "help_text": "A textual description of the product."
+                                    "help_text": "A textual description of the product.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.productsShown.description"
                                 },
-                                "gtin": {
+                                {
                                     "key": "gtin",
                                     "title": "GTIN (Global Trade Item Number)",
-                                    "type": "text",                                    
+                                    "type": "text",
                                     "required": true,
-                                    "help_text": "A 14 digit GTIN (Global Trade Item Number) of the product (GTIN-8 to GTIN-14 codes are used)."
+                                    "help_text": "A 14 digit GTIN (Global Trade Item Number) of the product (GTIN-8 to GTIN-14 codes are used).",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.productsShown.gtin"
                                 },
-                                "name": {
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "text",
-                                    "help_text": "Name of the product."
+                                    "help_text": "Name of the product.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.productsShown.name"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.maxAvailHeight",
-                            "title": "Max Avail Height",
+                            "title": "Maximum available height",
                             "type": "text",
                             "help_text": "The maximum available height in pixels of the original photo from which this photo has been derived by downsizing.",
-                            "rules":"numeric"
+                            "rules": "numeric"
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.maxAvailWidth",
-                            "title": "Max Avail Width",
+                            "title": "Maximum available width",
                             "type": "text",
                             "class": "required",
                             "help_text": "The maximum available width in pixels of the original photo from which this photo has been derived by downsizing.",
-                            "rules":"numeric"
+                            "rules": "numeric"
                         },
-                        
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.propertyReleaseStatus",
                             "title": "Property release status",
                             "class": "required",
-                            "help_text": "Summarises the availability and scope of property releases authorising usage of the properties appearing in the photograph.",
+                            "help_text": "This summarizes the availability and scope of property releases authorizing usage of the properties appearing in the photograph. One value should be selected from a controlled vocabulary. It is recommended to apply the value PR-UPR very carefully and to check the wording of the property release thoroughly before applying it.\n\n- cvId: The globally unique identifier of the Controlled Vocabulary the term is from.\n- cvTermName: The natural language name of the term from a Controlled Vocabulary.\n- cvTermId: The globally unique identifier of the term from a Controlled Vocabulary.\n- cvTermRefinedAbout: Refined ‘about’ relationship of the CV-Term. The refined ‘about’ relationship of the term with the content. Optionally enter a refinement of the \"About\" relationship of the term with the content of the image. This must be a globally unique identifier from a Controlled Vocabulary.",
                             "type": "array",
-                            "props": {
-                                "cvId": {
+                            "props": [
+                                {
                                     "key": "cvId",
                                     "title": "CV-Term CV ID",
                                     "type": "text",
-                                    "help_text": "The globally unique identifier of the Controlled Vocabulary the term is from."
+                                    "help_text": "The globally unique identifier of the Controlled Vocabulary the term is from.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.propertyReleaseStatus.cvId"
                                 },
-                                "cvTermName": {
+                                {
                                     "key": "cvTermName",
                                     "title": "CV-Term Name",
                                     "type": "text",
-                                    "help_text": "The natural language name of the term from a Controlled Vocabulary."
+                                    "help_text": "The natural language name of the term from a Controlled Vocabulary.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.propertyReleaseStatus.cvTermName"
                                 },
-                                "cvTermId": {
+                                {
                                     "key": "cvTermId",
                                     "title": "CV-Term ID",
                                     "type": "text",
-                                    "help_text": "The globally unique identifier of the term from a Controlled Vocabulary."
+                                    "help_text": "The globally unique identifier of the term from a Controlled Vocabulary.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.propertyReleaseStatus.cvTermId"
                                 },
-                                "cvTermRefinedAbout": {
+                                {
                                     "key": "cvTermRefinedAbout",
                                     "title": "About",
                                     "type": "text",
-                                    "help_text": "The refined 'about' relationship of the term with the content."
+                                    "help_text": "The refined 'about' relationship of the term with the content.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.propertyReleaseStatus.cvTermRefinedAbout"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.propertyReleaseDocuments",
-                            "title": "Property Release Documents",
-                            "type": "text",
+                            "title": "Property release documents",
+                            "type": "simple_array",
                             "class": "required",
-                            "help_text": "Optional identifier associated with each Property Release."
+                            "help_text": "Optional identifier associated with each Property Release.",
+                            "enum": []
                         },
-                        
                         {
                             "key": "image_description.iptc.photoVideoMetadataIPTC.aboutCvTerms",
                             "title": "aboutCvTerms",
-                            "help_text":"Topics, themes or entities the content is about",
+                            "help_text": "Topics, themes or entities the content is about",
                             "class": "required",
                             "required": true,
                             "type": "array",
-                            "props": {
-                                "cvld": {
+                            "props": [
+                                {
                                     "key": "cvld",
                                     "title": "ID",
                                     "class": "required",
                                     "required": true,
                                     "type": "text",
-                                    "help_text": "The globally unique identifier of the Controlled Vocabulary the term is from"
+                                    "help_text": "The globally unique identifier of the Controlled Vocabulary the term is from",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.aboutCvTerms.cvld"
                                 },
-                                "cvTermName": {
+                                {
                                     "key": "cvTermName",
                                     "title": "Term name",
                                     "type": "text",
-                                    "help_text": "The natural language name of the term from a Controlled Vocabulary."
+                                    "help_text": "The natural language name of the term from a Controlled Vocabulary.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.aboutCvTerms.cvTermName"
                                 },
-                                "cvTermId": {
+                                {
                                     "key": "cvTermId",
                                     "title": "Term ID",
                                     "type": "text",
-                                    "help_text": "The globally unique identifier of the term from a Controlled Vocabulary."
+                                    "help_text": "The globally unique identifier of the term from a Controlled Vocabulary.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.aboutCvTerms.cvTermId"
                                 },
-                                "cvTermRefinedAbout": {
+                                {
                                     "key": "cvTermRefinedAbout",
                                     "title": "Details",
                                     "type": "text",
-                                    "help_text": "The refined 'about' relationship of the term with the content."
+                                    "help_text": "The refined 'about' relationship of the term with the content.",
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.aboutCvTerms.cvTermRefinedAbout"
                                 }
-                            }
-                        }                        
+                            ]
+                        }
                     ]
                 }
             ]
@@ -1039,191 +1172,187 @@
                             "title": "Resource type",
                             "type": "text",
                             "default": "image",
-                            "help_text": "Type of resource"
-                        },
-                        {
-                            "key": "image_description.dcmi.title",
-                            "title": "Title",
-                            "type": "text",
-                            "help_text": "Title"
-                        },
-                        {
-                            "key": "image_description.dcmi.caption",
-                            "title": "Caption",
-                            "type": "text",
-                            "help_text": "Photo caption"
-                        },
-                        {
-                            "key": "image_description.dcmi.description",
-                            "title": "description",
-                            "type": "textarea",
-                            "help_text": ""
-                        },
-                        {
-							"key": "image_description.dcmi.topics",
-							"type": "array",
-							"title": "Topics",
-							"props": {
-								"id": {
-									"key": "id",
-									"title": "ID",
-									"type": "text"
-								},
-								"name": {
-									"key": "name",
-									"title": "Topic",
-									"type": "text"
-								},
-								"parent_id": {
-									"key": "parent_id",
-									"title": "Parent topic Identifier",
-									"help_text": "For subtopics, provide the ID of the parent topic",
-									"type": "text"
-								},
-								"vocabulary": {
-									"key": "vocabulary",
-									"title": "Vocabulary",
-									"type": "text"
-								},
-								"uri": {
-									"key": "uri",
-									"title": "URL",
-									"type": "text"
-								}
-							}
-						},
-                        {
-							"key": "image_description.dcmi.keywords",
-							"type": "array",
-							"title": "Keywords",
-							"props": {
-								"name": {
-									"key": "name",
-									"title": "Name",
-									"type": "text"
-								},
-								"vocabulary": {
-									"key": "vocabulary",
-									"title": "Vocabulary",
-									"type": "text"
-								},
-								"uri": {
-									"key": "uri",
-									"title": "URL",
-									"type": "text"
-								}
-							}
-						},
-                        {
-                            "key": "image_description.dcmi.creator",
-                            "title": "Creator",
-                            "type": "text",
-                            "help_text": ""
-                        },
-                        {
-                            "key": "image_description.dcmi.contributor",
-                            "title": "Contributor",
-                            "type": "text",
-                            "help_text": ""
-                        },
-                        {
-                            "key": "image_description.dcmi.publisher",
-                            "title": "Publisher",
-                            "type": "text",
-                            "help_text": ""
+                            "help_text": "The Dublin Core schema is flexible and versatile, and can be used to document different types of resources. This element is used to document the type of resource being documented. The DCMI provides a list of suggested categories, including “image” which is the relevant type to be entered here. Some users may want to be more specific in the description of the type of resource, for example distinguishing color from black & white images. This distinction should not be made in this element; another element can be used for such purpose (like tags and tag groups)."
                         },
                         {
                             "key": "image_description.dcmi.date",
                             "title": "Date",
                             "type": "text",
-                            "help_text": ""
+                            "help_text": "The date when the photo was taken / the image was created, preferably entered in ISO 8601 format.",
+                            "is_recommended": true
                         },
                         {
-							"key": "image_description.dcmi.country",
-							"type": "array",
-							"title": "Keywords",
-							"props": {
-								"name": {
-									"key": "name",
-									"title": "Name",
-									"type": "text"
-								},								
-								"code": {
-									"key": "code",
-									"title": "Country code",
-									"type": "text"
-								}
-							}
-						},
+                            "key": "image_description.dcmi.title",
+                            "title": "Title",
+                            "type": "text",
+                            "help_text": "The title of the photo.",
+                            "is_recommended": true
+                        },
+                        {
+                            "key": "image_description.dcmi.caption",
+                            "title": "Caption",
+                            "type": "text",
+                            "help_text": "A caption for the photo.",
+                            "is_recommended": true
+                        },
+                        {
+                            "key": "image_description.dcmi.description",
+                            "title": "Description",
+                            "type": "textarea",
+                            "help_text": "A brief description of the content depicted in the image. This element will typically provide more detailed information than the title or caption. Note that other elements can be used to provide a more specific and “itemized” description of an image; the element \"Keywords\" for example can be used to list labels associated with an image (possibly generated in an automated manner using machine learning tools)."
+                        },
+                        {
+                            "key": "image_description.dcmi.keywords",
+                            "type": "array",
+                            "title": "Keywords",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text",
+                                    "prop_key": "image_description.dcmi.keywords.name"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulary",
+                                    "type": "text",
+                                    "prop_key": "image_description.dcmi.keywords.vocabulary"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "text",
+                                    "prop_key": "image_description.dcmi.keywords.uri"
+                                }
+                            ],
+                            "is_recommended": true
+                        },
+                        {
+                            "key": "image_description.dcmi.topics",
+                            "type": "array",
+                            "title": "Topics",
+                            "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "text",
+                                    "prop_key": "image_description.dcmi.topics.id"
+                                },
+                                {
+                                    "key": "name",
+                                    "title": "Topic",
+                                    "type": "text",
+                                    "prop_key": "image_description.dcmi.topics.name"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "title": "Parent topic Identifier",
+                                    "help_text": "For subtopics, provide the ID of the parent topic",
+                                    "type": "text",
+                                    "prop_key": "image_description.dcmi.topics.parent_id"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulary",
+                                    "type": "text",
+                                    "prop_key": "image_description.dcmi.topics.vocabulary"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "text",
+                                    "prop_key": "image_description.dcmi.topics.uri"
+                                }
+                            ],
+                            "help_text": "The topics field indicates the broad substantive topic(s) that the image represents. A topic classification facilitates referencing and searches in electronic survey catalogs. Topics should be selected from a standard controlled vocabulary such as the Council of European Social Science Data Archives (CESSDA) thesaurus.\n\n- ID: The unique identifier of the topic. It can be a sequential number, or the ID of the topic in a controlled vocabulary.\n- Name: The label of the topic associated with the data.\n- Parent ID: When a hierarchical (nested) controlled vocabulary is used, the \"Parent ID\" field can be used to indicate a higher-level topic to which this topic belongs.\n- Vocabulary: The name of the controlled vocabulary used, if any.\n- URL: A link to the controlled vocabulary mentioned in field \"Vocabulary\"."
+                        },
+                        {
+                            "key": "image_description.dcmi.country",
+                            "type": "array",
+                            "title": "Keywords",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text",
+                                    "prop_key": "image_description.dcmi.country.name"
+                                },
+                                {
+                                    "key": "code",
+                                    "title": "Country code",
+                                    "type": "text",
+                                    "prop_key": "image_description.dcmi.country.code"
+                                }
+                            ],
+                            "help_text": "Words or phrases that describe salient aspects of an image content. Can be used for building keyword indexes and for classification and retrieval purposes. A controlled vocabulary can be employed. Keywords should be selected from a standard thesaurus, preferably an international, multilingual thesaurus.\n\n- Name: Keyword (or phrase). Keywords summarize the content or subject matter of the image.\n- Vocabulary: Controlled vocabulary from which the keyword is extracted, if any.\n- URL: The URI of the controlled vocabulary used, if any.",
+                            "is_recommended": true
+                        },
                         {
                             "key": "image_description.dcmi.coverage",
-                            "title": "Coverage",
+                            "title": "Geographic coverage",
                             "type": "text",
-                            "help_text": ""
+                            "help_text": "In the Dublin Core, the coverage can be either temporal or geographic. In the use of the schema, coverage is used to document the geographic coverage of the image. This element complements the \"Country\" element, and allows more specific information to be provided."
                         },
                         {
-                            "key": "image_description.dcmi.gps",
-                            "title": "Coverage",
-                            "type": "section",
-                            "help_text": "",
-                            "items":[
-                                {
-                                    "key": "image_description.dcmi.gps.latitude",
-                                    "title": "Latitude",
-                                    "type": "text",
-                                    "help_text": ""
-                                },
-                                {
-                                    "key": "image_description.dcmi.gps.longitude",
-                                    "title": "Longitude",
-                                    "type": "text",
-                                    "help_text": ""
-                                },
-                                {
-                                    "key": "image_description.dcmi.gps.altitude",
-                                    "title": "Altitude",
-                                    "type": "text",
-                                    "help_text": ""
-                                }                                
-                            ]
+                            "key": "image_description.dcmi.gps.latitude",
+                            "title": "Latitude",
+                            "type": "text",
+                            "help_text": "The latitude of the geographic location where the photo was taken."
+                        },
+                        {
+                            "key": "image_description.dcmi.gps.longitude",
+                            "title": "Longitude",
+                            "type": "text",
+                            "help_text": "The longitude of the geographic location where the photo was taken."
+                        },
+                        {
+                            "key": "image_description.dcmi.gps.altitude",
+                            "title": "Altitude",
+                            "type": "text",
+                            "help_text": "The altitude of the geographic location where the photo was taken."
                         },
                         {
                             "key": "image_description.dcmi.format",
                             "title": "Format",
                             "type": "string",
-                            "help_text": "Image file format e.g. `image/gif`"
+                            "help_text": "This refers to the image file format. It is typically expressed using a MIME format.",
+                            "enum": []
                         },
                         {
-							"key": "image_description.dcmi.languages",
-							"type": "array",
-							"title": "Languages",
-							"props": {
-								"name": {
-									"key": "name",
-									"title": "Name",
-									"type": "text"
-								},								
-								"code": {
-									"key": "code",
-									"title": "Code",
-									"type": "text"
-								}
-							}
-						},
+                            "key": "image_description.dcmi.languages",
+                            "type": "array",
+                            "title": "Language",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text",
+                                    "prop_key": "image_description.dcmi.languages.name"
+                                },
+                                {
+                                    "key": "code",
+                                    "title": "Code",
+                                    "type": "text",
+                                    "prop_key": "image_description.dcmi.languages.code"
+                                }
+                            ],
+                            "help_text": "The language(s) in which the image metadata (caption, title) is provided. This is a block of two elements (at least one must be provided for each language).\n\n- Name: The name of the language.\n- Code: The code of the language. The use of ISO 639-2 (the alpha-3 code in Codes for the representation of names of languages) is recommended. Numeric codes must be entered as strings."
+                        },
                         {
-							"key": "image_description.dcmi.relations",
-							"type": "array",
-							"title": "Related resources",
-							"props": {
-								"name": {
-									"key": "name",
-									"title": "Name",
-									"type": "text"
-								},								
-								"type": {
-									"key": "type",
-									"title": "Type",
-									"type": "text",
+                            "key": "image_description.dcmi.relations",
+                            "type": "array",
+                            "title": "Relations",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text",
+                                    "prop_key": "image_description.dcmi.relations.name"
+                                },
+                                {
+                                    "key": "type",
+                                    "title": "Type",
+                                    "type": "text",
                                     "enum": [
                                         "isPartOf",
                                         "hasPart",
@@ -1236,37 +1365,67 @@
                                         "isBasisFor",
                                         "requires",
                                         "isRequiredBy"
-                                      ]
-								},
-                                "uri": {
-									"key": "uri",
-									"title": "URL",
-									"type": "text"
-								}
-							}
-						},
-                        {
-                            "key": "image_description.dcmi.rights",
-                            "title": "Rights",
-                            "type": "string",
-                            "help_text": ""
-                        },
-                        {
-                            "key": "image_description.dcmi.source",
-                            "title": "Source",
-                            "type": "string",
-                            "help_text": "Related resource from which resource is derived"
+                                    ],
+                                    "prop_key": "image_description.dcmi.relations.type"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "text",
+                                    "prop_key": "image_description.dcmi.relations.uri"
+                                }
+                            ],
+                            "help_text": "A list of related resources (images or of other type)\n\n- Name: The name (title) of the related resource.\n- Type: A brief description of the type of relation. A controlled vocabulary could be used.\n- URL: A link to the related resource being described."
                         },
                         {
                             "key": "image_description.dcmi.note",
                             "title": "Note",
                             "type": "string",
-                            "help_text": "Any additional information not covered by other fields"
+                            "help_text": "Any additional information on the image, not captured in one of the other metadata elements.",
+                            "enum": []
                         }
                     ]
+                },
+                {
+                    "key": "DCMI1673378175843",
+                    "title": "Authors and rights",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "image_description.dcmi.creator",
+                            "title": "Creator",
+                            "type": "text",
+                            "help_text": "The name of the person (or organization) who has taken the photo or created the image."
+                        },
+                        {
+                            "key": "image_description.dcmi.contributor",
+                            "title": "Contributor",
+                            "type": "text",
+                            "help_text": "The contributor could be a person or organization, possibly a sponsoring organization."
+                        },
+                        {
+                            "key": "image_description.dcmi.publisher",
+                            "title": "Publisher",
+                            "type": "text",
+                            "help_text": "The person or organization who publish the image."
+                        },
+                        {
+                            "key": "image_description.dcmi.rights",
+                            "title": "Rights",
+                            "type": "string",
+                            "help_text": "The copyright for the photograph. License is in another (common) element.",
+                            "enum": []
+                        },
+                        {
+                            "key": "image_description.dcmi.source",
+                            "title": "Source",
+                            "type": "string",
+                            "help_text": "A related resource from which the described image is derived.",
+                            "enum": []
+                        }
+                    ],
+                    "help_text": ""
                 }
-                
-
             ]
         },
         {
@@ -1280,18 +1439,56 @@
                     "title": "License",
                     "class": "required",
                     "type": "array",
-                    "props": {
-                        "name": {
+                    "props": [
+                        {
                             "key": "name",
                             "title": "License",
-                            "type": "text"
+                            "type": "text",
+                            "prop_key": "image_description.license.name"
                         },
-                        "uri": {
+                        {
                             "key": "uri",
                             "title": "URI",
-                            "type": "text"
+                            "type": "text",
+                            "prop_key": "image_description.license.uri"
                         }
-                    }
+                    ],
+                    "help_text": "The license under which the image is published.\n\n- Name: The name of the license.\n- URL: A URL where detailed information on the license / terms of use can be found.\n"
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "key": "album",
+            "title": "Album",
+            "items": [
+                {
+                    "key": "image_description.album",
+                    "title": "Album",
+                    "type": "array",
+                    "props": [
+                        {
+                            "key": "name",
+                            "title": "Name",
+                            "type": "text"
+                        },
+                        {
+                            "key": "description",
+                            "title": "Description",
+                            "type": "text"
+                        },
+                        {
+                            "key": "owner",
+                            "title": "Owner",
+                            "type": "text"
+                        },
+                        {
+                            "key": "uri",
+                            "title": "URI",
+                            "type": "text",
+                            "prop_key": "image_description.license.uri"
+                        }
+                    ]
                 }
             ]
         },
@@ -1305,18 +1502,18 @@
                     "key": "tags",
                     "title": "Tags",
                     "type": "array",
-                    "props": {
-                        "tag_group": {
+                    "props": [
+                        {
                             "key": "tag_group",
                             "title": "Tag group",
                             "type": "string"
                         },
-                        "tag": {
+                        {
                             "key": "tag",
                             "title": "Tag",
                             "type": "string"
                         }
-                    }
+                    ]
                 }
             ]
         }

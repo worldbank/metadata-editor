@@ -28,30 +28,30 @@
                             "key": "metadata_information.producers",
                             "title": "Producers",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "text",
                                     "help_text": "Name (required)",
                                     "class": "required"
                                 },
-                                "abbr": {
+                                {
                                     "key": "abbreviation",
                                     "title": "Abbreviation",
                                     "type": "text"
                                 },
-                                "affiliation": {
+                                {
                                     "key": "affiliation",
                                     "type": "string",
                                     "title": "Affiliation"
                                 },
-                                "role": {
+                                {
                                     "key": "role",
                                     "title": "Role",
                                     "type": "string"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "metadata_information.production_date",
@@ -115,6 +115,11 @@
                             "type": "text"
                         },
                         {
+                            "key": "table_description.title_statement.translated_title",
+                            "title": "Alternate title",
+                            "type": "text"
+                        },
+                        {
                             "key": "table_description.title_statement.abbreviated_title",
                             "title": "Abbreviated Title",
                             "help_text": "Title as abbreviated for indexing or identification.",
@@ -133,19 +138,19 @@
 							"title": "Other Identifiers",
 							"type": "array",
 							"help_text": "Identifiers such as ISSN, ISBN, DOI",
-							"props": {
-								"type": {
+							"props": [
+								{
 									"key": "type",
 									"title": "ID Type",
 									"type": "text",
 									"help_text": "Identifiers such as ISSN, ISBN, DOI"
 								},
-								"identifier": {
+								{
 									"key": "identifier",
 									"title": "Identifier",
 									"type": "text"
 								}
-							}
+                            ]
 						}
                     ]
                 },
@@ -159,100 +164,118 @@
                             "key": "table_description.authoring_entity",
                             "title": "Primary investigator",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "text"
                                 },
-                                "affiliation": {
+                                {
                                     "key": "affiliation",
                                     "title": "Affiliation",
                                     "type": "text"
                                 },
-                                "abbreviation": {
+                                {
                                     "key": "abbreviation",
                                     "title": "Abbreviation",
                                     "type": "text"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "title": "URI",
                                     "type": "text"
+                                },
+                                {
+                                    "key": "author_id",
+                                    "type": "array",
+                                    "title": "Author ID",
+                                    "help_text": "Unique identifier of an author, which may be provided by services like ORCID or other",
+                                    "props":[
+                                        {
+                                            "key": "type",
+                                            "type": "text",
+                                            "title": "Type"
+                                        },
+                                        {
+                                            "key": "id",
+                                            "type": "text",
+                                            "title": "ID"
+                                        }
+                                    ]
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "table_description.contributors",
                             "title": "Contributors",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "text",
                                     "help_text": "Name of the person, corporate body, or agency responsible for the work's substantive and intellectual content. If a person, invert first and last name and use commas."
                                 },
-                                "role": {
+                                {
                                     "key": "role",
                                     "title": "Role",
                                     "type": "text",
                                     "help_text": "Title of the person (if any) responsible for the work's substantive and intellectual content."
                                 },
-                                "affiliation": {
+                                {
                                     "key": "affiliation",
                                     "title": "Affiliation",
                                     "type": "text"
                                 },
-                                "abbreviation": {
+                                {
                                     "key": "abbreviation",
                                     "title": "Abbreviation",
                                     "help_text": "Abbreviation",
                                     "type": "text"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "type": "text",
                                     "title": "URI",
                                     "help_text": "URI"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "table_description.publisher",
                             "title": "Publisher",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "text",
                                     "help_text": "Name of the person, corporate body, or agency responsible for the work's substantive and intellectual content. If a person, invert first and last name and use commas."
                                 },
-                                "role": {
+                                {
                                     "key": "role",
                                     "title": "Role",
                                     "type": "text",
                                     "help_text": "Title of the person (if any) responsible for the work's substantive and intellectual content."
                                 },
-                                "affiliation": {
+                                {
                                     "key": "affiliation",
                                     "title": "Affiliation",
                                     "type": "text"
                                 },
-                                "abbreviation": {
+                                {
                                     "key": "abbreviation",
                                     "title": "Abbreviation",
                                     "help_text": "Abbreviation",
                                     "type": "text"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "type": "text",
                                     "title": "URI",
                                     "help_text": "URI"
                                 }
-                            }
+                            ]
                         }
                     ]
                 },
@@ -301,156 +324,227 @@
                             "type": "array",
                             "title": "Table column names",
                             "help_text": "List of table column names",
-                            "props": {
-                                "var_name": {
-                                    "key": "name",
+                            "props": [
+                                {
+                                    "key": "var_name",
                                     "title": "Variable name",
                                     "help_text": "Variable name",
                                     "type": "text"
                                 },
-                                "label": {
+                                {
                                     "key": "label",
                                     "title": "Label",
                                     "type": "text"
+                                },
+                                {
+                                    "key": "dataset",
+                                    "title": "Dataset",
+                                    "type": "text",
+                                    "help_text":"Identifies the dataset that contains the variable reported in var_name"
                                 }
-                            }
+                            ]
+                        },
+                        {
+                            "key": "table_description.table_rows",
+                            "type": "array",
+                            "title": "Table rows",
+                            "help_text": "Table row level data",
+                            "props": [
+                                {
+                                    "key": "label",
+                                    "title": "Label",
+                                    "type": "text",
+                                    "is_required":true
+                                },
+                                {
+                                    "key": "var_name",
+                                    "title": "Variable name",
+                                    "help_text": "Variable name",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "dataset",
+                                    "title": "Dataset",
+                                    "type": "text",
+                                    "help_text":"Identifies the dataset that contains the variable reported in var_name"
+                                }
+                                
+                            ]
+                        },
+                        {
+                            "key": "table_description.table_footnotes",
+                            "type": "array",
+                            "title": "Table footnotes",
+                            "help_text": "Table footnotes",
+                            "props": [
+                                {
+                                    "key": "number",
+                                    "title": "Number",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "text",
+                                    "title": "Text",                                    
+                                    "type": "text"
+                                }
+                            ]
                         },
                         {
                             "key": "table_description.table_series",
                             "type": "array",
                             "title": "Table series",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "text"
                                 },
-                                "maintainer": {
+                                {
                                     "key": "maintainer",
                                     "title": "Maintainer",
                                     "type": "text"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "title": "URI",
                                     "type": "text"
                                 },
-                                "help_text": {
-                                    "key": "help_text",
-                                    "title": "Help text",
+                                {
+                                    "key": "description",
+                                    "title": "Description",
                                     "type": "text"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "table_description.statistics",
                             "type": "array",
                             "title": "Table statistics",
-                            "props": {
-                                "value": {
+                            "props": [
+                                {
                                     "key": "value",
                                     "title": "Value",
                                     "type": "text"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "table_description.unit_observation",
                             "type": "array",
                             "title": "Unit observations",
-                            "props": {
-                                "value": {
+                            "props": [
+                                {
                                     "key": "value",
                                     "title": "Value",
                                     "type": "text"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "table_description.data_sources",
                             "type": "array",
                             "title": "Data sources",
-                            "props": {
-                                "value": {
-                                    "key": "value",
-                                    "title": "Value",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "abbreviation",
+                                    "title": "Abbreviation",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "source_id",
+                                    "title": "Source ID",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "note",
+                                    "title": "Note",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
                                     "type": "text"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "table_description.time_periods",
                             "type": "array",
                             "title": "Time periods",
-                            "props": {
-                                "from": {
+                            "props": [
+                                {
                                     "key": "from",
                                     "title": "Start date",
                                     "help_text": "Date in ISO format  (YYYY-MM-DD). Partial dates are supported",
                                     "type": "text"
                                 },
-                                "to": {
+                                {
                                     "key": "to",
                                     "title": "End date",
                                     "help_text": "Date in ISO format  (YYYY-MM-DD). Partial dates are supported",
                                     "type": "text"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "table_description.universe",
                             "type": "array",
                             "title": "Universe",
-                            "props": {
-                                "value": {
+                            "props": [
+                                {
                                     "key": "value",
                                     "title": "Universe",
                                     "type": "text"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "table_description.ref_country",
                             "type": "array",
                             "title": "Reference country",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Country name",
                                     "type": "text"
                                 },
-                                "code": {
+                                {
                                     "key": "code",
                                     "title": "Country code",
                                     "type": "text"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "table_description.geographic_units",
                             "type": "array",
                             "title": "Geographic locations",
                             "help_text": "List of geographic units (regions, countries, states, provinces, etc.) for which data are available in the database.",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Location name",
                                     "help_text": "Name of the geographic unit e.g. 'World', 'Africa', 'Afghanistan'",
                                     "type": "text"
                                 },
-                                "code": {
+                                {
                                     "key": "code",
                                     "title": "Location code",
                                     "help_text": "Code of the geographic unit (for countries, preferred = ISO3 code)",
                                     "type": "text"
                                 },
-                                "type": {
+                                {
                                     "key": "type",
                                     "title": "Type",
                                     "help_text": "Type of geographic unit e.g. country, state, region, province etc",
                                     "type": "text"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "table_description.geographic_granularity",
@@ -459,206 +553,272 @@
                             "help_text": "Granularity of geographic coverage. examples `national`, `regional`, `provincial`"
                         },
                         {
+							"key": "table_description.bbox",
+							"title": "Geographic bounding box",
+							"type": "array",
+							"props": [
+								{
+									"key": "west",
+									"title": "West",
+									"type": "text"
+								},
+								{
+									"key": "east",
+									"title": "East",
+									"type": "text"
+								},
+								{
+									"key": "south",
+									"title": "South",
+									"type": "text"
+								},
+								{
+									"key": "north",
+									"title": "North",
+									"type": "text"
+								}
+                            ]
+						},
+                        {
                             "key": "table_description.languages",
                             "type": "array",
                             "title": "Languages",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "text"
                                 },
-                                "code": {
+                                {
                                     "key": "code",
                                     "title": "Code",
                                     "type": "text"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "table_description.links",
                             "type": "array",
                             "title": "Links",
-                            "props": {
-                                "uri": {
+                            "props": [
+                                 {
                                     "key": "uri",
                                     "title": "URL",
                                     "type": "text"
                                 },
-                                "help_text": {
-                                    "key": "help_text",
+                                {
+                                    "key": "description",
                                     "title": "Help text",
                                     "type": "text"
                                 }
-                            }
+                            ]
+                        },
+                        {
+                            "key": "table_description.api_documentation",
+                            "type": "array",
+                            "title": "API documentation",
+                            "props": [
+                                 {
+                                    "key": "description",
+                                    "title": "description",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "text"
+                                }
+                            ]
                         },
                         {
                             "key": "table_description.publications",
                             "type": "array",
                             "title": "Publications",
-                            "props": {
-                                "title": {
+                            "props": [
+                                {
                                     "key": "title",
                                     "title": "Title",
                                     "type": "text"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "title": "URL",
                                     "type": "text"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "table_description.keywords",
                             "type": "array",
                             "title": "Keywords",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Keyword",
                                     "type": "text"
                                 },
-                                "vocabulary": {
+                                {
                                     "key": "vocabulary",
                                     "title": "Vocabulary",
                                     "type": "text"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "title": "URL",
                                     "type": "text"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "table_description.themes",
                             "type": "array",
                             "title": "Themes",
-                            "props": {
-                                "name": {
-                                    "key": "name",
-                                    "title": "Theme",
-                                    "type": "text"
-                                },
-                                "vocabulary": {
-                                    "key": "vocabulary",
-                                    "title": "Vocabulary",
-                                    "type": "text"
-                                },
-                                "uri": {
-                                    "key": "uri",
-                                    "title": "URL",
-                                    "type": "text"
-                                }
-                            }
-                        },
-                        {
-                            "key": "table_description.topics",
-                            "type": "array",
-                            "title": "Topics",
-                            "props": {
-                                "id": {
+                            "props": [
+                                {
                                     "key": "id",
                                     "title": "ID",
                                     "type": "text"
                                 },
-                                "name": {
-                                    "key": "name",
-                                    "title": "Topic",
-                                    "type": "text"
-                                },
-                                "parent_id": {
+                                {
                                     "key": "parent_id",
                                     "title": "Parent topic Identifier",
                                     "help_text": "For subtopics, provide the ID of the parent topic",
                                     "type": "text"
                                 },
-                                "vocabulary": {
+                                {
+                                    "key": "name",
+                                    "title": "Theme",
+                                    "type": "text"
+                                },
+                                {
                                     "key": "vocabulary",
                                     "title": "Vocabulary",
                                     "type": "text"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "title": "URL",
                                     "type": "text"
                                 }
-                            }
+                            ]
+                        },
+                        {
+                            "key": "table_description.topics",
+                            "type": "array",
+                            "title": "Topics",
+                            "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "name",
+                                    "title": "Topic",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "title": "Parent topic Identifier",
+                                    "help_text": "For subtopics, provide the ID of the parent topic",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulary",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "text"
+                                }
+                            ]
                         },
                         {
                             "key": "table_description.disciplines",
                             "type": "array",
                             "title": "Disciplines",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "title": "Parent topic Identifier",
+                                    "help_text": "For subtopics, provide the ID of the parent topic",
+                                    "type": "text"
+                                },
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "text"
                                 },
-                                "vocabulary": {
+                                {
                                     "key": "vocabulary",
                                     "title": "Vocabulary",
                                     "type": "text"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "title": "URL",
                                     "type": "text"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "table_description.definitions",
                             "type": "array",
                             "title": "Definitions",
                             "help_text": "Definitions or concepts covered by the table",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "text"
                                 },
-                                "definition": {
+                                {
                                     "key": "definition",
                                     "title": "Definition",
                                     "type": "text"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "title": "URL",
                                     "type": "text"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "table_description.classifications",
                             "type": "array",
                             "title": "Classifications",
                             "help_text": "Classifications used in the table",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "text"
                                 },
-                                "version": {
+                                {
                                     "key": "version",
                                     "title": "Version",
                                     "type": "text"
                                 },
-                                "organization": {
+                                {
                                     "key": "organization",
                                     "title": "Organization",
                                     "help_text": "Organization responsible for the classification",
                                     "type": "text"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "title": "URL",
                                     "type": "text"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "table_description.rights",
@@ -669,18 +829,18 @@
                             "key": "table_description.license",
                             "title": "License",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "text"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "title": "URI",
                                     "type": "text"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "table_description.citation",
@@ -694,66 +854,72 @@
                             "type": "text"
                         },
                         {
+                            "key": "table_description.sdc",
+                            "title": "Statistical disclosure control",
+                            "type": "text",
+                            "help_text": "Information on statistical disclosure control measures applied to the table. This can include cell suppression, or other techniques. Specialized packages have been developed for this purpose, like sdcTable: Methods for Statistical Disclosure Control in Tabular Data (https://cran.r-project.org/web/packages/sdcTable/index.html) and https://cran.r-project.org/web/packages/sdcTable/sdcTable.pdf The information provided here should be such that it does not provide intruders with useful information for reverse-engineering the protection measures applied to the table."
+                        },
+                        {
                             "key": "table_description.contacts",
                             "title": "Contacts",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "string"
                                 },
-                                "role": {
+                                {
                                     "key": "role",
                                     "title": "Role",
                                     "type": "string"
                                 },
-                                "affiliation": {
+                                {
                                     "key": "affiliation",
                                     "title": "Affiliation",
                                     "type": "string"
                                 },
-                                "email": {
+                                {
                                     "key": "email",
                                     "title": "Email",
                                     "type": "string"
                                 },
-                                "telephone": {
+                                {
                                     "key": "telephone",
                                     "title": "Phone",
                                     "type": "string"
                                 },
-                                "uri": {
+                                {
                                     "key": "uri",
                                     "title": "URI",
                                     "type": "string"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "table_description.notes",
                             "title": "Notes",
                             "type": "array",
-                            "props": {
-                                "name": {
-                                    "key": "name",
+                            "props": [
+                                 {
+                                    "key": "note",
                                     "title": "Note",
                                     "type": "string"
                                 }
-                            }
+                            ]
                         },
                         {
                             "key": "table_description.relations",
                             "title": "Relations",
                             "help_text": "Related tables",
                             "type": "array",
-                            "props": {
-                                "name": {
+                            "props": [
+                                 {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "string"
                                 },
-                                "type": {
+                                {
                                     "key": "type",
                                     "title": "Type",
                                     "type": "string",
@@ -771,7 +937,7 @@
                                         "isRequiredBy"
                                     ]
                                 }
-                            }
+                            ]
                         }
                     ]
                 }
@@ -787,18 +953,18 @@
             "key": "table_description.tags",
             "title": "Tags",
             "type": "array",
-            "props": {
-                "tag_group": {
+            "props": [
+                {
                     "key": "tag_group",
                     "title": "Tag group",
                     "type": "string"
                 },
-                "tag": {
+                {
                     "key": "tag",
                     "title": "Tag",
                     "type": "string"
                 }
-            }
+            ]
         }]
         }
        
