@@ -69,6 +69,7 @@
                     <table class="table table-sm table-striped border bg-white mb-5">
                       <tr class="bg-secondary">
                         <th>Type</th>
+                        <th>Default</th>
                         <th>Title</th>
                         <th>Language</th>
                         <th>Version</th>
@@ -80,6 +81,12 @@
                           <tr>                           
                             <td>{{template.template_type}}</td>
                             <td>
+                              <span class="btn btn-sm btn-link" @click="setDefaultTemplate(template.data_type,template.uid)">
+                                <v-icon v-if="template.default">mdi-radiobox-marked</v-icon>
+                                <v-icon v-else>mdi-radiobox-blank</v-icon>
+                              </span>
+                            </td>
+                            <td>
                               <span style="font-weight:bold;" href="#" >{{template.name}}</span>
                               <div>{{template.uid}}</div>
                             </td>
@@ -88,7 +95,7 @@
                             <td>-</td>
                             <td>
                               <button type="button" class="btn btn-sm btn-link" @click="duplicateTemplate(template.uid)" >Duplicate</button>
-                              <button type="button" class="btn btn-sm btn-link" @click="exportTemplate(template.uid)" >Export</button>
+                              <button type="button" class="btn btn-sm btn-link" @click="exportTemplate(template.uid)" >Export</button>                              
                             </td>
                           </tr>  
                         </template>
@@ -98,6 +105,12 @@
                         <template v-if="data_type==template.data_type">
                           <tr>
                             <td>{{template.template_type}}</td>
+                            <td>
+                              <span class="btn btn-sm btn-link" @click="setDefaultTemplate(template.data_type,template.uid)">
+                                <v-icon v-if="template.default">mdi-radiobox-marked</v-icon>
+                                <v-icon v-else>mdi-radiobox-blank</v-icon>
+                              </span>
+                            </td>
                             <td>
                               <a href="#"  @click="editTemplate(template.uid)">{{template.name}}</a>
                               <div>{{template.uid}}</div>
@@ -109,7 +122,7 @@
                               <button type="button" class="btn btn-sm btn-link" @click="duplicateTemplate(template.uid)" >Duplicate</button>
                               <button type="button" class="btn btn-sm btn-link" @click="editTemplate(template.uid)" >Edit</button>
                               <button type="button" class="btn btn-sm btn-link" @click="exportTemplate(template.uid)" >Export</button>
-                              <button type="button" class="btn btn-sm btn-link" @click="deleteTemplate(template.uid)" >Delete</button>    
+                              <button type="button" class="btn btn-sm btn-link" @click="deleteTemplate(template.uid)" >Delete</button>                              
                             </td>
                           </tr>  
                         </template>
@@ -142,7 +155,7 @@
 
             <v-card-text>
               <div>
-                <textarea style="width:100%;height:300px;" v-model="import_template"></textarea>
+                <textarea style="width:100%;height:300px;" ></textarea>
               </div>
             </v-card-text>
 
@@ -279,6 +292,29 @@
           this.templates.core.forEach((template, index) => {
             this.data_types.push(template.data_type);
           });
+        },        
+        setDefaultTemplate: function (template_type,uid){
+          vm = this;
+          let form_data = {};
+          let url = CI.base_url + '/api/templates/default/' + template_type + '/' + uid;
+
+          axios.post(url,
+              form_data
+              /*headers: {
+                  "xname" : "value"
+              }*/
+            )
+            .then(function(response) {
+              console.log(response);
+              vm.loadTemplates();
+            })
+            .catch(function(error) {
+              console.log("error", error);
+              alert("Failed", error);
+            })
+            .then(function() {
+              console.log("request completed");
+            });
         },
         deleteTemplate: function (uid){
           if (!confirm("Confirm to delete?")){

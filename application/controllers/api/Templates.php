@@ -38,7 +38,6 @@ class Templates extends MY_REST_Controller
 			}
 
 			//$this->has_dataset_access('view');
-						
 			$result=$this->Editor_template_model->select_all();
 			array_walk($result, 'unix_date_to_gmt',array('created','changed'));
 			
@@ -267,6 +266,75 @@ class Templates extends MY_REST_Controller
 		}
 		catch(Exception $e){
 			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	/**
+	 * 
+	 * Set default template
+	 * @template_uid
+	 * 
+	 **/ 
+	function default_post($type=null,$uid=null)
+	{		
+		try{			
+			$result=$this->Editor_template_model->set_default_template($type,$uid);
+
+			$output=array(
+				'status'=>'success',
+				'template'=>$result
+			);
+
+			$this->set_response($output, REST_Controller::HTTP_OK);			
+		}
+		catch(Exception $e){
+			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	function default_get($type=null)
+	{
+		try{
+			//$this->has_dataset_access('view',$sid);
+
+			$result=$this->Editor_template_model->get_default_template($type);
+				
+			$response=array(
+				'status'=>'success',
+				'result'=>$result
+			);			
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	function defaults_get($type=null)
+	{
+		try{
+			//$this->has_dataset_access('view',$sid);
+
+			$result=$this->Editor_template_model->get_all_default_templates();
+				
+			$response=array(
+				'status'=>'success',
+				'result'=>$result
+			);			
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
 

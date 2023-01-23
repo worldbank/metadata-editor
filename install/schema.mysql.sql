@@ -1610,3 +1610,12 @@ CREATE TABLE `editor_templates` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uid_UNIQUE` (`uid`)
 ) AUTO_INCREMENT=1;
+
+
+
+CREATE TABLE `editor_templates_default` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `data_type` varchar(30) NOT NULL,
+  `template_uid` varchar(255) NOT NULL,  
+  PRIMARY KEY (`id`)
+) DEFAULT CHARSET=utf8;

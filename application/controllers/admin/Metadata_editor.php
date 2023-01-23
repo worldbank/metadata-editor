@@ -137,10 +137,6 @@ class Metadata_editor extends MY_Controller {
 		$options['type']=$project['type'];		
 		$options['metadata']=$project['metadata'];
 
-		if($project['type']=='geospatial'){
-			//show_error('GEOSPATIAL-TYPE-NOT-SUPPORTED');
-		}
-
 		//fix schema elements with mixed types
 		if ($project['type']=='survey'){
 			//coll_mode
@@ -159,8 +155,13 @@ class Metadata_editor extends MY_Controller {
 		}
 		
 		if (empty($template)){
+			$core_templates_by_type=$this->Editor_template_model->get_core_templates_by_type($project['type']);
+			if (!$core_templates_by_type){
+				throw new Exception("Template not found for type", $project['type']);
+			}
+
 			//load default core template by type
-			$template=$this->Editor_template_model->get_template_by_uid('core-'.$project['type']);
+			$template=$this->Editor_template_model->get_template_by_uid($core_templates_by_type[0]["uid"]);
 		}
 
 		$options['metadata_template']=json_encode($template);
