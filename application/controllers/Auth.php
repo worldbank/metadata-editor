@@ -15,7 +15,7 @@ class Auth extends MY_Controller {
     	$this->load->helper('admin_notifications');
 
     	$this->template->set_template('default');
-    	$this->template->write('sidebar', $this->_menu(),true);
+    	//$this->template->write('sidebar', $this->_menu(),true);
 
 		$this->lang->load('general');
 		$this->lang->load('users');

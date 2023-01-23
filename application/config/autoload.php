@@ -59,7 +59,7 @@ $autoload['libraries'] = array(
 							'DB_Logger',
 							'MY_Exception',
 							'ion_auth',
-							'breadcrumb',
+							//'breadcrumb',
 							'events',
 							'acl_manager'
 							);
@@ -120,7 +120,12 @@ $autoload['language'] = array();
 |
 */
 
-$autoload['model'] = array('Configurations_model','Menu_model','Repository_model','Stats_model');
+$autoload['model'] = array(
+	'Configurations_model',
+	//'Menu_model',
+	//'Repository_model',
+	//'Stats_model'
+);
 
 
 

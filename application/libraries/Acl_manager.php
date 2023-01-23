@@ -16,7 +16,7 @@ class Acl_manager
 		log_message('debug', "Acl_manager Class Initialized.");
 		$this->ci =& get_instance();
 		//$this->ci->load->model('Permissions_model');
-		$this->ci->load->model('repository_model');
+		//$this->ci->load->model('repository_model');
 
 		if ($this->ci->config->item('acl_debug')==true){
 			$this->debug=true;

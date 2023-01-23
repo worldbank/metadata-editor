@@ -5,7 +5,7 @@
  * handles all Catalog Maintenance pages
  *
  */
-class Metadata_editor extends MY_Controller {
+class Editor extends MY_Controller {
 
 	var $active_repo=NULL; //active repo object
 

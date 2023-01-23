@@ -7,11 +7,11 @@ class Editor extends MY_REST_Controller
 	public function __construct()
 	{
 		parent::__construct();
-		$this->load->model('Catalog_model'); 	
+		//$this->load->model('Catalog_model'); 	
 		$this->load->helper("date");
-		$this->load->model('Data_file_model');
-		$this->load->model('Variable_model');	
-		$this->load->model('Dataset_model');//remove with Datasets library
+		//$this->load->model('Data_file_model');
+		//$this->load->model('Variable_model');	
+		//$this->load->model('Dataset_model');//remove with Datasets library
 		$this->load->model("Editor_model");
 		$this->load->model("Editor_resource_model");
 		$this->load->model("Editor_publish_model");

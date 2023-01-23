@@ -15,6 +15,8 @@ class Page extends MY_Controller {
     
 	function index()
 	{	
+		echo "index";
+		return;
 		if (in_array($this->uri->segment(1), array('page','pages')) ){
 			if ($this->uri->segment(2)!=''){
 				//get page data
