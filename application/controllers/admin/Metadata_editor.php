@@ -247,16 +247,20 @@ class Metadata_editor extends MY_Controller {
 
 	function template_edit($uid)
 	{
-		$this->template->set_template('blank');
-		//echo "edit template" . $uid;
-
+		$this->template->set_template('blank');		
 		$user_template=$this->Editor_template_model->get_template_by_uid($uid);
 
 		if(!$user_template){
 			show_error("Template not found");
 		}
 
-		$core_template=$this->Editor_template_model->get_core_template_json($user_template['data_type']);
+		$core_templates=$this->Editor_template_model->get_core_template_by_data_type($user_template['data_type']);
+
+		if (!$core_templates){
+			throw new Exception("No system templates found for type: " . $user_template['data_type']);
+		}
+
+		$core_template=$this->Editor_template_model->get_template_by_uid($core_templates[0]["uid"]);
 
 		$options=array(
 			'user_template_info'=>$user_template,
@@ -265,7 +269,6 @@ class Metadata_editor extends MY_Controller {
 		);
 
 		unset($options['user_template_info']['template']);
-
 		echo $this->load->view('template_manager/index',$options,true);
 	}
 

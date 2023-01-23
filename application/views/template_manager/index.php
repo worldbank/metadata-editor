@@ -64,7 +64,7 @@
 
   <?php
 
-  $core_template = json_encode($core_template);
+  $core_template = json_encode($core_template['template']);
   $core_template_arr = json_decode($core_template, true);
 
   $user_template = json_encode($user_template['template']);
