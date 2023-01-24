@@ -52,9 +52,9 @@
 <template v-if="ActiveNode.type!=='section_container' && ActiveNode.type!=='section'">
     <v-tabs background-color="transparent" class="mb-5">
         <v-tab v-if="ActiveNode.key && isControlField(ActiveNode.type) == true">Display</v-tab>
-        <v-tab>Controlled vocabulary</v-tab>
-        <v-tab>Default</v-tab>
-        <v-tab v-if="ActiveNode.type!=='array'">Validation rules</v-tab>
+        <v-tab><span v-if="ActiveNodeEnumCount>0"><v-icon style="color:green;">mdi-circle-medium</v-icon></span>Controlled vocabulary</v-tab>
+        <v-tab><span v-if="ActiveNode.default"><v-icon style="color:green;">mdi-circle-medium</v-icon></span>Default</v-tab>
+        <v-tab v-if="ActiveNode.type!=='array'"><span v-if="ActiveNode.rules && Object.keys(ActiveNode.rules).length>0"><v-icon style="color:green;">mdi-circle-medium</v-icon></span>Validation rules</v-tab>
 
         <v-tab-item class="p-3" v-if="ActiveNode.key && isControlField(ActiveNode.type) == true">
             <!--display-->

@@ -1604,7 +1604,7 @@ CREATE TABLE `editor_templates` (
   `organization` varchar(300) DEFAULT NULL,
   `author` varchar(100) DEFAULT NULL,
   `description` varchar(1000) DEFAULT NULL,
-  `template` text,
+  `template` mediumtext,
   `created` int DEFAULT NULL,
   `changed` int DEFAULT NULL,
   PRIMARY KEY (`id`),

@@ -76,7 +76,7 @@
 
   //update template_parts
   get_template_part($core_template_arr['items'], null, $core_template_parts);
-  get_template_part($user_template_arr['items'], null, $user_template_parts);
+  //get_template_part($user_template_arr['items'], null, $user_template_parts);
 
   function get_template_part($items, $parent = null, &$output)
   {
@@ -102,7 +102,7 @@
     let core_template_parts = <?php echo json_encode($core_template_parts, JSON_PRETTY_PRINT); ?>;
 
     let user_template = <?php echo $user_template; ?>;
-    let user_template_parts = <?php echo json_encode($user_template_parts, JSON_PRETTY_PRINT); ?>;
+    //let user_template_parts = <?php //echo json_encode($user_template_parts, JSON_PRETTY_PRINT); ?>;
   </script>
 
   <div id="app" data-app>
@@ -303,7 +303,7 @@
 
         //template parts by key
         core_template_parts: core_template_parts,
-        user_template_parts: user_template_parts,
+        //user_template_parts: user_template_parts,
 
         //keys only
         core_tree_keys: [], //default system template keys
@@ -698,12 +698,12 @@
         userTreeKeys() {
           return this.$store.state.user_tree_keys;
         },
-        coreTemplateParts() {
+        coreTemplateParts() {          
           return this.$store.state.core_template_parts;
         },
-        userTemplateParts() {
-          return this.$store.state.user_template_parts;
-        },
+        /*userTemplateParts() {
+          //return this.$store.state.user_template_parts;
+        },*/
         ActiveNode: {
           get: function() {
             return this.$store.state.active_node;
@@ -711,6 +711,12 @@
           set: function(newValue) {
             this.$store.state.active_node = newValue;
           }
+        },
+        ActiveNodeEnumCount(){
+          if (this.ActiveNode.enum){
+            return this.ActiveNode.enum.length;
+          }
+          return 0;
         },
         ActiveCoreNode() {
           return this.$store.state.active_core_node;
