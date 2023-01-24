@@ -11,18 +11,18 @@
 
 * Managing templates
 
-   * [Template manager](managing_templates.md)
+   * [Template manager](template-manager/managing_templates.md)
 
 * Documenting data
-    * [File management](file management.md)
-    * [Microdata](microdata.md)
-    * [Documents](document.md)
-    * [Indicators/time series](indicator.md)
-    * [Statistical tables](table.md)
-    * [Images](image.md)
-    * [Videos](video.md)
-    * [Scripts](script.md)
-    * [External resources](external_resource.md)
+    * [File management](template-manager/file management.md)
+    * [Microdata](template-manager/microdata.md)
+    * [Documents](template-manager/document.md)
+    * [Indicators/time series](template-manager/indicator.md)
+    * [Statistical tables](template-manager/table.md)
+    * [Images](template-manager/image.md)
+    * [Videos](template-manager/video.md)
+    * [Scripts](template-manager/script.md)
+    * [External resources](template-manager/external_resource.md)
 
 * For developers
     * [Developers](developers.md)
