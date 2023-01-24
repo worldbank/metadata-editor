@@ -103,8 +103,6 @@ Vue.component('prop-edit', {
 
               <?php require_once 'vue-prop-edit-component-template.php';?>
 
-              <pre>{{prop}}</pre>
-              
             </div>          
             `    
 });
