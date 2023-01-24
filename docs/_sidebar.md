@@ -12,6 +12,8 @@
 
 * Managing templates
 
+   * [Template manager](managing_templates.md)
+
 * Documenting data
 
     * [Documenting microdata](template-manager/microdata.md)
