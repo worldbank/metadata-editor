@@ -10,7 +10,9 @@
     * [Quick start](quick-start.md)
     * [Installation and upgrade](installation.md)
 
-* Template manager
+* Managing templates
+
+* Documenting data
 
     * [Documenting microdata](template-manager/microdata.md)
     * [Documenting documents](template-manager/document.md)
