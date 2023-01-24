@@ -145,7 +145,15 @@
 
             <v-card-text>
               <div>
-                <textarea style="width:100%;height:300px;" ></textarea>
+                        <div class="file-group form-field mb-3">
+                            <label class="l" for="customFile">
+                                <span>Choose a JSON file</span>
+                            </label>
+                            <input type="file" accept="application/json" class="form-control p-1" @change="handleTemplateUpload( $event )">
+                        </div>
+
+                        <div v-if="!importJSON && templateFile" style="color:red;">Invalid file, failed to read the file!</div>
+                        
               </div>
             </v-card-text>
 
@@ -153,9 +161,14 @@
 
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="primary" text @click="dialog_import_template = false">
-                Close
+
+              <v-btn :disabled="!importJSON"  small color="primary" text @click="importTemplate">
+                Import template
               </v-btn>
+              <v-btn small text @click="dialog_import_template = false">
+                Cancel
+              </v-btn>
+              
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -232,8 +245,9 @@
           "document": "fas fa-file-alt",
         },
         dialog_import_template:false,
-        dialog_import:{}
-
+        dialog_import:{},
+        templateFile:'',
+        importJSON:''
       },
       created: async function() {
         //await this.$store.dispatch('initData',{dataset_idno:this.dataset_idno});
@@ -371,6 +385,39 @@
         getProjectIcon: function(type) {
           projectIcon = this.project_types_icons[type];
           return projectIcon;
+        },
+        importTemplate: function(){
+            let formData = this.importJSON;
+            
+            vm=this;
+            this.errors='';
+            let url=CI.base_url + '/api/templates/create'
+
+            axios.post( url,
+                formData,
+                {}
+            ).then(function(response){
+              vm.loadTemplates();
+              alert("Template imported successfully!");
+              vm.dialog_import_template=false;
+            })
+            .catch(function(response){
+                vm.errors=response;
+            }); 
+        },
+        handleTemplateUpload( event ){
+            this.templateFile = event.target.files[0];
+            if (!this.templateFile) return;
+            this.readFile(this.templateFile);//results are stored in this.importJSON
+        },
+        readFile(file) {
+          let vm=this;
+          let reader = new FileReader();
+          reader.onload = e => {
+            console.log(e.target.result);
+            vm.importJSON = JSON.parse(e.target.result);
+          };
+          reader.readAsText(file);
         }
       }
     })

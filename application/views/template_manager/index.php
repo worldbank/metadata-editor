@@ -126,7 +126,7 @@
                   <div class="col-md-9">
                     
                     <div class="ml-5 pt-2" > 
-                      <div class="text-crop">{{user_template_info.name}}</div>                      
+                      <div class="text-crop"><strong style="font-size:large;">{{user_template_info.name}}</strong></div>
                     </div>
                   </div>
                   <div class="col-md-3">
