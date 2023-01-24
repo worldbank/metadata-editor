@@ -15,7 +15,7 @@
 
 * Documenting data
 
-    * [File management](template-manager/file management.md)
+    * [File management](template-manager/file_management.md)
     * [Microdata](template-manager/microdata.md)
     * [Documents](template-manager/document.md)
     * [Indicators/time series](template-manager/indicator.md)
