@@ -11,7 +11,7 @@
 
 * Managing templates
 
-   * [Template manager](template-manager/managing_templates.md)
+   * [Template manager](managing_templates.md)
 
 * Documenting data
 
