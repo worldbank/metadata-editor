@@ -27,7 +27,7 @@
                             "title": "Document ID",
                             "type": "text",
                             "class": "required",
-                            "help_text": "AA unique identifier for the video's metadata document. This identifier must be unique in the catalog where the metadata are intended to be published. Ideally, the identifier should also be unique globally. This is different from the \"Primary ID\" in section \"Table description / Title statement\", although it is good practice to generate identifiers that establish a clear connection between these two identifiers. The Document ID could also include the metadata document version identifier. For example, if the \"Primary ID\" of the video is “VDO_0001”, the Document ID could be “IHSN_VDO_001_v1.0” if the metadata are produced by the IHSN and if this is version 1.0 of the metadata. Each organization should establish systematic rules to generate such IDs. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. "
+                            "help_text": "A unique identifier for the video's metadata document. This identifier must be unique in the catalog where the metadata are intended to be published. Ideally, the identifier should also be unique globally. This is different from the \"Primary ID\" in section \"Table description / Title statement\", although it is good practice to generate identifiers that establish a clear connection between these two identifiers. The Document ID could also include the metadata document version identifier. For example, if the \"Primary ID\" of the video is “VDO_0001”, the Document ID could be “IHSN_VDO_001_v1.0” if the metadata are produced by the IHSN and if this is version 1.0 of the metadata. Each organization should establish systematic rules to generate such IDs. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. "
                         },
                         {
                             "key": "metadata_information.producers",
@@ -40,25 +40,29 @@
                                     "class": "required",
                                     "required": true,
                                     "type": "text",
-                                    "prop_key": "metadata_information.producers.name"
+                                    "prop_key": "metadata_information.producers.name",
+                                    "help_text": "The name of the person or organization who produced the metadata or contributed to its production."
                                 },
                                 {
                                     "key": "abbr",
                                     "title": "Abbrevation",
                                     "type": "text",
-                                    "prop_key": "metadata_information.producers.abbr"
+                                    "prop_key": "metadata_information.producers.abbr",
+                                    "help_text": "The abbreviation (or acronym) of the organization that is referenced in \"Name\"."
                                 },
                                 {
                                     "key": "affiliation",
                                     "title": "Affiliation",
                                     "type": "text",
-                                    "prop_key": "metadata_information.producers.affiliation"
+                                    "prop_key": "metadata_information.producers.affiliation",
+                                    "help_text": "The affiliation of the person or organization mentioned in \"Name\"."
                                 },
                                 {
                                     "key": "role",
                                     "title": "Role",
                                     "type": "text",
-                                    "prop_key": "metadata_information.producers.role"
+                                    "prop_key": "metadata_information.producers.role",
+                                    "help_text": "The specific role of the person or organization mentioned in \"Name\" in the production of the metadata."
                                 }
                             ],
                             "is_recommended": true,
@@ -74,7 +78,7 @@
                         },
                         {
                             "key": "metadata_information.version",
-                            "title": "Document version",
+                            "title": "Version",
                             "type": "text",
                             "class": "required",
                             "help_text": "The version of the metadata document (not the version of the video itself)."
@@ -112,20 +116,21 @@
                             "key": "video_description.identifiers",
                             "title": "Other identifiers",
                             "type": "array",
-                            "help_text": "This element is used to enter video identifiers other than the idno element described above). It can for example be a Digital Object Identifier (DOI). Note that the identifier entered in idno can be repeated here, allowing to attach a “type” attribute to it.\n\n- Type: The type of unique identifier, e.g., “DOI”.\n- Value: The identifier.",
+                            "help_text": "This repeatable element is used to enter identifiers (IDs) other than the \"Primary ID\" (IDNO). It can for example be a Digital Object Identifier (DOI). The \"Primary ID\" can be repeated here (the \"Primary ID\" does not provide a \"Type\" parameter, so if a DOI or other standard ID type is used as main identifier, it is recommended to repeat it here with the identification of the type).",
                             "props": [
                                 {
                                     "key": "type",
-                                    "title": "ID Type",
+                                    "title": "Type",
                                     "type": "text",
-                                    "help_text": "Identifiers such as ISSN, ISBN, DOI",
+                                    "help_text": "The type of identifier. This could be for example “DOI”.",
                                     "prop_key": "video_description.identifiers.type"
                                 },
                                 {
                                     "key": "identifier",
                                     "title": "Identifier",
                                     "type": "text",
-                                    "prop_key": "video_description.identifiers.identifier"
+                                    "prop_key": "video_description.identifiers.identifier",
+                                    "help_text": "The identifier itself."
                                 }
                             ]
                         },
@@ -134,7 +139,7 @@
                             "title": "Alternate title",
                             "type": "text",
                             "rules": "max:300",
-                            "help_text": "An alias for the video title. "
+                            "help_text": "An alternate video title (other than the one entered in \"Title\"), possibly an abbreviated version. "
                         }
                     ],
                     "help_text": ""
@@ -389,13 +394,13 @@
                             "key": "video_description.genre",
                             "title": "Genre",
                             "type": "text",
-                            "help_text": "The genre of the video, broadcast channel or group. A controlled vocabulary can be used."
+                            "help_text": "The genre of the video, broadcast channel or group. A controlled vocabulary can be provided in user templates."
                         },
                         {
                             "key": "video_description.audience",
                             "title": "Audience",
                             "type": "textarea",
-                            "help_text": "A brief description of the intended audience of the video, i.e. the group for whom it was created."
+                            "help_text": "A brief description of the intended audience of the video, i.e. the group for whom it was created or for whom it may be suitable."
                         },
                         {
                             "key": "video_description.keywords",
@@ -406,23 +411,26 @@
                                     "key": "name",
                                     "title": "Keyword",
                                     "type": "text",
-                                    "prop_key": "video_description.keywords.name"
+                                    "prop_key": "video_description.keywords.name",
+                                    "help_text": "The keyword (or phrase) itself. "
                                 },
                                 {
                                     "key": "vocabulary",
                                     "title": "Vocabulary",
                                     "type": "text",
-                                    "prop_key": "video_description.keywords.vocabulary"
+                                    "prop_key": "video_description.keywords.vocabulary",
+                                    "help_text": "The controlled vocabulary (including version number or date) from which the keyword is extracted, if any."
                                 },
                                 {
                                     "key": "uri",
                                     "title": "URL",
                                     "type": "text",
-                                    "prop_key": "video_description.keywords.uri"
+                                    "prop_key": "video_description.keywords.uri",
+                                    "help_text": "The URL of the controlled vocabulary from which the keyword is extracted, if any."
                                 }
                             ],
                             "is_recommended": true,
-                            "help_text": "A list of keywords that provide information on the core content of the video. Keywords provide a convenient solution to improve the discoverability of the video, as it allows terms and phrases not found elsewhere in the video metadata to be indexed and to make the video discoverable by text-based search engines. A controlled vocabulary will preferably be used (although not required), such as the UNESCO Thesaurus. The list can combine keywords from multiple controlled vocabularies, and user-defined keywords.\n\n- Name: The keyword itself.\n- Vocabulary: The controlled vocabulary (including version number or date) from which the keyword is extracted, if any.\n- URL: The URL of the controlled vocabulary from which the keyword is extracted, if any."
+                            "help_text": "Keywords are words or phrases that describe salient aspects of what the video is about. The addition of keywords can significantly improve the discoverability of data and is thus recommended. Keywords can summarize and improve the description of the content or subject matter of a resource. Keywords can be selected from a standard thesaurus, preferably an international, multilingual thesaurus. Or they can be suggested by machine learning models. A controlled vocabulary can be defined in user templates."
                         },
                         {
                             "key": "video_description.topics",
@@ -433,18 +441,20 @@
                                     "key": "id",
                                     "title": "ID",
                                     "type": "text",
-                                    "prop_key": "video_description.topics.id"
+                                    "prop_key": "video_description.topics.id",
+                                    "help_text": "The unique identifier of the topic. It can be a sequential number, or the ID of the topic in a controlled vocabulary."
                                 },
                                 {
                                     "key": "name",
-                                    "title": "Topic",
+                                    "title": "Label",
                                     "type": "text",
-                                    "prop_key": "video_description.topics.name"
+                                    "prop_key": "video_description.topics.name",
+                                    "help_text": "The label of the topic. "
                                 },
                                 {
                                     "key": "parent_id",
-                                    "title": "Parent topic Identifier",
-                                    "help_text": "For subtopics, provide the ID of the parent topic",
+                                    "title": "Parent ID",
+                                    "help_text": "When a hierarchical (nested) controlled vocabulary is used, the \"Parent ID\" field can be used to indicate a higher-level topic to which this topic belongs.",
                                     "type": "text",
                                     "prop_key": "video_description.topics.parent_id"
                                 },
@@ -452,16 +462,21 @@
                                     "key": "vocabulary",
                                     "title": "Vocabulary",
                                     "type": "text",
-                                    "prop_key": "video_description.topics.vocabulary"
+                                    "prop_key": "video_description.topics.vocabulary",
+                                    "help_text": "The specification (name including the version and date) of the controlled vocabulary from which the topic is taken."
                                 },
                                 {
                                     "key": "uri",
                                     "title": "URL",
                                     "type": "text",
-                                    "prop_key": "video_description.topics.uri"
+                                    "prop_key": "video_description.topics.uri",
+                                    "help_text": "A link (URL) to the controlled vocabulary website.",
+                                    "rules": {
+                                        "is_uri": true
+                                    }
                                 }
                             ],
-                            "help_text": "Information on the topics covered in the video. A controlled vocabulary will preferably be used, for example the CESSDA Topics classification, a typology of topics available in 11 languages; or the Journal of Economic Literature (JEL) Classification System, or the World Bank topics classification. Note that you may use more than one controlled vocabulary. This element is a block of five fields:\n\n- ID: The identifier of the topic, taken from a controlled vocabulary.\n- Name: The name (label) of the topic, preferably taken from a controlled vocabulary.\n- Parent ID: The parent identifier of the topic (identifier of the item one level up in the hierarchy), if a hierarchical controlled vocabulary is used.\n- Vocabulary: The name (including version number) of the controlled vocabulary used, if any.\n- URL: The URL to the controlled vocabulary used, if any."
+                            "help_text": "\"Topics\" indicate the broad substantive topic(s) that the video represents. A topic classification facilitates referencing and searches in electronic survey catalogs; topics should thus be selected from a standard controlled vocabulary, for example the CESSDA Topics classification (a typology of topics available in 11 languages), or the Journal of Economic Literature (JEL) Classification System. Note that you may combine topics from more than one controlled vocabulary. "
                         },
                         {
                             "key": "video_description.persons",
@@ -472,93 +487,108 @@
                                     "key": "name",
                                     "title": "Name",
                                     "type": "text",
-                                    "prop_key": "video_description.persons.name"
+                                    "prop_key": "video_description.persons.name",
+                                    "help_text": "The name of the person."
                                 },
                                 {
                                     "key": "role",
                                     "title": "Role",
                                     "type": "text",
-                                    "prop_key": "video_description.persons.role"
+                                    "prop_key": "video_description.persons.role",
+                                    "help_text": "The role in the video of the person mentioned in \"Name\"."
                                 }
                             ],
-                            "help_text": "A list of persons who appear in the video.\n\n- Name: The name of the person.\n- Role: The role of the person mentioned in name."
+                            "help_text": "A list of persons who appear in the video."
                         },
                         {
                             "key": "video_description.main_entity",
                             "title": "Main entity",
                             "type": "text",
-                            "help_text": "Indicates the primary entity described in the video."
+                            "help_text": "Indicates the main entity described in the video, if any."
                         },
                         {
                             "key": "video_description.transcript",
                             "title": "Transcript",
-                            "help_text": "The transcript of the video content, provided as a text. Note that if the text is very long, an alternative is to save it in a separate text file and to make it available in a data catalog as an external resource.\n\n- Language: The language of the transcript.\n- Text: The transcript itself. Adding the transcript in the metadata will make the video much more discoverable, as the content of the transcription can be indexed in catalogs.",
+                            "help_text": "The transcript of the video content, provided as a text. Adding the transcript in the metadata will make the video much more discoverable, as the content of the transcription can be indexed in catalogs. Note that if the text is very long, an alternative is to save it in a separate text file and to make it available in a data catalog as an external resource. The transcript can be entered in multiple languages. For the language codes and names, the use of the ISO 639-2 standard is recommended. ",
                             "type": "array",
                             "props": [
                                 {
-                                    "key": "language",
-                                    "title": "Language",
+                                    "key": "language_code",
+                                    "title": "Language code",
                                     "type": "text",
-                                    "prop_key": "video_description.transcript.language"
+                                    "prop_key": "video_description.transcript.language_code",
+                                    "help_text": "The code of the language of the transcript. "
+                                },
+                                {
+                                    "key": "language_name",
+                                    "title": "Language name",
+                                    "type": "text",
+                                    "prop_key": "video_description.transcript.language_name",
+                                    "help_text": "The name of the language of the transcript."
                                 },
                                 {
                                     "key": "text",
                                     "title": "Text",
                                     "type": "text",
-                                    "prop_key": "video_description.transcript.text"
+                                    "prop_key": "video_description.transcript.text",
+                                    "help_text": "The transcript itself, in the language mentioned in \"Language name\". "
                                 }
                             ]
                         },
                         {
                             "key": "video_description.album",
                             "title": "Album",
-                            "help_text": "When a video is published in a catalog containing many other videos, it may be desirable to organize them by album. Albums are collections of videos organized by theme, period, location, or other criteria. One video can belong to more than one album. Albums are “virtual collections”.\n\n- Name: The name (label) of the album.\n- Description: A brief description of the album.\n- Owner: The owner of the album.\n- URL: A link (URL) to the album.",
+                            "help_text": "When a video is published in a catalog containing many other videos, it may be desirable to organize them by album. Albums are collections of videos organized by theme, period, location, or other criteria. One video can belong to more than one album. Albums are “virtual collections”.",
                             "type": "array",
                             "props": [
                                 {
                                     "key": "name",
                                     "title": "Name",
                                     "type": "text",
-                                    "prop_key": "video_description.album.name"
+                                    "prop_key": "video_description.album.name",
+                                    "help_text": "The name (label) of the album."
                                 },
                                 {
                                     "key": "description",
                                     "title": "Description",
-                                    "type": "text",
-                                    "prop_key": "video_description.album.description"
+                                    "type": "textarea",
+                                    "prop_key": "video_description.album.description",
+                                    "help_text": "A brief description of the album."
                                 },
                                 {
                                     "key": "owner",
                                     "title": "Owner",
                                     "type": "text",
-                                    "prop_key": "video_description.album.owner"
+                                    "prop_key": "video_description.album.owner",
+                                    "help_text": "The owner or custodian of the album."
                                 },
                                 {
                                     "key": "uri",
                                     "title": "URL",
                                     "type": "text",
-                                    "prop_key": "video_description.album.uri"
+                                    "prop_key": "video_description.album.uri",
+                                    "help_text": "A link (URL) to the album."
                                 }
                             ]
                         },
                         {
                             "key": "video_description.languages",
                             "title": "Languages",
-                            "help_text": "Most videos will only be provided in one language. This is however a repeatable field, to allow for more than one language to be listed. For the language code, ISO codes will preferably be used. The language refers to the language in which the video is published. This is a block of two elements (at least one must be provided for each language):\n\n- Name: The name of the language.\n- Code: The code of the language. The use of ISO 639-2 (the alpha-3 code in Codes for the representation of names of languages) is recommended. Numeric codes must be entered as strings.\n",
+                            "help_text": "The language refers to the language in which the video is published. Most videos will only be provided in one language. This is however a repeatable field, to allow for more than one language to be listed. For the language codes and names, the use of the ISO 639-2 standard is recommended.",
                             "type": "array",
                             "props": [
                                 {
                                     "key": "name",
-                                    "title": "Language Name",
+                                    "title": "Name",
                                     "type": "text",
-                                    "help_text": "Language name",
+                                    "help_text": "The name of the language.",
                                     "prop_key": "video_description.languages.name"
                                 },
                                 {
                                     "key": "code",
-                                    "title": "Language code",
+                                    "title": "Code",
                                     "type": "text",
-                                    "help_text": "Language code",
+                                    "help_text": "The code of the language.",
                                     "prop_key": "video_description.languages.code"
                                 }
                             ]
@@ -580,7 +610,7 @@
                             "title": "Relations",
                             "type": "simple_array",
                             "enum": [],
-                            "help_text": "Defines, as a free text field, the relation between the video being documented and other resources."
+                            "help_text": "Defines the relation between the video being documented and other resources."
                         }
                     ],
                     "help_text": ""
@@ -599,22 +629,24 @@
                                     "key": "name",
                                     "title": "Name",
                                     "type": "text",
-                                    "prop_key": "video_description.country.name"
+                                    "prop_key": "video_description.country.name",
+                                    "help_text": "The country/region name. The name and spelling of countries should be consistent across all resources being documented. Many organizations have their own policies on the naming of countries/regions/economies/territories, which data curators will have to comply with."
                                 },
                                 {
                                     "key": "code",
                                     "title": "Code",
                                     "type": "text",
-                                    "prop_key": "video_description.country.code"
+                                    "prop_key": "video_description.country.code",
+                                    "help_text": "The country/region code (entered as a string, even for numeric codes). It is recommended to use a standard list of countries and regions, such as the ISO country list (ISO 3166)."
                                 }
                             ],
-                            "help_text": "The list of countries (or regions) covered by the video, if applicable. This refers to the content of the video, not to the country where the video was released. This is a repeatable block of two elements:\n\n- Name: The country/region name. Note that many organizations have their own policies on the naming of countries/regions/economies/territories, which data curators will have to comply with.\n- Code: The country/region code (entered as a string, even for numeric codes). It is recommended to use a standard list of countries and regions, such as the ISO country list (ISO 3166).",
+                            "help_text": "The list of countries (or regions) covered by the video, if applicable. This refers to the content of the video, not to the country where the video was released.",
                             "is_recommended": true
                         },
                         {
                             "key": "video_description.spatial_coverage",
                             "title": "Spatial coverage",
-                            "type": "text",
+                            "type": "textarea",
                             "help_text": "Indicates the place(s) which are depicted or described in the video. This element complements the \"Country\" element. It can be used to qualify the geographic coverage of the video, in the form of a free text."
                         },
                         {
@@ -626,32 +658,36 @@
                                     "key": "west",
                                     "title": "West",
                                     "type": "text",
-                                    "prop_key": "video_description.bbox.west"
+                                    "prop_key": "video_description.bbox.west",
+                                    "help_text": "West longitude of the bounding box."
                                 },
                                 {
                                     "key": "east",
                                     "title": "East",
                                     "type": "text",
-                                    "prop_key": "video_description.bbox.east"
+                                    "prop_key": "video_description.bbox.east",
+                                    "help_text": "East longitude of the bounding box."
                                 },
                                 {
                                     "key": "south",
                                     "title": "South",
                                     "type": "text",
-                                    "prop_key": "video_description.bbox.south"
+                                    "prop_key": "video_description.bbox.south",
+                                    "help_text": "South latitude of the bounding box."
                                 },
                                 {
                                     "key": "north",
                                     "title": "North",
                                     "type": "text",
-                                    "prop_key": "video_description.bbox.north"
+                                    "prop_key": "video_description.bbox.north",
+                                    "help_text": "North latitude of the bounding box."
                                 }
                             ],
-                            "help_text": "This element is used to define one or multiple bounding box(es), which are the (rectangular) fundamental geometric description of the geographic coverage of the video. A bounding box is defined by west and east longitudes and north and south latitudes, and includes the largest geographic extent of the video’s geographic coverage. The bounding box provides the geographic coordinates of the top left (north/west) and bottom-right (south/east) corners of a rectangular area. This element can be used in catalogs as the first pass of a coordinate-based search.\n\n- West: West longitude of the box\n- East: East longitude of the box\n- South: South latitude of the box\n- North: North latitude of the box"
+                            "help_text": "This element is used to define one or multiple geographic bounding box(es), which are the rectangular fundamental geometric description of the geographic coverage of the video. A bounding box is defined by west and east longitudes and north and south latitudes, and includes the largest geographic extent of the video geographic coverage. The bounding box provides the geographic coordinates of the top left (north/west) and bottom-right (south/east) corners of a rectangular area. This element can be used in catalogs as the first pass of a coordinate-based search. The valid range of latitude in degrees is -90 and +90 for the southern and northern hemisphere, respectively. Longitude is in the range -180 and +180 specifying coordinates west and east of the Prime Meridian, respectively.\n"
                         },
                         {
                             "key": "video_description.content_reference_time",
-                            "title": "Content reference time",
+                            "title": "Reference time",
                             "type": "text",
                             "help_text": "The specific time described by the video, for works that emphasize a particular moment within an event."
                         },
@@ -670,22 +706,25 @@
                     "type": "section",
                     "items": [
                         {
-                            "key": "video_description.video_url",
-                            "title": "Video URL",
-                            "type": "text",
-                            "help_text": "URL of the video."
-                        },
-                        {
-                            "key": "video_description.embed_url",
-                            "title": "Video embed URL",
-                            "type": "text",
-                            "help_text": "A URL pointing to a player for a specific video. For example, “https://www.youtube.com/embed/7Aif1xjstws”\n\nTo be embedded, a video must be hosted on a video sharing platform like Youtube (www.youtube.com). To obtain the “embed link” from Youtube, click on the “Share” button, then “Embed”. In the result box, select the content of the element src =."
-                        },
-                        {
                             "key": "video_description.video_provider",
                             "title": "Video provider",
                             "type": "text",
                             "help_text": "The person or organization who provides the video."
+                        },
+                        {
+                            "key": "video_description.video_url",
+                            "title": "Video URL",
+                            "type": "text",
+                            "help_text": "URL of the video.",
+                            "rules": {
+                                "is_uri": true
+                            }
+                        },
+                        {
+                            "key": "video_description.embed_url",
+                            "title": "Embed URL",
+                            "type": "text",
+                            "help_text": "A URL pointing to a player for a specific video. For example, “https://www.youtube.com/embed/7Aif1xjstws”. To be embedded, a video must be hosted on a video sharing platform like Youtube (www.youtube.com). To obtain the “embed link” from Youtube, click on the “Share” button, then “Embed”. In the result box, select the content of the element \"src =\"."
                         },
                         {
                             "key": "video_description.repository",
@@ -697,7 +736,7 @@
                             "key": "video_description.rights",
                             "title": "Rights",
                             "type": "textarea",
-                            "help_text": "A textual description of the rights associated to the video. If a copyright is available, the three following elements will be used instead of this element."
+                            "help_text": "A textual description of the rights associated to the video."
                         },
                         {
                             "key": "video_description.copyright_holder",
@@ -742,7 +781,7 @@
                             "key": "video_description.duration",
                             "title": "Duration",
                             "type": "text",
-                            "help_text": "The duration of the item (movie, audio recording, event, etc.) in ISO 8601 format. \n\nISO 8601 durations are expressed using the following format, where (n) is replaced by the value for each of the date and time elements that follows the (n). For example: (3)H means 3 hours.\n\nInstructions: enter the duration as:  P(n)Y(n)M(n)DT(n)H(n)M(n)S\nWhere (n) is a number and:\n- P is the Period designator and is always placed at the beginning of the duration\n- (n)Y represents the number of years\n- (n)M represents the number of months\n- (n)W represents the number of weeks\n- (n)D represents the number of days\n- T is the Time designator and always precedes the time components\n- (n)H represents the number of hours\n- (n)M represents the number of minutes\n- (n)S represents the number of seconds\n\nFor example, P1Y2M20DT3H30M8S represents a duration of one year, two months, twenty days, three hours, thirty minutes, and eight seconds.\n\nDate and time elements including their designator may be omitted if their value is zero, and lower-order elements may also be omitted for reduced precision. For example, “P23DT23H” and “P4Y” are both acceptable duration representations.\n\nAs M can represent both Month and Minutes, the time designator T is used. For example, “P1M” is a one-month duration and “PT1M” is a one-minute duration.\n\nThis information on the ISO 8601 was adapted from Wikipedia where more detailed information can be found."
+                            "help_text": "The duration of the item (movie, audio recording, event, etc.) in ISO 8601 format. ISO 8601 durations are expressed following the formatting instructions below, where (n) is replaced by the value for each of the date and time elements that follows the (n). For example: (3)H means 3 hours.\nInstructions: Enter the duration as:  P(n)Y(n)M(n)DT(n)H(n)M(n)S where: \n- P is the Period designator and is always placed at the beginning of the duration\n- (n)Y represents the number of years\n- (n)M represents the number of months\n- (n)W represents the number of weeks\n- (n)D represents the number of days\n- T is the Time designator and always precedes the time components\n- (n)H represents the number of hours\n- (n)M represents the number of minutes\n- (n)S represents the number of seconds\nFor example, P1Y2M20DT3H30M8S represents a duration of one year, two months, twenty days, three hours, thirty minutes, and eight seconds.\nDate and time elements including their designator may be omitted if their value is zero, and lower-order elements may also be omitted for reduced precision. For example, “P23DT23H” and “P4Y” are both acceptable duration representations.\nAs M can represent both Month and Minutes, the time designator T is used. For example, “P1M” is a one-month duration and “PT1M” is a one-minute duration.\nSource: This information on the ISO 8601 was adapted from Wikipedia where more detailed information can be found."
                         },
                         {
                             "key": "video_description.encoding_format",

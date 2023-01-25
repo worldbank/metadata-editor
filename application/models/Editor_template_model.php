@@ -63,7 +63,7 @@ class Editor_template_model extends ci_model {
 				$this->core_templates[]=array(
 					'uid'=>$template['uid'],
 					'template_type'=>'core',
-					'name'=> $key. ' - default',
+					'name'=> $template['name'],
 					'data_type'=>$key,
 					'lang'=>$template['lang'],
 					'template'=>$template_json
