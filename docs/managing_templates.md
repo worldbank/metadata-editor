@@ -30,9 +30,6 @@ The standard or schema for each data type is provided in the Metadata Editor as 
 
 The Metadata Editor application comes with a collection of pre-designed user templates (the *IHSN templates*), covering all data types. Generating new user templates is thus not a requirement to make use of the Metadata Editor. 
 
-![image](https://user-images.githubusercontent.com/35276300/214350230-d3c3bc73-3cb1-4652-918a-3517c1add1ce.png)
-
-
 ## Creating or customizing a user template
 
 To build and select the templates to be used:
@@ -46,14 +43,15 @@ You will need at least one user template per data type you curate, and one to be
 
 To generate a template:
 
-Click “Duplicate”
+Click “Duplicate”. The page will show a new template. Edit the content of the template description.
+
+![image](https://user-images.githubusercontent.com/35276300/214677926-79ad0824-3678-4f23-999f-390ed63e248a.png)
  
 Change the name, and other fields described. A system ID will be given. But make sure the name is unique and provide info in other fields.
 All standards and schemas have a section “Metadata information” or “Document description”. It contains a few fields used to document the metadata.
 
-![image](https://user-images.githubusercontent.com/35276300/214395038-cc7ac3e9-70f4-49b7-9b6c-18001bce3c9e.png)
 
-### description of a metadata element
+### Description of a metadata element
 
 A description of the metadata element. 
 
