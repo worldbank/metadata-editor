@@ -1,27 +1,32 @@
 # Managing templates 
 
-The metadata standards and schemas embedded in the Metadata Editor contain a large number of metadata elements. For each data type, hard-coded core templates are provided that contain all elements of the standard or schema.These templates cannot be deleted or edited. But they can be duplicated and customized, allowing users to generate their own templates.
+## System and user templates
+
+The metadata standards and schemas embedded in the Metadata Editor contain a large number of metadata elements. These standards and schemas have been designed to accommodate the needs of different categories of users. Few users will find all elements relevant. **Templates** can be created to select and tailor the elements available in a standard or schema to the specific needs of an organization. By creating templates, users of the Metadata Editor have the possibility to: 
+- select, among all elements available in a standard or schema, those that they consider relevant; 
+- set some elements as "required" or "recommended";
+- organize the selected elements into groups;
+- control the order in which the elements will appear in metadata entry forms;
+- customize the labels and instructions associated with each metadata element;
+- set controlled vocabularies and default values where appropriate;
+- set custom validation rules for the content of the selected elements.
+
+Templates are used by the Metadata Editor to generate the metadata entry forms.
+
+![image](https://user-images.githubusercontent.com/35276300/214431708-b2eab31b-c32c-4483-9953-b086bbf63f7d.png)
+
+The standard or schema for each data type is provided in the Metadata Editor as a *system* template. System templates contain all elements of the standard or schema, with their default label and description. They contain a very small number of validation rules and controlled vocabularies. These system templates cannot be deleted or edited. But they can be duplicated then customized, allowing users to generate their own *user templates*. User templates can be exported and imported, i.e. shared with other users. Multiple user templates can be created for a given data type.
 
 ![image](https://user-images.githubusercontent.com/35276300/214394808-d752cb8e-b007-4642-9e16-e2cb26b16e91.png)
 
-Few users will find them all elements of a standard or schema relevant. Templates are created to subset and customize the elements to the specific needs of the organization that uses the Metadata Editor. By creating user templates, users of the Metadata Editor have the possibility to: 
-- select the elements from the available standards and schemas that they consider relevant; only these elements will be displayed in the metadata entry forms.
-- organize the selected elements into groups
-- control the order in which the elements appear in the metadata entry forms
-- customize the labels and instructions associated with each element
-- enter controlled vocabularies and default values for the content of the element, when appropriate
-- set validation rules for the content of elements.
-
-The Metadata Editor application comes with a collection of pre-loaded templates (the "IHSN templates"), covering all data types. Generating custom templates is thus not a requirement. But most users will find it useful to adapt the proposed templates.
-
-User templates can be exported and imported, allowing users to share their templates. When you document a dataset, the template is saved in the Project.
-
-NOTE: Metadata generated using a template can be edited using another template. The selection /switching of the template impacts what is shown in the metadata entry forms; it does not change the content.
+The Metadata Editor application comes with a collection of pre-designed user templates (the *IHSN templates*), covering all data types. Generating new user templates is thus not a requirement to make use of the Metadata Editor. 
 
 ![image](https://user-images.githubusercontent.com/35276300/214350230-d3c3bc73-3cb1-4652-918a-3517c1add1ce.png)
 
 
 ![image](https://user-images.githubusercontent.com/35276300/214386239-cb18dd2e-7184-4824-a02f-c2dbf0ab8ffe.png)
+
+## Creating or customizing a user template
 
 To build and select the templates to be used:
 -	Duplicate a core template and build your template from the standard or schema
@@ -58,12 +63,12 @@ Display options:
 [how this is reflected in the metadata entry forms]
 
 
-Controlled vocabularies:
+### Controlled vocabularies
 
 ![image](https://user-images.githubusercontent.com/35276300/214395449-bb8967db-8115-4ea4-8946-17313f3fb840.png)
 
  
-Default values:
+### Default values
 
 ![image](https://user-images.githubusercontent.com/35276300/214395605-c5ec98d9-23db-48d5-badf-a37014273e9d.png)
 
@@ -71,7 +76,7 @@ This works for repeatable and complex elements as well.
 
 ![image](https://user-images.githubusercontent.com/35276300/214395688-f0805e52-7794-40fa-80f1-b5e98a1632e0.png)
  
-Validation rules:
+### Validation rules
  
 ![image](https://user-images.githubusercontent.com/35276300/214395548-ef25e59a-18bb-4efa-a339-52c124c209e5.png)
 
@@ -80,8 +85,10 @@ Some elements are more complex and have sub-elements. But they can be controlled
 [...]
 
 Elements may be grouped. They are grouped by main section of the standard or schema. This is constrained. But you can also organize elements of a section into folders and sub-folders. This is just for convenience. It will not impact how the metadata is stored in the metadata file. And if the metadata are read using another template, they will be visible as long as the element is somewhere in the new template.
+
 NOTE: If you read metadata that contain element X using a template that does not include element X and save, the element will NOT be deleted from the metadata. So you do not have to worry about the template you use. The selection of a template will never result in automatic deletion of existing content.
 You may want to exclude or move an element. 
+
 To drop one: >
 It is then sent back to a repository of “Available elements” (list of available but not selected elements). The System templates have no “Available elements” because all are included. But a user template will typically have some.
 You can see the available elements here:
@@ -104,3 +111,6 @@ Importing templates:
 
 Deleting templates:
 
+NOTES: 
+1. When you document a dataset, the template is saved in the Project.
+2. Metadata generated using a template can be edited using another template. The selection /switching of the template impacts what is shown in the metadata entry forms; it does not change the content.
