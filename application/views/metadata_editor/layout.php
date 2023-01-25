@@ -2,7 +2,7 @@
   <pane min-size="15" max-size="35" size="20" height="100">
     <!--left -->
 
-    <div class="bg-dark  pt-3 pl-2" >
+    <div class="bg-light  pt-3 pl-2" >
         <?php // <div class="float-right pt-0 pr-2"><v-icon dark small>mdi-cog</v-icon></div> ?>
         <a href="<?php echo site_url('editor/');?>" class="brand-link-editor pb-4" style="display:block;">
             <i class="fas fa-compass"></i>
@@ -22,13 +22,12 @@
         </div>
     </div>
 
-    <div class="container-fluid bg-dark pt-2" style="overflow:auto;">
+    <div class="container-fluid bg-light pt-2" style="overflow:auto;">
 
     
     
-        <div style="font-size:small;" class="mb-5">
-            <v-treeview
-                dark
+        <div class="mb-5">
+            <v-treeview                
                 color="warning"
                 v-model="tree"
                 :active.sync="tree_active_items" 
@@ -102,13 +101,7 @@
 
 
                 <ul class="navbar-nav ml-5 ml-auto">
-
-                    <li class="nav-item">
-                        <a class="nav-link"  href="<?php echo site_url('admin/metadata_editor/templates');?>" role="button">
-                            <i class="far fa-file-alt"></i> Templates
-                        </a>
-                    </li>
-
+                    
                     <div class="dropdown">
                         <a class="btn btn-link dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <i class="fas fa-random"></i> Metadata
