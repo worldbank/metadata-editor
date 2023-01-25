@@ -1,6 +1,20 @@
-# NADA - Data Catalog
+<p align="center"><img src="docs/img/metadata-editor.png" ></p>
 
-NADA is an open source microdata cataloging system, compliant with the Data Documentation Initiative (DDI) and Dublin Core’s RDF metadata standards. It serves as a portal for researchers to browse, search, compare, apply for access, and download relevant census or survey datasets, questionnaires, reports and other information.
+# Metadata Editor
+
+Metadata Editor is an open-source web-based editor designed to help users document metadata using multiple standards. 
+
+The supported data types are:
+
+- DDI CodeBook 2.5
+- Document - based on the Dublin Core standard
+- Table
+- Image - [IPTC](https://iptc.org/standards/photo-metadata/iptc-standard/) and Dublin Core
+- Video - Dublin Core
+- Time series (Indicators)
+- Geospatial (ISO 19139)
+- Script (custom)
+
 
 ## Getting Started
 
@@ -13,17 +27,13 @@ NADA is an open source microdata cataloging system, compliant with the Data Docu
 
 ### Installation
 
-Please see the [NADA installation guide](https://nada.readthedocs.io/en/v5.0/installation-guide.html).
+See [Installation guide](https://ihsn.github.io/editor/#/installation)
 
 
-### Upgrading from older versions of NADA
+### Documentation
 
-Please see the [NADA upgrade guide](https://nada.readthedocs.io/en/v5.0/upgrade-from-4.4-to-5.html).
+see [Documentation](https://ihsn.github.io/editor/#/)
 
-
-## Versioning
-
-For the versions available, see the [tags on this repository](https://github.com/ihsn/nada/tags). 
 
 
 ## Authors
@@ -35,8 +45,3 @@ For the versions available, see the [tags on this repository](https://github.com
 
 This project is licensed under the MIT License - see the [license.txt](license.txt) file for details
 
-## Acknowledgments
-
-* CodeIgniter
-* Bootstrap
-* todo - other libraries used

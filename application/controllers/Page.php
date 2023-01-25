@@ -15,8 +15,6 @@ class Page extends MY_Controller {
     
 	function index()
 	{	
-		$data="page text";
-		
 		$content=$this->load->view('homepage', $data,true);
 		$this->template->write('title', "Metadata editor",true);
 		$this->template->write('content', $content,true);
