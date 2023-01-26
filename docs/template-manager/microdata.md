@@ -65,7 +65,7 @@ When a controlled vocabulary has been entered in the template, a drop down menu 
 ![image](https://user-images.githubusercontent.com/35276300/214942534-d47df5a3-93f0-4d61-b956-46bbc89f0632.png)
 Try and provide as much and as relevant information in all relevant metadata elements. 
 
-### Data files
+### Importing data files
 
 If you have data files available in CSV, Stata (.dta), or SPSS (.sav) format, you can import the data to automatically populate some of the content of the *File description* section and much of the content of the *Variable description* section. The Metadata Editor relies on the open source R software and on the Haven library to import (and re-export) data files. When a data file is imported, the application will:
 - Generate the list of variables for each data file
@@ -79,12 +79,56 @@ To import your data files, select "Data files" in the navigation bar, and click 
 Select the data files you want to import, and click "Import files".
 
 ![image](https://user-images.githubusercontent.com/35276300/214944454-86919d0a-e0ae-40dd-a537-a94122afa4b3.png)
+![image](https://user-images.githubusercontent.com/35276300/214952350-92cf2cdd-371c-4a4e-8fda-08653a4cb5b3.png)
+
+Success
+![image](https://user-images.githubusercontent.com/35276300/214952439-00f9a702-16a9-4b82-8bb1-690d68aaf966.png)
+
+### Creating data files
+
+
+### File description
+
+A brief description of each file can be entered. Select the filename in the navigation bar, and fill out the form. Then save.
+![image](https://user-images.githubusercontent.com/35276300/214966052-85ffabc6-7d04-4ca3-b3c0-800c44499b68.png)
+
+### Data
+
+Data page:
+![image](https://user-images.githubusercontent.com/35276300/214965888-3af24fa2-8fa4-4d3a-a225-bc90f62130a8.png)
 
 ### Variable description and statistics
-Description
+
+For each data file, the Variables section shows a variable list and metadata. Additional metadata can be entered for each variable.
+![image](https://user-images.githubusercontent.com/35276300/214965734-f5d357e0-af79-4d08-9f12-1025adccf605.png)
+What has been imported from the data files:
+- List of variables with name, label and type ("Variables" block).
+- Value labels for categorical variables ("Categories" block).
+- Variable information: type, decimals, format, missing values
+
+Documentation:
+- Statistics
+- Weights
+- Documentation
+![image](https://user-images.githubusercontent.com/35276300/214967059-352ab9cf-4dde-4867-85fe-dd40ba0bdbc6.png)
+
+In the variable page: Description
 - Ctrl and Shift keys
 - Spread metadata
 - Import metadata
+
+
+- JSON
+
+Variable labels can be added or changed directly in the variable list table.
+   - Spread metadata
+   - 
+
+Categories can be added or edited. 
+   - Generate categories from statistics button:
+   - Copy / paste
+   - Store in repository
+
 
 Weights
 Keys
