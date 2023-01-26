@@ -18,8 +18,6 @@ class Rutils
 		log_message('debug', "Rutils Class Initialized.");
 		require_once 'modules/guzzle/vendor/autoload.php';
 		$this->ci =& get_instance();
-
-		$this->ci->load->model("Catalog_model");
 		$this->ci->load->model("Editor_model");
 	}
 
