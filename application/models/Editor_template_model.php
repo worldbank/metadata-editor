@@ -84,12 +84,11 @@ class Editor_template_model extends ci_model {
 	function get_core_templates_by_type($type)
 	{
 		$templates_=array();
-		foreach($this->core_templates as $template_type=>$templates){			
-			if ($type==$template_type){
-				$templates_[]= $templates;
+		foreach($this->core_templates as $idx=>$template){
+			if ($type==$template['data_type']){
+				$templates_[]= $template;
 			}
 		}
-
 		return $templates_;
 	}
 

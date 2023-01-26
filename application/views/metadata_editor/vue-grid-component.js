@@ -39,6 +39,17 @@ Vue.component('grid-component', {
                     <th v-for="(column,idx_col) in columns" scope="col">
                         {{column.title}}
                         <span v-if="column.rules" class="required-label"> * </span>
+
+                        <v-tooltip v-if="column.help_text" 
+                            top 
+                            max-width="300"
+                        >
+                        <template v-slot:activator="{ on, attrs }">
+                            <i v-bind="attrs"
+                            v-on="on" class="far fa-question-circle"></i>        
+                        </template>
+                        <span>{{column.help_text}}</span>
+                        </v-tooltip>
                     </th>
                     <th scope="col">               
                     </th>
