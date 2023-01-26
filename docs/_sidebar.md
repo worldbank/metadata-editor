@@ -29,9 +29,9 @@
 
     * [Publishing in NADA](publish_to_nada.md)
 
-* Generating metadata programatically
+* Generating metadata programmatically
 
-    * [APIs, R and Python](programatic.md)
+    * [APIs, R and Python](programmatic.md)
 
 * For developers
 
