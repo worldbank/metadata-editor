@@ -7,6 +7,7 @@
 * Getting started
 
     * [Installation and upgrade](installation.md)
+    * [Befor you start](template-manager/before_start.md)
     * [Quick start](quick-start.md)
 
 * Managing templates
@@ -15,8 +16,6 @@
 
 * Documenting data
 
-    * [File management](template-manager/file_management.md)
-    * [Login](login.md)
     * [Microdata](template-manager/microdata.md)
     * [Documents](template-manager/document.md)
     * [Indicators/time series](template-manager/indicator.md)
@@ -28,7 +27,11 @@
 
 * Publishing metadata 
 
-    * [Publishing in NADA](publish_to_nada.md]
+    * [Publishing in NADA](publish_to_nada.md)
+
+* Generating metadata programatically
+
+    * [APIs, R and Python](programatic.md)
 
 * For developers
 
