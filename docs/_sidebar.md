@@ -7,7 +7,7 @@
 * Getting started
 
     * [Installation and upgrade](installation.md)
-    * [Befor you start](template-manager/before_start.md)
+    * [Before you start](template-manager/before_start.md)
     * [Quick start](quick-start.md)
 
 * Managing templates
