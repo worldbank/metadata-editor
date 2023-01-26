@@ -4,15 +4,21 @@
   <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+  
+  <!--
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
   
   <script src="https://adminlte.io/themes/v3/plugins/jquery/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+-->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
-
-  <script src="https://cdn.jsdelivr.net/npm/vue-toast-notification@0.6.3"></script>
-  <link href="https://cdn.jsdelivr.net/npm/vue-toast-notification@0.6.3/dist/theme-sugar.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/vue-toast-notification@0.6.3"></script>
+<link href="https://cdn.jsdelivr.net/npm/vue-toast-notification@0.6.3/dist/theme-sugar.css" rel="stylesheet">
 
 
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
@@ -22,7 +28,6 @@
 <?php
   //break template into smaller templates by spliting template ['items']
   $template_parts=array();
-  //$metadata_template_arr=json_decode($metadata_template,true);
   
   //update template_parts
   get_template_part($metadata_template_arr['items'],$template_parts);
@@ -152,11 +157,6 @@ Vue.config.errorHandler = (err, vm, info) => {
           is_loading:false,
           vuex_is_loaded:false,
           loading_status:null,
-          /*dialog_box_option:{
-              'title': '',
-              'content': '',
-              'erorrs': {}                    
-          },*/
           form_errors:[],
           schema_errors:[],
           initiallyOpen: [],
@@ -258,7 +258,7 @@ Vue.config.errorHandler = (err, vm, info) => {
           for (let file of this.DataFiles) {
             datafiles_nodes.push(
               {
-                title: file.file_name, //file.file_id + ' - ' + file.file_name, //+ ' [' + file.file_id + ']',
+                title: file.file_name,
                 type:'datafile',
                 index:i,
                 key:'datafile/'+file.file_id,
@@ -418,16 +418,9 @@ Vue.config.errorHandler = (err, vm, info) => {
         treeOnUpdate: function(node_key)
         {
           console.log("clicked on",node_key);
-          
-          /*this.treeClick({
-            'key':node_key
-          });*/
         },
         treeClick: function (node){
-          //this.active_form_field=node;
-          //this.$store.state.active_form_field=node;
           store.commit('tree_active_node',node.key);
-          console.log("treeClick",node);
 
           //expand tree node          
           this.initiallyOpen.push(node.key);
@@ -468,14 +461,6 @@ Vue.config.errorHandler = (err, vm, info) => {
             return;
           }
 
-         /*if (node.name=='study_description'){
-          router.push('/')
-         }*/
-
-         /*if (node.type=='section'){
-           EventBus.$emit('activeSection', node.key);
-         }*/
-
           router.push('/study/'+node.key);
             /*router.push('/study/' +node.key,{
                 name: 'study',
@@ -483,8 +468,6 @@ Vue.config.errorHandler = (err, vm, info) => {
                     element_id: 'hello there' // or anything you want
                 }
             });*/ 
-            
-            console.log(node); 
         },
         saveProjectDebounce: _.debounce(function(data) {
             this.saveProject(data);
@@ -496,10 +479,8 @@ Vue.config.errorHandler = (err, vm, info) => {
           form_data=JSON.parse(JSON.stringify(vm.ProjectMetadata));
           this.$refs.form.validateWithInfo().then(({ isValid, errors, $refs })=> {
               vm.form_errors=Object.values(errors).flat();                                                
-              if (vm.form_errors=='' || vm.form_errors.length==0){
-                  //vm.saveForm();
-                  console.log("save form",form_data);
-              }                    
+              //if (vm.form_errors=='' || vm.form_errors.length==0){
+              //}                    
           });
                   
           vm.removeEmpty(form_data);
@@ -543,28 +524,12 @@ Vue.config.errorHandler = (err, vm, info) => {
 
           axios.post(url, 
               form_data
-              /*headers: {
-                  "xname" : "value"
-              }*/
           )
           .then(function (response) {
-              console.log(response);              
               vm.schema_errors=[];
-              //alert("Your changes were saved");
           })
           .catch(function (error) {
-              console.log(error);
               vm.schema_errors=error.response.data.errors;
-              
-              /*console.log(error.response.data);
-              vm.dialog_box_option.title=error;
-              vm.dialog_box_option.errors=error.response.data;
-              $('#app_dialog').modal('show');
-              */
-          })
-          .then(function () {
-              // always executed
-              console.log("request completed");
           });
       },
       removeEmpty: function (obj) {
@@ -586,58 +551,7 @@ Vue.config.errorHandler = (err, vm, info) => {
             // expected output: ReferenceError: nonExistentFunction is not defined
             // Note - error messages will vary depending on browser
           }
-      },
-      /*validateData: function(data){                             
-          if (this.schema_validator == undefined){
-              alert("Schema validator not set");
-              return true;
-          }
-          console.log("valdiation data ",data);
-          
-          if (!this.schema_validator(data)){
-              return this.schema_validator.errors
-          }
-
-          return true;                    
-      },*/
-      /*initSchemaValidator: function(){
-        //initialize schema validator
-        var ajv = Ajv({
-            allErrors : true
-        });
-
-        provenance_schema=<?php echo file_get_contents('application/schemas/provenance-schema.json');?>;        
-        ajv.addSchema(provenance_schema,'http://ihsn.org/schemas/provenance-schema.json');
-
-        if (this.dataset_type=='survey'){
-            survey_schema=<?php echo file_get_contents('application/schemas/survey-schema.json');?>;
-            ddi_schema=<?php echo file_get_contents('application/schemas/ddi-schema.json');?>;
-            datafile_schema=<?php echo file_get_contents('application/schemas/datafile-schema.json');?>;  
-            variable_schema=<?php echo file_get_contents('application/schemas/variable-schema.json');?>;  
-            variable_group_schema=<?php echo file_get_contents('application/schemas/variable-group-schema.json');?>;    
-            //ajv.addSchema(survey_schema,'survey-schema');
-            ajv.addSchema(ddi_schema,'http://ihsn.org/schemas/ddi-schema.json');
-            ajv.addSchema(datafile_schema,'http://ihsn.org/schemas/datafile-schema.json');
-            ajv.addSchema(variable_schema,'http://ihsn.org/schemas/variable-schema.json');  
-            ajv.addSchema(variable_group_schema,'http://ihsn.org/schemas/variable-group-schema.json');                    
-            
-            this.schema_validator= ajv.compile(survey_schema);            
-        }
-        else if (this.dataset_type=='image'){
-            image_schema=<?php echo file_get_contents('application/schemas/image-schema.json');?>;
-            iptc_schema=<?php echo file_get_contents('application/schemas/iptc-pmd-schema.json');?>;
-            iptc_shared_schema=<?php echo file_get_contents('application/schemas/iptc-phovidmdshared-schema.json');?>;
-            ajv.addSchema(iptc_schema,'iptc-pmd-schema.json');
-            ajv.addSchema(iptc_shared_schema,'https://www.iptc.org/std/photometadata/specification/iptc-phovidmdshared-schema.json');
-            this.schema_validator= ajv.compile(image_schema);
-        }
-        else{
-            this.schema_validator= ajv.compile(this.metadata_schema);
-        }
-        window.validator_=this.schema_validator;
-        window._formdata=this.formData; 
-      }*/
-
+      }
     }
     })
   </script>

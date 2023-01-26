@@ -1,31 +1,63 @@
+<!--header-->
+<div>
+    
+
+<nav class="main-header sticky-top navbar navbar-expand navbar-white navbar-light bg-light border-bottom" style="margin-left:0px;">
+
+    <div class="navbar-brand" style="min-width:280px;" >
+        <a href="<?php echo site_url('editor/');?>" class="brand-link-editor p-2" style="display:block;">
+            <i class="fas fa-compass"></i>
+            <span class="brand-text font-weight-light">Metadata Editor</span>
+        </a>                
+    </div>
+
+    <div class="pl-2">
+        <div><strong>{{Title}}</strong></div>
+        <div style="font-size:small;color:gray;">{{dataset_type}} - {{StudyIDNO}}</div>
+    </div>
+    <div>{{this.loading_status}}</div>
+
+
+    <ul class="navbar-nav ml-5 ml-auto">
+        
+        <div class="dropdown">
+            <a class="btn btn-link dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fas fa-random"></i> Metadata
+            </a>
+
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                <a class="dropdown-item" href="#/import"><i class="fas fa-file-invoice"></i> Import project metadata</a>
+                <a v-if="dataset_type!=='timeseries-db'" class="dropdown-item" href="#/external-resources/import"><i class="fas fa-clone"></i> Import external resources</a>
+                <div class="dropdown-divider"></div>
+                <a v-if="dataset_type=='survey'" class="dropdown-item" :href="'<?php echo site_url('api/editor/ddi/');?>' + dataset_id" target="_blank"><i class="far fa-file-alt"></i> Export DDI CodeBook (2.5)</a>
+                <a class="dropdown-item" :href="'<?php echo site_url('api/editor/json/');?>' + dataset_id" target="_blank"><i class="far fa-file-code"></i> Export JSON</a>
+                <a v-if="dataset_type!=='timeseries-db'" class="dropdown-item" :href="'<?php echo site_url('api/editor/rdf/');?>' + dataset_id" target="_blank"><i class="far fa-file-alt"></i> Export External Resouces (RDF/XML)</a>
+                <a v-if="dataset_type!=='timeseries-db'" class="dropdown-item" :href="'<?php echo site_url('api/editor/resources/');?>' + dataset_id" target="_blank"><i class="far fa-file-alt"></i> Export External Resources (JSON)</a>
+            </div>
+        </div>
+
+        <li class="nav-item">
+            <a class="nav-link"  href="#/publish" role="button">
+                <i class="fas fa-location-arrow"></i> Publish
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <?php echo $this->load->view('user_menu/user-menu',null,true);?>                        
+        </li>
+    </ul>
+</nav>
+</div>
+<!--end-header-->
+
 <splitpanes class="default-theme splitpanes splitpanes--vertical" style="min-height: 400px">
   <pane min-size="15" max-size="35" size="20" height="100">
     <!--left -->
 
-    <div class="bg-light  pt-3 pl-2" >
-        <?php // <div class="float-right pt-0 pr-2"><v-icon dark small>mdi-cog</v-icon></div> ?>
-        <a href="<?php echo site_url('editor/');?>" class="brand-link-editor pb-4" style="display:block;">
-            <i class="fas fa-compass"></i>
-            <span class="brand-text font-weight-light">Metadata Editor</span>
-        </a>
-        
-        <div class="row" style="display:none;">
-            <div class="col-auto">                
-                <v-icon dark>mdi-form-select</v-icon><small>Form fields</small>
-                <v-icon dark>mdi-alpha-t-box</v-icon><small>Template</small>
-            </div>
-            <div class="col">
-                <div class="float-right">
-                <v-icon dark>mdi-alpha-t-box</v-icon><small>Template</small>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="container-fluid bg-light pt-2" style="overflow:auto;">
-
     
-    
+
+    <div class="container-fluid bg-secondary-light pt-2" style="overflow:auto;">
+
         <div class="mb-5">
             <v-treeview                
                 color="warning"
@@ -82,61 +114,7 @@
             
             <div class="container-fluid-" style="overflow:auto;">
 
-
-            <nav class="main-header navbar navbar-expand navbar-white navbar-light" style="margin-left:0px;">
-
-                <?php /* 
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
-                    </li>
-                </ul>
-                */ ?>
-
-                <div>
-                    <div><strong>{{Title}}</strong></div>
-                    <div style="font-size:small;color:gray;">{{dataset_type}} - {{StudyIDNO}}</div>
-                </div>
-                <div>{{this.loading_status}}</div>
-
-
-                <ul class="navbar-nav ml-5 ml-auto">
-                    
-                    <div class="dropdown">
-                        <a class="btn btn-link dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fas fa-random"></i> Metadata
-                        </a>
-
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                            <a class="dropdown-item" href="#/import"><i class="fas fa-file-invoice"></i> Import project metadata</a>
-                            <a v-if="dataset_type!=='timeseries-db'" class="dropdown-item" href="#/external-resources/import"><i class="fas fa-clone"></i> Import external resources</a>
-                            <div class="dropdown-divider"></div>
-                            <a v-if="dataset_type=='survey'" class="dropdown-item" :href="'<?php echo site_url('api/editor/ddi/');?>' + dataset_id" target="_blank"><i class="far fa-file-alt"></i> Export DDI CodeBook (2.5)</a>
-                            <a class="dropdown-item" :href="'<?php echo site_url('api/editor/json/');?>' + dataset_id" target="_blank"><i class="far fa-file-code"></i> Export JSON</a>
-                            <a v-if="dataset_type!=='timeseries-db'" class="dropdown-item" :href="'<?php echo site_url('api/editor/rdf/');?>' + dataset_id" target="_blank"><i class="far fa-file-alt"></i> Export External Resouces (RDF/XML)</a>
-                            <a v-if="dataset_type!=='timeseries-db'" class="dropdown-item" :href="'<?php echo site_url('api/editor/resources/');?>' + dataset_id" target="_blank"><i class="far fa-file-alt"></i> Export External Resources (JSON)</a>
-                        </div>
-                    </div>
-
-                    <li class="nav-item">
-                        <a class="nav-link"  href="#/publish" role="button">
-                            <i class="fas fa-location-arrow"></i> Publish
-                        </a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link" data-widget="fullscreen" href="#" role="button">
-                            <i class="fas fa-expand-arrows-alt"></i>
-                        </a>
-                    </li>
-
-
-
-                    <li class="nav-item">
-                        <?php echo $this->load->view('user_menu/user-menu',null,true);?>                        
-                    </li>
-                </ul>
-            </nav>
+            
 
 
 

@@ -28,9 +28,6 @@
             
             echo $this->load->view("metadata_editor/vue-external-resources-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-external-resources-edit-component.js",null,true);
-            //echo $this->load->view('metadata_editor/vue-form-text-field.js',null,true);
-            //echo $this->load->view('metadata_editor/vue-form-part.js',null,true);
-            //echo $this->load->view('metadata_editor/editor-main-component.js',null,true);
             echo $this->load->view("metadata_editor/vue-datafiles-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-datafile-edit-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-datafile-component.js",null,true);
@@ -44,9 +41,6 @@
 
             //tree view component
             echo $this->load->view("metadata_editor/vue-form-tree.js",null,true);
-
-            //metadata form component
-            //echo $this->load->view("metadata_editor/vue-metadata-form-component.js",null,true); //see v-form
 
             //metadata grid component
             echo $this->load->view("metadata_editor/vue-grid-component.js",null,true);
@@ -133,10 +127,8 @@
 
 
         router.beforeEach((to, from, next)=>{
-            console.log("router",to,from);
-
             route_path=to.path.replace('/study/','');
-            //store.commit('tree_active_node',route_path);
+            
             if (store.state.formTemplateParts[route_path] !== undefined){
                 store.commit('tree_active_node',route_path);
             }
@@ -301,7 +293,6 @@
                     return state.data_files;
                 },
                 getDataFileById: (state) => (fid) => {
-                    console.log("data files", state.data_files);
                     for(i=0;i<state.data_files.length;i++){
                         if(state.data_files[i].file_id==fid){
                             console.log("file found",state.data_files[i]);
@@ -375,16 +366,11 @@
                     return axios
                     .get(url)
                     .then(function (response) {
-                        console.log("loading templates",response);
                         store.state.templates=response.data.result;
                     })
                     .catch(function (error) {
                         console.log(error);
-                    })
-                    .then(function () {
-                        console.log("vuex request completed");
                     });
-                    console.log("3. should run after");
                 },
                 async loadProject({commit},options) {
                     let url=CI.base_url + '/api/editor/'+options.dataset_id;
@@ -396,11 +382,7 @@
                     })
                     .catch(function (error) {
                         console.log(error);
-                    })
-                    .then(function () {
-                        console.log("vuex request completed");
                     });
-                    console.log("3. should run after");
                 },
                 async loadDataFiles({commit},options) {
                     let url=CI.base_url + '/api/editor/datafiles/'+options.dataset_id;
@@ -425,13 +407,11 @@
                 },
                 async loadAllVariables({commit,state},options) {
                     i=0;
-                    console.log("state",state.data_files);
                     for (let file of state.data_files) {
                         store.dispatch('loadVariables',{dataset_id:options.dataset_id, fid:file.file_id});
                     }
                 },
                 async loadVariables({commit}, options) {//options {dataset_idno,fid}
-                    console.log("loadVariables",options);
                     let url=CI.base_url + '/api/editor/variables/'+options.dataset_id + '/'+ options.fid + '?detailed=1';
                     return axios
                     .get(url)
@@ -448,9 +428,6 @@
                     })
                     .catch(function (error) {
                         console.log(error);
-                    })
-                    .then(function () {
-                        console.log("request completed");
                     });
                 },
                 async loadExternalResources({commit}, options) {
@@ -458,36 +435,28 @@
                     return axios
                     .get(url)
                     .then(function (response) {
-                        console.log("external resources",response);
                         if(response.data.resources){
                             commit('external_resources',response.data.resources);
                         }
                     })
                     .catch(function (error) {
                         console.log(error);
-                    })
-                    .then(function () {
-                        console.log("request completed");
-                        this.loading_status="";
                     });
                 },
             },
             mutations: VueDeepSet.extendMutation({
                 // other mutations
                 data_model (state,data) {
-                    //this.$vuexSet('testing',"another value");
                     console.log("value added");
                 },
                 tree_active_node(state,node){
                     state.treeActiveNode=state.formTemplateParts[node];
-                    console.log("node",state.treeActiveNode);
                 },
                 external_resources(state,data){
                     state.external_resources=data;
                 },
                 external_resources_add(state,newResource){
                     let new_idx=state.external_resources.push(newResource)-1;
-                    console.log("external reosurceas add commited",state.external_resources);
                     return new_idx;//index of newly added resource
                 },
                 data_files(state,data){
@@ -498,7 +467,6 @@
                     return new_idx;
                 },
                 variables(state,data){
-                    //state.variables[data.fid]=data.variables;
                     Vue.set(state.variables, data.fid, data.variables);
                 },
                 variable_add(state,data){
@@ -508,18 +476,11 @@
                     }
 
                     let new_idx=state.variables[data.fid].push(data.variable)-1;
-                    //Vue.set(state.variables, data.fid, data.variable);
                 },
                 variables_active_tab(state,data){
                     state.variables_active_tab=data;
                 }
-            })
-            /*: {
-                data_model (state,data) {
-                    state.formData=data;
-                }
-            }*/
-            //mutations: VueDeepSet.extendMutation()
+            })            
         })
 
 

@@ -22,7 +22,6 @@ class R extends MY_REST_Controller
 		parent::__construct();
 		require_once 'modules/guzzle/vendor/autoload.php';
 
-		$this->load->model("Catalog_model");				
 		$this->load->model("Editor_model");
 		$this->load->library("Rutils");
 		//$this->is_admin_or_die();

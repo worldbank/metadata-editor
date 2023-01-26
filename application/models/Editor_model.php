@@ -176,7 +176,7 @@ class Editor_model extends CI_Model {
 	 * @fields - (optional) list of fields
 	 * 
 	 */
-	function get_all($limit=10,$offset=0, $fields=array())
+	function get_all($limit=10,$offset=0, $fields=array(), $search_options=array())
 	{
 		if (empty($fields)){
 			$fields=$this->listing_fields;
@@ -195,27 +195,78 @@ class Editor_model extends CI_Model {
 		if ($limit>0){
 			$this->db->limit($limit, $offset);
 		}
+
+		$search_filters=$this->apply_search_filters($search_options);
 		
 		$result= $this->db->get("editor_projects");
 		
 		if ($result){
-			$result=$result->result_array();
+			$result=$result->result_array();			
 		}else{
 			$error=$this->db->error();
 			throw  new Exception(implode(", ", $error));
 		}
-
-		if($result){
-			return $this->decode_encoded_fields_rows($result);
+		
+		if ($result){
+			$result=$this->decode_encoded_fields_rows($result);
 		}
+
+		return array(
+			'result'=>$result,
+			'filters'=>$search_filters
+		);
 
 		return false;
 	}
 
 	//returns the total 
-	function get_total_count()
+	function get_total_count($search_options=array())
 	{
-		return $this->db->count_all('editor_projects');
+		$this->apply_search_filters(($search_options));
+		return $this->db->count_all_results('editor_projects');
+	}
+
+
+	private function apply_search_filters($search_options)
+	{
+		$applied_filters=array();
+
+		//filter by type
+		$data_type_filters=$this->get_search_filter($search_options,'data_type');
+		
+		if ($data_type_filters){
+			$this->db->where_in('type',$data_type_filters);
+			$applied_filters['data_type']=$data_type_filters;
+		}
+
+		//keywords
+		if (isset($search_options['keywords']) && !empty($search_options['keywords'])) {
+			$escaped_keywords=$this->db->escape('%'.$search_options['keywords'].'%');
+			$where = sprintf('(title like %s OR idno like %s)',
+                        $escaped_keywords,
+                        $escaped_keywords
+                    );
+            $this->db->where($where,NULL,FALSE);
+			$applied_filters['keywords']=$search_options['keywords'];
+		}
+
+		//tags
+
+		return $applied_filters;		
+	}
+
+	function get_search_filter($options,$filter_key)
+	{
+		if (!isset($options[$filter_key])){
+			return false;
+		}
+
+		$values=$options[$filter_key];
+		foreach($values as $idx=>$value){
+			$values[$idx]=xss_clean($value);
+		}
+
+		return $values;
 	}
 
 

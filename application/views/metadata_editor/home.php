@@ -40,7 +40,7 @@
       <div class="content-wrapper">
         <section class="content">
           <!-- Provides the application the proper gutter -->
-          <div class="container-fluid" style="overflow:auto;">
+          <div class="container" style="overflow:auto;">
 
 
 
@@ -57,14 +57,12 @@
                         Project types
                       </v-expansion-panel-header>
                       <v-expansion-panel-content>
-                        <div class="form-check">
-                          <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-                          <label class="form-check-label" for="defaultCheck1">Microdata</label>
-                        </div>
-                        <div class="form-check">
-                          <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-                          <label class="form-check-label" for="defaultCheck1">Document</label>
-                        </div>
+                        <template v-for="(type_name, type_key) in data_types">
+                          <div class="form-check">
+                            <input class="form-check-input" type="checkbox" v-model="search_filters['data_type']" :value="type_key" :id="'filter-type-'+type_key">
+                            <label class="form-check-label" :for="'filter-type-'+type_key">{{type_name}}</label>
+                          </div>
+                        </template>                        
                       </v-expansion-panel-content>
                     </v-expansion-panel>
 
@@ -111,35 +109,45 @@
               <div class="projects col">
                 <?php echo $this->load->view('metadata_editor/home_buttons', null, true); ?>
 
-
-
                 <div>
-                  <div v-if="!Projects"> There are no projects!</div>
 
-                  <div class="row mb-2 border-bottom border-top">
-                    <div class="col-2">
-                      <div class="p-2" v-if="Projects">
-                        <strong>{{parseInt(projects.offset) +1}}</strong> - <strong>{{parseInt(projects.found)}}</strong> of <strong>{{projects.total}}</strong> projects
-                      </div>
-                    </div>
-
-                    <div class="col-4">
+                  <div class="rowx">
                       <div class="search-box">
 
-                        <div class="col-12 col-md-12 text-center">
-                          <div class="input-group mb-3">
+                        <div class="text-center">
+                          <div class="input-group">
                             <input type="text" class="form-control" placeholder="Keywords..." aria-label="Search" aria-describedby="search-box" v-model="search_keywords">
-                            <span class="input-group-text" id="search-box" @click="search(true)">Search</span>
+                            <span class="input-group-text" id="search-box" @click="search()">Search</span>
                           </div>
                         </div>
 
                       </div>
+                  </div>
+
+                  <div v-if="SearchFiltersQuerystring" class="mt-2">
+                        Filters:
+                        <template v-for="(filter_values, filter_type) in search_filters">
+                          <template v-for="(filter_value,idx) in filter_values">
+                            <span class="badge badge-primary mr-1" @click="removeFilter(filter_type,idx)">{{filter_value}}                            
+                              <span aria-hidden="true">&times;</span>                            
+                            </span>
+                          </template>
+                        </template>                     
+                  </div>
+
+                  <div class="mt-5 p-3 border text-center text-danger" v-if="!Projects || projects.found<1"> No projects found!</div>
+
+                  <div  v-if="!Projects || projects.found>0" class="row mb-2 border-bottom  mt-3">
+                    <div class="col-md-6">
+                      <div class="p-2" v-if="Projects">
+                        <strong>{{parseInt(projects.offset) +1}}</strong> - <strong>{{parseInt(projects.offset + projects.projects.length)}}</strong> of <strong>{{projects.total}}</strong> projects
+                      </div>
                     </div>
 
-                    <div class="col">
+                    <div class="col-md-6">
                       <template>
                         <div class="float-right">
-                          <v-pagination v-model="pagination_page" :length="6"></v-pagination>
+                          <v-pagination v-model="pagination_page" :length="PaginationTotalPages"  @input="PaginatePage"></v-pagination>
                         </div>
                       </template>
                     </div>
@@ -147,7 +155,7 @@
                   </div>
 
                   <div v-for="project in Projects" class="row" >
-                      <div class="col-md-6  border-bottom">
+                      <div class="col  border-bottom">
                           <h5 class="wb-card-title title">
                             <a href="#" :title="project.title" class="d-flex" @click="EditProject(project.id)">
                               <i :title="project.type" :class="project_types_icons[project.type]"></i>&nbsp;
@@ -169,7 +177,7 @@
                         
                         </div>
 
-                        <div class="col-md-1  card-thumbnail-col  border-bottom">
+                        <div class="col-2  card-thumbnail-col  border-bottom">
                           <a href="#" @click="EditProject(project.id)">
                             <img :src="'<?php echo site_url('api/editor/thumbnail');?>/' + project.id" alt="" class="img-fluid img-thumbnail rounded shadow-sm project-card-thumbnail">
                           </a>
@@ -299,9 +307,22 @@
         loading_status: null,
         form_errors: [],
         facet_panel: [],
-        pagination_page: 1,
+        pagination_page: 0,
         dialog_create_project: false,
         search_keywords: '',
+        search_filters:{
+          "data_type":[],
+          "tag":[]
+        },
+        data_types:{
+          "survey":"Microdata",
+          "document":"Document",
+          "table":"Table",
+          "geospatial":"Geospatial",
+          "image":"Image",
+          "script": "Script",
+          "video":"Video"
+        },
         project_types_icons: {
           "document": "fa fa-file-code",
           "survey": "fa fa-database",
@@ -310,14 +331,15 @@
           "timeseries": "fa fa-chart-line",
           "image": "fa fa-image",
           "video": "fa fa-video",
-          "script": "fa fa-file-code",
-
+          "script": "fa fa-file-code"
         }
+
 
       },
       created: async function() {
         //await this.$store.dispatch('initData',{dataset_idno:this.dataset_idno});
         //this.init_tree_data();
+        //Vue.set(this.search_filters,"data_type",[]);
       },
       mounted: function() {
         this.loadProjects();
@@ -328,26 +350,54 @@
         },
         Projects() {
           return this.projects.projects;
+        },
+        PaginationTotalPages()
+        {
+          return Math.ceil(this.projects.total/this.projects.limit);
+        },
+        PaginationOffset()
+        {
+          let pageSize=this.projects.limit;
+          let currentPage=this.pagination_page-1;
+          return pageSize * currentPage;
+        },
+        PaginationCurrentPage()
+        {
+          let offset=this.projects.offset;
+          let limit =this.projects.limit;
+          return Math.ceil(offset / limit) +1;
+        },
+        SearchFiltersQuerystring()
+        {
+          return jQuery.param(this.search_filters);
+          /*let qs='';
+          for(i=0;i<Object.keys(this.search_filters).length;i++){
+            let filter_name=Object.keys(this.search_filters)[i];
+            for (k=0;this.search_filters[filter_name]
+          }*/
         }
       },
+      
       watch: {
-        /*
-        ProjectMetadata: 
-        {
-            deep:true,
-            handler(val){
-              this.saveProjectDebounce(val);
-            }
-        }*/
+        SearchFiltersQuerystring: function (new_, old_) {
+          this.search();
+        }
       },
       methods: {
         momentDate(date) {
           return moment.utc(date).format("MMM d, YYYY")
         },
+        search: function(){
+          this.pagination_page=1;
+          this.loadProjects();
+        },
         loadProjects: function() {
           vm = this;
 
-          let url = CI.base_url + '/api/editor/';
+          let url = CI.base_url + '/api/editor/?offset='+this.PaginationOffset
+                    + '&' + 'keywords=' + this.search_keywords
+                    + '&' + this.SearchFiltersQuerystring ;
+                      
           this.loading_status = "Loading projects...";
 
           return axios
@@ -355,6 +405,7 @@
             .then(function(response) {
               console.log("success", response);
               vm.projects = response.data;
+              vm.pagination_page=vm.PaginationCurrentPage;
             })
             .catch(function(error) {
               console.log("error", error);
@@ -416,6 +467,12 @@
         getProjectIcon: function(type) {
           projectIcon = this.project_types_icons[type];
           return projectIcon;
+        },
+        PaginatePage: function (page){
+          this.loadProjects();
+        },
+        removeFilter: function(filter_type,value_idx){
+            this.$delete (this.search_filters[filter_type],value_idx);
         }
       }
     })

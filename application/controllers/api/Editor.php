@@ -48,20 +48,23 @@ class Editor extends MY_REST_Controller
 			$offset=(int)$this->input->get("offset");
 			$limit=(int)$this->input->get("limit");
 
+			$search_options=$this->input->get();
+
 			if (!$limit){
 				$limit=10;
 			}
 			
-			$result=$this->Editor_model->get_all($limit,$offset);
-			array_walk($result, 'unix_date_to_gmt',array('created','changed'));
+			$result=$this->Editor_model->get_all($limit,$offset,null,$search_options);
+			array_walk($result['result'], 'unix_date_to_gmt',array('created','changed'));
 			
 			$response=array(
 				'status'=>'success',
-				'total'=>$this->Editor_model->get_total_count(),
-				'found'=>is_array($result) ? count($result) : 0,
+				'total'=>$this->Editor_model->get_total_count($search_options),
+				'found'=>is_array($result['result']) ? count($result['result']) : 0,
 				'offset'=>$offset,
 				'limit'=>$limit,
-				'projects'=>$result
+				'projects'=>$result['result'],
+				'filters'=>$result['filters']
 			);
 						
 			$this->set_response($response, REST_Controller::HTTP_OK);
