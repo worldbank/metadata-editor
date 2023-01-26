@@ -45,6 +45,9 @@ To select a thumbnail, click on "Change image" and select an image file.
 
 ![image](https://user-images.githubusercontent.com/35276300/214941280-2493b610-1c2b-4c25-b8e5-37c07d1c6dde.png)
 
+
+### Document description and Study description
+
 Use the navigation tree to fill out information in the **Document description** and **Study description** sections.
 
 ![image](https://user-images.githubusercontent.com/35276300/214941497-887f698d-e763-48fe-8297-0e45bf6d2f73.png)
@@ -62,40 +65,48 @@ When a controlled vocabulary has been entered in the template, a drop down menu 
 ![image](https://user-images.githubusercontent.com/35276300/214942534-d47df5a3-93f0-4d61-b956-46bbc89f0632.png)
 Try and provide as much and as relevant information in all relevant metadata elements. 
 
-### Import data files
+### Data files
 
-If you have data files available in CSV, Stata, SPSS, or other format compatible with the Metadata Editor, importing the data files will usually be the first step  (automatically generate data dictionary) then add metadata. 
-If you do not have data, can still document the study and even create a data dictionary.
-Last, add external resources.
-Use R
-Supported formats
-What's imported
-Key variables and relationships
-Weight variables
+If you have data files available in CSV, Stata (.dta), or SPSS (.sav) format, you can import the data to automatically populate some of the content of the *File description* section and much of the content of the *Variable description* section. The Metadata Editor relies on the open source R software and on the Haven library to import (and re-export) data files. When a data file is imported, the application will:
+- Generate the list of variables for each data file
+- Import the variable and value labels from the data files, if available
+- Generate summary statistics that may be saved as metadata.
 
-### Fill document description 
-Default values
-Spread metadata
+To import your data files, select "Data files" in the navigation bar, and click on "Import files".
 
-### Fill study description
+![image](https://user-images.githubusercontent.com/35276300/214943689-7c608a52-777c-41c2-9662-d1c66797e370.png)
 
-### Data file description
+Select the data files you want to import, and click "Import files".
+
+![image](https://user-images.githubusercontent.com/35276300/214944454-86919d0a-e0ae-40dd-a537-a94122afa4b3.png)
 
 ### Variable description and statistics
 Description
+- Ctrl and Shift keys
+- Spread metadata
+- Import metadata
+
+Weights
+Keys
+
 Summary statistics
 
 ### Variable groups
 
 ### Tags
 
-### Adding external resources
+### External resources
+
+![image](https://user-images.githubusercontent.com/35276300/214945692-0e3a37e5-14b0-495c-8eeb-351d305fb185.png)
+
 
 ### Saving and exporting metadata
 
+
 ### Exporting data
 
-### Diagnostic
+
+### Diagnostics
 
 
 ## Editing an existing project
