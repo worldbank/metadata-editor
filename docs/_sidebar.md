@@ -16,6 +16,7 @@
 * Documenting data
 
     * [File management](template-manager/file_management.md)
+    * [Login](login.md)
     * [Microdata](template-manager/microdata.md)
     * [Documents](template-manager/document.md)
     * [Indicators/time series](template-manager/indicator.md)
@@ -25,7 +26,12 @@
     * [Scripts](template-manager/script.md)
     * [External resources](template-manager/external_resource.md)
 
+* Publishing metadata 
+
+    * [Publishing in NADA](publish_to_nada.md]
+
 * For developers
+
     * [Developers](developers.md)
 
 * References and links
