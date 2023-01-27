@@ -59,7 +59,7 @@
                                 {
                                     "key": "role",
                                     "title": "Role",
-                                    "type": "text",
+                                    "type": "textarea",
                                     "prop_key": "metadata_information.producers.role",
                                     "help_text": "The specific role of the person or organization mentioned in \"Name\" in the production of the metadata."
                                 }
@@ -72,7 +72,7 @@
                             "title": "Production date",
                             "type": "text",
                             "class": "required",
-                            "help_text": "The date the metadata on this image was produced (not distributed or archived), preferably entered in ISO 8601 format (YYYY-MM-DD or YYY-MM). A validation rule can be set in user templates to enforce a date format. This is a \"Recommended\" element, as information on the producer and on the date of metadata production is useful for catalog administration purposes.",
+                            "help_text": "The date the metadata on this image was produced (not distributed or archived), preferably entered in ISO 8601 format (YYYY-MM-DD or YYYY-MM). A validation rule can be set in user templates to enforce a date format. This is a \"Recommended\" element, as information on the producer and on the date of metadata production is useful for catalog administration purposes.",
                             "is_recommended": true
                         },
                         {
@@ -105,7 +105,6 @@
                             "required": true,
                             "help_text": "A unique identifier of the image. The \"Primary ID\" (also referred to as IDNO) is a unique identification number used to identify the image. A unique identifier is required for cataloguing purpose, so this element is declared as \"Required\". The identifier will allow users to cite the table properly. The identifier must be unique within the catalog. Ideally, it should also be globally unique. A Digital Object Identifier (DOI), or the ID included in the EXIF metadata for digital pictures can be used. for the study. Alternatively, the \"Primary ID\" can be constructed by an organization using a consistent scheme. Note that the schema allows you to provide more than one identifier for a same image (in element \"Other identifiers\"); a catalog-specific identifier is thus not incompatible with a globally unique identifier like a DOI. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. The identifier may not contain blank spaces.",
                             "rules": {
-                                "required": true,
                                 "alpha_dash": true,
                                 "min": 5,
                                 "max": 800
@@ -200,7 +199,7 @@
                                     "title": "Creator name",
                                     "type": "simple_array",
                                     "class": "required",
-                                    "help_text": "Enter details about the creator or creators of this image. The Image Creator must often be attributed in association with any use of the image. The Image Creator, Copyright Owner, Image Supplier and Licensor may be the same or different entities.",
+                                    "help_text": "Enter details about the creator or creators of this image. The image Creator must often be attributed in association with any use of the image. The image creator, copyright owner, image supplier and licensor may be the same or different entities.",
                                     "enum": [],
                                     "is_recommended": true
                                 },
@@ -262,7 +261,7 @@
                                 {
                                     "key": "image_description.iptc.photoVideoMetadataIPTC.creditLine",
                                     "title": "Credit",
-                                    "type": "text",
+                                    "type": "textarea",
                                     "class": "required",
                                     "help_text": "The credit to person(s) and/or organization(s) required by the supplier of the image to be used when published. This is a free-text field."
                                 },
@@ -277,7 +276,7 @@
                                     "key": "image_description.creatorContactInfo",
                                     "title": "Contact",
                                     "class": "required",
-                                    "type": "array",
+                                    "type": "textarea",
                                     "props": [
                                         {
                                             "key": "country",
@@ -706,7 +705,10 @@
                                     "type": "text",
                                     "class": "required",
                                     "help_text": "URL referencing a web resource providing a statement of the copyright ownership and usage rights of the image.",
-                                    "enum": []
+                                    "enum": [],
+                                    "rules": {
+                                        "is_uri": true
+                                    }
                                 },
                                 {
                                     "key": "image_description.iptc.photoVideoMetadataIPTC.instructions",
@@ -1335,16 +1337,21 @@
                     "type": "array",
                     "props": [
                         {
-                            "key": "tag_group",
-                            "title": "Tag group",
-                            "type": "string"
-                        },
-                        {
                             "key": "tag",
                             "title": "Tag",
-                            "type": "string"
+                            "type": "string",
+                            "prop_key": "tags.tag",
+                            "help_text": "A user-defined tag."
+                        },
+                        {
+                            "key": "tag_group",
+                            "title": "Tag group",
+                            "type": "string",
+                            "prop_key": "tags.tag_group",
+                            "help_text": "A user-defined group (optional) to which the tag belongs. Grouping tags allows implementation of controlled facets in data catalogs."
                         }
-                    ]
+                    ],
+                    "help_text": "Tags, especially when organized in tag groups, provide a powerful and flexible solution to enable custom facets (filters) in data catalogs. "
                 }
             ]
         }
