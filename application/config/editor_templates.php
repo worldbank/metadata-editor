@@ -72,12 +72,12 @@ $config['table'][]=array(
 ); 
 
 //image
-/*$config['image'][]=array(
+$config['image'][]=array(
     'template' => 'metadata_editor/metadata_editor_templates/image_form_template.json',
     'lang'=>'en',
     'uid'=>'image-system-en',
     'name'=> 'Image IHSN Schema (DCMI and IPTC)'
-);*/ 
+); 
 
 $config['image'][]=array(
     'template' => 'metadata_editor/metadata_editor_templates/image_dcmi_form_template.json',
