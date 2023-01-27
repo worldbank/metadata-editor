@@ -359,7 +359,6 @@
                     await store.dispatch('loadExternalResources',{dataset_id:options.dataset_id});
                     store.state.variables_loaded=true;
                     store.state.variables_isloading=false;
-                    window._store=store.state;
                 },
                 async loadTemplatesList({commit},options) {
                     let url=CI.base_url + '/api/templates/list/'+store.state.project_type;;

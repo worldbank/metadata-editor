@@ -311,10 +311,45 @@ Vue.config.errorHandler = (err, vm, info) => {
           }
           console.log("resources nodes:",resources_nodes);
           return resources_nodes;
-        }
+        },
+        TreeItems() {
+          let tree_data=this.filter_tree_items(this.form_template.template.items);
+
+          tree_data.unshift({
+              title: 'Home',
+              type:'home',
+              file: 'database',
+              key: 'home'              
+            });
+
+          if (this.dataset_type=='survey'){
+            tree_data.push({
+              title: 'Data files',
+              type:'datasets',
+              file: 'database',
+              key: 'datasets',
+              items:this.DataFilesTreeNodes
+            });
+          }
+
+          if (this.dataset_type!=='timeseries-db'){
+            tree_data.push({
+                title: 'External resources',
+                type: 'resources',
+                file: 'resource',
+                key:'external-resources',
+                items:this.ExternalResourcesTreeNodes
+            });
+          }
+
+          return tree_data;          
+        },
       },
       watch: {
         '$store.state.data_files': function() {
+            this.update_tree();
+        },
+        '$store.state.external_resources': function() {
             this.update_tree();
         },
         $route(to, from) {
@@ -394,7 +429,7 @@ Vue.config.errorHandler = (err, vm, info) => {
           
           //set active tree node
           //this.tree_active_items=["datafile/F22"];
-          console.log('tree_data',tree_data);
+         // console.log('tree_data',tree_data);
         },
         update_tree: function()
         {
@@ -410,6 +445,11 @@ Vue.config.errorHandler = (err, vm, info) => {
             if (this.items[k]["title"]=="Data files"){
               this.items[k]["items"]=this.DataFilesTreeNodes
             }
+
+            if (this.items[k]["key"]=="external-resources"){
+              this.items[k]["items"]=this.ExternalResourcesTreeNodes;
+            }
+            
           }
         },        
         templateToTree: function (){
@@ -421,6 +461,7 @@ Vue.config.errorHandler = (err, vm, info) => {
         },
         treeClick: function (node){
           store.commit('tree_active_node',node.key);
+          console.log("tree node click",node);
 
           //expand tree node          
           this.initiallyOpen.push(node.key);

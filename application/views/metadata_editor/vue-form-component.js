@@ -9,9 +9,6 @@ Vue.component('v-form', {
     },
     methods: {
         showFieldError(field,error){
-            //field_parts=field.split("-");
-            //field_name=field_parts[field_parts.length-1];
-            //return error.replace(field,field_name);
             return error.replace(field,'');
         },
         showActiveSection(field_key,active_section){
@@ -22,13 +19,6 @@ Vue.component('v-form', {
         this.field= this.$store.state.treeActiveNode;
       },
 
-    /*created(){
-        vm=this;
-        EventBus.$on('activeSection', function(data) {
-            console.log("active",data,vm.active_section);
-            vm.activeSection(data);
-        });
-    },*/
     computed: {
         toggleClasses() {
             return {

@@ -1202,11 +1202,11 @@ class Editor extends MY_REST_Controller
 
 			//get dctype by code
 			if(isset($options['dctype'])){ 
-				$options['dctype']=$this->Survey_resource_model->get_dctype_label_by_code($options['dctype']);
+				$options['dctype']=$this->Editor_resource_model->get_dctype_label_by_code($options['dctype']);
 			}
 
 			if(isset($options['dcformat'])){ 
-				$options['dcformat']=$this->Survey_resource_model->get_dcformat_label_by_code($options['dcformat']);
+				$options['dcformat']=$this->Editor_resource_model->get_dcformat_label_by_code($options['dcformat']);
 			}
 
 			//validate resource

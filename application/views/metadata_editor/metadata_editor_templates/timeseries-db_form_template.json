@@ -569,7 +569,7 @@
                             ]
                         },
                         {
-                            "key": "database_description.acknowledegments",
+                            "key": "database_description.acknowledgments",
                             "title": "Acknowledgements",
                             "type": "array",
                             "props": [

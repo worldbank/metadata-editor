@@ -113,7 +113,7 @@ Vue.component('form-main', {
 
 
         <template v-if="formField.type=='text' || formField.type=='string'">
-        <!--text-field-->
+            <!--text-field-->
             <div class="form-group form-field" :class="['field-' + formField.key, formField.class] ">
 
                 <label :for="'field-' + normalizeClassID(formField.key)">

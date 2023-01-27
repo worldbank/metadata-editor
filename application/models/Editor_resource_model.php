@@ -555,6 +555,46 @@ class Editor_resource_model extends ci_model {
 		return $dctype;
 	}
 
+	/**
+	 * 
+	 * 
+	 * Return the dcformat label by code
+	 * 
+	 * 
+	 */
+	function get_dcformat_label_by_code($dcformat)
+	{
+		$codes=array(
+			'application/x-compressed'=>'Compressed, Generic []',
+			'application/zip'=>'Compressed, ZIP',
+			'application/x-cspro'=>'Data, CSPro',
+			'application/dbase'=>'Data, dBase',
+			'application/msaccess'=>'Data, Microsoft Access',
+			'application/x-sas'=>'Data, SAS',
+			'application/x-spss'=>'Data, SPSS',
+			'application/x-stata'=>'Data, Stata',
+			'text'=>'Document, Generic',
+			'text/html'=>'Document, HTML',
+			'application/msexcel'=>'Document, Microsoft Excel',
+			'application/mspowerpoint'=>'Document, Microsoft PowerPoint',
+			'application/msword'=>'Document, Microsoft Word',
+			'application/pdf'=>'Document, PDF',
+			'application/postscript'=>'Document, Postscript',
+			'text/plain'=>'Document, Plain',
+			'text/wordperfect'=>'Document, WordPerfect',
+			'image/gif'=>'Image, GIF',
+			'image/jpeg'=>'Image, JPEG',
+			'image/png'=>'Image, PNG',
+			'image/tiff'=>'Image, TIFF'
+		);
+
+		if(array_key_exists($dcformat,$codes)){
+			return $codes[$dcformat] . ' ['.$dcformat.']';
+		}
+		
+		return $dcformat;
+	}
+
 
     /**
 	 * 

@@ -92,7 +92,7 @@ Vue.component('form-part', {
 
 
         <div v-if="field.type=='array'">
-        ddfdfdfdfdfdfdfdfd
+        
             <div class="form-group form-field form-field-table">
                 <label :for="'field-' + normalizeClassID(field.key)">{{title}}</label>
                 <grid-component

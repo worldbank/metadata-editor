@@ -1,7 +1,5 @@
 <!--header-->
 <div>
-    
-
 <nav class="main-header sticky-top navbar navbar-expand navbar-white navbar-light bg-light border-bottom" style="margin-left:0px;">
 
     <div class="navbar-brand" style="min-width:280px;" >
@@ -53,8 +51,6 @@
 <splitpanes class="default-theme splitpanes splitpanes--vertical" style="min-height: 400px">
   <pane min-size="15" max-size="35" size="20" height="100">
     <!--left -->
-
-    
 
     <div class="container-fluid bg-secondary-light pt-2" style="overflow:auto;">
 
@@ -299,7 +295,7 @@
                         :active.sync="tree_active_items" 
                         @update:open="treeOnUpdate" 
                         :open.sync="initiallyOpen" 
-                        :items="items" 
+                        :items="TreeItems" 
                         activatable dense 
                         item-key="key" 
                         item-text="title"                         
