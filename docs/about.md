@@ -1,19 +1,8 @@
-# About
+# Introduction
 
-text goes here...
+The volume and the diversity of data made available to the research community are growing fast. But too many valuable datasets remain largely under-exploited. Finding, understanding, and using the most relevant data can be a challenging task for researchers and other data users. To be used more extensively, data must be made easier to find, understand, access, and analyze. The production and exploitation of **rich and structured metadata** is a core requirement to meet these objectives.
 
-
-## Preface
-...
-
-## Acknowledgments
-...
-
-## Background and rationale
-
-The volume and the diversity of data made available to the research community are growing fast. But too many valuable datasets remain largely under-exploited. To be used more extensively, data must be made easier to find, understand, access, and analyze. The documentation, cataloguing, and dissemination of data must be improved. The discoverability, accessibility, and usability of data depend very much on the quality of the associated metadata. Finding, understanding, and using the most relevant data can be a challenging task for researchers and other data users.
-
-The definition of data we adopt in this document is broad, although we focus on data used for quantitative analysis of social and economic development issues. These data can be of different structured and unstructured types. The distinction we make between data types matters to identify the appropriate metadata standards and the tools to be used for their documentation. The data types covered by the IHSN Metadata Editor are:
+Producing quality metadata is not a trivial exercise. The adoption of metadata standards and schemas, designed by a community of professionals for the optimal documentation of different data types, fosters the quality of metadata. Standards and schemas help data curators produce detailed, comprehensive, and structured metadata in machine and human readable formats (such as JSON or XML) that facilitate their use. Structured metadata can be generated in multiple ways, programatically or using specialized software applications. The Metadata Editor presented in this document is an open-source solution provided by the International Household Survey Network (IHSN) for the documentation of multiple data types. The data types covered by the IHSN Metadata Editor are:
 
 - **STRUCTURED DATA**
    - **Microdata**: the unit-level data on a population of individuals, households, dwellings, facilities, establishments, or other. Microdata can be generated from surveys, censuses, administrative recording systems, or sensors.
@@ -26,5 +15,7 @@ The definition of data we adopt in this document is broad, although we focus on 
    - **Images**: Digital images can be processed using machine learning algorithms (of object detection, classification, or other).
    - **Audio and video recordings**: Speech-to-text algorithms can transform audio and video recordings as text files. They can thus be considered as data in the same way we consider text as data.
    - **Research projects and scripts**: Although they are not data per se, we treat research projects and the related programs and scripts used to edit, transform, tabulate, analyze, model, and visualize data as data-related resources that need to be documented, catalogued, and disseminated in pursuit of transparency and reproducibility of data use.
+
+The Metadata Editor is one application among others developed or supported by the IHSN. It is a natural companion of the NADA cataloguing application, used to build and maintain on-line data catalogs that exploit the rich and structured metadata generated using the Metadata Editor. The IHSN also provides tools for the programmatic production and publishing of metadata (including the R package NADAR and the Python library PyNADA), guidelines for data documentation and dissemination, and tools and guidelines for statistical disclosure control. Some of these tools are briefly introduced in this document. All are listed in the section References and Links.  
 
 
