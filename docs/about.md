@@ -1,4 +1,4 @@
-# Introduction
+# Rationale
 
 The volume and the diversity of data made available to the research community are growing fast. But too many valuable datasets remain largely under-exploited. Finding, understanding, and using the most relevant data can be a challenging task for researchers and other data users. To be used more extensively, data must be made easier to find, understand, access, and analyze. The production and exploitation of **rich and structured metadata** is a core requirement to meet these objectives.
 
