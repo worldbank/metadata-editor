@@ -9,6 +9,7 @@
     * [Installation and upgrade](installation.md)
     * [Before you start](template-manager/before_start.md)
     * [Quick start](quick-start.md)
+    * [Where and how your metadata are saved](saved_metadata.md)
 
 * Managing templates
 
@@ -31,7 +32,7 @@
 
 * Generating metadata programmatically
 
-    * [APIs, R and Python](programmatic.md)
+    * [Introduction to the API and its use](programmatic.md)
 
 * For developers
 
