@@ -19,3 +19,16 @@ Producing quality metadata is not a trivial exercise. The adoption of metadata s
 The Metadata Editor is one application among others developed or supported by the IHSN. It is a natural companion of the NADA cataloguing application, used to build and maintain on-line data catalogs that exploit the rich and structured metadata generated using the Metadata Editor. The IHSN also provides tools for the programmatic production and publishing of metadata (including the R package NADAR and the Python library PyNADA), guidelines for data documentation and dissemination, and tools and guidelines for statistical disclosure control. Some of these tools are briefly introduced in this document. All are listed in the section References and Links.  
 
 
+# About the Metadata Editor
+
+A multi-platform open source software.
+Technology: ...
+Embedded standards and schemas:
+Use: Select a template, then enter metadata. For microdata, R for data import/export.
+Output: JSON, XML
+Saves packages
+Can share. Web or stand-alone.
+Inspired by Nesstar but different approach and multiple standards.
+Can be adapted to different standards and schemas. Much flexibility.
+Related tools and materials:
+
