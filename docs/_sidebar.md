@@ -1,8 +1,6 @@
-* About
+* Introduction
 
-    * [Preface](about.md)
-    * [Acknowledgments](about.md#acknowledgements)
-    * [Background and rationale](about.md#background)
+    * [Introduction](about.md)
 
 * Getting started
 
