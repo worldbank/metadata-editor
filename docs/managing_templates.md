@@ -22,22 +22,22 @@ IMPORTANT NOTES:
 4. Do not use an element for what it is not designed to be. If you think elements are missing, and no generic field can suit your needs, contact us. A standard or schema is expected to provide predictability across organizations. Customize the templates, but not the purpose of the elements they contain. 
 5. If you read metadata that contain element X using a template that does not include element X and save, the element will NOT be deleted from the metadata. So you do not have to worry about the template you use. The selection of a template will never result in automatic deletion of existing content.
 
-## System vs user templates
+## Core templates vs Custom templates
 
-The standard or schema for each data type is provided in the Metadata Editor as a *system* template. System templates contain all elements of the standard or schema, with their default label and description. They contain a very small number of validation rules and controlled vocabularies. These system templates cannot be deleted or edited. But they can be duplicated then customized, allowing users to generate their own *user templates*. User templates can be exported and imported, i.e. shared with other users. Multiple user templates can be created for a given data type.
+The standard or schema for each data type is provided in the Metadata Editor as a *core* template. Core templates contain all elements of the standard or schema, with their default label and description. They contain a very small number of validation rules and controlled vocabularies. These system templates cannot be deleted or edited. But they can be duplicated then customized, allowing users to generate their own *Custom templates*. Custom templates can be exported and imported, i.e. shared with other users. Multiple custom templates can be created for a given data type.
 
 ![image](https://user-images.githubusercontent.com/35276300/214394808-d752cb8e-b007-4642-9e16-e2cb26b16e91.png)
 
-The Metadata Editor application comes with a collection of pre-designed user templates (the *IHSN templates*), covering all data types. Generating new user templates is thus not a requirement to make use of the Metadata Editor. 
+The Metadata Editor application comes with a collection of pre-designed custom templates (the *IHSN templates*), covering all data types. Generating new custom templates is thus not a requirement to make use of the Metadata Editor. 
 
-## Creating or customizing a user template
+## Creating or customizing a custom template
 
 To build and select the templates to be used:
 -	Duplicate a core template and build your template from the standard or schema
--	Import a user template
--	Modify a user template 
+-	Import a custom template
+-	Modify a custom template 
 
-You will need at least one user template per data type you curate, and one to be used for external resources. One user template per data type will be selected as the default one.
+You will need at least one user template per data type you curate, and one to be used for external resources. One custom template per data type will be selected as the default one.
 
 ![image](https://user-images.githubusercontent.com/35276300/214386279-82d6df69-4cf2-4694-bdfc-a8291a5c519a.png)
 
@@ -128,8 +128,9 @@ For complex elements, you also control the sub-elements that you include, and th
 
 ### Activating the default templates
 
+At least one template for each data type must be declared as being the "default" one.
 
-## Sharing templates
+## Sharing custom templates
 
 Exporting templates:
 
@@ -138,6 +139,9 @@ Importing templates:
 -	From the IHSN website
 -	From a project
 
+## Updating core templates
+
+If new data type, or new standard/schema for an existing data type:
 
 ## Deleting templates
 
