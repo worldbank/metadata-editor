@@ -6,7 +6,7 @@
 * Getting started
 
     * [Installation and upgrade](installation.md)
-    * [Before you start](template-manager/before_start.md)
+    * [Before you start](before_you_start.md)
     * [Quick start](quick-start.md)
     * [Where and how your metadata are saved](saved_metadata.md)
 
