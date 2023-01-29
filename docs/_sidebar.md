@@ -1,6 +1,6 @@
 * Introduction
 
-    * [Introduction](rationale.md)
+    * [Rationale](rationale.md)
     * [About the Metadata Editor](about.md)
 
 * Getting started
