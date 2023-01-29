@@ -17,6 +17,10 @@ For the documentation of indicators, the Metadata Editor also makes use of the D
 
 ## Preparing your indicators
 
+Rich metadata. Definition, keywords, topics, relevance are critical elements. Think of discoverability in keyword-based search engines.
+Example: "economic growth" or "child malnutrition"
+Metadata augmentation: ...
+
 ## Creating a new project
 A *project* here corresponds to an indicator or series.
 
