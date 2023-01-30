@@ -256,5 +256,21 @@ Summary statistics
 Open and edit
 Replacing data files
 
+## Using DDI from external applications
+
+Use case: CsPro or Survey Solutions.
+Data files not necessarily the exact same (variables may have been created, dropped, modified)
+But much to re-use.
+"Import metadata" tool.
+
+## Migrating Nesstar files
+
+Manual:
+
+Batch: For Windows users only. Can automate the export. 
+
+
+
+
 
 
