@@ -28,6 +28,10 @@ A study may contain a large number of files: data files, manuals, questionnaires
 IMPORTANT NOTE: 
 When documenting a dataset, some changes may be made to the files. You will select the data files to be included in the package, you may drop some variables from the data files, and you may edit the variable names, labels, and the value labels. Make sure you **always preserve an unaltered version of all resources**. Create a copy of the resources, and work on this new version, leaving the original files untouched. If you made a mistake, no information will be lost.
 
+### If you already have a DDI file
+
+Some data capture software application can export metadata in DDI. DDI will contain variable-level metadata, not study level. CsPro and Survey Solutions. In such case, you will import the metadata already available. See ...
+
 ### Run quality checks
 
 Prior to documenting a micro-dataset, ensure that you are working with the most appropriate version. If the dataset is meant for public release, you should work with the final, edited, anonymous version of the dataset. If the dataset is being documented for archiving and internal use only, you may want include the raw data as well as the final, fully edited files. You may in some cases document separately multiple versions of a same dataset.
