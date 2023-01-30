@@ -1,6 +1,6 @@
 * Introduction
 
-    * [Rationale](rationale.md)
+    * [Objectives](rationale.md)
     * [Specifications](about.md)
 
 * Getting started
