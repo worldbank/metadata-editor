@@ -45,8 +45,10 @@ Import data files
 
 ![image](https://user-images.githubusercontent.com/35276300/215515365-18c932ef-d45f-40ff-8732-368f94cf0ec1.png)
 
-For each file: 
-Add file description
+Preview data:
+![image](https://user-images.githubusercontent.com/35276300/215519930-04363e7a-eb09-423b-abd5-5dc98ee1197a.png)
+
+For each file: Add file description
 
 ![image](https://user-images.githubusercontent.com/35276300/215515702-fb3448ae-81e4-4c34-a27e-8c32eb3dcc49.png)
 Save
