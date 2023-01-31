@@ -188,7 +188,7 @@
                                 {
                                     "key": "description.contact",
                                     "type": "nested_array",
-                                    "title": "Contact(s) associated to the metadata",
+                                    "title": "Contact(s)",
                                     "props": [
                                         {
                                             "key": "individualName",
@@ -263,7 +263,7 @@
                                         },
                                         {
                                             "key": "contactInfo.onlineResource.description",
-                                            "title": "Desscription",
+                                            "title": "Description",
                                             "type": "string"                                            
                                         },
                                         {
@@ -274,6 +274,11 @@
                                         {
                                             "key": "contactInfo.onlineResource.function",
                                             "title": "Function",
+                                            "type": "string"                                            
+                                        },
+                                        {
+                                            "key": "role",
+                                            "title": "Role",
                                             "type": "string"                                            
                                         }
                                     ]
@@ -560,7 +565,7 @@
                                         },
                                         {
                                             "key": "contactInfo.onlineResource.description",
-                                            "title": "Desscription",
+                                            "title": "Description",
                                             "type": "string"                                            
                                         },
                                         {
@@ -571,6 +576,11 @@
                                         {
                                             "key": "contactInfo.onlineResource.function",
                                             "title": "Function",
+                                            "type": "string"                                            
+                                        },
+                                        {
+                                            "key": "role",
+                                            "title": "Role",
                                             "type": "string"                                            
                                         }
                                     ],
@@ -774,7 +784,7 @@
                                         },
                                         {
                                             "key": "contactInfo.onlineResource.description",
-                                            "title": "Desscription",
+                                            "title": "Description",
                                             "type": "string"                                            
                                         },
                                         {
@@ -785,6 +795,11 @@
                                         {
                                             "key": "contactInfo.onlineResource.function",
                                             "title": "Function",
+                                            "type": "string"                                            
+                                        },
+                                        {
+                                            "key": "role",
+                                            "title": "Role",
                                             "type": "string"                                            
                                         }
                                     ],
@@ -959,7 +974,7 @@
                                                 },
                                                 {
                                                     "key": "contactInfo.onlineResource.description",
-                                                    "title": "Desscription",
+                                                    "title": "Description",
                                                     "type": "string"                                            
                                                 },
                                                 {
@@ -970,6 +985,11 @@
                                                 {
                                                     "key": "contactInfo.onlineResource.function",
                                                     "title": "Function",
+                                                    "type": "string"                                            
+                                                },
+                                                {
+                                                    "key": "role",
+                                                    "title": "Role",
                                                     "type": "string"                                            
                                                 }
                                             ],
