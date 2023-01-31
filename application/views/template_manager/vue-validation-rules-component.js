@@ -60,7 +60,11 @@ Vue.component('validation-rules-component', {
     computed: {
         local()
         {
-            return this.value ? this.value : {};
+            if (this.isValidFormat(this.value)){
+                return this.value;
+            }
+
+            return {};
         },
         ValidationRules()
         {
@@ -79,6 +83,14 @@ Vue.component('validation-rules-component', {
         }
     },
     methods:{
+        isValidFormat: function(value)
+        {
+            if (typeof value=='string' || Array.isArray(value))
+            {
+                return false;
+            }
+            return true;
+        },
         update(key, value) {
             this.$emit('input', { ...this.value, [key]: value })
         },

@@ -99,7 +99,6 @@
                             "title": "Primary ID",
                             "help_text": "A unique identifier of the table. The \"Primary ID\" (also referred to as IDNO) is a unique identification number used to identify the table. A unique identifier is required for cataloguing purpose, so this element is declared as \"Required\". The identifier will allow users to cite the table properly. The identifier must be unique within the catalog. Ideally, it should also be globally unique. A Digital Object Identifier (DOI) can be used. for the study. Alternatively, the \"Primary ID\" can be constructed by an organization using a consistent scheme. Note that the schema allows you to provide more than one identifier for a same table (in element \"Other identifiers\"); a catalog-specific identifier is thus not incompatible with a globally unique identifier like a DOI. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. The identifier may not contain blank spaces.",
                             "type": "text",
-                            "rules": "required|idno|alpha_dash|min:5|max:80",
                             "required": true,
                             "name": "idno",
                             "is_required": true
@@ -136,7 +135,6 @@
                             "key": "table_description.title_statement.title",
                             "title": "Title",
                             "type": "text",
-                            "rules": "required|max:300",
                             "required": true,
                             "name": "title",
                             "is_required": true,

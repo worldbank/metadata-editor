@@ -245,6 +245,7 @@
 									"key": "author_id",
 									"type": "array",
 									"title": "Author ID",
+									"prop_key": "document_description.authors.author_id",
 									"help_text": "Unique identifier of an author, which may be provided by services like ORCID or other",
 									"props": [
 										{
@@ -261,8 +262,13 @@
 											"prop_key": "document_description.authors.author_id.id",
 											"help_text": "The ID of the author in the registry mentioned in `type`."
 										}
-									],
-									"prop_key": "document_description.authors.author_id"
+									]									
+								},
+								{
+									"key": "full_name",
+									"title": "Full name",
+									"type": "text",
+									"prop_key": "document_description.authors.full_name"									
 								}
 							],
 							"is_recommended": true

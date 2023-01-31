@@ -96,8 +96,7 @@
                             "title": "Primary ID",
                             "type": "text",
                             "class": "required",
-                            "required": true,
-                            "rules": "required|alpha_dash|min:5",
+                            "required": true,                            
                             "is_required": true,
                             "help_text": "A unique identifier of the database. For example, the World Bank’s World Development Indicators database published in April 2020 could have Main identifier = “WB_WDI_APR_2020”.\nThe \"Primary ID\" (also referred to as IDNO) is a unique identification number used to identify the database. A unique identifier is required for cataloguing purpose, so this element is declared as \"Required\". The identifier will allow users to cite the database properly. The identifier must be unique within the catalog. Ideally, it should also be globally unique; the recommended option is to obtain a Digital Object Identifier (DOI) for the study. Alternatively, the \"Primary ID\" can be constructed by an organization using a consistent scheme. Note that the schema allows you to provide more than one identifier for a same study (in element \"Other identifiers\"); a catalog-specific identifier is thus not incompatible with a globally unique identifier like a DOI. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. The identifier may not contain blank spaces."
                         },
