@@ -27,22 +27,26 @@
                             "key": "name",
                             "type": "text",
                             "title": "Name",
-                            "description": "Name (required)"
+                            "description": "Name (required)",
+                            "prop_key": "metadata_information.producers.name"
                         },
                         {
                             "key": "abbr",
                             "type": "text",
-                            "title": "Abbreviation"
+                            "title": "Abbreviation",
+                            "prop_key": "metadata_information.producers.abbr"
                         },
                         {
                             "key": "affiliation",
                             "type": "text",
-                            "title": "Affiliation"
+                            "title": "Affiliation",
+                            "prop_key": "metadata_information.producers.affiliation"
                         },
                         {
                             "key": "role",
                             "type": "text",
-                            "title": "Role"
+                            "title": "Role",
+                            "prop_key": "metadata_information.producers.role"
                         }
                     ]
                 },
@@ -97,13 +101,15 @@
                                     "key": "description.hierarchyLevel",
                                     "type": "simple_array",
                                     "title": "Hierarchy level",
-                                    "help_text": "List of Scope(s), or 'hierarchy level(s)'. e.g. dataset, service. Recommended code following the ISO/TS 19139 Scope codelist"
+                                    "help_text": "List of Scope(s), or 'hierarchy level(s)'. e.g. dataset, service. Recommended code following the ISO/TS 19139 Scope codelist",
+                                    "enum": []
                                 },
                                 {
                                     "key": "description.hierarchyLevelName",
-                                    "type": "text",
+                                    "type": "simple_array",
                                     "title": "Hierarchy level name",
-                                    "help_text": "List of scope / hierarchy level names. Alternative to the use of 'hierarchyLevel' code items"
+                                    "help_text": "List of scope / hierarchy level names. Alternative to the use of 'hierarchyLevel' code items",
+                                    "enum": []
                                 },
                                 {
                                     "key": "description.role",
@@ -187,52 +193,88 @@
                                         {
                                             "key": "individualName",
                                             "title": "Individual name",
-                                            "type": "string"
+                                            "type": "string",
+                                            "prop_key": "description.contact.individualName"
                                         },
                                         {
                                             "key": "organisationName",
                                             "title": "Organisation name",
-                                            "type": "string"
+                                            "type": "string",
+                                            "prop_key": "description.contact.organisationName"
                                         },
                                         {
                                             "key": "positionName",
                                             "title": "Position",
-                                            "type": "string"
+                                            "type": "string",
+                                            "prop_key": "description.contact.positionName"
                                         },
                                         {
                                             "key": "contactInfo.phone.voice",
                                             "title": "Voice",
-                                            "type": "string"
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.phone.voice"
                                         },
                                         {
                                             "key": "contactInfo.phone.facsimile",
                                             "title": "Facsimile",
-                                            "type": "string"
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.phone.facsimile"
                                         },
                                         {
                                             "key": "contactInfo.address.deliveryPoint",
                                             "title": "Delivery point",
-                                            "type": "string"
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.deliveryPoint"
                                         },
                                         {
                                             "key": "contactInfo.address.city",
                                             "title": "City",
-                                            "type": "string"
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.city"
                                         },
                                         {
                                             "key": "contactInfo.address.postalCode",
                                             "title": "Postal code",
-                                            "type": "string"
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.postalCode"
                                         },
                                         {
                                             "key": "contactInfo.address.country",
                                             "title": "Country",
-                                            "type": "string"
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.country"
                                         },
                                         {
-                                            "key": "contactInfo.address.elctronicMailAddress",
+                                            "key": "contactInfo.address.electronicMailAddress",
                                             "title": "Email",
-                                            "type": "string"
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.electronicMailAddress"
+                                        },
+
+                                        {
+                                            "key": "contactInfo.onlineResource.linkage",
+                                            "title": "URL",
+                                            "type": "string"                                            
+                                        },
+                                        {
+                                            "key": "contactInfo.onlineResource.name",
+                                            "title": "Name",
+                                            "type": "string"                                            
+                                        },
+                                        {
+                                            "key": "contactInfo.onlineResource.description",
+                                            "title": "Desscription",
+                                            "type": "string"                                            
+                                        },
+                                        {
+                                            "key": "contactInfo.onlineResource.protocol",
+                                            "title": "Protocol",
+                                            "type": "string"                                            
+                                        },
+                                        {
+                                            "key": "contactInfo.onlineResource.function",
+                                            "title": "Function",
+                                            "type": "string"                                            
                                         }
                                     ]
                                 }
@@ -386,12 +428,14 @@
                                 {
                                     "key": "citation.title",
                                     "title": "Title",
-                                    "type": "string"
+                                    "type": "string",
+                                    "prop_key": "description.identificationInfo.citation.title"
                                 },
                                 {
                                     "key": "citation.alternateTitle",
                                     "title": "Alternate title",
-                                    "type": "string"
+                                    "type": "string",
+                                    "prop_key": "description.identificationInfo.citation.alternateTitle"
                                 },
                                 {
                                     "key": "citation.date",
@@ -401,35 +445,42 @@
                                         {
                                             "key": "date",
                                             "type": "text",
-                                            "title": "Date (YYYY-MM-DD)"
+                                            "title": "Date (YYYY-MM-DD)",
+                                            "prop_key": "description.identificationInfo.citation.date.date"
                                         },
                                         {
                                             "key": "type",
                                             "type": "text",
                                             "title": "Type",
-                                            "help_text": "Date type e.g. publication, revision, creation"
+                                            "help_text": "Date type e.g. publication, revision, creation",
+                                            "prop_key": "description.identificationInfo.citation.date.type"
                                         }
-                                    ]
+                                    ],
+                                    "prop_key": "description.identificationInfo.citation.date"
                                 },
                                 {
                                     "key": "citation.edition",
                                     "title": "Edition",
-                                    "type": "string"
+                                    "type": "string",
+                                    "prop_key": "description.identificationInfo.citation.edition"
                                 },
                                 {
                                     "key": "citation.editionDate",
                                     "title": "Edition date",
-                                    "type": "string"
+                                    "type": "string",
+                                    "prop_key": "description.identificationInfo.citation.editionDate"
                                 },
                                 {
                                     "key": "cition.identifier.authority",
                                     "title": "Authority (identifier)",
-                                    "type": "string"
+                                    "type": "string",
+                                    "prop_key": "description.identificationInfo.cition.identifier.authority"
                                 },
                                 {
                                     "key": "cition.identifier.code",
                                     "title": "Code (identifier)",
-                                    "type": "string"
+                                    "type": "string",
+                                    "prop_key": "description.identificationInfo.cition.identifier.code"
                                 },
                                 {
                                     "key": "citation.citedResponsibleParty",
@@ -439,81 +490,91 @@
                                         {
                                             "key": "individualName",
                                             "title": "Individual name",
-                                            "type": "string"
+                                            "type": "string",
+                                            "prop_key": "description.contact.individualName"
                                         },
                                         {
                                             "key": "organisationName",
                                             "title": "Organisation name",
-                                            "type": "string"
+                                            "type": "string",
+                                            "prop_key": "description.contact.organisationName"
                                         },
                                         {
                                             "key": "positionName",
                                             "title": "Position",
-                                            "type": "string"
+                                            "type": "string",
+                                            "prop_key": "description.contact.positionName"
                                         },
                                         {
                                             "key": "contactInfo.phone.voice",
                                             "title": "Voice",
-                                            "type": "string"
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.phone.voice"
                                         },
                                         {
                                             "key": "contactInfo.phone.facsimile",
                                             "title": "Facsimile",
-                                            "type": "string"
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.phone.facsimile"
                                         },
                                         {
                                             "key": "contactInfo.address.deliveryPoint",
                                             "title": "Delivery point",
-                                            "type": "string"
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.deliveryPoint"
                                         },
                                         {
                                             "key": "contactInfo.address.city",
                                             "title": "City",
-                                            "type": "string"
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.city"
                                         },
                                         {
                                             "key": "contactInfo.address.postalCode",
                                             "title": "Postal code",
-                                            "type": "string"
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.postalCode"
                                         },
                                         {
                                             "key": "contactInfo.address.country",
                                             "title": "Country",
-                                            "type": "string"
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.country"
                                         },
                                         {
-                                            "key": "contactInfo.address.elctronicMailAddress",
+                                            "key": "contactInfo.address.electronicMailAddress",
                                             "title": "Email",
-                                            "type": "string"
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.electronicMailAddress"
+                                        },
+
+                                        {
+                                            "key": "contactInfo.onlineResource.linkage",
+                                            "title": "URL",
+                                            "type": "string"                                            
                                         },
                                         {
-                                            "key": "role",
-                                            "title": "Role",
-                                            "type": "dropdown",
-                                            "enum": [
-                                                "resourceProvider",
-                                                "custodian",
-                                                "owner",
-                                                "sponsor",
-                                                "user",
-                                                "distributor",
-                                                "originator",
-                                                "pointOfContact",
-                                                "principalInvestigator",
-                                                "processor",
-                                                "publisher",
-                                                "author",
-                                                "coAuthor",
-                                                "collaborator",
-                                                "editor",
-                                                "mediator",
-                                                "rightsHolder",
-                                                "contributor",
-                                                "funder",
-                                                "stakeholder"
-                                            ]
+                                            "key": "contactInfo.onlineResource.name",
+                                            "title": "Name",
+                                            "type": "string"                                            
+                                        },
+                                        {
+                                            "key": "contactInfo.onlineResource.description",
+                                            "title": "Desscription",
+                                            "type": "string"                                            
+                                        },
+                                        {
+                                            "key": "contactInfo.onlineResource.protocol",
+                                            "title": "Protocol",
+                                            "type": "string"                                            
+                                        },
+                                        {
+                                            "key": "contactInfo.onlineResource.function",
+                                            "title": "Function",
+                                            "type": "string"                                            
                                         }
-                                    ]
+                                    ],
+                                    "prop_key": "description.identificationInfo.citation.citedResponsibleParty"
                                 },
                                 {
                                     "key": "cition.presentationForm",
@@ -541,7 +602,8 @@
                                         "physicalSample",
                                         "diagramDigital",
                                         "diagramHardcopy"
-                                    ]
+                                    ],
+                                    "prop_key": "description.identificationInfo.cition.presentationForm"
                                 },
                                 {
                                     "key": "citation.series_section",
@@ -563,42 +625,50 @@
                                             "title": "Page",
                                             "type": "text"
                                         }
-                                    ]
+                                    ],
+                                    "prop_key": "description.identificationInfo.citation.series_section"
                                 },
                                 {
                                     "key": "citation.otherCitationDetails",
                                     "title": "Other citation details",
-                                    "type": "textarea"
+                                    "type": "textarea",
+                                    "prop_key": "description.identificationInfo.citation.otherCitationDetails"
                                 },
                                 {
                                     "key": "citation.collectiveTitle",
                                     "title": "Collective title",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "description.identificationInfo.citation.collectiveTitle"
                                 },
                                 {
                                     "key": "citation.ISBN",
                                     "title": "ISBN",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "description.identificationInfo.citation.ISBN"
                                 },
                                 {
                                     "key": "citation.ISSN",
                                     "title": "ISSN",
-                                    "type": "text"
+                                    "type": "text",
+                                    "prop_key": "description.identificationInfo.citation.ISSN"
                                 },
                                 {
                                     "key": "abstract",
                                     "title": "Abstract",
-                                    "type": "textarea"
+                                    "type": "textarea",
+                                    "prop_key": "description.identificationInfo.abstract"
                                 },
                                 {
                                     "key": "purpose",
                                     "title": "Purpose",
-                                    "type": "textarea"
+                                    "type": "textarea",
+                                    "prop_key": "description.identificationInfo.purpose"
                                 },
                                 {
                                     "key": "credit",
                                     "title": "Credit",
-                                    "type": "string"
+                                    "type": "string",
+                                    "prop_key": "description.identificationInfo.credit"
                                 },
                                 {
                                     "key": "status",
@@ -623,7 +693,8 @@
                                         "withdrawn",
                                         "proposed",
                                         "deprecated"
-                                    ]
+                                    ],
+                                    "prop_key": "description.identificationInfo.status"
                                 },
                                 {
                                     "key": "pointOfContact",
@@ -633,81 +704,91 @@
                                         {
                                             "key": "individualName",
                                             "title": "Individual name",
-                                            "type": "string"
+                                            "type": "string",
+                                            "prop_key": "description.contact.individualName"
                                         },
                                         {
                                             "key": "organisationName",
                                             "title": "Organisation name",
-                                            "type": "string"
+                                            "type": "string",
+                                            "prop_key": "description.contact.organisationName"
                                         },
                                         {
                                             "key": "positionName",
                                             "title": "Position",
-                                            "type": "string"
+                                            "type": "string",
+                                            "prop_key": "description.contact.positionName"
                                         },
                                         {
                                             "key": "contactInfo.phone.voice",
                                             "title": "Voice",
-                                            "type": "string"
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.phone.voice"
                                         },
                                         {
                                             "key": "contactInfo.phone.facsimile",
                                             "title": "Facsimile",
-                                            "type": "string"
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.phone.facsimile"
                                         },
                                         {
                                             "key": "contactInfo.address.deliveryPoint",
                                             "title": "Delivery point",
-                                            "type": "string"
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.deliveryPoint"
                                         },
                                         {
                                             "key": "contactInfo.address.city",
                                             "title": "City",
-                                            "type": "string"
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.city"
                                         },
                                         {
                                             "key": "contactInfo.address.postalCode",
                                             "title": "Postal code",
-                                            "type": "string"
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.postalCode"
                                         },
                                         {
                                             "key": "contactInfo.address.country",
                                             "title": "Country",
-                                            "type": "string"
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.country"
                                         },
                                         {
-                                            "key": "contactInfo.address.elctronicMailAddress",
+                                            "key": "contactInfo.address.electronicMailAddress",
                                             "title": "Email",
-                                            "type": "string"
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.electronicMailAddress"
+                                        },
+
+                                        {
+                                            "key": "contactInfo.onlineResource.linkage",
+                                            "title": "URL",
+                                            "type": "string"                                            
                                         },
                                         {
-                                            "key": "contactInfo.role",
-                                            "title": "Role",
-                                            "type": "dropdown",
-                                            "enum": [
-                                                "resourceProvider",
-                                                "custodian",
-                                                "owner",
-                                                "sponsor",
-                                                "user",
-                                                "distributor",
-                                                "originator",
-                                                "pointOfContact",
-                                                "principalInvestigator",
-                                                "processor",
-                                                "publisher",
-                                                "author",
-                                                "coAuthor",
-                                                "collaborator",
-                                                "editor",
-                                                "mediator",
-                                                "rightsHolder",
-                                                "contributor",
-                                                "funder",
-                                                "stakeholder"
-                                            ]
+                                            "key": "contactInfo.onlineResource.name",
+                                            "title": "Name",
+                                            "type": "string"                                            
+                                        },
+                                        {
+                                            "key": "contactInfo.onlineResource.description",
+                                            "title": "Desscription",
+                                            "type": "string"                                            
+                                        },
+                                        {
+                                            "key": "contactInfo.onlineResource.protocol",
+                                            "title": "Protocol",
+                                            "type": "string"                                            
+                                        },
+                                        {
+                                            "key": "contactInfo.onlineResource.function",
+                                            "title": "Function",
+                                            "type": "string"                                            
                                         }
-                                    ]
+                                    ],
+                                    "prop_key": "description.identificationInfo.pointOfContact"
                                 },
                                 {
                                     "key": "resourceMaintenance",
@@ -732,9 +813,11 @@
                                                 "irregular",
                                                 "notPlanned",
                                                 "unknown"
-                                            ]
+                                            ],
+                                            "prop_key": "description.identificationInfo.resourceMaintenance.maintenanceAndUpdateFrequency"
                                         }
-                                    ]
+                                    ],
+                                    "prop_key": "description.identificationInfo.resourceMaintenance"
                                 },
                                 {
                                     "key": "graphicOverview",
@@ -744,19 +827,23 @@
                                         {
                                             "key": "fileName",
                                             "type": "text",
-                                            "title": "fileName"
+                                            "title": "fileName",
+                                            "prop_key": "description.identificationInfo.graphicOverview.fileName"
                                         },
                                         {
                                             "key": "fileDescription",
                                             "type": "text",
-                                            "title": "fileDescription"
+                                            "title": "fileDescription",
+                                            "prop_key": "description.identificationInfo.graphicOverview.fileDescription"
                                         },
                                         {
                                             "key": "fileType",
                                             "type": "text",
-                                            "title": "fileType"
+                                            "title": "fileType",
+                                            "prop_key": "description.identificationInfo.graphicOverview.fileType"
                                         }
-                                    ]
+                                    ],
+                                    "prop_key": "description.identificationInfo.graphicOverview"
                                 },
                                 {
                                     "key": "resourceFormat",
@@ -766,28 +853,33 @@
                                         {
                                             "key": "name",
                                             "type": "text",
-                                            "title": "Name"
+                                            "title": "Name",
+                                            "prop_key": "description.identificationInfo.resourceFormat.name"
                                         },
                                         {
                                             "key": "version",
                                             "type": "text",
-                                            "title": "Version"
+                                            "title": "Version",
+                                            "prop_key": "description.identificationInfo.resourceFormat.version"
                                         },
                                         {
                                             "key": "amendmentNumber",
                                             "type": "text",
                                             "title": "Amendment number",
-                                            "help_text": "Format version amendment number"
+                                            "help_text": "Format version amendment number",
+                                            "prop_key": "description.identificationInfo.resourceFormat.amendmentNumber"
                                         },
                                         {
                                             "key": "specification",
                                             "type": "text",
-                                            "title": "Format specification"
+                                            "title": "Format specification",
+                                            "prop_key": "description.identificationInfo.resourceFormat.specification"
                                         },
                                         {
                                             "key": "fileDecompressionTechnique",
                                             "type": "text",
-                                            "title": "File decompression technique"
+                                            "title": "File decompression technique",
+                                            "prop_key": "description.identificationInfo.resourceFormat.fileDecompressionTechnique"
                                         },
                                         {
                                             "key": "formatDistributor",
@@ -797,83 +889,94 @@
                                                 {
                                                     "key": "individualName",
                                                     "title": "Individual name",
-                                                    "type": "string"
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.individualName"
                                                 },
                                                 {
                                                     "key": "organisationName",
                                                     "title": "Organisation name",
-                                                    "type": "string"
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.organisationName"
                                                 },
                                                 {
                                                     "key": "positionName",
                                                     "title": "Position",
-                                                    "type": "string"
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.positionName"
                                                 },
                                                 {
                                                     "key": "contactInfo.phone.voice",
                                                     "title": "Voice",
-                                                    "type": "string"
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.contactInfo.phone.voice"
                                                 },
                                                 {
                                                     "key": "contactInfo.phone.facsimile",
                                                     "title": "Facsimile",
-                                                    "type": "string"
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.contactInfo.phone.facsimile"
                                                 },
                                                 {
                                                     "key": "contactInfo.address.deliveryPoint",
                                                     "title": "Delivery point",
-                                                    "type": "string"
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.contactInfo.address.deliveryPoint"
                                                 },
                                                 {
                                                     "key": "contactInfo.address.city",
                                                     "title": "City",
-                                                    "type": "string"
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.contactInfo.address.city"
                                                 },
                                                 {
                                                     "key": "contactInfo.address.postalCode",
                                                     "title": "Postal code",
-                                                    "type": "string"
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.contactInfo.address.postalCode"
                                                 },
                                                 {
                                                     "key": "contactInfo.address.country",
                                                     "title": "Country",
-                                                    "type": "string"
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.contactInfo.address.country"
                                                 },
                                                 {
-                                                    "key": "contactInfo.address.elctronicMailAddress",
+                                                    "key": "contactInfo.address.electronicMailAddress",
                                                     "title": "Email",
-                                                    "type": "string"
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.contactInfo.address.electronicMailAddress"
+                                                },
+        
+                                                {
+                                                    "key": "contactInfo.onlineResource.linkage",
+                                                    "title": "URL",
+                                                    "type": "string"                                            
                                                 },
                                                 {
-                                                    "key": "contactInfo.role",
-                                                    "title": "Role",
-                                                    "type": "dropdown",
-                                                    "enum": [
-                                                        "resourceProvider",
-                                                        "custodian",
-                                                        "owner",
-                                                        "sponsor",
-                                                        "user",
-                                                        "distributor",
-                                                        "originator",
-                                                        "pointOfContact",
-                                                        "principalInvestigator",
-                                                        "processor",
-                                                        "publisher",
-                                                        "author",
-                                                        "coAuthor",
-                                                        "collaborator",
-                                                        "editor",
-                                                        "mediator",
-                                                        "rightsHolder",
-                                                        "contributor",
-                                                        "funder",
-                                                        "stakeholder"
-                                                    ]
+                                                    "key": "contactInfo.onlineResource.name",
+                                                    "title": "Name",
+                                                    "type": "string"                                            
+                                                },
+                                                {
+                                                    "key": "contactInfo.onlineResource.description",
+                                                    "title": "Desscription",
+                                                    "type": "string"                                            
+                                                },
+                                                {
+                                                    "key": "contactInfo.onlineResource.protocol",
+                                                    "title": "Protocol",
+                                                    "type": "string"                                            
+                                                },
+                                                {
+                                                    "key": "contactInfo.onlineResource.function",
+                                                    "title": "Function",
+                                                    "type": "string"                                            
                                                 }
-                                            ]
+                                            ],
+                                            "prop_key": "description.identificationInfo.resourceFormat.formatDistributor"
                                         }
-                                    ]
+                                    ],
+                                    "prop_key": "description.identificationInfo.resourceFormat"
                                 },
                                 {
                                     "key": "descriptiveKeywords",
@@ -901,19 +1004,23 @@
                                                 "service",
                                                 "product",
                                                 "subTopicCategory"
-                                            ]
+                                            ],
+                                            "prop_key": "description.identificationInfo.descriptiveKeywords.type"
                                         },
                                         {
                                             "key": "keyword",
                                             "type": "text",
-                                            "title": "Keyword"
+                                            "title": "Keyword",
+                                            "prop_key": "description.identificationInfo.descriptiveKeywords.keyword"
                                         },
                                         {
                                             "key": "thesaurusName",
                                             "type": "text",
-                                            "title": "thesaurusName"
+                                            "title": "thesaurusName",
+                                            "prop_key": "description.identificationInfo.descriptiveKeywords.thesaurusName"
                                         }
-                                    ]
+                                    ],
+                                    "prop_key": "description.identificationInfo.descriptiveKeywords"
                                 },
                                 {
                                     "key": "resourceConstraints",
@@ -928,24 +1035,29 @@
                                                 {
                                                     "key": "useLimitation",
                                                     "type": "simple_array",
-                                                    "title": "useLimitation"
+                                                    "title": "useLimitation",
+                                                    "prop_key": "description.identificationInfo.resourceConstraints.legalConstraints.useLimitation"
                                                 },
                                                 {
                                                     "key": "accessConstraints",
                                                     "type": "simple_array",
-                                                    "title": "accessConstraints"
+                                                    "title": "accessConstraints",
+                                                    "prop_key": "description.identificationInfo.resourceConstraints.legalConstraints.accessConstraints"
                                                 },
                                                 {
                                                     "key": "useConstraints",
                                                     "type": "simple_array",
-                                                    "title": "useConstraints"
+                                                    "title": "useConstraints",
+                                                    "prop_key": "description.identificationInfo.resourceConstraints.legalConstraints.useConstraints"
                                                 },
                                                 {
                                                     "key": "otherConstraints",
                                                     "type": "simple_array",
-                                                    "title": "otherConstraints"
+                                                    "title": "otherConstraints",
+                                                    "prop_key": "description.identificationInfo.resourceConstraints.legalConstraints.otherConstraints"
                                                 }
-                                            ]
+                                            ],
+                                            "prop_key": "description.identificationInfo.resourceConstraints.legalConstraints"
                                         },
                                         {
                                             "key": "securityConstraints",
@@ -955,31 +1067,38 @@
                                                 {
                                                     "key": "useLimitation",
                                                     "type": "simple_array",
-                                                    "title": "useLimitation"
+                                                    "title": "useLimitation",
+                                                    "prop_key": "description.identificationInfo.resourceConstraints.securityConstraints.useLimitation"
                                                 },
                                                 {
                                                     "key": "classification",
                                                     "type": "text",
-                                                    "title": "Classification"
+                                                    "title": "Classification",
+                                                    "prop_key": "description.identificationInfo.resourceConstraints.securityConstraints.classification"
                                                 },
                                                 {
                                                     "key": "userNote",
                                                     "type": "text",
-                                                    "title": "userNote"
+                                                    "title": "userNote",
+                                                    "prop_key": "description.identificationInfo.resourceConstraints.securityConstraints.userNote"
                                                 },
                                                 {
                                                     "key": "classificationSystem",
                                                     "type": "text",
-                                                    "title": "classificationSystem"
+                                                    "title": "classificationSystem",
+                                                    "prop_key": "description.identificationInfo.resourceConstraints.securityConstraints.classificationSystem"
                                                 },
                                                 {
                                                     "key": "handlingDescription",
                                                     "type": "text",
-                                                    "title": "handlingDescription"
+                                                    "title": "handlingDescription",
+                                                    "prop_key": "description.identificationInfo.resourceConstraints.securityConstraints.handlingDescription"
                                                 }
-                                            ]
+                                            ],
+                                            "prop_key": "description.identificationInfo.resourceConstraints.securityConstraints"
                                         }
-                                    ]
+                                    ],
+                                    "prop_key": "description.identificationInfo.resourceConstraints"
                                 },
                                 {
                                     "key": "aggregationInfo",
@@ -989,19 +1108,23 @@
                                         {
                                             "key": "type",
                                             "type": "text",
-                                            "title": "Type"
+                                            "title": "Type",
+                                            "prop_key": "description.identificationInfo.aggregationInfo.type"
                                         },
                                         {
                                             "key": "keyword",
                                             "type": "text",
-                                            "title": "Keyword"
+                                            "title": "Keyword",
+                                            "prop_key": "description.identificationInfo.aggregationInfo.keyword"
                                         },
                                         {
                                             "key": "thesaurusName",
                                             "type": "text",
-                                            "title": "thesaurusName"
+                                            "title": "thesaurusName",
+                                            "prop_key": "description.identificationInfo.aggregationInfo.thesaurusName"
                                         }
-                                    ]
+                                    ],
+                                    "prop_key": "description.identificationInfo.aggregationInfo"
                                 },
                                 {
                                     "key": "extent.geographicElement",
@@ -1016,34 +1139,41 @@
                                                 {
                                                     "key": "westBoundLongitude",
                                                     "type": "text",
-                                                    "title": "westBoundLongitude"
+                                                    "title": "westBoundLongitude",
+                                                    "prop_key": "description.identificationInfo.extent.geographicElement.geographicBoundingBox.westBoundLongitude"
                                                 },
                                                 {
                                                     "key": "eastBoundLongitude",
                                                     "type": "text",
                                                     "title": "eastBoundLongitude",
-                                                    "help_text": "East"
+                                                    "help_text": "East",
+                                                    "prop_key": "description.identificationInfo.extent.geographicElement.geographicBoundingBox.eastBoundLongitude"
                                                 },
                                                 {
                                                     "key": "southBoundLatitude",
                                                     "type": "text",
                                                     "title": "southBoundLatitude",
-                                                    "help_text": "South"
+                                                    "help_text": "South",
+                                                    "prop_key": "description.identificationInfo.extent.geographicElement.geographicBoundingBox.southBoundLatitude"
                                                 },
                                                 {
                                                     "key": "northBoundLatitude",
                                                     "type": "text",
                                                     "title": "northBoundLatitude",
-                                                    "help_text": "North"
+                                                    "help_text": "North",
+                                                    "prop_key": "description.identificationInfo.extent.geographicElement.geographicBoundingBox.northBoundLatitude"
                                                 }
-                                            ]
+                                            ],
+                                            "prop_key": "description.identificationInfo.extent.geographicElement.geographicBoundingBox"
                                         },
                                         {
                                             "key": "geographicDescription",
                                             "title": "Geographic description",
-                                            "type": "textarea"
+                                            "type": "textarea",
+                                            "prop_key": "description.identificationInfo.extent.geographicElement.geographicDescription"
                                         }
-                                    ]
+                                    ],
+                                    "prop_key": "description.identificationInfo.extent.geographicElement"
                                 },
                                 {
                                     "key": "extent.temporalElement",
@@ -1053,9 +1183,11 @@
                                         {
                                             "key": "extent",
                                             "type": "text",
-                                            "title": "Extent"
+                                            "title": "Extent",
+                                            "prop_key": "description.identificationInfo.extent.temporalElement.extent"
                                         }
-                                    ]
+                                    ],
+                                    "prop_key": "description.identificationInfo.extent.temporalElement"
                                 },
                                 {
                                     "key": "extent.verticalElement",
@@ -1065,19 +1197,23 @@
                                         {
                                             "key": "minimumValue",
                                             "type": "text",
-                                            "title": "Minimum value"
+                                            "title": "Minimum value",
+                                            "prop_key": "description.identificationInfo.extent.verticalElement.minimumValue"
                                         },
                                         {
                                             "key": "maximumValue",
                                             "type": "text",
-                                            "title": "Maximum value"
+                                            "title": "Maximum value",
+                                            "prop_key": "description.identificationInfo.extent.verticalElement.maximumValue"
                                         },
                                         {
                                             "key": "verticalCRS",
                                             "type": "text",
-                                            "title": "Vertical CRS"
+                                            "title": "Vertical CRS",
+                                            "prop_key": "description.identificationInfo.extent.verticalElement.verticalCRS"
                                         }
-                                    ]
+                                    ],
+                                    "prop_key": "description.identificationInfo.extent.verticalElement"
                                 },
                                 {
                                     "key": "spatialRepresentationType",
@@ -1090,17 +1226,20 @@
                                         "tin",
                                         "stereoModel",
                                         "video"
-                                    ]
+                                    ],
+                                    "prop_key": "description.identificationInfo.spatialRepresentationType"
                                 },
                                 {
                                     "key": "spatialResolution",
                                     "type": "text",
-                                    "title": "Spatial resolution"
+                                    "title": "Spatial resolution",
+                                    "prop_key": "description.identificationInfo.spatialResolution"
                                 },
                                 {
                                     "key": "language",
                                     "type": "simple_array",
-                                    "title": "Language"
+                                    "title": "Language",
+                                    "prop_key": "description.identificationInfo.language"
                                 },
                                 {
                                     "key": "characterSet",
@@ -1110,14 +1249,17 @@
                                         {
                                             "key": "codeListValue",
                                             "type": "text",
-                                            "title": "Characterset code"
+                                            "title": "Characterset code",
+                                            "prop_key": "description.identificationInfo.characterSet.codeListValue"
                                         },
                                         {
                                             "key": "codeList",
                                             "type": "text",
-                                            "title": "Codelist used"
+                                            "title": "Codelist used",
+                                            "prop_key": "description.identificationInfo.characterSet.codeList"
                                         }
-                                    ]
+                                    ],
+                                    "prop_key": "description.identificationInfo.characterSet"
                                 },
                                 {
                                     "key": "topicCategory",
@@ -1145,52 +1287,62 @@
                                         "utilitiesCommunication",
                                         "extraTerrestrial",
                                         "disaster"
-                                    ]
+                                    ],
+                                    "prop_key": "description.identificationInfo.topicCategory"
                                 },
                                 {
                                     "key": "supplementalInformation",
                                     "type": "text",
-                                    "title": "Supplemental information"
+                                    "title": "Supplemental information",
+                                    "prop_key": "description.identificationInfo.supplementalInformation"
                                 },
                                 {
                                     "key": "serviceIdentification",
                                     "type": "section",
-                                    "title": "Service identification"
+                                    "title": "Service identification",
+                                    "prop_key": "description.identificationInfo.serviceIdentification"
                                 },
                                 {
                                     "key": "serviceIdentification.serviceType",
                                     "type": "text",
-                                    "title": "Service type"
+                                    "title": "Service type",
+                                    "prop_key": "description.identificationInfo.serviceIdentification.serviceType"
                                 },
                                 {
                                     "key": "serviceIdentification.serviceTypeVersion",
                                     "type": "text",
-                                    "title": "Service type version"
+                                    "title": "Service type version",
+                                    "prop_key": "description.identificationInfo.serviceIdentification.serviceTypeVersion"
                                 },
                                 {
                                     "key": "serviceIdentification.accessProperties",
                                     "type": "section",
-                                    "title": "Access properties"
+                                    "title": "Access properties",
+                                    "prop_key": "description.identificationInfo.serviceIdentification.accessProperties"
                                 },
                                 {
                                     "key": "serviceIdentification.accessProperties.fees",
                                     "type": "text",
-                                    "title": "Fees"
+                                    "title": "Fees",
+                                    "prop_key": "description.identificationInfo.serviceIdentification.accessProperties.fees"
                                 },
                                 {
                                     "key": "serviceIdentification.accessProperties.plannedAvailableDateTime",
                                     "type": "date",
-                                    "title": "Service availability date stamp"
+                                    "title": "Service availability date stamp",
+                                    "prop_key": "description.identificationInfo.serviceIdentification.accessProperties.plannedAvailableDateTime"
                                 },
                                 {
                                     "key": "serviceIdentification.accessProperties.orderingInstructions",
                                     "type": "text",
-                                    "title": "Ordering instructions"
+                                    "title": "Ordering instructions",
+                                    "prop_key": "description.identificationInfo.serviceIdentification.accessProperties.orderingInstructions"
                                 },
                                 {
                                     "key": "serviceIdentification.accessProperties.turnaround",
                                     "type": "text",
-                                    "title": "Turnaround"
+                                    "title": "Turnaround",
+                                    "prop_key": "description.identificationInfo.serviceIdentification.accessProperties.turnaround"
                                 },
                                 {
                                     "key": "serviceIdentification.restrictions",
@@ -1205,24 +1357,29 @@
                                                 {
                                                     "key": "useLimitation",
                                                     "type": "simple_array",
-                                                    "title": "useLimitation"
+                                                    "title": "useLimitation",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.restrictions.legalConstraints.useLimitation"
                                                 },
                                                 {
                                                     "key": "accessConstraints",
                                                     "type": "simple_array",
-                                                    "title": "accessConstraints"
+                                                    "title": "accessConstraints",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.restrictions.legalConstraints.accessConstraints"
                                                 },
                                                 {
                                                     "key": "useConstraints",
                                                     "type": "simple_array",
-                                                    "title": "useConstraints"
+                                                    "title": "useConstraints",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.restrictions.legalConstraints.useConstraints"
                                                 },
                                                 {
                                                     "key": "otherConstraints",
                                                     "type": "simple_array",
-                                                    "title": "otherConstraints"
+                                                    "title": "otherConstraints",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.restrictions.legalConstraints.otherConstraints"
                                                 }
-                                            ]
+                                            ],
+                                            "prop_key": "description.identificationInfo.serviceIdentification.restrictions.legalConstraints"
                                         },
                                         {
                                             "key": "securityConstraints",
@@ -1232,31 +1389,38 @@
                                                 {
                                                     "key": "useLimitation",
                                                     "type": "simple_array",
-                                                    "title": "useLimitation"
+                                                    "title": "useLimitation",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.restrictions.securityConstraints.useLimitation"
                                                 },
                                                 {
                                                     "key": "classification",
                                                     "type": "text",
-                                                    "title": "Classification"
+                                                    "title": "Classification",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.restrictions.securityConstraints.classification"
                                                 },
                                                 {
                                                     "key": "userNote",
                                                     "type": "text",
-                                                    "title": "userNote"
+                                                    "title": "userNote",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.restrictions.securityConstraints.userNote"
                                                 },
                                                 {
                                                     "key": "classificationSystem",
                                                     "type": "text",
-                                                    "title": "classificationSystem"
+                                                    "title": "classificationSystem",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.restrictions.securityConstraints.classificationSystem"
                                                 },
                                                 {
                                                     "key": "handlingDescription",
                                                     "type": "text",
-                                                    "title": "handlingDescription"
+                                                    "title": "handlingDescription",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.restrictions.securityConstraints.handlingDescription"
                                                 }
-                                            ]
+                                            ],
+                                            "prop_key": "description.identificationInfo.serviceIdentification.restrictions.securityConstraints"
                                         }
-                                    ]
+                                    ],
+                                    "prop_key": "description.identificationInfo.serviceIdentification.restrictions"
                                 },
                                 {
                                     "key": "descriptiveKeywords",
@@ -1284,19 +1448,23 @@
                                                 "service",
                                                 "product",
                                                 "subTopicCategory"
-                                            ]
+                                            ],
+                                            "prop_key": "description.identificationInfo.descriptiveKeywords.type"
                                         },
                                         {
                                             "key": "keyword",
                                             "type": "text",
-                                            "title": "Keyword"
+                                            "title": "Keyword",
+                                            "prop_key": "description.identificationInfo.descriptiveKeywords.keyword"
                                         },
                                         {
                                             "key": "thesaurusName",
                                             "type": "text",
-                                            "title": "thesaurusName"
+                                            "title": "thesaurusName",
+                                            "prop_key": "description.identificationInfo.descriptiveKeywords.thesaurusName"
                                         }
-                                    ]
+                                    ],
+                                    "prop_key": "description.identificationInfo.descriptiveKeywords"
                                 },
                                 {
                                     "key": "serviceIdentification.coupledResource",
@@ -1306,19 +1474,23 @@
                                         {
                                             "key": "operationName",
                                             "type": "text",
-                                            "title": "Operation name"
+                                            "title": "Operation name",
+                                            "prop_key": "description.identificationInfo.serviceIdentification.coupledResource.operationName"
                                         },
                                         {
                                             "key": "identifier",
                                             "type": "text",
-                                            "title": "Identifier"
+                                            "title": "Identifier",
+                                            "prop_key": "description.identificationInfo.serviceIdentification.coupledResource.identifier"
                                         }
-                                    ]
+                                    ],
+                                    "prop_key": "description.identificationInfo.serviceIdentification.coupledResource"
                                 },
                                 {
                                     "key": "serviceIdentification.couplingType",
                                     "type": "text",
-                                    "title": "Coupling type"
+                                    "title": "Coupling type",
+                                    "prop_key": "description.identificationInfo.serviceIdentification.couplingType"
                                 },
                                 {
                                     "key": "serviceIdentification.containsOperations",
@@ -1328,22 +1500,26 @@
                                         {
                                             "key": "operationName",
                                             "type": "text",
-                                            "title": "Operation name"
+                                            "title": "Operation name",
+                                            "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.operationName"
                                         },
                                         {
                                             "key": "DCP",
                                             "type": "simple_array",
-                                            "title": "DCP"
+                                            "title": "DCP",
+                                            "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.DCP"
                                         },
                                         {
                                             "key": "operationDescription",
                                             "type": "text",
-                                            "title": "Operation description"
+                                            "title": "Operation description",
+                                            "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.operationDescription"
                                         },
                                         {
                                             "key": "invocationName",
                                             "type": "text",
-                                            "title": "Invocation name"
+                                            "title": "Invocation name",
+                                            "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.invocationName"
                                         },
                                         {
                                             "key": "parameters",
@@ -1353,34 +1529,41 @@
                                                 {
                                                     "key": "name",
                                                     "type": "text",
-                                                    "title": "Name"
+                                                    "title": "Name",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.parameters.name"
                                                 },
                                                 {
                                                     "key": "direction",
                                                     "type": "text",
-                                                    "title": "Direction"
+                                                    "title": "Direction",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.parameters.direction"
                                                 },
                                                 {
                                                     "key": "description",
                                                     "type": "text",
-                                                    "title": "Description"
+                                                    "title": "Description",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.parameters.description"
                                                 },
                                                 {
                                                     "key": "optionality",
                                                     "type": "text",
-                                                    "title": "Optionality"
+                                                    "title": "Optionality",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.parameters.optionality"
                                                 },
                                                 {
                                                     "key": "repeatability",
                                                     "type": "text",
-                                                    "title": "Repeatability"
+                                                    "title": "Repeatability",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.parameters.repeatability"
                                                 },
                                                 {
                                                     "key": "valueType",
                                                     "type": "text",
-                                                    "title": "Value type"
+                                                    "title": "Value type",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.parameters.valueType"
                                                 }
-                                            ]
+                                            ],
+                                            "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.parameters"
                                         },
                                         {
                                             "key": "connectPoint",
@@ -1390,31 +1573,38 @@
                                                 {
                                                     "key": "linkage",
                                                     "type": "text",
-                                                    "title": "Linkage"
+                                                    "title": "Linkage",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.connectPoint.linkage"
                                                 },
                                                 {
                                                     "key": "name",
                                                     "type": "text",
-                                                    "title": "Name"
+                                                    "title": "Name",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.connectPoint.name"
                                                 },
                                                 {
                                                     "key": "description",
                                                     "type": "text",
-                                                    "title": "Description"
+                                                    "title": "Description",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.connectPoint.description"
                                                 },
                                                 {
                                                     "key": "protocol",
                                                     "type": "text",
-                                                    "title": "Protocol"
+                                                    "title": "Protocol",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.connectPoint.protocol"
                                                 },
                                                 {
                                                     "key": "function",
                                                     "type": "text",
-                                                    "title": "Function"
+                                                    "title": "Function",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.connectPoint.function"
                                                 }
-                                            ]
+                                            ],
+                                            "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.connectPoint"
                                         }
-                                    ]
+                                    ],
+                                    "prop_key": "description.identificationInfo.serviceIdentification.containsOperations"
                                 },
                                 {
                                     "key": "serviceIdentification.operatesOn",
@@ -1424,9 +1614,11 @@
                                         {
                                             "key": "uuidref",
                                             "type": "text",
-                                            "title": "uuidref"
+                                            "title": "uuidref",
+                                            "prop_key": "description.identificationInfo.serviceIdentification.operatesOn.uuidref"
                                         }
-                                    ]
+                                    ],
+                                    "prop_key": "description.identificationInfo.serviceIdentification.operatesOn"
                                 }
                             ]
                         }
@@ -1435,4 +1627,4 @@
             ]
         }
     ]
-} 
+}
