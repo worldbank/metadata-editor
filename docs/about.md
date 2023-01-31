@@ -1,30 +1,21 @@
-# About
+# Specifications
 
-text goes here...
+The Metadata Editor is a multi-platform application developed for the production of metadata compliant with multiple metadata standards and schemas. The application is highly flexible, and may in the future accommodate additional standards and schemas, as well as new versions of standards an schemas already supported.
 
+The application works as a stand-alone application or as a server application. Operating the application on a server allows curation teams to collaborate on the documentation of datasets in the context of a data archive or data library. 
 
-## Preface
-...
+The software makes use of the following technologies:
+- For the user interface: Bootstrap version ...
+- For the back-end: PHP 8
+- For the storage of metadata: JSON (with option to export metadata in XML)
+- For the import and export of microdata: R and the Haven package. The application uses R but users do not need any expertise in R to use the Metadata Editor. 
 
-## Acknowledgments
-...
+The application was in part inspired by the Nesstar Publisher software application (by the Norwegian Social Science Data ARchive). The Nesstar Publisher, designed for the production of DDI-compliant metadata for microdata, is not maintained anymore. But the Metadata Editor interface is largely inspired from Nesstar. A large community of data curators have relied on Nesstar, and will be familiar with the interface. We express our gratitude to the Nesstar developers for our past collaboration and for allowing us to replicate much of their user interface. Note that there are major differences in the way we store and manage metadata. Nesstar was built on a specific format to store data and metadata. Our application is web-based and operates differently. We package data and related documentation in ZIP files, with metadata in JSON, and store the metadata in a database.
 
-## Background and rationale
+Note to Nesstar users: You can convert your Nesstar files by ... (only Windows).
 
-The volume and the diversity of data made available to the research community are growing fast. But too many valuable datasets remain largely under-exploited. To be used more extensively, data must be made easier to find, understand, access, and analyze. The documentation, cataloguing, and dissemination of data must be improved. The discoverability, accessibility, and usability of data depend very much on the quality of the associated metadata. Finding, understanding, and using the most relevant data can be a challenging task for researchers and other data users.
-
-The definition of data we adopt in this document is broad, although we focus on data used for quantitative analysis of social and economic development issues. These data can be of different structured and unstructured types. The distinction we make between data types matters to identify the appropriate metadata standards and the tools to be used for their documentation. The data types covered by the IHSN Metadata Editor are:
-
-•	Structured (quantitative) data:
-o	Microdata: the unit-level data on a population of individuals, households, dwellings, facilities, establishments, or other. Microdata can be generated from surveys, censuses, administrative recording systems, or sensors.
-o	Statistical tables: aggregated statistical information provided in the form of cross-tables, e.g., as published in statistics yearbooks or census reports. Statistical tables are often derived from microdata.
-o	Indicators, time series, and databases of indicators: Indicators are summary measures derived from observed facts (often from microdata). When repeated over time at a regular frequency, the indicators form a time series. Time series are typically stored in databases.
-o	Geographic datasets and geographic data services: Geographic (or geospatial) data identify and depict geographic locations, boundaries, and characteristics of the surface of the earth. They can be provided in the form of datasets (raster or vector data) or data services (web applications).
-
-•	Unstructured data:
-o	Text: A collection of documents (bibliographic resources of any type, such as books, papers, reports, manuals, and other resources consisting of text) form a corpus. Using natural language processing (NLP) techniques, corpora can be converted into structured information. 
-o	Images: Digital images can be processed using machine learning algorithms (of object detection, classification, or other).
-o	Audio and video recordings: Speech-to-text algorithms can transform audio and video recordings as text files. They can thus be considered as data in the same way we consider text as data.
-o	Research projects and scripts: Although they are not data per se, we treat research projects and the related programs and scripts used to edit, transform, tabulate, analyze, model, and visualize data as data-related resources that need to be documented, catalogued, and disseminated in pursuit of transparency and reproducibility of data use.
-
+The Metadata Editor application was developed by Mehmood Asghar (sotware developer / data engineer) with Olivier Dupriez (statistician / data scientist). Other contributors include:
+- ...
+- ...
+- ...
 
