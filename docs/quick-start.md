@@ -59,6 +59,10 @@ You may now add or edit the information available on each variable, for each dat
 
 ![image](https://user-images.githubusercontent.com/35276300/215516149-43bb069f-5db8-42cc-8915-b5f653a5b7ec.png)
 
+Summary statistics are displayed. You may control the statistics to be included in the metadata.
+
+![image](https://user-images.githubusercontent.com/35276300/215844294-82c6d847-d126-44a3-bd46-67120992549a.png)
+
 More important, metadata can be added. We will add the formulation of the question, the universe, and the interviewer instructions. This can be copy/pasted from the PDF files.
 
 ![image](https://user-images.githubusercontent.com/35276300/215517055-b5df50ac-e647-4c09-a46a-3f510430cfed.png)
