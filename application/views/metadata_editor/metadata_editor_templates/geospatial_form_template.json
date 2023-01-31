@@ -237,7 +237,7 @@
                                     ]
                                 }
                             ]
-                        }                                        
+                        }
                     ]
                 },
                 {
@@ -259,7 +259,17 @@
                                             "key": "vectorSpatialRepresentation.topologyLevel",
                                             "title": "Topology level",
                                             "type": "dropdown",
-                                            "enum":["geometryOnly", "topology1D", "planarGraph", "fullPlanarGraph", "surfaceGraph", "fullSurfaceGraph", "topology3D", "fullTopology3D", "abstract"]
+                                            "enum": [
+                                                "geometryOnly",
+                                                "topology1D",
+                                                "planarGraph",
+                                                "fullPlanarGraph",
+                                                "surfaceGraph",
+                                                "fullSurfaceGraph",
+                                                "topology3D",
+                                                "fullTopology3D",
+                                                "abstract"
+                                            ]
                                         },
                                         {
                                             "key": "vectorSpatialRepresentation.geometricObjects",
@@ -289,9 +299,9 @@
                                                     "type": "text"
                                                 },
                                                 {
-                                                    "key":"axisDimensionProperties.dimension",
-                                                    "title":"Axis dimensions",
-                                                    "type":"array",
+                                                    "key": "axisDimensionProperties.dimension",
+                                                    "title": "Axis dimensions",
+                                                    "type": "array",
                                                     "props": [
                                                         {
                                                             "key": "dimensionName",
@@ -314,15 +324,22 @@
                                                     "key": "cellGeometry",
                                                     "title": "Cell geometry",
                                                     "type": "text",
-                                                    "enum":["point", "area", "voxel", "stratum"]
+                                                    "enum": [
+                                                        "point",
+                                                        "area",
+                                                        "voxel",
+                                                        "stratum"
+                                                    ]
                                                 },
                                                 {
                                                     "key": "transformationParameterAvailability",
                                                     "title": "Transformation Parameter Availability",
                                                     "type": "dropdown",
-                                                    "enum":["true", "false"]
+                                                    "enum": [
+                                                        "true",
+                                                        "false"
+                                                    ]
                                                 }
-
                                             ]
                                         }
                                     ]
@@ -344,7 +361,7 @@
                             "props": [
                                 {
                                     "key": "code",
-                                    "title": "Code",                                            
+                                    "title": "Code",
                                     "type": "text"
                                 },
                                 {
@@ -358,7 +375,7 @@
                 },
                 {
                     "title": "Identification info",
-                    "key":"description_identifiction_container",
+                    "key": "description_identifiction_container",
                     "type": "section",
                     "items": [
                         {
@@ -415,6 +432,160 @@
                                     "type": "string"
                                 },
                                 {
+                                    "key": "citation.citedResponsibleParty",
+                                    "type": "nested_array",
+                                    "title": "Responsible party",
+                                    "props": [
+                                        {
+                                            "key": "individualName",
+                                            "title": "Individual name",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "key": "organisationName",
+                                            "title": "Organisation name",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "key": "positionName",
+                                            "title": "Position",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "key": "contactInfo.phone.voice",
+                                            "title": "Voice",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "key": "contactInfo.phone.facsimile",
+                                            "title": "Facsimile",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "key": "contactInfo.address.deliveryPoint",
+                                            "title": "Delivery point",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "key": "contactInfo.address.city",
+                                            "title": "City",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "key": "contactInfo.address.postalCode",
+                                            "title": "Postal code",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "key": "contactInfo.address.country",
+                                            "title": "Country",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "key": "contactInfo.address.elctronicMailAddress",
+                                            "title": "Email",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "key": "role",
+                                            "title": "Role",
+                                            "type": "dropdown",
+                                            "enum": [
+                                                "resourceProvider",
+                                                "custodian",
+                                                "owner",
+                                                "sponsor",
+                                                "user",
+                                                "distributor",
+                                                "originator",
+                                                "pointOfContact",
+                                                "principalInvestigator",
+                                                "processor",
+                                                "publisher",
+                                                "author",
+                                                "coAuthor",
+                                                "collaborator",
+                                                "editor",
+                                                "mediator",
+                                                "rightsHolder",
+                                                "contributor",
+                                                "funder",
+                                                "stakeholder"
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "cition.presentationForm",
+                                    "title": "Resource presentation",
+                                    "type": "dropdown",
+                                    "enum": [
+                                        "documentDigital",
+                                        "imageDigital",
+                                        "documentHardcopy",
+                                        "imageHardcopy",
+                                        "mapDigital",
+                                        "mapHardcopy",
+                                        "modelDigital",
+                                        "modelHardcopy",
+                                        "profileDigital",
+                                        "profileHardcopy",
+                                        "tableDigital",
+                                        "tableHardcopy",
+                                        "videoDigital",
+                                        "videoHardcopy",
+                                        "audioDigital",
+                                        "audioHardcopy",
+                                        "multimediaDigital",
+                                        "multimediaHardcopy",
+                                        "physicalSample",
+                                        "diagramDigital",
+                                        "diagramHardcopy"
+                                    ]
+                                },
+                                {
+                                    "key": "citation.series_section",
+                                    "title": "Series",
+                                    "type": "section",
+                                    "items": [
+                                        {
+                                            "key": "citation.series.name",
+                                            "title": "Series name",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "citation.series.issueIdentification",
+                                            "title": "Identification of the series issue",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "citation.series.page",
+                                            "title": "Page",
+                                            "type": "text"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "citation.otherCitationDetails",
+                                    "title": "Other citation details",
+                                    "type": "textarea"
+                                },
+                                {
+                                    "key": "citation.collectiveTitle",
+                                    "title": "Collective title",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "citation.ISBN",
+                                    "title": "ISBN",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "citation.ISSN",
+                                    "title": "ISSN",
+                                    "type": "text"
+                                },
+                                {
                                     "key": "abstract",
                                     "title": "Abstract",
                                     "type": "textarea"
@@ -423,24 +594,41 @@
                                     "key": "purpose",
                                     "title": "Purpose",
                                     "type": "textarea"
-                                },     
+                                },
                                 {
                                     "key": "credit",
                                     "title": "Credit",
                                     "type": "string"
-                                }, 
+                                },
                                 {
                                     "key": "status",
                                     "title": "Status",
                                     "type": "dropdown",
-                                    "enum":[
-                                        "completed", "historicalArchive", "obsolete", "onGoing", "planned", "required", "underDevelopment", "final", "pending", "retired", "superseded", "tentative", "valid", "accepted", "notAccepted", "withdrawn", "proposed", "deprecated"
+                                    "enum": [
+                                        "completed",
+                                        "historicalArchive",
+                                        "obsolete",
+                                        "onGoing",
+                                        "planned",
+                                        "required",
+                                        "underDevelopment",
+                                        "final",
+                                        "pending",
+                                        "retired",
+                                        "superseded",
+                                        "tentative",
+                                        "valid",
+                                        "accepted",
+                                        "notAccepted",
+                                        "withdrawn",
+                                        "proposed",
+                                        "deprecated"
                                     ]
                                 },
                                 {
-                                    "key": "contactInfo",
+                                    "key": "pointOfContact",
                                     "type": "nested_array",
-                                    "title": "Contact info",
+                                    "title": "Contacts",
                                     "props": [
                                         {
                                             "key": "individualName",
@@ -522,10 +710,31 @@
                                     ]
                                 },
                                 {
-                                    "key": "resourceMaintenance.maintenanceAndUpdateFrequency",
-                                    "title": "Resource maintenance and frequency",
-                                    "type": "simple_array",
-                                    "enum":["continual", "daily", "weekly", "fortnightly", "monthly", "quarterly", "biannually", "annually", "asNeeded", "irregular", "notPlanned", "unknown"]
+                                    "key": "resourceMaintenance",
+                                    "title": "Resource maintenance",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "maintenanceAndUpdateFrequency",
+                                            "title": "Frequency",
+                                            "help_text": "Maintenance and update frequency",
+                                            "type": "text",
+                                            "enum": [
+                                                "continual",
+                                                "daily",
+                                                "weekly",
+                                                "fortnightly",
+                                                "monthly",
+                                                "quarterly",
+                                                "biannually",
+                                                "annually",
+                                                "asNeeded",
+                                                "irregular",
+                                                "notPlanned",
+                                                "unknown"
+                                            ]
+                                        }
+                                    ]
                                 },
                                 {
                                     "key": "graphicOverview",
@@ -549,7 +758,123 @@
                                         }
                                     ]
                                 },
-
+                                {
+                                    "key": "resourceFormat",
+                                    "title": "Resource format",
+                                    "type": "nested_array",
+                                    "props": [
+                                        {
+                                            "key": "name",
+                                            "type": "text",
+                                            "title": "Name"
+                                        },
+                                        {
+                                            "key": "version",
+                                            "type": "text",
+                                            "title": "Version"
+                                        },
+                                        {
+                                            "key": "amendmentNumber",
+                                            "type": "text",
+                                            "title": "Amendment number",
+                                            "help_text": "Format version amendment number"
+                                        },
+                                        {
+                                            "key": "specification",
+                                            "type": "text",
+                                            "title": "Format specification"
+                                        },
+                                        {
+                                            "key": "fileDecompressionTechnique",
+                                            "type": "text",
+                                            "title": "File decompression technique"
+                                        },
+                                        {
+                                            "key": "formatDistributor",
+                                            "type": "nested_array",
+                                            "title": "Format distributor",
+                                            "props": [
+                                                {
+                                                    "key": "individualName",
+                                                    "title": "Individual name",
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "key": "organisationName",
+                                                    "title": "Organisation name",
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "key": "positionName",
+                                                    "title": "Position",
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "key": "contactInfo.phone.voice",
+                                                    "title": "Voice",
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "key": "contactInfo.phone.facsimile",
+                                                    "title": "Facsimile",
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "key": "contactInfo.address.deliveryPoint",
+                                                    "title": "Delivery point",
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "key": "contactInfo.address.city",
+                                                    "title": "City",
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "key": "contactInfo.address.postalCode",
+                                                    "title": "Postal code",
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "key": "contactInfo.address.country",
+                                                    "title": "Country",
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "key": "contactInfo.address.elctronicMailAddress",
+                                                    "title": "Email",
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "key": "contactInfo.role",
+                                                    "title": "Role",
+                                                    "type": "dropdown",
+                                                    "enum": [
+                                                        "resourceProvider",
+                                                        "custodian",
+                                                        "owner",
+                                                        "sponsor",
+                                                        "user",
+                                                        "distributor",
+                                                        "originator",
+                                                        "pointOfContact",
+                                                        "principalInvestigator",
+                                                        "processor",
+                                                        "publisher",
+                                                        "author",
+                                                        "coAuthor",
+                                                        "collaborator",
+                                                        "editor",
+                                                        "mediator",
+                                                        "rightsHolder",
+                                                        "contributor",
+                                                        "funder",
+                                                        "stakeholder"
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
                                 {
                                     "key": "descriptiveKeywords",
                                     "title": "Keywords",
@@ -558,7 +883,25 @@
                                         {
                                             "key": "type",
                                             "type": "text",
-                                            "title": "Type"
+                                            "title": "Type",
+                                            "enum": [
+                                                "dataCenter",
+                                                "discipline",
+                                                "place",
+                                                "dataResolution",
+                                                "stratum",
+                                                "temporal",
+                                                "theme",
+                                                "dataCentre",
+                                                "featureType",
+                                                "instrument",
+                                                "platform",
+                                                "process",
+                                                "project",
+                                                "service",
+                                                "product",
+                                                "subTopicCategory"
+                                            ]
                                         },
                                         {
                                             "key": "keyword",
@@ -572,7 +915,6 @@
                                         }
                                     ]
                                 },
-                                
                                 {
                                     "key": "resourceConstraints",
                                     "title": "resourceConstraints",
@@ -591,7 +933,7 @@
                                                 {
                                                     "key": "accessConstraints",
                                                     "type": "simple_array",
-                                                    "title": "accessConstraints"                                                    
+                                                    "title": "accessConstraints"
                                                 },
                                                 {
                                                     "key": "useConstraints",
@@ -702,6 +1044,389 @@
                                             "type": "textarea"
                                         }
                                     ]
+                                },
+                                {
+                                    "key": "extent.temporalElement",
+                                    "title": "Temporal element",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "extent",
+                                            "type": "text",
+                                            "title": "Extent"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "extent.verticalElement",
+                                    "title": "Vertical element",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "minimumValue",
+                                            "type": "text",
+                                            "title": "Minimum value"
+                                        },
+                                        {
+                                            "key": "maximumValue",
+                                            "type": "text",
+                                            "title": "Maximum value"
+                                        },
+                                        {
+                                            "key": "verticalCRS",
+                                            "type": "text",
+                                            "title": "Vertical CRS"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "spatialRepresentationType",
+                                    "type": "dropdown",
+                                    "title": "Spatial representation type",
+                                    "enum": [
+                                        "vector",
+                                        "grid",
+                                        "textTable",
+                                        "tin",
+                                        "stereoModel",
+                                        "video"
+                                    ]
+                                },
+                                {
+                                    "key": "spatialResolution",
+                                    "type": "text",
+                                    "title": "Spatial resolution"
+                                },
+                                {
+                                    "key": "language",
+                                    "type": "simple_array",
+                                    "title": "Language"
+                                },
+                                {
+                                    "key": "characterSet",
+                                    "title": "Character encoding",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "codeListValue",
+                                            "type": "text",
+                                            "title": "Characterset code"
+                                        },
+                                        {
+                                            "key": "codeList",
+                                            "type": "text",
+                                            "title": "Codelist used"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "topicCategory",
+                                    "type": "text",
+                                    "title": "Topic category",
+                                    "enum": [
+                                        "farming",
+                                        "biota",
+                                        "boundaries",
+                                        "climatologyMeteorologyAtmosphere",
+                                        "economy",
+                                        "elevation",
+                                        "environment",
+                                        "geoscientificInformation",
+                                        "health",
+                                        "imageryBaseMapsEarthCover",
+                                        "intelligenceMilitary",
+                                        "inlandWaters",
+                                        "location",
+                                        "oceans",
+                                        "planningCadastre",
+                                        "society",
+                                        "structure",
+                                        "transportation",
+                                        "utilitiesCommunication",
+                                        "extraTerrestrial",
+                                        "disaster"
+                                    ]
+                                },
+                                {
+                                    "key": "supplementalInformation",
+                                    "type": "text",
+                                    "title": "Supplemental information"
+                                },
+                                {
+                                    "key": "serviceIdentification",
+                                    "type": "section",
+                                    "title": "Service identification"
+                                },
+                                {
+                                    "key": "serviceIdentification.serviceType",
+                                    "type": "text",
+                                    "title": "Service type"
+                                },
+                                {
+                                    "key": "serviceIdentification.serviceTypeVersion",
+                                    "type": "text",
+                                    "title": "Service type version"
+                                },
+                                {
+                                    "key": "serviceIdentification.accessProperties",
+                                    "type": "section",
+                                    "title": "Access properties"
+                                },
+                                {
+                                    "key": "serviceIdentification.accessProperties.fees",
+                                    "type": "text",
+                                    "title": "Fees"
+                                },
+                                {
+                                    "key": "serviceIdentification.accessProperties.plannedAvailableDateTime",
+                                    "type": "date",
+                                    "title": "Service availability date stamp"
+                                },
+                                {
+                                    "key": "serviceIdentification.accessProperties.orderingInstructions",
+                                    "type": "text",
+                                    "title": "Ordering instructions"
+                                },
+                                {
+                                    "key": "serviceIdentification.accessProperties.turnaround",
+                                    "type": "text",
+                                    "title": "Turnaround"
+                                },
+                                {
+                                    "key": "serviceIdentification.restrictions",
+                                    "title": "Restrictions",
+                                    "type": "nested_array",
+                                    "props": [
+                                        {
+                                            "key": "legalConstraints",
+                                            "title": "legalConstraints",
+                                            "type": "nested_array",
+                                            "props": [
+                                                {
+                                                    "key": "useLimitation",
+                                                    "type": "simple_array",
+                                                    "title": "useLimitation"
+                                                },
+                                                {
+                                                    "key": "accessConstraints",
+                                                    "type": "simple_array",
+                                                    "title": "accessConstraints"
+                                                },
+                                                {
+                                                    "key": "useConstraints",
+                                                    "type": "simple_array",
+                                                    "title": "useConstraints"
+                                                },
+                                                {
+                                                    "key": "otherConstraints",
+                                                    "type": "simple_array",
+                                                    "title": "otherConstraints"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "key": "securityConstraints",
+                                            "title": "securityConstraints",
+                                            "type": "nested_array",
+                                            "props": [
+                                                {
+                                                    "key": "useLimitation",
+                                                    "type": "simple_array",
+                                                    "title": "useLimitation"
+                                                },
+                                                {
+                                                    "key": "classification",
+                                                    "type": "text",
+                                                    "title": "Classification"
+                                                },
+                                                {
+                                                    "key": "userNote",
+                                                    "type": "text",
+                                                    "title": "userNote"
+                                                },
+                                                {
+                                                    "key": "classificationSystem",
+                                                    "type": "text",
+                                                    "title": "classificationSystem"
+                                                },
+                                                {
+                                                    "key": "handlingDescription",
+                                                    "type": "text",
+                                                    "title": "handlingDescription"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "descriptiveKeywords",
+                                    "title": "Keywords",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "type",
+                                            "type": "text",
+                                            "title": "Type",
+                                            "enum": [
+                                                "dataCenter",
+                                                "discipline",
+                                                "place",
+                                                "dataResolution",
+                                                "stratum",
+                                                "temporal",
+                                                "theme",
+                                                "dataCentre",
+                                                "featureType",
+                                                "instrument",
+                                                "platform",
+                                                "process",
+                                                "project",
+                                                "service",
+                                                "product",
+                                                "subTopicCategory"
+                                            ]
+                                        },
+                                        {
+                                            "key": "keyword",
+                                            "type": "text",
+                                            "title": "Keyword"
+                                        },
+                                        {
+                                            "key": "thesaurusName",
+                                            "type": "text",
+                                            "title": "thesaurusName"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "serviceIdentification.coupledResource",
+                                    "type": "array",
+                                    "title": "Coupled resource(s)",
+                                    "props": [
+                                        {
+                                            "key": "operationName",
+                                            "type": "text",
+                                            "title": "Operation name"
+                                        },
+                                        {
+                                            "key": "identifier",
+                                            "type": "text",
+                                            "title": "Identifier"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "serviceIdentification.couplingType",
+                                    "type": "text",
+                                    "title": "Coupling type"
+                                },
+                                {
+                                    "key": "serviceIdentification.containsOperations",
+                                    "type": "nested_array",
+                                    "title": "Operation(s) contained in the service",
+                                    "props": [
+                                        {
+                                            "key": "operationName",
+                                            "type": "text",
+                                            "title": "Operation name"
+                                        },
+                                        {
+                                            "key": "DCP",
+                                            "type": "simple_array",
+                                            "title": "DCP"
+                                        },
+                                        {
+                                            "key": "operationDescription",
+                                            "type": "text",
+                                            "title": "Operation description"
+                                        },
+                                        {
+                                            "key": "invocationName",
+                                            "type": "text",
+                                            "title": "Invocation name"
+                                        },
+                                        {
+                                            "key": "parameters",
+                                            "type": "array",
+                                            "title": "Parameters",
+                                            "props": [
+                                                {
+                                                    "key": "name",
+                                                    "type": "text",
+                                                    "title": "Name"
+                                                },
+                                                {
+                                                    "key": "direction",
+                                                    "type": "text",
+                                                    "title": "Direction"
+                                                },
+                                                {
+                                                    "key": "description",
+                                                    "type": "text",
+                                                    "title": "Description"
+                                                },
+                                                {
+                                                    "key": "optionality",
+                                                    "type": "text",
+                                                    "title": "Optionality"
+                                                },
+                                                {
+                                                    "key": "repeatability",
+                                                    "type": "text",
+                                                    "title": "Repeatability"
+                                                },
+                                                {
+                                                    "key": "valueType",
+                                                    "type": "text",
+                                                    "title": "Value type"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "key": "connectPoint",
+                                            "type": "array",
+                                            "title": "Connect point (Resource)",
+                                            "props": [
+                                                {
+                                                    "key": "linkage",
+                                                    "type": "text",
+                                                    "title": "Linkage"
+                                                },
+                                                {
+                                                    "key": "name",
+                                                    "type": "text",
+                                                    "title": "Name"
+                                                },
+                                                {
+                                                    "key": "description",
+                                                    "type": "text",
+                                                    "title": "Description"
+                                                },
+                                                {
+                                                    "key": "protocol",
+                                                    "type": "text",
+                                                    "title": "Protocol"
+                                                },
+                                                {
+                                                    "key": "function",
+                                                    "type": "text",
+                                                    "title": "Function"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "serviceIdentification.operatesOn",
+                                    "type": "array",
+                                    "title": "Operates on",
+                                    "props": [
+                                        {
+                                            "key": "uuidref",
+                                            "type": "text",
+                                            "title": "uuidref"
+                                        }
+                                    ]
                                 }
                             ]
                         }
@@ -710,4 +1435,4 @@
             ]
         }
     ]
-}
+} 
