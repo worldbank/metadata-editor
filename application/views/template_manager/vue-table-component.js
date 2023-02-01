@@ -80,7 +80,7 @@ Vue.component('table-component', {
         }
     },  
     template: `
-            <div class="table-component">
+            <div class="table-component table-responsive">
 
             <table class="table table-striped table-sm">
                 <thead class="thead-light">

@@ -119,7 +119,7 @@
             </div>
           </div>
 
-          <div class="col">
+          <div class="col-md-9">
           <!-- header -->
           <div class="header" >
                 <div class="row">
@@ -202,7 +202,7 @@
 
 
           <!--content section-->
-          <div class="col bg-light" style="height:100vh;">
+          <div class="col-md-9 bg-light" style="height:100vh;">
 
               
 

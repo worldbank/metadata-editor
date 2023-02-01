@@ -58,13 +58,26 @@ Vue.component('validation-rules-component', {
     created: function () {           
     },
     computed: {
-        local()
+        /*local()
         {
+            return this.value ? this.value : {};
             if (this.isValidFormat(this.value)){
                 return this.value;
             }
+            
 
             return {};
+        },*/
+        local:{
+            get(){                
+                if (this.isValidFormat(this.value)){
+                    return this.value;
+                }
+                return {};
+            },
+            set(val){
+                this.$emit('update:value', val);
+            }
         },
         ValidationRules()
         {
@@ -84,8 +97,8 @@ Vue.component('validation-rules-component', {
     },
     methods:{
         isValidFormat: function(value)
-        {
-            if (typeof value=='string' || Array.isArray(value))
+        {            
+            if (typeof value=='string' || Array.isArray(value) || !value)
             {
                 return false;
             }
@@ -146,7 +159,7 @@ Vue.component('validation-rules-component', {
             rule_info=this.validation_rules[this.rule_selected];
             this.local[this.rule_selected]=rule_info.param==true ? '' : true;
             this.rule_selected='';
-            this.$emit('update:value', this.local);
+            //this.$emit('update:value', this.local);
         }
         
     },
