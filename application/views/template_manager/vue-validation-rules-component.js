@@ -152,14 +152,14 @@ Vue.component('validation-rules-component', {
             return '';
         },
         remove: function (rule_name){
-            Vue.delete(this.value, rule_name);
+            Vue.delete(this.local, rule_name);
         },
         addRule: function ()
         {
             rule_info=this.validation_rules[this.rule_selected];
             this.local[this.rule_selected]=rule_info.param==true ? '' : true;
             this.rule_selected='';
-            //this.$emit('update:value', this.local);
+            this.$emit('update:value', this.local);
         }
         
     },

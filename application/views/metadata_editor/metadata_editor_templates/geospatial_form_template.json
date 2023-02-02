@@ -112,33 +112,6 @@
                                     "enum": []
                                 },
                                 {
-                                    "key": "description.role",
-                                    "title": "Role",
-                                    "type": "dropdown",
-                                    "enum": [
-                                        "resourceProvider",
-                                        "custodian",
-                                        "owner",
-                                        "sponsor",
-                                        "user",
-                                        "distributor",
-                                        "originator",
-                                        "pointOfContact",
-                                        "principalInvestigator",
-                                        "processor",
-                                        "publisher",
-                                        "author",
-                                        "coAuthor",
-                                        "collaborator",
-                                        "editor",
-                                        "mediator",
-                                        "rightsHolder",
-                                        "contributor",
-                                        "funder",
-                                        "stakeholder"
-                                    ]
-                                },
-                                {
                                     "key": "description.dateStamp",
                                     "type": "text",
                                     "title": "Date stamp",
@@ -250,36 +223,35 @@
                                             "type": "string",
                                             "prop_key": "description.contact.contactInfo.address.electronicMailAddress"
                                         },
-
                                         {
                                             "key": "contactInfo.onlineResource.linkage",
                                             "title": "URL",
-                                            "type": "string"                                            
+                                            "type": "string"
                                         },
                                         {
                                             "key": "contactInfo.onlineResource.name",
                                             "title": "Name",
-                                            "type": "string"                                            
+                                            "type": "string"
                                         },
                                         {
                                             "key": "contactInfo.onlineResource.description",
                                             "title": "Description",
-                                            "type": "string"                                            
+                                            "type": "string"
                                         },
                                         {
                                             "key": "contactInfo.onlineResource.protocol",
                                             "title": "Protocol",
-                                            "type": "string"                                            
+                                            "type": "string"
                                         },
                                         {
                                             "key": "contactInfo.onlineResource.function",
                                             "title": "Function",
-                                            "type": "string"                                            
+                                            "type": "string"
                                         },
                                         {
                                             "key": "role",
                                             "title": "Role",
-                                            "type": "string"                                            
+                                            "type": "string"
                                         }
                                     ]
                                 }
@@ -338,55 +310,54 @@
                                         {
                                             "key": "gridSpatialRepresentation",
                                             "title": "gridSpatialRepresentation",
-                                            "type": "nested_array",
+                                            "type": "section",
+                                            "props": []
+                                        },
+                                        {
+                                            "key": "gridSpatialRepresentation.numberOfDimensions",
+                                            "title": "numberOfDimensions",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "gridSpatialRepresentation.axisDimensionProperties",
+                                            "title": "axisDimensionProperties",
+                                            "type": "array",
                                             "props": [
                                                 {
-                                                    "key": "numberOfDimensions",
-                                                    "title": "numberOfDimensions",
+                                                    "key": "dimensionName",
+                                                    "title": "Dimension name",
                                                     "type": "text"
                                                 },
                                                 {
-                                                    "key": "axisDimensionProperties.dimension",
-                                                    "title": "Axis dimensions",
-                                                    "type": "array",
-                                                    "props": [
-                                                        {
-                                                            "key": "dimensionName",
-                                                            "title": "Dimension name",
-                                                            "type": "text"
-                                                        },
-                                                        {
-                                                            "key": "dimensionSize",
-                                                            "title": "Dimension size",
-                                                            "type": "text"
-                                                        },
-                                                        {
-                                                            "key": "resolution",
-                                                            "title": "Resolution",
-                                                            "type": "text"
-                                                        }
-                                                    ]
+                                                    "key": "dimensionSize",
+                                                    "title": "Dimension size",
+                                                    "type": "text"
                                                 },
                                                 {
-                                                    "key": "cellGeometry",
-                                                    "title": "Cell geometry",
-                                                    "type": "text",
-                                                    "enum": [
-                                                        "point",
-                                                        "area",
-                                                        "voxel",
-                                                        "stratum"
-                                                    ]
-                                                },
-                                                {
-                                                    "key": "transformationParameterAvailability",
-                                                    "title": "Transformation Parameter Availability",
-                                                    "type": "dropdown",
-                                                    "enum": [
-                                                        "true",
-                                                        "false"
-                                                    ]
+                                                    "key": "resolution",
+                                                    "title": "Resolution",
+                                                    "type": "text"
                                                 }
+                                            ]
+                                        },
+                                        {
+                                            "key": "gridSpatialRepresentation.cellGeometry",
+                                            "title": "Cell geometry",
+                                            "type": "text",
+                                            "enum": [
+                                                "point",
+                                                "area",
+                                                "voxel",
+                                                "stratum"
+                                            ]
+                                        },
+                                        {
+                                            "key": "gridSpatialRepresentation.transformationParameterAvailability",
+                                            "title": "Transformation Parameter Availability",
+                                            "type": "dropdown",
+                                            "enum": [
+                                                "true",
+                                                "false"
                                             ]
                                         }
                                     ]
@@ -476,16 +447,16 @@
                                     "prop_key": "description.identificationInfo.citation.editionDate"
                                 },
                                 {
-                                    "key": "cition.identifier.authority",
+                                    "key": "citation.identifier.authority",
                                     "title": "Authority (identifier)",
                                     "type": "string",
-                                    "prop_key": "description.identificationInfo.cition.identifier.authority"
+                                    "prop_key": "description.identificationInfo.citation.identifier.authority"
                                 },
                                 {
-                                    "key": "cition.identifier.code",
+                                    "key": "citation.identifier.code",
                                     "title": "Code (identifier)",
                                     "type": "string",
-                                    "prop_key": "description.identificationInfo.cition.identifier.code"
+                                    "prop_key": "description.identificationInfo.citation.identifier.code"
                                 },
                                 {
                                     "key": "citation.citedResponsibleParty",
@@ -552,42 +523,41 @@
                                             "type": "string",
                                             "prop_key": "description.contact.contactInfo.address.electronicMailAddress"
                                         },
-
                                         {
                                             "key": "contactInfo.onlineResource.linkage",
                                             "title": "URL",
-                                            "type": "string"                                            
+                                            "type": "string"
                                         },
                                         {
                                             "key": "contactInfo.onlineResource.name",
                                             "title": "Name",
-                                            "type": "string"                                            
+                                            "type": "string"
                                         },
                                         {
                                             "key": "contactInfo.onlineResource.description",
                                             "title": "Description",
-                                            "type": "string"                                            
+                                            "type": "string"
                                         },
                                         {
                                             "key": "contactInfo.onlineResource.protocol",
                                             "title": "Protocol",
-                                            "type": "string"                                            
+                                            "type": "string"
                                         },
                                         {
                                             "key": "contactInfo.onlineResource.function",
                                             "title": "Function",
-                                            "type": "string"                                            
+                                            "type": "string"
                                         },
                                         {
                                             "key": "role",
                                             "title": "Role",
-                                            "type": "string"                                            
+                                            "type": "string"
                                         }
                                     ],
                                     "prop_key": "description.identificationInfo.citation.citedResponsibleParty"
                                 },
                                 {
-                                    "key": "cition.presentationForm",
+                                    "key": "citation.presentationForm",
                                     "title": "Resource presentation",
                                     "type": "dropdown",
                                     "enum": [
@@ -613,30 +583,29 @@
                                         "diagramDigital",
                                         "diagramHardcopy"
                                     ],
-                                    "prop_key": "description.identificationInfo.cition.presentationForm"
+                                    "prop_key": "description.identificationInfo.citation.presentationForm"
                                 },
                                 {
                                     "key": "citation.series_section",
                                     "title": "Series",
                                     "type": "section",
-                                    "items": [
-                                        {
-                                            "key": "citation.series.name",
-                                            "title": "Series name",
-                                            "type": "text"
-                                        },
-                                        {
-                                            "key": "citation.series.issueIdentification",
-                                            "title": "Identification of the series issue",
-                                            "type": "text"
-                                        },
-                                        {
-                                            "key": "citation.series.page",
-                                            "title": "Page",
-                                            "type": "text"
-                                        }
-                                    ],
+                                    "items": [],
                                     "prop_key": "description.identificationInfo.citation.series_section"
+                                },
+                                {
+                                    "key": "citation.series.name",
+                                    "title": "Series name",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "citation.series.issueIdentification",
+                                    "title": "Identification of the series issue",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "citation.series.page",
+                                    "title": "Page",
+                                    "type": "text"
                                 },
                                 {
                                     "key": "citation.otherCitationDetails",
@@ -771,36 +740,35 @@
                                             "type": "string",
                                             "prop_key": "description.contact.contactInfo.address.electronicMailAddress"
                                         },
-
                                         {
                                             "key": "contactInfo.onlineResource.linkage",
                                             "title": "URL",
-                                            "type": "string"                                            
+                                            "type": "string"
                                         },
                                         {
                                             "key": "contactInfo.onlineResource.name",
                                             "title": "Name",
-                                            "type": "string"                                            
+                                            "type": "string"
                                         },
                                         {
                                             "key": "contactInfo.onlineResource.description",
                                             "title": "Description",
-                                            "type": "string"                                            
+                                            "type": "string"
                                         },
                                         {
                                             "key": "contactInfo.onlineResource.protocol",
                                             "title": "Protocol",
-                                            "type": "string"                                            
+                                            "type": "string"
                                         },
                                         {
                                             "key": "contactInfo.onlineResource.function",
                                             "title": "Function",
-                                            "type": "string"                                            
+                                            "type": "string"
                                         },
                                         {
                                             "key": "role",
                                             "title": "Role",
-                                            "type": "string"                                            
+                                            "type": "string"
                                         }
                                     ],
                                     "prop_key": "description.identificationInfo.pointOfContact"
@@ -898,8 +866,231 @@
                                         },
                                         {
                                             "key": "formatDistributor",
-                                            "type": "nested_array",
+                                            "type": "section",
                                             "title": "Format distributor",
+                                            "props": []
+                                        },
+                                        {
+                                            "key": "formatDistributor.individualName",
+                                            "title": "Individual name",
+                                            "type": "string",
+                                            "prop_key": "description.contact.individualName"
+                                        },
+                                        {
+                                            "key": "formatDistributor.organisationName",
+                                            "title": "Organisation name",
+                                            "type": "string",
+                                            "prop_key": "description.contact.organisationName"
+                                        },
+                                        {
+                                            "key": "formatDistributor.positionName",
+                                            "title": "Position",
+                                            "type": "string",
+                                            "prop_key": "description.contact.positionName"
+                                        },
+                                        {
+                                            "key": "formatDistributor.contactInfo.phone.voice",
+                                            "title": "Voice",
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.phone.voice"
+                                        },
+                                        {
+                                            "key": "formatDistributor.contactInfo.phone.facsimile",
+                                            "title": "Facsimile",
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.phone.facsimile"
+                                        },
+                                        {
+                                            "key": "formatDistributor.contactInfo.address.deliveryPoint",
+                                            "title": "Delivery point",
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.deliveryPoint"
+                                        },
+                                        {
+                                            "key": "formatDistributor.contactInfo.address.city",
+                                            "title": "City",
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.city"
+                                        },
+                                        {
+                                            "key": "formatDistributor.contactInfo.address.postalCode",
+                                            "title": "Postal code",
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.postalCode"
+                                        },
+                                        {
+                                            "key": "formatDistributor.contactInfo.address.country",
+                                            "title": "Country",
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.country"
+                                        },
+                                        {
+                                            "key": "formatDistributor.contactInfo.address.electronicMailAddress",
+                                            "title": "Email",
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.electronicMailAddress"
+                                        },
+                                        {
+                                            "key": "formatDistributor.contactInfo.onlineResource.linkage",
+                                            "title": "URL",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "key": "formatDistributor.contactInfo.onlineResource.name",
+                                            "title": "Name",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "key": "formatDistributor.contactInfo.onlineResource.description",
+                                            "title": "Description",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "key": "formatDistributor.contactInfo.onlineResource.protocol",
+                                            "title": "Protocol",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "key": "formatDistributor.contactInfo.onlineResource.function",
+                                            "title": "Function",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "key": "formatDistributor.role",
+                                            "title": "Role",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "descriptiveKeywords",
+                                    "title": "Keywords",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "type",
+                                            "type": "text",
+                                            "title": "Type",
+                                            "enum": [
+                                                "dataCenter",
+                                                "discipline",
+                                                "place",
+                                                "dataResolution",
+                                                "stratum",
+                                                "temporal",
+                                                "theme",
+                                                "dataCentre",
+                                                "featureType",
+                                                "instrument",
+                                                "platform",
+                                                "process",
+                                                "project",
+                                                "service",
+                                                "product",
+                                                "subTopicCategory"
+                                            ],
+                                            "prop_key": "description.identificationInfo.descriptiveKeywords.type"
+                                        },
+                                        {
+                                            "key": "keyword",
+                                            "type": "text",
+                                            "title": "Keyword",
+                                            "prop_key": "description.identificationInfo.descriptiveKeywords.keyword"
+                                        },
+                                        {
+                                            "key": "thesaurusName",
+                                            "type": "text",
+                                            "title": "thesaurusName",
+                                            "prop_key": "description.identificationInfo.descriptiveKeywords.thesaurusName"
+                                        }
+                                    ],
+                                    "prop_key": "description.identificationInfo.descriptiveKeywords"
+                                },
+                                {
+                                    "key": "resourceConstraints",
+                                    "title": "resourceConstraints",
+                                    "type": "nested_array",
+                                    "props": [
+                                        {
+                                            "key": "legalConstraints.useLimitation",
+                                            "type": "simple_array",
+                                            "title": "useLimitation",
+                                            "prop_key": "description.identificationInfo.resourceConstraints.legalConstraints.useLimitation"
+                                        },
+                                        {
+                                            "key": "legalConstraints.accessConstraints",
+                                            "type": "simple_array",
+                                            "title": "accessConstraints",
+                                            "prop_key": "description.identificationInfo.resourceConstraints.legalConstraints.accessConstraints"
+                                        },
+                                        {
+                                            "key": "legalConstraints.useConstraints",
+                                            "type": "simple_array",
+                                            "title": "useConstraints",
+                                            "prop_key": "description.identificationInfo.resourceConstraints.legalConstraints.useConstraints"
+                                        },
+                                        {
+                                            "key": "legalConstraints.otherConstraints",
+                                            "type": "simple_array",
+                                            "title": "otherConstraints",
+                                            "prop_key": "description.identificationInfo.resourceConstraints.legalConstraints.otherConstraints"
+                                        },
+                                        {
+                                            "key": "securityConstraints.useLimitation",
+                                            "type": "simple_array",
+                                            "title": "useLimitation",
+                                            "prop_key": "description.identificationInfo.resourceConstraints.securityConstraints.useLimitation"
+                                        },
+                                        {
+                                            "key": "securityConstraints.classification",
+                                            "type": "text",
+                                            "title": "Classification",
+                                            "prop_key": "description.identificationInfo.resourceConstraints.securityConstraints.classification"
+                                        },
+                                        {
+                                            "key": "securityConstraints.userNote",
+                                            "type": "text",
+                                            "title": "userNote",
+                                            "prop_key": "description.identificationInfo.resourceConstraints.securityConstraints.userNote"
+                                        },
+                                        {
+                                            "key": "securityConstraints.classificationSystem",
+                                            "type": "text",
+                                            "title": "classificationSystem",
+                                            "prop_key": "description.identificationInfo.resourceConstraints.securityConstraints.classificationSystem"
+                                        },
+                                        {
+                                            "key": "securityConstraints.handlingDescription",
+                                            "type": "text",
+                                            "title": "handlingDescription",
+                                            "prop_key": "description.identificationInfo.resourceConstraints.securityConstraints.handlingDescription"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "resourceSpecificUsage",
+                                    "title": "Resource specific usage",
+                                    "type": "nested_array",
+                                    "props": [
+                                        {
+                                            "key": "specificUsage",
+                                            "type": "text",
+                                            "title": "Specific usage"
+                                        },
+                                        {
+                                            "key": "usageDateTime",
+                                            "type": "text",
+                                            "title": "Timestamp"
+                                        },
+                                        {
+                                            "key": "userDeterminedLimitations",
+                                            "type": "text",
+                                            "title": "User determined limitations"
+                                        },
+                                        {
+                                            "key": "userContactInfo",
+                                            "type": "nested_array",
+                                            "title": "Contact(s)",
                                             "props": [
                                                 {
                                                     "key": "individualName",
@@ -961,194 +1152,69 @@
                                                     "type": "string",
                                                     "prop_key": "description.contact.contactInfo.address.electronicMailAddress"
                                                 },
-        
                                                 {
                                                     "key": "contactInfo.onlineResource.linkage",
                                                     "title": "URL",
-                                                    "type": "string"                                            
+                                                    "type": "string"
                                                 },
                                                 {
                                                     "key": "contactInfo.onlineResource.name",
                                                     "title": "Name",
-                                                    "type": "string"                                            
+                                                    "type": "string"
                                                 },
                                                 {
                                                     "key": "contactInfo.onlineResource.description",
                                                     "title": "Description",
-                                                    "type": "string"                                            
+                                                    "type": "string"
                                                 },
                                                 {
                                                     "key": "contactInfo.onlineResource.protocol",
                                                     "title": "Protocol",
-                                                    "type": "string"                                            
+                                                    "type": "string"
                                                 },
                                                 {
                                                     "key": "contactInfo.onlineResource.function",
                                                     "title": "Function",
-                                                    "type": "string"                                            
+                                                    "type": "string"
                                                 },
                                                 {
                                                     "key": "role",
                                                     "title": "Role",
-                                                    "type": "string"                                            
+                                                    "type": "string"
                                                 }
-                                            ],
-                                            "prop_key": "description.identificationInfo.resourceFormat.formatDistributor"
+                                            ]
                                         }
-                                    ],
-                                    "prop_key": "description.identificationInfo.resourceFormat"
-                                },
-                                {
-                                    "key": "descriptiveKeywords",
-                                    "title": "Keywords",
-                                    "type": "array",
-                                    "props": [
-                                        {
-                                            "key": "type",
-                                            "type": "text",
-                                            "title": "Type",
-                                            "enum": [
-                                                "dataCenter",
-                                                "discipline",
-                                                "place",
-                                                "dataResolution",
-                                                "stratum",
-                                                "temporal",
-                                                "theme",
-                                                "dataCentre",
-                                                "featureType",
-                                                "instrument",
-                                                "platform",
-                                                "process",
-                                                "project",
-                                                "service",
-                                                "product",
-                                                "subTopicCategory"
-                                            ],
-                                            "prop_key": "description.identificationInfo.descriptiveKeywords.type"
-                                        },
-                                        {
-                                            "key": "keyword",
-                                            "type": "text",
-                                            "title": "Keyword",
-                                            "prop_key": "description.identificationInfo.descriptiveKeywords.keyword"
-                                        },
-                                        {
-                                            "key": "thesaurusName",
-                                            "type": "text",
-                                            "title": "thesaurusName",
-                                            "prop_key": "description.identificationInfo.descriptiveKeywords.thesaurusName"
-                                        }
-                                    ],
-                                    "prop_key": "description.identificationInfo.descriptiveKeywords"
-                                },
-                                {
-                                    "key": "resourceConstraints",
-                                    "title": "resourceConstraints",
-                                    "type": "nested_array",
-                                    "props": [
-                                        {
-                                            "key": "legalConstraints",
-                                            "title": "legalConstraints",
-                                            "type": "nested_array",
-                                            "props": [
-                                                {
-                                                    "key": "useLimitation",
-                                                    "type": "simple_array",
-                                                    "title": "useLimitation",
-                                                    "prop_key": "description.identificationInfo.resourceConstraints.legalConstraints.useLimitation"
-                                                },
-                                                {
-                                                    "key": "accessConstraints",
-                                                    "type": "simple_array",
-                                                    "title": "accessConstraints",
-                                                    "prop_key": "description.identificationInfo.resourceConstraints.legalConstraints.accessConstraints"
-                                                },
-                                                {
-                                                    "key": "useConstraints",
-                                                    "type": "simple_array",
-                                                    "title": "useConstraints",
-                                                    "prop_key": "description.identificationInfo.resourceConstraints.legalConstraints.useConstraints"
-                                                },
-                                                {
-                                                    "key": "otherConstraints",
-                                                    "type": "simple_array",
-                                                    "title": "otherConstraints",
-                                                    "prop_key": "description.identificationInfo.resourceConstraints.legalConstraints.otherConstraints"
-                                                }
-                                            ],
-                                            "prop_key": "description.identificationInfo.resourceConstraints.legalConstraints"
-                                        },
-                                        {
-                                            "key": "securityConstraints",
-                                            "title": "securityConstraints",
-                                            "type": "nested_array",
-                                            "props": [
-                                                {
-                                                    "key": "useLimitation",
-                                                    "type": "simple_array",
-                                                    "title": "useLimitation",
-                                                    "prop_key": "description.identificationInfo.resourceConstraints.securityConstraints.useLimitation"
-                                                },
-                                                {
-                                                    "key": "classification",
-                                                    "type": "text",
-                                                    "title": "Classification",
-                                                    "prop_key": "description.identificationInfo.resourceConstraints.securityConstraints.classification"
-                                                },
-                                                {
-                                                    "key": "userNote",
-                                                    "type": "text",
-                                                    "title": "userNote",
-                                                    "prop_key": "description.identificationInfo.resourceConstraints.securityConstraints.userNote"
-                                                },
-                                                {
-                                                    "key": "classificationSystem",
-                                                    "type": "text",
-                                                    "title": "classificationSystem",
-                                                    "prop_key": "description.identificationInfo.resourceConstraints.securityConstraints.classificationSystem"
-                                                },
-                                                {
-                                                    "key": "handlingDescription",
-                                                    "type": "text",
-                                                    "title": "handlingDescription",
-                                                    "prop_key": "description.identificationInfo.resourceConstraints.securityConstraints.handlingDescription"
-                                                }
-                                            ],
-                                            "prop_key": "description.identificationInfo.resourceConstraints.securityConstraints"
-                                        }
-                                    ],
-                                    "prop_key": "description.identificationInfo.resourceConstraints"
+                                    ]
                                 },
                                 {
                                     "key": "aggregationInfo",
                                     "title": "aggregationInfo",
                                     "type": "section",
-                                    "props": [
-                                        {
-                                            "key": "type",
-                                            "type": "text",
-                                            "title": "Type",
-                                            "prop_key": "description.identificationInfo.aggregationInfo.type"
-                                        },
-                                        {
-                                            "key": "keyword",
-                                            "type": "text",
-                                            "title": "Keyword",
-                                            "prop_key": "description.identificationInfo.aggregationInfo.keyword"
-                                        },
-                                        {
-                                            "key": "thesaurusName",
-                                            "type": "text",
-                                            "title": "thesaurusName",
-                                            "prop_key": "description.identificationInfo.aggregationInfo.thesaurusName"
-                                        }
-                                    ],
-                                    "prop_key": "description.identificationInfo.aggregationInfo"
+                                    "props": []
+                                },
+                                {
+                                    "key": "aggregationInfo.aggregateDataSetName",
+                                    "type": "text",
+                                    "title": "Aggregate dataset name"
+                                },
+                                {
+                                    "key": "aggregationInfo.aggregateDataSetIdentifier",
+                                    "type": "text",
+                                    "title": "Aggregate dataset identifier"
+                                },
+                                {
+                                    "key": "aggregationInfo.associationType",
+                                    "type": "text",
+                                    "title": "Association type"
+                                },
+                                {
+                                    "key": "aggregationInfo.initiativeType",
+                                    "type": "text",
+                                    "title": "Type of initiative"
                                 },
                                 {
                                     "key": "extent.geographicElement",
-                                    "title": "Extent",
+                                    "title": "Geographic element",
                                     "type": "nested_array",
                                     "props": [
                                         {
@@ -1639,6 +1705,2230 @@
                                         }
                                     ],
                                     "prop_key": "description.identificationInfo.serviceIdentification.operatesOn"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "key": "description.contentInfo_section",
+                    "title": "ContentInfo",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "description.contentInfo",
+                            "title": "ContentInfo",
+                            "type": "nested_array",
+                            "props": [
+                                {
+                                    "key": "featureCatalogueDescription",
+                                    "title": "Feature catalogue description",
+                                    "type": "section"
+                                },
+                                {
+                                    "key": "featureCatalogueDescription.complianceCode",
+                                    "title": "Compliance code (boolean)",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "featureCatalogueDescription.language",
+                                    "title": "Language",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "featureCatalogueDescription.includedWithDataset",
+                                    "title": "Included with dataset (boolean)",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "featureCatalogueDescription.featureCatalogueCitation",
+                                    "title": "FeatureCatalogueCitation",
+                                    "type": "section"
+                                },
+                                {
+                                    "key": "featureCatalogueDescription.featureCatalogueCitation",
+                                    "title": "FeatureCatalogueCitation",
+                                    "type": "section"
+                                },
+                                {
+                                    "key": "featureCatalogueDescription.featureCatalogueCitation.title",
+                                    "title": "Title",
+                                    "type": "string",
+                                    "prop_key": "description.identificationInfo.featureCatalogueDescription.featureCatalogueCitation.title"
+                                },
+                                {
+                                    "key": "featureCatalogueDescription.featureCatalogueCitation.alternateTitle",
+                                    "title": "Alternate title",
+                                    "type": "string",
+                                    "prop_key": "description.identificationInfo.featureCatalogueDescription.featureCatalogueCitation.alternateTitle"
+                                },
+                                {
+                                    "key": "featureCatalogueDescription.featureCatalogueCitation.date",
+                                    "title": "Date",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "date",
+                                            "type": "text",
+                                            "title": "Date (YYYY-MM-DD)",
+                                            "prop_key": "description.identificationInfo.featureCatalogueDescription.featureCatalogueCitation.date.date"
+                                        },
+                                        {
+                                            "key": "type",
+                                            "type": "text",
+                                            "title": "Type",
+                                            "help_text": "Date type e.g. publication, revision, creation",
+                                            "prop_key": "description.identificationInfo.featureCatalogueDescription.featureCatalogueCitation.date.type"
+                                        }
+                                    ],
+                                    "prop_key": "description.identificationInfo.featureCatalogueDescription.featureCatalogueCitation.date"
+                                },
+                                {
+                                    "key": "featureCatalogueDescription.featureCatalogueCitation.edition",
+                                    "title": "Edition",
+                                    "type": "string",
+                                    "prop_key": "description.identificationInfo.featureCatalogueDescription.featureCatalogueCitation.edition"
+                                },
+                                {
+                                    "key": "featureCatalogueDescription.featureCatalogueCitation.editionDate",
+                                    "title": "Edition date",
+                                    "type": "string",
+                                    "prop_key": "description.identificationInfo.featureCatalogueDescription.featureCatalogueCitation.editionDate"
+                                },
+                                {
+                                    "key": "featureCatalogueDescription.featureCatalogueCitation.identifier.authority",
+                                    "title": "Authority (identifier)",
+                                    "type": "string",
+                                    "prop_key": "description.identificationInfo.citation.identifier.authority"
+                                },
+                                {
+                                    "key": "featureCatalogueDescription.featureCatalogueCitation.identifier.code",
+                                    "title": "Code (identifier)",
+                                    "type": "string",
+                                    "prop_key": "description.identificationInfo.citation.identifier.code"
+                                },
+                                {
+                                    "key": "featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty",
+                                    "type": "nested_array",
+                                    "title": "Responsible party",
+                                    "props": [
+                                        {
+                                            "key": "individualName",
+                                            "title": "Individual name",
+                                            "type": "string",
+                                            "prop_key": "description.contact.individualName"
+                                        },
+                                        {
+                                            "key": "organisationName",
+                                            "title": "Organisation name",
+                                            "type": "string",
+                                            "prop_key": "description.contact.organisationName"
+                                        },
+                                        {
+                                            "key": "positionName",
+                                            "title": "Position",
+                                            "type": "string",
+                                            "prop_key": "description.contact.positionName"
+                                        },
+                                        {
+                                            "key": "contactInfo.phone.voice",
+                                            "title": "Voice",
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.phone.voice"
+                                        },
+                                        {
+                                            "key": "contactInfo.phone.facsimile",
+                                            "title": "Facsimile",
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.phone.facsimile"
+                                        },
+                                        {
+                                            "key": "contactInfo.address.deliveryPoint",
+                                            "title": "Delivery point",
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.deliveryPoint"
+                                        },
+                                        {
+                                            "key": "contactInfo.address.city",
+                                            "title": "City",
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.city"
+                                        },
+                                        {
+                                            "key": "contactInfo.address.postalCode",
+                                            "title": "Postal code",
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.postalCode"
+                                        },
+                                        {
+                                            "key": "contactInfo.address.country",
+                                            "title": "Country",
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.country"
+                                        },
+                                        {
+                                            "key": "contactInfo.address.electronicMailAddress",
+                                            "title": "Email",
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.electronicMailAddress"
+                                        },
+                                        {
+                                            "key": "contactInfo.onlineResource.linkage",
+                                            "title": "URL",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "key": "contactInfo.onlineResource.name",
+                                            "title": "Name",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "key": "contactInfo.onlineResource.description",
+                                            "title": "Description",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "key": "contactInfo.onlineResource.protocol",
+                                            "title": "Protocol",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "key": "contactInfo.onlineResource.function",
+                                            "title": "Function",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "key": "role",
+                                            "title": "Role",
+                                            "type": "string"
+                                        }
+                                    ],
+                                    "prop_key": "description.identificationInfo.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty"
+                                },
+                                {
+                                    "key": "featureCatalogueDescription.featureCatalogueCitation.presentationForm",
+                                    "title": "Resource presentation",
+                                    "type": "dropdown",
+                                    "enum": [
+                                        "documentDigital",
+                                        "imageDigital",
+                                        "documentHardcopy",
+                                        "imageHardcopy",
+                                        "mapDigital",
+                                        "mapHardcopy",
+                                        "modelDigital",
+                                        "modelHardcopy",
+                                        "profileDigital",
+                                        "profileHardcopy",
+                                        "tableDigital",
+                                        "tableHardcopy",
+                                        "videoDigital",
+                                        "videoHardcopy",
+                                        "audioDigital",
+                                        "audioHardcopy",
+                                        "multimediaDigital",
+                                        "multimediaHardcopy",
+                                        "physicalSample",
+                                        "diagramDigital",
+                                        "diagramHardcopy"
+                                    ],
+                                    "prop_key": "description.identificationInfo.citation.presentationForm"
+                                },
+                                {
+                                    "key": "featureCatalogueDescription.featureCatalogueCitation.series_section",
+                                    "title": "Series",
+                                    "type": "section",
+                                    "items": []
+                                },
+                                {
+                                    "key": "featureCatalogueDescription.featureCatalogueCitation.series.name",
+                                    "title": "Series name",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "featureCatalogueDescription.featureCatalogueCitation.series.issueIdentification",
+                                    "title": "Identification of the series issue",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "featureCatalogueDescription.featureCatalogueCitation.series.page",
+                                    "title": "Page",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "featureCatalogueDescription.featureCatalogueCitation.otherCitationDetails",
+                                    "title": "Other citation details",
+                                    "type": "textarea",
+                                    "prop_key": "description.identificationInfo.featureCatalogueDescription.featureCatalogueCitation.otherCitationDetails"
+                                },
+                                {
+                                    "key": "featureCatalogueDescription.featureCatalogueCitation.collectiveTitle",
+                                    "title": "Collective title",
+                                    "type": "text",
+                                    "prop_key": "description.identificationInfo.featureCatalogueDescription.featureCatalogueCitation.collectiveTitle"
+                                },
+                                {
+                                    "key": "featureCatalogueDescription.featureCatalogueCitation.ISBN",
+                                    "title": "ISBN",
+                                    "type": "text",
+                                    "prop_key": "description.identificationInfo.featureCatalogueDescription.featureCatalogueCitation.ISBN"
+                                },
+                                {
+                                    "key": "featureCatalogueDescription.featureCatalogueCitation.ISSN",
+                                    "title": "ISSN",
+                                    "type": "text",
+                                    "prop_key": "description.identificationInfo.featureCatalogueDescription.featureCatalogueCitation.ISSN"
+                                },
+                                {
+                                    "key": "featureCatalogueDescription.coverageDescription",
+                                    "title": "Coverage Description",
+                                    "type": "section",
+                                    "items": []
+                                },
+                                {
+                                    "key": "featureCatalogueDescription.coverageDescription.contentType",
+                                    "title": "Content type",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "featureCatalogueDescription.coverageDescription.dimension",
+                                    "title": "Dimension",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "name",
+                                            "title": "Name",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "type",
+                                            "title": "Type",
+                                            "type": "text"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "key": "description.distributionInfo",
+                    "title": "distributionInfo",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "description.distributionInfo.distributionFormat",
+                            "title": "Distribution format",
+                            "type": "nested_array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "type": "text",
+                                    "title": "Name",
+                                    "prop_key": "description.identificationInfo.resourceFormat.name"
+                                },
+                                {
+                                    "key": "version",
+                                    "type": "text",
+                                    "title": "Version",
+                                    "prop_key": "description.identificationInfo.resourceFormat.version"
+                                },
+                                {
+                                    "key": "amendmentNumber",
+                                    "type": "text",
+                                    "title": "Amendment number",
+                                    "help_text": "Format version amendment number",
+                                    "prop_key": "description.identificationInfo.resourceFormat.amendmentNumber"
+                                },
+                                {
+                                    "key": "specification",
+                                    "type": "text",
+                                    "title": "Format specification",
+                                    "prop_key": "description.identificationInfo.resourceFormat.specification"
+                                },
+                                {
+                                    "key": "fileDecompressionTechnique",
+                                    "type": "text",
+                                    "title": "File decompression technique",
+                                    "prop_key": "description.identificationInfo.resourceFormat.fileDecompressionTechnique"
+                                },
+                                {
+                                    "key": "formatDistributor",
+                                    "type": "section",
+                                    "title": "Format distributor",
+                                    "props": []
+                                },
+                                {
+                                    "key": "formatDistributor.individualName",
+                                    "title": "Individual name",
+                                    "type": "string",
+                                    "prop_key": "description.contact.individualName"
+                                },
+                                {
+                                    "key": "formatDistributor.organisationName",
+                                    "title": "Organisation name",
+                                    "type": "string",
+                                    "prop_key": "description.contact.organisationName"
+                                },
+                                {
+                                    "key": "formatDistributor.positionName",
+                                    "title": "Position",
+                                    "type": "string",
+                                    "prop_key": "description.contact.positionName"
+                                },
+                                {
+                                    "key": "formatDistributor.contactInfo.phone.voice",
+                                    "title": "Voice",
+                                    "type": "string",
+                                    "prop_key": "description.contact.contactInfo.phone.voice"
+                                },
+                                {
+                                    "key": "formatDistributor.contactInfo.phone.facsimile",
+                                    "title": "Facsimile",
+                                    "type": "string",
+                                    "prop_key": "description.contact.contactInfo.phone.facsimile"
+                                },
+                                {
+                                    "key": "formatDistributor.contactInfo.address.deliveryPoint",
+                                    "title": "Delivery point",
+                                    "type": "string",
+                                    "prop_key": "description.contact.contactInfo.address.deliveryPoint"
+                                },
+                                {
+                                    "key": "formatDistributor.contactInfo.address.city",
+                                    "title": "City",
+                                    "type": "string",
+                                    "prop_key": "description.contact.contactInfo.address.city"
+                                },
+                                {
+                                    "key": "formatDistributor.contactInfo.address.postalCode",
+                                    "title": "Postal code",
+                                    "type": "string",
+                                    "prop_key": "description.contact.contactInfo.address.postalCode"
+                                },
+                                {
+                                    "key": "formatDistributor.contactInfo.address.country",
+                                    "title": "Country",
+                                    "type": "string",
+                                    "prop_key": "description.contact.contactInfo.address.country"
+                                },
+                                {
+                                    "key": "formatDistributor.contactInfo.address.electronicMailAddress",
+                                    "title": "Email",
+                                    "type": "string",
+                                    "prop_key": "description.contact.contactInfo.address.electronicMailAddress"
+                                },
+                                {
+                                    "key": "formatDistributor.contactInfo.onlineResource.linkage",
+                                    "title": "URL",
+                                    "type": "string"
+                                },
+                                {
+                                    "key": "formatDistributor.contactInfo.onlineResource.name",
+                                    "title": "Name",
+                                    "type": "string"
+                                },
+                                {
+                                    "key": "formatDistributor.contactInfo.onlineResource.description",
+                                    "title": "Description",
+                                    "type": "string"
+                                },
+                                {
+                                    "key": "formatDistributor.contactInfo.onlineResource.protocol",
+                                    "title": "Protocol",
+                                    "type": "string"
+                                },
+                                {
+                                    "key": "formatDistributor.contactInfo.onlineResource.function",
+                                    "title": "Function",
+                                    "type": "string"
+                                },
+                                {
+                                    "key": "formatDistributor.role",
+                                    "title": "Role",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "description.distributionInfo.distributor",
+                            "type": "nested_array",
+                            "title": "Distributor",
+                            "props": [
+                                {
+                                    "key": "individualName",
+                                    "title": "Individual name",
+                                    "type": "string",
+                                    "prop_key": "description.contact.individualName"
+                                },
+                                {
+                                    "key": "organisationName",
+                                    "title": "Organisation name",
+                                    "type": "string",
+                                    "prop_key": "description.contact.organisationName"
+                                },
+                                {
+                                    "key": "positionName",
+                                    "title": "Position",
+                                    "type": "string",
+                                    "prop_key": "description.contact.positionName"
+                                },
+                                {
+                                    "key": "contactInfo.phone.voice",
+                                    "title": "Voice",
+                                    "type": "string",
+                                    "prop_key": "description.contact.contactInfo.phone.voice"
+                                },
+                                {
+                                    "key": "contactInfo.phone.facsimile",
+                                    "title": "Facsimile",
+                                    "type": "string",
+                                    "prop_key": "description.contact.contactInfo.phone.facsimile"
+                                },
+                                {
+                                    "key": "contactInfo.address.deliveryPoint",
+                                    "title": "Delivery point",
+                                    "type": "string",
+                                    "prop_key": "description.contact.contactInfo.address.deliveryPoint"
+                                },
+                                {
+                                    "key": "contactInfo.address.city",
+                                    "title": "City",
+                                    "type": "string",
+                                    "prop_key": "description.contact.contactInfo.address.city"
+                                },
+                                {
+                                    "key": "contactInfo.address.postalCode",
+                                    "title": "Postal code",
+                                    "type": "string",
+                                    "prop_key": "description.contact.contactInfo.address.postalCode"
+                                },
+                                {
+                                    "key": "contactInfo.address.country",
+                                    "title": "Country",
+                                    "type": "string",
+                                    "prop_key": "description.contact.contactInfo.address.country"
+                                },
+                                {
+                                    "key": "contactInfo.address.electronicMailAddress",
+                                    "title": "Email",
+                                    "type": "string",
+                                    "prop_key": "description.contact.contactInfo.address.electronicMailAddress"
+                                },
+                                {
+                                    "key": "contactInfo.onlineResource.linkage",
+                                    "title": "URL",
+                                    "type": "string"
+                                },
+                                {
+                                    "key": "contactInfo.onlineResource.name",
+                                    "title": "Name",
+                                    "type": "string"
+                                },
+                                {
+                                    "key": "contactInfo.onlineResource.description",
+                                    "title": "Description",
+                                    "type": "string"
+                                },
+                                {
+                                    "key": "contactInfo.onlineResource.protocol",
+                                    "title": "Protocol",
+                                    "type": "string"
+                                },
+                                {
+                                    "key": "contactInfo.onlineResource.function",
+                                    "title": "Function",
+                                    "type": "string"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Role",
+                                    "type": "string"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "key": "description.dataQualityInfo_section",
+                    "title": "dataQualityInfo",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "description.dataQualityInfo",
+                            "title": "dataQualityInfo",
+                            "type": "nested_array",
+                            "props": [
+                                {
+                                    "key": "scope",
+                                    "title": "Scope",
+                                    "type": "text",
+                                    "enum": [
+                                        "attribute",
+                                        "attributeType",
+                                        "collectionHardware",
+                                        "collectionSession",
+                                        "dataset",
+                                        "series",
+                                        "nonGeographicDataset",
+                                        "dimensionGroup",
+                                        "feature",
+                                        "featureType",
+                                        "propertyType",
+                                        "fieldSession",
+                                        "software",
+                                        "service",
+                                        "model",
+                                        "tile",
+                                        "initiative",
+                                        "stereomate",
+                                        "sensor",
+                                        "platformSeries",
+                                        "sensorSeries",
+                                        "productionSeries",
+                                        "transferAggregate",
+                                        "otherAggregate"
+                                    ]
+                                },
+                                {
+                                    "key": "report",
+                                    "title": "Report",
+                                    "type": "nested_array",
+                                    "props": [
+                                        {
+                                            "key": "DQ_DomainConsistency.result.nameOfMeasure",
+                                            "title": "Name of measure",
+                                            "type": "simple_array"
+                                        },
+                                        {
+                                            "key": "DQ_DomainConsistency.result.measureIdentification",
+                                            "title": "Measure identification",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "DQ_DomainConsistency.result.measureDescription",
+                                            "title": "Measure description",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "DQ_DomainConsistency.result.evaluationMethodType",
+                                            "title": "Evaluation method type",
+                                            "type": "simple_array"
+                                        },
+                                        {
+                                            "key": "DQ_DomainConsistency.result.evaluationMethodDescription",
+                                            "title": "evaluationMethodDescription",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "DQ_DomainConsistency.result.evaluationProcedure.title",
+                                            "title": "Title",
+                                            "type": "string",
+                                            "prop_key": "description.identificationInfo.DQ_DomainConsistency.result.evaluationProcedure.title"
+                                        },
+                                        {
+                                            "key": "DQ_DomainConsistency.result.evaluationProcedure.alternateTitle",
+                                            "title": "Alternate title",
+                                            "type": "string",
+                                            "prop_key": "description.identificationInfo.DQ_DomainConsistency.result.evaluationProcedure.alternateTitle"
+                                        },
+                                        {
+                                            "key": "DQ_DomainConsistency.result.evaluationProcedure.date",
+                                            "title": "Date",
+                                            "type": "array",
+                                            "props": [
+                                                {
+                                                    "key": "date",
+                                                    "type": "text",
+                                                    "title": "Date (YYYY-MM-DD)",
+                                                    "prop_key": "description.identificationInfo.DQ_DomainConsistency.result.evaluationProcedure.date.date"
+                                                },
+                                                {
+                                                    "key": "type",
+                                                    "type": "text",
+                                                    "title": "Type",
+                                                    "help_text": "Date type e.g. publication, revision, creation",
+                                                    "prop_key": "description.identificationInfo.DQ_DomainConsistency.result.evaluationProcedure.date.type"
+                                                }
+                                            ],
+                                            "prop_key": "description.identificationInfo.DQ_DomainConsistency.result.evaluationProcedure.date"
+                                        },
+                                        {
+                                            "key": "DQ_DomainConsistency.result.evaluationProcedure.edition",
+                                            "title": "Edition",
+                                            "type": "string",
+                                            "prop_key": "description.identificationInfo.DQ_DomainConsistency.result.evaluationProcedure.edition"
+                                        },
+                                        {
+                                            "key": "DQ_DomainConsistency.result.evaluationProcedure.editionDate",
+                                            "title": "Edition date",
+                                            "type": "string",
+                                            "prop_key": "description.identificationInfo.DQ_DomainConsistency.result.evaluationProcedure.editionDate"
+                                        },
+                                        {
+                                            "key": "DQ_DomainConsistency.result.evaluationProcedure.identifier.authority",
+                                            "title": "Authority (identifier)",
+                                            "type": "string",
+                                            "prop_key": "description.identificationInfo.DQ_DomainConsistency.result.evaluationProcedure.identifier.authority"
+                                        },
+                                        {
+                                            "key": "DQ_DomainConsistency.result.evaluationProcedure.identifier.code",
+                                            "title": "Code (identifier)",
+                                            "type": "string",
+                                            "prop_key": "description.identificationInfo.DQ_DomainConsistency.result.evaluationProcedure.identifier.code"
+                                        },
+                                        {
+                                            "key": "DQ_DomainConsistency.result.evaluationProcedure.citedResponsibleParty",
+                                            "type": "nested_array",
+                                            "title": "Responsible party",
+                                            "props": [
+                                                {
+                                                    "key": "individualName",
+                                                    "title": "Individual name",
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.individualName"
+                                                },
+                                                {
+                                                    "key": "organisationName",
+                                                    "title": "Organisation name",
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.organisationName"
+                                                },
+                                                {
+                                                    "key": "positionName",
+                                                    "title": "Position",
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.positionName"
+                                                },
+                                                {
+                                                    "key": "contactInfo.phone.voice",
+                                                    "title": "Voice",
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.contactInfo.phone.voice"
+                                                },
+                                                {
+                                                    "key": "contactInfo.phone.facsimile",
+                                                    "title": "Facsimile",
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.contactInfo.phone.facsimile"
+                                                },
+                                                {
+                                                    "key": "contactInfo.address.deliveryPoint",
+                                                    "title": "Delivery point",
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.contactInfo.address.deliveryPoint"
+                                                },
+                                                {
+                                                    "key": "contactInfo.address.city",
+                                                    "title": "City",
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.contactInfo.address.city"
+                                                },
+                                                {
+                                                    "key": "contactInfo.address.postalCode",
+                                                    "title": "Postal code",
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.contactInfo.address.postalCode"
+                                                },
+                                                {
+                                                    "key": "contactInfo.address.country",
+                                                    "title": "Country",
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.contactInfo.address.country"
+                                                },
+                                                {
+                                                    "key": "contactInfo.address.electronicMailAddress",
+                                                    "title": "Email",
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.contactInfo.address.electronicMailAddress"
+                                                },
+                                                {
+                                                    "key": "contactInfo.onlineResource.linkage",
+                                                    "title": "URL",
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "key": "contactInfo.onlineResource.name",
+                                                    "title": "Name",
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "key": "contactInfo.onlineResource.description",
+                                                    "title": "Description",
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "key": "contactInfo.onlineResource.protocol",
+                                                    "title": "Protocol",
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "key": "contactInfo.onlineResource.function",
+                                                    "title": "Function",
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "key": "role",
+                                                    "title": "Role",
+                                                    "type": "string"
+                                                }
+                                            ],
+                                            "prop_key": "description.identificationInfo.DQ_DomainConsistency.result.evaluationProcedure.citedResponsibleParty"
+                                        },
+                                        {
+                                            "key": "DQ_DomainConsistency.result.evaluationProcedure.presentationForm",
+                                            "title": "Resource presentation",
+                                            "type": "dropdown",
+                                            "enum": [
+                                                "documentDigital",
+                                                "imageDigital",
+                                                "documentHardcopy",
+                                                "imageHardcopy",
+                                                "mapDigital",
+                                                "mapHardcopy",
+                                                "modelDigital",
+                                                "modelHardcopy",
+                                                "profileDigital",
+                                                "profileHardcopy",
+                                                "tableDigital",
+                                                "tableHardcopy",
+                                                "videoDigital",
+                                                "videoHardcopy",
+                                                "audioDigital",
+                                                "audioHardcopy",
+                                                "multimediaDigital",
+                                                "multimediaHardcopy",
+                                                "physicalSample",
+                                                "diagramDigital",
+                                                "diagramHardcopy"
+                                            ],
+                                            "prop_key": "description.identificationInfo.DQ_DomainConsistency.result.evaluationProcedure.presentationForm"
+                                        },
+                                        {
+                                            "key": "DQ_DomainConsistency.result.evaluationProcedure.series_section",
+                                            "title": "Series",
+                                            "type": "section",
+                                            "items": [],
+                                            "prop_key": "description.identificationInfo.DQ_DomainConsistency.result.evaluationProcedure.series_section"
+                                        },
+                                        {
+                                            "key": "DQ_DomainConsistency.result.evaluationProcedure.series.name",
+                                            "title": "Series name",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "DQ_DomainConsistency.result.evaluationProcedure.series.issueIdentification",
+                                            "title": "Identification of the series issue",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "DQ_DomainConsistency.result.evaluationProcedure.series.page",
+                                            "title": "Page",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "DQ_DomainConsistency.result.evaluationProcedure.otherCitationDetails",
+                                            "title": "Other citation details",
+                                            "type": "textarea",
+                                            "prop_key": "description.identificationInfo.DQ_DomainConsistency.result.evaluationProcedure.otherCitationDetails"
+                                        },
+                                        {
+                                            "key": "DQ_DomainConsistency.result.evaluationProcedure.collectiveTitle",
+                                            "title": "Collective title",
+                                            "type": "text",
+                                            "prop_key": "description.identificationInfo.DQ_DomainConsistency.result.evaluationProcedure.collectiveTitle"
+                                        },
+                                        {
+                                            "key": "DQ_DomainConsistency.result.evaluationProcedure.ISBN",
+                                            "title": "ISBN",
+                                            "type": "text",
+                                            "prop_key": "description.identificationInfo.DQ_DomainConsistency.result.evaluationProcedure.ISBN"
+                                        },
+                                        {
+                                            "key": "DQ_DomainConsistency.result.evaluationProcedure.ISSN",
+                                            "title": "ISSN",
+                                            "type": "text",
+                                            "prop_key": "description.identificationInfo.DQ_DomainConsistency.result.evaluationProcedure.ISSN"
+                                        },
+                                        {
+                                            "key": "DQ_DomainConsistency.result.dateTime",
+                                            "title": "dateTime",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "DQ_DomainConsistency.result.result",
+                                            "title": "Results of consistency",
+                                            "type": "nested_array",
+                                            "props": [
+                                                {
+                                                    "key": "specification.title",
+                                                    "title": "Title",
+                                                    "type": "string",
+                                                    "prop_key": "description.identificationInfo.specification.title"
+                                                },
+                                                {
+                                                    "key": "specification.alternateTitle",
+                                                    "title": "Alternate title",
+                                                    "type": "string",
+                                                    "prop_key": "description.identificationInfo.specification.alternateTitle"
+                                                },
+                                                {
+                                                    "key": "specification.date",
+                                                    "title": "Date",
+                                                    "type": "array",
+                                                    "props": [
+                                                        {
+                                                            "key": "date",
+                                                            "type": "text",
+                                                            "title": "Date (YYYY-MM-DD)",
+                                                            "prop_key": "description.identificationInfo.specification.date.date"
+                                                        },
+                                                        {
+                                                            "key": "type",
+                                                            "type": "text",
+                                                            "title": "Type",
+                                                            "help_text": "Date type e.g. publication, revision, creation",
+                                                            "prop_key": "description.identificationInfo.specification.date.type"
+                                                        }
+                                                    ],
+                                                    "prop_key": "description.identificationInfo.specification.date"
+                                                },
+                                                {
+                                                    "key": "specification.edition",
+                                                    "title": "Edition",
+                                                    "type": "string",
+                                                    "prop_key": "description.identificationInfo.specification.edition"
+                                                },
+                                                {
+                                                    "key": "specification.editionDate",
+                                                    "title": "Edition date",
+                                                    "type": "string",
+                                                    "prop_key": "description.identificationInfo.specification.editionDate"
+                                                },
+                                                {
+                                                    "key": "specification.identifier.authority",
+                                                    "title": "Authority (identifier)",
+                                                    "type": "string",
+                                                    "prop_key": "description.identificationInfo.specification.identifier.authority"
+                                                },
+                                                {
+                                                    "key": "specification.identifier.code",
+                                                    "title": "Code (identifier)",
+                                                    "type": "string",
+                                                    "prop_key": "description.identificationInfo.specification.identifier.code"
+                                                },
+                                                {
+                                                    "key": "specification.citedResponsibleParty",
+                                                    "type": "nested_array",
+                                                    "title": "Responsible party",
+                                                    "props": [
+                                                        {
+                                                            "key": "individualName",
+                                                            "title": "Individual name",
+                                                            "type": "string",
+                                                            "prop_key": "description.contact.individualName"
+                                                        },
+                                                        {
+                                                            "key": "organisationName",
+                                                            "title": "Organisation name",
+                                                            "type": "string",
+                                                            "prop_key": "description.contact.organisationName"
+                                                        },
+                                                        {
+                                                            "key": "positionName",
+                                                            "title": "Position",
+                                                            "type": "string",
+                                                            "prop_key": "description.contact.positionName"
+                                                        },
+                                                        {
+                                                            "key": "contactInfo.phone.voice",
+                                                            "title": "Voice",
+                                                            "type": "string",
+                                                            "prop_key": "description.contact.contactInfo.phone.voice"
+                                                        },
+                                                        {
+                                                            "key": "contactInfo.phone.facsimile",
+                                                            "title": "Facsimile",
+                                                            "type": "string",
+                                                            "prop_key": "description.contact.contactInfo.phone.facsimile"
+                                                        },
+                                                        {
+                                                            "key": "contactInfo.address.deliveryPoint",
+                                                            "title": "Delivery point",
+                                                            "type": "string",
+                                                            "prop_key": "description.contact.contactInfo.address.deliveryPoint"
+                                                        },
+                                                        {
+                                                            "key": "contactInfo.address.city",
+                                                            "title": "City",
+                                                            "type": "string",
+                                                            "prop_key": "description.contact.contactInfo.address.city"
+                                                        },
+                                                        {
+                                                            "key": "contactInfo.address.postalCode",
+                                                            "title": "Postal code",
+                                                            "type": "string",
+                                                            "prop_key": "description.contact.contactInfo.address.postalCode"
+                                                        },
+                                                        {
+                                                            "key": "contactInfo.address.country",
+                                                            "title": "Country",
+                                                            "type": "string",
+                                                            "prop_key": "description.contact.contactInfo.address.country"
+                                                        },
+                                                        {
+                                                            "key": "contactInfo.address.electronicMailAddress",
+                                                            "title": "Email",
+                                                            "type": "string",
+                                                            "prop_key": "description.contact.contactInfo.address.electronicMailAddress"
+                                                        },
+                                                        {
+                                                            "key": "contactInfo.onlineResource.linkage",
+                                                            "title": "URL",
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "key": "contactInfo.onlineResource.name",
+                                                            "title": "Name",
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "key": "contactInfo.onlineResource.description",
+                                                            "title": "Description",
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "key": "contactInfo.onlineResource.protocol",
+                                                            "title": "Protocol",
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "key": "contactInfo.onlineResource.function",
+                                                            "title": "Function",
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "key": "role",
+                                                            "title": "Role",
+                                                            "type": "string"
+                                                        }
+                                                    ],
+                                                    "prop_key": "description.identificationInfo.specification.citedResponsibleParty"
+                                                },
+                                                {
+                                                    "key": "specification.presentationForm",
+                                                    "title": "Resource presentation",
+                                                    "type": "dropdown",
+                                                    "enum": [
+                                                        "documentDigital",
+                                                        "imageDigital",
+                                                        "documentHardcopy",
+                                                        "imageHardcopy",
+                                                        "mapDigital",
+                                                        "mapHardcopy",
+                                                        "modelDigital",
+                                                        "modelHardcopy",
+                                                        "profileDigital",
+                                                        "profileHardcopy",
+                                                        "tableDigital",
+                                                        "tableHardcopy",
+                                                        "videoDigital",
+                                                        "videoHardcopy",
+                                                        "audioDigital",
+                                                        "audioHardcopy",
+                                                        "multimediaDigital",
+                                                        "multimediaHardcopy",
+                                                        "physicalSample",
+                                                        "diagramDigital",
+                                                        "diagramHardcopy"
+                                                    ],
+                                                    "prop_key": "description.identificationInfo.specification.presentationForm"
+                                                },
+                                                {
+                                                    "key": "specification.series_section",
+                                                    "title": "Series",
+                                                    "type": "section",
+                                                    "items": [],
+                                                    "prop_key": "description.identificationInfo.specification.series_section"
+                                                },
+                                                {
+                                                    "key": "specification.series.name",
+                                                    "title": "Series name",
+                                                    "type": "text"
+                                                },
+                                                {
+                                                    "key": "specification.series.issueIdentification",
+                                                    "title": "Identification of the series issue",
+                                                    "type": "text"
+                                                },
+                                                {
+                                                    "key": "specification.series.page",
+                                                    "title": "Page",
+                                                    "type": "text"
+                                                },
+                                                {
+                                                    "key": "specification.otherCitationDetails",
+                                                    "title": "Other citation details",
+                                                    "type": "textarea",
+                                                    "prop_key": "description.identificationInfo.specification.otherCitationDetails"
+                                                },
+                                                {
+                                                    "key": "specification.collectiveTitle",
+                                                    "title": "Collective title",
+                                                    "type": "text",
+                                                    "prop_key": "description.identificationInfo.specification.collectiveTitle"
+                                                },
+                                                {
+                                                    "key": "specification.ISBN",
+                                                    "title": "ISBN",
+                                                    "type": "text",
+                                                    "prop_key": "description.identificationInfo.specification.ISBN"
+                                                },
+                                                {
+                                                    "key": "specification.ISSN",
+                                                    "title": "ISSN",
+                                                    "type": "text",
+                                                    "prop_key": "description.identificationInfo.specification.ISSN"
+                                                },
+                                                {
+                                                    "key": "explanation",
+                                                    "title": "Explanation",
+                                                    "type": "text"
+                                                },
+                                                {
+                                                    "key": "pass",
+                                                    "title": "Pass (boolean)",
+                                                    "type": "text"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "lineage",
+                                    "title": "Lineage",
+                                    "type": "section",
+                                    "items": []
+                                },
+                                {
+                                    "key": "lineage.statement",
+                                    "title": "Lineage statement",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "lineage.processStep",
+                                    "title": "Process statement",
+                                    "type": "nested_array",
+                                    "props": [
+                                        {
+                                            "key": "description",
+                                            "title": "Description",
+                                            "type": "textarea"
+                                        },
+                                        {
+                                            "key": "rationale",
+                                            "title": "Rationale",
+                                            "type": "textarea"
+                                        },
+                                        {
+                                            "key": "dateTime",
+                                            "title": "Date stamp",
+                                            "type": "date"
+                                        },
+                                        {
+                                            "key": "processor",
+                                            "title": "Processor",
+                                            "type": "array",
+                                            "props": [
+                                                {
+                                                    "key": "individualName",
+                                                    "title": "Individual name",
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.individualName"
+                                                },
+                                                {
+                                                    "key": "organisationName",
+                                                    "title": "Organisation name",
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.organisationName"
+                                                },
+                                                {
+                                                    "key": "positionName",
+                                                    "title": "Position",
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.positionName"
+                                                },
+                                                {
+                                                    "key": "contactInfo.phone.voice",
+                                                    "title": "Voice",
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.contactInfo.phone.voice"
+                                                },
+                                                {
+                                                    "key": "contactInfo.phone.facsimile",
+                                                    "title": "Facsimile",
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.contactInfo.phone.facsimile"
+                                                },
+                                                {
+                                                    "key": "contactInfo.address.deliveryPoint",
+                                                    "title": "Delivery point",
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.contactInfo.address.deliveryPoint"
+                                                },
+                                                {
+                                                    "key": "contactInfo.address.city",
+                                                    "title": "City",
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.contactInfo.address.city"
+                                                },
+                                                {
+                                                    "key": "contactInfo.address.postalCode",
+                                                    "title": "Postal code",
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.contactInfo.address.postalCode"
+                                                },
+                                                {
+                                                    "key": "contactInfo.address.country",
+                                                    "title": "Country",
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.contactInfo.address.country"
+                                                },
+                                                {
+                                                    "key": "contactInfo.address.electronicMailAddress",
+                                                    "title": "Email",
+                                                    "type": "string",
+                                                    "prop_key": "description.contact.contactInfo.address.electronicMailAddress"
+                                                },
+                                                {
+                                                    "key": "contactInfo.onlineResource.linkage",
+                                                    "title": "URL",
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "key": "contactInfo.onlineResource.name",
+                                                    "title": "Name",
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "key": "contactInfo.onlineResource.description",
+                                                    "title": "Description",
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "key": "contactInfo.onlineResource.protocol",
+                                                    "title": "Protocol",
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "key": "contactInfo.onlineResource.function",
+                                                    "title": "Function",
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "key": "role",
+                                                    "title": "Role",
+                                                    "type": "string"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "key": "source",
+                                            "title": "Source",
+                                            "type": "nested_array",
+                                            "props": [
+                                                {
+                                                    "key": "description",
+                                                    "title": "Description",
+                                                    "type": "textarea"
+                                                },
+                                                {
+                                                    "key": "sourceCitation.title",
+                                                    "title": "Title",
+                                                    "type": "string",
+                                                    "prop_key": "description.identificationInfo.sourceCitation.title"
+                                                },
+                                                {
+                                                    "key": "sourceCitation.alternateTitle",
+                                                    "title": "Alternate title",
+                                                    "type": "string",
+                                                    "prop_key": "description.identificationInfo.sourceCitation.alternateTitle"
+                                                },
+                                                {
+                                                    "key": "sourceCitation.date",
+                                                    "title": "Date",
+                                                    "type": "array",
+                                                    "props": [
+                                                        {
+                                                            "key": "date",
+                                                            "type": "text",
+                                                            "title": "Date (YYYY-MM-DD)",
+                                                            "prop_key": "description.identificationInfo.sourceCitation.date.date"
+                                                        },
+                                                        {
+                                                            "key": "type",
+                                                            "type": "text",
+                                                            "title": "Type",
+                                                            "help_text": "Date type e.g. publication, revision, creation",
+                                                            "prop_key": "description.identificationInfo.sourceCitation.date.type"
+                                                        }
+                                                    ],
+                                                    "prop_key": "description.identificationInfo.sourceCitation.date"
+                                                },
+                                                {
+                                                    "key": "sourceCitation.edition",
+                                                    "title": "Edition",
+                                                    "type": "string",
+                                                    "prop_key": "description.identificationInfo.sourceCitation.edition"
+                                                },
+                                                {
+                                                    "key": "sourceCitation.editionDate",
+                                                    "title": "Edition date",
+                                                    "type": "string",
+                                                    "prop_key": "description.identificationInfo.sourceCitation.editionDate"
+                                                },
+                                                {
+                                                    "key": "sourceCitation.identifier.authority",
+                                                    "title": "Authority (identifier)",
+                                                    "type": "string",
+                                                    "prop_key": "description.identificationInfo.sourceCitation.identifier.authority"
+                                                },
+                                                {
+                                                    "key": "sourceCitation.identifier.code",
+                                                    "title": "Code (identifier)",
+                                                    "type": "string",
+                                                    "prop_key": "description.identificationInfo.sourceCitation.identifier.code"
+                                                },
+                                                {
+                                                    "key": "sourceCitation.citedResponsibleParty",
+                                                    "type": "nested_array",
+                                                    "title": "Responsible party",
+                                                    "props": [
+                                                        {
+                                                            "key": "individualName",
+                                                            "title": "Individual name",
+                                                            "type": "string",
+                                                            "prop_key": "description.contact.individualName"
+                                                        },
+                                                        {
+                                                            "key": "organisationName",
+                                                            "title": "Organisation name",
+                                                            "type": "string",
+                                                            "prop_key": "description.contact.organisationName"
+                                                        },
+                                                        {
+                                                            "key": "positionName",
+                                                            "title": "Position",
+                                                            "type": "string",
+                                                            "prop_key": "description.contact.positionName"
+                                                        },
+                                                        {
+                                                            "key": "contactInfo.phone.voice",
+                                                            "title": "Voice",
+                                                            "type": "string",
+                                                            "prop_key": "description.contact.contactInfo.phone.voice"
+                                                        },
+                                                        {
+                                                            "key": "contactInfo.phone.facsimile",
+                                                            "title": "Facsimile",
+                                                            "type": "string",
+                                                            "prop_key": "description.contact.contactInfo.phone.facsimile"
+                                                        },
+                                                        {
+                                                            "key": "contactInfo.address.deliveryPoint",
+                                                            "title": "Delivery point",
+                                                            "type": "string",
+                                                            "prop_key": "description.contact.contactInfo.address.deliveryPoint"
+                                                        },
+                                                        {
+                                                            "key": "contactInfo.address.city",
+                                                            "title": "City",
+                                                            "type": "string",
+                                                            "prop_key": "description.contact.contactInfo.address.city"
+                                                        },
+                                                        {
+                                                            "key": "contactInfo.address.postalCode",
+                                                            "title": "Postal code",
+                                                            "type": "string",
+                                                            "prop_key": "description.contact.contactInfo.address.postalCode"
+                                                        },
+                                                        {
+                                                            "key": "contactInfo.address.country",
+                                                            "title": "Country",
+                                                            "type": "string",
+                                                            "prop_key": "description.contact.contactInfo.address.country"
+                                                        },
+                                                        {
+                                                            "key": "contactInfo.address.electronicMailAddress",
+                                                            "title": "Email",
+                                                            "type": "string",
+                                                            "prop_key": "description.contact.contactInfo.address.electronicMailAddress"
+                                                        },
+                                                        {
+                                                            "key": "contactInfo.onlineResource.linkage",
+                                                            "title": "URL",
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "key": "contactInfo.onlineResource.name",
+                                                            "title": "Name",
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "key": "contactInfo.onlineResource.description",
+                                                            "title": "Description",
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "key": "contactInfo.onlineResource.protocol",
+                                                            "title": "Protocol",
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "key": "contactInfo.onlineResource.function",
+                                                            "title": "Function",
+                                                            "type": "string"
+                                                        },
+                                                        {
+                                                            "key": "role",
+                                                            "title": "Role",
+                                                            "type": "string"
+                                                        }
+                                                    ],
+                                                    "prop_key": "description.identificationInfo.sourceCitation.citedResponsibleParty"
+                                                },
+                                                {
+                                                    "key": "sourceCitation.presentationForm",
+                                                    "title": "Resource presentation",
+                                                    "type": "dropdown",
+                                                    "enum": [
+                                                        "documentDigital",
+                                                        "imageDigital",
+                                                        "documentHardcopy",
+                                                        "imageHardcopy",
+                                                        "mapDigital",
+                                                        "mapHardcopy",
+                                                        "modelDigital",
+                                                        "modelHardcopy",
+                                                        "profileDigital",
+                                                        "profileHardcopy",
+                                                        "tableDigital",
+                                                        "tableHardcopy",
+                                                        "videoDigital",
+                                                        "videoHardcopy",
+                                                        "audioDigital",
+                                                        "audioHardcopy",
+                                                        "multimediaDigital",
+                                                        "multimediaHardcopy",
+                                                        "physicalSample",
+                                                        "diagramDigital",
+                                                        "diagramHardcopy"
+                                                    ],
+                                                    "prop_key": "description.identificationInfo.sourceCitation.presentationForm"
+                                                },
+                                                {
+                                                    "key": "sourceCitation.series_section",
+                                                    "title": "Series",
+                                                    "type": "section",
+                                                    "items": [],
+                                                    "prop_key": "description.identificationInfo.sourceCitation.series_section"
+                                                },
+                                                {
+                                                    "key": "sourceCitation.series.name",
+                                                    "title": "Series name",
+                                                    "type": "text"
+                                                },
+                                                {
+                                                    "key": "sourceCitation.series.issueIdentification",
+                                                    "title": "Identification of the series issue",
+                                                    "type": "text"
+                                                },
+                                                {
+                                                    "key": "sourceCitation.series.page",
+                                                    "title": "Page",
+                                                    "type": "text"
+                                                },
+                                                {
+                                                    "key": "sourceCitation.otherCitationDetails",
+                                                    "title": "Other citation details",
+                                                    "type": "textarea",
+                                                    "prop_key": "description.identificationInfo.sourceCitation.otherCitationDetails"
+                                                },
+                                                {
+                                                    "key": "sourceCitation.collectiveTitle",
+                                                    "title": "Collective title",
+                                                    "type": "text",
+                                                    "prop_key": "description.identificationInfo.sourceCitation.collectiveTitle"
+                                                },
+                                                {
+                                                    "key": "sourceCitation.ISBN",
+                                                    "title": "ISBN",
+                                                    "type": "text",
+                                                    "prop_key": "description.identificationInfo.sourceCitation.ISBN"
+                                                },
+                                                {
+                                                    "key": "sourceCitation.ISSN",
+                                                    "title": "ISSN",
+                                                    "type": "text",
+                                                    "prop_key": "description.identificationInfo.sourceCitation.ISSN"
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "key": "description.metadataMaintenance_section",
+                    "title": "Metadata maintenance",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "description.metadataMaintenance.maintenanceAndUpdateFrequency",
+                            "title": "Metadata maintenance",
+                            "type": "text",
+                            "enum": [
+                                "continual",
+                                "daily",
+                                "weekly",
+                                "fortnightly",
+                                "monthly",
+                                "quarterly",
+                                "biannually",
+                                "annually",
+                                "asNeeded",
+                                "irregular",
+                                "notPlanned",
+                                "unknown"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "key": "description.portrayalCatalogueInfo_section",
+                    "title": "Portrayal Catalogue Info",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "portrayalCatalogueInfo.portrayalCatalogueCitation",
+                            "title": "Portrayal Catalogue info",
+                            "type": "nested_array",
+                            "props": [
+                                {
+                                    "key": "title",
+                                    "title": "Title",
+                                    "type": "string"
+                                },
+                                {
+                                    "key": "alternateTitle",
+                                    "title": "Alternate title",
+                                    "type": "string"
+                                },
+                                {
+                                    "key": "date",
+                                    "title": "Date",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "date",
+                                            "type": "text",
+                                            "title": "Date (YYYY-MM-DD)",
+                                            "prop_key": "description.identificationInfo.citation.date.date"
+                                        },
+                                        {
+                                            "key": "type",
+                                            "type": "text",
+                                            "title": "Type",
+                                            "help_text": "Date type e.g. publication, revision, creation",
+                                            "prop_key": "description.identificationInfo.citation.date.type"
+                                        }
+                                    ],
+                                    "prop_key": "description.identificationInfo.citation.date"
+                                },
+                                {
+                                    "key": "edition",
+                                    "title": "Edition",
+                                    "type": "string",
+                                    "prop_key": "description.identificationInfo.edition"
+                                },
+                                {
+                                    "key": "editionDate",
+                                    "title": "Edition date",
+                                    "type": "string",
+                                    "prop_key": "description.identificationInfo.editionDate"
+                                },
+                                {
+                                    "key": "identifier.authority",
+                                    "title": "Authority (identifier)",
+                                    "type": "string",
+                                    "prop_key": "description.identificationInfo.identifier.authority"
+                                },
+                                {
+                                    "key": "identifier.code",
+                                    "title": "Code (identifier)",
+                                    "type": "string",
+                                    "prop_key": "description.identificationInfo.identifier.code"
+                                },
+                                {
+                                    "key": "citedResponsibleParty",
+                                    "type": "nested_array",
+                                    "title": "Responsible party",
+                                    "props": [
+                                        {
+                                            "key": "individualName",
+                                            "title": "Individual name",
+                                            "type": "string",
+                                            "prop_key": "description.contact.individualName"
+                                        },
+                                        {
+                                            "key": "organisationName",
+                                            "title": "Organisation name",
+                                            "type": "string",
+                                            "prop_key": "description.contact.organisationName"
+                                        },
+                                        {
+                                            "key": "positionName",
+                                            "title": "Position",
+                                            "type": "string",
+                                            "prop_key": "description.contact.positionName"
+                                        },
+                                        {
+                                            "key": "contactInfo.phone.voice",
+                                            "title": "Voice",
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.phone.voice"
+                                        },
+                                        {
+                                            "key": "contactInfo.phone.facsimile",
+                                            "title": "Facsimile",
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.phone.facsimile"
+                                        },
+                                        {
+                                            "key": "contactInfo.address.deliveryPoint",
+                                            "title": "Delivery point",
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.deliveryPoint"
+                                        },
+                                        {
+                                            "key": "contactInfo.address.city",
+                                            "title": "City",
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.city"
+                                        },
+                                        {
+                                            "key": "contactInfo.address.postalCode",
+                                            "title": "Postal code",
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.postalCode"
+                                        },
+                                        {
+                                            "key": "contactInfo.address.country",
+                                            "title": "Country",
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.country"
+                                        },
+                                        {
+                                            "key": "contactInfo.address.electronicMailAddress",
+                                            "title": "Email",
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.electronicMailAddress"
+                                        },
+                                        {
+                                            "key": "contactInfo.onlineResource.linkage",
+                                            "title": "URL",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "key": "contactInfo.onlineResource.name",
+                                            "title": "Name",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "key": "contactInfo.onlineResource.description",
+                                            "title": "Description",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "key": "contactInfo.onlineResource.protocol",
+                                            "title": "Protocol",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "key": "contactInfo.onlineResource.function",
+                                            "title": "Function",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "key": "role",
+                                            "title": "Role",
+                                            "type": "string"
+                                        }
+                                    ],
+                                    "prop_key": "description.identificationInfo.citedResponsibleParty"
+                                },
+                                {
+                                    "key": "presentationForm",
+                                    "title": "Resource presentation",
+                                    "type": "dropdown",
+                                    "enum": [
+                                        "documentDigital",
+                                        "imageDigital",
+                                        "documentHardcopy",
+                                        "imageHardcopy",
+                                        "mapDigital",
+                                        "mapHardcopy",
+                                        "modelDigital",
+                                        "modelHardcopy",
+                                        "profileDigital",
+                                        "profileHardcopy",
+                                        "tableDigital",
+                                        "tableHardcopy",
+                                        "videoDigital",
+                                        "videoHardcopy",
+                                        "audioDigital",
+                                        "audioHardcopy",
+                                        "multimediaDigital",
+                                        "multimediaHardcopy",
+                                        "physicalSample",
+                                        "diagramDigital",
+                                        "diagramHardcopy"
+                                    ],
+                                    "prop_key": "description.identificationInfo.presentationForm"
+                                },
+                                {
+                                    "key": "series_section",
+                                    "title": "Series",
+                                    "type": "section",
+                                    "items": [],
+                                    "prop_key": "description.identificationInfo.series_section"
+                                },
+                                {
+                                    "key": "series.name",
+                                    "title": "Series name",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "series.issueIdentification",
+                                    "title": "Identification of the series issue",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "series.page",
+                                    "title": "Page",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "otherCitationDetails",
+                                    "title": "Other citation details",
+                                    "type": "textarea",
+                                    "prop_key": "description.identificationInfo.otherCitationDetails"
+                                },
+                                {
+                                    "key": "collectiveTitle",
+                                    "title": "Collective title",
+                                    "type": "text",
+                                    "prop_key": "description.identificationInfo.collectiveTitle"
+                                },
+                                {
+                                    "key": "ISBN",
+                                    "title": "ISBN",
+                                    "type": "text",
+                                    "prop_key": "description.identificationInfo.ISBN"
+                                },
+                                {
+                                    "key": "ISSN",
+                                    "title": "ISSN",
+                                    "type": "text",
+                                    "prop_key": "description.identificationInfo.ISSN"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "key": "description.thesaurusInfo_section",
+                    "title": "Thesaurus Info",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "description.thesaurusInfo",
+                            "title": "Thesaurus info",
+                            "type": "nested_array",
+                            "props": [
+                                {
+                                    "key": "title",
+                                    "title": "Title",
+                                    "type": "string",
+                                    "prop_key": "description.identificationInfo.title"
+                                },
+                                {
+                                    "key": "alternateTitle",
+                                    "title": "Alternate title",
+                                    "type": "string",
+                                    "prop_key": "description.identificationInfo.alternateTitle"
+                                },
+                                {
+                                    "key": "date",
+                                    "title": "Date",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "date",
+                                            "type": "text",
+                                            "title": "Date (YYYY-MM-DD)",
+                                            "prop_key": "description.identificationInfo.date.date"
+                                        },
+                                        {
+                                            "key": "type",
+                                            "type": "text",
+                                            "title": "Type",
+                                            "help_text": "Date type e.g. publication, revision, creation",
+                                            "prop_key": "description.identificationInfo.date.type"
+                                        }
+                                    ],
+                                    "prop_key": "description.identificationInfo.date"
+                                },
+                                {
+                                    "key": "edition",
+                                    "title": "Edition",
+                                    "type": "string",
+                                    "prop_key": "description.identificationInfo.edition"
+                                },
+                                {
+                                    "key": "editionDate",
+                                    "title": "Edition date",
+                                    "type": "string",
+                                    "prop_key": "description.identificationInfo.editionDate"
+                                },
+                                {
+                                    "key": "identifier.authority",
+                                    "title": "Authority (identifier)",
+                                    "type": "string",
+                                    "prop_key": "description.identificationInfo.identifier.authority"
+                                },
+                                {
+                                    "key": "identifier.code",
+                                    "title": "Code (identifier)",
+                                    "type": "string",
+                                    "prop_key": "description.identificationInfo.identifier.code"
+                                },
+                                {
+                                    "key": "citedResponsibleParty",
+                                    "type": "nested_array",
+                                    "title": "Responsible party",
+                                    "props": [
+                                        {
+                                            "key": "individualName",
+                                            "title": "Individual name",
+                                            "type": "string",
+                                            "prop_key": "description.contact.individualName"
+                                        },
+                                        {
+                                            "key": "organisationName",
+                                            "title": "Organisation name",
+                                            "type": "string",
+                                            "prop_key": "description.contact.organisationName"
+                                        },
+                                        {
+                                            "key": "positionName",
+                                            "title": "Position",
+                                            "type": "string",
+                                            "prop_key": "description.contact.positionName"
+                                        },
+                                        {
+                                            "key": "contactInfo.phone.voice",
+                                            "title": "Voice",
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.phone.voice"
+                                        },
+                                        {
+                                            "key": "contactInfo.phone.facsimile",
+                                            "title": "Facsimile",
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.phone.facsimile"
+                                        },
+                                        {
+                                            "key": "contactInfo.address.deliveryPoint",
+                                            "title": "Delivery point",
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.deliveryPoint"
+                                        },
+                                        {
+                                            "key": "contactInfo.address.city",
+                                            "title": "City",
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.city"
+                                        },
+                                        {
+                                            "key": "contactInfo.address.postalCode",
+                                            "title": "Postal code",
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.postalCode"
+                                        },
+                                        {
+                                            "key": "contactInfo.address.country",
+                                            "title": "Country",
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.country"
+                                        },
+                                        {
+                                            "key": "contactInfo.address.electronicMailAddress",
+                                            "title": "Email",
+                                            "type": "string",
+                                            "prop_key": "description.contact.contactInfo.address.electronicMailAddress"
+                                        },
+                                        {
+                                            "key": "contactInfo.onlineResource.linkage",
+                                            "title": "URL",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "key": "contactInfo.onlineResource.name",
+                                            "title": "Name",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "key": "contactInfo.onlineResource.description",
+                                            "title": "Description",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "key": "contactInfo.onlineResource.protocol",
+                                            "title": "Protocol",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "key": "contactInfo.onlineResource.function",
+                                            "title": "Function",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "key": "role",
+                                            "title": "Role",
+                                            "type": "string"
+                                        }
+                                    ],
+                                    "prop_key": "description.identificationInfo.citedResponsibleParty"
+                                },
+                                {
+                                    "key": "presentationForm",
+                                    "title": "Resource presentation",
+                                    "type": "dropdown",
+                                    "enum": [
+                                        "documentDigital",
+                                        "imageDigital",
+                                        "documentHardcopy",
+                                        "imageHardcopy",
+                                        "mapDigital",
+                                        "mapHardcopy",
+                                        "modelDigital",
+                                        "modelHardcopy",
+                                        "profileDigital",
+                                        "profileHardcopy",
+                                        "tableDigital",
+                                        "tableHardcopy",
+                                        "videoDigital",
+                                        "videoHardcopy",
+                                        "audioDigital",
+                                        "audioHardcopy",
+                                        "multimediaDigital",
+                                        "multimediaHardcopy",
+                                        "physicalSample",
+                                        "diagramDigital",
+                                        "diagramHardcopy"
+                                    ],
+                                    "prop_key": "description.identificationInfo.presentationForm"
+                                },
+                                {
+                                    "key": "series_section",
+                                    "title": "Series",
+                                    "type": "section",
+                                    "items": [],
+                                    "prop_key": "description.identificationInfo.series_section"
+                                },
+                                {
+                                    "key": "series.name",
+                                    "title": "Series name",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "series.issueIdentification",
+                                    "title": "Identification of the series issue",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "series.page",
+                                    "title": "Page",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "otherCitationDetails",
+                                    "title": "Other citation details",
+                                    "type": "textarea",
+                                    "prop_key": "description.identificationInfo.otherCitationDetails"
+                                },
+                                {
+                                    "key": "collectiveTitle",
+                                    "title": "Collective title",
+                                    "type": "text",
+                                    "prop_key": "description.identificationInfo.collectiveTitle"
+                                },
+                                {
+                                    "key": "ISBN",
+                                    "title": "ISBN",
+                                    "type": "text",
+                                    "prop_key": "description.identificationInfo.ISBN"
+                                },
+                                {
+                                    "key": "ISSN",
+                                    "title": "ISSN",
+                                    "type": "text",
+                                    "prop_key": "description.identificationInfo.ISSN"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "key": "description.feature_catalogue_section",
+                    "title": "Feature catalogue",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "description.feature_catalogue.name",
+                            "title": "Feature catalogue name",
+                            "type": "text"
+                        },
+                        {
+                            "key": "description.feature_catalogue.scope",
+                            "title": "Scope",
+                            "type": "simple_array"
+                        },
+                        {
+                            "key": "description.feature_catalogue.fieldOfApplication",
+                            "title": "Field of application",
+                            "type": "simple_array"
+                        },
+                        {
+                            "key": "description.feature_catalogue.versionNumber",
+                            "title": "Version number",
+                            "type": "text"
+                        },
+                        {
+                            "key": "description.feature_catalogue.versionDate.date",
+                            "title": "Version date (ISO 8601)",
+                            "type": "text"
+                        },
+                        {
+                            "key": "description.feature_catalogue.versionDate.type",
+                            "title": "Version date type",
+                            "type": "text",
+                            "enum": [
+                                "publication",
+                                "revision",
+                                "creation",
+                                "expiry",
+                                "lastUpdate",
+                                "lastRevision",
+                                "deprecated"
+                            ]
+                        },
+                        {
+                            "key": "producer_section",
+                            "title": "Producer",
+                            "type": "section"
+                        },
+                        {
+                            "key": "description.feature_catalogue.producer.individualName",
+                            "title": "Individual name",
+                            "type": "string",
+                            "prop_key": "description.contact.individualName"
+                        },
+                        {
+                            "key": "description.feature_catalogue.producer.organisationName",
+                            "title": "Organisation name",
+                            "type": "string",
+                            "prop_key": "description.contact.organisationName"
+                        },
+                        {
+                            "key": "description.feature_catalogue.producer.positionName",
+                            "title": "Position",
+                            "type": "string",
+                            "prop_key": "description.contact.positionName"
+                        },
+                        {
+                            "key": "description.feature_catalogue.producer.contactInfo.phone.voice",
+                            "title": "Voice",
+                            "type": "string",
+                            "prop_key": "description.contact.contactInfo.phone.voice"
+                        },
+                        {
+                            "key": "description.feature_catalogue.producer.contactInfo.phone.facsimile",
+                            "title": "Facsimile",
+                            "type": "string",
+                            "prop_key": "description.contact.contactInfo.phone.facsimile"
+                        },
+                        {
+                            "key": "description.feature_catalogue.producer.contactInfo.address.deliveryPoint",
+                            "title": "Delivery point",
+                            "type": "string",
+                            "prop_key": "description.contact.contactInfo.address.deliveryPoint"
+                        },
+                        {
+                            "key": "description.feature_catalogue.producer.contactInfo.address.city",
+                            "title": "City",
+                            "type": "string",
+                            "prop_key": "description.contact.contactInfo.address.city"
+                        },
+                        {
+                            "key": "description.feature_catalogue.producer.contactInfo.address.postalCode",
+                            "title": "Postal code",
+                            "type": "string",
+                            "prop_key": "description.contact.contactInfo.address.postalCode"
+                        },
+                        {
+                            "key": "description.feature_catalogue.producer.contactInfo.address.country",
+                            "title": "Country",
+                            "type": "string",
+                            "prop_key": "description.contact.contactInfo.address.country"
+                        },
+                        {
+                            "key": "description.feature_catalogue.producer.contactInfo.address.electronicMailAddress",
+                            "title": "Email",
+                            "type": "string",
+                            "prop_key": "description.contact.contactInfo.address.electronicMailAddress"
+                        },
+                        {
+                            "key": "description.feature_catalogue.producer.contactInfo.onlineResource.linkage",
+                            "title": "URL",
+                            "type": "string"
+                        },
+                        {
+                            "key": "description.feature_catalogue.producer.contactInfo.onlineResource.name",
+                            "title": "Name",
+                            "type": "string"
+                        },
+                        {
+                            "key": "description.feature_catalogue.producer.contactInfo.onlineResource.description",
+                            "title": "Description",
+                            "type": "string"
+                        },
+                        {
+                            "key": "description.feature_catalogue.producer.contactInfo.onlineResource.protocol",
+                            "title": "Protocol",
+                            "type": "string"
+                        },
+                        {
+                            "key": "description.feature_catalogue.producer.contactInfo.onlineResource.function",
+                            "title": "Function",
+                            "type": "string"
+                        },
+                        {
+                            "key": "description.feature_catalogue.producer.role",
+                            "title": "Role",
+                            "type": "string"
+                        },
+                        {
+                            "key": "description.feature_catalogue.functionalLanguage",
+                            "title": "Functional language",
+                            "type": "string"
+                        },
+                        {
+                            "key": "description.feature_catalogue.featureType",
+                            "title": "Feature type",
+                            "type": "nested_array",
+                            "props": [
+                                {
+                                    "key": "typeName",
+                                    "title": "Type name",
+                                    "type": "string"
+                                },
+                                {
+                                    "key": "definition",
+                                    "title": "Definition",
+                                    "type": "textarea"
+                                },
+                                {
+                                    "key": "code",
+                                    "title": "Code",
+                                    "type": "string"
+                                },
+                                {
+                                    "key": "isAbstract",
+                                    "title": "isAbstract (boolean)",
+                                    "type": "string"
+                                },
+                                {
+                                    "key": "aliases",
+                                    "title": "Aliases",
+                                    "type": "simple_array"
+                                },
+                                {
+                                    "key": "carrierOfCharacteristics",
+                                    "title": "carrierOfCharacteristics",
+                                    "type": "nested_array",
+                                    "props": [
+                                        {
+                                            "key": "memberName",
+                                            "title": "Member name",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "definition",
+                                            "title": "Definition",
+                                            "type": "textarea"
+                                        },
+                                        {
+                                            "key": "cardinality.lower",
+                                            "title": "Cardinality lower (number)",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "cardinality.upper",
+                                            "title": "Cardinality upper (number)",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "code",
+                                            "title": "Code",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "valueMeasurementUnit",
+                                            "title": "valueMeasurementUnit",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "valueType",
+                                            "title": "valueType",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "listedValue",
+                                            "title": "Listed values",
+                                            "type": "array",
+                                            "props": [
+                                                {
+                                                    "key": "label",
+                                                    "title": "Label",
+                                                    "type": "text"
+                                                },
+                                                {
+                                                    "key": "code",
+                                                    "title": "Code",
+                                                    "type": "text"
+                                                },
+                                                {
+                                                    "key": "definition",
+                                                    "title": "Definition",
+                                                    "type": "text"
+                                                }
+                                            ]
+                                        }
+                                    ]
                                 }
                             ]
                         }

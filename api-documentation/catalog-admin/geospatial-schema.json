@@ -862,38 +862,30 @@
 										"items": {
 											"type": "object",
 											"properties": {
-												"dimension": {
-													"title": "Grid dimension",
-													"description": "Definition of a grid dimension including its name, size and resolution",
-													"type": "object",
-													"_xpath": "gmd:spatialRepresentationInfo/gmd:MD_GridSpatialRepresentation/gmd:axisDimensionProperties/gmd:MD_Dimension",
+												"dimensionName": {
+													"title": "Dimension name type",
+													"description": "name type of the dimension. Codelist value according to the [ISO/TS 19139](http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_DimensionNameTypeCode) DimensionNameType codelist. Possible values: {`row`, `column`, `vertical`, `track`, `crossTrack`, `line`, `sample`, `time`}",
+													"type": "string",
+													"_xpath": "gmd:spatialRepresentationInfo/gmd:MD_GridSpatialRepresentation/gmd:axisDimensionProperties/gmd:MD_Dimension/gmd:dimensionName/gmd:MD_DimensionNameTypeCode"
+												},
+												"dimensionSize": {
+													"title": "Dimension size",
+													"description": "Size of the dimension",
+													"type": "integer",
+													"_xpath": "gmd:spatialRepresentationInfo/gmd:MD_GridSpatialRepresentation/gmd:axisDimensionProperties/gmd:MD_Dimension/gmd:dimensionSize/gco:Integer"
+												},
+												"resolution": {
+													"title": "Dimension resolution",
+													"description": "Resolution associated to the dimension. The resolution is handled as 'measure' which could be either a length, distance [special measure of length), angle or scale.",
+													"type": "number",
+													"_xpath": "gmd:spatialRepresentationInfo/gmd:MD_GridSpatialRepresentation/gmd:axisDimensionProperties/gmd:MD_Dimension/gmd:dimensionSize/gco:Measure",
+													"_xpath_note": "gco:Measure is an abstract element, use sub-classes gco:Length/gco:Distance/gco:Angle/gco:Scale",
 													"properties": {
-														"dimensionName": {
-															"title": "Dimension name type",
-															"description": "name type of the dimension. Codelist value according to the [ISO/TS 19139](http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_DimensionNameTypeCode) DimensionNameType codelist. Possible values: {`row`, `column`, `vertical`, `track`, `crossTrack`, `line`, `sample`, `time`}",
+														"uom": {
+															"title": "Unit Of Measure",
+															"description": "Unit considered for the resolution measure",
 															"type": "string",
-															"_xpath": "gmd:spatialRepresentationInfo/gmd:MD_GridSpatialRepresentation/gmd:axisDimensionProperties/gmd:MD_Dimension/gmd:dimensionName/gmd:MD_DimensionNameTypeCode"
-														},
-														"dimensionSize": {
-															"title": "Dimension size",
-															"description": "Size of the dimension",
-															"type": "integer",
-															"_xpath": "gmd:spatialRepresentationInfo/gmd:MD_GridSpatialRepresentation/gmd:axisDimensionProperties/gmd:MD_Dimension/gmd:dimensionSize/gco:Integer"
-														},
-														"resolution": {
-															"title": "Dimension resolution",
-															"description": "Resolution associated to the dimension. The resolution is handled as 'measure' which could be either a length, distance [special measure of length), angle or scale.",
-															"type": "number",
-															"_xpath": "gmd:spatialRepresentationInfo/gmd:MD_GridSpatialRepresentation/gmd:axisDimensionProperties/gmd:MD_Dimension/gmd:dimensionSize/gco:Measure",
-															"_xpath_note": "gco:Measure is an abstract element, use sub-classes gco:Length/gco:Distance/gco:Angle/gco:Scale",
-															"properties": {
-																"uom": {
-																	"title": "Unit Of Measure",
-																	"description": "Unit considered for the resolution measure",
-																	"type": "string",
-																	"propertyType": "attribute"
-																}
-															}
+															"propertyType": "attribute"
 														}
 													}
 												}
