@@ -53,7 +53,19 @@ All standards and schemas start with a first section named either **Metadata inf
 
 ### Description of a metadata element
 
-A description of the metadata element. 
+This section describes the types of *metadata elements* found in the standards and schemas used in the Metadata Editor, and how they are selected and customized. In brief:
+- Each metadata standard belongs to a specific section of a standard/schema. For example, in the DDI Codebook standard used for microdata, the elements used to describe each variable will be found in the "Variable description" section, while the elements used to describe overall aspects of a survey like the geographic coverage of abstract would be part of the "Study description" section.
+- A metadata element can be *repeatable* or *non repeatable*. The title of a book for example must be unique, so the element "Title" will be non-repeatable. But the section "keywords" element may contain multiple entries, and is thus a repeatable element.
+- A metadata element can be simple or contain multiple sub-elements. For example, the "title" element in the DDI standard is a simple element, while the "author" element in the *document* schema contains multiple sub-elements that describe an author including first name, last name, affiliation, and more.
+- A metadata element has a "name" in the standard.
+- A metadata element has a default label, which can be changed in custom templates.
+- A metadata element has a default description, which can be edited in custom templates.
+- A metadata element or sub-element will contain information of a specific format: numeric, string, array, or boolean.  
+- An element can be declared as *required* or *recommended*.
+- The display of an element can be controlled: text, textarea, ...
+- An element may have a default value. 
+- A controlled vocabulary can be provided.
+- Validation rules can be set.
 
 ![image](https://user-images.githubusercontent.com/35276300/214395275-46bb01e0-6a43-4973-a456-4e68693001ea.png)
 
@@ -76,7 +88,6 @@ How this is reflected in the metadata entry forms
 
 Controlled vocabularies
 ![image](https://user-images.githubusercontent.com/35276300/214395449-bb8967db-8115-4ea4-8946-17313f3fb840.png)
-
  
 Default values
 ![image](https://user-images.githubusercontent.com/35276300/214395605-c5ec98d9-23db-48d5-badf-a37014273e9d.png)
@@ -109,6 +120,9 @@ Copy
 Then select the destination subfolder and paste
 ![image](https://user-images.githubusercontent.com/35276300/214673959-573b2c99-21cc-48d0-995b-235b7b2b4f46.png)
 
+For complex elements, you also control the grouping of sub-elements.
+[screenshot]
+
 ### Available vs selected elements
 
 One element of a metadata standard or schema can only appear once in a template. When you duplicate a core template, ALL elements are in the list. 
@@ -121,8 +135,6 @@ NOTE: When you send an element back to the repository of unused elements, the cu
 To see all elements including the ones already selected: 
 ![image](https://user-images.githubusercontent.com/35276300/214675037-42382140-6333-48e7-8c81-3cbed5d6d00f.png)
 
-### Available vs selected sub-elements
- 
 For complex elements, you also control the sub-elements that you include, and their sequence and description and status.
 [screenshot]
 
@@ -139,12 +151,15 @@ Importing templates:
 -	From the IHSN website
 -	From a project
 
+Note: saved as JSON files. Stored in ...
+
 ## Updating core templates
 
 If new data type, or new standard/schema for an existing data type:
 
 ## Deleting templates
 
+Click "delete".
 
 
 
