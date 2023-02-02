@@ -22,7 +22,7 @@ IMPORTANT NOTES:
 4. Do not use an element for what it is not designed to be. If you think elements are missing, and no generic field can suit your needs, contact us. A standard or schema is expected to provide predictability across organizations. Customize the templates, but not the purpose of the elements they contain. 
 5. If you read metadata that contain element X using a template that does not include element X and save, the element will NOT be deleted from the metadata. So you do not have to worry about the template you use. The selection of a template will never result in automatic deletion of existing content.
 
-## Core templates vs Custom templates
+## Core templates vs custom templates
 
 The standard or schema for each data type is provided in the Metadata Editor as a *core* template. Core templates contain all elements of the standard or schema, with their default label and description. They contain a very small number of validation rules and controlled vocabularies. These system templates cannot be deleted or edited. But they can be duplicated then customized, allowing users to generate their own *Custom templates*. Custom templates can be exported and imported, i.e. shared with other users. Multiple custom templates can be created for a given data type.
 
@@ -30,7 +30,7 @@ The standard or schema for each data type is provided in the Metadata Editor as 
 
 The Metadata Editor application comes with a collection of pre-designed custom templates (the *IHSN templates*), covering all data types. Generating new custom templates is thus not a requirement to make use of the Metadata Editor. 
 
-## Creating or customizing a custom template
+## Creating or editing a custom template
 
 To build and select the templates to be used:
 -	Duplicate a core template and build your template from the standard or schema
@@ -43,13 +43,13 @@ You will need at least one user template per data type you curate, and one to be
 
 To generate a template:
 
-Click “Duplicate”. The page will show a new template. Edit the content of the template description.
+Click “Duplicate”. The "Template description" page of new template will be displayed. 
 
 ![image](https://user-images.githubusercontent.com/35276300/214677926-79ad0824-3678-4f23-999f-390ed63e248a.png)
  
-Change the name, and other fields described. A system ID will be given. But make sure the name is unique and provide info in other fields.
-All standards and schemas have a section “Metadata information” or “Document description”. It contains a few fields used to document the metadata.
+First, change the name of the template (by default, the name will be the name of the template you duplicated followed by "- copy"). Give a clear and unique ame to the template. The Metadata Editor does not enforce templates to have a unique name (but it automatically generated an underlying unique system identifier), so it is important that the name you chose distinguish the template you are creating from other custom templates. It is good practice to create a name that will include the data type, the organization that developed the template, and the version of the custom template. Other fields should be filled as appropriate (although not required, no field should be left empty). For the "language", we suggest you enter the language code. When done, SAVE this page. You can now start customizing the template you duplicated. 
 
+All standards and schemas start with a first section named either **Metadata information** or **Document description**. This section contains the metadata elements used to document the metadata (not the data themselves). This information will be useful to keep track of who documented the dataset, and when. This first section is followed by other "hard-coded" sections specific to each standard and schema, within which metadata elements will be listed and grouped.
 
 ### Description of a metadata element
 
