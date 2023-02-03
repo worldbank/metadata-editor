@@ -21,7 +21,25 @@ The table below shows some examples of the kind of external resources that may b
 
 The schema used to document external resources only contains 16 elements. It is based on the Dublin Core standard.
 
-##
+## Creating a new resource
+
+External resources are not created independently. They are created from the forms used to document any of the data types supported by the Metadata Editor, and we provided examples of creation of external sources in the sections related to the documentation of each data type. The item "External resource" will appear in the navigation bar. For example, the Microdata template would show:
+
+![image](https://user-images.githubusercontent.com/35276300/216709283-aabdf248-7b6b-4f8a-b78c-5dc077d08b10.png)
+
+The default template is activated. If you need to change the template, change the default template in the Template Manager.
+
+Enter the metadata. Be as complete as you can.
+SAVE.
+
+The matadata can be exported as ...
+
+To delete a resource:
+
+![image](https://user-images.githubusercontent.com/35276300/216710009-c8457fc5-52de-4cc4-aea3-17580dcf2c34.png)
+
+
+
 
 
 
