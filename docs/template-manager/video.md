@@ -31,8 +31,7 @@ The default template is activated. If you need to change the template, select "S
 
 We describe the documentation process with an example. 
 Video used as example: Somalia: Guterres in Mogadishu (available on YouTube at https://www.youtube.com/watch?v=7Aif1xjstws)
-
-![image](https://user-images.githubusercontent.com/35276300/216686978-a6f2317e-42dc-4d0f-b078-24cfdfa208f0.png)
+![video_somalia](https://user-images.githubusercontent.com/35276300/216694636-c629b6f1-e775-44cc-a2ad-bdf9386ce317.JPG)
 
 An image is used as thumbnail (in a NADA catalog). 
 [image]
