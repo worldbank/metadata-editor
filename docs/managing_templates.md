@@ -15,12 +15,7 @@ Templates are used by the Metadata Editor to generate the metadata entry forms.
 
 ![image](https://user-images.githubusercontent.com/35276300/214431708-b2eab31b-c32c-4483-9953-b086bbf63f7d.png)
 
-IMPORTANT NOTES: 
-1. When you document a dataset, the template is saved in the Project.
-2. Metadata generated using a template can be edited using another template. The selection /switching of the template impacts what is shown in the metadata entry forms; it does not change the content.
-3. Typically, you will rarely visit the Template Manager. Once a template has been designed or imported, and set as default, there is not much reason to change them. Spend some time reviewing and customizing the template to your specific needs. Using stable templates will guarantee consistency.
-4. Do not use an element for what it is not designed to be. If you think elements are missing, and no generic field can suit your needs, contact us. A standard or schema is expected to provide predictability across organizations. Customize the templates, but not the purpose of the elements they contain. 
-5. If you read metadata that contain element X using a template that does not include element X and save, the element will NOT be deleted from the metadata. So you do not have to worry about the template you use. The selection of a template will never result in automatic deletion of existing content.
+You will rarely need to use the Template Manager. Once a template has been designed or imported, and set as default, there is not much reason to change them. Spend some time reviewing and customizing the template to your specific needs. Using stable templates will guarantee consistency.
 
 ## Core templates vs custom templates
 
@@ -28,14 +23,24 @@ The standard or schema for each data type is provided in the Metadata Editor as 
 
 ![image](https://user-images.githubusercontent.com/35276300/214394808-d752cb8e-b007-4642-9e16-e2cb26b16e91.png)
 
-The Metadata Editor application comes with a collection of pre-designed custom templates (the *IHSN templates*), covering all data types. Generating new custom templates is thus not a requirement to make use of the Metadata Editor. 
+The Metadata Editor application comes with a collection of pre-designed custom templates (the *IHSN templates*), covering all data types. Generating custom templates is thus not a requirement to make use of the Metadata Editor. 
+
+NOTE ON CORE TEMPLATES: 
+
+New core templates (new version, new standards): import from GitHub or IHSN.
+
+NOTES ON THE USE OF CUSTOM TEMPLATES:
+
+1. When you document a dataset, the template is saved in the Project.
+2. Metadata generated using a template can be edited using another template. The selection /switching of the template impacts what is shown in the metadata entry forms; it does not change the content.
+3. If you read metadata that contain element X using a template that does not include element X and save, the element will NOT be deleted from the metadata. So you do not have to worry about the template you use. The selection of a template will never result in automatic deletion of existing content.
 
 ## Creating or editing a custom template
 
-To build and select the templates to be used:
--	Duplicate a core template and build your template from the standard or schema
--	Import a custom template
--	Modify a custom template 
+To build a custom template:
+-	Duplicate and edit a core template. You will then build your template from the original standard or schema.
+-	Modify a custom template. You will then build your template from a subset of the original standard or schema. 
+-	Import a custom template.
 
 You will need at least one user template per data type you curate, and one to be used for external resources. One custom template per data type will be selected as the default one.
 
@@ -53,54 +58,56 @@ All standards and schemas start with a first section named either **Metadata inf
 
 ### Description of a metadata element
 
-This section describes the types of *metadata elements* found in the standards and schemas used in the Metadata Editor, and how they are selected and customized. In brief:
+This section describes the types of *metadata elements* found in the standards and schemas used in the Metadata Editor, and how they are selected and customized. 
+
 - Each metadata standard belongs to a specific section of a standard/schema. For example, in the DDI Codebook standard used for microdata, the elements used to describe each variable will be found in the "Variable description" section, while the elements used to describe overall aspects of a survey like the geographic coverage of abstract would be part of the "Study description" section.
+
 - A metadata element can be *repeatable* or *non repeatable*. The title of a book for example must be unique, so the element "Title" will be non-repeatable. But the section "keywords" element may contain multiple entries, and is thus a repeatable element.
+
 - A metadata element can be simple or contain multiple sub-elements. For example, the "title" element in the DDI standard is a simple element, while the "author" element in the *document* schema contains multiple sub-elements that describe an author including first name, last name, affiliation, and more.
-- A metadata element has a "name" in the standard.
+
 - A metadata element has a default label, which can be changed in custom templates.
-- A metadata element has a default description, which can be edited in custom templates.
-- A metadata element or sub-element will contain information of a specific format: numeric, string, array, or boolean.  
-- An element can be declared as *required* or *recommended*.
-- The display of an element can be controlled: text, textarea, ...
-- An element may have a default value. 
-- A controlled vocabulary can be provided.
-- Validation rules can be set.
-
-![image](https://user-images.githubusercontent.com/35276300/214395275-46bb01e0-6a43-4973-a456-4e68693001ea.png)
-
-The label of the block and of the element can be changed. Information on the original label and name of the metadata element in the schema is always provided.
-
-Label:
 ![image](https://user-images.githubusercontent.com/35276300/214671331-30aefe93-0053-4710-a88b-de101810170b.png)
 
-Status:
+- A metadata element has a "name" in the standard/schema. This corresponds to the names shown in ReDoc. When the metadata are exported, this is the name that will be used, no matter what custom label you give to the elements. This guarantees that the standard is "standard" and can be validated.
+(show where it is displayed)
+
+- A metadata element has a default description, which can be edited in custom templates. When you duplicate a standard, the original description is shown.
+![image](https://user-images.githubusercontent.com/35276300/214671674-326b5de0-b7af-42de-baa1-ce82fe3b50a6.png)
+
+- A metadata element or sub-element will contain information of a specific format: numeric, string, array, or boolean.  
+
+- An element can be declared as *required* or *recommended* in the template.
 ![image](https://user-images.githubusercontent.com/35276300/214671469-ce5a006c-5cca-4ff8-b816-eab44c948439.png)
 How this will be used?
 Do not make many elements mandatory.
- 
-Description:
-![image](https://user-images.githubusercontent.com/35276300/214671674-326b5de0-b7af-42de-baa1-ce82fe3b50a6.png)
- 
-Display options:
+
+- The display of an element in the ME forms can be controlled: text, textarea, ... This is not in the standard; this is specific to the ME.
 ![image](https://user-images.githubusercontent.com/35276300/214672121-1d6ca75a-8cf4-4590-8673-fed61cf204ab.png)
 How this is reflected in the metadata entry forms
 
-Controlled vocabularies
-![image](https://user-images.githubusercontent.com/35276300/214395449-bb8967db-8115-4ea4-8946-17313f3fb840.png)
- 
-Default values
+- An element may have a default value. 
 ![image](https://user-images.githubusercontent.com/35276300/214395605-c5ec98d9-23db-48d5-badf-a37014273e9d.png)
+How this will be used?
+
+- A controlled vocabulary can be provided.
+![image](https://user-images.githubusercontent.com/35276300/214395449-bb8967db-8115-4ea4-8946-17313f3fb840.png)
+How this shows in ME.
+Can still enter info from outside the CV.
+
+- Validation rules can be set.
+![image](https://user-images.githubusercontent.com/35276300/214395548-ef25e59a-18bb-4efa-a339-52c124c209e5.png)
+How this is used in ME.
 
 This works for repeatable and complex elements as well.
 ![image](https://user-images.githubusercontent.com/35276300/214395688-f0805e52-7794-40fa-80f1-b5e98a1632e0.png)
- 
-Validation rules
-![image](https://user-images.githubusercontent.com/35276300/214395548-ef25e59a-18bb-4efa-a339-52c124c209e5.png)
+
 
 ### Navigation bar and groupings
 
-Elements may be grouped. They are grouped by main section of the standard or schema. This is constrained. 
+Elements can be grouped in custom folders and sub-folders. This is for convenience only.
+![image](https://user-images.githubusercontent.com/35276300/214395275-46bb01e0-6a43-4973-a456-4e68693001ea.png)
+They are grouped by main section of the standard or schema. This is constrained. 
 When you see:
 ![image](https://user-images.githubusercontent.com/35276300/214672976-1fd6d1b0-8f23-4f5c-b8e5-63c60529c781.png)
 
@@ -125,7 +132,9 @@ For complex elements, you also control the grouping of sub-elements.
 
 ### Available vs selected elements
 
-One element of a metadata standard or schema can only appear once in a template. When you duplicate a core template, ALL elements are in the list. 
+When you duplicate a core template, ALL elements are in the list. 
+When you edit a custom templates, it is likely that some elements have been dropped.
+
 You can drop elements using the > button. When you drop an element, it is sent back to the list of available elements. All elements from a standard/schema that are not selected in the template are available for selection. They can only be added to the section of the standard they belong to. For example, in DDI, you cannot include element from file or variable description in Study description, or from Study description in Variable description. Within a Standard section, you are free to group and sequence the elements as you want.
 
 NOTE: When you send an element back to the repository of unused elements, the customization of label, description, etc. are lost.
@@ -140,7 +149,9 @@ For complex elements, you also control the sub-elements that you include, and th
 
 ### Activating the default templates
 
-At least one template for each data type must be declared as being the "default" one.
+At least one template for each data type must be declared as being the "default" one. When a new project is created, this is the template that will be used. You can change the default using the radio button.
+
+Remember (see NOTES)
 
 ## Sharing custom templates
 
@@ -152,10 +163,6 @@ Importing templates:
 -	From a project
 
 Note: saved as JSON files. Stored in ...
-
-## Updating core templates
-
-If new data type, or new standard/schema for an existing data type:
 
 ## Deleting templates
 
