@@ -4,10 +4,7 @@
 
 The Metadata Editor provides two options for the documentation of images: a simple one based on the Dublin Come (DCMI option), and a more complex one based on the IPTC standard. It makes use of the Dublin Core metadata standard to document **external resources**. External resources are files or links that provide content other than the metadata stored in the DDI. This may consist of images files or any other resource available in digital format.
 
-
-
 ![image](https://user-images.githubusercontent.com/35276300/216645466-4d9af121-1cab-4e1d-8b92-bb7d038b0964.png)
-
 
 ## Preparing your photos
 
@@ -31,12 +28,11 @@ Some metadata is provided with the photo.
 ![image](https://user-images.githubusercontent.com/35276300/216649278-fd13571a-7cd5-4970-b684-b0c04e4f2a1d.png)
 ![image](https://user-images.githubusercontent.com/35276300/216649380-2ed6da5d-0795-4c67-862c-39e852cfb8ef.png)
 
-
 The image itself (low resolution) will be used as thumbnail (in a NADA catalog). 
 [image]
 
 Enter the metadata. Be as complete as you can.
-[image]
+![image](https://user-images.githubusercontent.com/35276300/216682630-8feb34dc-5b6c-4547-b875-6019440f6a52.png)
 
 Example of use of Google Vision:
 https://cloud.google.com/vision
