@@ -37,17 +37,47 @@ The elements that are required to form a complete bibliographic citation depend 
 ## Creating a new project
 
 From the Project page, click on "Create new project". When prompted, select "Document".
+![image](https://user-images.githubusercontent.com/35276300/216628250-5427e25d-6064-4b27-9c32-ac5edca22f50.png)
 
-If you need to change the template, select "Switch template".
+The default template is activated. If you need to change the template, select "Switch template".
+![image](https://user-images.githubusercontent.com/35276300/216628394-6ddaae2d-3a08-4f4b-b0f5-75560386ebab.png)
 
 If you have the document available as a PDF file, you can create a thumbnail by taking a screenshot of the document cover page. This image will then be used as thumbnail (in a NADA catalog). If you have another image in JPG or PNG format, you may select it using the "..."
-Enter metadata.
+![image](https://user-images.githubusercontent.com/35276300/216628789-77578460-06bc-40cc-ba29-3026935b5cce.png)
+![image](https://user-images.githubusercontent.com/35276300/216628976-bda5e5cb-87c0-4c36-ad47-bde881f6a583.png)
 
-Add the document or a link to the document as an external resource.
+Enter metadata. Be as complete as you can.
 
-SAVE
+![image](https://user-images.githubusercontent.com/35276300/216636200-68c564e6-3bab-47b5-8bf4-3535f9ed664b.png)
+
+Add the document or a link to the document as an external resource. SAVE.
+
+All complete. No validation error.
+![image](https://user-images.githubusercontent.com/35276300/216639994-104e6fb9-676b-4dd8-8074-2f5e095ed26d.png)
 
 Exporting metadata:
+Options: RDF and JSON.
+
+![image](https://user-images.githubusercontent.com/35276300/216640188-399fe827-ed26-4184-8969-52d036429b83.png)
+
+
+
+An example:
+
+This document is the World Bank Policy Working Paper No 9412, titled “Predicting Food Crises” published in September 2020 under a CC-By 4.0 license. The list of authors is provided on the cover page; an abstract, a list of acknowledgments, and a list of keywords are also provided.
+
+![image](https://user-images.githubusercontent.com/35276300/216627559-efab57c2-2cfa-4303-b706-fd5f0ce3d44a.png)
+![image](https://user-images.githubusercontent.com/35276300/216627610-f335de54-6370-4fe3-b96b-9e18aa249b82.png)
+![image](https://user-images.githubusercontent.com/35276300/216627674-fef8734b-d237-4d81-a680-5878137104dd.png)
+
+
+
+In NADA:
+![image](https://user-images.githubusercontent.com/35276300/216627755-eab6373f-eaf1-430c-b891-2a591863dfe4.png)
+
+
+
+
 
 ## Editing a project
 
