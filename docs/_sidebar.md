@@ -7,7 +7,7 @@
 
     * [Installation and upgrade](installation.md)
     * [Quick start](quick-start.md)
-    * [Where and how your metadata are saved](saved_metadata.md)
+    * [Where and how your metadata are saved](file_management.md)
 
 * Managing templates
 
