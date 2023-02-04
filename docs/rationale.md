@@ -20,3 +20,9 @@ Structured metadata can be generated programmatically or using specialized softw
 
 The Metadata Editor is one application among others developed or supported by the IHSN. It is a companion of the NADA cataloguing application, used to build and maintain on-line data catalogs that exploit the rich and structured metadata generated using the Metadata Editor.
 
+**IMPORTANT NOTE**
+
+Metadata compliant with standards and schemas can be generated using the Metadata Editor as described in this Guide. They can also be generated  programmatically using a programming language like R or Python. The latter option provides a high degree of flexibility and efficiency, as it  offers multiple opportunities to automate part of the metadata generation process, and to exploit advanced machine learning solutions to enhance metadata. Metadata generated using R or Python can also be published in a NADA catalog using the NADA API and the R package NADAR or the Python library PyNADA. The programmatic option may thus be the preferred option for organizations that have strong expertise in R or Python. This may be the case particularly for the documentation of publications, indicators, or images. For microdata, the use of a Metadata Editor with capability to extract metadata from data files may provide significant advantage. 
+
+Users interested in the programmatic option will need to be falimiar with the API description of the standard and schemas. More information is available in the Schema Guide (https://mah0001.github.io/schema-guide/), and in the API documentation (https://ihsn.github.io/nada-api-redoc/catalog-admin/#). 
+
