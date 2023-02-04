@@ -2,6 +2,8 @@
 
 The Metadata Editor makes use of the Data Documentation Initiative (DDI) metadata standard for the documentation of microdata. The DDI version implemented in the Metadata Editor is the DDI Codebook, version 2.5.
 
+![image](https://user-images.githubusercontent.com/35276300/216786555-8217b6ef-7f9c-43c7-9c31-ba1c20b6249b.png)
+
 ## The DDI Codebook metadata standard
 
 The DDI Codebook metadata standard is developed and maintained by the DDI Alliance. It contains the following main sections:
