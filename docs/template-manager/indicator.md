@@ -13,6 +13,9 @@ In NADA, can publish metadata and data that become available via API. Metadata E
 Documenting time series is easy. Only requires selection of a template, then fill out metadata entry form. If you have many indicators from a same database/organization, consider entering default values in the template. 
 
 The Metadata Editor makes use of the ... metadata standard for the documentation of indicators. 
+
+An indicator or time series is documented using the time series /indicators schema. The database schema is optional, and used to document the database, if any, that the indicator belongs to. When multiple series of a same database are documented, the metadata related to the database only needs to be generated once, then applied to all series. One metadata element in the time series /indicators schema is used to link an indicator to the corresponding database.
+
 ...
 
 ## The ... metadata schema
