@@ -2,7 +2,11 @@
 
 Indicators vs time series.
 Metadata schema developed by compiling elements from multiple databases like WDI and SDGs.
+
+Indicators are summary measures related to key issues or phenomena, derived from observed facts. Indicators form time series when they are provided with a temporal ordering, i.e. when their values are provided with an ordered annual, quarterly, monthly, daily, or other time reference.
+
 Indicators are typically organized in a database. WDI, ADB KI, etc. We document the indicator/series, but also have a template for database.
+
 In catalog, entries are series. But attach metadata of database for information.
 In NADA, can publish metadata and data that become available via API. Metadata Editor for metadata only. Future versions may provide tools for publishing data.
 
