@@ -1,22 +1,22 @@
 # Document
 
-The Metadata Editor makes use of the ... metadata standard for the documentation of documents. 
-...
+By document, we mean a bibliographic resource of any type such as a book, a working paper or a paper published in a scientific journal, a report, a presentation, a manual, or any another resource consisting mainly of text and available in physical and/or electronic format.
 
-## The ... metadata schema
+## The metadata schema
 
-For the documentation of documents, the Metadata Editor also makes use of the Dublin Core metadata standard to document **external resources**. External resources are files or links that provide content other than the metadata stored in the DDI. This may consist of PDF questionnaires or manuals, scripts, images, or any other resource available in digital format.
+Librarians have developed specific standards to describe and catalog documents. The MARC 21 (MAchine-Readable Cataloging) standard used by the United States Library of Congress is one of them. It provides a detailed structure for documenting bibliographic resources, and is the recommended standard for well-resourced document libraries. For the purpose of cataloguing documents in a less-specialized repository intended to accommodate data of multiple types, we built our schema on a simpler but also highly popular standard, the Dublin Core Metadata Element Set. MARC 21 and the Dublin Core are used to document a resource (typically, the electronic file containing the document) and its content. Another schema, BibTex, has been developed for the specific purpose of recording bibliographic citations. BibTex is a list of fields that may be used to generate bibliographic citations compliant with different bibliography styles. It applies to documents of multiple types: books, articles, reports, etc. The metadata schema we propose to document publications and reports is a combination of Dublin Core, MARC 21, and BibTex elements. The technical documentation of the schema and its API is available at https://ihsn.github.io/nada-api-redoc/catalog-admin/#tag/Documents.
 
-## Preparing your documents
+![image](https://user-images.githubusercontent.com/35276300/216790862-b8b968a4-42fb-4841-8854-230722892fd0.png)
 
-Recommendations
+The Metadata Editor also makes use of the Dublin Core metadata standard to document **external resources**. External resources are files or links that provide content other than the metadata stored in the DDI. This may consist of PDF questionnaires or manuals, scripts, images, or any other resource available in digital format.
 
-To make the documents discoverable: abstract and keywords, and topics. Use ML tools. For topics, use a controlled vocabulary if available.
-Structured metadata will enable advanced search if available in the catalog application.
-Will generate metadata; ideally, in cataloguing application, you will index not only the metadata but also the full text. See NLP4DEV.
-Pay attention to capitalization of title and sub-title.
+## Recommendations
 
-The elements that are required to form a complete bibliographic citation depend on the type of document. The table below, adapted from the BibTex templates, provides a list of required and optional fields by type of document:
+- Including a screenshot of a document cover page in a data catalog adds value.
+- Documents should be categorized by type, and the type metadata element should have a controlled vocabulary. If a document can have more than one type, use the tags element (with a tag_group = type) instead of the non-repeatable type element to store this information. Use this information to activate a facet in the catalog user interface. Many users will find it useful to be able to filter documents by type.
+- It is highly recommended to obtain a globally unique identifier for each document, such as a DOI, an ISBN, or other.
+- Pay attention to capitalization of title and sub-title.
+- For bibliographic elements: The elements that are required to form a complete bibliographic citation depend on the type of document. The table below, adapted from the BibTex templates, provides a list of required and optional fields by type of document:
 
 
    | Document type                      | Required fields                   | Optional fields                      |
