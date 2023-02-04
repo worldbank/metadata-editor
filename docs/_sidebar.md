@@ -28,7 +28,7 @@
 
 * Publishing metadata 
 
-    * [Publishing in NADA](publish_to_nada.md)
+    * [Publish metadata](publish.md)
 
 * For developers
 
