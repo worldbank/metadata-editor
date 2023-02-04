@@ -7,7 +7,7 @@
 
     * [Installation and upgrade](installation.md)
     * [Quick start](quick-start.md)
-    * [Where and how your metadata are saved](file_management.md)
+    * [Where and how your metadata are saved](template-manager/file_management.md)
 
 * Managing templates
 
@@ -20,6 +20,7 @@
     * [Indicators/time series](template-manager/indicator.md)
     * [Databases](template-manager/database.md)
     * [Statistical tables](template-manager/table.md)
+    * [Geographic data and services](template-manager/geographic.md)
     * [Images](template-manager/image.md)
     * [Videos](template-manager/video.md)
     * [Scripts](template-manager/script.md)
