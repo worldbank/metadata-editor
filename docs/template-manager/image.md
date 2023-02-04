@@ -4,14 +4,28 @@
 
 The Metadata Editor provides two options for the documentation of images: a simple one based on the Dublin Come (DCMI option), and a more complex one based on the IPTC standard. It makes use of the Dublin Core metadata standard to document **external resources**. External resources are files or links that provide content other than the metadata stored in the DDI. This may consist of images files or any other resource available in digital format.
 
-![image](https://user-images.githubusercontent.com/35276300/216645466-4d9af121-1cab-4e1d-8b92-bb7d038b0964.png)
+![image](https://user-images.githubusercontent.com/35276300/216791125-a81ff46f-46b5-4a58-84b0-75e8d8a0ed17.png)
 
-## Preparing your photos
+The metadata schema we propose for documenting images contains two mutually-exclusive options: the Dublin Core, as a simple option, and the IPTC as a more complex and advanced solutions. The schema also contains a few metadata elements that will be used no matter which option is selected. The schema is structured as follows:
+
+A few elements common to both options are provided to document the metadata (not the image itself), to provide some cataloguing parameters, and to set a unique identifier for the image being documented.
+
+Then come the two options for documenting the image itself: the IPTC block of metadata elements, and the Dublin Core block of elements. Users will make use of one of them, not both.
+
+The IPTC is the most detailed and complex schema. The version embedded in our schema is 2019.1 According to the IPTC website, “The IPTC Photo Metadata Standard is the most widely used standard to describe photos, because of its universal acceptance among news agencies, photographers, photo agencies, libraries, museums, and other related industries. It structures and defines metadata properties that allow users to add precise and reliable data about images.” The IPTC standard consists of two schemas: IPTC Core and IPTC Extension. They provide a comprehensive set of fields to document an image including information on time and geographic coverage, people and objects shown in the image, information on rights, and more. The schema is complex and in most cases only a small subset of fields will be used to document an image. Controlled vocabularies are recommended for some elements.
+
+The Dublin Core (DCMI) is a simpler and highly flexible standard, composed of 15 core elements which we supplement with a few elements mostly taken from the ImageObject schema from schema.org.
+
+Last, a small number of additional metadata elements are provided, which are common to both options described above.
+
+Whether the IPTC or the simpler DCMI option is used, the metadata should be made as rich as possible.
+
+## Recommendations
 
 Recommendations
 
 - To make the documents discoverable: caption and keywords, and possibly topics. Use ML tools like Google Vision for labeling images. For topics, use a controlled vocabulary if available.
-- What you can get from EXIF
+- What you can get from EXIF. Modern digital cameras automatically generate metadata and embed it into the image file. This metadata is known as the Exchangeable Image File Format or EXIF. EXIF will record information on the date and time the image was taken, on the GPS location coordinates (latitude & longitude, possibly altitude) if the camera was equipped with a GPS and geolocation was enabled, information on the device including manufacturer and model, technical information (lens type, focal range, aperture, shutter speed, flash settings), the system-generated unique image identifier, and more. But with the exception of the date, location (if captured), and unique image identifier, the content of the EXIF does not provide information that users interested in identifying images based on their source and/or content will find useful. Metadata describing the content and source of an image will have to be obtained from another source or using other tools.
 
 ## Creating a new project
 
