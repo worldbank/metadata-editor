@@ -2,6 +2,11 @@
 
 ## The Video metadata schema
 
+The schema we propose to document video files is a combination of elements extracted from the Dublin Core Metadata Initiative (DCMI) and from the VideoObject (from schema.org) schemas. This schema is very similar to the schema we proposed for audio files (see chapter 10).
+
+The Dublin Core is a generic and versatile standard, which we also use (in an augmented form) for the documentation of Documents (Chapter 4), Images (Chapter 9), and Audio files (chapter 10). It contains 15 core elements, to which we added a selection of elements from VideoObject. We also included the elements keywords, topics, tags, provenance and additional that are found in other schemas documented in the Guide.
+
+The resulting metadata schema is simple, but it contains the elements needed to document the resources and their content in a way that will foster their discoverability in data catalogs. Compliance with the VideoObject elements contributes to search engine optimization, as search engines like Google, Bing and others “reward” metadata published in formats compatible with the schema.org recommendations.
 
 ## Preparing your video
 
