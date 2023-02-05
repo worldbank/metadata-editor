@@ -1,6 +1,6 @@
 # Microdata
 
-The Metadata Editor makes use of the Data Documentation Initiative (DDI) metadata standard for the documentation of microdata. The DDI version implemented in the Metadata Editor is the DDI Codebook, version 2.5.
+The Metadata Editor makes use of the Data Documentation Initiative (DDI) metadata standard for the documentation of microdata. The DDI version implemented in the Metadata Editor v1.0 is the DDI Codebook, version 2.5.
 
 ![image](https://user-images.githubusercontent.com/35276300/216786555-8217b6ef-7f9c-43c7-9c31-ba1c20b6249b.png)
 
@@ -93,23 +93,23 @@ Include the relevant weighting coefficients and variables identifying the strati
 
 Variable labels should be short and precise. They should provide a clear indication of what information is contained in the variables. Variable labels are brief descriptions or attributes of each variable. Without variable labels, users are not able to link the variables in the database to the questions of the questionnaire. So, one should ensure that all variables are labelled. Variable labels should be informative, short and accurate. The same label should not be used for two different variables. Although it is common practice to use the literal question from a survey as variable label, literal questions are often longer than the maximum number of characters, so this is not an advisable practice. Variable labels can be added or edited in the Metadata Editor.
 
-13. Value labels
+11. Value labels
 
 Value labels are used for categorical variables. ALl codes used in categorical variables should have a clear, short label. Value labels can be added or edited in the Metadata Editor.
 
-14. Non-relevant variables
+12. Non-relevant variables
 
 Remove all unnecessary or temporary variables that present no interest for users from the data files. 
 
-15. Data types
+13. Data types
 
 Check that the data types are correct, and optimize the variable format. Do not include string variables if they can be converted into numeric variables. Look at your data and check each variable type, particularly for those that you expect to be numeric (age, years, number of persons/employees/hours, income, purchases/expenditures, weights, and so forth). If there are numeric variables stored as string variables, convert them using a statistical package before you start documenting your dataset.
 
-16. Privacy protection
+14. Privacy protection
 
 Datasets intended for dissemination should in general not contain any directed identifiers. Verify that sensitive information or direct identifiers that could reveal the identity of the respondent directly (names, addresses, GPS coordinates, phone numbers, etc.) have been removed from the data files. Remember to preserve an unaltered copy of all your files before making any suppression of information.
 
-17. Compress your files
+15. Compress your files
 
 Statistical software like Stata provide a "compress" or equivalent function to optimize the storage of the data. This function adjusts the format of the variable to reduce the size of the data file without loss of precision or information. 
 
@@ -231,6 +231,7 @@ Categories can be added or edited.
 
 
 Weights
+
 Keys
 
 Summary statistics
