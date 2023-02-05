@@ -115,9 +115,7 @@ Statistical software like Stata provide a "compress" or equivalent function to o
 
 ## Creating a new project
 
-A *project* consists of a survey, a census, or another type of activity that generates microdata). 
-
-To create a new project, click on "Create new project" in the Project page and select "Microdata" as type.
+A *project* consists of a survey, a census, or another type of activity that generates microdata). To create a new project, click on "Create new project" in the Project page and, when prompted, select "Microdata" as data type.
 
 ![image](https://user-images.githubusercontent.com/35276300/214939118-1c290c3b-52c2-4f05-88ac-31952c04e668.png)
 
@@ -127,15 +125,15 @@ A new project home page will be displayed.
 
 ![image](https://user-images.githubusercontent.com/35276300/214939548-3cc62a96-c7f4-4c6b-a29d-cfd914c79abd.png)
 
-By default, the template identified as default in the Template Manager will be used. You can select a different template by clicking on "Switch template".
+The template identified  the Template Manager as the default template for Microdata in will be used. You can select a different template by clicking on "Switch template". 
 
 ![image](https://user-images.githubusercontent.com/35276300/214939822-f513121c-b659-45d1-bb7b-45a0243d471b.png)
 
-The navigation bar on the right of the page reflects the content of the template you selected.
+The navigation bar on the right of the page reflects the content of the template you selected. Note that you may change the template at any time without losing any information. The templates are only "masks" used to generate the metadata entry forms in the Metadata Editor.
 
 ![image](https://user-images.githubusercontent.com/35276300/214939873-1a6bfb5f-da4f-4824-94cc-9677e2066f49.png)
 
-You have the option to select a project thumbnail. The thumbnail can for example be the logo of your survey or census. It will be used in the NADA catalog, should you publish the metadata in NADA. The thumbnail is an image in JPG or PNG format. 
+The project home page provides an option to select a project thumbnail. It can for example be the logo of your survey or census. The thumbnail will be used by the NADA cataloguing application. It will also be displayed in the Metadata Home page. The thumbnail is an image in JPG or PNG format. 
 
 ![image](https://user-images.githubusercontent.com/35276300/214940035-d99d65fe-7764-45b7-b498-d367d52c98c5.png)
 
@@ -145,14 +143,19 @@ To select a thumbnail, click on "Change image" and select an image file.
 
 ![image](https://user-images.githubusercontent.com/35276300/214941280-2493b610-1c2b-4c25-b8e5-37c07d1c6dde.png)
 
-
 ### Document description and Study description
 
-Use the navigation tree to fill out information in the **Document description** and **Study description** sections.
+The navigation tree in the left frame allows you to navigate the metadata entry pages. The metadata can be entered in any sequence. 
+
+Fill out the sections **Document description** and **Study description** sections. Try and provide as much and as relevant information in all relevant metadata elements.
 
 ![image](https://user-images.githubusercontent.com/35276300/214941497-887f698d-e763-48fe-8297-0e45bf6d2f73.png)
 
-A description of the content of each element is available by clicking on the "?". If the content you enter violates a validation rule entered in the template, an error message will be displayed in red. Required elements are indicated by a red asterisk. 
+A description of the content of each element is available by clicking on the "?". You will find more information on the metadata elements in the Schemna Guide (https://ihsn.github.io/editor/#/template-manager/microdata).
+
+If the content you enter violates a validation rule entered in the template, an error message will be displayed in red. All violation of rules will also be displayed in the project Home page. 
+
+The *Required* elements are indicated by a red asterisk. 
 
 ![image](https://user-images.githubusercontent.com/35276300/214941921-3e765962-8573-486c-af2c-a2168e79ebf2.png)
 
@@ -163,20 +166,24 @@ When an element is "repeatable", an option to "Add rows" is provided.
 When a controlled vocabulary has been entered in the template, a drop down menu will appear.
 
 ![image](https://user-images.githubusercontent.com/35276300/214942534-d47df5a3-93f0-4d61-b956-46bbc89f0632.png)
-Try and provide as much and as relevant information in all relevant metadata elements. 
+
+Importing metadata: 
+
 
 ### Importing data files
 
-If you have data files available in CSV, Stata (.dta), or SPSS (.sav) format, you can import the data to automatically populate some of the content of the *File description* section and much of the content of the *Variable description* section. The Metadata Editor relies on the open source R software and on the Haven library to import (and re-export) data files. When a data file is imported, the application will:
-- Generate the list of variables for each data file
-- Import the variable and value labels from the data files, if available
-- Generate summary statistics that may be saved as metadata.
+If you have data files available in CSV, Stata (.dta), or SPSS (.sav) format, you can import the data to automatically populate some of the content of the *File description* section and much of the content of the *Variable description* section. The Metadata Editor relies on the R software and on the Haven library to import (and export) data files. 
 
-To import your data files, select "Data files" in the navigation bar, and click on "Import files".
+When a data file is imported, the application will:
+- Generate the list of variables for each data file
+- Import the variable and value labels from the data files (if the data have been labelled in Stata or SPSS)
+- Generate summary statistics for each variable, which may be saved as metadata.
+
+To import data files, select "Data files" in the navigation bar, and click "Import files".
 
 ![image](https://user-images.githubusercontent.com/35276300/214943689-7c608a52-777c-41c2-9662-d1c66797e370.png)
 
-Select the data files you want to import, and click "Import files".
+Select the data files you want to import.
 
 ![image](https://user-images.githubusercontent.com/35276300/214944454-86919d0a-e0ae-40dd-a537-a94122afa4b3.png)
 ![image](https://user-images.githubusercontent.com/35276300/214952350-92cf2cdd-371c-4a4e-8fda-08653a4cb5b3.png)
@@ -186,15 +193,18 @@ Success
 
 ### Creating data files
 
+In some cases, you may want to document data files that you do not have. In such case, you will not be able to automatically generate the data dictionary. But you can enter it manually.
+...
 
 ### File description
 
-A brief description of each file can be entered. Select the filename in the navigation bar, and fill out the form. Then save.
+Enter a brief description of each file by select the filename in the navigation bar, and filling out the metadata entry form. Then save.
 ![image](https://user-images.githubusercontent.com/35276300/214966052-85ffabc6-7d04-4ca3-b3c0-800c44499b68.png)
 
-### Data
+### Preview data
 
-Data page:
+You can preview the data you imported by selecting *Data* in the navigation bar for one of the imported data files. The data can be viewed and exported. The Metadata Editor does not provide an option to modify the data.
+
 ![image](https://user-images.githubusercontent.com/35276300/214965888-3af24fa2-8fa4-4d3a-a225-bc90f62130a8.png)
 
 ### Variable description and statistics
@@ -205,36 +215,38 @@ What has been imported from the data files:
 - List of variables with name, label and type ("Variables" block).
 - Value labels for categorical variables ("Categories" block).
 - Variable information: type, decimals, format, missing values
+- Variable type:
+
+Editing metadata:
+
+- Changing file names:
+- Changing variable type:
+- Adding or editing variable labels:
+- Deleting variables:
+- Editing value labels:
+- Adding value labels: 
+   Categories can be added or edited. 
+   - Generate categories from statistics button:
+   - Copy / paste
+   - Store in repository
 
 Documentation:
-- Statistics
+- Summary statistics
 - Weights
 - Documentation
 ![image](https://user-images.githubusercontent.com/35276300/214967059-352ab9cf-4dde-4867-85fe-dd40ba0bdbc6.png)
 
 In the variable page: Description
 - Ctrl and Shift keys
-- Spread metadata
-- Import metadata
-
+- Spreading metadata
+- Importing metadata
+- Copy/paste
 
 - JSON
-
-Variable labels can be added or changed directly in the variable list table.
-   - Spread metadata
-   - 
-
-Categories can be added or edited. 
-   - Generate categories from statistics button:
-   - Copy / paste
-   - Store in repository
-
 
 Weights
 
 Keys
-
-Summary statistics
 
 ### Variable groups
 
@@ -244,15 +256,11 @@ Summary statistics
 
 ![image](https://user-images.githubusercontent.com/35276300/214945692-0e3a37e5-14b0-495c-8eeb-351d305fb185.png)
 
-
 ### Saving and exporting metadata
-
 
 ### Exporting data
 
-
 ### Diagnostics
-
 
 ## Editing an existing project
 
