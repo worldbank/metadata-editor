@@ -4,7 +4,12 @@ The volume and diversity of data made available to the research community are gr
 
 Producing quality metadata is not a trivial exercise. The adoption of metadata standards and schemas fosters the quality of metadata. Standards and schemas, designed for different data types by communities of professionals, help data curators to produce detailed, comprehensive, and structured metadata. These metadata, saved in machine readable formats like JSON or XML, provide considerable flexibility and efficiency.
 
-Structured metadata can be generated programmatically or using specialized software applications. The ***IHSN Metadata Editor*** presented in this document is an open-source solution provided by the International Household Survey Network (IHSN) for the documentation of multiple data types using different metadata standards and schemas. The data types covered by the IHSN Metadata Editor, and the related standards and schemas, are the following:
+Structured metadata can be generated programmatically or using specialized software applications. The ***IHSN Metadata Editor*** presented in this document is an open-source solution provided by the International Household Survey Network (IHSN) for the documentation of multiple data types using different metadata standards and schemas. 
+
+![image](https://user-images.githubusercontent.com/35276300/217036490-cae854cc-24f3-4754-810f-e83040e4f308.png)
+
+
+The data types covered by the IHSN Metadata Editor, and the related standards and schemas, are the following:
 
 - **STRUCTURED DATA**
    - **Microdata**: the unit-level data on a population of individuals, households, dwellings, facilities, establishments, or other. Microdata can be generated from surveys, censuses, administrative recording systems, or sensors. The Metadata Editor uses the Data Documentation Initiative (DDI) Codebook metadata standard for documenting microdata.
