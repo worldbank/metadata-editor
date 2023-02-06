@@ -1,4 +1,4 @@
-# Table
+# Statistical tables
 
 ## The Table metadata schema
 
@@ -10,12 +10,13 @@ Statistical tables can be understood by a broad audience. In some cases, they ma
 
 The schema description is available at http://dev.ihsn.org/nada/api-documentation/catalog-admin/index.html#tag/Tables
 
+Information on the metadata elements can be found in the SChema Guide at https://mah0001.github.io/schema-guide/chapter08.html.
+
 ## Anatomy of a table
 
 The figure below, adapted from LabWrite Resources (https://labwrite.ncsu.edu/res/gh/gh-tables.html), provides an illustration of what statistical tables typically look like. The main parts of a table are highlighted. They provide a content structure for the metadata schema we use in the Metadata Editor.
 
 ![image](https://user-images.githubusercontent.com/35276300/216686104-25d21426-28f8-43c3-8830-e2b8a466b8cd.png)
-
 
 ## Creating a new project
 
