@@ -82,9 +82,25 @@ This section describes the types of *metadata elements* found in the standards a
 How this will be used?
 Do not make many elements mandatory.
 
-- The display of an element in the ME forms can be controlled: text, textarea, ... This is not in the standard; this is specific to the ME.
-![image](https://user-images.githubusercontent.com/35276300/214672121-1d6ca75a-8cf4-4590-8673-fed61cf204ab.png)
-How this is reflected in the metadata entry forms
+- The way each element will be displayed in the Metadata Editor entry pages is controlled in the Template Manager. The "DISPLAY" parameter provides the main customization options. For a specific case described below, the "Type" will also be used.
+![image](https://user-images.githubusercontent.com/35276300/217053424-45e59e6b-c476-46af-b6c7-678360d3ab61.png)
+
+An single element (or sub-element) can have the following types, controled by selecting an option in the *Display* drop-down :
+  - **Text**: the element will be displayed as a single, on-line text box. The box can accept entries with up to N characters. For example, in the metadata entry page: 
+  ![image](https://user-images.githubusercontent.com/35276300/217052523-219836b5-6cd2-40d3-9df5-2b9c63d58e6e.png)
+
+  - **Text area**: the element will be displayed as a multi-line text box. The box can accept entries with up to N characters. For example, in the metadata entry page:
+  ![image](https://user-images.githubusercontent.com/35276300/217052997-dee39f62-13a5-424c-a880-19cbb8f2e056.png)
+
+  -  **Drop down**: the element will appear as a single text box, but with a controlled vocabulary. Two options are possible: mandating the entry to be taken from the drop down, or allowing users to either select an entry from the drop down or typing a free text.
+  ![image](https://user-images.githubusercontent.com/35276300/217054205-b7ff2678-5d23-4d44-b85f-bc4216cc2ad2.png)
+ 
+ - Elements that contain sub-elements will be displayed either as arrays or as nested -arrays. This is controlled by the "Type" setting in the Template Manager. An "array" and a "nested array" will be displayed respecyively as follows:
+ ARRAY (all elements appear as one row, with limited space for each sub-element):
+ ![image](https://user-images.githubusercontent.com/35276300/217054957-a88b126c-16f1-48d4-8f5a-96cc79283c68.png)
+
+ NESTED ARRAY (each element appear as a separate row, providing adequate space for long content):
+ ![image](https://user-images.githubusercontent.com/35276300/217055225-9c4dee87-c80d-4b27-9aa4-9092e0732c0d.png)
 
 - An element may have a default value. 
 ![image](https://user-images.githubusercontent.com/35276300/214395605-c5ec98d9-23db-48d5-badf-a37014273e9d.png)
