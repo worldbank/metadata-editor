@@ -34,18 +34,33 @@ When documenting an indicator or time series, attention should be paid to includ
 
 
 ## Creating a new project
-A *project* here corresponds to an indicator or series.
 
-Create New 
-Switch template if default is not the right one
-Enter metadata.
+A *project* here corresponds to an indicator or series. To create a new project, click on "Create new project" in the Project page and, when prompted, select "Indicator/time series" as data type. A new project page will open.
 
-Recommendations for improved discoverability: keywords
+The project home page provides an option to select a project thumbnail. The thumbnail will be used by the NADA cataloguing application. It will also be displayed in the Metadata Home page. The thumbnail is an image in JPG or PNG format.
 
-Tags
+The template identified the Template Manager as the default template for Microdata in will be used. You can select a different template by clicking on "Switch template". The navigation bar on the right of the page will reflect the content of the template you selected. Note that you may change the template at any time without losing any information. The templates are only "masks" used to generate the metadata entry forms in the Metadata Editor.
+
+After changing the Thumbnail and selecting the IHSN template (if it was not selected by default), the Home page will be as follows:
+
+![image](https://user-images.githubusercontent.com/35276300/217011384-99583063-37f4-4b38-bd9c-4dbc968e7303.png)
+
+A description of the content of each element is available by clicking on the "?". You will find more information on the metadata elements in the Schema Guide ([https://ihsn.github.io/editor/#/template-manager/](https://mah0001.github.io/schema-guide/chapter07.html).
+
+If the content you enter violates a validation rule entered in the template, an error message will be displayed in red. All violation of rules will also be displayed in the project Home page.
+
+The Required elements are indicated by a red asterisk.
+
+Enter metadata with as much relevant information as possible. Remember that the metadata is the input that will be indexed by catalogs, and is critical to ensure data discovery. In the example, below, we document an indicator from the World Bank World Development Indicator. The indicator is SP.POP.DPND - Age dependency ratio (% of working-age population). 
+
+![image](https://user-images.githubusercontent.com/35276300/217014831-136d57c2-b700-451c-901e-44cca5096d00.png)
 
 External resources
 
-## Editing
+## Editing a project
 
+
+## Publishing in NADA
+
+![image](https://user-images.githubusercontent.com/35276300/217015089-c28370c9-1650-4292-8af9-c82962c944f3.png)
 
