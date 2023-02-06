@@ -16,31 +16,28 @@ The figure below, adapted from LabWrite Resources (https://labwrite.ncsu.edu/res
 
 ![image](https://user-images.githubusercontent.com/35276300/216686104-25d21426-28f8-43c3-8830-e2b8a466b8cd.png)
 
-## Preparing your table
-
-Recommendations
-
-- Link to publications and datasets (and scripts)
 
 ## Creating a new project
 
-From the Project page, click on "Create new project". When prompted, select "Table".
-![image](https://user-images.githubusercontent.com/35276300/216628250-5427e25d-6064-4b27-9c32-ac5edca22f50.png)
+A project here corresponds to an indicator or series. To create a new project, click on "Create new project" in the Project page and, when prompted, select "Table" as data type. A new project page will open.
 
-The default template is activated. If you need to change the template, select "Switch template".
-[image]
+The project home page provides an option to select a project thumbnail. The thumbnail will be used by the NADA cataloguing application. It will also be displayed in the Metadata Home page. The thumbnail is an image in JPG or PNG format.
 
-We describe the documentation process with an example. 
-Table used as example:
+The template identified in the Template Manager as the default template for statistical tables will be used. You can select a different template by clicking on "Switch template". The navigation bar on the right of the page will reflect the content of the template you select. Note that you may change the template at any time without losing any information. The templates are only "masks" used to generate the metadata entry forms in the Metadata Editor.
+
+After changing the Thumbnail and selecting the IHSN template (if it was not selected by default), the Home page will be as follows:
+
+![image](https://user-images.githubusercontent.com/35276300/217111890-491edd50-982f-4f55-bbc8-b711a44d3feb.png)
+
+The table we use as an example to describe the addition of metadata is a table presenting the evolution since 1960 of the number of households by size and of the average household size in the United States, published by the US Census Bureau. This table, published in MS-Excel format, was downloaded on 20 February 2021 from https://www.census.gov/data/tables/time-series/demo/families/households.html.
+
 ![image](https://user-images.githubusercontent.com/35276300/216686978-a6f2317e-42dc-4d0f-b078-24cfdfa208f0.png)
 
-An image is used as thumbnail (in a NADA catalog). 
-[image]
+Add all available metadata.
 
-Enter the metadata. Be as complete as you can.
+![image](https://user-images.githubusercontent.com/35276300/217113319-a638c701-6592-4467-ad92-4e2eefe6b254.png)
 
-Add the table file(s) or a link to the table as external resources. 
-Add other related materials.
+Add external resource if relevant.
 
 SAVE.
 
