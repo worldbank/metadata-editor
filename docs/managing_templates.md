@@ -90,33 +90,32 @@ An single element (or sub-element) can have the following types, controled by se
   ![image](https://user-images.githubusercontent.com/35276300/217052523-219836b5-6cd2-40d3-9df5-2b9c63d58e6e.png)
 
   - **Text area**: the element will be displayed as a multi-line text box. The box can accept entries with up to N characters. For example, in the metadata entry page:
+  - 
   ![image](https://user-images.githubusercontent.com/35276300/217052997-dee39f62-13a5-424c-a880-19cbb8f2e056.png)
 
-  -  **Drop down**: the element will appear as a single text box, but with a controlled vocabulary. Two options are possible: mandating the entry to be taken from the drop down, or allowing users to either select an entry from the drop down or typing a free text.
+  -  **Drop down**: the element will appear as a single text box, but with a controlled vocabulary. Two options are possible: mandating the entry to be taken from the drop down, or allowing users to either select an entry from the drop down or typing a free text. The values that appear in the drop down must be entered in the "CONTROLLED VOCABULARY" tab.
+  
   ![image](https://user-images.githubusercontent.com/35276300/217054205-b7ff2678-5d23-4d44-b85f-bc4216cc2ad2.png)
  
  - Elements that contain sub-elements will be displayed either as arrays or as nested -arrays. This is controlled by the "Type" setting in the Template Manager. An "array" and a "nested array" will be displayed respecyively as follows:
- ARRAY (all elements appear as one row, with limited space for each sub-element):
- ![image](https://user-images.githubusercontent.com/35276300/217054957-a88b126c-16f1-48d4-8f5a-96cc79283c68.png)
+ 
+     - ARRAY (all elements appear as one row, with limited space for each sub-element):
+ 
+     ![image](https://user-images.githubusercontent.com/35276300/217054957-a88b126c-16f1-48d4-8f5a-96cc79283c68.png)
 
- NESTED ARRAY (each element appear as a separate row, providing adequate space for long content):
- ![image](https://user-images.githubusercontent.com/35276300/217055225-9c4dee87-c80d-4b27-9aa4-9092e0732c0d.png)
+     - NESTED ARRAY (each element appear as a separate row, providing adequate space for long content):
+ 
+     ![image](https://user-images.githubusercontent.com/35276300/217055225-9c4dee87-c80d-4b27-9aa4-9092e0732c0d.png)
 
-- An element may have a default value. 
+- An element may have a default value. A tool is provided in the Metadata Editor to "Load default values". When you document a dataset, this option will provide you with a way to automatically fill out the fields for which a default value is available.
+
 ![image](https://user-images.githubusercontent.com/35276300/214395605-c5ec98d9-23db-48d5-badf-a37014273e9d.png)
-How this will be used?
 
-- A controlled vocabulary can be provided.
-![image](https://user-images.githubusercontent.com/35276300/214395449-bb8967db-8115-4ea4-8946-17313f3fb840.png)
-How this shows in ME.
-Can still enter info from outside the CV.
+- Controled vocabularies
 
-- Validation rules can be set.
+- Validation rules. One or multiploe validation rule(s) can be set for each element or sub-element. Multiple options are provided, including the option to enter a regular expression. When content is entered in a metadata field, the compliance with the validation rules will automatically be checked and a warning message will be displayed in teh element and in the project home page. When more than one validation rule is set for a same element, the entry must comply with all of them to be valid.
+  
 ![image](https://user-images.githubusercontent.com/35276300/214395548-ef25e59a-18bb-4efa-a339-52c124c209e5.png)
-How this is used in ME.
-
-This works for repeatable and complex elements as well.
-![image](https://user-images.githubusercontent.com/35276300/214395688-f0805e52-7794-40fa-80f1-b5e98a1632e0.png)
 
 
 ### Navigation bar and groupings
