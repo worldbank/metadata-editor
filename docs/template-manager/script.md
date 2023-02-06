@@ -33,9 +33,10 @@ We can import an image to be used as thumbnail (in a NADA catalog).
 
 Enter the metadata. Be as complete as you can.
 
-![image](https://user-images.githubusercontent.com/35276300/217000741-d1b883c0-e3f1-4d68-9124-b498678fdceb.png)
+![image](https://user-images.githubusercontent.com/35276300/217010762-0d5a6e81-0d20-45ac-85bc-cbf3afeb0ad0.png)
 
 Add the script file(s) or a link to the scripts as external resources. 
+
 Zip your scripts
 SAVE.
 
