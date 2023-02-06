@@ -1,6 +1,6 @@
 # Statistical tables
 
-## The Table metadata schema
+## The metadata schema
 
 A statistical table (cross tabulation or contingency table) is a summary presentation of data. The OECD Glossary of Statistical Terms defines it as “observation data gained by a purposeful aggregation of statistical microdata conforming to statistical methodology [organized in] groups or aggregates, such as counts, means, or frequencies.”
 
