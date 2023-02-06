@@ -38,10 +38,13 @@ Enter metadata with as much relevant information as possible. Remember that the 
 
 ![image](https://user-images.githubusercontent.com/35276300/217087648-14c1b83b-f9e4-4784-a4ea-17b5133d4484.png)
 
+
 ## Editing a project
 
 
 ## Publishing in NADA
+
+Note: NADA offers option to publish data and add visualizations using widgets. This is not part of the metadata.
 
 ![image](https://user-images.githubusercontent.com/35276300/217015089-c28370c9-1650-4292-8af9-c82962c944f3.png)
 
