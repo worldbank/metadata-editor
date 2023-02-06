@@ -8,7 +8,6 @@ Structured metadata can be generated programmatically or using specialized softw
 
 ![image](https://user-images.githubusercontent.com/35276300/217036876-e3c18188-a28d-49fd-8437-6cb14c1f25a0.png)
 
-
 The data types covered by the IHSN Metadata Editor, and the related standards and schemas, are the following:
 
 - **STRUCTURED DATA**
@@ -29,5 +28,5 @@ The Metadata Editor is one application among others developed or supported by th
 
 Metadata compliant with standards and schemas can be generated using the Metadata Editor as described in this Guide. They can also be generated  programmatically using a programming language like R or Python. The latter option provides a high degree of flexibility and efficiency, as it  offers multiple opportunities to automate part of the metadata generation process, and to exploit advanced machine learning solutions to enhance metadata. Metadata generated using R or Python can also be published in a NADA catalog using the NADA API and the R package NADAR or the Python library PyNADA. The programmatic option may thus be the preferred option for organizations that have strong expertise in R or Python. This may be the case particularly for the documentation of publications, indicators, or images. For microdata, the use of a Metadata Editor with capability to extract metadata from data files may provide significant advantage. 
 
-Users interested in the programmatic option will need to be falimiar with the API description of the standard and schemas. More information is available in the Schema Guide (https://mah0001.github.io/schema-guide/), and in the API documentation (https://ihsn.github.io/nada-api-redoc/catalog-admin/#). 
+Users interested in the programmatic option will need to be familiar with the API description of the standard and schemas. More information is available in the Schema Guide (https://mah0001.github.io/schema-guide/), and in the API documentation (https://ihsn.github.io/nada-api-redoc/catalog-admin/#). 
 
