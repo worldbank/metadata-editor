@@ -66,31 +66,30 @@ This section describes the types of *metadata elements* found in the standards a
 
 - A metadata element can be simple or contain multiple sub-elements. For example, the "title" element in the DDI standard is a simple element, while the "author" element in the *document* schema contains multiple sub-elements that describe an author including first name, last name, affiliation, and more.
 
-- A metadata element has a default label, which can be changed in custom templates.
+- A metadata element has a default *label*, which can be changed in custom templates.
 ![image](https://user-images.githubusercontent.com/35276300/214671331-30aefe93-0053-4710-a88b-de101810170b.png)
 
-- A metadata element has a "name" in the standard/schema. This corresponds to the names shown in ReDoc. When the metadata are exported, this is the name that will be used, no matter what custom label you give to the elements. This guarantees that the standard is "standard" and can be validated.
+- A metadata element has a *name* in the standard/schema. This corresponds to the names shown in ReDoc. When the metadata are exported, this is the name that will be used, no matter what custom label you give to the elements. This guarantees that the standard is "standard" and can be validated.
 (show where it is displayed)
 
-- A metadata element has a default description, which can be edited in custom templates. When you duplicate a standard, the original description is shown.
+- A metadata element has a default *description*, which can be edited in custom templates. When you duplicate a standard, the original description is shown.
 ![image](https://user-images.githubusercontent.com/35276300/214671674-326b5de0-b7af-42de-baa1-ce82fe3b50a6.png)
 
-- A metadata element or sub-element will contain information of a specific format: numeric, string, array, or boolean.  
+- A metadata element or sub-element will contain information of a specific *format*: numeric, string, array, or boolean.  
 
-- An element can be declared as *required* or *recommended* in the template.
-![image](https://user-images.githubusercontent.com/35276300/214671469-ce5a006c-5cca-4ff8-b816-eab44c948439.png)
-How this will be used?
-Do not make many elements mandatory.
+- An element can be declared as *required* or *recommended* in the template. A 'diagnostic" tool is embedded in the Metadata Editor, which flags metadata elements that contain invalid content (based on validation rules) and elelements declared as *required* but for which no content has been entered. Also, the navigation bar provides an option to only display the *required* and/or *recommended* elements. This option is provided to allow data curators to focus on the most important metadata elements.
+
+ ![image](https://user-images.githubusercontent.com/35276300/214671469-ce5a006c-5cca-4ff8-b816-eab44c948439.png)
 
 - The way each element will be displayed in the Metadata Editor entry pages is controlled in the Template Manager. The "DISPLAY" parameter provides the main customization options. For a specific case described below, the "Type" will also be used.
 ![image](https://user-images.githubusercontent.com/35276300/217053424-45e59e6b-c476-46af-b6c7-678360d3ab61.png)
 
-An single element (or sub-element) can have the following types, controled by selecting an option in the *Display* drop-down :
+An single element (or sub-element) can have the following types, controlled by selecting an option in the *Display* drop-down :
   - **Text**: the element will be displayed as a single, on-line text box. The box can accept entries with up to N characters. For example, in the metadata entry page: 
   ![image](https://user-images.githubusercontent.com/35276300/217052523-219836b5-6cd2-40d3-9df5-2b9c63d58e6e.png)
 
   - **Text area**: the element will be displayed as a multi-line text box. The box can accept entries with up to N characters. For example, in the metadata entry page:
-  - 
+  
   ![image](https://user-images.githubusercontent.com/35276300/217052997-dee39f62-13a5-424c-a880-19cbb8f2e056.png)
 
   -  **Drop down**: the element will appear as a single text box, but with a controlled vocabulary. Two options are possible: mandating the entry to be taken from the drop down, or allowing users to either select an entry from the drop down or typing a free text. The values that appear in the drop down must be entered in the "CONTROLLED VOCABULARY" tab.
