@@ -1,4 +1,4 @@
-# Metadata Editor [beta]
+# Metadata Editor [beta] User Manual
 
 
 <p align="center">
@@ -12,16 +12,3 @@
 </p>
 
 
-## Features
-
-- ...
-- ....
-
-
-## Get started
-
-...
-
-## Community
-
-...
