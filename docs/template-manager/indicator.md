@@ -1,4 +1,4 @@
-# Indicators
+# Indicators and time series
 
 Indicators vs time series.
 Metadata schema developed by compiling elements from multiple databases like WDI and SDGs.
@@ -12,13 +12,9 @@ In NADA, can publish metadata and data that become available via API. Metadata E
 
 Documenting time series is easy. Only requires selection of a template, then fill out metadata entry form. If you have many indicators from a same database/organization, consider entering default values in the template. 
 
-The Metadata Editor makes use of the ... metadata standard for the documentation of indicators. 
-
 An indicator or time series is documented using the time series /indicators schema. The database schema is optional, and used to document the database, if any, that the indicator belongs to. When multiple series of a same database are documented, the metadata related to the database only needs to be generated once, then applied to all series. One metadata element in the time series /indicators schema is used to link an indicator to the corresponding database.
 
-...
-
-## The ... metadata schema
+## The metadata schema
 
 For the documentation of indicators, the Metadata Editor also makes use of the Dublin Core metadata standard to document **external resources**. External resources are files or links that provide content other than the metadata stored in the DDI. This may consist of PDF questionnaires or manuals, scripts, images, or any other resource available in digital format.
 
@@ -39,7 +35,7 @@ A *project* here corresponds to an indicator or series. To create a new project,
 
 The project home page provides an option to select a project thumbnail. The thumbnail will be used by the NADA cataloguing application. It will also be displayed in the Metadata Home page. The thumbnail is an image in JPG or PNG format.
 
-The template identified the Template Manager as the default template for Microdata in will be used. You can select a different template by clicking on "Switch template". The navigation bar on the right of the page will reflect the content of the template you selected. Note that you may change the template at any time without losing any information. The templates are only "masks" used to generate the metadata entry forms in the Metadata Editor.
+The template identified in the Template Manager as the default template for indicators/time series will be used. You can select a different template by clicking on "Switch template". The navigation bar on the right of the page will reflect the content of the template you selected. Note that you may change the template at any time without losing any information. The templates are only "masks" used to generate the metadata entry forms in the Metadata Editor.
 
 After changing the Thumbnail and selecting the IHSN template (if it was not selected by default), the Home page will be as follows:
 
