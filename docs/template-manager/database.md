@@ -22,7 +22,7 @@ A *project* here corresponds to a database of indicators. To create a new projec
 
 The project home page provides an option to select a project thumbnail. The thumbnail will be used by the NADA cataloguing application. It will also be displayed in the Metadata Home page. The thumbnail is an image in JPG or PNG format.
 
-The template identified the Template Manager as the default template for Database in will be used. You can select a different template by clicking on "Switch template". The navigation bar on the right of the page will reflect the content of the template you selected. Note that you may change the template at any time without losing any information. The templates are only "masks" used to generate the metadata entry forms in the Metadata Editor.
+The template identified in the Template Manager as the default template for Database will be used. You can select a different template by clicking on "Switch template". The navigation bar on the right of the page will reflect the content of the template you selected. Note that you may change the template at any time without losing any information. The templates are only "masks" used to generate the metadata entry forms in the Metadata Editor.
 
 After changing the Thumbnail and selecting the IHSN template (if it was not selected by default), the Home page will be as follows:
 
