@@ -7,6 +7,7 @@ Vue.component('external-resources-edit', {
             errors:[],
             attachment_type:'',
             attachment_url:'',
+            resource_template:'',
             dc_types:{                
                 "doc/adm":"Document, Administrative [doc/adm]",
                 "doc/anl":"Document, Analytical [doc/anl]",
@@ -29,6 +30,7 @@ Vue.component('external-resources-edit', {
     }, 
     created () {
         //this.loadDataFiles();
+        //this.loadResourceTemplate();
     },   
     methods: {        
         getResourceByID: function(){
@@ -37,6 +39,19 @@ Vue.component('external-resources-edit', {
                     console.log(":resource",resource, this.ActiveResourceIndex);
                     return this.ExternalResources[index];
                 }
+            });
+        },
+        loadResourceTemplate: function(){
+            vm=this;
+            let url=CI.base_url + '/api/templates/resource-system-en';
+
+            axios.get( url
+            ).then(function(response){
+                vm.resource_template=response.data.result;
+            })
+            .catch(function(response){
+                console.log("loadResourceTemplate",response);
+                alert("Failed to load template");
             });
         },
         saveResource: function()
@@ -106,6 +121,7 @@ Vue.component('external-resources-edit', {
             })
             .catch(function(response){
                 vm.errors=response;
+                alert("Failed to upload file");
             });            
         }, 
         handleFileUpload( event ){
@@ -140,7 +156,7 @@ Vue.component('external-resources-edit', {
 
             return this.$store.state.external_resources.find(resource => {
                 return resource.id == this.ActiveResourceIndex
-              });
+            });
 
             return this.$store.state.external_resources.forEach((resource, index) => {
                 if (resource.id==this.ActiveResourceIndex){
@@ -164,10 +180,9 @@ Vue.component('external-resources-edit', {
     },
     template: `
         <div>
-            <v-container>
+            <v-container v-if="Resource">
+            <h1>Edit resource</h1>
             
-            <h1>Edit resource</h1>            
-
             <div class="form-group form-field" >
                 <label>File type *</label>
                 <select 
@@ -176,7 +191,7 @@ Vue.component('external-resources-edit', {
                     id="dctype">
 
                     <option value="">Select</option>
-                    <option v-for="(option_key,option_value) in dc_types" v-bind:value="option_value">
+                    <option v-for="(option_key,option_value) in dc_types" v-bind:value="option_key">
                         {{ option_key }}
                     </option>
                 </select>

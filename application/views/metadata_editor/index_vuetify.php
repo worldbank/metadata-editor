@@ -190,15 +190,13 @@ Vue.config.errorHandler = (err, vm, info) => {
       mounted: function(){
         let vm=this;
         axios.interceptors.response.use(
-          function(successfulReq) {
-            console.log("success");
+          function(resp) {
+            return resp;
           },
           function(error) {
-            console.log("error global handler",error);
             if (error.response.status==403){
               vm.login_dialog=true;
             }
-            console.log("login_dialog", this.login_dialog);
             return Promise.reject(error);
           }
         );
@@ -454,14 +452,19 @@ Vue.config.errorHandler = (err, vm, info) => {
 
           this.items=tree_data;
 
-          //set active tree node
-          let active_node_name=this.$route.path;
-          active_node_name=active_node_name.slice(active_node_name.lastIndexOf("/")+1);
+          if (this.$route.path.startsWith("/external-resources")){
+            this.initiallyOpen=["external-resources"];
+            this.setTreeActiveNode("external-resources");
+          }
+          else{
+            let active_node_name=this.$route.path;
+            active_node_name=active_node_name.slice(active_node_name.lastIndexOf("/")+1);
 
-          if (active_node_name){
-            let node_paths= this.getTreeNestedPath(this.TreeItems,active_node_name);
-            this.initiallyOpen=node_paths.split("/");
-            this.setTreeActiveNode(active_node_name);
+            if (active_node_name){
+              let node_paths= this.getTreeNestedPath(this.TreeItems,active_node_name);
+              this.initiallyOpen=node_paths.split("/");
+              this.setTreeActiveNode(active_node_name);
+            }
           }
         },
         update_tree: function()

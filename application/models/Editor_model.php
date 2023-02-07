@@ -522,6 +522,10 @@ class Editor_model extends CI_Model {
 			'timeseries-db'=>array(
 				'idno'=>'database_description.title_statement.idno',
 				'title'=>'database_description.title_statement.title'
+			),
+			'geospatial'=>array(
+				'idno'=>'database_description.title_statement.idno',
+				'title'=>'database_description.title_statement.title'
 			)			
 
 		);
