@@ -87,6 +87,11 @@ This section describes the types of *metadata elements* found in the standards a
 An single element (or sub-element) can have the following types, controlled by selecting an option in the *Display* drop-down :
   - **Text**: the element will be displayed as a single, on-line text box. The box can accept entries with up to N characters. For example, in the metadata entry page: 
   ![image](https://user-images.githubusercontent.com/35276300/217052523-219836b5-6cd2-40d3-9df5-2b9c63d58e6e.png)
+  
+  - **Repeatable text**: the element will be displayed as a single, on-line text box, but this box is repeatable. To implement this option, select "type" = "simple_array".
+  
+  ![image](https://user-images.githubusercontent.com/35276300/217288316-4dbd03f6-3aba-49e1-8454-d223b12bab1e.png)
+  ![image](https://user-images.githubusercontent.com/35276300/217289419-b21eb75a-b6f1-4603-beb0-18aca6f81123.png)
 
   - **Text area**: the element will be displayed as a multi-line text box. The box can accept entries with up to N characters. For example, in the metadata entry page:
   
@@ -110,7 +115,7 @@ An single element (or sub-element) can have the following types, controlled by s
 
 ![image](https://user-images.githubusercontent.com/35276300/214395605-c5ec98d9-23db-48d5-badf-a37014273e9d.png)
 
-- Controled vocabularies
+- Controlled vocabularies
 
 - Validation rules. One or multiploe validation rule(s) can be set for each element or sub-element. Multiple options are provided, including the option to enter a regular expression. When content is entered in a metadata field, the compliance with the validation rules will automatically be checked and a warning message will be displayed in teh element and in the project home page. When more than one validation rule is set for a same element, the entry must comply with all of them to be valid.
   
