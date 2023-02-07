@@ -121,7 +121,7 @@ abstract class MY_REST_Controller extends REST_Controller {
 		
 		$json=json_decode($data,true);
 
-		if (!$json){
+		if (!$json && json_last_error()!==0){
 			throw new Exception("INVALID_JSON_INPUT");
 		}
 

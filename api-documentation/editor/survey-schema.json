@@ -1,0 +1,225 @@
+{
+  "$id": "http://ihsn.org/schemas/microdata",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Survey Microdata Schema",
+  "id": "survey-schema.json",
+  "version": "0.0",
+  "description": "Schema for Survey data type based on DDI 2.5",
+  "allOf": [
+    {
+      "type": "object",
+      "properties": {
+        "repositoryid": {
+          "type": "string",
+          "title": "Collection ID that owns the survey",
+          "description": "Abbreviation for the collection that owns this survey."
+        },
+        "access_policy": {
+          "type": "string",
+          "title": "Data access policy",
+          "description": "Data access policy for attached microdata resources",
+          "enum": [
+            "direct",
+            "open",
+            "public",
+            "licensed",
+            "remote",
+            "data_na"
+          ],
+          "default": "data_na"
+        },
+        "published": {
+          "type": "integer",
+          "description": "Status of the survey - 0=draft, 1=published",
+          "default": 0
+        },
+        "overwrite": {
+          "type": "string",
+          "description": "Overwrite survey if already exists?",
+          "enum": [
+            "yes",
+            "no"
+          ],
+          "default": "no"
+        }
+      }
+    },
+    {
+      "$ref": "ddi-schema.json"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "provenance": {
+          "type": "array",
+          "description": "Provenance",
+          "items": {
+            "$ref": "provenance-schema.json"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "title": "Tags (user-defined)",
+          "description": "Tags",
+          "items": {
+            "type": "object",
+            "properties": {
+              "tag": {
+                "title": "Tag",
+                "type": "string"
+              },
+              "tag_group": {
+                "title": "Tag group",
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "tag"
+          ]
+        },
+        "lda_topics": {
+          "type": "array",
+          "title": "LDA topics",
+          "description": "LDA topics",
+          "items": {
+            "type": "object",
+            "properties": {
+              "model_info": {
+                "type": "array",
+                "title": "Model information",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "source": {
+                      "title": "Source",
+                      "type": "string"
+                    },
+                    "author": {
+                      "title": "Author",
+                      "type": "string"
+                    },
+                    "version": {
+                      "title": "Version",
+                      "type": "string"
+                    },
+                    "model_id": {
+                      "title": "Model Identifier",
+                      "type": "string"
+                    },
+                    "nb_topics": {
+                      "title": "Number of topics",
+                      "type": "number"
+                    },
+                    "description": {
+                      "title": "Description",
+                      "type": "string"
+                    },
+                    "corpus": {
+                      "title": "Corpus name",
+                      "type": "string"
+                    },
+                    "uri": {
+                      "title": "URI",
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "model_id"
+                ]
+              },
+              "topic_description": {
+                "type": "array",
+                "title": "Topic information",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "topic_id": {
+                      "title": "Topic identifier",
+                      "type": [
+                        "integer",
+                        "string"
+                      ]
+                    },
+                    "topic_score": {
+                      "title": "Topic score",
+                      "type": [
+                        "number",
+                        "string"
+                      ]
+                    },
+                    "topic_label": {
+                      "title": "Topic label",
+                      "type": "string"
+                    },
+                    "topic_words": {
+                      "type": "array",
+                      "title": "Topic words",
+                      "description": "Words",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "word": {
+                            "title": "Word",
+                            "type": "string"
+                          },
+                          "word_weight": {
+                            "title": "Word weight",
+                            "type": "number"
+                          }
+                        }
+                      },
+                      "required": [
+                        "word"
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "topic_id"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "embeddings": {
+          "type": "array",
+          "title": "Word embeddings",
+          "description": "Word embeddings",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "title": "Vector Model ID",
+                "type": "string"
+              },
+              "description": {
+                "title": "Vector Model Description",
+                "type": "string"
+              },
+              "date": {
+                "title": "Date (YYYY-MM-DD)",
+                "type": "string"
+              },
+              "vector": {
+                "title": "Vector",
+                "type": "object"
+              }
+            },
+            "required": [
+              "id",
+              "vector"
+            ]
+          }
+        },
+        "additional": {
+          "type": "object",
+          "description": "Additional metadata not covered by DDI elements",
+          "properties": {}
+        }
+      }
+    }
+  ]
+}

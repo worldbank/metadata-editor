@@ -163,13 +163,7 @@ class Editor extends MY_REST_Controller
 	 */
 	function create_post($type=null)
 	{
-		/*if($type=='timeseries-db' || $type=='timeseriesdb'){
-			throw new Exception("NOT IMPLEMENTED YET");
-			//return $this->create_timeseries_database($idno);
-		}*/
-
-		try{
-			//$options=$this->raw_json_input();
+		try{			
 			$user_id=$this->get_api_user_id();
 			
 			$options=array(
@@ -194,6 +188,12 @@ class Editor extends MY_REST_Controller
 
 			$this->Editor_model->create_project_folder($dataset_id);
 			$project=$this->Editor_model->get_row($dataset_id);
+
+			$project_options=$this->raw_json_input();
+			
+			if (!empty($project_options)){
+				$this->update_post($type,$dataset_id);
+			}
 
 			/*
 			//create dataset project folder
@@ -243,11 +243,6 @@ class Editor extends MY_REST_Controller
 	 */
 	function update_post($type=null,$id=null,$validate=false)
 	{
-		/*if($type=='timeseries-db' || $type=='timeseriesdb'){
-			//return $this->update_timeseries_database($idno);
-			throw new Exception("NOT IMPLEMENTED YET");
-		}*/
-
 		try{			
 			$options=$this->raw_json_input();
 			$user_id=$this->get_api_user_id();

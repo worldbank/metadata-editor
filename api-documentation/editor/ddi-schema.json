@@ -1,0 +1,1623 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://ihsn.org/schemas/ddi2-codebook",
+  "version": "0.0",
+  "title": "Survey Microdata Schema Draft",
+  "description": "Schema for Survey data type based on DDI 2.5",
+  "definitions": {
+    "doc_desc": {
+      "type": "object",
+      "title": "Document Description",
+      "description": "Document Description",
+      "_ddi_xpath": "docDscr",
+      "properties": {
+        "title": {
+          "title": "Document title",
+          "description": "Document title",
+          "type": "string",
+          "_ddi_xpath": "docDscr/citation/titlStmt/titl"
+        },
+        "idno": {
+          "title": "Unique ID number for the document",
+          "type": "string",
+          "_ddi_xpath": "docDscr/citation/titlStmt/IDNo"
+        },
+        "producers": {
+          "type": "array",
+          "title": "Producers",
+          "description": "List of producers",
+          "_ddi_xpath": "docDscr/citation/prodStmt/producer",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "title": "Name",
+                "description": "Name (required)",
+                "type": "string"
+              },
+              "abbr": {
+                "title": "Abbreviation",
+                "type": "string"
+              },
+              "affiliation": {
+                "type": "string",
+                "title": "Affiliation"
+              },
+              "role": {
+                "title": "Role",
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "prod_date": {
+          "title": "Date of Production",
+          "description": "Document production date using format(YYYY-MM-DD)",
+          "type": "string",
+          "_ddi_xpath": "docDscr/citation/prodStmt/prodDate"
+        },
+        "version_statement": {
+          "type": "object",
+          "title": "Version Statement",
+          "description": "Version Statement",
+          "_ddi_xpath": "docDscr/citation/verStmt",
+          "properties": {
+            "version": {
+              "title": "Version",
+              "type": "string",
+              "_ddi_xpath": "docDscr/citation/verStmt/version"
+            },
+            "version_date": {
+              "title": "Version Date",
+              "type": "string",
+              "_ddi_xpath": "docDscr/citation/verStmt/version/@date"
+            },
+            "version_resp": {
+              "title": "Version Responsibility Statement",
+              "description": "The organization or person responsible for the version of the work",
+              "type": "string",
+              "_ddi_xpath": "docDscr/citation/verStmt/verResp"
+            },
+            "version_notes": {
+              "title": "Version Notes",
+              "type": "string",
+              "_ddi_xpath": "docDscr/citation/verStmt/notes"
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "study_desc": {
+      "type": "object",
+      "description": "Study Description",
+      "_ddi_xpath": "stdyDscr",
+      "properties": {
+        "title_statement": {
+          "type": "object",
+          "description": "Study title",
+          "_ddi_xpath": "stdyDscr/citation/titlStmt",
+          "properties": {
+            "idno": {
+              "type": "string",
+              "title": "Unique user defined ID",
+              "description": "The ID number of a dataset is a unique number that is used to identify a particular survey. Define and use a consistent scheme to use. Such an ID could be constructed as follows: country-producer-survey-year-version where \n - country is the 3-letter ISO country abbreviation \n - producer is the abbreviation of the producing agency \n - survey is the survey abbreviation \n - year is the reference year (or the year the survey started) \n - version is the number dataset version number (see Version Description below)",
+              "_ddi_xpath": "stdyDscr/citation/titlStmt/IDNo"
+            },
+            "identifiers": {
+              "type": "array",
+              "title": "Other identifiers",
+              "description": "Other identifiers",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "title": "Identifier type",
+                    "description": "Type of identifier e.g. `doi`, `handle`, `other`",
+                    "type": "string"
+                  },
+                  "identifier": {
+                    "title": "Identifier",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "identifier"
+                ]
+              }
+            },
+            "title": {
+              "type": "string",
+              "title": "Survey title",
+              "description": "The title is the official name of the survey as it is stated on the questionnaire or as it appears in the design documents. The following items should be noted:\n - Include the reference year(s) of the survey in the title. \n - Do not include the abbreviation of the survey name in the title. \n - As the survey title is a proper noun, the first letter of each word should be capitalized (except for prepositions or other conjunctions).\n - Including the country name in the title is optional.",
+              "_ddi_xpath": "stdyDscr/citation/titlStmt/titl"
+            },
+            "sub_title": {
+              "type": "string",
+              "title": "Survey subtitle",
+              "description": "A short subtitle for the survey",
+              "_ddi_xpath": "stdyDscr/citation/titlStmt/subTitl"
+            },
+            "alternate_title": {
+              "type": "string",
+              "title": "Abbreviation or Acronym",
+              "description": "The abbreviation of a survey is usually the first letter of each word of the titled survey. The survey reference year(s) may be included.",
+              "_ddi_xpath": "stdyDscr/citation/titlStmt/altTitl"
+            },
+            "translated_title": {
+              "title": "Translated Title",
+              "description": "In countries with more than one official language, a translation of the title may be provided.",
+              "type": "string",
+              "_ddi_xpath": "stdyDscr/citation/titlStmt/parTitl"
+            }
+          },
+          "required": [
+            "idno",
+            "title"
+          ]
+        },
+        "authoring_entity": {
+          "type": "array",
+          "title": "Authoring entity/Primary investigators",
+          "description": "The person, corporate body, or agency responsible for the work's substantive and intellectual content. Repeat the element for each author, and use 'affiliation' attribute if available. Invert first and last name and use commas.",
+          "_ddi_xpath": "stdyDscr/citation/rspStmt/AuthEnty",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "title": "Agency Name",
+                "type": "string"
+              },
+              "affiliation": {
+                "title": "Affiliation",
+                "type": "string"
+              }
+            },
+            "required": [
+              "name"
+            ]
+          }
+        },
+        "oth_id": {
+          "type": "array",
+          "title": "Other Identifications/Acknowledgments",
+          "description": "Acknowledge any other people and institutions that have in some form contributed to the survey",
+          "_ddi_xpath": "stdyDscr/citation/rspStmt/othId",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "title": "Name",
+                "description": "Person or Agency name",
+                "type": "string"
+              },
+              "role": {
+                "title": "Role",
+                "type": "string"
+              },
+              "affiliation": {
+                "title": "Affiliation",
+                "type": "string"
+              }
+            },
+            "required": [
+              "name"
+            ]
+          }
+        },
+        "production_statement": {
+          "type": "object",
+          "title": "Production Statement",
+          "description": "Production Statement",
+          "_ddi_xpath": "stdyDscr/citation/prodStmt",
+          "properties": {
+            "producers": {
+              "type": "array",
+              "title": "Producers",
+              "description": "List of producers",
+              "_ddi_xpath": "stdyDscr/citation/prodStmt/producer",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "title": "Name",
+                    "description": "Name (required)",
+                    "type": "string"
+                  },
+                  "abbr": {
+                    "title": "Abbreviation",
+                    "type": "string"
+                  },
+                  "affiliation": {
+                    "type": "string",
+                    "title": "Affiliation"
+                  },
+                  "role": {
+                    "title": "Role",
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "name"
+              ]
+            },
+            "copyright": {
+              "title": "Copyright",
+              "type": "string",
+              "_ddi_xpath": "stdyDscr/citation/prodStmt/copyright"
+            },
+            "prod_date": {
+              "title": "Production Date",
+              "description": "Date when the marked-up document/marked-up document source/data collection/other material(s) were produced (not distributed or archived). The ISO standard for dates (YYYY-MM-DD) is recommended for use with the date attribute. Production date for data collection (2.1.3.3) maps to Dublin Core Date element.",
+              "type": "string",
+              "_ddi_xpath": "stdyDscr/citation/prodStmt/prodDate"
+            },
+            "prod_place": {
+              "title": "Production Place",
+              "description": "Address of the archive or organization that produced the work",
+              "type": "string",
+              "_ddi_xpath": "stdyDscr/citation/prodStmt/prodPlac"
+            },
+            "funding_agencies": {
+              "type": "array",
+              "title": "Funding Agency/Sponsor",
+              "description": "The source(s) of funds for production of the work. If different funding agencies sponsored different stages of the production process, use the 'role' attribute to distinguish them.",
+              "_ddi_xpath": "stdyDscr/citation/prodStmt/fundAg",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "title": "Funding Agency/Sponsor",
+                    "type": "string"
+                  },
+                  "abbr": {
+                    "title": "Abbreviation",
+                    "type": "string"
+                  },
+                  "grant": {
+                    "title": "Grant Number",
+                    "type": "string",
+                    "_ddi_xpath": "stdyDscr/citation/prodStmt/grantNo"
+                  },
+                  "role": {
+                    "title": "Role",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          }
+        },
+        "distribution_statement": {
+          "type": "object",
+          "title": "Distribution Statement",
+          "description": "Distribution Statement",
+          "_ddi_xpath": "stdyDscr/citation/distStmt",
+          "properties": {
+            "distributors": {
+              "type": "array",
+              "title": "Distributor",
+              "description": "The organization designated by the author or producer to generate copies of the particular work including any necessary editions or revisions. Names and addresses may be specified and other archives may be co-distributors. A URI attribute is included to provide an URN or URL to the ordering service or download facility on a Web site.",
+              "_ddi_xpath": "stdyDscr/citation/distStmt/distrbtr",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "title": "Organization name",
+                    "description": "Organization name",
+                    "type": "string"
+                  },
+                  "abbr": {
+                    "title": "Abbreviation",
+                    "type": "string"
+                  },
+                  "affiliation": {
+                    "title": "Affiliation",
+                    "type": "string"
+                  },
+                  "uri": {
+                    "title": "URI",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            },
+            "contact": {
+              "type": "array",
+              "title": "Contact",
+              "description": "Contact",
+              "_ddi_xpath": "stdyDscr/citation/distStmt/contact",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "title": "Name",
+                    "type": "string"
+                  },
+                  "affiliation": {
+                    "title": "Affiliation",
+                    "type": "string"
+                  },
+                  "email": {
+                    "title": "Email",
+                    "type": "string"
+                  },
+                  "uri": {
+                    "title": "URI",
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "name"
+              ]
+            },
+            "depositor": {
+              "type": "array",
+              "title": "Depositor",
+              "description": "Depositor",
+              "_ddi_xpath": "stdyDscr/citation/distStmt/depositr",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "title": "Name",
+                    "type": "string"
+                  },
+                  "abbr": {
+                    "title": "Abbreviation",
+                    "type": "string"
+                  },
+                  "affiliation": {
+                    "title": "Affiliation",
+                    "type": "string"
+                  },
+                  "uri": {
+                    "title": "URI",
+                    "type": "string"
+                  }
+                }
+              },
+              "required": [
+                "name"
+              ]
+            },
+            "deposit_date": {
+              "title": "Date of Deposit",
+              "type": "string",
+              "_ddi_xpath": "stdyDscr/citation/distStmt/depDate"
+            },
+            "distribution_date": {
+              "title": "Date of Distribution",
+              "type": "string",
+              "_ddi_xpath": "stdyDscr/citation/distStmt/distDate"
+            }
+          }
+        },
+        "series_statement": {
+          "type": "object",
+          "title": "Series Statement",
+          "description": "Series Statement",
+          "_ddi_xpath": "stdyDscr/citation/serStmt",
+          "properties": {
+            "series_name": {
+              "title": "Series Name",
+              "description": "The name of the series to which the work belongs.",
+              "type": "string",
+              "_ddi_xpath": "stdyDscr/citation/serStmt/serName"
+            },
+            "series_info": {
+              "title": "Series Information",
+              "description": "A survey may be repeated at regular intervals (such as an annual labour force survey), or be part of an international survey program (such as the MICS, CWIQ, DHS, LSMS and others). The Series information is a description of this `collection` of surveys. A brief description of the characteristics of the survey, including when it started, how many rounds were already implemented, and who is in charge would be provided here.",
+              "type": "string",
+              "_ddi_xpath": "stdyDscr/citation/serStmt/serInfo"
+            }
+          }
+        },
+        "version_statement": {
+          "type": "object",
+          "title": "Version Statement",
+          "description": "Version Statement",
+          "_ddi_xpath": "stdyDscr/citation/verStmt",
+          "properties": {
+            "version": {
+              "title": "Version",
+              "type": "string",
+              "_ddi_xpath": "stdyDscr/citation/verStmt/version"
+            },
+            "version_date": {
+              "title": "Version Date",
+              "type": "string",
+              "_ddi_xpath": "stdyDscr/citation/verStmt/version/@date"
+            },
+            "version_resp": {
+              "title": "Version Responsibility Statement",
+              "description": "The organization or person responsible for the version of the work",
+              "type": "string",
+              "_ddi_xpath": "stdyDscr/citation/verStmt/verResp"
+            },
+            "version_notes": {
+              "title": "Version Notes",
+              "type": "string",
+              "_ddi_xpath": "stdyDscr/citation/verStmt/notes"
+            }
+          }
+        },
+        "bib_citation": {
+          "type": "string",
+          "title": "Bibliographic Citation",
+          "description": "Complete bibliographic reference containing all of the standard elements of a citation that can be used to cite the work. The `'bib_citation_format'` field is provided to enable specification of the particular citation style used, e.g., APA, MLA, Chicago, etc.",
+          "_ddi_xpath": "stdyDscr/citation/biblCit"
+        },
+        "bib_citation_format": {
+          "type": "string",
+          "title": "Bibliographic Citation Format",
+          "description": "Specification of the particular citation style used, e.g., `APA`, `MLA`, `Chicago`, etc.",
+          "_ddi_xpath": "stdyDscr/citation/biblCit/@format"
+        },
+        "holdings": {
+          "type": "array",
+          "title": "Holdings Information",
+          "description": "Information concerning either the physical or electronic holdings of the cited work. Attributes include: location--The physical location where a copy is held; callno--The call number for a work at the location specified; and URI--A URN or URL for accessing the electronic copy of the cited work.",
+          "_ddi_xpath": "stdyDscr/citation/holdings",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "title": "Name",
+                "type": "string"
+              },
+              "location": {
+                "title": "Location",
+                "type": "string"
+              },
+              "callno": {
+                "title": "Callno",
+                "type": "string"
+              },
+              "uri": {
+                "title": "URI",
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "name"
+          ]
+        },
+        "study_notes": {
+          "title": "Study notes",
+          "type": "string",
+          "_ddi_xpath": "stdyDscr/citation/notes"
+        },
+        "study_authorization": {
+          "type": "object",
+          "title": "Study Authorization",
+          "_ddi_xpath": "stdyDscr/studyAuthorization",
+          "description": "Provides structured information on the agency that authorized the study, the date of authorization, and an authorization statement",
+          "properties": {
+            "date": {
+              "title": "Authorization Date",
+              "type": "string",
+              "_ddi_xpath": "stdyDscr/studyAuthorization/@date"
+            },
+            "agency": {
+              "type": "array",
+              "title": "Authorizing Agency",
+              "description": "The source(s) of funds for production of the work. If different funding agencies sponsored different stages of the production process, use the 'role' attribute to distinguish them.",
+              "_ddi_xpath": "stdyDscr/studyAuthorization/authorizingAgency",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "title": "Funding Agency/Sponsor",
+                    "type": "string"
+                  },
+                  "affiliation": {
+                    "title": "Affiliation",
+                    "type": "string"
+                  },
+                  "abbr": {
+                    "title": "Abbreviation",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            },
+            "authorization_statement": {
+              "title": "Authorization Statement",
+              "description": "Authorization Statement",
+              "_ddi_xpath": "stdyDscr/studyAuthorization/authorizationStatement",
+              "type": "string"
+            }
+          }
+        },
+        "study_info": {
+          "type": "object",
+          "title": "Study Scope",
+          "description": "This section contains information about the data collection's scope across several dimensions, including substantive content, geography, and time.",
+          "_ddi_xpath": "stdyDscr/stdyInfo",
+          "properties": {
+            "study_budget": {
+              "title": "Study Budget",
+              "description": "Provide a clear summary of the pDescribe the budget of the project in as much detail as needed. Use XHTML structure elements to identify discrete pieces of information in a way that facilitates direct transfer of information on the study budget between DDI 2 and DDI 3 structures.urposes, objectives and content of the survey",
+              "type": "string",
+              "_ddi_xpath": "stdyDscr/stdyInfo/studyBudget"
+            },
+            "keywords": {
+              "type": "array",
+              "description": "Keywords",
+              "_ddi_xpath": "stdyDscr/stdyInfo/subject/keywords",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "keyword": {
+                    "title": "Keyword",
+                    "type": "string"
+                  },
+                  "vocab": {
+                    "title": "Vocabulary",
+                    "type": "string"
+                  },
+                  "uri": {
+                    "title": "uri",
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "topics": {
+              "type": "array",
+              "title": "Topic Classification",
+              "description": "Topic Classification",
+              "_ddi_xpath": "stdyDscr/stdyInfo/subject/topcClas",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "topic": {
+                    "title": "Topic",
+                    "type": "string"
+                  },
+                  "vocab": {
+                    "title": "Vocab",
+                    "type": "string"
+                  },
+                  "uri": {
+                    "title": "URI",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "topic"
+                ]
+              }
+            },
+            "abstract": {
+              "title": "Abstract",
+              "description": "Provide a clear summary of the purposes, objectives and content of the survey",
+              "type": "string",
+              "_ddi_xpath": "stdyDscr/stdyInfo/abstract"
+            },
+            "time_periods": {
+              "type": "array",
+              "title": "Time periods (YYYY/MM/DD)",
+              "description": "This field will usually be left empty. Time period differs from the dates of collection as they represent the period for which the data collected are applicable or relevant.",
+              "_ddi_xpath": "stdyDscr/stdyInfo/sumDscr/timePrd",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "start": {
+                    "title": "Start date",
+                    "description": "Start date",
+                    "type": "string"
+                  },
+                  "end": {
+                    "title": "End date",
+                    "description": "End date",
+                    "type": "string"
+                  },
+                  "cycle": {
+                    "title": "Cycle",
+                    "description": "Cycle",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "start"
+                ]
+              }
+            },
+            "coll_dates": {
+              "type": "array",
+              "title": "Dates of Data Collection (YYYY/MM/DD)",
+              "description": "Enter the dates (at least month and year) of the start and end of the data collection. In some cases, data collection for a same survey can be conducted in waves. In such case, you should enter the start and end date of each wave separately, and identify each wave in the 'cycle' field.",
+              "_ddi_xpath": "stdyDscr/stdyInfo/sumDscr/collDate",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "start": {
+                    "title": "Start date",
+                    "description": "Start date",
+                    "type": "string"
+                  },
+                  "end": {
+                    "title": "End date",
+                    "description": "End date",
+                    "type": "string"
+                  },
+                  "cycle": {
+                    "title": "Cycle",
+                    "description": "Cycle",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "start"
+                ]
+              }
+            },
+            "nation": {
+              "title": "Country",
+              "description": "Indicates the country or countries covered in the file. Field `abbreviation` may be used to list common abbreviations; use of ISO country codes is recommended. Maps to Dublin Core Coverage element. Inclusion of this element is recommended.",
+              "_ddi_xpath": "stdyDscr/stdyInfo/sumDscr/nation",
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "title": "Name",
+                    "description": "Country name",
+                    "type": "string"
+                  },
+                  "abbreviation": {
+                    "title": "Country code",
+                    "description": "Country ISO code",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            },
+            "bbox": {
+              "title": "Geographic bounding box",
+              "type": "array",
+              "_ddi_xpath": "stdyDscr/sumDscr/geoBndBox",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "west": {
+                    "title": "West",
+                    "type": "string"
+                  },
+                  "east": {
+                    "title": "East",
+                    "type": "string"
+                  },
+                  "south": {
+                    "title": "South",
+                    "type": "string"
+                  },
+                  "north": {
+                    "title": "North",
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "bound_poly": {
+              "title": "Geographic Bounding Polygon",
+              "description": "This field allows the creation of multiple polygons to describe in a more detailed manner the geographic area covered by the dataset. It should only be used to define the outer boundaries of a covered area. For example, in the United States, such polygons can be created to define boundaries for Hawaii, Alaska, and the continental United States, but not interior boundaries for the contiguous states. This field is used to refine a coordinate-based search, not to actually map an area. \nIf the boundPoly element is used, then geoBndBox MUST be present, and all points enclosed by the boundPoly MUST be contained within the geoBndBox. Elements westBL, eastBL, southBL, and northBL of the geoBndBox should each be represented in at least one point of the boundPoly description.",
+              "type": "array",
+              "_ddi_xpath": "stdyDscr/sumDscr/boundPoly",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "lat": {
+                    "title": "Latitude",
+                    "description": "Latitude (y coordinate) of a point. Valid range expressed in decimal degrees is as follows: -90,0 to 90,0 degrees (latitude)",
+                    "type": "string"
+                  },
+                  "lon": {
+                    "title": "longitude",
+                    "description": "Longitude (x coordinate) of a point. Valid range expressed in decimal degrees is as follows: -180,0 to 180,0 degrees (longitude)",
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "geog_coverage": {
+              "description": " Information on the geographic coverage of the data. Includes the total geographic scope of the data, and any additional levels of geographic coding provided in the variables. Maps to Dublin Core Coverage element. Inclusion of this element in the codebook is recommended.",
+              "title": "Geographic Coverage",
+              "type": "string",
+              "_ddi_xpath": "stdyDscr/stdyInfo/sumDscr/geogCover"
+            },
+            "geog_coverage_notes": {
+              "description": "Geographic coverage notes",
+              "title": "Geographic Coverage notes",
+              "type": "string",
+              "_ddi_xpath": "stdyDscr/sumDscr/geogCover/txt"
+            },
+            "geog_unit": {
+              "title": "Geographic Unit",
+              "description": "Lowest level of geographic aggregation covered by the data",
+              "type": "string",
+              "_ddi_xpath": "stdyDscr/stdyInfo/sumDscr/geogUnit"
+            },
+            "analysis_unit": {
+              "title": "Unit of Analysis",
+              "description": "Basic unit(s) of analysis or observation that the study describes: individuals, families/households, groups, facilities, institutions/organizations, administrative units, physical locations, etc.",
+              "type": "string",
+              "_ddi_xpath": "stdyDscr/stdyInfo/sumDscr/anlyUnit"
+            },
+            "universe": {
+              "title": "Universe",
+              "description": "We are interested here in the survey universe (not the universe of particular sections of the questionnaires or variables), i.e. in the identification of the population of interest in the survey. The universe will rarely be the entire population of the country. Sample household surveys, for example, usually do not cover homeless, nomads, diplomats, community households. Some surveys may cover only the population of a particular age group, or only male (or female), etc.",
+              "type": "string",
+              "_ddi_xpath": "stdyDscr/stdyInfo/sumDscr/universe"
+            },
+            "data_kind": {
+              "title": "Kind of Data",
+              "description": "Broad classification of the data",
+              "type": "string",
+              "_ddi_xpath": "stdyDscr/stdyInfo/sumDscr/dataKind",
+              "enum_": [
+                "Sample survey data[ssd]",
+                "Census/enumeration data[cen]",
+                "Administrative records data[adm]",
+                "Aggregate data[agg]",
+                "Event/transaction data[even]",
+                "Observation data/ratings[obs]"
+              ]
+            },
+            "notes": {
+              "title": "Study notes",
+              "description": "Study notes",
+              "type": "string",
+              "_ddi_xpath": "stdyDscr/stdyInfo/notes"
+            },
+            "quality_statement": {
+              "title": "Quality Statement",
+              "description": "The quality statement provides elements to describe compliance with quality standards in the form of a statement and an itemized list of standards complied with, and an element to provide other quality statement.",
+              "type": "object",
+              "_ddi_xpath": "stdyDscr/stdyInfo/qualityStatement",
+              "_comments": "TODO: not clear if this should be repeatable.",
+              "properties": {
+                "compliance_description": {
+                  "title": "Standard compliance description",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/stdyInfo/qualityStatement/standardsCompliance/complianceDescription"
+                },
+                "standards": {
+                  "type": "array",
+                  "title": "Standards",
+                  "description": "Standards",
+                  "_ddi_xpath": "stdyDscr/stdyInfo/qualityStatement/standardsCompliance/standard",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "title": "Name",
+                        "type": "string"
+                      },
+                      "producer": {
+                        "title": "Producer",
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ]
+                },
+                "other_quality_statement": {
+                  "title": "Other quality statement",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/stdyInfo/qualityStatement/otherQualityStatement"
+                }
+              }
+            },
+            "ex_post_evaluation": {
+              "title": "Ex-Post Evaluation",
+              "description": "This structure consists of two parts, standardsCompliance and otherQualityStatements. In standardsCompliance list all specific standards complied with during the execution of this study. Note the standard name and producer and how the study complied with the standard. Enter any additional quality statements in otherQualityStatements.",
+              "type": "object",
+              "_ddi_xpath": "stdyDscr/stdyInfo/exPostEvaluation",
+              "_comments": "TODO: not clear if this should be repeatable.",
+              "properties": {
+                "completion_date": {
+                  "title": "Evaluation completion date",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/stdyInfo/exPostEvaluation/@completionDate"
+                },
+                "type": {
+                  "title": "Evaluation type",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/stdyInfo/@type"
+                },
+                "evaluator": {
+                  "type": "array",
+                  "title": "Evaluators",
+                  "description": "Evaluators",
+                  "_ddi_xpath": "stdyDscr/stdyInfo/exPostEvaluation/evaluator",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "title": "Funding Agency/Sponsor",
+                        "type": "string"
+                      },
+                      "affiliation": {
+                        "title": "Affiliation",
+                        "type": "string"
+                      },
+                      "abbr": {
+                        "title": "Abbreviation",
+                        "type": "string"
+                      },
+                      "role": {
+                        "title": "Role",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "name"
+                    ]
+                  }
+                },
+                "evaluation_process": {
+                  "title": "Evaluation process",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/stdyInfo/exPostEvaluation/evaluationProcess"
+                },
+                "outcomes": {
+                  "title": "Outcomes",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/stdyInfo/exPostEvaluation/outcomes"
+                }
+              }
+            }
+          },
+          "required": [
+            "nation"
+          ]
+        },
+        "study_development": {
+          "title": "Study Development",
+          "description": "Describe the process of study development as a series of development activities. These activities can be typed using a controlled vocabulary. Describe the activity, listing participants with their role and affiliation, resources used (sources of information), and the outcome of the development activity.",
+          "type": "object",
+          "_ddi_xpath": "stdyDscr/studyDevelopment",
+          "properties": {
+            "development_activity": {
+              "type": "array",
+              "title": "Development activity",
+              "_ddi_xpath": "stdyDscr/studyDevelopment/developmentActivity",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "activity_type": {
+                    "title": "Development activity type",
+                    "type": "string",
+                    "_ddi_xpath": "stdyDscr/studyDevelopment/developmentActivity/@type"
+                  },
+                  "activity_description": {
+                    "title": "Development activity description",
+                    "type": "string",
+                    "_ddi_xpath": "stdyDscr/studyDevelopment/developmentActivity/description"
+                  },
+                  "participants": {
+                    "type": "array",
+                    "title": "Participants",
+                    "description": "Participants",
+                    "_ddi_xpath": "stdyDscr/studyDevelopment/developmentActivity/participant",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "title": "Participant name",
+                          "type": "string"
+                        },
+                        "affiliation": {
+                          "title": "Affiliation",
+                          "type": "string"
+                        },
+                        "role": {
+                          "title": "Role",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "name"
+                      ]
+                    }
+                  },
+                  "resources": {
+                    "type": "array",
+                    "title": "Development activity resources",
+                    "description": "Development activity resources",
+                    "_ddi_xpath": "stdyDscr/studyDevelopment/developmentActivity/resource",
+                    "items":{
+                      "type":"object",
+                      "properties":{
+                        "name": {
+                          "type": "string",
+                          "title": "Resource name",
+                          "description": "Name of the resource"
+                        },
+                        "origin": {
+                          "type": "string",
+                          "title": "Origin of resource",
+                          "description": "For historical materials, information about the origin(s) of the sources and the rules followed in establishing the sources should be specified. May not be relevant to survey data. ",
+                          "_ddi_xpath": "stdyDscr/studyDevelopment/developmentActivity/resource/srcOrig"
+                        },
+                        "characteristics": {
+                          "type": "string",
+                          "title": "Characteristics of resource",
+                          "description": "Assessment of characteristics and quality of source material. May not be relevant to survey data.",
+                          "_ddi_xpath": "stdyDscr/studyDevelopment/developmentActivity/resource/srcChar"
+                        }
+                      }
+                    }                    
+                  },
+                  "outcome": {
+                    "title": "Development Activity Outcome",
+                    "description": "Development Activity Outcome",
+                    "type": "string",
+                    "_ddi_xpath": "stdyDscr/studyDevelopment/developmentActivity/outcome"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "method": {
+          "type": "object",
+          "title": "Methodology and Processing",
+          "description": "Methodology and processing",
+          "_ddi_xpath": "stdyDscr/method",
+          "properties": {
+            "data_collection": {
+              "type": "object",
+              "title": "Data Collection",
+              "_ddi_xpath": "stdyDscr/method/dataColl",
+              "description": "Information about the methodology employed in a data collection",
+              "properties": {
+                "time_method": {
+                  "title": "Time Method",
+                  "description": "The time method or time dimension of the data collection. Examples: `panel survey`, `h>cross-section`, `trend study`, `time-series`",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/method/dataColl/timeMeth"
+                },
+                "data_collectors": {
+                  "title": "Data Collectors",
+                  "description": "The persons and/or agencies that took charge of the data collection. This element includes 3 fields: Name, Abbreviation and the Affiliation. In most cases, we will record here the name of the agency, not the name of interviewers. Only in the case of very small-scale surveys, with a very limited number of interviewers, the name of person will be included as well. The field Affiliation is optional and not relevant in all cases.",
+                  "_ddi_xpath": "stdyDscr/method/dataColl/dataCollector",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "title": "Name",
+                        "type": "string"
+                      },
+                      "affiliation": {
+                        "title": "Affiliation",
+                        "type": "string"
+                      },
+                      "abbr": {
+                        "title": "Abbreviation",
+                        "type": "string"
+                      },
+                      "role": {
+                        "title": "Role",
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "collector_training": {
+                  "title": "Collector training",
+                  "description": "Describes the training provided to data collectors including interviewer training, process testing, compliance with standards etc. This is repeatable for language and to capture different aspects of the training process. The type attribute allows specification of the type of training being described.",
+                  "type": "array",
+                  "items":{
+                    "type":"object",
+                    "properties": {
+                      "type": {
+                        "title": "Training type",
+                        "description": "The percentage of sample members who provided information",
+                        "type": "string",
+                        "_ddi_xpath": "stdyDscr/method/dataColl/collectorTraining/@type"
+                      },
+                      "training": {
+                        "title": "Training",
+                        "description": "Training provided to data collectors",
+                        "type": "string",
+                        "_ddi_xpath": "stdyDscr/method/dataColl/collectorTraining"
+                      }
+                    }
+                  }
+                },
+                "frequency": {
+                  "title": "Frequency of Data Collection",
+                  "description": "For data collected at more than one point in time, the frequency with which the data were collected. Examples `monthly`, `quarterly`, `yearly`",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/method/dataColl/frequenc"
+                },
+                "sampling_procedure": {
+                  "title": "Sampling Procedure",
+                  "description": "The type of sample and sample design used to select the survey respondents to represent the population. \nThis field only applies to sample surveys. Information on sampling procedure is crucial (although not applicable for censuses and administrative datasets). Examples `National multistage area probability sample`, `Simple random sample`, `Quota sample`",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/method/dataColl/sampProc"
+                },
+                "sample_frame": {
+                  "title": "Sample Frame",
+                  "description": "Sample frame describes the sampling frame used for identifying the population from which the sample was taken. For example, a telephone book may be a sample frame for a phone survey. In addition to the name, label and text describing the sample frame, this structure lists who maintains the sample frame, the period for which it is valid, a use statement, the universe covered, the type of unit contained in the frame as well as the number of units available, the reference period of the frame and procedures used to update the frame.",
+                  "type": "object",
+                  "_ddi_xpath": "stdyDscr/method/dataColl/sampleFrame",
+                  "properties": {
+                    "name": {
+                      "title": "Sample frame name",
+                      "description": "Sample frame name",
+                      "type": "string",
+                      "_ddi_xpath": "stdyDscr/method/dataColl/sampleFrame/sampleFrameName"
+                    },
+                    "valid_period": {
+                      "type": "array",
+                      "title": "Valid periods (YYYY/MM/DD)",
+                      "description": "Defines a time period for the validity of the sampling frame. Enter dates in YYYY-MM-DD format.",
+                      "_ddi_xpath": "stdyDscr/method/dataColl/sampleFrame/validPeriod",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "event": {
+                            "title": "Event",
+                            "description": "Event e.g. start, end",
+                            "type": "string"
+                          },
+                          "date": {
+                            "title": "Date",
+                            "description": "Date",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "date"
+                        ]
+                      }
+                    },
+                    "custodian": {
+                      "title": "Custodian",
+                      "description": "Custodian identifies the agency or individual who is responsible for creating or maintaining the sample frame.",
+                      "type": "string",
+                      "_ddi_xpath": "stdyDscr/method/dataColl/sampleFrame/custodian"
+                    },
+                    "universe": {
+                      "title": "Universe",
+                      "description": "The group of persons or other elements that are the object of research and to which any analytic results refer.",
+                      "type": "string",
+                      "_ddi_xpath": "stdyDscr/method/dataColl/sampleFrame/universe"
+                    },
+                    "frame_unit": {
+                      "type": "object",
+                      "title": "Frame unit",
+                      "_ddi_xpath": "stdyDscr/method/dataColl/sampleFrame/frameUnit",
+                      "description": "Provides information about the sampling frame unit. The attribute `isPrimary` is boolean, indicating whether the unit is primary or not.",
+                      "properties": {
+                        "is_primary": {
+                          "title": "Is Primary",
+                          "description": "Is a primary unit?",
+                          "type": [
+                            "boolean",
+                            "string"
+                          ],
+                          "_ddi_xpath": "stdyDscr/method/dataColl/sampleFrame/frameUnit/@isPrimary"
+                        },
+                        "unit_type": {
+                          "title": "Unit Type",
+                          "description": "Describes the type of sampling frame unit. The field `num_of_units` provides the number of units in the sampling frame.",
+                          "type": "string",
+                          "_ddi_xpath": "stdyDscr/method/dataColl/sampleFrame/frameUnit/unitType"
+                        },
+                        "num_of_units": {
+                          "title": "Number of units",
+                          "description": "Number of units in the sampling frame",
+                          "type": "string",
+                          "_ddi_xpath": "stdyDscr/method/dataColl/sampleFrame/frameUnit/@numberOfUnits"
+                        }
+                      }
+                    },
+                    "reference_period": {
+                      "type": "array",
+                      "title": "Reference periods (YYYY/MM/DD)",
+                      "description": "Indicates the period of time in which the sampling frame was actually used for the study in question. Use ISO 8601 date/time formats to enter the relevant date(s).",
+                      "_ddi_xpath": "stdyDscr/method/dataColl/sampleFrame/referencePeriod",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "event": {
+                            "title": "Event",
+                            "description": "Event e.g. start, end",
+                            "type": "string"
+                          },
+                          "date": {
+                            "title": "Date",
+                            "description": "Date",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "date"
+                        ]
+                      }
+                    },
+                    "update_procedure": {
+                      "title": "Update procedure",
+                      "description": "Description of how and with what frequency the sample frame is updated.",
+                      "type": "string",
+                      "_ddi_xpath": "stdyDscr/method/dataColl/sampleFrame/updateProcedure"
+                    }
+                  }
+                },
+                "sampling_deviation": {
+                  "title": "Deviations from the Sample Design",
+                  "description": "This field only applies to sample surveys.\nSometimes the reality of the field requires a deviation from the sampling design (for example due to difficulty to access to zones due to weather problems, political instability, etc). If for any reason, the sample design has deviated, this should be reported here. ",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/method/dataColl/deviat"
+                },
+                "coll_mode": {
+                  "title": "Mode of data collection",
+                  "type": [
+                    "string",
+                    "array"
+                  ],
+                  "description": "The mode of data collection is the manner in which the interview was conducted or information was gathered.  In most cases, the response will be 'face to face interview'. But for some specific kinds of datasets, such as for example data on rain fall, the response will be different.",
+                  "_ddi_xpath": "stdyDscr/method/dataColl/collMode",
+                  "enum_": [
+                    "Computer Assisted Personal Interview[capi]",
+                    "Computer Assisted Telephone Interview[cati]",
+                    "Face-to-Face[f2f]",
+                    "Focus Group[foc]",
+                    "Internet[int]",
+                    "Other[oth]"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "research_instrument": {
+                  "title": "Type of Research Instrument",
+                  "description": "The type of data collection instrument used. \n`Structured` indicates an instrument in which all respondents are asked the same questions/tests, possibly with precoded answers. If a small portion of such a questionnaire includes open-ended questions, provide appropriate comments. \n`Semi-structured` indicates that the research instrument contains mainly open-ended questions. \n`Unstructured` indicates that in-depth interviews were conducted.",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/method/dataColl/resInstru"
+                },
+                "instru_development": {
+                  "title": "Instrument development",
+                  "description": "Describe any development work on the data collection instrument. Type attribute allows for the optional use of a defined development type with or without use of a controlled vocabulary.",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/method/dataColl/instrumentDevelopment"
+                },
+                "instru_development_type": {
+                  "title": "Instrument development type",
+                  "description": "Instrument development type",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/method/dataColl/instrumentDevelopment/@type"
+                },
+                "sources": {
+                  "type": "array",
+                  "title": "Sources",
+                  "description": "Description of sources used for the data collection. The element is nestable so that the sources statement might encompass a series of discrete source statements, each of which could contain the facts about an individual source. This element maps to Dublin Core Source element.",
+                  "_ddi_xpath": "stdyDscr/method/dataColl/sources",
+                  "items":{
+                    "type":"object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "title": "Source name",
+                      "description": "Name of the source"
+                    },
+                    "origin": {
+                      "type": "string",
+                      "title": "Origin of Source",
+                      "description": "For historical materials, information about the origin(s) of the sources and the rules followed in establishing the sources should be specified. May not be relevant to survey data. ",
+                      "_ddi_xpath": "stdyDscr/method/dataColl/sources/srcOrig"
+                    },
+                    "characteristics": {
+                      "type": "string",
+                      "title": "Characteristics of Source Noted",
+                      "description": "Assessment of characteristics and quality of source material. May not be relevant to survey data.",
+                      "_ddi_xpath": "stdyDscr/method/dataColl/sources/srcChar"
+                    }                    
+                  }
+                }
+                },
+                "coll_situation": {
+                  "title": "Characteristics of Data Collection Situation - Notes on data collection",
+                  "__comment": "used for notes on data collection",
+                  "description": "Description of noteworthy aspects of the data collection situation. Includes information on factors such as cooperativeness of respondents, duration of interviews, number of call-backs, etc.",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/method/dataColl/collSitu"
+                },
+                "act_min": {
+                  "title": "Supervision",
+                  "description": "Summary of actions taken to minimize data loss. Includes information on actions such as follow-up visits, supervisory checks, historical matching, estimation, etc.",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/method/dataColl/actMin"
+                },
+                "control_operations": {
+                  "title": "Control Operations",
+                  "description": " Methods to facilitate data control performed by the primary investigator or by the data archive. Specify any special programs used for such operations.",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/method/dataColl/ConOps"
+                },
+                "weight": {
+                  "title": "Weighting",
+                  "description": "The use of sampling procedures may make it necessary to apply weights to produce accurate statistical results. Describe here the criteria for using weights in analysis of a collection. If a weighting formula or coefficient was developed, provide this formula, define its elements, and indicate how the formula is applied to data.",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/method/dataColl/weight"
+                },
+                "cleaning_operations": {
+                  "title": "Cleaning Operations",
+                  "description": "Methods used to `clean` the data collection, e.g., consistency checking, wildcode checking, etc.",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/method/dataColl/cleanOps"
+                }
+              }
+            },
+            "method_notes": {
+              "title": "Methodology notes",
+              "description": "Methodology notes",
+              "type": "string",
+              "_ddi_xpath": "stdyDscr/method/notes"
+            },
+            "analysis_info": {
+              "type": "object",
+              "title": "Data Appraisal",
+              "_ddi_xpath": "stdyDscr/method/anlyInfo",
+              "description": "Information about Data Appraisal",
+              "properties": {
+                "response_rate": {
+                  "title": "Response Rate",
+                  "description": "The percentage of sample members who provided information",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/method/anlyInfo/respRate"
+                },
+                "sampling_error_estimates": {
+                  "title": "Estimates of Sampling Error",
+                  "description": "Measure of how precisely one can estimate a population value from a given sample",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/method/anlyInfo/EstSmpErr"
+                },
+                "data_appraisal": {
+                  "title": "Data Appraisal",
+                  "description": "Other issues pertaining to data appraisal. Describe here issues such as response variance, nonresponse rate and testing for bias, interviewer and response bias, confidence levels, question bias, etc.",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/method/anlyInfo/dataAppr"
+                }
+              }
+            },
+            "study_class": {
+              "title": "Class of the Study",
+              "description": "Generally used to give the data archive's class or study status number, which indicates the processing status of the study. May also be used as a text field to describe processing status. Example: `DDA Class C`, `Study is available from http://example.com` ",
+              "type": [
+                "string",
+                "array"
+              ],
+              "_ddi_xpath": "stdyDscr/method/stdyClas"
+            },
+            "data_processing": {
+              "type": "array",
+              "title": "Data Processing",
+              "description": "Describes various data processing procedures not captured elsewhere in the documentation, such as topcoding, recoding, suppression, tabulation, etc. The `type` attribute supports better classification of this activity, including the optional use of a controlled vocabulary",
+              "_ddi_xpath": "stdyDscr/method/dataProcessing",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "title": "Data processing type",
+                    "type": "string"
+                  },
+                  "description": {
+                    "title": "Data processing description",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "description"
+                ]
+              }
+            },
+            "coding_instructions": {
+              "type": "array",
+              "title": "Coding Instructions",
+              "_ddi_xpath": "stdyDscr/method/codingInstructions",
+              "description": "Describe specific coding instructions used in data processing, cleaning, assession, or tabulation.",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "related_processes": {
+                    "title": "Related processes",
+                    "type": "string",
+                    "_ddi_xpath": "stdyDscr/method/codingInstructions/@relatedProcesses"
+                  },
+                  "type": {
+                    "title": "Coding instructions type",
+                    "type": "string",
+                    "_ddi_xpath": "stdyDscr/method/codingInstructions/@type"
+                  },
+                  "txt": {
+                    "title": "Coding instructions text",
+                    "type": "string",
+                    "_ddi_xpath": "stdyDscr/method/codingInstructions/txt"
+                  },
+                  "command": {
+                    "title": "Command",
+                    "description": "Provide command code for the coding instruction. The formalLanguage attribute identifies the language of the command code.",
+                    "type": "string",
+                    "_ddi_xpath": "stdyDscr/method/codingInstructions/command"
+                  },
+                  "formal_language": {
+                    "title": "Identify the language of the command code",
+                    "description": "Identifies the language of the command code. e.g. `SPSS`, `R`, `STATA` ",
+                    "type": "string",
+                    "_ddi_xpath": "stdyDscr/method/codingInstructions/command/@formalLanguage"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "data_access": {
+          "type": "object",
+          "description": "Data Access",
+          "_ddi_xpath": "stdyDscr/dataAccs/setAvail/dataAccs",
+          "properties": {
+            "dataset_availability": {
+              "type": "object",
+              "title": "Data Set Availability",
+              "description": "Information on availability and storage of the collection",
+              "properties": {
+                "access_place": {
+                  "title": "Location of Data Collection",
+                  "description": "Location where the data collection is currently stored. Use the URL field `access_place_url` to provide a URN or URL for the storage site or the actual address from which the data may be downloaded",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/dataAccs/setAvail/accsPlac"
+                },
+                "access_place_url": {
+                  "title": "URL for Location of Data Collection",
+                  "description": "Location where the data collection is currently stored. Provide a URN or URL for the storage site or the actual address from which the data may be downloaded",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/dataAccs/setAvail/accsPlac/@URI"
+                },
+                "original_archive": {
+                  "title": "Archive where study is originally stored",
+                  "description": "Archive from which the data collection was obtained; the originating archive",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/dataAccs/setAvail/origArch"
+                },
+                "status": {
+                  "title": "Availability Status",
+                  "description": "Statement of collection availability. An archive may need to indicate that a collection is unavailable because it is embargoed for a period of time, because it has been superseded, because a new edition is imminent, etc.",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/dataAccs/setAvail/avlStatus"
+                },
+                "coll_size": {
+                  "title": "Extent of Collection",
+                  "description": "Summarizes the number of physical files that exist in a collection, recording the number of files that contain data and noting whether the collection contains machine-readable documentation and/or other supplementary files and information such as data dictionaries, data definition statements, or data collection instruments.",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/dataAccs/setAvail/collSize"
+                },
+                "complete": {
+                  "title": "Completeness of Study Stored",
+                  "description": "This item indicates the relationship of the data collected to the amount of data coded and stored in the data collection. Information as to why certain items of collected information were not included in the data file stored by the archive should be provided",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/dataAccs/setAvail/complete"
+                },
+                "file_quantity": {
+                  "title": "Number of Files",
+                  "description": "Total number of physical files associated with a collection",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/dataAccs/setAvail/fileQnty"
+                },
+                "notes": {
+                  "title": "Notes",
+                  "description": "Notes and comments",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/dataAccs/setAvail/notes"
+                }
+              }
+            },
+            "dataset_use": {
+              "type": "object",
+              "title": "Data Set Availability",
+              "description": " Information on terms of use for the data collection",
+              "_ddi_xpath": "stdyDscr/dataAccs/useStmt",
+              "properties": {
+                "conf_dec": {
+                  "type": "array",
+                  "title": "Confidentiality Declaration",
+                  "description": " This element is used to determine if signing of a confidentiality declaration is needed to access a resource.",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "txt": {
+                        "type": "string",
+                        "title": "Confidentiality declaration text",
+                        "description": "Confidentiality declaration text",
+                        "_ddi_xpath": "stdyDscr/dataAccs/useStmt/confDec"
+                      },
+                      "required": {
+                        "type": "string",
+                        "title": "Is signing of a confidentiality declaration required?",
+                        "description": "Is signing of a confidentiality declaration required",
+                        "_ddi_xpath": "stdyDscr/dataAccs/useStmt/confDec/@required"
+                      },
+                      "form_url": {
+                        "type": "string",
+                        "title": "Confidentiality declaration form URL",
+                        "description": "Provide a URN or URL for online access to a confidentiality declaration form.",
+                        "_ddi_xpath": "stdyDscr/dataAccs/useStmt/confDec/@URI"
+                      },
+                      "form_id": {
+                        "type": "string",
+                        "title": "Form ID",
+                        "description": "Indicates the number or ID of the form that the user must fill out",
+                        "_ddi_xpath": "stdyDscr/dataAccs/useStmt/confDec/@formNo"
+                      }
+                    }
+                  }
+                },
+                "spec_perm": {
+                  "type": "array",
+                  "title": "Special Permissions",
+                  "description": "Determine if any special permissions are required to access a resource",
+                  "_ddi_xpath": "stdyDscr/dataAccs/useStmt/specPerm",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "txt": {
+                        "type": "string",
+                        "title": "Special permissions description",
+                        "description": "Confidentiality declaration text"
+                      },
+                      "required": {
+                        "type": "string",
+                        "title": "Indicate if special permissions are required to access a resource",
+                        "description": "Indicate if special permissions are required to access a resource"
+                      },
+                      "form_url": {
+                        "type": "string",
+                        "title": "Form URL",
+                        "description": "Link to the form URL"
+                      },
+                      "form_id": {
+                        "type": "string",
+                        "title": "Form ID",
+                        "description": "Indicates the number or ID of the form that the user must fill out"
+                      }
+                    }
+                  }
+                },
+                "restrictions": {
+                  "title": "Restrictions",
+                  "description": "Any restrictions on access to or use of the collection such as privacy certification or distribution restrictions should be indicated here. These can be restrictions applied by the author, producer, or disseminator of the data collection. If the data are restricted to only a certain class of user, specify which type.",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/dataAccs/useStmt/restrctn"
+                },
+                "contact": {
+                  "type": "array",
+                  "title": "Contact",
+                  "description": "Contact",
+                  "_ddi_xpath": "stdyDscr/dataAccs/useStmt/contact",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "title": "Name",
+                        "type": "string"
+                      },
+                      "affiliation": {
+                        "title": "Affiliation",
+                        "type": "string"
+                      },
+                      "uri": {
+                        "title": "URI",
+                        "type": "string"
+                      },
+                      "email": {
+                        "title": "Email",
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ]
+                },
+                "cit_req": {
+                  "title": "Citation requirement",
+                  "description": "Text of requirement that a data collection should be cited properly in articles or other publications that are based on analysis of the data.",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/dataAccs/useStmt/citReq"
+                },
+                "deposit_req": {
+                  "title": "Deposit requirement",
+                  "description": "Information regarding user responsibility for informing archives of their use of data through providing citations to the published work or providing copies of the manuscripts.",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/dataAccs/useStmt/deposReq"
+                },
+                "conditions": {
+                  "title": "Conditions",
+                  "description": "Indicates any additional information that will assist the user in understanding the access and use conditions of the data collection.",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/dataAccs/useStmt/conditions"
+                },
+                "disclaimer": {
+                  "title": "Disclaimer",
+                  "description": "Information regarding responsibility for uses of the data collection",
+                  "type": "string",
+                  "_ddi_xpath": "stdyDscr/dataAccs/useStmt/disclaimer"
+                }
+              }
+            },
+            "notes": {
+              "title": "Notes",
+              "description": "Notes and comments",
+              "type": "string",
+              "_ddi_xpath": "stdyDscr/dataAccs/setAvail/notes"
+            }
+          }
+        }
+      },
+      "required": [
+        "title_statement",
+        "study_info"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "type": "object",
+  "properties": {
+    "doc_desc": {
+      "$ref": "#/definitions/doc_desc"
+    },
+    "study_desc": {
+      "$ref": "#/definitions/study_desc"
+    },
+    "data_files": {
+      "type": "array",
+      "description": "Data files",
+      "items": {
+        "$ref": "datafile-schema.json"
+      }
+    },
+    "variables": {
+      "type": "array",
+      "description": "Variables",
+      "items": {
+        "$ref": "variable-schema.json"
+      }
+    },
+    "variable_groups": {
+      "type": "array",
+      "description": "Variable group",
+      "title": "Variable groups",
+      "items": {
+        "$ref": "variable-group-schema.json"
+      },
+      "additionalProperties": false
+    } 
+  }
+}

@@ -1,0 +1,413 @@
+swagger: '2.0'
+info:
+  description: >-
+    The NADA REST API allows searching, browsing and viewing the catalog. Use the metadata endpoints to extract detailed study metadata as JSON. 
+    
+
+    Find out more about NADA at
+    [http://nada.ihsn.org](http://nada.ihsn.org).  
+
+    
+  version: 1.0.0
+  title: Metadata Editor API
+  x-logo:
+    url: ""
+    backgroundColor: "#FFFFFF"
+    altText: ""
+basePath: /index.php/api/
+tags:
+  - name: Editor
+    description: Create, update projects
+
+  - name: Resources
+    description: Manage external resources and files for projects
+
+  - name: Collections
+    description: Collections
+
+  - name: Catalog
+    description: API to browse, search and explore studies in the catalog
+
+  - name: Metadata
+    description: Access metadata and documentation available for the studies in the catalog
+
+
+x-tagGroups:
+  - name: Editor
+    tags:
+      - Editor
+      - Microdata
+      - Timeseries
+      - Resources
+      - Datafile
+      - Variable
+
+  - name: Collections
+    tags:
+      - Collections
+  - name: Catalog
+    tags:
+      - Catalog
+  - name: Metadata
+    tags:
+      - Metadata    
+schemes:
+  - http
+paths:
+
+  /editor:
+    get:
+      tags:
+        - Editor
+      summary: List projects
+      description: List and find projects
+      operationId: EditorProjects
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: keyowrds
+          in: path
+          title: Project search keywords
+          description: Keywords for searching project by title and IDNO
+          type: string
+        - name: from
+          in: path
+          title: Start year
+          description: Starting year for a project
+          type: int
+        - name: to
+          in: path
+          title: End year
+          description: Project end year
+          type: int
+        - name: data_type
+          in: path
+          title: Project data type
+          description: Project data type e.g. Microdata, Document, Table, ...
+          type: string
+        - name: page
+          in: path
+          title: Page
+          description: Page to return for the search result
+          type: int
+        
+        - name: sort_by
+          in: path
+          title: Sort results
+          description: Sort results
+          type: string
+          enum:
+          - title
+          - created
+          - year
+        - name: sort_order
+          in: path
+          title: Sort order
+          description: Set results sort order. Ascending = `asc`, Descending= `desc`
+          type: string
+          enum:
+          - asc
+          - desc
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Bad input
+  
+    
+  /editor/{id}:
+    get:
+      tags:
+        - Editor
+      summary: Get project by ID
+      description: "Get study level metadata for a project"
+      operationId: singleProject
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          title: Study unique ID
+          description: Study unique ID number
+          type: string
+          required: true
+      responses:
+        '200':
+          description: successful operation
+
+  /editor/{id}/data_files:
+    get:
+      tags:
+        - Editor
+        - Datafile
+      summary: List data files
+      description: List all data files for a Microdata type project
+      operationId: listDataFiles
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          title: Study unique ID
+          description: Study unique ID number
+          type: string
+          required: true
+      responses:
+        '200':
+          description: successful operation
+
+  /editor/{id}/variables:
+    get:
+      tags:
+        - Editor
+        - Variable
+      summary: List variables
+      description: List variables by a Microdata project 
+      operationId: listVariables
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          title: Study unique ID
+          description: Study unique ID number
+          type: string
+          required: true
+      responses:
+        '200':
+          description: successful operation
+  /editor/{id}/variables/{varId}:
+    get:
+      tags:
+        - Editor
+        - Variable
+      summary: Find variable
+      description: Get a single variable metadata
+      operationId: findSingleVariable
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          title: Study unique ID
+          description: Study unique ID number
+          type: string
+          required: true
+        - name: varId
+          in: path
+          title: Variable ID
+          description: Variable ID
+          type: string
+          required: true
+      responses:
+        '200':
+          description: successful operation
+          schema:
+
+
+  /editor/create/survey:
+      post:
+        tags:
+          - Microdata
+        summary: Create Microdata
+        description: Create a new microdata project
+        operationId: createSurvey
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: 'survey-schema.json'
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: 'survey-schema.json'
+        security:
+          - ApiKeyAuth: []
+
+  /editor/update/survey/{id}:
+      post:
+        tags:
+          - Microdata
+        summary: Update Microdata
+        description: Update Microdata project
+        operationId: updateSurvey
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "id"
+            description: Project ID
+            type: string
+            format: string
+            required: true
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: 'survey-schema.json'
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: 'survey-schema.json'
+        security:
+          - ApiKeyAuth: []        
+
+
+  /editor/create/timeseries:
+      post:
+        tags:
+          - Timeseries
+        summary: Create Timeseries
+        description: Create a new timeseries project
+        operationId: createTimeseries
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: 'timeseries-schema.json'
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: 'timeseries-schema.json'
+        security:
+          - ApiKeyAuth: []
+  /editor/update/timeseries/{id}:
+      post:
+        tags:
+          - Timeseries
+        summary: Update Timeseries
+        description: Update Timeseries project
+        operationId: updateTimseries
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "id"
+            description: Project ID
+            type: string
+            format: string
+            required: true
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: 'timeseries-schema.json'
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: 'timeseries-schema.json'
+        security:
+          - ApiKeyAuth: []                  
+###############################################################
+definitions:
+  Catalog:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+        readOnly: true
+      idno:
+        type: string        
+      title:
+        type: string
+      nation:
+        type: string      
+      created:
+        type: string
+        format: date-time
+      changed:
+        type: string
+        format: date-time
+    xml:
+      name: Catalog
+  AuthenticationResponse:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+        readOnly: true
+      user_id:
+        type: int      
+      username:
+        type: string
+      api-keys:
+        type: object  
+    xml:
+      name: AuthenticationResponse    
+  Resource:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+        readOnly: true
+      pid:
+        type: integer
+        format: int64
+        description: Project ID
+      resource_type:
+        type: string
+        enum:
+          - microdata
+          - questionnaire
+          - report
+          - table
+          - other
+      title:
+        type: string
+      description:
+        type: string
+      filename:
+        type: string
+      created:
+        type: string
+        format: date-time
+      changed:
+        type: string
+        format: date-time
+    xml:
+      name: Resource
+  
+  
+  
+  
+  ApiResponse:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      type:
+        type: string
+      message:
+        type: string

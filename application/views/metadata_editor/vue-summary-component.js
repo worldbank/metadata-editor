@@ -78,7 +78,7 @@ Vue.component('summary-component', {
 
                 <div class="row" >
                     <div class="col-6" >
-                        <div v-if="ProjectType!=='timeseries-db'" class="thumbnail-container border bg-white mb-3">
+                        <div class="thumbnail-container border bg-white mb-3">
                             <project-thumbnail/>
                         </div>
 

@@ -4,6 +4,7 @@
 
   <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css" crossorigin="anonymous" /> 
 
   <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
@@ -126,7 +127,10 @@
                   <div class="col-md-9">
                     
                     <div class="ml-5 pt-2" > 
-                      <div class="text-crop"><strong style="font-size:large;">{{user_template_info.name}}</strong></div>
+                      <div class="text-crop">
+                        <i :class="project_types_icons[user_template_info.data_type]"></i>
+                        <strong style="font-size:large;">{{user_template_info.name}}</strong>
+                      </div>
                     </div>
                   </div>
                   <div class="col-md-3">
@@ -215,6 +219,12 @@
               <div v-if="isEditingDescription==true" class="pl-4 pt-2">
 
                 <h5>Template description</h5>
+                
+                <div class="form-group">
+                  <label>Type:</label>
+                  <input type="text" class="form-control" disabled="disabled" v-model="user_template_info.data_type">
+                </div>
+                
 
                 <div class="form-group">
                   <label>Language:</label>
@@ -389,7 +399,26 @@
             "dropdown",
             //"date"
           ],
-          cut_fields: []
+          cut_fields: [],
+          data_types:{
+            "survey":"Microdata",
+            "document":"Document",
+            "table":"Table",
+            "geospatial":"Geospatial",
+            "image":"Image",
+            "script": "Script",
+            "video":"Video"
+        },
+        project_types_icons: {
+          "document": "fa fa-file-code",
+          "survey": "fa fa-database",
+          "geospatial": "fa fa-globe-americas",
+          "table": "fa fa-database",
+          "timeseries": "fa fa-chart-line",
+          "image": "fa fa-image",
+          "video": "fa fa-video",
+          "script": "fa fa-file-code"
+        }
         }
       },
       created: function() {

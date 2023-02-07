@@ -1,0 +1,726 @@
+{
+	"$id": "http://ihsn.org/schemas/timeseries-db",
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"title": "Timeseries Database Schema",
+	"description": "Schema for timeseries database",
+	"type": "object",
+	"properties": {
+		"published": {
+			"type": "integer",
+			"title": "Status",
+			"description": "0=draft, 1=published",
+			"default": 0
+		},
+		"overwrite": {
+			"type": "string",
+			"description": "Overwrite database if already exists?",
+			"enum": [
+				"yes",
+				"no"
+			],
+			"default": "no"
+		},
+		"metadata_information": {
+			"type": "object",
+			"title": "Document metadata information",
+			"description": "Document description",
+			"additionalProperties": false,
+			"properties": {
+				"title": {
+					"type": "string",
+					"title": "Document title",
+					"description": "Document title"
+				},
+				"idno": {
+					"type": "string",
+					"title": "Unique ID number for the document"
+				},
+				"producers": {
+					"type": "array",
+					"title": "Producers",
+					"description": "List of producers",
+					"items": {
+						"type": "object",
+						"properties": {
+							"name": {
+								"type": "string",
+								"title": "Name",
+								"description": "Name (required)"
+							},
+							"abbr": {
+								"type": "string",
+								"title": "Abbreviation"
+							},
+							"affiliation": {
+								"type": "string",
+								"title": "Affiliation"
+							},
+							"role": {
+								"type": "string",
+								"title": "Role"
+							}
+						}
+					}
+				},
+				"prod_date": {
+					"type": "string",
+					"title": "Date of Production",
+					"description": "Document production date using format(YYYY-MM-DD)"
+				},
+				"version": {
+					"type": "string",
+					"title": "Document version",
+					"description": "Identify and describe the current version of the document"
+				}
+			}
+		},
+		"database_description": {
+			"type": "object",
+			"title": "Database Description",
+			"description": "Database Description",
+			"properties": {
+				"title_statement": {
+					"type": "object",
+					"description": "Study title",
+					"properties": {
+						"idno": {
+							"type": "string",
+							"title": "Unique user defined ID",
+							"description": "The ID number of a database is a unique number that is used to identify a particular database."
+						},
+						"identifiers": {
+							"type": "array",
+							"title": "Other identifiers",
+							"description": "Other identifiers",
+							"items": {
+								"type": "object",
+								"properties": {
+									"type": {
+										"title": "Identifier type",
+										"description": "Type of identifier e.g. `doi`, `handle`, `other`",
+										"type": "string"
+									},
+									"identifier": {
+										"title": "Identifier",
+										"type": "string"
+									}
+								},
+								"required": [
+									"identifier"
+								]
+							}
+						},
+						"title": {
+							"type": "string",
+							"title": "Survey title",
+							"description": "The title is the official name of the survey as it is stated on the questionnaire or as it appears in the design documents. The following items should be noted:\n - Include the reference year(s) of the survey in the title. \n - Do not include the abbreviation of the survey name in the title. \n - As the survey title is a proper noun, the first letter of each word should be capitalized (except for prepositions or other conjunctions).\n - Including the country name in the title is optional."
+						},
+						"sub_title": {
+							"type": "string",
+							"title": "Survey subtitle",
+							"description": "A short subtitle for the survey"
+						},
+						"alternate_title": {
+							"type": "string",
+							"title": "Abbreviation or Acronym",
+							"description": "The abbreviation of a survey is usually the first letter of each word of the titled survey. The survey reference year(s) may be included."
+						},
+						"translated_title": {
+							"title": "Translated Title",
+							"description": "In countries with more than one official language, a translation of the title may be provided.",
+							"type": "string"
+						}
+					},
+					"required": [
+						"idno",
+						"title"
+					]
+				},
+				"authoring_entity": {
+					"type": "array",
+					"title": "Authoring entity",
+					"description": "The person, corporate body, or agency responsible for the work's substantive and intellectual content. Repeat the element for each author, and use 'affiliation' attribute if available. Invert first and last name and use commas.",
+					"items": {
+						"type": "object",
+						"properties": {
+							"name": {
+								"title": "Agency Name",
+								"type": "string",
+								"description": "Name of the person, corporate body, or agency responsible for the work's substantive and intellectual content. If a person, invert first and last name and use commas."
+							},							
+							"affiliation": {
+								"title": "Affiliation",
+								"type": "string"
+							},
+							"abbreviation": {
+								"title": "Abbreviation",
+								"description": "Abbreviation",
+								"type": "string"
+							},
+							"email": {
+								"title": "Email",
+								"description": "Email",
+								"type": "string"
+							},
+							"uri": {
+								"title": "URI",
+								"type": "string"
+							}
+						},
+						"required": [
+							"name"
+						]
+					}
+				},
+				"abstract": {
+					"title": "Abstract",
+					"type": "string",
+					"description": "A brief description of the database"
+				},
+				"url": {
+					"type": "string",
+					"title": "Dataset URL",
+					"description": "Link to the dataset web page"
+				},
+				"type": {
+					"type": "string",
+					"title": "Dataset type",
+					"description": "Dataset type"
+				},
+				"doi": {
+					"type": "string",
+					"title": "DOI",
+					"description": "DOI handle"
+				},
+				"date_created": {
+					"type": "string",
+					"title": "Date of creation",
+					"description": "Date this version of the dataset was created"
+				},
+				"date_published": {
+					"type": "string",
+					"title": "Dataset published date",
+					"description": "Date this version of the dataset was published"
+				},
+				"version": {
+					"type": "array",
+					"title": "Version Statement",
+					"items": {
+						"type": "object",
+						"properties": {
+							"version": {
+								"title": "Version",
+								"type": "string",
+								"description": "Version number e.g. v1.0"
+							},
+							"date": {
+								"title": "Version Date",
+								"type": "string"
+							},
+							"responsibility": {
+								"title": "Version Responsibility Statement",
+								"description": "Version Responsibility Statement",
+								"type": "string"
+							},
+							"notes": {
+								"title": "Version Notes",
+								"type": "string"
+							}
+						},
+						"required": [
+							"version",
+							"date"
+						]
+					}
+				},
+				"update_frequency": {
+					"title": "Frequency of update",
+					"description": "Dataset frequency of updates (for datasets updated at regular intervals)",
+					"type": "string"
+				},
+				"update_schedule": {
+					"title": "Schedule of updates",
+					"description": "Dataset schedule of updates",
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"update": {
+								"title": "Schedule date",
+								"type": "string"
+							}
+						}
+					}
+				},
+				"time_coverage": {
+					"type": "array",
+					"title": "Range of dates covered by the dataset",
+					"description": "Time coverage for the whole database. This will typically be the min and max dates for which data are available in any series contained in the database.",
+					"items": {
+						"type": "object",
+						"properties": {
+							"start": {
+								"title": "Start date",
+								"description": "Time coverage, start date (oldest date for which data are available)",
+								"type": "string"
+							},
+							"end": {
+								"title": "End date",
+								"type": "string",
+								"description": "Time coverage, end date (most recent date for which data are available)"
+							}
+						}
+					}
+				},
+				"time_coverage_note": {
+					"title": "Time coverage note",
+					"description": "Time coverage note",
+					"type": "string"
+				},
+				"periodicity": {
+					"title": "Periodicity of series",
+					"description": "Periodicity of the data contained in the database (NOT the periodicity of update of the database). This describes the various reference periods for the series. Example: `annual`, `quarterly`, `monthly`, `daily`.",
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"period": {
+								"title": "Period",
+								"type": "string"
+							}
+						}
+					}
+				},
+				"themes":{
+					"type":"array",
+					"description":"Themes",
+					"items": {
+					  "type": "object",
+					  "properties": {
+						"id": {
+						  "title": "Unique Identifier",
+						  "type": "string"
+						},
+						"name": {
+						  "title": "Name",
+						  "type": "string"
+						},
+						"parent_id": {
+						  "title": "Parent Identifier",
+						  "type": "string"
+						},
+						"vocabulary": {
+						  "title": "Vocabulary",
+						  "description": "Name of the controlled vocabulary",
+						  "type": "string"
+						},
+						"uri": {
+						  "title": "Vocabulary URI",
+						  "description": "Link to the controlled vocabulary web page, if the theme is from a taxonomy.",
+						  "type": "string"
+						}
+					  },
+					  "required": [
+						"name"
+					  ]
+					}
+				  },
+				"topics": {
+					"type": "array",
+					"title": "Topics",
+					"description": "Topics covered by the database (ideally, the list of topics will be a controlled vocabulary)",
+					"items": {
+						"type": "object",
+						"properties": {
+							"id": {
+								"title": "Unique Identifier",
+								"type": "string"
+							},
+							"name": {
+								"title": "Topic",
+								"type": "string"
+							},
+							"parent_id": {
+								"title": "Parent topic Identifier",
+								"description": "For subtopics, provide the ID of the parent topic",
+								"type": "string"
+							},
+							"vocabulary": {
+								"title": "Vocabulary",
+								"description": "Name of the controlled vocabulary, if the topic is from a taxonomy.",
+								"type": "string"
+							},
+							"uri": {
+								"title": "Vocabulary URI",
+								"description": "Link to the controlled vocabulary web page, if the topic is from a taxonomy.",
+								"type": "string"
+							}
+						},
+						"required": [
+							"id",
+							"name"
+						]
+					}
+				},
+				"keywords": {
+					"type": "array",
+					"description": "Keywords",
+					"items": {
+						"type": "object",
+						"properties": {
+							"name": {
+								"title": "Keyword",
+								"type": "string"
+							},
+							"vocabulary": {
+								"title": "Vocabulary",
+								"type": "string"
+							},
+							"uri": {
+								"title": "URI",
+								"type": "string"
+							}
+						},
+						"required": [
+							"name"
+						]
+					}
+				},
+				"ref_country": {
+					"type": "array",
+					"title": "Reference country",
+					"description": "List of countries for which data are available",
+					"items": {
+						"type": "object",
+						"properties": {
+							"name": {
+								"title": "Country name",
+								"type": "string"
+							},
+							"code": {
+								"title": "Country code",
+								"type": "string"
+							}
+						}
+					}
+				},
+				"geographic_units": {
+					"title": "Geographic locations",
+					"description": "List of geographic units (regions, countries, states, provinces, etc.) for which data are available in the database.",
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"name": {
+								"title": "Location name",
+								"description": "Name of the geographic unit e.g. 'World', 'Africa', 'Afghanistan'",
+								"type": "string"
+							},
+							"code": {
+								"title": "Location code",
+								"description": "Code of the geographic unit (for countries, preferred = ISO3 code)",
+								"type": "string"
+							},
+							"type": {
+								"title": "Type",
+								"description": "Type of geographic unit e.g. country, state, region, province etc",
+								"type": "string"
+							}
+						},
+						"required": [
+							"name"
+						]
+					}
+				},
+				"geographic_coverage_note": {
+					"type": "string",
+					"title": "Geographic coverage notes",
+					"description": "Notes on geographic coverage"
+				},
+				"bbox": {
+					"title": "Geographic bounding box",
+					"description": "Geographic bounding box",
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"west": {
+								"title": "West",
+								"type": "string"
+							},
+							"east": {
+								"title": "East",
+								"type": "string"
+							},
+							"south": {
+								"title": "South",
+								"type": "string"
+							},
+							"north": {
+								"title": "North",
+								"type": "string"
+							}
+						}
+					}
+				},
+				"geographic_granularity": {
+					"title": "Geographic granularity",
+					"description": "Granularity of geographic coverage e.g. `national`, `regional`, `provincial`",
+					"type": "string"
+				},
+				"geographic_area_count": {
+					"description": "Number of geographic areas",
+					"type": "string"
+				},
+				"sponsors": {
+					"type": "array",
+					"title": "Sponsor/Funding Agency",
+					"description": "The source(s) of funds for production of the work. If different funding agencies sponsored different stages of the production process, use the 'role' attribute to distinguish them.",
+					"items": {
+						"type": "object",
+						"properties": {
+							"name": {
+								"title": "Funding Agency/Sponsor",
+								"type": "string",
+								"description": "Name of the sponsoring agency"
+							},
+							"abbreviation": {
+								"title": "Abbreviation",
+								"type": "string",
+								"description": "Abbreviation (acronym) of the sponsoring agency"
+							},
+							"role": {
+								"title": "Role",
+								"type": "string",
+								"description": "Specific role of the sponsoring agency"
+							},
+							"grant": {
+								"title": "Grant",
+								"type": "string",
+								"description": "Grant number"
+							},
+							"uri": {
+								"title": "URI",
+								"type": "string"
+							}
+						}
+					},
+					"required": [
+						"name"
+					]
+				},
+				"acknowledgments": {
+					"type": "array",
+					"title": "Other Acknowledgments",
+					"description": "Other Acknowledgments",
+					"items": {
+						"type": "object",
+						"properties": {
+							"name": {
+								"title": "Name",
+								"type": "string"
+							},
+							"affiliation": {
+								"title": "Affiliation",
+								"type": "string"
+							},
+							"role": {
+								"title": "Role",
+								"type": "string"
+							},
+							"uri": {
+								"title": "URI",
+								"type": "string"
+							}
+						}
+					},
+					"required": [
+						"name"
+					]
+				},
+				"acknowledgment_statement": {
+					"title": "An overall statement of acknowledgment, which can be used as an alternative (or supplement) to the itemized list provided in `acknowledgments`.",
+					"type": "string"
+				},
+				"contacts": {
+					"type": "array",
+					"title": "Contacts",
+					"description": "Contacts",
+					"items": {
+						"type": "object",
+						"properties": {
+							"name": {
+								"title": "Name",
+								"type": "string"
+							},
+							"role": {
+								"title": "Role",
+								"type": "string"
+							},
+							"affiliation": {
+								"title": "Affiliation",
+								"type": "string"
+							},
+							"email": {
+								"title": "Email",
+								"type": "string"
+							},
+							"telephone": {
+								"title": "Telephone",
+								"type": "string"
+							},
+							"uri": {
+								"title": "URI",
+								"type": "string"
+							}
+						}
+					},
+					"required": [
+						"name"
+					]
+				},
+				"links": {
+					"type": "array",
+					"title": "Related links",
+					"description": "Related links",
+					"items": {
+						"type": "object",
+						"properties": {
+							"uri": {
+								"title": "URI",
+								"type": "string"
+							},
+							"description": {
+								"title": "Description",
+								"type": "string"
+							}
+						}
+					},
+					"required": [
+						"uri"
+					]
+				},
+				"languages": {
+					"type": "array",
+					"description": "Supported languages",
+					"items": {
+						"type": "object",
+						"properties": {
+							"name": {
+								"title": "Name",
+								"description": "Language title",
+								"type": "string"
+							},
+							"code": {
+								"title": "code",
+								"Descripton": "Language code",
+								"type": "string"
+							}
+						}
+					},
+					"required": [
+						"name"
+					]
+				},
+				"access_options": {
+					"type": "array",
+					"title": "Access options",
+					"description": "Access options e.g. API, Bulk, Query",
+					"items": {
+						"type": "object",
+						"properties": {
+							"type": {
+								"title": "Access type",
+								"description": "Access type e.g. API, Bulk, Query, etc",
+								"type": "string"
+							},
+							"uri": {
+								"title": "URI",
+								"type": "string"
+							},
+							"note": {
+								"title": "Note",
+								"description": "Note",
+								"type": "string"
+							}
+						},
+						"required": [
+							"type"
+						]
+					}
+				},
+				"license": {
+					"type": "array",
+					"title": "License",
+					"description": "License information",
+					"items": {
+						"type": "object",
+						"properties": {
+							"name": {
+								"title": "Name",
+								"type": "string"
+							},
+							"uri": {
+								"title": "URI",
+								"type": "string"
+							},
+							"note": {
+								"title": "Note",
+								"type": "string"
+							}
+						}
+					},
+					"required": [
+						"name"
+					]
+				},
+				"citation": {
+					"title": "Citation",
+					"type": "string"
+				},
+				"notes": {
+					"title": "Notes",
+					"description": "Notes",
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"note": {
+								"title": "Note",
+								"type": "string"
+							}
+						}
+					}
+				},
+				"disclaimer": {
+					"title": "Disclaimer",
+					"type": "string"
+				},
+				"copyright": {
+					"title": "Copyright",
+					"type": "string"
+				}
+			},
+			"required": [
+				"title_statement"
+			],
+			"additionalProperties": false
+		},
+		"provenance": {
+			"type": "array",
+			"description": "Provenance",
+			"items": {
+				"$ref": "provenance-schema.json"
+			}
+		},
+		"additional": {
+			"type": "object",
+			"title": "Additional custom metadata",
+			"description": "Any other custom metadata not covered by the schema",
+			"properties": {}
+		}
+	},
+	"required": [
+		"database_description"
+	]
+}
