@@ -4,7 +4,11 @@ The volume and diversity of data made available to the research community are gr
 
 Producing quality metadata is not a trivial exercise. The adoption of metadata standards and schemas fosters the quality of metadata. Standards and schemas, designed for different data types by communities of professionals, help data curators to produce detailed, comprehensive, and structured metadata. These metadata, saved in machine readable formats like JSON or XML, provide considerable flexibility and efficiency.
 
-Structured metadata can be generated programmatically or using specialized software applications. The ***IHSN Metadata Editor*** presented in this document is an open-source solution provided by the International Household Survey Network (IHSN) for the documentation of multiple data types using different metadata standards and schemas. The data types covered by the IHSN Metadata Editor, and the related standards and schemas, are the following:
+Structured metadata can be generated programmatically or using specialized software applications. The ***IHSN Metadata Editor*** presented in this document is an open-source solution provided by the International Household Survey Network (IHSN) for the documentation of multiple data types using different metadata standards and schemas. 
+
+![image](https://user-images.githubusercontent.com/35276300/217036876-e3c18188-a28d-49fd-8437-6cb14c1f25a0.png)
+
+The data types covered by the IHSN Metadata Editor, and the related standards and schemas, are the following:
 
 - **STRUCTURED DATA**
    - **Microdata**: the unit-level data on a population of individuals, households, dwellings, facilities, establishments, or other. Microdata can be generated from surveys, censuses, administrative recording systems, or sensors. The Metadata Editor uses the Data Documentation Initiative (DDI) Codebook metadata standard for documenting microdata.
@@ -19,4 +23,10 @@ Structured metadata can be generated programmatically or using specialized softw
    - **Research projects and scripts**: Although they are not data per se, we treat research projects and the related programs and scripts used to edit, transform, tabulate, analyze, model, and visualize data as data-related resources that need to be documented, catalogued, and disseminated in pursuit of transparency and reproducibility of data use. The Metadata Editor uses a specific schema for documenting research projects and scripts.
 
 The Metadata Editor is one application among others developed or supported by the IHSN. It is a companion of the NADA cataloguing application, used to build and maintain on-line data catalogs that exploit the rich and structured metadata generated using the Metadata Editor.
+
+**IMPORTANT NOTE**
+
+Metadata compliant with standards and schemas can be generated using the Metadata Editor as described in this Guide. They can also be generated  programmatically using a programming language like R or Python. The latter option provides a high degree of flexibility and efficiency, as it  offers multiple opportunities to automate part of the metadata generation process, and to exploit advanced machine learning solutions to enhance metadata. Metadata generated using R or Python can also be published in a NADA catalog using the NADA API and the R package NADAR or the Python library PyNADA. The programmatic option may thus be the preferred option for organizations that have strong expertise in R or Python. This may be the case particularly for the documentation of publications, indicators, or images. For microdata, the use of a Metadata Editor with capability to extract metadata from data files may provide significant advantage. 
+
+Users interested in the programmatic option will need to be familiar with the API description of the standard and schemas. More information is available in the Schema Guide (https://mah0001.github.io/schema-guide/), and in the API documentation (https://ihsn.github.io/nada-api-redoc/catalog-admin/#). 
 

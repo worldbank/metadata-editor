@@ -6,9 +6,8 @@
 * Getting started
 
     * [Installation and upgrade](installation.md)
-    * [Before you start](before_you_start.md)
     * [Quick start](quick-start.md)
-    * [Where and how your metadata are saved](saved_metadata.md)
+    * [Where and how your metadata are saved](template-manager/file_management.md)
 
 * Managing templates
 
@@ -19,7 +18,9 @@
     * [Microdata](template-manager/microdata.md)
     * [Documents](template-manager/document.md)
     * [Indicators/time series](template-manager/indicator.md)
+    * [Databases](template-manager/database.md)
     * [Statistical tables](template-manager/table.md)
+    * [Geographic data and services](template-manager/geographic.md)
     * [Images](template-manager/image.md)
     * [Videos](template-manager/video.md)
     * [Scripts](template-manager/script.md)
@@ -27,11 +28,7 @@
 
 * Publishing metadata 
 
-    * [Publishing in NADA](publish_to_nada.md)
-
-* Generating metadata programmatically
-
-    * [Introduction to the API and its use](programmatic.md)
+    * [Publish metadata](publish.md)
 
 * For developers
 
