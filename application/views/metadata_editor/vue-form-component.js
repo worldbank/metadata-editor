@@ -65,14 +65,12 @@ Vue.component('v-form', {
                 <!-- end-form-section-container -->
 
                 <!-- form-section --> 
-                <div v-if="item.type=='section'"  class="form-section" >
-                    <!-- <div>item.key={{item.key}} - active_section={{active_section}} - {{showActiveSection(item.key,active_section)}}</div> -->
-                    <div v-show="showActiveSection(item.key,active_section)">
+                <div v-if="item.type=='section'"  class="form-section" >                    
                     <template>
                         <v-expansion-panels :value="0">
                             <v-expansion-panel>
                             <v-expansion-panel-header>
-                                {{item.title}} - {{item.key}}
+                                {{item.title}}
                             </v-expansion-panel-header>
                             <v-expansion-panel-content>
                                 <v-form
@@ -88,21 +86,27 @@ Vue.component('v-form', {
                             </v-expansion-panel>
                         </v-expansion-panels>
                     </template>
-                    </div>
                 </div>
                 <!-- end-form-section -->
 
                 <!-- textarea-->
                 <div v-if="item.type=='textarea'">
                     <div class="form-group form-field" :class="['field-' + item.key, item.class] ">
-                        <label :for="'field-' + normalizeClassID(item.key)">{{item.title}}</label>
+                    
+                        <label :for="'field-' + normalizeClassID(item.key)">
+                            {{item.title}}
+                            <span class="small" v-if="item.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(item.key)" ><i class="far fa-question-circle"></i></span>
+                            <span v-if="item.required==true" class="required-label"> * </span>
+                        </label>
+                    
                         <textarea-autosize
                             :max-height="350"
                             v-model="formData[item.key]"        
                             class="form-control form-field-textarea" 
                             :id="'field-' + normalizeClassID(item.key)"                                     
                         ></textarea-autosize>
-                        <small class="help-text form-text text-muted">{{item.help_text}}</small>                            
+                        
+                        <small :id="'field-toggle-' + normalizeClassID(item.key)" class="collapse help-text form-text text-muted">{{item.help_text}}</small>
                     </div>
 
                 </div> 

@@ -179,25 +179,42 @@ Vue.config.errorHandler = (err, vm, info) => {
           },
         tree: [],
         items: [],
-        tree_active_items:[]
+        tree_active_items:[],
+        login_dialog:false
       },
       created: async function(){
        await this.$store.dispatch('initData',{dataset_id:this.dataset_id});
        this.init_tree_data();
       }
       ,
-      mounted: function(){        
+      mounted: function(){
+        let vm=this;
+        axios.interceptors.response.use(
+          function(successfulReq) {
+            console.log("success");
+          },
+          function(error) {
+            console.log("error global handler",error);
+            if (error.response.status==403){
+              vm.login_dialog=true;
+            }
+            console.log("login_dialog", this.login_dialog);
+            return Promise.reject(error);
+          }
+        );
       },
       computed:{
         Title(){          
           let titles={
             "survey":"study_desc.title_statement.title",
+            "timeseries":"series_description.name",
             "timeseries-db":"database_description.title_statement.title",
             "script":"project_desc.title_statement.title",
             "video":"video_description.title",
             "table":"table_description.title_statement.title",
             "document":"document_description.title_statement.title",
-            "image":"image_description.dcmi.title"
+            "image":"image_description.dcmi.title",
+            "geospatial":"description.identificationInfo[0].citation.title"
           };
 
           //image IPTC?
@@ -224,10 +241,12 @@ Vue.config.errorHandler = (err, vm, info) => {
             "survey":"study_desc.title_statement.idno",
             "script":"project_desc.title_statement.idno",
             "timeseries-db":"database_description.title_statement.idno",
+            "timeseries":"series_description.idno",
             "video":"video_description.idno",
             "table":"table_description.title_statement.idno",
             "document":"document_description.title_statement.idno",
-            "image":"image_description.idno"
+            "image":"image_description.idno",
+            "geospatial":"description.idno",
           };
 
           if (idnos[this.dataset_type]){
@@ -343,8 +362,8 @@ Vue.config.errorHandler = (err, vm, info) => {
           }
 
           return tree_data;          
-        },
-      },
+        }        
+      },      
       watch: {
         '$store.state.data_files': function() {
             this.update_tree();
@@ -365,23 +384,33 @@ Vue.config.errorHandler = (err, vm, info) => {
         }
       },
       methods:{
+        getTreeNestedPath: function(arr,name)
+        {
+            let vm=this;
+            for(let item of arr){
+                if(item.key===name) return `/${name}`;
+                if(item.items) {
+                    const child = vm.getTreeNestedPath(item.items, name);
+                    if(child) return `/${item.key}${child}`
+                }
+            }
+        },
         setTreeActiveNode: function(path)
         {
           this.tree_active_items=[];
-          this.tree_active_items.push(path.substring(1));
-
-          let path_arr=path.substring(1).split("/");
+          this.tree_active_items.push(path);
+          let path_arr=path.split("/");
 
           //expand datafile
           if(path_arr[0]=='variables'){
             this.initiallyOpen.push("datafile/"+path_arr[1]);
           }
 
-          if (path.substring(1)==""){
+          if (path==""){
             this.tree_active_items.push("home");
           }else{          
-            this.initiallyOpen.push(path.substring(1));
-          }
+            this.initiallyOpen.push(path);
+          }          
         },
         filter_tree_items: function(items)
         {
@@ -424,12 +453,16 @@ Vue.config.errorHandler = (err, vm, info) => {
           }
 
           this.items=tree_data;
-          this.initiallyOpen= ["study_description","datasets","document"];
-          this.setTreeActiveNode(this.$route.path);
-          
+
           //set active tree node
-          //this.tree_active_items=["datafile/F22"];
-         // console.log('tree_data',tree_data);
+          let active_node_name=this.$route.path;
+          active_node_name=active_node_name.slice(active_node_name.lastIndexOf("/")+1);
+
+          if (active_node_name){
+            let node_paths= this.getTreeNestedPath(this.TreeItems,active_node_name);
+            this.initiallyOpen=node_paths.split("/");
+            this.setTreeActiveNode(active_node_name);
+          }
         },
         update_tree: function()
         {
@@ -570,6 +603,7 @@ Vue.config.errorHandler = (err, vm, info) => {
               vm.schema_errors=[];
           })
           .catch(function (error) {
+              console.log("data-errors",error);
               vm.schema_errors=error.response.data.errors;
           });
       },

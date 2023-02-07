@@ -50,7 +50,6 @@
 .form-field-table{
     margin-top: 20px;
     margin-bottom: 20px;
-    margin-right: 15px
 }
 
 .form-field-table th{
@@ -148,7 +147,7 @@ label{
 
 .grid-component{
     background:white;
-    padding:5px;
+    padding-bottom:10px;
 }
 
 html,body {
@@ -227,6 +226,7 @@ html,body {
 
   .v-treeview-node__label{
     white-space: normal !important;
+    font-size:small !important;
   }  
 
 

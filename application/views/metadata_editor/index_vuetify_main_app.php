@@ -17,7 +17,7 @@
         
         <?php 
             
-            echo $this->load->view("metadata_editor/fields/vue-field-text.js",null,true);
+            echo $this->load->view("metadata_editor/vue-login-component.js",null,true);
             echo $this->load->view("metadata_editor/fields/vue-field-date.js",null,true);
 
             echo $this->load->view("metadata_editor/vue-spreadmetadata-component.js",null,true);

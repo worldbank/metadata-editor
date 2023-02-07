@@ -33,7 +33,7 @@ Vue.component('nested-section-preview', {
 
                 <div :class="'nested-section-row nested-section-'+index" > 
                     <div class="label-wrapper" @click="toggleChildren(index)">
-                        <div class="tree-node form-section nested-form-section" >[{{index}}] - {{ title }}                            
+                        <div class="tree-node form-section nested-form-section" >[{{index+1}}] - {{ title }}                            
                             <span class="float-right section-toggle-icon"><i class="fas" :class="toggleClasses(index)"></i></span>
                         </div>
                     </div>

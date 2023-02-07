@@ -38,7 +38,7 @@ $use_cdn=false;
 <div class="container border rounded mt-4 p-0 shadow p-3 mb-5 bg-white rounded" style="max-width:700px;">
 
     <nav class="navbar navbar-light bg-light mb-3">
-            <span class="navbar-brand mb-0 h1">NADA Installer</span>
+            <span class="navbar-brand mb-0 h1">Metadata Editor</span>
     </nav>
     
     <?php if (isset($content) ):?>

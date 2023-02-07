@@ -47,7 +47,7 @@ abstract class MY_REST_Controller extends REST_Controller {
                 'status'=>'ACCESS-DENIED',
                 'message'=>'Access denied'
             );
-            $this->response($response, REST_Controller::HTTP_BAD_REQUEST,false);
+            $this->response($response, REST_Controller::HTTP_FORBIDDEN,false);
             die();
         }
     }

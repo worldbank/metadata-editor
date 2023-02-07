@@ -36,7 +36,7 @@ $lang['recommended']="Recommended";
 $lang['disabled']="Disabled";
 $lang['install_database']="Install Database";
 $lang['create_user']="Create account";
-$lang['installer_title']="NADA Installer";
+$lang['installer_title']="Editor Installer";
 $lang['time_zone_is_required']="See how to <a target=&quot;_blank&quot; href=&quot;%s&quot;>configure</a> and select the right <a target=&quot;_blank&quot; href=&quot;%s&quot;>timezone</a>";
 $lang['not_set']="Not set";
 

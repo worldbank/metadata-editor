@@ -31,7 +31,7 @@ Vue.component('grid-component', {
     },  
     template: `
             <!--vuejs template for grid -->
-            <div class="grid-component">
+            <div class="grid-component border">
 
             <table class="table table-striped table-sm">
                 <thead class="thead-light">
@@ -86,7 +86,7 @@ Vue.component('grid-component', {
             </table>
 
             <div class="d-flex justify-content-center">
-                <button type="button" class="btn btn-link btn-block btn-sm" @click="addRow" ><i class="fas fa-plus-square"></i> Add row</button>    
+                <button type="button" class="btn btn-outline-primary btn-sm" @click="addRow" ><i class="fas fa-plus-square"></i> Add row</button>    
             </div>
 
             </div>  `,

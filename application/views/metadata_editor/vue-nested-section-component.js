@@ -33,7 +33,7 @@ Vue.component('nested-section', {
 
                 <div :class="'nested-section-row nested-section-'+index" > 
                     <div class="label-wrapper" @click="toggleChildren(index)">
-                        <div class="tree-node form-section nested-form-section" >[{{index}}] - {{ title }}
+                        <div class="tree-node form-section nested-form-section" >[{{index+1}}] - {{ title }}
                             <button type="button"  class="btn btn-sm btn-link" v-on:click="remove(index)">Remove <i class="fa fa-trash-o" aria-hidden="true"></i></button>
                             <span class="float-right section-toggle-icon"><i class="fas" :class="toggleClasses(index)"></i></span>
                         </div>

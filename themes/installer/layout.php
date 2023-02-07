@@ -6,7 +6,7 @@ header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>NADA Installer</title>
+<title>Editor Installer</title>
 <base href="<?php echo js_base_url(); ?>" />
 <link rel="stylesheet" type="text/css" href="themes/<?php echo $this->template->theme();?>/reset-fonts-grids.css" />
 <link rel="stylesheet" type="text/css" href="themes/<?php echo $this->template->theme();?>/styles.css" />
@@ -31,7 +31,7 @@ header("Expires: Sat, 26 Jul 1997 05:00:00 GMT");
     
        	<!-- logo -->
         <div class="site-logo">
-            <div style="float:left;padding-top:15px;">NADA Installer</div>
+            <div style="float:left;padding-top:15px;">Editor Installer</div>
         </div>
         <div style="float:right;margin-top:40px;">
         	<?php foreach($this->languages as $lang):?>

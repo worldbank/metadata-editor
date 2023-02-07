@@ -1550,6 +1550,7 @@ CREATE TABLE `editor_projects` (
   `changed_by` int DEFAULT NULL,
   `thumbnail` varchar(300) CHARACTER SET utf8 DEFAULT NULL,
   `metadata` mediumtext CHARACTER SET utf8,
+  `template_uid` varchar(100),
   PRIMARY KEY (`id`)
 ) AUTO_INCREMENT=1;
 

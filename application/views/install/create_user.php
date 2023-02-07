@@ -25,7 +25,7 @@ $options_country=$this->ion_auth_model->get_all_countries();
     <?php $message=$this->session->flashdata('message');?>
     <?php echo ($message!="") ? '<div class="success text-success">'.$message.'</div>' : '';?>
 	
-        
+
     <div class="form-group">
 	      <label for="first_name"><?php echo t('first_name');?><span class="required">*</span></label>
 	      <?php echo form_input($first_name,'','class="form-control"');?>
@@ -35,12 +35,13 @@ $options_country=$this->ion_auth_model->get_all_countries();
 	      <label for="last_name"><?php echo t('last_name');?><span class="required">*</span></label>
 	      <?php echo form_input($last_name,'','class="form-control"');?>
       </div>
-      
+
       <div class="form-group">
 	      <label for="email"><?php echo t('email');?><span class="required">*</span></label>
 	      <?php echo form_input($email,'','class="form-control"');?>
       </div>
 
+<?php /*      
       <div class="form-group">
 	      <label for="company"><?php echo t('company');?></label>
 	      <?php echo form_input($company,'','class="form-control"');?>
@@ -56,6 +57,7 @@ $options_country=$this->ion_auth_model->get_all_countries();
             <?php echo form_dropdown('country', $options_country, get_form_value("country",isset($country) ? $country : ''), 'class="form-control"'); ?>
         </div>
 
+*/?>        
       <div class="form-group">
 	      <label for="password"><?php echo t('password');?><span class="required">*</span></label>
 	      <?php echo form_input($password,'','class="form-control"');?>

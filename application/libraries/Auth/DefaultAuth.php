@@ -146,6 +146,10 @@ class DefaultAuth implements AuthInterface
     //log the user in
     function login()
     {
+		if ($this->ci->input->get("isajax")) {
+			return $this->login_ajax();
+		}
+
 		$this->ci->template->set_template('blank');
         $this->data['title'] = t("login");
 
@@ -193,7 +197,7 @@ class DefaultAuth implements AuthInterface
         	if ($this->ci->ion_auth->login($this->ci->input->post('email'), $this->ci->input->post('password'), $remember)) //if the login is successful
 			{
 				//log
-				$this->ci->db_logger->write_log('login',$this->ci->input->post('email'));
+				//$this->ci->db_logger->write_log('login',$this->ci->input->post('email'));
 
 				if ($destination!="")
 				{
@@ -210,7 +214,7 @@ class DefaultAuth implements AuthInterface
 	        	$this->ci->session->set_flashdata('error', t("login_failed"));
 
 				//log
-				$this->ci->db_logger->write_log('login-failed',$this->ci->input->post('email'));
+				//$this->ci->db_logger->write_log('login-failed',$this->ci->input->post('email'));
 
 	        	redirect("auth/login", 'refresh'); //use redirects instead of loading views for compatibility with MY_Controller libraries
 	        }
@@ -238,6 +242,49 @@ class DefaultAuth implements AuthInterface
 			$this->ci->template->render();
 		}
     }
+
+	function login_ajax()
+    {
+        //validate form input
+    	$this->ci->form_validation->set_rules('email', t('email'), 'trim|required|valid_email|max_length[100]');
+	    $this->ci->form_validation->set_rules('password', t('password'), 'required|max_length[100]');
+		//$this->ci->form_validation->set_rules($this->ci->captcha_lib->get_question_field(), t('captcha'), 'trim|required|callback_validate_captcha');
+
+        if ($this->ci->form_validation->run() == true) { //check to see if the user is logging in
+        	if ($this->ci->ion_auth->login(
+					$this->ci->input->post('email'), 
+					$this->ci->input->post('password'), $remember=true)) //if the login is successful
+			{
+				//success
+				$this->json_response($data=array(
+					'status'=>'success'
+				),200);
+			}
+	        else
+			{ 	
+				//login failed
+				$this->json_response($data=array(
+					'status'=>'error',
+					'message'=>'Login failed'
+				),401);
+	        }
+        }
+		else
+		{  	
+			$this->json_response($data=array(
+				'status'=>'error',
+				'message'=>'Login failed'
+			),401);
+		}
+    }
+
+	function json_response($body,$status_code=200)
+	{		
+		http_response_code($status_code);
+		header('Content-Type: application/json; charset=utf-8');
+		echo json_encode($body);
+		die();
+	}
 
     //log the user out
 	function logout()
@@ -493,7 +540,7 @@ class DefaultAuth implements AuthInterface
         if ($this->ci->form_validation->run() === TRUE)
 		{
 			//log
-			$this->ci->db_logger->write_log('register',$this->ci->input->post('email'));
+			//$this->ci->db_logger->write_log('register',$this->ci->input->post('email'));
 
 			//check to see if we are creating the user
 			$username  = $this->ci->input->post('first_name').' '.$this->ci->input->post('last_name');
@@ -650,7 +697,7 @@ class DefaultAuth implements AuthInterface
 				throw new exception("Code verification failed");
 			}
 			catch(Exception $e){
-				$this->ci->db_logger->write_log('otp-error',$e->getMessage(). ' user: '.$user->email);
+				//$this->ci->db_logger->write_log('otp-error',$e->getMessage(). ' user: '.$user->email);
 				$this->ci->session->set_flashdata('error', $e->getMessage());
 				redirect("auth/verify_code", 'refresh');
 			}			

@@ -498,7 +498,32 @@ class Editor_model extends CI_Model {
 			'survey'=>array(
 				'idno'=>'study_desc.title_statement.idno',
 				'title'=>'study_desc.title_statement.title'				
-			)
+			),
+			'document'=>array(
+				'idno'=>'document_description.title_statement.idno',
+				'title'=>'document_description.title_statement.title'
+			),
+			'table'=>array(
+				'idno'=>'table_description.title_statement.idno',
+				'title'=>'table_description.title_statement.title'
+			),
+			'script'=>array(
+				'idno'=>'project_desc.title_statement.idno',
+				'title'=>'project_desc.title_statement.title'
+			),
+			'video'=>array(
+				'idno'=>'video_description.idno',
+				'title'=>'video_description.title'
+			),
+			'timeseries'=>array(
+				'idno'=>'series_description.idno',
+				'title'=>'series_description.name'
+			),
+			'timeseries-db'=>array(
+				'idno'=>'database_description.title_statement.idno',
+				'title'=>'database_description.title_statement.title'
+			)			
+
 		);
 
 		if(!array_key_exists($type,$core_fields)){

@@ -24,7 +24,7 @@ Vue.component('form-main', {
         }
     },
     template: `
-        <div :class="'metadata-form'" >
+        <div class="metadata-form mt-3" >
 
         <!-- form-section -->
         <div v-if="formField.type=='section_container'"  class="form-section m-3" >
@@ -41,7 +41,7 @@ Vue.component('form-main', {
 
         <!-- form-section -->
         <div v-if="formField.type=='section'"  class="form-section" >
-        <h5 class="mt-3">{{formField.title}}</h5>
+            <h5 class="mt-3">{{formField.title}}</h5>
             <v-form                                    
                     :items="formField.items" 
                     :title="formField.title"
@@ -53,6 +53,17 @@ Vue.component('form-main', {
             </v-form>
         </div>
         <!-- end-form-section -->
+
+
+        <div v-if="formField.type=='nested_array'" class="mt-2 mb-3">
+            <label :for="'field-' + normalizeClassID(formField.key)">{{formField.title}}</label>
+            <nested-section 
+                :value="formData[formField.key]"                                         
+                :columns="formField.props"
+                :title="formField.title"
+                :path="formField.key">
+            </nested-section>  
+        </div>
 
         <div v-if="formField.type=='textarea'">
 
