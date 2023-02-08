@@ -147,7 +147,7 @@
                     <div class="col-md-6">
                       <template>
                         <div class="float-right">
-                          <v-pagination v-model="pagination_page" :length="PaginationTotalPages"  @input="PaginatePage"></v-pagination>
+                          <v-pagination v-model="pagination_page" :length="PaginationTotalPages" :total-visible="6"  @input="PaginatePage"></v-pagination>
                         </div>
                       </template>
                     </div>
