@@ -64,23 +64,7 @@
                           </div>
                         </template>                        
                       </v-expansion-panel-content>
-                    </v-expansion-panel>
-
-                    <v-expansion-panel>
-                      <v-expansion-panel-header>
-                        Collections
-                      </v-expansion-panel-header>
-                      <v-expansion-panel-content>
-                        <div class="form-check">
-                          <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-                          <label class="form-check-label" for="defaultCheck1">Collection 1</label>
-                        </div>
-                        <div class="form-check">
-                          <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
-                          <label class="form-check-label" for="defaultCheck1">Collection 2</label>
-                        </div>
-                      </v-expansion-panel-content>
-                    </v-expansion-panel>
+                    </v-expansion-panel>                    
 
                     <v-expansion-panel>
                       <v-expansion-panel-header>
@@ -306,7 +290,7 @@
         is_loading: false,
         loading_status: null,
         form_errors: [],
-        facet_panel: [],
+        facet_panel: [0],
         pagination_page: 0,
         dialog_create_project: false,
         search_keywords: '',
@@ -316,12 +300,14 @@
         },
         data_types:{
           "survey":"Microdata",
-          "document":"Document",
+          "document":"Document",          
           "table":"Table",
           "geospatial":"Geospatial",
           "image":"Image",
           "script": "Script",
-          "video":"Video"
+          "video":"Video",
+          "timeseries":"Timeseries",
+          "timeseries-db":"Timeseries DB",
         },
         project_types_icons: {
           "document": "fa fa-file-code",
