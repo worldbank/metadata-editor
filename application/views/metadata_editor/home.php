@@ -57,7 +57,7 @@
                         Project types
                       </v-expansion-panel-header>
                       <v-expansion-panel-content>
-                        <template v-for="(type_name, type_key) in data_types">
+                        <template v-for="(type_name, type_key) in DataTypes">
                           <div class="form-check">
                             <input class="form-check-input" type="checkbox" v-model="search_filters['data_type']" :value="type_key" :id="'filter-type-'+type_key">
                             <label class="form-check-label" :for="'filter-type-'+type_key">{{type_name}}</label>
@@ -130,7 +130,7 @@
 
                     <div class="col-md-6">
                       <template>
-                        <div class="float-right">
+                        <div class="float-right" v-if="PaginationTotalPages">
                           <v-pagination v-model="pagination_page" :length="PaginationTotalPages" :total-visible="6"  @input="PaginatePage"></v-pagination>
                         </div>
                       </template>
@@ -192,17 +192,15 @@
 
             <v-card-text>
               <div>
-                <a class="dropdown-item" href="#" @click="createProject('survey')">Microdata</a>
-                <a class="dropdown-item" href="#" @click="createProject('timeseries')">Timeseries</a>
-                <a class="dropdown-item" href="#" @click="createProject('timeseries-db')">Timeseries database</a>
-                <a class="dropdown-item" href="#" @click="createProject('document')">Document</a>
-                <a class="dropdown-item" href="#" @click="createProject('table')">Table</a>
-                <a class="dropdown-item" href="#" @click="createProject('image')">Image</a>
-                <a class="dropdown-item" href="#" @click="createProject('script')">Script</a>
-                <a class="dropdown-item" href="#" @click="createProject('video')">Video</a>
-                <a class="dropdown-item" href="#" @click="createProject('geospatial')">Geospatial</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#">Import from URL</a>
+                <a class="dropdown-item" href="#" @click="createProject('survey')"><i :class="project_types_icons['survey']"></i> Microdata</a>
+                <a class="dropdown-item" href="#" @click="createProject('timeseries')"><i :class="project_types_icons['timeseries']"></i> Timeseries</a>
+                <a class="dropdown-item" href="#" @click="createProject('timeseries-db')"><i :class="project_types_icons['timeseries-db']"></i> Timeseries database</a>
+                <a class="dropdown-item" href="#" @click="createProject('document')"><i :class="project_types_icons['document']"></i> Document</a>
+                <a class="dropdown-item" href="#" @click="createProject('table')"><i :class="project_types_icons['table']"></i> Table</a>
+                <a class="dropdown-item" href="#" @click="createProject('image')"><i :class="project_types_icons['image']"></i> Image</a>
+                <a class="dropdown-item" href="#" @click="createProject('script')"><i :class="project_types_icons['script']"></i> Script</a>
+                <a class="dropdown-item" href="#" @click="createProject('video')"><i :class="project_types_icons['video']"></i> Video</a>
+                <a class="dropdown-item" href="#" @click="createProject('geospatial')"><i :class="project_types_icons['geospatial']"></i> Geospatial</a>
               </div>
             </v-card-text>
 
@@ -300,7 +298,7 @@
         },
         data_types:{
           "survey":"Microdata",
-          "document":"Document",          
+          "document":"Document",
           "table":"Table",
           "geospatial":"Geospatial",
           "image":"Image",
@@ -315,6 +313,7 @@
           "geospatial": "fa fa-globe-americas",
           "table": "fa fa-database",
           "timeseries": "fa fa-chart-line",
+          "timeseries-db": "fa fa-chart-line",
           "image": "fa fa-image",
           "video": "fa fa-video",
           "script": "fa fa-file-code"
@@ -333,6 +332,15 @@
       computed: {
         Title() {
           return 'title';
+        },
+        DataTypes()
+        {
+          let sorted={};          
+          let sorted_keys=Object.keys(this.data_types).sort();
+          for (k in sorted_keys){
+            sorted[sorted_keys[k]]=this.data_types[sorted_keys[k]];
+          }
+          return sorted;
         },
         Projects() {
           return this.projects.projects;

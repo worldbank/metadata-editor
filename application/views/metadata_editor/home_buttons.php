@@ -19,9 +19,8 @@
         </div>
         */?>
 
-        <button type="button" class="btn btn-outline-primary" @click="dialog_create_project=true">Create new project</button>
-        <button type="button" class="btn btn-outline-primary">Open project</button>
-        <button type="button" class="btn btn-outline-primary">Import from data deposit</button>
+        <button type="button" class="btn btn-sm btn-outline-primary" @click="dialog_create_project=true">Create new project</button>        
+        <button type="button" class="btn btn-sm btn-outline-primary" >Import</button>
     
 </div>
 
