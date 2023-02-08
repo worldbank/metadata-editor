@@ -168,7 +168,16 @@ When a controlled vocabulary has been entered in the template, a drop down menu 
 ![image](https://user-images.githubusercontent.com/35276300/214942534-d47df5a3-93f0-4d61-b956-46bbc89f0632.png)
 
 Importing metadata: 
+You can import metadata from another project (another DDI). To import metadata, click on ...
+Select the project of DDI (XML/JSON) file containing the metadata.
+You have the option to select what you want to import:
+- Document description
+- Study description
+- File description
+- Variable description
 
+All fields with content will be imported and overwrite the contentif any. Empty fields will not replace elements with content.
+For file and variable description, import will only take place if the file names and variable names are a match (see nex sections).
 
 ### Importing data files
 
@@ -203,9 +212,11 @@ Enter a brief description of each file by select the filename in the navigation 
 
 ### Preview data
 
-You can preview the data you imported by selecting *Data* in the navigation bar for one of the imported data files. The data can be viewed and exported. The Metadata Editor does not provide an option to modify the data.
+You can preview the data you imported by selecting *Data* in the navigation bar for one of the imported data files. The data can be viewed and exported. The Metadata Editor does not provide an option to modify the data. The data can be exported for this data file from here.
 
 ![image](https://user-images.githubusercontent.com/35276300/214965888-3af24fa2-8fa4-4d3a-a225-bc90f62130a8.png)
+
+You can display values or labels by clicking on ...
 
 ### Variable description and statistics
 
@@ -229,10 +240,12 @@ Editing metadata:
    - Generate categories from statistics button:
    - Copy / paste
    - Store in repository
+- Tagging keys and weights
+- Setting missing values
 
 Documentation:
 - Summary statistics
-- Weights
+- Weights and how to apply
 - Documentation
 ![image](https://user-images.githubusercontent.com/35276300/214967059-352ab9cf-4dde-4867-85fe-dd40ba0bdbc6.png)
 
@@ -242,11 +255,21 @@ In the variable page: Description
 - Importing metadata
 - Copy/paste
 
+Spreading metadata:
+
+
+Importing metadata:
+
+
+Summary statistics:
+
 - JSON
 
 Weights
 
 Keys
+
+If you change the weights, missing, 
 
 ### Variable groups
 
