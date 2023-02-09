@@ -391,13 +391,28 @@
           tree: [],
 
           tab: '',
-          field_types: [
+          field_data_types: [
+            "string",
+            "number",
+            "integer",
+            "boolean"
+          ],
+          field_display_types: [
+            "text",
+            "textarea",
+            "date",
+            "dropdown",
+            "dropdown-custom"
+          ],
+
+          field_types: [ //tobe removed
             "text",
             "string",
             "integer",
             "textarea",
             "dropdown",
-            //"date"
+            "date",
+            "boolean"
           ],
           cut_fields: [],
           data_types:{
@@ -730,15 +745,33 @@
         coreTemplateParts() {          
           return this.$store.state.core_template_parts;
         },
-        /*userTemplateParts() {
-          //return this.$store.state.user_template_parts;
-        },*/
         ActiveNode: {
           get: function() {
             return this.$store.state.active_node;
           },
           set: function(newValue) {
             this.$store.state.active_node = newValue;
+          }
+        },
+        ActiveNodeEnum: {
+          get: function() {
+            if (this.ActiveNode.enum && this.ActiveNode.enum.length>0 && typeof(this.ActiveNode.enum[0]) =='string')
+            {
+              let enum_list=[];
+              this.ActiveNode.enum.forEach(function(item){
+                enum_list.push({
+                  'code':item,
+                  'label':item
+                });
+              });
+              Vue.set(this.ActiveNode,"enum",enum_list);
+              return enum_list;
+            }
+            return this.ActiveNode.enum;
+          },
+          set: function(newValue) {
+            console.log("updating enum value",newValue);
+            this.ActiveNode.enum = newValue;
           }
         },
         ActiveNodeEnumCount(){
@@ -761,7 +794,35 @@
             return this.ActiveNode.props;
           }
           return false;
-        }
+        },
+        ActiveNodeSimpleControlledVocabColumns() {
+          return [
+            {
+              'type':'text',
+              'key':'code',
+              'title':'Code'
+            },
+            {
+              'type':'text',
+              'key':'label',
+              'title':'Label'
+            }
+          ]
+          
+        },
+        ActiveArrayNodeIsNested() {
+          if (this.ActiveNode.type =='array'  || this.ActiveNode.type =='nested_array' ) {            
+            let isNested=false;
+            this.ActiveNode.props.forEach((prop, index) => { 
+              if (prop.props){
+                isNested=true;
+              }
+            });
+
+            return isNested;            
+          }
+          return false;
+        },
       }
     });
   </script>

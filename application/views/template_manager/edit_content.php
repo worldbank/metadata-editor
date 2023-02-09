@@ -52,38 +52,49 @@
 <template v-if="ActiveNode.type!=='section_container' && ActiveNode.type!=='section'">
     <v-tabs background-color="transparent" class="mb-5">
         <v-tab v-if="ActiveNode.key && isControlField(ActiveNode.type) == true">Display</v-tab>
-        <v-tab><span v-if="ActiveNodeEnumCount>0"><v-icon style="color:green;">mdi-circle-medium</v-icon></span>Controlled vocabulary</v-tab>
-        <v-tab><span v-if="ActiveNode.default"><v-icon style="color:green;">mdi-circle-medium</v-icon></span>Default</v-tab>
-        <v-tab v-if="ActiveNode.type!=='array'"><span v-if="ActiveNode.rules && Object.keys(ActiveNode.rules).length>0"><v-icon style="color:green;">mdi-circle-medium</v-icon></span>Validation rules</v-tab>
+        <v-tab v-if="!ActiveArrayNodeIsNested"><span v-if="ActiveNodeEnumCount>0"><v-icon style="color:green;">mdi-circle-medium</v-icon></span>Controlled vocabulary</v-tab>
+        <v-tab v-if="!ActiveArrayNodeIsNested"><span v-if="ActiveNode.default"><v-icon style="color:green;">mdi-circle-medium</v-icon></span>Default</v-tab>
+        <v-tab v-if="isControlField(ActiveNode.type)"><span v-if="ActiveNode.rules && Object.keys(ActiveNode.rules).length>0"><v-icon style="color:green;">mdi-circle-medium</v-icon></span>Validation rules</v-tab>
+        <v-tab>JSON</v-tab>
 
         <v-tab-item class="p-3" v-if="ActiveNode.key && isControlField(ActiveNode.type) == true">
             <!--display-->
             <div class="form-group">
-                <label >Display:</label>
-                <div class="text-secondary">UI control to use for editing field value</div>
+                <label >Data type:</label>
                 <select 
                     v-model="ActiveNode.type" 
                     class="form-control form-field-dropdown" >        
-                    <option v-for="field_type in field_types">
+                    <option v-for="field_type in field_data_types">
                         {{field_type}}
                     </option>
                 </select>
+            </div>
 
-                <div v-if="ActiveNode.type=='date'">
-                    <pre>{{ActiveNode}}</pre>
-                </div>
+            <div class="form-group">
+                <label>Display:</label>
+                <select 
+                    v-model="ActiveNode.display_type" 
+                    class="form-control form-field-dropdown" >        
+                    <option v-for="display_type in field_display_types">
+                        {{display_type}}
+                    </option>
+                </select>
+
             </div>
             <!--end display -->
         </v-tab-item>
 
         <v-tab-item class="p-3">
             <!-- controlled vocab -->
-            <template v-if="ActiveNode.type!=='section_container' && ActiveNode.type!=='section' ">
+            <template v-if="!ActiveArrayNodeIsNested">
             <div class="form-group" >
                 <label for="controlled_vocab">Controlled vocabulary:</label>
                 <div class="border bg-white" style="max-height:300px;overflow:auto;">
                     <template v-if="!ActiveNodeControlledVocabColumns">
-                        <list-component :key="ActiveNode.key" @update:value="EnumListUpdate" v-model="ActiveNode.enum" :columns="ActiveNodeControlledVocabColumns" class="border m-2 pb-2"/>
+                        <?php /*
+                         <list-component :key="ActiveNode.key" @update:value="EnumListUpdate" v-model="ActiveNode.enum" :columns="ActiveNodeControlledVocabColumns" class="border m-2 pb-2"/>
+                         */ ?>
+                         <table-component :key="ActiveNode.key"  @update:value="EnumUpdate" v-model="ActiveNodeEnum" :columns="ActiveNodeSimpleControlledVocabColumns" class="border m-2 pb-2" />
                     </template>
                     <template v-else>
                         <table-component :key="ActiveNode.key"  @update:value="EnumUpdate" v-model="ActiveNode.enum" :columns="ActiveNodeControlledVocabColumns" class="border m-2 pb-2" />
@@ -96,7 +107,7 @@
         </v-tab-item>
         <v-tab-item class="p-3">
             <!-- default -->
-            <template v-if="ActiveNode.type!=='section_container' && ActiveNode.type!=='section'">
+            <template v-if="!ActiveArrayNodeIsNested">
                 <div class="form-group" >
                     <label for="controlled_vocab">Default:</label>
                     <div class="border bg-white" style="max-height:300px;overflow:auto;" v-if="ActiveNode.type=='array'">
@@ -114,11 +125,20 @@
             </template>
             <!-- end default -->
         </v-tab-item>
-        <v-tab-item class="p-3" v-if="ActiveNode.type!=='array'">
+        <v-tab-item class="p-3" v-if="isControlField(ActiveNode.type) ">
             <div class="form-group" >
                 <label for="controlled_vocab">Validation rules:</label>
                 <div class="bg-white border">
                     <validation-rules-component @update:value="RulesUpdate"  v-model="ActiveNode.rules"  class="m-2 pb-2" />
+                </div>
+            </div>
+        </v-tab-item>
+
+        <v-tab-item class="p-3">
+            <div class="form-group" >
+                <label for="controlled_vocab">JSON:</label>
+                <div class="bg-white border">
+                    <pre>{{ActiveNode}}</pre>
                 </div>
             </div>
         </v-tab-item>
