@@ -2,12 +2,19 @@
 Vue.component('prop-edit', {
     props:['value'],
     data: function () {    
-        return {
-          field_ui_types: [
+        return {          
+          field_data_types: [
+            "string",
+            "number",
+            "integer",
+            "boolean"
+          ],
+          field_display_types: [
             "text",
             "textarea",
+            "date",
             "dropdown",
-            "date"
+            "dropdown-custom"
           ]
         }
     },
@@ -26,6 +33,20 @@ Vue.component('prop-edit', {
           set(val){
               this.$emit('input:value', val);
           }
+        },
+        SimpleControlledVocabColumns: function(){
+          return [
+            {
+              'type':'text',
+              'key':'code',
+              'title':'Code'
+            },
+            {
+              'type':'text',
+              'key':'label',
+              'title':'Label'
+            }
+          ]
         }
     },
     methods:{    
