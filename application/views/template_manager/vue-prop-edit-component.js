@@ -47,7 +47,27 @@ Vue.component('prop-edit', {
               'title':'Label'
             }
           ]
-        }
+        },
+        PropEnum: {
+          get: function() {
+            if (this.prop.enum && this.prop.enum.length>0 && typeof(this.prop.enum[0]) =='string')
+            {
+              let enum_list=[];
+              this.prop.enum.forEach(function(item){
+                enum_list.push({
+                  'code':item,
+                  'label':item
+                });
+              });
+              Vue.set(this.prop,"enum",enum_list);
+              return enum_list;
+            }
+            return this.prop.enum;
+          },
+          set: function(newValue) {
+            this.prop.enum = newValue;
+          }
+        },
     },
     methods:{    
       isField: function(field_type){

@@ -43,7 +43,7 @@
                 <div class="border bg-white" style="max-height:300px;overflow:auto;">
 
                     <template v-if="isField(prop.type) || prop.type=='simple_array'">                        
-                        <table-component @update:value="EnumListUpdate" :key="prop.key"  v-model="prop.enum" :columns="SimpleControlledVocabColumns" class="border m-2 pb-2" />
+                        <table-component @update:value="EnumListUpdate" :key="prop.key"  v-model="PropEnum" :columns="SimpleControlledVocabColumns" class="border m-2 pb-2" />
                     </template>
                     <template v-else>
                         <table-component @update:value="EnumListUpdate"  :key="prop.key"  v-model="prop.enum" :columns="prop.props" class="border m-2 pb-2" />
