@@ -1,118 +1,134 @@
 <!--header-->
 <div>
-<nav class="main-header sticky-top navbar navbar-expand navbar-white navbar-light bg-light border-bottom" style="margin-left:0px;">
+    <nav class="main-header sticky-top navbar navbar-expand navbar-white navbar-light bg-light border-bottom" style="margin-left:0px;">
 
-    <div class="navbar-brand" style="min-width:280px;" >
-        <a href="<?php echo site_url('editor/');?>" class="brand-link-editor p-2" style="display:block;">
-            <i class="fas fa-compass"></i>
-            <span class="brand-text font-weight-light">Metadata Editor</span>
-        </a>                
-    </div>
-
-    <div class="pl-2">
-        <div><strong>{{Title}}</strong></div>
-        <div style="font-size:small;color:gray;">{{dataset_type}} - {{StudyIDNO}}</div>
-    </div>
-    <div>{{this.loading_status}}</div>
-
-
-    <ul class="navbar-nav ml-5 ml-auto">
-        
-        <div class="dropdown">
-            <a class="btn btn-link dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <i class="fas fa-random"></i> Metadata
+        <div class="navbar-brand" style="min-width:280px;">
+            <a href="<?php echo site_url('editor/'); ?>" class="brand-link-editor p-2" style="display:block;">
+                <i class="fas fa-compass"></i>
+                <span class="brand-text font-weight-light">Metadata Editor</span>
             </a>
-
-            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                <a class="dropdown-item" href="#/import"><i class="fas fa-file-invoice"></i> Import project metadata</a>
-                <a v-if="dataset_type!=='timeseries-db'" class="dropdown-item" href="#/external-resources/import"><i class="fas fa-clone"></i> Import external resources</a>
-                <div class="dropdown-divider"></div>
-                <a v-if="dataset_type=='survey'" class="dropdown-item" :href="'<?php echo site_url('api/editor/ddi/');?>' + dataset_id" target="_blank"><i class="far fa-file-alt"></i> Export DDI CodeBook (2.5)</a>
-                <a class="dropdown-item" :href="'<?php echo site_url('api/editor/json/');?>' + dataset_id" target="_blank"><i class="far fa-file-code"></i> Export JSON</a>
-                <a v-if="dataset_type!=='timeseries-db'" class="dropdown-item" :href="'<?php echo site_url('api/editor/rdf/');?>' + dataset_id" target="_blank"><i class="far fa-file-alt"></i> Export External Resouces (RDF/XML)</a>
-                <a v-if="dataset_type!=='timeseries-db'" class="dropdown-item" :href="'<?php echo site_url('api/editor/resources/');?>' + dataset_id" target="_blank"><i class="far fa-file-alt"></i> Export External Resources (JSON)</a>
-            </div>
         </div>
 
-        <li class="nav-item">
-            <a class="nav-link"  href="#/publish" role="button">
-                <i class="fas fa-location-arrow"></i> Publish
-            </a>
-        </li>
+        <div class="pl-2">
+            <div><strong>{{Title}}</strong></div>
+            <div style="font-size:small;color:gray;">{{dataset_type}} - {{StudyIDNO}}</div>
+        </div>
+        <div>{{this.loading_status}}</div>
 
-        <li class="nav-item">
-            <?php echo $this->load->view('user_menu/user-menu',null,true);?>                        
-        </li>
-    </ul>
-</nav>
+
+        <ul class="navbar-nav ml-5 ml-auto">
+
+            <div class="dropdown">
+                <a class="btn btn-link dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-random"></i> Metadata
+                </a>
+
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                    <a class="dropdown-item" href="#/import"><i class="fas fa-file-invoice"></i> Import project metadata</a>
+                    <a v-if="dataset_type!=='timeseries-db'" class="dropdown-item" href="#/external-resources/import"><i class="fas fa-clone"></i> Import external resources</a>
+                    <div class="dropdown-divider"></div>
+                    <a v-if="dataset_type=='survey'" class="dropdown-item" :href="'<?php echo site_url('api/editor/ddi/'); ?>' + dataset_id" target="_blank"><i class="far fa-file-alt"></i> Export DDI CodeBook (2.5)</a>
+                    <a class="dropdown-item" :href="'<?php echo site_url('api/editor/json/'); ?>' + dataset_id" target="_blank"><i class="far fa-file-code"></i> Export JSON</a>
+                    <a v-if="dataset_type!=='timeseries-db'" class="dropdown-item" :href="'<?php echo site_url('api/editor/rdf/'); ?>' + dataset_id" target="_blank"><i class="far fa-file-alt"></i> Export External Resouces (RDF/XML)</a>
+                    <a v-if="dataset_type!=='timeseries-db'" class="dropdown-item" :href="'<?php echo site_url('api/editor/resources/'); ?>' + dataset_id" target="_blank"><i class="far fa-file-alt"></i> Export External Resources (JSON)</a>
+                </div>
+            </div>
+
+            <li class="nav-item">
+                <a class="nav-link" href="#/publish" role="button">
+                    <i class="fas fa-location-arrow"></i> Publish
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <?php echo $this->load->view('user_menu/user-menu', null, true); ?>
+            </li>
+        </ul>
+    </nav>
 </div>
 <!--end-header-->
 
 <splitpanes class="default-theme splitpanes splitpanes--vertical" style="min-height: 400px">
-  <pane min-size="15" max-size="35" size="20" height="100">
-    <!--left -->
+    <pane min-size="15" max-size="35" size="20" height="100">
+        <!--left -->
 
-    <div class="container-fluid bg-secondary-light pt-2" style="overflow:auto;">
+        <div class="container-fluid bg-secondary-light pt-2 pb-3" style="overflow:auto;">
 
-        <div class="mb-5">
-            <v-treeview                
-                color="warning"
-                v-model="tree"
-                :active.sync="tree_active_items" 
-                @update:open="treeOnUpdate" 
-                :open.sync="initiallyOpen" 
-                :items="items" 
-                activatable dense 
-                item-key="key" 
-                item-text="title"                         
-                expand-icon="mdi-chevron-down"
-                indeterminate-icon="mdi-bookmark-minus"
-                on-icon="mdi-bookmark"
-                off-icon="mdi-bookmark-outline"
-                item-children="items">
+            <!-- icons -->
+            <div class="bg-dark-x pb-2 sidebar-menu-bar">
+                    <button type="button" title="Expand/Collapse" class="btn btn-xs btn-outline-secondary">
+                        <i class="icon fas fa-compress-arrows-alt"></i>
+                    </button>
 
-                <template #label="{ item }" >
-                    <span @click="treeClick(item)" :title="item.title" class="tree-item-label">
-                        <span v-if="item.type=='resource'" >{{item.title | truncate(23, '...') }}</span>
-                        <span v-else>{{item.title}}</span>
-                    </span>
-                </template>
+                    <button type="button" title="Show mandatory fields" class="btn btn-xs btn-outline-secondary" :class="{ active: show_fields_mandatory }" @click="toggleFields('mandatory')">
+                        <v-icon class="icon" >mdi-check-circle</v-icon>
+                    </button>
 
-                <template v-slot:prepend="{ item, open }">
-                    <v-icon v-if="item.type=='section_container'">
-                        {{ open ? 'mdi-dresser' : 'mdi-dresser' }}
-                    </v-icon> 
-                    <v-icon v-else-if="item.type=='section'">
-                        {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
-                    </v-icon> 
-                    <v-icon v-else-if="item.file" >
-                        {{ files[item.file] }}
-                    </v-icon>    
-                    <v-icon v-else-if="item.items">
-                        {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
-                    </v-icon>
-                    <v-icon v-else>
-                        {{ files['file'] }}
-                    </v-icon>
-                </template>
-            </v-treeview>
+                    <button type="button" title="Show recommended fields" class="btn btn-xs btn-outline-secondary" :class="{ active: show_fields_recommended }" @click="toggleFields('recommended')">
+                        <v-icon class="icon" >mdi-circle-half-full</v-icon>
+                    </button>
+
+                    <button type="button" title="Show empty fields" class="btn btn-xs btn-outline-secondary" :class="{ active: show_fields_empty }" @click="toggleFields('empty')">
+                        <v-icon class="icon" >mdi-circle-outline</v-icon>Empty
+                    </button>
+
+                    <button type="button" title="Expand/Collapse" class="btn btn-xs btn-outline-secondary" :class="{ active: show_fields_nonempty }" @click="toggleFields('nonempty')">
+                        <v-icon class="icon" >mdi-checkbox-blank-circle</v-icon>Filled
+                    </button>
+
+            </div>
+            <!-- end-icons -->
+
+
+
+            <div class="mb-5">
+                <v-treeview color="warning" v-model="tree" :active.sync="tree_active_items" @update:open="treeOnUpdate" :open.sync="initiallyOpen" :items="items" activatable dense item-key="key" item-text="title" expand-icon="mdi-chevron-down" indeterminate-icon="mdi-bookmark-minus" on-icon="mdi-bookmark" off-icon="mdi-bookmark-outline" item-children="items">
+
+                    <template #label="{ item }">
+                        <span @click="treeClick(item)" :title="item.title" class="tree-item-label">
+                            <span v-if="item.type=='resource'">{{item.title | truncate(23, '...') }}</span>
+                            <span v-else>
+                                <span v-if="item.is_required"><strong>{{item.title}}</strong></span>
+                                <span v-else>{{item.title}}</span>
+                            </span>
+                        </span>
+                    </template>
+
+                    <template v-slot:prepend="{ item, open }">
+                        <v-icon v-if="item.type=='section_container'">
+                            {{ open ? 'mdi-dresser' : 'mdi-dresser' }}
+                        </v-icon>
+                        <v-icon v-else-if="item.type=='section'">
+                            {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
+                        </v-icon>
+                        <v-icon v-else-if="item.file">
+                            {{ files[item.file] }}
+                        </v-icon>
+                        <v-icon v-else-if="item.items">
+                            {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
+                        </v-icon>
+                        <v-icon v-else>
+                            {{ files['file'] }}
+                        </v-icon>
+                    </template>
+                </v-treeview>
+            </div>
         </div>
-    </div>
-    <!--end left-->
-  </pane>  
-  <pane size="80">
-    <!-- right -->
+        <!--end left-->
+    </pane>
+    <pane size="80">
+        <!-- right -->
 
 
-    <div class="content-wrapper" style="margin-left:0px;">
+        <div class="content-wrapper" style="margin-left:0px;">
 
-        <section class="content-x">
-            
-            <div class="container-fluid-" style="overflow:auto;">
+            <section class="content-x">
 
-                <v-login v-model="login_dialog"></v-login>
+                <div class="container-fluid-" style="overflow:auto;">
 
-                <?php /*
+                    <v-login v-model="login_dialog"></v-login>
+
+                    <?php /*
                 //route path: {{$route.fullPath}}
                 <div v-if="active_form_field">active_form_field.key:{{active_form_field.key}}</div>
 
@@ -137,23 +153,25 @@
                             </div>
                         </div>
                 </div>
-                */?>
+                */ ?>
 
-                <validation-observer ref="form" v-slot="{ invalid }">                
-                <div class="container-fluid p-3" style="overflow:auto;">
-                    <keep-alive include="datafiles">
-                        <router-view :key="$route.fullPath" />
-                    </keep-alive>
+                    <validation-observer ref="form" v-slot="{ invalid }">
+                        <div class="container-fluid p-3" style="overflow:auto;">
+                            <keep-alive include="datafiles">
+                                <router-view :key="$route.fullPath" />
+                            </keep-alive>
+                        </div>
+
+                    </validation-observer>
                 </div>
 
-                </validation-observer>
-            </div>
+                <?php // store_state:<pre>{{$store.state}}</pre> 
+                ?>
+                <?php // <pre>{{form_template}}</pre> 
+                ?>
 
-           <?php // store_state:<pre>{{$store.state}}</pre> ?>
-           <?php // <pre>{{form_template}}</pre> ?>
-           
-        </section>
-    </div>
-    <!--end right-->
-  </pane>
+            </section>
+        </div>
+        <!--end right-->
+    </pane>
 </splitpanes>

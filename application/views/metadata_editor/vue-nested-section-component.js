@@ -9,9 +9,7 @@ Vue.component('nested-section', {
         }
     },
     watch: { 
-        field_data: function(newVal, oldVal) {
-            console.log('Prop changed: ', newVal, ' | was: ', oldVal)
-            console.log('key path:',this.key_path);
+        field_data: function(newVal, oldVal) {            
             this.$vueSet (this.$store.state.formData, this.key_path, newVal);
         }
     },
@@ -33,7 +31,8 @@ Vue.component('nested-section', {
 
                 <div :class="'nested-section-row nested-section-'+index" > 
                     <div class="label-wrapper" @click="toggleChildren(index)">
-                        <div class="tree-node form-section nested-form-section" >[{{index+1}}] - {{ title }}
+                        <div class="tree-node form-section nested-form-section" >
+                            <v-icon style="padding:4px;font-weight:bold;">mdi-file-tree-outline</v-icon> {{index+1}} - {{ title }}
                             <button type="button"  class="btn btn-sm btn-link" v-on:click="remove(index)">Remove <i class="fa fa-trash-o" aria-hidden="true"></i></button>
                             <span class="float-right section-toggle-icon"><i class="fas" :class="toggleClasses(index)"></i></span>
                         </div>
@@ -108,7 +107,9 @@ Vue.component('nested-section', {
 
                             <div v-if="column.type=='array'">
                                 <div class="form-group form-field form-field-table">
-                                    <label :for="'field-' + path">{{column.title}}</label>                                      
+                                    <label :for="'field-' + path">{{column.title}}</label>
+                                    <span class="small" v-if="column.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(column.key + index)" ><i class="far fa-question-circle"></i></span>
+                                    <small :id="'field-toggle-' + normalizeClassID(column.key + index)" class="collapse help-text form-text text-muted">{{column.help_text}}</small>
                                     <grid-component 
                                         :value="getData('['+index+']'+ column.key)"   
                                         :columns="column.props"
@@ -143,8 +144,8 @@ Vue.component('nested-section', {
                     </div>
                 </template>
 
-                <div class="d-flex justify-content-center">
-                    <button type="button" class="btn btn-light btn-block btn-sm" @click="addRow" >Add row</button>    
+                <div class="d-flex justify-content-center m-3">
+                    <button type="button" class="btn btn-light btn-sm btn-outline-primary" @click="addRow" >Add section - {{title}}</button>
                 </div>
 
             </div>  `,

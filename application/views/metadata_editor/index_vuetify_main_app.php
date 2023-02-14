@@ -78,7 +78,7 @@
         let project_idno='<?php echo isset($survey['idno']) ? $survey['idno'] : '';?>';
         let project_type='<?php echo isset($type) ? $type : '';?>';
 
-        // 1. Define route components.
+        //Define route components
         const main = {props:['element_id'],template: '<div><form-main/></div>' }
         const Home = { template: '<div><summary-component/> </div>' }
         const PublishProject = { template: '<div><publish-options/> </div>' }
@@ -94,17 +94,8 @@
         const ResourcesImport ={template: '<div> <external-resources-import /></div>'}
         const ResourcesEditComp ={props: ['index'],template: '<div><external-resources-edit /></div>'}
 
-
-
-        // 2. Define some routes
-        // Each route should map to a component. The "component" can
-        // either be an actual component constructor created via
-        // `Vue.extend()`, or just a component options object.
+        //routes
         const routes = [
-            /*{path: '/', component: main,
-                redirect: '/study/<?php echo isset($metadata_template_arr['items'][0]['key']) ? $metadata_template_arr['items'][0]['key'] : 'study_description' ;?>',
-                name: 'home',
-            },*/
             { path: '/', component: Home },
             { path: '/publish', component: PublishProject },
             { path: '/configure-catalog', component: ConfigureCatalog },
@@ -120,21 +111,20 @@
             { path: '/external-resources/:index', component: ResourcesEditComp, props: true}
         ]
 
-        // 3. Create the router instance and pass the `routes` option
         const router = new VueRouter({
-            routes // short for `routes: routes`
+            routes
         })
 
 
         router.beforeEach((to, from, next)=>{
             route_path=to.path.replace('/study/','');
             
-            if (store.state.formTemplateParts[route_path] !== undefined){
-                store.commit('tree_active_node',route_path);
+            if (!store.state.treeActiveNode){            
+                if (store.state.formTemplateParts[route_path] !== undefined){
+                    store.commit('tree_active_node_path',route_path);
+                }
             }
 
-            if (route_path=='/'){}
-            //store.commit('tree_active_node','study_desc.title_statement.idno');            
             next();
         })
 
@@ -149,6 +139,7 @@
                 formTemplateParts:form_template_parts,
                 templates:[],//list of templates available                
                 treeActiveNode:null,
+                treeItems:[],
                 active_node: {
                     id: 'table_description.title_statement.table_number'
                 },
@@ -295,7 +286,6 @@
                 getDataFileById: (state) => (fid) => {
                     for(i=0;i<state.data_files.length;i++){
                         if(state.data_files[i].file_id==fid){
-                            console.log("file found",state.data_files[i]);
                             return state.data_files[i];
                         }
                     }
@@ -348,7 +338,10 @@
                 },
                 getVariablesActiveTab: function(state){
                     return state.variables_active_tab;
-                }
+                },
+                getTreeItems(state){
+                    return state.treeItems;
+                },
             },
             actions: {               
                 async initData({commit},options) {
@@ -359,6 +352,9 @@
                     await store.dispatch('loadExternalResources',{dataset_id:options.dataset_id});
                     store.state.variables_loaded=true;
                     store.state.variables_isloading=false;
+                },
+                async initTreeItems({commit},options) {                    
+                    store.state.treeItems=store.state.formTemplate.template.items;    
                 },
                 async loadTemplatesList({commit},options) {
                     let url=CI.base_url + '/api/templates/list/'+store.state.project_type;;
@@ -376,11 +372,10 @@
                     return axios
                     .get(url)
                     .then(function (response) {
-                        console.log(response);
                         store.state.formData=response.data.project.metadata;                        
                     })
                     .catch(function (error) {
-                        console.log(error);
+                        console.log("error loading project",error);
                     });
                 },
                 async loadDataFiles({commit},options) {
@@ -388,7 +383,6 @@
                     return axios
                     .get(url)
                     .then(function (response) {
-                        console.log(response);
                         let data_files_=[];
                         if(response.data.datafiles){
                             Object.keys(response.data.datafiles).forEach(function(element, index) { 
@@ -398,10 +392,7 @@
                         }
                     })
                     .catch(function (error) {
-                        console.log(error);
-                    })
-                    .then(function () {
-                        console.log("vuex request completed");
+                        console.log("error loading datafiles", error);
                     });                    
                 },
                 async loadAllVariables({commit,state},options) {
@@ -426,7 +417,7 @@
                         }
                     })
                     .catch(function (error) {
-                        console.log(error);
+                        console.log("error loading variables",error);
                     });
                 },
                 async loadExternalResources({commit}, options) {
@@ -448,9 +439,17 @@
                 data_model (state,data) {
                     console.log("value added");
                 },
-                tree_active_node(state,node){
-                    state.treeActiveNode=state.formTemplateParts[node];
+                tree_active_node(state,node){//tobe removed
+                    alert("toberemoved");
+                    //state.treeActiveNode=state.formTemplateParts[node];
                 },
+                tree_active_node_path(state,node_key){
+                    state.treeActiveNode=state.formTemplateParts[node_key];
+                },
+                tree_active_node_data(state,node){
+                    state.treeActiveNode=node;
+                },
+
                 external_resources(state,data){
                     state.external_resources=data;
                 },

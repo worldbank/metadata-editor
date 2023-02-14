@@ -1,12 +1,13 @@
 ///props treeview component
 Vue.component('props-treeview', {
-    props:['value','initially_open','cut_fields','core_props','parent_key'],
+    props:['value','initially_open','core_props','parent_key','parent_type'],
     data: function () {    
         return {
             template: this.value,
             initiallyOpen:[],
             tree_active_items:[],
             active_prop:'',
+            cut_fields:[],
             files: {
               html: 'mdi-language-html5',
               js: 'mdi-nodejs',
@@ -87,10 +88,10 @@ Vue.component('props-treeview', {
           }
 
           for(let item of arr){
-              if(item.key===name) return `/${item.key}`;
-              if(item.items) {
-                  const child = this.getNodePath(item.items, name);
-                  if(child) return `/${item.key}${child}`
+              if(item.prop_key===name) return `/${item.prop_key}`;
+              if(item.props) {
+                  const child = this.getNodePath(item.props, name);
+                  if(child) return `/${item.prop_key}${child}`
               }
           }
       },
@@ -158,11 +159,26 @@ Vue.component('props-treeview', {
          }
          return prop_keys;         
       },
-      getNodeContainerKey: function(tree,node_key)
+      /*getNodeNestedArrayParentKey: function(tree,node_key)
       {
-        let el_path=this.getNodePath(tree,node_key);
+        let el_path=this.getNodeNestedArrayPath(tree,node_key);
+        //console.log("el_path: " + el_path,tree,node_key);
         return el_path.split("/")[1];
       },
+      getNodeNestedArrayPath: function(arr,name)
+      {
+          if (!arr){
+            return false;
+          }
+
+          for(let item of arr){
+              if(item.prop_key===name) return `/${item.prop_key}`;
+              if(item.props) {
+                  const child = this.getNodeNestedArrayPath(item.props, name);
+                  if(child) return `/${item.prop_key}${child}`
+              }
+          }
+      },*/
       deleteProp: function()
       {
         this.delete_tree_item(this.Items,this.active_prop.prop_key);
@@ -174,12 +190,13 @@ Vue.component('props-treeview', {
             this.delete_tree_item(item.props, item_key);
           }
           if (item.prop_key == item_key) {
-            if (tree.length>1){
+            Vue.delete(tree, idx);
+            /*if (tree.length>1){
               Vue.delete(tree, idx);
             }
             else{
               alert("To remove all items, remove the parent element");
-            }
+            }*/
           }
         });
       },
@@ -212,7 +229,8 @@ Vue.component('props-treeview', {
       },
       moveUp: function()
         {
-          parentNode = this.getNodeParent(this.UserProps, this.active_prop.prop_key);          
+          parentNode = this.getNodeParent(this.UserProps, this.active_prop.prop_key);
+          console.log("parentNode",parentNode);
           nodeIdx=this.findNodePosition(parentNode,this.active_prop.prop_key);
           if (nodeIdx >0 ){
             this.array_move(parentNode,nodeIdx,nodeIdx-1);
@@ -228,6 +246,34 @@ Vue.component('props-treeview', {
           if (nodeIdx >-1 && nodeIdx<parentNodeItemsCount){
             this.array_move(parentNode,nodeIdx,nodeIdx+1);
           }
+        },
+        addSection: function()
+        {
+          /*if (!this.active_prop.type == 'section') {
+            return false;
+          }*/
+          if (!this.active_prop.props){
+            parentNode = this.getNodeParent(this.UserProps, this.active_prop.prop_key);
+          }
+          else{
+            parentNode=this.active_prop.props;
+          }
+
+          new_node_key = 'section-' + Date.now();
+          new_node_prop_key = 'prop-' + new_node_key;
+          parentNode.push({
+            "key": new_node_key,
+            "prop_key": new_node_prop_key,
+            "title": "Untitled",
+            "type": "section",
+            "props": [],
+            "help_text": ""
+          });
+
+          this.active_prop = parentNode[parentNode.length - 1];
+          this.tree_active_items = new Array();
+          this.tree_active_items.push(new_node_prop_key);
+          //this.initiallyOpen.push(new_node_key);
         },
         array_move: function (arr, old_index, new_index) {
             if (new_index >= arr.length) {
@@ -249,7 +295,63 @@ Vue.component('props-treeview', {
           }
 
           return -1;
-        }
+        },
+        cutField: function() {
+          //let nestedArrayParentKey = this.getNodeNestedArrayParentKey(this.Items, this.active_prop.prop_key);
+          //console.log("nestedArrayParentKey",nestedArrayParentKey);
+
+          //unselect cut field
+          for (i = 0; i < this.cut_fields.length; i++) {
+            //if (nestedArrayParentKey == this.cut_fields[i].nestedParent) {
+              if (this.cut_fields[i].node.prop_key == this.active_prop.prop_key) {
+                this.cut_fields.splice(i, 1);
+                return;
+              }
+            //}
+          }
+
+          this.cut_fields.push({
+            "node": this.active_prop,
+            //"nestedParent": nestedArrayParentKey
+          });        
+        },
+        pasteField: function() 
+        {
+          if (this.cut_fields.length < 1) {
+            return false;
+          }
+
+          pasteTarget=this.active_prop;
+
+          if (this.active_prop.type != 'section' && this.active_prop.type != 'nested_array') {
+            pasteTarget=this.getNodeParent(this.Items, this.active_prop.prop_key);
+          }
+
+          for (i = 0; i < this.cut_fields.length; i++) {
+              //remove existing item
+              this.delete_tree_item(this.Items, this.cut_fields[i].node.prop_key);
+              //add copied item
+              if (pasteTarget.props) {
+                pasteTarget.props.push(this.cut_fields[i].node);
+              }else{
+                pasteTarget.push(this.cut_fields[i].node);
+              }
+          }
+          this.cut_fields = [];
+        },
+        //check if an item is selected for cut/paste        
+        isPropCut: function(prop) {
+          //let nestedArrayParentKey = this.getNodeNestedArrayParentKey(this.Items, prop.prop_key);
+
+          for (i = 0; i < this.cut_fields.length; i++) {
+            //if (nestedArrayParentKey == this.cut_fields[i].nestedParent) {
+              if (prop.prop_key == this.cut_fields[i].node.prop_key) {
+                return true;
+              }
+            ///}
+          }
+          return false;
+        },
       
     },
     template: `
@@ -260,7 +362,6 @@ Vue.component('props-treeview', {
               <div class="col-md-4 border">
                 <div class="row">
                   <div class="col-md-11" style="min-height: 30vh; max-height:80vh; overflow: auto;">
-
                     <template>
                       <v-treeview                   
                           color="warning"
@@ -280,8 +381,10 @@ Vue.component('props-treeview', {
                       >
 
                         <template #label="{ item }" >
-                            <span @click="treeClick(item)" :title="item.title" class="tree-item-label" >
-                                <span>{{item.title}}</span>                        
+                            <span @click="treeClick(item)" :title="item.title" class="tree-item-label" :class="{iscut: isPropCut(item)}">
+                                <span v-if="!item.title">untitled</span>
+                                <span v-else>{{item.title}}</span>
+                                <span v-if="isPropCut(item)">*</span>
                             </span>
                         </template>
 
@@ -315,6 +418,22 @@ Vue.component('props-treeview', {
                       <v-icon v-if="active_prop.key" color="#3498db" @click="moveDown()">mdi-arrow-down-bold-box</v-icon>
                       <v-icon v-else color="rgb(0 0 0 / 12%)">mdi-arrow-down-bold-box</v-icon>
                     </div>
+                    <div>
+                      <v-icon v-if="active_prop.key" color="#3498db" @click="addSection()">mdi-plus-box</v-icon>
+                      <v-icon v-else color="rgb(0 0 0 / 12%)">mdi-mdi-plus-box</v-icon>
+                    </div>
+
+
+                    <div class="mt-5" title="Move">
+                      <v-icon v-if="active_prop.type" color="#3498db" @click="cutField()">mdi-content-copy</v-icon>
+                      <v-icon v-else color="rgb(0 0 0 / 12%)">mdi-content-copy</v-icon>
+                    </div>
+
+                    <div class="mt-2" title="Paste">
+                      <v-icon v-if="cut_fields.length>0" color="#3498db" @click="pasteField()">mdi-content-paste</v-icon>
+                      <v-icon v-else color="rgb(0 0 0 / 12%)">mdi-content-paste</v-icon>
+                    </div>
+
                   </div>
 
                 </div>
@@ -338,6 +457,7 @@ Vue.component('props-treeview', {
             </div>
             
             <div class="col-md-8 border">
+
               <div v-if="active_prop.key">
                 <prop-edit :key="active_prop.prop_key" v-model="active_prop"></prop-edit>
               </div>

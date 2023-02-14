@@ -46,7 +46,7 @@
 
 <div class="form-group mt-2 pb-5" v-if="ActiveNode.key && ActiveNode.props">
     <div><label>Field properties:</label></div>
-    <props-treeview :key="ActiveNode.key" :parent_key="ActiveNode.key" v-model="ActiveNode.props" :core_props="coreTemplateParts[ActiveNode.key].props"></props-treeview>
+    <props-treeview :key="ActiveNode.key" :parent_type="ActiveNode.type" :parent_key="ActiveNode.key" v-model="ActiveNode.props" :core_props="coreTemplateParts[ActiveNode.key].props"></props-treeview>
 </div>
 
 <template v-if="ActiveNode.type!=='section_container' && ActiveNode.type!=='section'">
@@ -145,9 +145,6 @@
     </v-tabs>
 
 </template>
-
-
-
 
 
 <div class="form-group" v-if="ActiveNode.type=='section'  || ActiveNode.type=='nested_array'">

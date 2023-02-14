@@ -10,14 +10,12 @@ Vue.component('simple-array-component', {
     },
     watch: { 
         field_data: function(newVal, oldVal) {
-            console.log('simple array Prop changed: ', JSON.stringify(newVal), ' | was: ', JSON.stringify(oldVal));
             this.$vueSet (this.$store.state.formData, this.key_path, newVal);
         }
     
     },
     
-    mounted: function () {
-        console.log("simple_array mounted", JSON.stringify(this.field_data));
+    mounted: function () {        
         /*if (!this.field_data){
             this.field_data=[];
             this.field_data.push("");

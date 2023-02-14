@@ -406,3 +406,31 @@ html,body {
 .splitpanes.default-theme .splitpanes__pane{
     background-color: hsl(0deg 0% 100% / 70%)!important;
 }
+
+
+.sidebar-menu-bar .icon{
+    color:gray!important;
+    font-size:12px;
+    margin-top:-2px;
+}
+
+.sidebar-menu-bar .btn{
+    background:rgb(0 0 0 / 12%);
+    color:black;
+    border:0px;
+}
+
+.sidebar-menu-bar .btn:hover{
+    background-color:rgb(174, 173, 173);
+}
+
+.sidebar-menu-bar .btn.active .icon,
+.sidebar-menu-bar .btn:hover .icon{
+    color:rgb(251, 251, 251)!important;
+}
+
+.sidebar-menu-bar .btn{
+    background:rgb(0 0 0 / 12%);
+    color:black;
+    border:0px;
+}

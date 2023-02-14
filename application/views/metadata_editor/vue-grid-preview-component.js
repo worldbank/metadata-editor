@@ -15,7 +15,10 @@ Vue.component('grid-preview-component', {
         isEmpty: function()
         {
             is_empty=true;
-
+            if (!this.field_data){
+                return true;
+            }
+            
             this.field_data.forEach(row => {
                 Object.values(row).forEach(val=>{
                     if (val.length>0){

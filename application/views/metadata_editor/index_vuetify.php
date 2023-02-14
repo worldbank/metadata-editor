@@ -180,11 +180,23 @@ Vue.config.errorHandler = (err, vm, info) => {
         tree: [],
         items: [],
         tree_active_items:[],
-        login_dialog:false
+        login_dialog:false,
+        show_fields_mandatory:false,
+        show_fields_recommended:false,
+        show_fields_empty:false,
+        show_fields_nonempty:false,
+        show_fields_validation_errors:false
       },
       created: async function(){
-       await this.$store.dispatch('initData',{dataset_id:this.dataset_id});
-       this.init_tree_data();
+        await this.$store.dispatch('initData',{dataset_id:this.dataset_id});
+        await this.$store.dispatch('initTreeItems');
+        this.init_tree_data();
+
+        /*let node_path=this.getNodeKeyFromPath(this.$route.path);
+
+        if (node_path){        
+          store.commit('tree_active_node_path',node_path);
+        }*/
       }
       ,
       mounted: function(){
@@ -301,8 +313,6 @@ Vue.config.errorHandler = (err, vm, info) => {
           }
           console.log("data file nodes:",datafiles_nodes);
           return datafiles_nodes;
-          
-
         },
         ExternalResourcesTreeNodes(){
           let resources=this.$store.state.external_resources;
@@ -329,38 +339,16 @@ Vue.config.errorHandler = (err, vm, info) => {
           console.log("resources nodes:",resources_nodes);
           return resources_nodes;
         },
-        TreeItems() {
-          let tree_data=this.filter_tree_items(this.form_template.template.items);
-
-          tree_data.unshift({
-              title: 'Home',
-              type:'home',
-              file: 'database',
-              key: 'home'              
-            });
-
-          if (this.dataset_type=='survey'){
-            tree_data.push({
-              title: 'Data files',
-              type:'datasets',
-              file: 'database',
-              key: 'datasets',
-              items:this.DataFilesTreeNodes
-            });
-          }
-
-          if (this.dataset_type!=='timeseries-db'){
-            tree_data.push({
-                title: 'External resources',
-                type: 'resources',
-                file: 'resource',
-                key:'external-resources',
-                items:this.ExternalResourcesTreeNodes
-            });
-          }
-
-          return tree_data;          
-        }        
+        TreeItems:
+        {
+            get(){
+                return this.$store.state.treeItems;
+            },
+            set(val){
+              return this.$store.state.treeItems=val;
+            }
+        }
+        
       },      
       watch: {
         '$store.state.data_files': function() {
@@ -382,6 +370,17 @@ Vue.config.errorHandler = (err, vm, info) => {
         }
       },
       methods:{
+        getNodeKeyFromPath: function(path)
+        {
+          path=path.substr(0,1)=="/" ? path.substr(1,path.length) : path;
+          let path_arr=path.split("/");
+
+          if (path_arr.length>1 && path_arr[0]=='study'){
+            return path_arr[1];
+          }else{
+            return '';
+          }          
+        },
         getTreeNestedPath: function(arr,name)
         {
             let vm=this;
@@ -418,10 +417,111 @@ Vue.config.errorHandler = (err, vm, info) => {
 
           return items.filter(item => item.is_custom!==true);
         },
+        filter_empty_items: function(items)
+        {
+          if (items.items){
+            items=this.filter_empty_items(items);
+          }
+
+          return items.filter(item => item.type=='section' || item.key=='doc_description');
+        },
+        filterRecursiveSearch: function(items,filter_type='')
+        {
+          let vm=this;
+          let filtered_items=[];
+          for (let item of items){
+
+            if (item.items){              
+                let filtered_children=vm.filterRecursiveSearch(item.items,filter_type);
+
+                if (item.is_custom){
+                  continue;              
+                }
+
+                if (filtered_children.length>0){
+                  item.items=filtered_children;
+                  filtered_items.push(item);
+                }
+            }else{
+                if(!item.is_custom){
+                    //show mandatory fields only
+                    if (filter_type=='mandatory' && this.show_fields_mandatory==true && item.is_required){
+                      filtered_items.push(item);
+                    }
+
+                    //show recommended fields only [recommended + mandatory]
+                    else if (filter_type=='recommended' && this.show_fields_recommended==true && (item.is_recommended || item.is_required)){
+                      filtered_items.push(item);
+                    }
+
+                    //show empty fields only
+                    else if (filter_type=='empty' && this.show_fields_empty==true){
+                      let field_value=this.getFieldValueByPath(item.key);
+                      if (_.isEmpty(field_value)){
+                        filtered_items.push(item);
+                      }
+                    }
+                    else if (filter_type=='nonempty' && this.show_fields_nonempty==true){
+                      let field_value=this.getFieldValueByPath(item.key);
+                      if (field_value){
+                        filtered_items.push(item);
+                      }
+                    }
+
+                    else if (filter_type==''){
+                      filtered_items.push(item);
+                    }
+                }
+            }
+          }
+
+          return filtered_items;
+        },
+        getFieldValueByPath: function(path)
+        {
+          return _.get(this.ProjectMetadata,path);
+        },
+        toggleFields: function(field_type)
+        {
+          if (field_type=='mandatory'){
+            this.show_fields_mandatory=!this.show_fields_mandatory;
+          }
+          if (field_type=='recommended'){
+            this.show_fields_recommended=!this.show_fields_recommended;
+          }
+          if (field_type=='empty'){
+            this.show_fields_empty=!this.show_fields_empty;
+            this.show_fields_nonempty=false;
+          }
+          if (field_type=='nonempty'){
+            this.show_fields_nonempty=!this.show_fields_nonempty;
+            this.show_fields_empty=false;
+          }
+          this.init_tree_data();
+          router.push('/');
+        },
+        cloneObject: function(obj)
+        {
+          return JSON.parse(JSON.stringify(obj));
+        },
         init_tree_data: function() {
           this.is_loading=true;
           this.items=[];
-          let tree_data=this.filter_tree_items(this.form_template.template.items);
+          let tree_data=this.filterRecursiveSearch(this.cloneObject(this.form_template.template.items),'');
+
+          if (this.show_fields_recommended){
+            tree_data=this.filterRecursiveSearch(tree_data,'recommended');
+          }
+          if (this.show_fields_mandatory && this.show_fields_recommended==false){
+            tree_data=this.filterRecursiveSearch(tree_data,'mandatory');
+          }
+          
+          if (this.show_fields_empty){
+            tree_data=this.filterRecursiveSearch(tree_data,'empty');
+          }
+          if (this.show_fields_nonempty){
+            tree_data=this.filterRecursiveSearch(tree_data,'nonempty');
+          }
 
           tree_data.unshift({
               title: 'Home',
@@ -461,11 +561,15 @@ Vue.config.errorHandler = (err, vm, info) => {
             active_node_name=active_node_name.slice(active_node_name.lastIndexOf("/")+1);
 
             if (active_node_name){
-              let node_paths= this.getTreeNestedPath(this.TreeItems,active_node_name);
-              this.initiallyOpen=node_paths.split("/");
-              this.setTreeActiveNode(active_node_name);
+              let node_paths= this.getTreeNestedPath(this.items,active_node_name);
+              
+              if (node_paths){
+                this.initiallyOpen=node_paths.split("/");
+                this.setTreeActiveNode(active_node_name);
+              }
             }
           }
+          
         },
         update_tree: function()
         {
@@ -496,8 +600,7 @@ Vue.config.errorHandler = (err, vm, info) => {
           console.log("clicked on",node_key);
         },
         treeClick: function (node){
-          store.commit('tree_active_node',node.key);
-          console.log("tree node click",node);
+          store.commit('tree_active_node_data',node);
 
           //expand tree node          
           this.initiallyOpen.push(node.key);
@@ -555,7 +658,8 @@ Vue.config.errorHandler = (err, vm, info) => {
           
           form_data=JSON.parse(JSON.stringify(vm.ProjectMetadata));
           this.$refs.form.validateWithInfo().then(({ isValid, errors, $refs })=> {
-              vm.form_errors=Object.values(errors).flat();                                                
+              console.log("validation errors",errors);
+              vm.form_errors=Object.values(errors).flat();
               //if (vm.form_errors=='' || vm.form_errors.length==0){
               //}                    
           });
@@ -613,6 +717,9 @@ Vue.config.errorHandler = (err, vm, info) => {
       removeEmpty: function (obj) {
           vm=this;
           try {
+            //console.log("removeempty object type is ",typeof(obj), obj);
+            if (typeof(obj) == "string") { return; }
+
           $.each(obj, function(key, value){
               if (value === "" || value === null || ($.isArray(value) && value.length === 0) ){
                   delete obj[key];
