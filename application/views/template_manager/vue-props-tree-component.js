@@ -331,6 +331,13 @@ Vue.component('props-treeview', {
               //remove existing item
               this.delete_tree_item(this.Items, this.cut_fields[i].node.prop_key);
               //add copied item
+
+              if (pasteTarget.type=='section' || pasteTarget.type=='nested_array'){
+                if (!pasteTarget.props){
+                  Vue.set(pasteTarget,"props",[]);
+                }                
+              }
+
               if (pasteTarget.props) {
                 pasteTarget.props.push(this.cut_fields[i].node);
               }else{
@@ -394,6 +401,9 @@ Vue.component('props-treeview', {
                           </v-icon> 
                           <v-icon v-else-if="item.type=='section'">
                             {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
+                          </v-icon>
+                          <v-icon v-else-if="item.type=='nested_array'">
+                            {{ open ? 'mdi-file-tree-outline' : 'mdi-file-tree' }}
                           </v-icon> 
                           <v-icon v-else>
                             mdi-note-text-outline
