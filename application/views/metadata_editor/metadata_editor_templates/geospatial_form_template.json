@@ -23,7 +23,7 @@
                             "key": "metadata_information.idno",
                             "type": "text",
                             "title": "Document ID",
-                            "help_text": "A unique identifier for the metadata document. This identifier must be unique in the catalog where the metadata are intended to be published. Ideally, the identifier should also be unique globally. This is different from the \"Primary ID\" in section Study description \/ Title statement, although it is good practice to generate identifiers that establish a clear connection between these two identifiers. The Document ID could also include the metadata document version identifier. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. The identifier may not contain blank spaces."
+                            "help_text": "A unique identifier for the metadata document. This identifier must be unique in the catalog where the metadata are intended to be published. Ideally, the identifier should also be unique globally. This is different from the \"Primary ID\" in section Study description / Title statement, although it is good practice to generate identifiers that establish a clear connection between these two identifiers. The Document ID could also include the metadata document version identifier. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. The identifier may not contain blank spaces."
                         },
                         {
                             "key": "metadata_information.producers",
@@ -60,7 +60,7 @@
                                     "help_text": "The specific role of the person or organization mentioned in \"Name\" in the production of the DDI metadata."
                                 }
                             ],
-                            "help_text": "The metadata producer is the person or organization with the financial and\/or administrative responsibility for the processes whereby the metadata document was created. This is a \"Recommended\" element. For catalog administration purposes, information on the producer and on the date of metadata production is useful. ",
+                            "help_text": "The metadata producer is the person or organization with the financial and/or administrative responsibility for the processes whereby the metadata document was created. This is a \"Recommended\" element. For catalog administration purposes, information on the producer and on the date of metadata production is useful. ",
                             "is_recommended": true
                         },
                         {
@@ -281,7 +281,7 @@
                                     "title": "Role",
                                     "type": "string",
                                     "prop_key": "description.contact.role",
-                                    "help_text": "Role of the person\/organization. A recommended controlled vocabulary is provided by ISO 19139",
+                                    "help_text": "Role of the person/organization. A recommended controlled vocabulary is provided by ISO 19139",
                                     "enum": [
                                         {
                                             "code": "resourceProvider",
@@ -490,14 +490,14 @@
                             "key": "description.metadataStandardName",
                             "type": "string",
                             "title": "Metadata standard name",
-                            "help_text": "The name of the geographic metadata standard used to describe the resource. The recommended values are:\n- in the case of vector dataset metadata: ISO 19115 Geographic information - Metadata\n- in the case of grid\/imagery dataset metadata: ISO 19115-2 Geographic Information - Metadata Part 2 Extensions for imagery and gridded data\n- in the case of service metadata: ISO 19119 Geographic information - Services",
+                            "help_text": "The name of the geographic metadata standard used to describe the resource. The recommended values are:\n- in the case of vector dataset metadata: ISO 19115 Geographic information - Metadata\n- in the case of grid/imagery dataset metadata: ISO 19115-2 Geographic Information - Metadata Part 2 Extensions for imagery and gridded data\n- in the case of service metadata: ISO 19119 Geographic information - Services",
                             "display_type": "text"
                         },
                         {
                             "key": "description.metadataStandardVersion",
                             "type": "string",
                             "title": "Metadata standard version",
-                            "help_text": "The version of the metadata standard being used. It is good practice to enter the standard’s inception\/revision year. ISO standards are revised with an average periodicity of 10-year. Although the ISO TC211 geographic information metadata standards have been reviewed, it is still accepted to refer to the original version of the standard as many information systems\/catalogs still make use of that version. The recommended values are:\n- in the case of vector dataset metadata: ISO 19115:2003\n- in the case of grid\/imagery dataset metadata: ISO 19115-2:2009\n- in the case of service metadata: ISO 19119:2005",
+                            "help_text": "The version of the metadata standard being used. It is good practice to enter the standard’s inception/revision year. ISO standards are revised with an average periodicity of 10-year. Although the ISO TC211 geographic information metadata standards have been reviewed, it is still accepted to refer to the original version of the standard as many information systems/catalogs still make use of that version. The recommended values are:\n- in the case of vector dataset metadata: ISO 19115:2003\n- in the case of grid/imagery dataset metadata: ISO 19115-2:2009\n- in the case of service metadata: ISO 19119:2005",
                             "display_type": "text"
                         },
                         {
@@ -551,7 +551,7 @@
                                             "key": "date",
                                             "type": "date",
                                             "title": "Date",
-                                            "prop_key": "citation.date.date",
+                                            "prop_key": "description.identificationInfo.citation.date.date",
                                             "help_text": "The date, in ISO format."
                                         },
                                         {
@@ -559,7 +559,7 @@
                                             "type": "string",
                                             "title": "Type",
                                             "help_text": "The type of date should be provided, and selected from the controlled vocabulary proposed by the ISO 19139.",
-                                            "prop_key": "citation.date.type",
+                                            "prop_key": "description.identificationInfo.citation.date.type",
                                             "enum": [
                                                 {
                                                     "code": "creation",
@@ -673,54 +673,54 @@
                                             "key": "organisationName",
                                             "title": "Organisation name",
                                             "type": "string",
-                                            "prop_key": "citation.citedResponsibleParty.organisationName",
+                                            "prop_key": "description.identificationInfo.citation.citedResponsibleParty.organisationName",
                                             "display_type": "text"
                                         },
                                         {
                                             "key": "individualName",
                                             "title": "Individual name",
                                             "type": "string",
-                                            "prop_key": "citation.citedResponsibleParty.individualName",
+                                            "prop_key": "description.identificationInfo.citation.citedResponsibleParty.individualName",
                                             "display_type": "text"
                                         },
                                         {
                                             "key": "positionName",
                                             "title": "Position",
                                             "type": "string",
-                                            "prop_key": "citation.citedResponsibleParty.positionName",
+                                            "prop_key": "description.identificationInfo.citation.citedResponsibleParty.positionName",
                                             "display_type": "text"
                                         },
                                         {
                                             "key": "role",
                                             "title": "Role",
                                             "type": "string",
-                                            "prop_key": "citation.citedResponsibleParty.role",
+                                            "prop_key": "description.identificationInfo.citation.citedResponsibleParty.role",
                                             "display_type": "text"
                                         },
                                         {
                                             "key": "contactInfo.address.electronicMailAddress",
                                             "title": "Email",
                                             "type": "string",
-                                            "prop_key": "citation.citedResponsibleParty.contactInfo.address.electronicMailAddress",
+                                            "prop_key": "description.identificationInfo.citation.citedResponsibleParty.contactInfo.address.electronicMailAddress",
                                             "display_type": "text"
                                         },
                                         {
                                             "key": "contactInfo.phone.voice",
                                             "title": "Voice",
                                             "type": "string",
-                                            "prop_key": "citation.citedResponsibleParty.contactInfo.phone.voice",
+                                            "prop_key": "description.identificationInfo.citation.citedResponsibleParty.contactInfo.phone.voice",
                                             "display_type": "text"
                                         },
                                         {
                                             "key": "contactInfo.phone.facsimile",
                                             "title": "Facsimile",
                                             "type": "string",
-                                            "prop_key": "citation.citedResponsibleParty.contactInfo.phone.facsimile",
+                                            "prop_key": "description.identificationInfo.citation.citedResponsibleParty.contactInfo.phone.facsimile",
                                             "display_type": "text"
                                         },
                                         {
                                             "key": "section-1676478323711",
-                                            "prop_key": "citation.citedResponsibleParty.section-1676478323711",
+                                            "prop_key": "description.identificationInfo.citation.citedResponsibleParty.section-1676478323711",
                                             "title": "Address",
                                             "type": "section",
                                             "props": [
@@ -728,28 +728,28 @@
                                                     "key": "contactInfo.address.deliveryPoint",
                                                     "title": "Delivery point",
                                                     "type": "string",
-                                                    "prop_key": "citation.citedResponsibleParty.section-1676478323711.contactInfo.address.deliveryPoint",
+                                                    "prop_key": "description.identificationInfo.citation.citedResponsibleParty.section-1676478323711.contactInfo.address.deliveryPoint",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "contactInfo.address.city",
                                                     "title": "City",
                                                     "type": "string",
-                                                    "prop_key": "citation.citedResponsibleParty.section-1676478323711.contactInfo.address.city",
+                                                    "prop_key": "description.identificationInfo.citation.citedResponsibleParty.section-1676478323711.contactInfo.address.city",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "contactInfo.address.postalCode",
                                                     "title": "Postal code",
                                                     "type": "string",
-                                                    "prop_key": "citation.citedResponsibleParty.section-1676478323711.contactInfo.address.postalCode",
+                                                    "prop_key": "description.identificationInfo.citation.citedResponsibleParty.section-1676478323711.contactInfo.address.postalCode",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "contactInfo.address.country",
                                                     "title": "Country",
                                                     "type": "string",
-                                                    "prop_key": "citation.citedResponsibleParty.section-1676478323711.contactInfo.address.country",
+                                                    "prop_key": "description.identificationInfo.citation.citedResponsibleParty.section-1676478323711.contactInfo.address.country",
                                                     "display_type": "text"
                                                 }
                                             ],
@@ -757,7 +757,7 @@
                                         },
                                         {
                                             "key": "section-1676478338407",
-                                            "prop_key": "citation.citedResponsibleParty.section-1676478338407",
+                                            "prop_key": "description.identificationInfo.citation.citedResponsibleParty.section-1676478338407",
                                             "title": "Online resource",
                                             "type": "section",
                                             "props": [
@@ -765,21 +765,21 @@
                                                     "key": "contactInfo.onlineResource.name",
                                                     "title": "Name",
                                                     "type": "string",
-                                                    "prop_key": "citation.citedResponsibleParty.section-1676478338407.contactInfo.onlineResource.name",
+                                                    "prop_key": "description.identificationInfo.citation.citedResponsibleParty.section-1676478338407.contactInfo.onlineResource.name",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "contactInfo.onlineResource.description",
                                                     "title": "Description",
                                                     "type": "string",
-                                                    "prop_key": "citation.citedResponsibleParty.section-1676478338407.contactInfo.onlineResource.description",
+                                                    "prop_key": "description.identificationInfo.citation.citedResponsibleParty.section-1676478338407.contactInfo.onlineResource.description",
                                                     "display_type": "textarea"
                                                 },
                                                 {
                                                     "key": "contactInfo.onlineResource.linkage",
                                                     "title": "URL",
                                                     "type": "string",
-                                                    "prop_key": "citation.citedResponsibleParty.section-1676478338407.contactInfo.onlineResource.linkage",
+                                                    "prop_key": "description.identificationInfo.citation.citedResponsibleParty.section-1676478338407.contactInfo.onlineResource.linkage",
                                                     "rules": {
                                                         "is_uri": true
                                                     },
@@ -789,14 +789,14 @@
                                                     "key": "contactInfo.onlineResource.protocol",
                                                     "title": "Protocol",
                                                     "type": "string",
-                                                    "prop_key": "citation.citedResponsibleParty.section-1676478338407.contactInfo.onlineResource.protocol",
+                                                    "prop_key": "description.identificationInfo.citation.citedResponsibleParty.section-1676478338407.contactInfo.onlineResource.protocol",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "contactInfo.onlineResource.function",
                                                     "title": "Function",
                                                     "type": "string",
-                                                    "prop_key": "citation.citedResponsibleParty.section-1676478338407.contactInfo.onlineResource.function",
+                                                    "prop_key": "description.identificationInfo.citation.citedResponsibleParty.section-1676478338407.contactInfo.onlineResource.function",
                                                     "display_type": "text"
                                                 }
                                             ],
@@ -804,7 +804,7 @@
                                         }
                                     ],
                                     "prop_key": "description.identificationInfo.citation.citedResponsibleParty",
-                                    "help_text": "Contact(s)\/party(ies) responsible for the resource.",
+                                    "help_text": "Contact(s)/party(ies) responsible for the resource.",
                                     "is_recommended": true
                                 },
                                 {
@@ -1082,54 +1082,54 @@
                                             "key": "individualName",
                                             "title": "Individual name",
                                             "type": "string",
-                                            "prop_key": "pointOfContact.individualName",
+                                            "prop_key": "description.identificationInfo.pointOfContact.individualName",
                                             "display_type": "text"
                                         },
                                         {
                                             "key": "organisationName",
                                             "title": "Organisation name",
                                             "type": "string",
-                                            "prop_key": "pointOfContact.organisationName",
+                                            "prop_key": "description.identificationInfo.pointOfContact.organisationName",
                                             "display_type": "text"
                                         },
                                         {
                                             "key": "positionName",
                                             "title": "Position",
                                             "type": "string",
-                                            "prop_key": "pointOfContact.positionName",
+                                            "prop_key": "description.identificationInfo.pointOfContact.positionName",
                                             "display_type": "text"
                                         },
                                         {
                                             "key": "role",
                                             "title": "Role",
                                             "type": "string",
-                                            "prop_key": "pointOfContact.role",
+                                            "prop_key": "description.identificationInfo.pointOfContact.role",
                                             "display_type": "text"
                                         },
                                         {
                                             "key": "contactInfo.phone.voice",
                                             "title": "Voice",
                                             "type": "string",
-                                            "prop_key": "pointOfContact.contactInfo.phone.voice",
+                                            "prop_key": "description.identificationInfo.pointOfContact.contactInfo.phone.voice",
                                             "display_type": "text"
                                         },
                                         {
                                             "key": "contactInfo.phone.facsimile",
                                             "title": "Facsimile",
                                             "type": "string",
-                                            "prop_key": "pointOfContact.contactInfo.phone.facsimile",
+                                            "prop_key": "description.identificationInfo.pointOfContact.contactInfo.phone.facsimile",
                                             "display_type": "text"
                                         },
                                         {
                                             "key": "contactInfo.address.electronicMailAddress",
                                             "title": "Email",
                                             "type": "string",
-                                            "prop_key": "pointOfContact.contactInfo.address.electronicMailAddress",
+                                            "prop_key": "description.identificationInfo.pointOfContact.contactInfo.address.electronicMailAddress",
                                             "display_type": "text"
                                         },
                                         {
                                             "key": "section-1676479710348",
-                                            "prop_key": "pointOfContact.section-1676479710348",
+                                            "prop_key": "description.identificationInfo.pointOfContact.section-1676479710348",
                                             "title": "Address",
                                             "type": "section",
                                             "props": [
@@ -1137,28 +1137,28 @@
                                                     "key": "contactInfo.address.deliveryPoint",
                                                     "title": "Delivery point",
                                                     "type": "string",
-                                                    "prop_key": "pointOfContact.section-1676479710348.contactInfo.address.deliveryPoint",
+                                                    "prop_key": "description.identificationInfo.pointOfContact.section-1676479710348.contactInfo.address.deliveryPoint",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "contactInfo.address.city",
                                                     "title": "City",
                                                     "type": "string",
-                                                    "prop_key": "pointOfContact.section-1676479710348.contactInfo.address.city",
+                                                    "prop_key": "description.identificationInfo.pointOfContact.section-1676479710348.contactInfo.address.city",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "contactInfo.address.postalCode",
                                                     "title": "Postal code",
                                                     "type": "string",
-                                                    "prop_key": "pointOfContact.section-1676479710348.contactInfo.address.postalCode",
+                                                    "prop_key": "description.identificationInfo.pointOfContact.section-1676479710348.contactInfo.address.postalCode",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "contactInfo.address.country",
                                                     "title": "Country",
                                                     "type": "string",
-                                                    "prop_key": "pointOfContact.section-1676479710348.contactInfo.address.country",
+                                                    "prop_key": "description.identificationInfo.pointOfContact.section-1676479710348.contactInfo.address.country",
                                                     "display_type": "text"
                                                 }
                                             ],
@@ -1166,7 +1166,7 @@
                                         },
                                         {
                                             "key": "section-1676479717564",
-                                            "prop_key": "pointOfContact.section-1676479717564",
+                                            "prop_key": "description.identificationInfo.pointOfContact.section-1676479717564",
                                             "title": "Online resource",
                                             "type": "section",
                                             "props": [
@@ -1174,14 +1174,14 @@
                                                     "key": "contactInfo.onlineResource.name",
                                                     "title": "Name",
                                                     "type": "string",
-                                                    "prop_key": "pointOfContact.section-1676479717564.contactInfo.onlineResource.name",
+                                                    "prop_key": "description.identificationInfo.pointOfContact.section-1676479717564.contactInfo.onlineResource.name",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "contactInfo.onlineResource.linkage",
                                                     "title": "URL",
                                                     "type": "string",
-                                                    "prop_key": "pointOfContact.section-1676479717564.contactInfo.onlineResource.linkage",
+                                                    "prop_key": "description.identificationInfo.pointOfContact.section-1676479717564.contactInfo.onlineResource.linkage",
                                                     "rules": {
                                                         "is_uri": true
                                                     }
@@ -1190,21 +1190,21 @@
                                                     "key": "contactInfo.onlineResource.description",
                                                     "title": "Description",
                                                     "type": "string",
-                                                    "prop_key": "pointOfContact.section-1676479717564.contactInfo.onlineResource.description",
+                                                    "prop_key": "description.identificationInfo.pointOfContact.section-1676479717564.contactInfo.onlineResource.description",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "contactInfo.onlineResource.protocol",
                                                     "title": "Protocol",
                                                     "type": "string",
-                                                    "prop_key": "pointOfContact.section-1676479717564.contactInfo.onlineResource.protocol",
+                                                    "prop_key": "description.identificationInfo.pointOfContact.section-1676479717564.contactInfo.onlineResource.protocol",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "contactInfo.onlineResource.function",
                                                     "title": "Function",
                                                     "type": "string",
-                                                    "prop_key": "pointOfContact.section-1676479717564.contactInfo.onlineResource.function",
+                                                    "prop_key": "description.identificationInfo.pointOfContact.section-1676479717564.contactInfo.onlineResource.function",
                                                     "display_type": "text"
                                                 }
                                             ],
@@ -1281,7 +1281,7 @@
                                                     "label": "unknown"
                                                 }
                                             ],
-                                            "prop_key": "resourceMaintenance.maintenanceAndUpdateFrequency",
+                                            "prop_key": "description.identificationInfo.resourceMaintenance.maintenanceAndUpdateFrequency",
                                             "display_type": "dropdown-custom"
                                         }
                                     ],
@@ -1304,21 +1304,21 @@
                                             "key": "fileName",
                                             "type": "string",
                                             "title": "File name",
-                                            "prop_key": "graphicOverview.fileName",
+                                            "prop_key": "description.identificationInfo.graphicOverview.fileName",
                                             "display_type": "text"
                                         },
                                         {
                                             "key": "fileDescription",
                                             "type": "string",
                                             "title": "File description",
-                                            "prop_key": "graphicOverview.fileDescription",
+                                            "prop_key": "description.identificationInfo.graphicOverview.fileDescription",
                                             "display_type": "textarea"
                                         },
                                         {
                                             "key": "fileType",
                                             "type": "string",
                                             "title": "File type",
-                                            "prop_key": "graphicOverview.fileType",
+                                            "prop_key": "description.identificationInfo.graphicOverview.fileType",
                                             "display_type": "text"
                                         }
                                     ],
@@ -1407,7 +1407,7 @@
                                                     "label": "subTopicCategory"
                                                 }
                                             ],
-                                            "prop_key": "descriptiveKeywords.type",
+                                            "prop_key": "description.identificationInfo.descriptiveKeywords.type",
                                             "help_text": "Keywords type. The ISO 19139 provides a recommended controlled vocabulary.",
                                             "display_type": "dropdown-custom"
                                         },
@@ -1415,14 +1415,14 @@
                                             "key": "keyword",
                                             "type": "text",
                                             "title": "Keyword",
-                                            "prop_key": "descriptiveKeywords.keyword",
-                                            "help_text": "The keyword itself. When possible, existing vocabularies should be preferred to writing free-text keywords. An example of global vocabulary is the Global Change Master Directory that could be a valuable source to reference data domains \/ disciplines, or the UNESCO Thesaurus."
+                                            "prop_key": "description.identificationInfo.descriptiveKeywords.keyword",
+                                            "help_text": "The keyword itself. When possible, existing vocabularies should be preferred to writing free-text keywords. An example of global vocabulary is the Global Change Master Directory that could be a valuable source to reference data domains / disciplines, or the UNESCO Thesaurus."
                                         },
                                         {
                                             "key": "thesaurusName",
                                             "type": "text",
                                             "title": "Thesaurus name",
-                                            "prop_key": "descriptiveKeywords.thesaurusName",
+                                            "prop_key": "description.identificationInfo.descriptiveKeywords.thesaurusName",
                                             "help_text": "A reference to a thesaurus (if applicable) from which the keywords are extracted. The thesaurus itself should then be documented as a citation."
                                         }
                                     ],
@@ -1443,7 +1443,7 @@
                                     "props": [
                                         {
                                             "key": "section-1676478956897",
-                                            "prop_key": "resourceConstraints.section-1676478956897",
+                                            "prop_key": "description.identificationInfo.resourceConstraints.section-1676478956897",
                                             "title": "Legal",
                                             "type": "section",
                                             "props": [
@@ -1451,14 +1451,14 @@
                                                     "key": "legalConstraints.useLimitation",
                                                     "type": "simple_array",
                                                     "title": "Use limitation",
-                                                    "prop_key": "resourceConstraints.section-1676478956897.legalConstraints.useLimitation",
+                                                    "prop_key": "description.identificationInfo.resourceConstraints.section-1676478956897.legalConstraints.useLimitation",
                                                     "enum": []
                                                 },
                                                 {
                                                     "key": "legalConstraints.accessConstraints",
                                                     "type": "simple_array",
                                                     "title": "Access constraints",
-                                                    "prop_key": "resourceConstraints.section-1676478956897.legalConstraints.accessConstraints",
+                                                    "prop_key": "description.identificationInfo.resourceConstraints.section-1676478956897.legalConstraints.accessConstraints",
                                                     "enum": [
                                                         {
                                                             "code": "copyright",
@@ -1535,7 +1535,7 @@
                                                     "key": "legalConstraints.useConstraints",
                                                     "type": "simple_array",
                                                     "title": "Use constraints",
-                                                    "prop_key": "resourceConstraints.section-1676478956897.legalConstraints.useConstraints",
+                                                    "prop_key": "description.identificationInfo.resourceConstraints.section-1676478956897.legalConstraints.useConstraints",
                                                     "enum": [],
                                                     "help_text": "Use constraints. To be entered as free text. Filling this element will depend on the resource that is described. As best practice recommended to fill this element, this is where terms of use, disclaimers, preferred citation or* even data limitations can be captured"
                                                 },
@@ -1543,7 +1543,7 @@
                                                     "key": "legalConstraints.otherConstraints",
                                                     "type": "simple_array",
                                                     "title": "Other constraints",
-                                                    "prop_key": "resourceConstraints.section-1676478956897.legalConstraints.otherConstraints",
+                                                    "prop_key": "description.identificationInfo.resourceConstraints.section-1676478956897.legalConstraints.otherConstraints",
                                                     "enum": [],
                                                     "help_text": "Any other legal constraints related to the resource."
                                                 }
@@ -1552,7 +1552,7 @@
                                         },
                                         {
                                             "key": "section-1676478978376",
-                                            "prop_key": "resourceConstraints.section-1676478978376",
+                                            "prop_key": "description.identificationInfo.resourceConstraints.section-1676478978376",
                                             "title": "Security",
                                             "type": "section",
                                             "props": [
@@ -1560,14 +1560,14 @@
                                                     "key": "securityConstraints.useLimitation",
                                                     "type": "simple_array",
                                                     "title": "Use limitation",
-                                                    "prop_key": "resourceConstraints.section-1676478978376.securityConstraints.useLimitation",
+                                                    "prop_key": "description.identificationInfo.resourceConstraints.section-1676478978376.securityConstraints.useLimitation",
                                                     "enum": []
                                                 },
                                                 {
                                                     "key": "securityConstraints.classification",
                                                     "type": "string",
                                                     "title": "Classification",
-                                                    "prop_key": "resourceConstraints.section-1676478978376.securityConstraints.classification",
+                                                    "prop_key": "description.identificationInfo.resourceConstraints.section-1676478978376.securityConstraints.classification",
                                                     "help_text": "Classification code. The ISO 19139 provides a controlled vocabulary.",
                                                     "enum": [
                                                         {
@@ -1613,7 +1613,7 @@
                                                     "key": "securityConstraints.classificationSystem",
                                                     "type": "string",
                                                     "title": "Classification system",
-                                                    "prop_key": "resourceConstraints.section-1676478978376.securityConstraints.classificationSystem",
+                                                    "prop_key": "description.identificationInfo.resourceConstraints.section-1676478978376.securityConstraints.classificationSystem",
                                                     "help_text": "Information on the system used to classify the information. Organizations may have their own system to classify the information.",
                                                     "display_type": "text"
                                                 },
@@ -1621,7 +1621,7 @@
                                                     "key": "securityConstraints.handlingDescription",
                                                     "type": "string",
                                                     "title": "Description of the classification ",
-                                                    "prop_key": "resourceConstraints.section-1676478978376.securityConstraints.handlingDescription",
+                                                    "prop_key": "description.identificationInfo.resourceConstraints.section-1676478978376.securityConstraints.handlingDescription",
                                                     "help_text": "Additional free-text description of the classification.",
                                                     "display_type": "textarea"
                                                 },
@@ -1629,7 +1629,7 @@
                                                     "key": "securityConstraints.userNote",
                                                     "type": "string",
                                                     "title": "Note on constraints",
-                                                    "prop_key": "resourceConstraints.section-1676478978376.securityConstraints.userNote",
+                                                    "prop_key": "description.identificationInfo.resourceConstraints.section-1676478978376.securityConstraints.userNote",
                                                     "help_text": "Note to users (free text)",
                                                     "display_type": "textarea"
                                                 }
@@ -1657,21 +1657,21 @@
                                             "key": "specificUsage",
                                             "type": "string",
                                             "title": "Specific usage",
-                                            "prop_key": "resourceSpecificUsage.specificUsage",
+                                            "prop_key": "description.identificationInfo.resourceSpecificUsage.specificUsage",
                                             "display_type": "textarea"
                                         },
                                         {
                                             "key": "usageDateTime",
                                             "type": "string",
                                             "title": "Time stamp",
-                                            "prop_key": "resourceSpecificUsage.usageDateTime",
+                                            "prop_key": "description.identificationInfo.resourceSpecificUsage.usageDateTime",
                                             "display_type": "date"
                                         },
                                         {
                                             "key": "userDeterminedLimitations",
                                             "type": "string",
                                             "title": "User determined limitations",
-                                            "prop_key": "resourceSpecificUsage.userDeterminedLimitations",
+                                            "prop_key": "description.identificationInfo.resourceSpecificUsage.userDeterminedLimitations",
                                             "display_type": "textarea"
                                         },
                                         {
@@ -1683,54 +1683,54 @@
                                                     "key": "individualName",
                                                     "title": "Individual name",
                                                     "type": "string",
-                                                    "prop_key": "resourceSpecificUsage.userContactInfo.individualName",
+                                                    "prop_key": "description.identificationInfo.resourceSpecificUsage.userContactInfo.individualName",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "organisationName",
                                                     "title": "Organisation name",
                                                     "type": "string",
-                                                    "prop_key": "resourceSpecificUsage.userContactInfo.organisationName",
+                                                    "prop_key": "description.identificationInfo.resourceSpecificUsage.userContactInfo.organisationName",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "positionName",
                                                     "title": "Position",
                                                     "type": "string",
-                                                    "prop_key": "resourceSpecificUsage.userContactInfo.positionName",
+                                                    "prop_key": "description.identificationInfo.resourceSpecificUsage.userContactInfo.positionName",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "role",
                                                     "title": "Role",
                                                     "type": "string",
-                                                    "prop_key": "resourceSpecificUsage.userContactInfo.role",
+                                                    "prop_key": "description.identificationInfo.resourceSpecificUsage.userContactInfo.role",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "contactInfo.address.electronicMailAddress",
                                                     "title": "Email",
                                                     "type": "string",
-                                                    "prop_key": "resourceSpecificUsage.userContactInfo.contactInfo.address.electronicMailAddress",
+                                                    "prop_key": "description.identificationInfo.resourceSpecificUsage.userContactInfo.contactInfo.address.electronicMailAddress",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "contactInfo.phone.voice",
                                                     "title": "Voice",
                                                     "type": "string",
-                                                    "prop_key": "resourceSpecificUsage.userContactInfo.contactInfo.phone.voice",
+                                                    "prop_key": "description.identificationInfo.resourceSpecificUsage.userContactInfo.contactInfo.phone.voice",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "contactInfo.phone.facsimile",
                                                     "title": "Facsimile",
                                                     "type": "string",
-                                                    "prop_key": "resourceSpecificUsage.userContactInfo.contactInfo.phone.facsimile",
+                                                    "prop_key": "description.identificationInfo.resourceSpecificUsage.userContactInfo.contactInfo.phone.facsimile",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "section-1676479119224",
-                                                    "prop_key": "resourceSpecificUsage.userContactInfo.section-1676479119224",
+                                                    "prop_key": "description.identificationInfo.resourceSpecificUsage.userContactInfo.section-1676479119224",
                                                     "title": "Address",
                                                     "type": "section",
                                                     "props": [
@@ -1738,28 +1738,28 @@
                                                             "key": "contactInfo.address.deliveryPoint",
                                                             "title": "Delivery point",
                                                             "type": "string",
-                                                            "prop_key": "resourceSpecificUsage.userContactInfo.section-1676479119224.contactInfo.address.deliveryPoint",
+                                                            "prop_key": "description.identificationInfo.resourceSpecificUsage.userContactInfo.section-1676479119224.contactInfo.address.deliveryPoint",
                                                             "display_type": "text"
                                                         },
                                                         {
                                                             "key": "contactInfo.address.city",
                                                             "title": "City",
                                                             "type": "string",
-                                                            "prop_key": "resourceSpecificUsage.userContactInfo.section-1676479119224.contactInfo.address.city",
+                                                            "prop_key": "description.identificationInfo.resourceSpecificUsage.userContactInfo.section-1676479119224.contactInfo.address.city",
                                                             "display_type": "text"
                                                         },
                                                         {
                                                             "key": "contactInfo.address.postalCode",
                                                             "title": "Postal code",
                                                             "type": "string",
-                                                            "prop_key": "resourceSpecificUsage.userContactInfo.section-1676479119224.contactInfo.address.postalCode",
+                                                            "prop_key": "description.identificationInfo.resourceSpecificUsage.userContactInfo.section-1676479119224.contactInfo.address.postalCode",
                                                             "display_type": "text"
                                                         },
                                                         {
                                                             "key": "contactInfo.address.country",
                                                             "title": "Country",
                                                             "type": "string",
-                                                            "prop_key": "resourceSpecificUsage.userContactInfo.section-1676479119224.contactInfo.address.country",
+                                                            "prop_key": "description.identificationInfo.resourceSpecificUsage.userContactInfo.section-1676479119224.contactInfo.address.country",
                                                             "display_type": "text"
                                                         }
                                                     ],
@@ -1767,7 +1767,7 @@
                                                 },
                                                 {
                                                     "key": "section-1676479152000",
-                                                    "prop_key": "resourceSpecificUsage.userContactInfo.section-1676479152000",
+                                                    "prop_key": "description.identificationInfo.resourceSpecificUsage.userContactInfo.section-1676479152000",
                                                     "title": "Online resource",
                                                     "type": "section",
                                                     "props": [
@@ -1775,14 +1775,14 @@
                                                             "key": "contactInfo.onlineResource.name",
                                                             "title": "Name",
                                                             "type": "string",
-                                                            "prop_key": "resourceSpecificUsage.userContactInfo.section-1676479152000.contactInfo.onlineResource.name",
+                                                            "prop_key": "description.identificationInfo.resourceSpecificUsage.userContactInfo.section-1676479152000.contactInfo.onlineResource.name",
                                                             "display_type": "text"
                                                         },
                                                         {
                                                             "key": "contactInfo.onlineResource.linkage",
                                                             "title": "URL",
                                                             "type": "string",
-                                                            "prop_key": "resourceSpecificUsage.userContactInfo.section-1676479152000.contactInfo.onlineResource.linkage",
+                                                            "prop_key": "description.identificationInfo.resourceSpecificUsage.userContactInfo.section-1676479152000.contactInfo.onlineResource.linkage",
                                                             "display_type": "text",
                                                             "rules": {
                                                                 "is_uri": true
@@ -1792,28 +1792,28 @@
                                                             "key": "contactInfo.onlineResource.description",
                                                             "title": "Description",
                                                             "type": "string",
-                                                            "prop_key": "resourceSpecificUsage.userContactInfo.section-1676479152000.contactInfo.onlineResource.description",
+                                                            "prop_key": "description.identificationInfo.resourceSpecificUsage.userContactInfo.section-1676479152000.contactInfo.onlineResource.description",
                                                             "display_type": "textarea"
                                                         },
                                                         {
                                                             "key": "contactInfo.onlineResource.protocol",
                                                             "title": "Protocol",
                                                             "type": "string",
-                                                            "prop_key": "resourceSpecificUsage.userContactInfo.section-1676479152000.contactInfo.onlineResource.protocol",
+                                                            "prop_key": "description.identificationInfo.resourceSpecificUsage.userContactInfo.section-1676479152000.contactInfo.onlineResource.protocol",
                                                             "display_type": "text"
                                                         },
                                                         {
                                                             "key": "contactInfo.onlineResource.function",
                                                             "title": "Function",
                                                             "type": "string",
-                                                            "prop_key": "resourceSpecificUsage.userContactInfo.section-1676479152000.contactInfo.onlineResource.function",
+                                                            "prop_key": "description.identificationInfo.resourceSpecificUsage.userContactInfo.section-1676479152000.contactInfo.onlineResource.function",
                                                             "display_type": "text"
                                                         }
                                                     ],
                                                     "help_text": ""
                                                 }
                                             ],
-                                            "prop_key": "resourceSpecificUsage.userContactInfo"
+                                            "prop_key": "description.identificationInfo.resourceSpecificUsage.userContactInfo"
                                         }
                                     ],
                                     "prop_key": "description.identificationInfo.resourceSpecificUsage"
@@ -1876,7 +1876,7 @@
                                                     "key": "westBoundLongitude",
                                                     "type": "string",
                                                     "title": "West bound longitude",
-                                                    "prop_key": "extent.geographicElement.geographicBoundingBox.westBoundLongitude",
+                                                    "prop_key": "description.identificationInfo.extent.geographicElement.geographicBoundingBox.westBoundLongitude",
                                                     "help_text": "West",
                                                     "display_type": "text"
                                                 },
@@ -1885,7 +1885,7 @@
                                                     "type": "string",
                                                     "title": "East bound longitude",
                                                     "help_text": "East",
-                                                    "prop_key": "extent.geographicElement.geographicBoundingBox.eastBoundLongitude",
+                                                    "prop_key": "description.identificationInfo.extent.geographicElement.geographicBoundingBox.eastBoundLongitude",
                                                     "display_type": "text"
                                                 },
                                                 {
@@ -1893,7 +1893,7 @@
                                                     "type": "string",
                                                     "title": "South bound latitude",
                                                     "help_text": "South",
-                                                    "prop_key": "extent.geographicElement.geographicBoundingBox.southBoundLatitude",
+                                                    "prop_key": "description.identificationInfo.extent.geographicElement.geographicBoundingBox.southBoundLatitude",
                                                     "display_type": "text"
                                                 },
                                                 {
@@ -1901,18 +1901,18 @@
                                                     "type": "string",
                                                     "title": "North bound latitude",
                                                     "help_text": "North",
-                                                    "prop_key": "extent.geographicElement.geographicBoundingBox.northBoundLatitude",
+                                                    "prop_key": "description.identificationInfo.extent.geographicElement.geographicBoundingBox.northBoundLatitude",
                                                     "display_type": "text"
                                                 }
                                             ],
-                                            "prop_key": "extent.geographicElement.geographicBoundingBox",
+                                            "prop_key": "description.identificationInfo.extent.geographicElement.geographicBoundingBox",
                                             "help_text": "providing the coordinates bounding the limits of the dataset, by means of four properties: South bound longitude, West bound longitude, North bound longitude, East bound longitude "
                                         },
                                         {
                                             "key": "geographicDescription",
                                             "title": "Geographic description",
                                             "type": "string",
-                                            "prop_key": "extent.geographicElement.geographicDescription",
+                                            "prop_key": "description.identificationInfo.extent.geographicElement.geographicDescription",
                                             "display_type": "textarea"
                                         }
                                     ],
@@ -1928,13 +1928,13 @@
                                             "key": "extent",
                                             "type": "string",
                                             "title": "Extent",
-                                            "prop_key": "extent.temporalElement.extent",
-                                            "help_text": "Depending on the temporal characteristics of the dataset, this will consist in a TimePeriod (made of a beginPosition and endPosition) or a TimeInstant (made of a single timePosition) referencing date\/time information according to ISO 8601.",
+                                            "prop_key": "description.identificationInfo.extent.temporalElement.extent",
+                                            "help_text": "Depending on the temporal characteristics of the dataset, this will consist in a TimePeriod (made of a beginPosition and endPosition) or a TimeInstant (made of a single timePosition) referencing date/time information according to ISO 8601.",
                                             "display_type": "textarea"
                                         }
                                     ],
                                     "prop_key": "description.identificationInfo.extent.temporalElement",
-                                    "help_text": "Temporal extent element. Depending on the temporal characteristics of the dataset, this will consist in a Time period (made of a begin position and end position) or a time instant (made of a single time position) referencing date\/time information according to ISO 8601."
+                                    "help_text": "Temporal extent element. Depending on the temporal characteristics of the dataset, this will consist in a Time period (made of a begin position and end position) or a time instant (made of a single time position) referencing date/time information according to ISO 8601."
                                 },
                                 {
                                     "key": "description.identificationInfo.extent.verticalElement",
@@ -1945,21 +1945,21 @@
                                             "key": "minimumValue",
                                             "type": "string",
                                             "title": "Minimum value",
-                                            "prop_key": "extent.verticalElement.minimumValue",
+                                            "prop_key": "description.identificationInfo.extent.verticalElement.minimumValue",
                                             "display_type": "text"
                                         },
                                         {
                                             "key": "maximumValue",
                                             "type": "string",
                                             "title": "Maximum value",
-                                            "prop_key": "extent.verticalElement.maximumValue",
+                                            "prop_key": "description.identificationInfo.extent.verticalElement.maximumValue",
                                             "display_type": "text"
                                         },
                                         {
                                             "key": "verticalCRS",
                                             "type": "string",
                                             "title": "Vertical CRS",
-                                            "prop_key": "extent.verticalElement.verticalCRS",
+                                            "prop_key": "description.identificationInfo.extent.verticalElement.verticalCRS",
                                             "display_type": "text"
                                         }
                                     ],
@@ -2168,14 +2168,14 @@
                                             "key": "name",
                                             "type": "string",
                                             "title": "Name",
-                                            "prop_key": "resourceFormat.name",
+                                            "prop_key": "description.identificationInfo.resourceFormat.name",
                                             "display_type": "text"
                                         },
                                         {
                                             "key": "version",
                                             "type": "string",
                                             "title": "Version",
-                                            "prop_key": "resourceFormat.version",
+                                            "prop_key": "description.identificationInfo.resourceFormat.version",
                                             "display_type": "text"
                                         },
                                         {
@@ -2183,21 +2183,21 @@
                                             "type": "string",
                                             "title": "Amendment number",
                                             "help_text": "Format version amendment number",
-                                            "prop_key": "resourceFormat.amendmentNumber",
+                                            "prop_key": "description.identificationInfo.resourceFormat.amendmentNumber",
                                             "display_type": "text"
                                         },
                                         {
                                             "key": "specification",
                                             "type": "string",
                                             "title": "Format specification",
-                                            "prop_key": "resourceFormat.specification",
+                                            "prop_key": "description.identificationInfo.resourceFormat.specification",
                                             "display_type": "text"
                                         },
                                         {
                                             "key": "fileDecompressionTechnique",
                                             "type": "string",
                                             "title": "File decompression technique",
-                                            "prop_key": "resourceFormat.fileDecompressionTechnique",
+                                            "prop_key": "description.identificationInfo.resourceFormat.fileDecompressionTechnique",
                                             "display_type": "text"
                                         },
                                         {
@@ -2209,54 +2209,54 @@
                                                     "key": "formatDistributor.individualName",
                                                     "title": "Individual name",
                                                     "type": "string",
-                                                    "prop_key": "resourceFormat.formatDistributor.formatDistributor.individualName",
+                                                    "prop_key": "description.identificationInfo.resourceFormat.formatDistributor.formatDistributor.individualName",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "formatDistributor.organisationName",
                                                     "title": "Organisation name",
                                                     "type": "string",
-                                                    "prop_key": "resourceFormat.formatDistributor.formatDistributor.organisationName",
+                                                    "prop_key": "description.identificationInfo.resourceFormat.formatDistributor.formatDistributor.organisationName",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "formatDistributor.positionName",
                                                     "title": "Position",
                                                     "type": "string",
-                                                    "prop_key": "resourceFormat.formatDistributor.formatDistributor.positionName",
+                                                    "prop_key": "description.identificationInfo.resourceFormat.formatDistributor.formatDistributor.positionName",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "formatDistributor.role",
                                                     "title": "Role",
                                                     "type": "string",
-                                                    "prop_key": "resourceFormat.formatDistributor.formatDistributor.role",
+                                                    "prop_key": "description.identificationInfo.resourceFormat.formatDistributor.formatDistributor.role",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "formatDistributor.contactInfo.address.electronicMailAddress",
                                                     "title": "Email",
                                                     "type": "string",
-                                                    "prop_key": "resourceFormat.formatDistributor.formatDistributor.contactInfo.address.electronicMailAddress",
+                                                    "prop_key": "description.identificationInfo.resourceFormat.formatDistributor.formatDistributor.contactInfo.address.electronicMailAddress",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "formatDistributor.contactInfo.phone.voice",
                                                     "title": "Voice",
                                                     "type": "string",
-                                                    "prop_key": "resourceFormat.formatDistributor.formatDistributor.contactInfo.phone.voice",
+                                                    "prop_key": "description.identificationInfo.resourceFormat.formatDistributor.formatDistributor.contactInfo.phone.voice",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "formatDistributor.contactInfo.phone.facsimile",
                                                     "title": "Facsimile",
                                                     "type": "string",
-                                                    "prop_key": "resourceFormat.formatDistributor.formatDistributor.contactInfo.phone.facsimile",
+                                                    "prop_key": "description.identificationInfo.resourceFormat.formatDistributor.formatDistributor.contactInfo.phone.facsimile",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "section-1676479533357",
-                                                    "prop_key": "resourceFormat.formatDistributor.section-1676479533357",
+                                                    "prop_key": "description.identificationInfo.resourceFormat.formatDistributor.section-1676479533357",
                                                     "title": "Address",
                                                     "type": "section",
                                                     "props": [
@@ -2264,28 +2264,28 @@
                                                             "key": "formatDistributor.contactInfo.address.deliveryPoint",
                                                             "title": "Delivery point",
                                                             "type": "string",
-                                                            "prop_key": "resourceFormat.formatDistributor.section-1676479533357.formatDistributor.contactInfo.address.deliveryPoint",
+                                                            "prop_key": "description.identificationInfo.resourceFormat.formatDistributor.section-1676479533357.formatDistributor.contactInfo.address.deliveryPoint",
                                                             "display_type": "text"
                                                         },
                                                         {
                                                             "key": "formatDistributor.contactInfo.address.city",
                                                             "title": "City",
                                                             "type": "string",
-                                                            "prop_key": "resourceFormat.formatDistributor.section-1676479533357.formatDistributor.contactInfo.address.city",
+                                                            "prop_key": "description.identificationInfo.resourceFormat.formatDistributor.section-1676479533357.formatDistributor.contactInfo.address.city",
                                                             "display_type": "text"
                                                         },
                                                         {
                                                             "key": "formatDistributor.contactInfo.address.postalCode",
                                                             "title": "Postal code",
                                                             "type": "string",
-                                                            "prop_key": "resourceFormat.formatDistributor.section-1676479533357.formatDistributor.contactInfo.address.postalCode",
+                                                            "prop_key": "description.identificationInfo.resourceFormat.formatDistributor.section-1676479533357.formatDistributor.contactInfo.address.postalCode",
                                                             "display_type": "text"
                                                         },
                                                         {
                                                             "key": "formatDistributor.contactInfo.address.country",
                                                             "title": "Country",
                                                             "type": "string",
-                                                            "prop_key": "resourceFormat.formatDistributor.section-1676479533357.formatDistributor.contactInfo.address.country",
+                                                            "prop_key": "description.identificationInfo.resourceFormat.formatDistributor.section-1676479533357.formatDistributor.contactInfo.address.country",
                                                             "display_type": "text"
                                                         }
                                                     ],
@@ -2293,7 +2293,7 @@
                                                 },
                                                 {
                                                     "key": "section-1676479549701",
-                                                    "prop_key": "resourceFormat.formatDistributor.section-1676479549701",
+                                                    "prop_key": "description.identificationInfo.resourceFormat.formatDistributor.section-1676479549701",
                                                     "title": "Online resource",
                                                     "type": "section",
                                                     "props": [
@@ -2301,14 +2301,14 @@
                                                             "key": "formatDistributor.contactInfo.onlineResource.name",
                                                             "title": "Name",
                                                             "type": "string",
-                                                            "prop_key": "resourceFormat.formatDistributor.section-1676479549701.formatDistributor.contactInfo.onlineResource.name",
+                                                            "prop_key": "description.identificationInfo.resourceFormat.formatDistributor.section-1676479549701.formatDistributor.contactInfo.onlineResource.name",
                                                             "display_type": "text"
                                                         },
                                                         {
                                                             "key": "formatDistributor.contactInfo.onlineResource.linkage",
                                                             "title": "URL",
                                                             "type": "string",
-                                                            "prop_key": "resourceFormat.formatDistributor.section-1676479549701.formatDistributor.contactInfo.onlineResource.linkage",
+                                                            "prop_key": "description.identificationInfo.resourceFormat.formatDistributor.section-1676479549701.formatDistributor.contactInfo.onlineResource.linkage",
                                                             "display_type": "text",
                                                             "rules": {
                                                                 "is_uri": true
@@ -2318,28 +2318,28 @@
                                                             "key": "formatDistributor.contactInfo.onlineResource.description",
                                                             "title": "Description",
                                                             "type": "string",
-                                                            "prop_key": "resourceFormat.formatDistributor.section-1676479549701.formatDistributor.contactInfo.onlineResource.description",
+                                                            "prop_key": "description.identificationInfo.resourceFormat.formatDistributor.section-1676479549701.formatDistributor.contactInfo.onlineResource.description",
                                                             "display_type": "textarea"
                                                         },
                                                         {
                                                             "key": "formatDistributor.contactInfo.onlineResource.protocol",
                                                             "title": "Protocol",
                                                             "type": "string",
-                                                            "prop_key": "resourceFormat.formatDistributor.section-1676479549701.formatDistributor.contactInfo.onlineResource.protocol",
+                                                            "prop_key": "description.identificationInfo.resourceFormat.formatDistributor.section-1676479549701.formatDistributor.contactInfo.onlineResource.protocol",
                                                             "display_type": "text"
                                                         },
                                                         {
                                                             "key": "formatDistributor.contactInfo.onlineResource.function",
                                                             "title": "Function",
                                                             "type": "string",
-                                                            "prop_key": "resourceFormat.formatDistributor.section-1676479549701.formatDistributor.contactInfo.onlineResource.function",
+                                                            "prop_key": "description.identificationInfo.resourceFormat.formatDistributor.section-1676479549701.formatDistributor.contactInfo.onlineResource.function",
                                                             "display_type": "text"
                                                         }
                                                     ],
                                                     "help_text": ""
                                                 }
                                             ],
-                                            "prop_key": "resourceFormat.formatDistributor"
+                                            "prop_key": "description.identificationInfo.resourceFormat.formatDistributor"
                                         }
                                     ],
                                     "prop_key": "description.identificationInfo.resourceFormat"
@@ -2433,32 +2433,32 @@
                                                     "key": "useLimitation",
                                                     "type": "simple_array",
                                                     "title": "Use limitation",
-                                                    "prop_key": "serviceIdentification.restrictions.legalConstraints.useLimitation",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.restrictions.legalConstraints.useLimitation",
                                                     "enum": []
                                                 },
                                                 {
                                                     "key": "accessConstraints",
                                                     "type": "simple_array",
                                                     "title": "Access constraints",
-                                                    "prop_key": "serviceIdentification.restrictions.legalConstraints.accessConstraints",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.restrictions.legalConstraints.accessConstraints",
                                                     "enum": []
                                                 },
                                                 {
                                                     "key": "useConstraints",
                                                     "type": "simple_array",
                                                     "title": "Use constraints",
-                                                    "prop_key": "serviceIdentification.restrictions.legalConstraints.useConstraints",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.restrictions.legalConstraints.useConstraints",
                                                     "enum": []
                                                 },
                                                 {
                                                     "key": "otherConstraints",
                                                     "type": "simple_array",
                                                     "title": "Other constraints",
-                                                    "prop_key": "serviceIdentification.restrictions.legalConstraints.otherConstraints",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.restrictions.legalConstraints.otherConstraints",
                                                     "enum": []
                                                 }
                                             ],
-                                            "prop_key": "serviceIdentification.restrictions.legalConstraints"
+                                            "prop_key": "description.identificationInfo.serviceIdentification.restrictions.legalConstraints"
                                         },
                                         {
                                             "key": "securityConstraints",
@@ -2469,39 +2469,39 @@
                                                     "key": "useLimitation",
                                                     "type": "simple_array",
                                                     "title": "Use limitation",
-                                                    "prop_key": "serviceIdentification.restrictions.securityConstraints.useLimitation",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.restrictions.securityConstraints.useLimitation",
                                                     "enum": []
                                                 },
                                                 {
                                                     "key": "classification",
                                                     "type": "string",
                                                     "title": "Classification",
-                                                    "prop_key": "serviceIdentification.restrictions.securityConstraints.classification",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.restrictions.securityConstraints.classification",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "userNote",
                                                     "type": "string",
                                                     "title": "Note on security classification",
-                                                    "prop_key": "serviceIdentification.restrictions.securityConstraints.userNote",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.restrictions.securityConstraints.userNote",
                                                     "display_type": "textarea"
                                                 },
                                                 {
                                                     "key": "classificationSystem",
                                                     "type": "string",
                                                     "title": "Classification system",
-                                                    "prop_key": "serviceIdentification.restrictions.securityConstraints.classificationSystem",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.restrictions.securityConstraints.classificationSystem",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "handlingDescription",
                                                     "type": "string",
                                                     "title": "Handling description",
-                                                    "prop_key": "serviceIdentification.restrictions.securityConstraints.handlingDescription",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.restrictions.securityConstraints.handlingDescription",
                                                     "display_type": "textarea"
                                                 }
                                             ],
-                                            "prop_key": "serviceIdentification.restrictions.securityConstraints"
+                                            "prop_key": "description.identificationInfo.serviceIdentification.restrictions.securityConstraints"
                                         }
                                     ],
                                     "prop_key": "description.identificationInfo.serviceIdentification.restrictions"
@@ -2581,21 +2581,21 @@
                                                     "label": "subTopicCategory"
                                                 }
                                             ],
-                                            "prop_key": "serviceIdentification.keywords.type",
+                                            "prop_key": "description.identificationInfo.serviceIdentification.keywords.type",
                                             "display_type": "text"
                                         },
                                         {
                                             "key": "keyword",
                                             "type": "string",
                                             "title": "Keyword",
-                                            "prop_key": "serviceIdentification.keywords.keyword",
+                                            "prop_key": "description.identificationInfo.serviceIdentification.keywords.keyword",
                                             "display_type": "text"
                                         },
                                         {
                                             "key": "thesaurusName",
                                             "type": "string",
                                             "title": "Thesaurus name",
-                                            "prop_key": "serviceIdentification.keywords.thesaurusName",
+                                            "prop_key": "description.identificationInfo.serviceIdentification.keywords.thesaurusName",
                                             "display_type": "text"
                                         }
                                     ],
@@ -2610,14 +2610,14 @@
                                             "key": "operationName",
                                             "type": "string",
                                             "title": "Operation name",
-                                            "prop_key": "serviceIdentification.coupledResource.operationName",
+                                            "prop_key": "description.identificationInfo.serviceIdentification.coupledResource.operationName",
                                             "display_type": "text"
                                         },
                                         {
                                             "key": "identifier",
                                             "type": "string",
                                             "title": "Identifier",
-                                            "prop_key": "serviceIdentification.coupledResource.identifier",
+                                            "prop_key": "description.identificationInfo.serviceIdentification.coupledResource.identifier",
                                             "display_type": "text"
                                         }
                                     ],
@@ -2639,28 +2639,28 @@
                                             "key": "operationName",
                                             "type": "string",
                                             "title": "Operation name",
-                                            "prop_key": "serviceIdentification.containsOperations.operationName",
+                                            "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.operationName",
                                             "display_type": "text"
                                         },
                                         {
                                             "key": "DCP",
                                             "type": "simple_array",
                                             "title": "DCP",
-                                            "prop_key": "serviceIdentification.containsOperations.DCP",
+                                            "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.DCP",
                                             "enum": []
                                         },
                                         {
                                             "key": "operationDescription",
                                             "type": "string",
                                             "title": "Operation description",
-                                            "prop_key": "serviceIdentification.containsOperations.operationDescription",
+                                            "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.operationDescription",
                                             "display_type": "textarea"
                                         },
                                         {
                                             "key": "invocationName",
                                             "type": "string",
                                             "title": "Invocation name",
-                                            "prop_key": "serviceIdentification.containsOperations.invocationName",
+                                            "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.invocationName",
                                             "display_type": "text"
                                         },
                                         {
@@ -2672,46 +2672,46 @@
                                                     "key": "name",
                                                     "type": "string",
                                                     "title": "Name",
-                                                    "prop_key": "serviceIdentification.containsOperations.parameters.name",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.parameters.name",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "direction",
                                                     "type": "string",
                                                     "title": "Direction",
-                                                    "prop_key": "serviceIdentification.containsOperations.parameters.direction",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.parameters.direction",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "description",
                                                     "type": "string",
                                                     "title": "Description",
-                                                    "prop_key": "serviceIdentification.containsOperations.parameters.description",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.parameters.description",
                                                     "display_type": "textarea"
                                                 },
                                                 {
                                                     "key": "optionality",
                                                     "type": "string",
                                                     "title": "Optionality",
-                                                    "prop_key": "serviceIdentification.containsOperations.parameters.optionality",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.parameters.optionality",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "repeatability",
                                                     "type": "string",
                                                     "title": "Repeatability",
-                                                    "prop_key": "serviceIdentification.containsOperations.parameters.repeatability",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.parameters.repeatability",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "valueType",
                                                     "type": "string",
                                                     "title": "Value type",
-                                                    "prop_key": "serviceIdentification.containsOperations.parameters.valueType",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.parameters.valueType",
                                                     "display_type": "text"
                                                 }
                                             ],
-                                            "prop_key": "serviceIdentification.containsOperations.parameters"
+                                            "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.parameters"
                                         },
                                         {
                                             "key": "connectPoint",
@@ -2722,38 +2722,38 @@
                                                     "key": "linkage",
                                                     "type": "string",
                                                     "title": "Linkage",
-                                                    "prop_key": "serviceIdentification.containsOperations.connectPoint.linkage",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.connectPoint.linkage",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "name",
                                                     "type": "string",
                                                     "title": "Name",
-                                                    "prop_key": "serviceIdentification.containsOperations.connectPoint.name",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.connectPoint.name",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "description",
                                                     "type": "string",
                                                     "title": "Description",
-                                                    "prop_key": "serviceIdentification.containsOperations.connectPoint.description",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.connectPoint.description",
                                                     "display_type": "textarea"
                                                 },
                                                 {
                                                     "key": "protocol",
                                                     "type": "string",
                                                     "title": "Protocol",
-                                                    "prop_key": "serviceIdentification.containsOperations.connectPoint.protocol",
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.connectPoint.protocol",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "function",
                                                     "type": "text",
                                                     "title": "Function",
-                                                    "prop_key": "serviceIdentification.containsOperations.connectPoint.function"
+                                                    "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.connectPoint.function"
                                                 }
                                             ],
-                                            "prop_key": "serviceIdentification.containsOperations.connectPoint"
+                                            "prop_key": "description.identificationInfo.serviceIdentification.containsOperations.connectPoint"
                                         }
                                     ],
                                     "prop_key": "description.identificationInfo.serviceIdentification.containsOperations"
@@ -2767,7 +2767,7 @@
                                             "key": "uuidref",
                                             "type": "string",
                                             "title": "uuidref",
-                                            "prop_key": "serviceIdentification.operatesOn.uuidref",
+                                            "prop_key": "description.identificationInfo.serviceIdentification.operatesOn.uuidref",
                                             "display_type": "text"
                                         }
                                     ],
@@ -2971,7 +2971,7 @@
                                                             "title": "Resolution",
                                                             "type": "string",
                                                             "prop_key": "description.spatialRepresentationInfo.gridSpatialRepresentation.gridSpatialRepresentation.axisDimensionProperties.resolution",
-                                                            "help_text": "The dimension resolution: a resolution number associated to a unit of measurement. This is the resolution of the grid cell dimension. For example:\n\nfor longitude\/latitude dimensions, and a grid at 1deg x 5deg, the ‘row’ dimension will have a resolution of 1 deg and the ‘column’ dimension will have a resolution of 5 deg\nfor a “vertical” dimension, this will represent the elevation step. For example, the vertical resolution of the mean Ozone concentration between 40m and 50m altitude at a location of longitude x\/ latitude y would be 10 m.\nsimilar: in case of a spatial-temporal grid, the “time” resolution will represent the time lag (e.g., 1 year, 1 month, 1 week, etc.) between two measures.",
+                                                            "help_text": "The dimension resolution: a resolution number associated to a unit of measurement. This is the resolution of the grid cell dimension. For example:\n\nfor longitude/latitude dimensions, and a grid at 1deg x 5deg, the ‘row’ dimension will have a resolution of 1 deg and the ‘column’ dimension will have a resolution of 5 deg\nfor a “vertical” dimension, this will represent the elevation step. For example, the vertical resolution of the mean Ozone concentration between 40m and 50m altitude at a location of longitude x/ latitude y would be 10 m.\nsimilar: in case of a spatial-temporal grid, the “time” resolution will represent the time lag (e.g., 1 year, 1 month, 1 week, etc.) between two measures.",
                                                             "display_type": "text"
                                                         }
                                                     ],
@@ -3040,7 +3040,7 @@
                             "key": "description.referenceSystemInfo",
                             "title": "Reference system",
                             "type": "array",
-                            "help_text": "The reference system(s) typically (but not necessarily) applies to the geographic reference system of the dataset. Multiple reference systems can be listed if a dataset is distributed with different spatial reference systems. This block of elements may also apply to service metadata. A spatial web-service may support several map projections \/ geographic coordinate reference systems.\n\nA reference system is defined by two properties:\n- the identifier of the reference system. The recommended practice is to use to the Spatial Reference IDentifier (SRID) number. For example, the SRID of the World Geodetic System (WGS 84) is 4326.\n- the code space of the source authority providing the SRID. The best practice is to use the EPSG authority code EPSG (as most of geographic reference systems are registered in it). Codes from other authorities can be used to define ad-hoc projections, for example:\nESRI:54012 (Eckert IV equal area projection)\nEPSG:4326 (World Geodetic System 84 - aka WGS84), the system used for GPS\nEPSG:3857 (Web Mercator \/ Pseudo-Mercator) - widely used for map visualization from web map tile providers.\n\nThe main reference system registry is EPSG, which provides a “search by name” tool for users who need to find a SRID (global or local\/country-specific). Other websites reference geographic systems, but are not authoritative sources including http:\/\/epsg.io\/ and https:\/\/spatialreference.org\/ The advantage of these sites is that they go beyond the EPSG registry, and handle other specific registries given by providers like ESRI.\n\nThe following ESRI projections could be relevant, in particular those in support of world equal-area projected maps (maps conserving area proportions):\n- ESRI:54012 (Eckert IV)\n- ESRI:54009 (Mollweide)\n- ESRI:54030 (Robinson)",
+                            "help_text": "The reference system(s) typically (but not necessarily) applies to the geographic reference system of the dataset. Multiple reference systems can be listed if a dataset is distributed with different spatial reference systems. This block of elements may also apply to service metadata. A spatial web-service may support several map projections / geographic coordinate reference systems.\n\nA reference system is defined by two properties:\n- the identifier of the reference system. The recommended practice is to use to the Spatial Reference IDentifier (SRID) number. For example, the SRID of the World Geodetic System (WGS 84) is 4326.\n- the code space of the source authority providing the SRID. The best practice is to use the EPSG authority code EPSG (as most of geographic reference systems are registered in it). Codes from other authorities can be used to define ad-hoc projections, for example:\nESRI:54012 (Eckert IV equal area projection)\nEPSG:4326 (World Geodetic System 84 - aka WGS84), the system used for GPS\nEPSG:3857 (Web Mercator / Pseudo-Mercator) - widely used for map visualization from web map tile providers.\n\nThe main reference system registry is EPSG, which provides a “search by name” tool for users who need to find a SRID (global or local/country-specific). Other websites reference geographic systems, but are not authoritative sources including http://epsg.io/ and https://spatialreference.org/ The advantage of these sites is that they go beyond the EPSG registry, and handle other specific registries given by providers like ESRI.\n\nThe following ESRI projections could be relevant, in particular those in support of world equal-area projected maps (maps conserving area proportions):\n- ESRI:54012 (Eckert IV)\n- ESRI:54009 (Mollweide)\n- ESRI:54030 (Robinson)",
                             "props": [
                                 {
                                     "key": "code",
@@ -3500,7 +3500,7 @@
                                                 }
                                             ],
                                             "prop_key": "description.contentInfo.featureCatalogueDescription.coverageDescription.featureCatalogueDescription.coverageDescription.dimension",
-                                            "help_text": "List of coverage dimensions. Each dimension can be defined by a name and a type. For the type, a good practice is to rely on primitive data types defined in the XML Schema https:\/\/www.w3.org\/2009\/XMLSchema\/XMLSchema.xsd"
+                                            "help_text": "List of coverage dimensions. Each dimension can be defined by a name and a type. For the type, a good practice is to rely on primitive data types defined in the XML Schema https://www.w3.org/2009/XMLSchema/XMLSchema.xsd"
                                         }
                                     ]
                                 }
@@ -3954,7 +3954,7 @@
                                         }
                                     ],
                                     "prop_key": "description.dataQualityInfo.scope",
-                                    "help_text": "Scope \/ hierarchy level targeted by the data quality information section. The ISO 19139 recommends the use of a controlled vocabulary.",
+                                    "help_text": "Scope / hierarchy level targeted by the data quality information section. The ISO 19139 recommends the use of a controlled vocabulary.",
                                     "display_type": "dropdown-custom"
                                 },
                                 {
@@ -4787,7 +4787,7 @@
                                     "type": "section",
                                     "items": [],
                                     "prop_key": "description.dataQualityInfo.lineage",
-                                    "help_text": "The lineage provides a structured solution to describe the work flow that led to the production of the data\/service, defined by a general statement of the work flow performed, and a sequence of process steps performed.",
+                                    "help_text": "The lineage provides a structured solution to describe the work flow that led to the production of the data/service, defined by a general statement of the work flow performed, and a sequence of process steps performed.",
                                     "props": [
                                         {
                                             "key": "lineage.statement",
@@ -6440,7 +6440,7 @@
                                             "title": "Cardinality lower",
                                             "type": "string",
                                             "prop_key": "description.feature_catalogue.featureType.carrierOfCharacteristics.cardinality.lower",
-                                            "help_text": "Definition of the member type cardinality. The cardinality is set of two properties: lower cardinality (lower) and upper cardinality (upper). For simple tabular datasets, the cardinality will be 1-1. Multiple cardinalities (eg. 1-N, N-N) apply particularly to feature catalogues\/types that describe relational databases.",
+                                            "help_text": "Definition of the member type cardinality. The cardinality is set of two properties: lower cardinality (lower) and upper cardinality (upper). For simple tabular datasets, the cardinality will be 1-1. Multiple cardinalities (eg. 1-N, N-N) apply particularly to feature catalogues/types that describe relational databases.",
                                             "display_type": "text"
                                         },
                                         {
@@ -6448,7 +6448,7 @@
                                             "title": "Cardinality upper",
                                             "type": "string",
                                             "prop_key": "description.feature_catalogue.featureType.carrierOfCharacteristics.cardinality.upper",
-                                            "help_text": "Definition of the member type cardinality. The cardinality is set of two properties: lower cardinality (lower) and upper cardinality (upper). For simple tabular datasets, the cardinality will be 1-1. Multiple cardinalities (eg. 1-N, N-N) apply particularly to feature catalogues\/types that describe relational databases.",
+                                            "help_text": "Definition of the member type cardinality. The cardinality is set of two properties: lower cardinality (lower) and upper cardinality (upper). For simple tabular datasets, the cardinality will be 1-1. Multiple cardinalities (eg. 1-N, N-N) apply particularly to feature catalogues/types that describe relational databases.",
                                             "display_type": "text"
                                         },
                                         {
@@ -6472,7 +6472,7 @@
                                             "title": "Value type",
                                             "type": "string",
                                             "prop_key": "description.feature_catalogue.featureType.carrierOfCharacteristics.valueType",
-                                            "help_text": "Type of value. A good practice is to rely on primitive data types defined in the XML Schema https:\/\/www.w3.org\/2009\/XMLSchema\/XMLSchema.xsd",
+                                            "help_text": "Type of value. A good practice is to rely on primitive data types defined in the XML Schema https://www.w3.org/2009/XMLSchema/XMLSchema.xsd",
                                             "display_type": "text"
                                         },
                                         {
@@ -6507,7 +6507,7 @@
                                         }
                                     ],
                                     "prop_key": "description.feature_catalogue.featureType.carrierOfCharacteristics",
-                                    "help_text": "Feature attribute(s) \/ column(s) definitions. Each feature attribute, i.e. column that is a member of the vector data structure is defined as carrier of characteristics. Each set of characteristics can be defined with a set of properties."
+                                    "help_text": "Feature attribute(s) / column(s) definitions. Each feature attribute, i.e. column that is a member of the vector data structure is defined as carrier of characteristics. Each set of characteristics can be defined with a set of properties."
                                 }
                             ],
                             "help_text": "One or more feature type(s) defined in the Feature catalogue. The definition of several feature types can be considered when targeting various forms of a dataset (e.g., simplified vs. complete set of attributes, raw vs. aggregated, etc.) In practice, a simple ISO 19110 feature catalogue will reference one feature type describing the unique dataset structure. "
