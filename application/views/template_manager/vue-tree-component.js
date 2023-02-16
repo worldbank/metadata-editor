@@ -127,7 +127,15 @@ Vue.component('nada-treeview', {
                   </v-icon> 
                   <v-icon v-else-if="item.type=='section'">
                     {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
+                  </v-icon>
+                  
+                  <v-icon v-else-if="item.type=='nested_array'">
+                    {{ open ? 'mdi-file-tree-outline' : 'mdi-file-tree' }}
                   </v-icon> 
+                  <v-icon v-else-if="item.type=='array'">
+                    {{ open ? 'mdi-folder-table-outline' : 'mdi-folder-table' }}
+                  </v-icon> 
+
                   <v-icon v-else>
                     mdi-note-text-outline
                   </v-icon>

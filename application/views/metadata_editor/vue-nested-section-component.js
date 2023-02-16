@@ -51,6 +51,29 @@ Vue.component('nested-section', {
                                 </nested-section>  
                             </div>
 
+                            
+
+                            <div v-if="column.type=='section'"  class="form-section" >                    
+                                <template>
+                                    <v-expansion-panels :value="0">
+                                        <v-expansion-panel>
+                                        <v-expansion-panel-header>
+                                            {{column.title}}
+                                        </v-expansion-panel-header>
+                                        <v-expansion-panel-content>
+                                            <v-form
+                                                    :items="column.props" 
+                                                    :title="column.title"
+                                                    :path="column.key"
+                                                    :field="column"
+                                                >
+                                            </v-form>
+                                        </v-expansion-panel-content>
+                                        </v-expansion-panel>
+                                    </v-expansion-panels>
+                                </template>
+                            </div>
+
                             <!-- textarea-->
                             <div v-if="column.type=='textarea'">
 

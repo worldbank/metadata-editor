@@ -51,10 +51,10 @@
 
     .text-crop{
       max-width: 40em;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    }
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }    
 
   </style>
 
@@ -111,7 +111,7 @@
 
       <div class="container-fluid-x">
 
-        <div class="row no-gutters sticky-top shadow bg-white">
+        <div class="row no-gutters sticky-top border-bottom bg-white">
 
           <div class="col-md-3">
             <div class="color-white branding-icon" style="padding:5px;padding-left:30px;font-weight:bold;"> 
