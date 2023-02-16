@@ -224,7 +224,7 @@ Vue.config.errorHandler = (err, vm, info) => {
             "table":"table_description.title_statement.title",
             "document":"document_description.title_statement.title",
             "image":"image_description.dcmi.title",
-            "geospatial":"description.identificationInfo[0].citation.title"
+            "geospatial":"description.identificationInfo.citation.title"
           };
 
           //image IPTC?
