@@ -928,10 +928,8 @@
 				"identificationInfo": {
 					"title": "Identification Info(s)",
 					"description": "Identification(s) of the resource",
-					"type": "array",
 					"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification",
-					"items": {
-						"type": "object",
+					"type": "object",
 						"properties": {
 							"citation": {
 								"type": "object",
@@ -1453,7 +1451,6 @@
 								}
 							}
 						}
-					}
 				},
 				"contentInfo": {
 					"title": "Content information",

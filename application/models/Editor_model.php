@@ -524,8 +524,8 @@ class Editor_model extends CI_Model {
 				'title'=>'database_description.title_statement.title'
 			),
 			'geospatial'=>array(
-				'idno'=>'database_description.title_statement.idno',
-				'title'=>'database_description.title_statement.title'
+				'idno'=>'description.idno',
+				'title'=>'description.identificationInfo.citation.title'
 			)			
 
 		);
@@ -997,6 +997,12 @@ class Editor_model extends CI_Model {
 
 	function importJSON($sid,$type,$json_data,$validate=true)
 	{
+		//fix for geospatial IdentifcationInfo
+		if ($type=='geospatial'){
+			if (isset($json_data['description']['identificationInfo']) && is_array($json_data['description']['identificationInfo']) ){
+				$json_data['description']['identificationInfo']=$json_data['description']['identificationInfo'][0];
+			}
+		}
 		return $this->update_project($type,$sid,$json_data,$validate);
 	}
 
