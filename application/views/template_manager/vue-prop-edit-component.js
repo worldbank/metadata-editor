@@ -77,7 +77,9 @@ Vue.component('prop-edit', {
           "number",
           "textarea",
           "dropdown",
-          "date"
+          "date",
+          "boolean",
+          "integer"
         ];
         return field_types.includes(field_type);
       },
