@@ -53,7 +53,7 @@
     <v-tabs background-color="transparent" class="mb-5">
         <v-tab v-if="ActiveNode.key && isControlField(ActiveNode.type) == true">Display</v-tab>
         <v-tab v-if="!ActiveArrayNodeIsNested"><span v-if="ActiveNodeEnumCount>0"><v-icon style="color:green;">mdi-circle-medium</v-icon></span>Controlled vocabulary</v-tab>
-        <v-tab v-if="!ActiveArrayNodeIsNested"><span v-if="ActiveNode.default"><v-icon style="color:green;">mdi-circle-medium</v-icon></span>Default</v-tab>
+        <v-tab v-if="!ActiveArrayNodeIsNested || isControlField(ActiveNode.type) == true"><span v-if="ActiveNode.default"><v-icon style="color:green;">mdi-circle-medium</v-icon></span>Default</v-tab>
         <v-tab v-if="isControlField(ActiveNode.type)"><span v-if="ActiveNode.rules && Object.keys(ActiveNode.rules).length>0"><v-icon style="color:green;">mdi-circle-medium</v-icon></span>Validation rules</v-tab>
         <v-tab>JSON</v-tab>
 
@@ -107,14 +107,14 @@
         </v-tab-item>
         <v-tab-item class="p-3">
             <!-- default -->
-            <template v-if="!ActiveArrayNodeIsNested">
+            <template v-if="!ActiveArrayNodeIsNested || isControlField(ActiveNode.type) == true">
                 <div class="form-group" >
                     <label for="controlled_vocab">Default:</label>
                     <div class="border bg-white" style="max-height:300px;overflow:auto;" v-if="ActiveNode.type=='array'">
                         <table-component @update:value="DefaultUpdate" v-model="ActiveNode.default" :columns="ActiveNodeControlledVocabColumns" class="border m-2 pb-2" />
                     </div>
                     <div class="border bg-white" v-else>
-                        <div v-if="ActiveNode.type=='string' || ActiveNode.type=='text' || ActiveNode.type=='dropdown' ">
+                        <div v-if="ActiveNode.type=='string' || ActiveNode.type=='text' || ActiveNode.type=='dropdown' || ActiveNode.type=='simple_array' ">
                             <input class="form-control" type="text" v-model="ActiveNode.default"/>
                         </div>
                         <div v-else-if="ActiveNode.type=='textarea'">

@@ -544,7 +544,8 @@
           return false;
         },
         isControlField: function(field_type) {
-          return this.field_types.includes(field_type);
+          let field_types= ["text", "string", "integer", "textarea", "dropdown", "date", "boolean","simple_array"];
+          return field_types.includes(field_type);
         },
         addField: function() {
           if (!this.ActiveCoreNode.key) {

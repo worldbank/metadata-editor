@@ -1,6 +1,6 @@
 <template>
     <v-tabs background-color="transparent" class="mb-5">
-        <v-tab  v-if="isField(prop.type)">Display</v-tab>
+        <v-tab  v-if="!prop.props">Display</v-tab>
         <v-tab><span v-if="prop.enum && prop.enum.length>0"><v-icon style="color:green;">mdi-circle-medium</v-icon></span>Controlled vocabulary</v-tab>
         <v-tab>Default<span v-if="prop.default"><v-icon style="color:green;">mdi-circle-medium</v-icon></span></v-tab>
         <v-tab v-if="isField(prop.type)"><span v-if="prop.rules && Object.keys(prop.rules).length>0"><v-icon style="color:green;">mdi-circle-medium</v-icon></span>Validation rules</v-tab>
