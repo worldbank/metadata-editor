@@ -252,6 +252,11 @@
                             "help_text": "Methodological details on the production of the series or indicator."
                         },
                         {
+                            "key": "series_description.derivation",
+                            "type": "text",                            
+                            "title": "Derivation"
+                        },
+                        {
                             "key": "series_description.imputation",
                             "type": "textarea",
                             "class": "imputation",
@@ -587,6 +592,12 @@
                                     "type": "text",
                                     "prop_key": "series_description.time_periods.end",
                                     "help_text": "The end date is the latest date for which an estimate for the indicator is available. The end date should be entered in ISO 8601 format (YYYY-MM-DD or YYYY-MM or YYYY). A validation rule can be set to enforce the use of a specific date format."
+                                },
+                                {
+                                    "key": "notes",
+                                    "title": "Notes",
+                                    "type": "texta",
+                                    "prop_key": "series_description.time_periods.notes"
                                 }
                             ],
                             "help_text": "The time period covers the entire span of data available for the series. The time period has a start and an end and is reported according to the periodicity provided in a previous element.\n"
@@ -751,6 +762,12 @@
                             "title": "Dimensions",
                             "type": "array",
                             "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text",
+                                    "prop_key": "series_description.dimensions.name"
+                                },
                                 {
                                     "key": "label",
                                     "title": "Label",
@@ -1109,6 +1126,12 @@
                             "title": "Notes",
                             "type": "array",
                             "props": [
+                                {
+                                    "key": "type",
+                                    "title": "Type",
+                                    "type": "text",
+                                    "prop_key": "series_description.notes.type"                                    
+                                },
                                 {
                                     "key": "note",
                                     "title": "Note",
