@@ -16,17 +16,19 @@
                     "items": [
                         {
                             "key": "doc_desc.title",
-                            "type": "text",
+                            "type": "string",
                             "class": "required",
                             "title": "Document title",
-                            "help_text": "The title of the metadata document (which will usually be the same as the element \"Title\" in the \"Project description / Title statement\" section). The metadata document is the metadata file (XML or JSON file) that is being generated."
+                            "help_text": "The title of the metadata document (which will usually be the same as the element \"Title\" in the \"Project description / Title statement\" section). The metadata document is the metadata file (XML or JSON file) that is being generated.",
+                            "display_type": "text"
                         },
                         {
                             "key": "doc_desc.idno",
-                            "type": "text",
+                            "type": "string",
                             "class": "required",
                             "title": "Document ID",
-                            "help_text": "A unique identifier for the project metadata document. This identifier must be unique in the catalog where the metadata are intended to be published. Ideally, the identifier should also be unique globally. This is different from the \"Primary ID\" in section Project description / Title statement, although it is good practice to generate identifiers that establish a clear connection between these two identifiers. The Document ID could also include the metadata document version identifier. For example, if the \"Primary ID\" of the reproducible research project “Madagascar Poverty Mapping 2022” is \"RR_MDG_POVMAP_2022”, the Document ID could be “IHSN_RR_MDG_POVMAP_2022_v1.0” if the metadata are produced by the IHSN and if this is version 1.0 of the metadata. Each organization should establish systematic rules to generate such IDs. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. The identifier may not contain blank spaces."
+                            "help_text": "A unique identifier for the project metadata document. This identifier must be unique in the catalog where the metadata are intended to be published. Ideally, the identifier should also be unique globally. This is different from the \"Primary ID\" in section Project description / Title statement, although it is good practice to generate identifiers that establish a clear connection between these two identifiers. The Document ID could also include the metadata document version identifier. For example, if the \"Primary ID\" of the reproducible research project “Madagascar Poverty Mapping 2022” is \"RR_MDG_POVMAP_2022”, the Document ID could be “IHSN_RR_MDG_POVMAP_2022_v1.0” if the metadata are produced by the IHSN and if this is version 1.0 of the metadata. Each organization should establish systematic rules to generate such IDs. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. The identifier may not contain blank spaces.",
+                            "display_type": "text"
                         },
                         {
                             "key": "doc_desc.producers",
@@ -37,48 +39,56 @@
                                 {
                                     "key": "name",
                                     "title": "Name",
-                                    "type": "text",
+                                    "type": "string",
                                     "help_text": "The name of the person or organization who produced the metadata or contributed to its production.",
                                     "class": "required",
-                                    "prop_key": "doc_desc.producers.name"
+                                    "prop_key": "doc_desc.producers.name",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "abbr",
                                     "title": "Abbreviation",
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "doc_desc.producers.abbr",
-                                    "help_text": "The abbreviation (or acronym) of the organization that is referenced in \"Name\"."
+                                    "help_text": "The abbreviation (or acronym) of the organization that is referenced in \"Name\".",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "affiliation",
                                     "type": "string",
                                     "title": "Affiliation",
                                     "prop_key": "doc_desc.producers.affiliation",
-                                    "help_text": "The affiliation of the person or organization mentioned in \"Name\"."
+                                    "help_text": "The affiliation of the person or organization mentioned in \"Name\".",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "role",
                                     "title": "Role",
                                     "type": "string",
                                     "prop_key": "doc_desc.producers.role",
-                                    "help_text": "The specific role of the person or organization mentioned in \"Name\" in the production of the metadata."
+                                    "help_text": "The specific role of the person or organization mentioned in \"Name\" in the production of the metadata.",
+                                    "display_type": "textarea"
                                 }
                             ],
-                            "help_text": "The metadata producer is the person or organization with the financial and/or administrative responsibility for the processes whereby the metadata document was created. This is a \"Recommended\" element. For catalog administration purposes, information on the producer and on the date of metadata production is useful."
+                            "help_text": "The metadata producer is the person or organization with the financial and/or administrative responsibility for the processes whereby the metadata document was created. This is a \"Recommended\" element. For catalog administration purposes, information on the producer and on the date of metadata production is useful.",
+                            "is_recommended": true
                         },
                         {
                             "key": "doc_desc.prod_date",
-                            "type": "text",
+                            "type": "string",
                             "class": "required",
                             "title": "Production date",
-                            "help_text": "The date the metadata on this project was produced (not distributed or archived), preferably entered in ISO 8601 format (YYYY-MM-DD or YYY-MM). A validation rule can be set in user templates to enforce a date format. This is a \"Recommended\" element, as information on the producer and on the date of metadata production is useful for catalog administration purposes."
+                            "help_text": "The date the metadata on this project was produced (not distributed or archived), preferably entered in ISO 8601 format (YYYY-MM-DD or YYY-MM). A validation rule can be set in user templates to enforce a date format. This is a \"Recommended\" element, as information on the producer and on the date of metadata production is useful for catalog administration purposes.",
+                            "is_recommended": true,
+                            "display_type": "date"
                         },
                         {
                             "key": "doc_desc.version",
-                            "type": "text",
+                            "type": "string",
                             "class": "",
                             "title": "Version",
-                            "help_text": "The version of the metadata document (not the version of the project itself)."
+                            "help_text": "The version of the metadata document (not the version of the project itself).",
+                            "display_type": "text"
                         }
                     ]
                 }
@@ -100,8 +110,9 @@
                             "key": "project_desc.title_statement.idno",
                             "title": "Primary ID",
                             "help_text": "A unique identifier of the project. The \"Primary ID\" (also referred to as IDNO) is a unique identification number used to identify the database. A unique identifier is required for cataloguing purpose, so this element is declared as \"Required\". The identifier will allow users to cite the indicator/series properly. The identifier must be unique within the catalog. Ideally, it should also be globally unique; the recommended option is to obtain a Digital Object Identifier (DOI) for the study. Alternatively, the \"Primary ID\" can be constructed by an organization using a consistent scheme. Note that the schema allows you to provide more than one identifier for a same study (in element \"Other identifiers\"); a catalog-specific identifier is thus not incompatible with a globally unique identifier like a DOI. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. The identifier may not contain blank spaces.\n",
-                            "type": "text",
-                            "is_required": true
+                            "type": "string",
+                            "is_required": true,
+                            "display_type": "text"
                         },
                         {
                             "key": "project_description.identifiers",
@@ -112,335 +123,102 @@
                                 {
                                     "key": "type",
                                     "title": "Type",
-                                    "type": "text",
+                                    "type": "string",
                                     "help_text": "The type of identifier. For example: “DOI”, or \"ISBN\". ",
-                                    "prop_key": "project_description.identifiers.type"
+                                    "prop_key": "project_description.identifiers.type",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "identifier",
                                     "title": "Identifier",
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "project_description.identifiers.identifier",
-                                    "help_text": "The identifier itself."
+                                    "help_text": "The identifier itself.",
+                                    "display_type": "text"
                                 }
                             ]
                         },
                         {
                             "key": "project_desc.title_statement.title",
                             "title": "Title",
-                            "type": "text",
+                            "type": "string",
                             "help_text": "The title is the official name of the project as it may be stated in reports, papers or other documents. Make sure to use a unique name for each distinct project. The title may correspond to the title of an academic paper, of a project impact evaluation, etc. Pay attention to the consistent use of capitalization in the title.",
-                            "is_required": true
+                            "is_required": true,
+                            "display_type": "text"
                         },
                         {
                             "key": "project_desc.title_statement.sub_title",
                             "title": "Subtitle",
-                            "type": "text",
-                            "help_text": "The project/script subtitle can be used when there is a need to distinguish characteristics of a project. This element will rarely be used. Pay attention to the consistent use of capitalization in the subtitle."
+                            "type": "string",
+                            "help_text": "The project/script subtitle can be used when there is a need to distinguish characteristics of a project. This element will rarely be used. Pay attention to the consistent use of capitalization in the subtitle.",
+                            "display_type": "text"
                         },
                         {
                             "key": "project_desc.title_statement.alternate_title",
                             "title": "Alternate title",
-                            "type": "text",
-                            "help_text": "An alternate title of the project. This would be any alternate title that would help discover the research project. It could for example be an acronym by which the project is often referred to."
+                            "type": "string",
+                            "help_text": "An alternate title of the project. This would be any alternate title that would help discover the research project. It could for example be an acronym by which the project is often referred to.",
+                            "display_type": "text"
                         },
                         {
                             "key": "project_desc.title_statement.translated_title",
                             "title": "Translated title",
-                            "type": "text",
-                            "help_text": "A translated version of the title (this will be used for example when a catalog documents all entries in English, but wants to preserve the title of a project in its original language when the original language is not English). Special characters should be properly displayed, such as accents and other stress marks or different alphabets."
+                            "type": "string",
+                            "help_text": "A translated version of the title (this will be used for example when a catalog documents all entries in English, but wants to preserve the title of a project in its original language when the original language is not English). Special characters should be properly displayed, such as accents and other stress marks or different alphabets.",
+                            "display_type": "text"
                         }
                     ]
                 },
                 {
+                    "key": "project_desc_container1674844564813",
+                    "title": "Authors and contributors",
                     "type": "section",
-                    "key": "project_desc_others",
-                    "title": "Description of the project",
-                    "class": "recommended",
                     "items": [
-                        {
-                            "key": "project_desc.abstract",
-                            "title": "Abstract",
-                            "type": "textarea",
-                            "help_text": "The abstract should provide a clear summary of the purposes, objectives and content of the project. An abstract can make reference to the various outputs associated with the research project."
-                        },
-                        {
-                            "key": "project_desc.review_board",
-                            "title": "Institutional review board",
-                            "help_text": "Information on whether and when the project was submitted, reviewed, and approved by an institutional review board (or independent ethics committee, ethical review board (ERB), research ethics board, or equivalent).",
-                            "type": "textarea"
-                        },
-                        {
-                            "key": "project_desc.output",
-                            "title": "Output",
-                            "help_text": "This element will describe and reference all substantial/intended products of the research project, which may include publications, reports, websites, datasets, interactive applications, presentations, visualizations, and others. An output may also be referred to as a “deliverable”.\nThe output is a repeatable block of seven elements, used to document all output of the research project:\n\n- Type: Type of output. The type of output relates to the media which is used to convey or communicate the intended results, findings or conclusions of the research project. This field may be controlled by a controlled vocabulary. The kind on content could be “Working paper”, “Database”, etc.\n- Title: Formal title of the output. Depending upon the kind of output, the title will vary in formality.\n- Authors: Authors of the output; if multiple, they will be listed in one same text field.\n- Description: A brief description of the output (NOT an abstract)\n- Abstract: If the output consists of a document, the abstract will be entered here.\n- URI: A link where the output or information on the output can be found.\n- DOI: The Digital Object Identifier (DOI) of the output, if available.",
-                            "type": "array",
-                            "props": [
-                                {
-                                    "key": "type",
-                                    "title": "Type",
-                                    "type": "text",
-                                    "help_text": "Type of output. The type of output relates to the media which is used to convey or communicate the intended results, findings or conclusions of the research project. This field may be controlled by a controlled vocabulary. The kind on content could be “Working paper”, “Database”, etc.",
-                                    "prop_key": "project_desc.output.type"
-                                },
-                                {
-                                    "key": "title",
-                                    "title": "Title",
-                                    "type": "text",
-                                    "prop_key": "project_desc.output.title",
-                                    "help_text": "Formal title of the output. Depending upon the kind of output, the title will vary in formality."
-                                },
-                                {
-                                    "key": "authors",
-                                    "title": "Authors",
-                                    "type": "text",
-                                    "prop_key": "project_desc.output.authors",
-                                    "help_text": "Authors of the output; if multiple, they will be listed in one same text field."
-                                },
-                                {
-                                    "key": "description",
-                                    "title": "Description",
-                                    "type": "text",
-                                    "prop_key": "project_desc.output.description",
-                                    "help_text": "A brief description of the output (NOT an abstract)"
-                                },
-                                {
-                                    "key": "abstract",
-                                    "type": "text",
-                                    "title": "Abstract",
-                                    "prop_key": "project_desc.output.abstract",
-                                    "help_text": "If the output consists of a document, the abstract will be entered here."
-                                },
-                                {
-                                    "key": "uri",
-                                    "type": "text",
-                                    "title": "URI",
-                                    "prop_key": "project_desc.output.uri",
-                                    "help_text": "A link where the output or information on the output can be found."
-                                },
-                                {
-                                    "key": "doi",
-                                    "type": "text",
-                                    "title": "DOI",
-                                    "prop_key": "project_desc.output.doi",
-                                    "help_text": "The Digital Object Identifier (DOI) of the output, if available."
-                                }
-                            ]
-                        },
-                        {
-                            "key": "project_desc.approval_process",
-                            "title": "Approval process",
-                            "help_text": "The approval_process is a group of six elements used to describe the formal approval process(es) (if any) that the project had to go through. This may for example include an approval by an Ethics Board to collect new data, followed by an internal review process to endorse the results.\n\n- Phase name: A label that describes the approval phase.\n- Authority: Identification of the person(s) or organization(s) whose approval was required or sought.\n- Submission date: The date, entered in ISO 8601 format (YYYY-MM-DD), when the project (or a component of it) was submitted for approval.\n- Reviewer: Identification of the reviewer(s).\n- Review status: Status of approval.\n- Approval date: Date the approval was formally received, preferably entered in ISO 8601 format (YYYY-MM-DD).",
-                            "type": "array",
-                            "props": [
-                                {
-                                    "key": "approval_phase",
-                                    "title": "Phase name",
-                                    "type": "text",
-                                    "prop_key": "project_desc.approval_process.approval_phase",
-                                    "help_text": "A label that describes the approval phase."
-                                },
-                                {
-                                    "key": "approval_authority",
-                                    "title": "Authority",
-                                    "type": "text",
-                                    "prop_key": "project_desc.approval_process.approval_authority",
-                                    "help_text": "Identification of the person(s) or organization(s) whose approval was required or sought."
-                                },
-                                {
-                                    "key": "submission_date",
-                                    "title": "Submission date",
-                                    "type": "text",
-                                    "prop_key": "project_desc.approval_process.submission_date",
-                                    "help_text": "The date, entered in ISO 8601 format (YYYY-MM-DD), when the project (or a component of it) was submitted for approval."
-                                },
-                                {
-                                    "key": "reviewer",
-                                    "title": "Reviewer",
-                                    "type": "text",
-                                    "help_text": "Identification of the reviewer(s)."
-                                },
-                                {
-                                    "key": "review_status",
-                                    "title": "Review status",
-                                    "type": "text",
-                                    "prop_key": "project_desc.approval_process.review_status",
-                                    "help_text": "Status of approval."
-                                },
-                                {
-                                    "key": "approval_date",
-                                    "title": "Approval date",
-                                    "type": "string",
-                                    "prop_key": "project_desc.approval_process.approval_date",
-                                    "help_text": "Date the approval was formally received, preferably entered in ISO 8601 format (YYYY-MM-DD)."
-                                }
-                            ]
-                        },
-                        {
-                            "key": "project_desc.project_website",
-                            "title": "Project website",
-                            "help_text": "URL of the project website.",
-                            "type": "array_simple",
-                            "enum": []
-                        },
-                        {
-                            "key": "project_desc.language",
-                            "title": "Language",
-                            "help_text": "A block of two elements describing the language(s) of the project. At least one of the two elements must be provided for each listed language. The use of ISO 639-2 (the alpha-3 code in Codes for the representation of names of languages) is recommended.\n\n- Name: The name of the language.\n- Code: The code of the language. Numeric codes must be entered as strings.",
-                            "type": "array",
-                            "props": [
-                                {
-                                    "key": "name",
-                                    "title": "Name",
-                                    "type": "text",
-                                    "prop_key": "project_desc.language.name",
-                                    "help_text": "The name of the language."
-                                },
-                                {
-                                    "key": "code",
-                                    "title": "Code",
-                                    "type": "text",
-                                    "prop_key": "project_desc.language.code",
-                                    "help_text": "The code of the language. Numeric codes must be entered as strings."
-                                }
-                            ]
-                        },
-                        {
-                            "key": "project_desc.production_date",
-                            "title": "Date of production",
-                            "help_text": "The date in ISO 8601 format (YYYY-MM-DD) the project was completed (this refers to the version that is being documented and released.)",
-                            "type": "simple_array",
-                            "enum": []
-                        },
-                        {
-                            "type": "section",
-                            "key": "project_desc_version_statement",
-                            "title": "Version statement",
-                            "items": [
-                                {
-                                    "key": "project_desc.version_statement.version",
-                                    "title": "Version",
-                                    "type": "text",
-                                    "help_text": "A label describing the version. For example, “Version 1.2”"
-                                },
-                                {
-                                    "key": "project_desc.version_statement.version_date",
-                                    "title": "Version date",
-                                    "type": "text",
-                                    "help_text": "Date (in ISO 8601 format, YYYY-MM-DD) the version was released."
-                                },
-                                {
-                                    "key": "project_desc.version_statement.version_resp",
-                                    "title": "Responsibility",
-                                    "help_text": "Person(s) or organization(s) responsible for this version.",
-                                    "type": "text"
-                                },
-                                {
-                                    "key": "project_desc.version_statement.version_notes",
-                                    "title": "Note on version",
-                                    "type": "textarea",
-                                    "help_text": "Additional information on the version if any; it is good practice to describe what distinguishes this version from the previous one(s). The version must be entered as a string, even when composed only of numbers."
-                                }
-                            ]
-                        },
-                        {
-                            "key": "project_desc.errata",
-                            "title": "Errata",
-                            "help_text": "This field is used to list and describe errata.\n\n- Date: Date (in ISO 8601 format, YYYY-MM-DD) the erratum was released.\n- Description: Description of the error(s) and measures taken to address it/them.",
-                            "type": "array",
-                            "props": [
-                                {
-                                    "key": "date",
-                                    "title": "Date",
-                                    "type": "text",
-                                    "prop_key": "project_desc.errata.date",
-                                    "help_text": "Date (in ISO 8601 format, YYYY-MM-DD) the erratum was released."
-                                },
-                                {
-                                    "key": "description",
-                                    "title": "Description",
-                                    "type": "text",
-                                    "prop_key": "project_desc.errata.description",
-                                    "help_text": "Description of the error(s) and measures taken to address it/them."
-                                }
-                            ]
-                        },
-                        {
-                            "key": "project_desc.process",
-                            "title": "Process",
-                            "help_text": "This element is used to document the life cycle of the research project, from its design and inception to its conclusion. This can include phases of fundraising, approval by a review board, concept note review, data acquisition, analysis, publishing of a working paper, peer review, publishing in journal, presentation to conferences, publishing, evaluation, reporting to sponsors, etc. It is recommended to provide these steps in a chronological order.\n\n- Name: This is a header (label) for the phase of the process.\n- Start date: Date the described phase started (preferably in ISO 8601 format, YYYY-MM-DD)\n- End date: Date the described phase ended (preferably in ISO 8601 format, YYYY-MM-DD)\n- Description: A brief description of the phase.",
-                            "type": "array",
-                            "props": [
-                                {
-                                    "key": "name",
-                                    "title": "Name",
-                                    "type": "text",
-                                    "prop_key": "project_desc.process.name",
-                                    "help_text": "This is a header for the phase of the process."
-                                },
-                                {
-                                    "key": "date_start",
-                                    "title": "Start date",
-                                    "type": "text",
-                                    "prop_key": "project_desc.process.date_start",
-                                    "help_text": "Date the phase started (preferably in ISO 8601 format, YYYY-MM-DD)"
-                                },
-                                {
-                                    "key": "date_end",
-                                    "title": "End date",
-                                    "type": "text",
-                                    "prop_key": "project_desc.process.date_end",
-                                    "help_text": "Date the phase ended (preferably in ISO 8601 format, YYYY-MM-DD)"
-                                },
-                                {
-                                    "key": "description",
-                                    "title": "Description",
-                                    "type": "text",
-                                    "prop_key": "project_desc.process.description",
-                                    "help_text": "A brief description of the phase."
-                                }
-                            ]
-                        },
                         {
                             "key": "project_desc.authoring_entity",
                             "title": "Authoring entity",
-                            "help_text": "This section will identify the person(s) and/or organization(s) in charge of the intellectual content of the research project, and specify their respective role.\n\n- Name: Name of the person or organization responsible for the research project.\n- Role: Specific role of the person or organization mentioned in Name.\n- Affiliation: Agency or organization affiliation of the author/primary investigator mentioned in name.\n- Abbreviation: Abbreviation used to identify the agency stated under affiliation.\n- Email: Depending on the agency policies, a researcher may provide a personal email or an agency email to field inquires related to the project.\n- Author ID: A block of two elements used to provide unique identifiers of the authors, as provided by different registers of researchers. For example, this can be an ORCID number (ORCID is a non-profit organization supported by a global community of member organizations, including research institutions, publishers, sponsors, professional associations, service providers, and other stakeholders in the research ecosystem.)\n   * ID type: The type of ID; for example, “ORCID”.\n   * ID: A unique identification number/code for the authoring entity, entered as a string variable.",
+                            "help_text": "This section will identify the person(s) and/or organization(s) in charge of the intellectual content of the research project, and specify their respective role.",
                             "type": "array",
                             "props": [
                                 {
                                     "key": "name",
                                     "title": "Name",
-                                    "type": "text",
+                                    "type": "string",
                                     "help_text": "Name of the person or organization responsible for the research project.",
-                                    "prop_key": "project_desc.authoring_entity.name"
+                                    "prop_key": "project_desc.authoring_entity.name",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "role",
                                     "title": "Role",
-                                    "type": "text",
+                                    "type": "string",
                                     "help_text": "Specific role of the person or organization mentioned in \"Name\".",
-                                    "prop_key": "project_desc.authoring_entity.role"
+                                    "prop_key": "project_desc.authoring_entity.role",
+                                    "display_type": "textarea"
                                 },
                                 {
                                     "key": "affiliation",
                                     "title": "Affiliation",
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "project_desc.authoring_entity.affiliation",
-                                    "help_text": "Agency or organization affiliation of the author/primary investigator mentioned in \"Name\"."
+                                    "help_text": "Agency or organization affiliation of the author/primary investigator mentioned in \"Name\".",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "abbreviation",
                                     "title": "Abbreviation",
                                     "help_text": "Abbreviation used to identify the agency stated under \"Affiliation\".",
-                                    "type": "text",
-                                    "prop_key": "project_desc.authoring_entity.abbreviation"
+                                    "type": "string",
+                                    "prop_key": "project_desc.authoring_entity.abbreviation",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "email",
-                                    "type": "text",
+                                    "type": "string",
                                     "title": "Email",
                                     "help_text": "Depending on the agency policies, a researcher may provide a personal email or an agency email to field inquires related to the project.",
-                                    "prop_key": "project_desc.authoring_entity.email"
+                                    "prop_key": "project_desc.authoring_entity.email",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "author_id",
@@ -450,72 +228,89 @@
                                     "props": [
                                         {
                                             "key": "type",
-                                            "type": "text",
-                                            "title": "Type"
+                                            "type": "string",
+                                            "title": "Type",
+                                            "prop_key": "project_desc.authoring_entity.author_id.type",
+                                            "help_text": "The type of identifier, for example \"ORCID\".",
+                                            "display_type": "text"
                                         },
                                         {
                                             "key": "id",
-                                            "type": "text",
-                                            "title": "ID"
+                                            "type": "string",
+                                            "title": "ID",
+                                            "prop_key": "project_desc.authoring_entity.author_id.id",
+                                            "help_text": "A unique identification number/code for the authoring entity.",
+                                            "display_type": "text"
                                         }
-                                    ]
+                                    ],
+                                    "prop_key": "project_desc.authoring_entity.author_id"
                                 }
-                            ]
+                            ],
+                            "is_recommended": true
                         },
                         {
                             "key": "project_desc.contributors",
                             "title": "Contributors",
-                            "help_text": "This section is provided to record other contributors to the research project and provide recognition for the roles they provided.\n\n- Name: Name of the person, corporate body, or agency contributing to the intellectual content of the project (other than the PI). If a person, invert first and last name and use commas.\n- Role: Title of the person (if any) responsible for the work’s substantive and intellectual content.\n- Affiliation: Agency or organization affiliation of the contributor.\n- Abbreviation: Abbreviation used to identify the agency stated under affiliation.\n- Email: Depending on the agency policies, a researcher may provide a personal email or an agency email to field inquires related to the project.\n- URL: The URL that provides information on the contributor or its affiliate.",
+                            "help_text": "This section is provided to record other contributors to the research project and provide recognition for the roles they provided.",
                             "type": "array",
                             "props": [
                                 {
                                     "key": "name",
                                     "title": "Name",
-                                    "type": "text",
+                                    "type": "string",
                                     "help_text": "Name of the person, corporate body, or agency contributing to the intellectual content of the project (other than the authoring entity/primary investigator). When entering the name of a person, invert first and last name and use commas.",
-                                    "prop_key": "project_desc.contributors.name"
+                                    "prop_key": "project_desc.contributors.name",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "role",
                                     "title": "Role",
-                                    "type": "text",
+                                    "type": "string",
                                     "help_text": "Title of the person (if any) responsible for the work’s substantive and intellectual content.",
-                                    "prop_key": "project_desc.contributors.role"
+                                    "prop_key": "project_desc.contributors.role",
+                                    "display_type": "textarea"
                                 },
                                 {
                                     "key": "affiliation",
                                     "title": "Affiliation",
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "project_desc.contributors.affiliation",
-                                    "help_text": "Agency or organization affiliation of the contributor."
+                                    "help_text": "Agency or organization affiliation of the contributor.",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "abbreviation",
                                     "title": "Abbreviation",
-                                    "help_text": "Abbreviation used to identify the agency stated under affiliation.",
-                                    "type": "text",
-                                    "prop_key": "project_desc.contributors.abbreviation"
+                                    "help_text": "Abbreviation used to identify the agency stated under \"Affiliation\".",
+                                    "type": "string",
+                                    "prop_key": "project_desc.contributors.abbreviation",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "email",
-                                    "type": "text",
+                                    "type": "string",
                                     "title": "Email",
                                     "help_text": "Depending on the agency policies, a researcher may provide a personal email or an agency email to field inquires related to the project.",
-                                    "prop_key": "project_desc.contributors.email"
+                                    "prop_key": "project_desc.contributors.email",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "url",
-                                    "type": "text",
+                                    "type": "string",
                                     "title": "URL",
                                     "prop_key": "project_desc.contributors.url",
-                                    "help_text": "The URL that provides information on the contributor or its affiliate"
+                                    "help_text": "The URL that provides information on the contributor or its affiliate",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
                                 }
                             ]
                         },
                         {
                             "key": "project_desc.sponsors",
                             "title": "Sponsors",
-                            "help_text": "The source(s) of funds for production of the work. If different funding agencies sponsored different stages of the production process, use the ‘role’ attribute to distinguish them.\n\n- Name: Name of the funding agency/sponsor.\n- Abbreviation: Abbreviation of the funding/sponsoring agency.\n- Role: Specific role of the funding/sponsoring agency.\n- Grant No: Grant or award number.",
+                            "help_text": "The source(s) of funds for production of the work. If different funding agencies sponsored different stages of the production process, use the ‘role’ attribute to distinguish them.",
                             "type": "array",
                             "props": [
                                 {
@@ -523,26 +318,32 @@
                                     "title": "Name",
                                     "type": "string",
                                     "prop_key": "project_desc.sponsors.name",
-                                    "help_text": "Name of the funding agency/sponsor."
+                                    "help_text": "Name of the funding agency/sponsor.",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "abbr",
                                     "title": "Abbreviation",
                                     "type": "string",
                                     "prop_key": "project_desc.sponsors.abbr",
-                                    "help_text": "Abbreviation of the funding/sponsoring agency."
+                                    "help_text": "Abbreviation of the funding/sponsoring agency.",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "role",
                                     "title": "Role",
                                     "type": "string",
                                     "prop_key": "project_desc.sponsors.role",
-                                    "help_text": "Specific role of the funding/sponsoring agency."
+                                    "help_text": "Specific role of the funding/sponsoring agency.",
+                                    "display_type": "textarea"
                                 },
                                 {
                                     "key": "grant_no",
-                                    "title": "Grant#",
-                                    "type": "string"
+                                    "title": "Grant No",
+                                    "type": "string",
+                                    "prop_key": "project_desc.sponsors.grant_no",
+                                    "help_text": "Grant or award number.",
+                                    "display_type": "text"
                                 }
                             ]
                         },
@@ -554,83 +355,56 @@
                                 {
                                     "key": "name",
                                     "title": "Name",
-                                    "type": "text",
+                                    "type": "string",
                                     "help_text": "The name of the person or organization.",
-                                    "prop_key": "project_desc.curators.name"
+                                    "prop_key": "project_desc.curators.name",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "role",
                                     "title": "Role",
-                                    "type": "text",
+                                    "type": "string",
                                     "help_text": "The specific role of the person or organization in the curation of the project resources.",
-                                    "prop_key": "project_desc.curators.role"
+                                    "prop_key": "project_desc.curators.role",
+                                    "display_type": "textarea"
                                 },
                                 {
                                     "key": "affiliation",
                                     "title": "Affiliation",
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "project_desc.curators.affiliation",
-                                    "help_text": "The affiliation of the person or organization."
+                                    "help_text": "The affiliation of the person or organization.",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "abbreviation",
                                     "title": "Abbreviation",
-                                    "help_text": "An acronym of the organization, if an organization was entered in name.",
-                                    "type": "text",
-                                    "prop_key": "project_desc.curators.abbreviation"
+                                    "help_text": "An acronym of the organization, if an organization was entered in \"Name\".",
+                                    "type": "string",
+                                    "prop_key": "project_desc.curators.abbreviation",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "email",
-                                    "type": "text",
+                                    "type": "string",
                                     "title": "Email",
-                                    "help_text": "The email address of the person or organization. The use of personal email addresses must be avoided.",
-                                    "prop_key": "project_desc.curators.email"
+                                    "help_text": "The email address of the person or organization mentioned in \"Name\". The use of personal email addresses must be avoided.",
+                                    "prop_key": "project_desc.curators.email",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "url",
-                                    "type": "text",
+                                    "type": "string",
                                     "title": "URL",
                                     "prop_key": "project_desc.curators.url",
-                                    "help_text": "A link to the website of the person or organization."
+                                    "help_text": "A link to the website of the person or organization mentioned in \"Name\".",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
                                 }
                             ],
-                            "help_text": "A list of persons and/or organizations in charge of curating the resources associated with the project.\n\n- Name: The name of the person or organization.\n- Role: The specific role of the person or organization in the curation of the project resources.\n- Affiliation: The affiliation of the person or organization.\n- Abbreviation: An acronym of the organization, if an organization was entered in Name.\n- Email: The email address of the person or organization. The use of personal email addresses must be avoided.\n- URL: A link to the website of the person or organization."
-                        },
-                        {
-                            "key": "project_desc.reviews_comments",
-                            "title": "Reviews and comments",
-                            "type": "array",
-                            "props": [
-                                {
-                                    "key": "comment_date",
-                                    "title": "Date",
-                                    "type": "text",
-                                    "prop_key": "project_desc.reviews_comments.comment_date",
-                                    "help_text": "The date the comment was provided, in ISO 8601 format (YYYY-MM-DD or YYYY-MM)."
-                                },
-                                {
-                                    "key": "comment_by",
-                                    "title": "By",
-                                    "type": "text",
-                                    "prop_key": "project_desc.reviews_comments.comment_by",
-                                    "help_text": "The name of the person or organization that provided the comment."
-                                },
-                                {
-                                    "key": "comment_description",
-                                    "title": "Comment",
-                                    "type": "text",
-                                    "prop_key": "project_desc.reviews_comments.comment_description",
-                                    "help_text": "The text of the comment itself, in its original formulation or in a summary version."
-                                },
-                                {
-                                    "key": "comment_response",
-                                    "title": "Response",
-                                    "type": "text",
-                                    "prop_key": "project_desc.reviews_comments.comment_response",
-                                    "help_text": "The response provided by the research team/person to the comment, in its original formulation or in a summary version."
-                                }
-                            ],
-                            "help_text": "Many research projects will be subject to a review process, which may happen at different stages of the project implementation (from design to review of the final output). This block is intended to document the comments received by reviewers during this process. It is a repeatable block of metadata elements, which can be used to document comments with a fine granularity.\n\n- Date: The date the comment was provided, in ISO 8601 format (YYYY-MM-DD or YYYY-MM).\n- By: The name of the person or organization that provided the comment.\n- Comment: The text of the comment itself, in its original formulation or in a summary version.\n- Response: The response provided by the research team/person to the comment, in its original formulation or in a summary version."
+                            "help_text": "A list of persons and/or organizations in charge of curating the resources associated with the project."
                         },
                         {
                             "key": "project_desc.acknowledgments",
@@ -642,77 +416,92 @@
                                     "title": "Name",
                                     "type": "string",
                                     "prop_key": "project_desc.acknowledgments.name",
-                                    "help_text": "The name of the person or agency being recognized for supporting the project."
+                                    "help_text": "The name of the person or agency being recognized for supporting the project.",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "affiliation",
                                     "title": "Affiliation",
                                     "type": "string",
                                     "prop_key": "project_desc.acknowledgments.affiliation",
-                                    "help_text": "The affiliation of the person or agency being acknowledged."
+                                    "help_text": "The affiliation of the person or agency being acknowledged.",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "role",
                                     "title": "Role",
                                     "type": "string",
                                     "prop_key": "project_desc.acknowledgments.role",
-                                    "help_text": "A brief description of the role of the person or agency that is being recognized or acknowledged for supporting the project."
+                                    "help_text": "A brief description of the role of the person or agency that is being recognized or acknowledged for supporting the project.",
+                                    "display_type": "textarea"
                                 }
                             ],
-                            "help_text": "This repeatable block of elements is used to provide an itemized list of persons and organizations whose contribution to the project must be acknowledged. Note that specific metadata elements are available for listing financial sponsors and main contributors to the study.\nAn alternative to this field is the \"Acknowledgment statement\" field (see below) which can be used to provide the acknowledgment in the form of an unstructured text.\n\n- Name: The name of the person or agency being recognized for supporting the project.\n- Affiliation: The affiliation of the person or agency being acknowledged.\n- Role: A brief description of the role of the person or agency that is being recognized or acknowledged for supporting the project."
+                            "help_text": "This repeatable block of elements is used to provide an itemized list of persons and organizations whose contribution to the project must be acknowledged. Note that specific metadata elements are available for listing financial sponsors and main contributors to the study. An alternative to this field is the \"Acknowledgment statement\" field (see below) which can be used to provide the acknowledgment in the form of an unstructured text."
                         },
                         {
                             "key": "project_desc.acknowledgment_statement",
                             "title": "Acknowledgment statement",
-                            "type": "textarea",
-                            "help_text": "This field is used to provide acknowledgments in the form of an unstructured text. An alternative to this field is the acknowledgments field which provides a solution to itemize the acknowledgments."
+                            "type": "string",
+                            "help_text": "This field is used to provide acknowledgments in the form of an unstructured text. It is an alternative to the element \"Acknowledgments\" which provides a solution to itemize the acknowledgments.",
+                            "display_type": "textarea"
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "project_desc_container1674844693452",
+                    "title": "Version statement",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "project_desc.production_date",
+                            "title": "Date of production",
+                            "help_text": "The date, preferably entered in ISO 8601 format (YYYY-MM-DD), when the project was completed (this refers to the version that is being documented and released.)",
+                            "type": "simple_array",
+                            "enum": []
                         },
                         {
-                            "key": "project_desc.disclaimer",
-                            "type": "textarea",
-                            "title": "Disclaimer",
-                            "help_text": "A disclaimer limits the responsibility or liability of the publishing organization or researchers associated with the research project. A disclaimer assures that any research in the public domain produced by an organization has limited repercussions to the publishing organization. A disclaimer is intended to prevent liability from any effects occurring as a result of the acts or omissions in the research."
+                            "key": "project_desc.version_statement.version",
+                            "title": "Version",
+                            "type": "string",
+                            "help_text": "A label describing the version. For example, “Version 1.2”.",
+                            "display_type": "text"
                         },
                         {
-                            "key": "project_desc.confidentiality",
-                            "type": "textarea",
-                            "title": "Confidentiality",
-                            "help_text": "A confidentiality statement binds the publisher to ethical considerations regarding the subjects of the research. In most cases, the individual identity of an individual that is the subject of research can not be released and special effort is required to assure the preservation of privacy."
+                            "key": "project_desc.version_statement.version_date",
+                            "title": "Version date",
+                            "type": "string",
+                            "help_text": "The date, preferably entered in ISO 8601 format (YYYY-MM-DD), when the version was released.",
+                            "display_type": "text"
                         },
                         {
-                            "key": "project_desc.citation_requirement",
-                            "type": "textarea",
-                            "title": "Citation requirement",
-                            "help_text": "The citation requirement is specific to the output and is a preferred shorthand or means to refer to the publication or published good."
+                            "key": "project_desc.version_statement.version_resp",
+                            "title": "Responsibility",
+                            "help_text": "Person(s) or organization(s) responsible for this version.",
+                            "type": "string",
+                            "display_type": "text"
                         },
                         {
-                            "key": "project_desc.related_projects",
-                            "title": "Related projects",
-                            "type": "array",
-                            "props": [
-                                {
-                                    "key": "name",
-                                    "title": "Name",
-                                    "type": "string",
-                                    "prop_key": "project_desc.related_projects.name",
-                                    "help_text": "The name (title) of the related project."
-                                },
-                                {
-                                    "key": "uri",
-                                    "title": "URL",
-                                    "type": "string",
-                                    "prop_key": "project_desc.related_projects.uri",
-                                    "help_text": "A link (URL) to the related project web page."
-                                },
-                                {
-                                    "key": "note",
-                                    "title": "Note",
-                                    "type": "string",
-                                    "prop_key": "project_desc.related_projects.note",
-                                    "help_text": "A brief description or other relevant information on the related project."
-                                }
-                            ],
-                            "help_text": "The objective of this block is to provide links (URLs) to other, related projects which can be documented and disseminated in the same catalog or any other location on the internet.\n\n- Name: The name (title) of the related project.\n- URL: A link (URL) to the related project web page.\n- Note: A brief description or other relevant information on the related project."
+                            "key": "project_desc.version_statement.version_notes",
+                            "title": "Note on version",
+                            "type": "string",
+                            "help_text": "Additional information on the version if any; it is good practice to describe what distinguishes this version from the previous one(s). ",
+                            "display_type": "textarea"
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "project_desc_container1674844638082",
+                    "title": "Scope and coverage",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "project_desc.abstract",
+                            "title": "Abstract",
+                            "type": "string",
+                            "help_text": "The abstract should provide a clear summary of the purposes, objectives and content of the project. An abstract can make reference to the various outputs associated with the research project.",
+                            "display_type": "textarea"
                         },
                         {
                             "key": "project_desc.geographic_units",
@@ -724,24 +513,27 @@
                                     "title": "Name",
                                     "type": "string",
                                     "prop_key": "project_desc.geographic_units.name",
-                                    "help_text": "The name of the geographic area."
+                                    "help_text": "The name of the geographic area.",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "code",
                                     "title": "Code",
                                     "type": "string",
                                     "prop_key": "project_desc.geographic_units.code",
-                                    "help_text": "The code of the geographic area. For countries, it is recommended to use the ISO 3166 country codes and names."
+                                    "help_text": "The code of the geographic area. For countries, it is recommended to use the ISO 3166 country codes and names.",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "type",
                                     "title": "Type",
                                     "type": "string",
                                     "prop_key": "project_desc.geographic_units.type",
-                                    "help_text": "The type of geographic area."
+                                    "help_text": "The type of geographic area. For example: \"country\", \"province\", \"refugee camp\", etc. ",
+                                    "display_type": "text"
                                 }
                             ],
-                            "help_text": "The geographic areas covered by the project. When the project relates to one or more countries, or part of one or more countries, it is important to provide the country name. This means that for a project related to a specific province or town of a country, the country name will be entered in addition to the province or town (as separate entries in this repeatable block of elements). Note that the area does not have to be an administrative area; it can for example be an ocean).\n\n- Name: The name of the geographic area.\n- Code: The code of the geographic area. For countries, it is recommended to use the ISO 3166 country codes and names.\n- Type: The type of geographic area. For example: \"country\", \"province\", \"refugee camp\", etc. ",
+                            "help_text": "The geographic areas covered by the project. When the project relates to one or more countries, or part of one or more countries, it is important to provide the country name. This means that for a project related to a specific province or town of a country, the country name will be entered in addition to the province or town (as separate entries in this repeatable block of elements). Note that the area does not have to be an administrative area; it can for example be an ocean).",
                             "is_recommended": true
                         },
                         {
@@ -752,26 +544,32 @@
                                 {
                                     "key": "name",
                                     "title": "Keyword",
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "project_description.keywords.name",
-                                    "help_text": "The keyword itself (a word or a phrase)."
+                                    "help_text": "The keyword itself (a word or a phrase).",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "vocabulary",
                                     "title": "Vocabulary",
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "project_description.keywords.vocabulary",
-                                    "help_text": "The controlled vocabulary (including version number or date) from which the keyword is extracted, if any."
+                                    "help_text": "The controlled vocabulary (including version number or date) from which the keyword is extracted, if any.",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "uri",
                                     "title": "URL",
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "project_description.keywords.uri",
-                                    "help_text": "The URL of the controlled vocabulary from which the keyword is extracted, if any."
+                                    "help_text": "The URL of the controlled vocabulary from which the keyword is extracted, if any.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
                                 }
                             ],
-                            "help_text": "A list of keywords that provide information on the core scope and objectives of the research project. Keywords provide a convenient solution to improve the discoverability of the research, as it allows terms and phrases not found elsewhere in the metadata to be indexed and to make a project discoverable by text-based search engines. A controlled vocabulary will preferably be used (although not required), such as the UNESCO Thesaurus. The list provided here can combine keywords from multiple controlled vocabularies, and user-defined keywords.\n\n- Name: The keyword itself (a word or a phrase).\n- Vocabulary: The controlled vocabulary (including version number or date) from which the keyword is extracted, if any.\n- URL: The URL of the controlled vocabulary from which the keyword is extracted, if any.",
+                            "help_text": "A list of keywords that provide information on the core scope and objectives of the research project. Keywords provide a convenient solution to improve the discoverability of the research, as it allows terms and phrases not found elsewhere in the metadata to be indexed and to make a project discoverable by text-based search engines. A controlled vocabulary will preferably be used (although not required), such as the UNESCO Thesaurus. The list provided here can combine keywords from multiple controlled vocabularies, and user-defined keywords.",
                             "is_recommended": true
                         },
                         {
@@ -782,39 +580,48 @@
                                 {
                                     "key": "id",
                                     "title": "ID",
-                                    "type": "text",
-                                    "prop_key": "project_description.themes.id"
+                                    "type": "string",
+                                    "prop_key": "project_description.themes.id",
+                                    "help_text": "The ID of the theme, taken from a controlled vocabulary.",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "name",
                                     "title": "Name",
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "project_description.themes.name",
-                                    "help_text": "The name (label) of the theme, preferably taken from a controlled vocabulary."
+                                    "help_text": "The name (label) of the theme, preferably taken from a controlled vocabulary.",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "parent_id",
                                     "title": "Parent ID",
-                                    "help_text": "For sub-themes, provide the ID of the parent theme",
-                                    "type": "text",
-                                    "prop_key": "project_description.themes.parent_id"
+                                    "help_text": "The parent ID of the theme (ID of the item one level up in the hierarchy), if a hierarchical controlled vocabulary is used.",
+                                    "type": "string",
+                                    "prop_key": "project_description.themes.parent_id",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "vocabulary",
                                     "title": "Vocabulary",
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "project_description.themes.vocabulary",
-                                    "help_text": "The name (including version number) of the controlled vocabulary used, if any."
+                                    "help_text": "The name (including version number) of the controlled vocabulary used, if any.",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "uri",
                                     "title": "URL",
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "project_description.themes.uri",
-                                    "help_text": "The URL to the controlled vocabulary used, if any."
+                                    "help_text": "The URL to the controlled vocabulary used, if any.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
                                 }
                             ],
-                            "help_text": "A list of themes covered by the research project. A controlled vocabulary will preferably be used. Note that themes will rarely be used as the elements topics and disciplines are more appropriate for most uses. This is a block of five fields:\n\n- ID: The ID of the theme, taken from a controlled vocabulary.\n- Name: The name (label) of the theme, preferably taken from a controlled vocabulary.\n- Parent ID: The parent ID of the theme (ID of the item one level up in the hierarchy), if a hierarchical controlled vocabulary is used.\n- Vocabulary: The name (including version number) of the controlled vocabulary used, if any.\n- URL: The URL to the controlled vocabulary used, if any."
+                            "help_text": "A list of themes covered by the research project. A controlled vocabulary will preferably be used. Note that themes will rarely be used as the elements topics and disciplines are more appropriate for most uses. "
                         },
                         {
                             "key": "project_description.topics",
@@ -824,40 +631,48 @@
                                 {
                                     "key": "id",
                                     "title": "ID",
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "project_description.topics.id",
-                                    "help_text": "The identifier of the topic, taken from a controlled vocabulary."
+                                    "help_text": "The identifier of the topic, taken from a controlled vocabulary.",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "name",
                                     "title": "Name",
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "project_description.topics.name",
-                                    "help_text": "The name (label) of the topic, preferably taken from a controlled vocabulary."
+                                    "help_text": "The name (label) of the topic, preferably taken from a controlled vocabulary.",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "parent_id",
                                     "title": "Parent ID",
                                     "help_text": "The parent identifier of the topic (identifier of the item one level up in the hierarchy), if a hierarchical controlled vocabulary is used.",
-                                    "type": "text",
-                                    "prop_key": "project_description.topics.parent_id"
+                                    "type": "string",
+                                    "prop_key": "project_description.topics.parent_id",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "vocabulary",
                                     "title": "Vocabulary",
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "project_description.topics.vocabulary",
-                                    "help_text": "The name (including version number) of the controlled vocabulary used, if any."
+                                    "help_text": "The name (including version number) of the controlled vocabulary used, if any.",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "uri",
                                     "title": "URL",
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "project_description.topics.uri",
-                                    "help_text": "The URL to the controlled vocabulary used, if any."
+                                    "help_text": "The URL to the controlled vocabulary used, if any.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
                                 }
                             ],
-                            "help_text": "Information on the topics covered in the research project. A controlled vocabulary will preferably be used, for example the CESSDA Topics classification, a typology of topics available in 11 languages; or the Journal of Economic Literature (JEL) Classification System, or the World Bank topics classification. Note that you may use more than one controlled vocabulary. This element is a block of five fields:\n\n- ID: The identifier of the topic, taken from a controlled vocabulary.\n- Name: The name (label) of the topic, preferably taken from a controlled vocabulary.\n- Parent ID: The parent identifier of the topic (identifier of the item one level up in the hierarchy), if a hierarchical controlled vocabulary is used.\n- Vocabulary: The name (including version number) of the controlled vocabulary used, if any.\n- URL: The URL to the controlled vocabulary used, if any."
+                            "help_text": "Information on the topics covered in the research project. A controlled vocabulary will preferably be used, for example the CESSDA Topics classification, a typology of topics available in 11 languages; or the Journal of Economic Literature (JEL) Classification System, or the World Bank topics classification. Note that you may use more than one controlled vocabulary. "
                         },
                         {
                             "key": "project_description.disciplines",
@@ -867,68 +682,766 @@
                                 {
                                     "key": "id",
                                     "title": "ID",
-                                    "type": "text",
-                                    "prop_key": "project_description.disciplines.id"
+                                    "type": "string",
+                                    "prop_key": "project_description.disciplines.id",
+                                    "help_text": "The identifier of the discipline, taken from a controlled vocabulary.",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "name",
                                     "title": "Name",
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "project_description.disciplines.name",
-                                    "help_text": "The name (label) of the discipline, preferably taken from a controlled vocabulary."
+                                    "help_text": "The name (label) of the discipline, preferably taken from a controlled vocabulary.",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "parent_id",
-                                    "title": "Parent Identifier",
-                                    "help_text": "For sub-disciplines, provide the ID of the parent discipline",
-                                    "type": "text",
-                                    "prop_key": "project_description.disciplines.parent_id"
+                                    "title": "Parent ID",
+                                    "help_text": "The parent identifier of the discipline (identifier of the item one level up in the hierarchy), if a hierarchical controlled vocabulary is used.",
+                                    "type": "string",
+                                    "prop_key": "project_description.disciplines.parent_id",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "vocabulary",
                                     "title": "Vocabulary",
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "project_description.disciplines.vocabulary",
-                                    "help_text": "The name (including version number) of the controlled vocabulary used, if any."
+                                    "help_text": "The name (including version number) of the controlled vocabulary used, if any.",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "uri",
                                     "title": "URL",
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "project_description.disciplines.uri",
-                                    "help_text": "The URL to the controlled vocabulary used, if any."
+                                    "help_text": "The URL to the controlled vocabulary used, if any.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
                                 }
                             ],
-                            "help_text": "Information on the academic disciplines related to the content of the research project. A controlled vocabulary will preferably be used, for example the one provided by the list of academic fields in Wikipedia. This is a block of five elements:\n\n- ID: The identifier of the discipline, taken from a controlled vocabulary.\n- Name: The name (label) of the discipline, preferably taken from a controlled vocabulary.\n- Parent ID: The parent identifier of the discipline (identifier of the item one level up in the hierarchy), if a hierarchical controlled vocabulary is used.\n- Vocabulary: The name (including version number) of the controlled vocabulary used, if any.\n- URL: The URL to the controlled vocabulary used, if any."
+                            "help_text": "Information on the academic disciplines related to the content of the research project. A controlled vocabulary will preferably be used, for example the one provided by the list of academic fields in Wikipedia."
                         },
                         {
-                            "key": "project_desc.repository_uri",
-                            "title": "Repository",
-                            "help_text": "In the process of producing the outputs of the research project, a researcher may want to share their source code for transparency and replicability. This repository provides information for finding the repository where the source code is kept.\n\n- Name: Name of the repository where the code is hosted.\n- Type: Repository type e.g. \"GitHub\", \"Bitbucket\", etc.\n- URL: A link to the project source code/script repository.",
+                            "key": "project_desc.related_projects",
+                            "title": "Related projects",
                             "type": "array",
                             "props": [
                                 {
                                     "key": "name",
                                     "title": "Name",
-                                    "help_text": "Name of the repository where the code is hosted.",
-                                    "type": "text",
-                                    "prop_key": "project_desc.repository_uri.name"
+                                    "type": "string",
+                                    "prop_key": "project_desc.related_projects.name",
+                                    "help_text": "The name (title) of the related project.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "project_desc.related_projects.uri",
+                                    "help_text": "A link (URL) to the related project web page.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "note",
+                                    "title": "Note",
+                                    "type": "string",
+                                    "prop_key": "project_desc.related_projects.note",
+                                    "help_text": "A brief description or other relevant information on the related project.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "The objective of this block is to provide links (URLs) to other, related projects which can be documented and disseminated in the same catalog or any other location on the internet."
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "project_desc_container1674844845378",
+                    "title": "Processes and output",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "project_desc.process",
+                            "title": "Process",
+                            "help_text": "This element is used to document the life cycle of the research project, from its design and inception to its conclusion. This can include phases of fundraising, approval by a review board, concept note review, data acquisition, analysis, publishing of a working paper, peer review, publishing in journal, presentation to conferences, publishing, evaluation, reporting to sponsors, etc. It is recommended to provide these steps in a chronological order.",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "prop_key": "project_desc.process.name",
+                                    "help_text": "This is a header for the phase of the process.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "date_start",
+                                    "title": "Start date",
+                                    "type": "string",
+                                    "prop_key": "project_desc.process.date_start",
+                                    "help_text": "Date the phase started, preferably entered in ISO 8601 format (YYYY-MM-DD).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "date_end",
+                                    "title": "End date",
+                                    "type": "string",
+                                    "prop_key": "project_desc.process.date_end",
+                                    "help_text": "Date the phase ended, preferably entered in ISO 8601 format (YYYY-MM-DD).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "string",
+                                    "prop_key": "project_desc.process.description",
+                                    "help_text": "A brief description of the phase.",
+                                    "display_type": "textarea"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "project_desc.review_board",
+                            "title": "Institutional review board",
+                            "help_text": "Information on whether and when the project was submitted, reviewed, and approved by an institutional review board (or independent ethics committee, ethical review board (ERB), research ethics board, or equivalent).",
+                            "type": "string",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "project_desc.approval_process",
+                            "title": "Approval process",
+                            "help_text": "The \"Approval process\" is a group of six elements used to describe the formal approval process(es) (if any) that the project had to go through. This may for example include an approval by an Ethics Board to collect new data, followed by an internal review process to endorse the results.",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "approval_phase",
+                                    "title": "Phase name",
+                                    "type": "string",
+                                    "prop_key": "project_desc.approval_process.approval_phase",
+                                    "help_text": "A label that describes the approval phase.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "approval_authority",
+                                    "title": "Authority",
+                                    "type": "string",
+                                    "prop_key": "project_desc.approval_process.approval_authority",
+                                    "help_text": "Identification of the person(s) or organization(s) whose approval was required or sought.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "submission_date",
+                                    "title": "Submission date",
+                                    "type": "string",
+                                    "prop_key": "project_desc.approval_process.submission_date",
+                                    "help_text": "The date, preferably entered in ISO 8601 format (YYYY-MM-DD), when the project (or a component of it) was submitted for approval.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "reviewer",
+                                    "title": "Reviewer",
+                                    "type": "string",
+                                    "help_text": "Identification of the reviewer(s).",
+                                    "prop_key": "project_desc.approval_process.reviewer",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "review_status",
+                                    "title": "Review status",
+                                    "type": "string",
+                                    "prop_key": "project_desc.approval_process.review_status",
+                                    "help_text": "Status of approval.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "approval_date",
+                                    "title": "Approval date",
+                                    "type": "string",
+                                    "prop_key": "project_desc.approval_process.approval_date",
+                                    "help_text": "Date the approval was formally received, preferably entered in ISO 8601 format (YYYY-MM-DD).",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "project_desc.reviews_comments",
+                            "title": "Reviews and comments",
+                            "type": "nested_array",
+                            "props": [
+                                {
+                                    "key": "comment_date",
+                                    "title": "Date",
+                                    "type": "string",
+                                    "prop_key": "project_desc.reviews_comments.comment_date",
+                                    "help_text": "The date the comment was provided, preferably entered in ISO 8601 format (YYYY-MM-DD or YYYY-MM).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "comment_by",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "prop_key": "project_desc.reviews_comments.comment_by",
+                                    "help_text": "The name of the person or organization that provided the comment.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "comment_description",
+                                    "title": "Comment",
+                                    "type": "string",
+                                    "prop_key": "project_desc.reviews_comments.comment_description",
+                                    "help_text": "The text of the comment itself, in its original formulation or in a summary version.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "comment_response",
+                                    "title": "Response",
+                                    "type": "string",
+                                    "prop_key": "project_desc.reviews_comments.comment_response",
+                                    "help_text": "The response provided by the research team/person to the comment, in its original formulation or in a summary version.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "Many research projects will be subject to a review process, which may happen at different stages of the project implementation (from design to review of the final output). This block is intended to document the comments received by reviewers during this process. It is a repeatable block of metadata elements, which can be used to document comments with a fine granularity."
+                        },
+                        {
+                            "key": "project_desc.output",
+                            "title": "Output",
+                            "help_text": "This element will describe and reference all substantial/intended products of the research project, which may include publications, reports, websites, datasets, interactive applications, presentations, visualizations, and others. An output may also be referred to as a “deliverable”.",
+                            "type": "nested_array",
+                            "props": [
+                                {
+                                    "key": "type",
+                                    "title": "Type",
+                                    "type": "string",
+                                    "help_text": "Type of output. The type of output relates to the media which is used to convey or communicate the intended results, findings or conclusions of the research project. This field may be controlled by a controlled vocabulary. The kind on content could be “Working paper”, “Database”, etc.",
+                                    "prop_key": "project_desc.output.type",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "title",
+                                    "title": "Title",
+                                    "type": "string",
+                                    "prop_key": "project_desc.output.title",
+                                    "help_text": "Formal title of the output. Depending upon the kind of output, the title will vary in formality.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "authors",
+                                    "title": "Authors",
+                                    "type": "string",
+                                    "prop_key": "project_desc.output.authors",
+                                    "help_text": "Authors of the output; if multiple, they will be listed in one same text field.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "string",
+                                    "prop_key": "project_desc.output.description",
+                                    "help_text": "A brief description of the output (but not an abstract, which would be entered in \"Abstract\").",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "abstract",
+                                    "type": "string",
+                                    "title": "Abstract",
+                                    "prop_key": "project_desc.output.abstract",
+                                    "help_text": "If the output consists of a document, the abstract will be entered here.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "uri",
+                                    "type": "string",
+                                    "title": "URL",
+                                    "prop_key": "project_desc.output.uri",
+                                    "help_text": "A link (URL) where the output or information on the output can be found.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "doi",
+                                    "type": "string",
+                                    "title": "DOI",
+                                    "prop_key": "project_desc.output.doi",
+                                    "help_text": "The Digital Object Identifier (DOI) of the output, if available.",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "project_desc.language",
+                            "title": "Language",
+                            "help_text": "A block of two elements describing the language(s) of the project. At least one of the two elements must be provided for each listed language. ",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "prop_key": "project_desc.language.name",
+                                    "help_text": "The name of the language.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "code",
+                                    "title": "Code",
+                                    "type": "string",
+                                    "prop_key": "project_desc.language.code",
+                                    "help_text": "The code of the language. Numeric codes must be entered as strings. The use of ISO 639-2 (the alpha-3 code in Codes for the representation of names of languages) is recommended.",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "project_desc.errata",
+                            "title": "Errata",
+                            "help_text": "This field is used to list and describe errata.",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "date",
+                                    "title": "Date",
+                                    "type": "string",
+                                    "prop_key": "project_desc.errata.date",
+                                    "help_text": "The date, preferably entered in ISO 8601 format (YYYY-MM-DD), when the erratum was released.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "textarea",
+                                    "prop_key": "project_desc.errata.description",
+                                    "help_text": "Description of the error(s) and measures taken to address it/them."
+                                }
+                            ]
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "project_desc_container1674845183788",
+                    "title": "Data",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "project_desc.data_statement",
+                            "title": "Data statement",
+                            "help_text": "An overall statement on the data used in the project. A separate field is provided to list and document the origin and key characteristics of the datasets.",
+                            "type": "string",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "project_desc.datasets",
+                            "title": "Datasets",
+                            "help_text": "This field is used to provide an itemized list of datasets used in the project. The data are not documented here (specific metadata are available for documenting data of different types, like the DDI for microdata, the ISO 19139 for geographic datasets, etc.)",
+                            "type": "nested_array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "prop_key": "project_desc.datasets.name",
+                                    "help_text": "The dataset name (title).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "idno",
+                                    "title": "Dataset ID",
+                                    "type": "string",
+                                    "prop_key": "project_desc.datasets.idno",
+                                    "help_text": "The unique identifier of the dataset. If the dataset has multiple identifiers including a DOI, the DOI should be used here.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "note",
+                                    "title": "Note",
+                                    "type": "string",
+                                    "prop_key": "project_desc.datasets.note",
+                                    "help_text": "A brief description of the dataset.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "access_type",
+                                    "title": "Access policy",
+                                    "type": "string",
+                                    "prop_key": "project_desc.datasets.access_type",
+                                    "help_text": "The access policy applied to the dataset.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "license",
+                                    "title": "License",
+                                    "type": "string",
+                                    "prop_key": "project_desc.datasets.license",
+                                    "help_text": "The access or data use license that applies to the dataset.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "license_uri",
+                                    "title": "License URL",
+                                    "type": "string",
+                                    "prop_key": "project_desc.datasets.license_uri",
+                                    "help_text": "The URL of a web page where more information on the license can be obtained.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "type": "string",
+                                    "title": "Data URL",
+                                    "prop_key": "project_desc.datasets.uri",
+                                    "help_text": "The URL where the dataset (or a detailed description of it) can be obtained. This can be a link to a data catalog.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ]
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "project_desc_container1674845066822",
+                    "title": "Methods, software and scripts",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "project_desc.methods",
+                            "title": "Methods",
+                            "help_text": "A list of analytic, statistical, econometric, machine learning methods used in the project. The objective is to allow users to find projects based on a search on methods applied, e.g. answer a query like “poverty prediction using random forest”.",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "prop_key": "project_desc.methods.name",
+                                    "help_text": "A short name for the method being described.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "note",
+                                    "title": "Note",
+                                    "type": "string",
+                                    "prop_key": "project_desc.methods.note",
+                                    "help_text": "Any additional information on the method.",
+                                    "display_type": "textarea"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "project_desc.software",
+                            "title": "Software",
+                            "help_text": "This field is used to list the software and the specialized packages and libraries/packages that were used to implement the project and that are required to reproduce the scripts. The libraries that are loaded by the scripts (e.g., by the R \"require\" or \"library\" command) are included (not all their own dependencies, which will be assumed to be installed automatically).",
+                            "type": "nested_array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "prop_key": "project_desc.software.name",
+                                    "help_text": "The name of the software. For example: \"Python\", or \"R\". It is recommended to use a controlled vocabulary.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "version",
+                                    "title": "Version",
+                                    "type": "string",
+                                    "prop_key": "project_desc.software.version",
+                                    "help_text": "The version of the software.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "library",
+                                    "title": "Libraries",
+                                    "help_text": "A list of libraries/packages required to run the scripts. Note that the specific version of each package is not documented here; it is expected to be found in the script or in the reproduction instructions.",
+                                    "type": "simple_array",
+                                    "prop_key": "project_desc.software.library",
+                                    "enum": []
+                                }
+                            ]
+                        },
+                        {
+                            "key": "project_desc.scripts",
+                            "title": "Scripts",
+                            "help_text": "This field is used to describe the scripts written by the project authors. All scripts are expected to have been written using software listed in the field software.\n",
+                            "type": "nested_array",
+                            "props": [
+                                {
+                                    "key": "file_name",
+                                    "title": "File name",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.file_name",
+                                    "help_text": "Name of the script file (for R users, this will typically include files with extension [.R], for Stata users it will be files with extension [.do], for Python users …). But this can also include other files related and required to run the scripts (for example lookup CSV files, etc.) This does not include the data files, which are described in a specific field.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "zip_package",
+                                    "title": "Zip package",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.zip_package",
+                                    "help_text": "If the script files have been saved as or in a compressed file (zip, rar, of equivalent), we provide here the name of the zip file containing the script.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "title",
+                                    "title": "Title",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.title",
+                                    "help_text": "A title (label) given to the script file.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "authors",
+                                    "type": "array",
+                                    "title": "Authors",
+                                    "props": [
+                                        {
+                                            "key": "name",
+                                            "title": "Name",
+                                            "type": "string",
+                                            "prop_key": "project_desc.scripts.authors.name",
+                                            "help_text": "Name of the author (person or organization) of the script.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "abbr",
+                                            "title": "Abbreviation",
+                                            "type": "string",
+                                            "prop_key": "project_desc.scripts.authors.abbr",
+                                            "help_text": "The acronym of the organization who authored the script.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "role",
+                                            "title": "Role",
+                                            "type": "string",
+                                            "prop_key": "project_desc.scripts.authors.role",
+                                            "help_text": "Specific role of the person or organization in the production of the script.",
+                                            "display_type": "textarea"
+                                        }
+                                    ],
+                                    "prop_key": "project_desc.scripts.authors",
+                                    "help_text": "This is a repeatable block that allows entering a list of authors and co-authors of a script"
+                                },
+                                {
+                                    "key": "date",
+                                    "title": "Date",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.date",
+                                    "help_text": "Date the script was produced, preferably entered in ISO 8601 format (YYYY-MM-DD).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "format",
+                                    "title": "Format",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.format",
+                                    "help_text": "File format",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "software",
+                                    "title": "Software",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.software",
+                                    "help_text": "Software used to run the script",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.description",
+                                    "help_text": "Brief description of the script",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "methods",
+                                    "title": "Methods",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.methods",
+                                    "help_text": "Statistical/analytic methods included in the script",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "dependencies",
+                                    "title": "Dependencies",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.dependencies",
+                                    "help_text": "Any dependencies (packages/libraries) that the script relies on. This field is not needed if dependencies were described in the library element.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "instructions",
+                                    "title": "Instructions",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.instructions",
+                                    "help_text": "Instructions for running the script. Information on the sequence in which the scripts must be run is critical.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "source_code_repo",
+                                    "title": "Repository",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.source_code_repo",
+                                    "help_text": "Repository (e.g. GitHub repo) where the script has been published.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "notes",
+                                    "title": "Notes",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.notes",
+                                    "help_text": "Any additional information on the script.",
+                                    "enum": [],
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "license",
+                                    "title": "License",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "name",
+                                            "title": "Name",
+                                            "type": "string",
+                                            "prop_key": "project_desc.scripts.license.name",
+                                            "help_text": "Name (label) of the license",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "uri",
+                                            "title": "URL",
+                                            "type": "string",
+                                            "prop_key": "project_desc.scripts.license.uri",
+                                            "help_text": "License URL",
+                                            "rules": {
+                                                "is_uri": true
+                                            },
+                                            "display_type": "text"
+                                        }
+                                    ],
+                                    "prop_key": "project_desc.scripts.license",
+                                    "help_text": "License, if any, under which the script is published."
+                                }
+                            ]
+                        },
+                        {
+                            "key": "project_desc.repository_uri",
+                            "title": "Repository",
+                            "help_text": "In the process of producing the outputs of the research project, a researcher may want to share their source code for transparency and replicability. This repository provides information for finding the repository where the source code is kept.",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "help_text": "The name of the repository where the code is hosted.",
+                                    "type": "string",
+                                    "prop_key": "project_desc.repository_uri.name",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "type",
                                     "title": "Type",
-                                    "type": "text",
-                                    "help_text": "Repo type e.g. `git`, `svn`, `other`",
-                                    "prop_key": "project_desc.repository_uri.type"
+                                    "type": "string",
+                                    "help_text": "Repository type e.g. \"GitHub\", \"Bitbucket\", etc.",
+                                    "prop_key": "project_desc.repository_uri.type",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "uri",
-                                    "type": "text",
+                                    "type": "string",
                                     "title": "URL",
                                     "prop_key": "project_desc.repository_uri.uri",
-                                    "help_text": "URL of the project source code/script repository"
+                                    "help_text": "A link to the project source code/script repository.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
                                 }
                             ]
+                        },
+                        {
+                            "key": "project_desc_container16748450668221674845089408",
+                            "title": "Reproducibility",
+                            "type": "section",
+                            "items": [
+                                {
+                                    "key": "project_desc.technology_environment",
+                                    "title": "Technology environment",
+                                    "help_text": "This field is used to provide a description (as detailed as possible) of the computational environment under which the scripts were implemented and are expected to be reproducible. A substantial challenge in reproducing analyses is installing and configuring the web of dependencies of specific versions of various analytical tools. Virtual machines (a computer inside a computer) enable you to efficiently share your entire computational environment with all the dependencies intact. (https://ropensci.github.io/reproducibility-guide/sections/introduction/)",
+                                    "type": "string",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "project_desc.technology_requirements",
+                                    "title": "Technology requirements",
+                                    "help_text": "Software/hardware or other technology requirements needed to run the scripts and replicate the outputs.",
+                                    "type": "string",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "project_desc.reproduction_instructions",
+                                    "title": "Reproduction instructions",
+                                    "type": "string",
+                                    "help_text": "Instructions for the replication or reproduction of the work.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": ""
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "project_desc_container1674844764972",
+                    "title": "Access and rights",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "project_desc.project_website",
+                            "title": "Project website",
+                            "help_text": "URL of the project website.",
+                            "type": "array_simple",
+                            "enum": [],
+                            "rules": {
+                                "is_uri": true
+                            }
+                        },
+                        {
+                            "key": "project_desc.disclaimer",
+                            "type": "string",
+                            "title": "Disclaimer",
+                            "help_text": "A disclaimer limits the responsibility or liability of the publishing organization or researchers associated with the research project. A disclaimer assures that any research in the public domain produced by an organization has limited repercussions to the publishing organization. A disclaimer is intended to prevent liability from any effects occurring as a result of the acts or omissions in the research.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "project_desc.confidentiality",
+                            "type": "string",
+                            "title": "Confidentiality",
+                            "help_text": "A confidentiality statement binds the publisher to ethical considerations regarding the subjects of the research. In most cases, the individual identity of an individual that is the subject of research can not be released and special effort is required to assure the preservation of privacy.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "project_desc.citation_requirement",
+                            "type": "string",
+                            "title": "Citation requirement",
+                            "help_text": "The citation requirement is specific to the output and is a preferred shorthand or means to refer to the publication or published good.",
+                            "display_type": "textarea"
                         },
                         {
                             "key": "project_desc.license",
@@ -938,299 +1451,41 @@
                                 {
                                     "key": "name",
                                     "title": "Name",
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "project_desc.license.name",
-                                    "help_text": "The name of the license."
+                                    "help_text": "The name of the license, for example “Creative Commons Attribution 4.0 International license (CC-BY 4.0)”.",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "uri",
                                     "title": "URL",
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "project_desc.license.uri",
-                                    "help_text": "The URL of the license, where detailed information on the license can be obtained."
+                                    "help_text": "A URL to a description of the license, for example “https://creativecommons.org/licenses/by/4.0/”.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
                                 }
                             ],
-                            "help_text": "Information on the license(s) attached to the research project resources, which defines their terms of use.\n\n- Name: The name of the license.\n- URL: The URL of the license, where detailed information on the license can be obtained."
+                            "help_text": "Information on the license(s) attached to the research project resources, which defines their terms of use."
                         },
                         {
                             "key": "project_desc.copyright",
                             "title": "Copyright",
-                            "type": "text",
-                            "help_text": "Information on the copyright, if any, that applies to the research project metadata."
-                        },
-                        {
-                            "key": "project_desc.technology_environment",
-                            "title": "Technology environment",
-                            "help_text": "This field is used to provide a description (as detailed as possible) of the computational environment under which the scripts were implemented and are expected to be reproducible. A substantial challenge in reproducing analyses is installing and configuring the web of dependencies of specific versions of various analytical tools. Virtual machines (a computer inside a computer) enable you to efficiently share your entire computational environment with all the dependencies intact. (https://ropensci.github.io/reproducibility-guide/sections/introduction/)",
-                            "type": "textarea"
-                        },
-                        {
-                            "key": "project_desc.technology_requirements",
-                            "title": "Technology requirements",
-                            "help_text": "Software/hardware or other technology requirements needed to run the scripts and replicate the outputs.",
-                            "type": "textarea"
-                        },
-                        {
-                            "key": "project_desc.reproduction_instructions",
-                            "title": "Reproduction instructions",
-                            "type": "textarea",
-                            "help_text": "Instructions for the replication or reproduction of the work."
-                        },
-                        {
-                            "key": "project_desc.methods",
-                            "title": "Methods",
-                            "help_text": "A list of analytic, statistical, econometric, machine learning methods used in the project. The objective is to allow users to find projects based on a search on methods applied, e.g. answer a query like “poverty prediction using random forest”.\n\n- Name: A short name for the method being described.\n- Note: Any additional information on the method.",
-                            "type": "array",
-                            "props": [
-                                {
-                                    "key": "name",
-                                    "title": "Name",
-                                    "type": "text",
-                                    "prop_key": "project_desc.methods.name",
-                                    "help_text": "A short name for the method being described."
-                                },
-                                {
-                                    "key": "note",
-                                    "title": "Note",
-                                    "type": "text",
-                                    "prop_key": "project_desc.methods.note",
-                                    "help_text": "Any additional information on the method."
-                                }
-                            ]
-                        },
-                        {
-                            "key": "project_desc_software_section",
-                            "title": "Software",
-                            "type": "section",
-                            "items": [
-                                {
-                                    "key": "project_desc.software",
-                                    "title": "Software",
-                                    "help_text": "This field is used to list the software and the specialized packages and libraries/packages that were used to implement the project and that are required to reproduce the scripts. The libraries that are loaded by the scripts (e.g., by the R \"require\" or \"library\" command) are included (not all their own dependencies, which will be assumed to be installed automatically).\n\n- Name: The name of the software. For example: \"Python\", or \"R\". It is recommended to use a controlled vocabulary.\n- Version: The version of the software.\n- Libraries: A list of libraries/packages required to run the scripts. Note that the specific version of each package is not documented here; it is expected to be found in the script or in the reproduction instructions.",
-                                    "type": "nested_array",
-                                    "props": [
-                                        {
-                                            "key": "name",
-                                            "title": "Name",
-                                            "type": "text",
-                                            "prop_key": "project_desc.software.name",
-                                            "help_text": "The name of the software. For example: \"Python\", or \"R\". It is recommended to use a controlled vocabulary."
-                                        },
-                                        {
-                                            "key": "version",
-                                            "title": "Version",
-                                            "type": "text",
-                                            "prop_key": "project_desc.software.version",
-                                            "help_text": "The version of the software."
-                                        },
-                                        {
-                                            "key": "library",
-                                            "title": "Libraries",
-                                            "help_text": "A list of libraries/packages required to run the scripts. Note that the specific version of each package is not documented here; it is expected to be found in the script or in the reproduction instructions.",
-                                            "type": "simple_array",
-                                            "prop_key": "project_desc.software.library",
-                                            "enum": []
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "key": "project_desc_scripts_section",
-                            "title": "Scripts",
-                            "type": "section",
-                            "items": [
-                                {
-                                    "key": "project_desc.scripts",
-                                    "title": "Scripts",
-                                    "help_text": "This field is used to describe the scripts written by the project authors. All scripts are expected to have been written using software listed in the field software.\n\n- File name: Name of the script file (for R users, this will typically include files with extension [.R], for Stata users it will be files with extension [.do], for Python users …). But this can also include other files related and required to run the scripts (for example lookup CSV files, etc.) This does not include the data files, which are described in a specific field.\n- Zip package: If the script files have been saved as or in a compressed file (zip, rar, of equivalent), we provide here the name of the zip file containing the script.\n- Title: A title (label) given to the script file\n- Authors: This is a repeatable block that allows entering a list of authors and co-authors of a script\n   * Name: Name of the author (person or organization) of the script.\n   * Abbreviation: The acronym of the organization who authored the script.\n   * Role: Specific role of the person or organization in the production of the script.\n- Date: Date the script was produced, in ISO 8601 format (YYYY-MM-DD)\n- Format: File format\n- Software: Software used to run the script\n- Description: Brief description of the script\n- Methods: Statistical/analytic methods included in the script\n- Dependencies: Any dependencies (packages/libraries) that the script relies on. This field is not needed if dependencies were described in the library element.\n- Instructions: Instructions for running the script. Information on the sequence in which the scripts must be run is critical.\n- Repository: Repository (e.g. GitHub repo) where the script has been published.\n- Notes: Any additional information on the script.\n- License: License, if any, under which the script is published.\n   * Name: Name (label) of the license\n   * URL: License URL\n",
-                                    "type": "nested_array",
-                                    "props": [
-                                        {
-                                            "key": "file_name",
-                                            "title": "File name",
-                                            "type": "text",
-                                            "prop_key": "project_desc.scripts.file_name"
-                                        },
-                                        {
-                                            "key": "zip_package",
-                                            "title": "Zip package",
-                                            "type": "text",
-                                            "prop_key": "project_desc.scripts.zip_package"
-                                        },
-                                        {
-                                            "key": "title",
-                                            "title": "Title",
-                                            "type": "text",
-                                            "prop_key": "project_desc.scripts.title"
-                                        },
-                                        {
-                                            "key": "authors",
-                                            "type": "array",
-                                            "title": "Authors",
-                                            "props": [
-                                                {
-                                                    "key": "name",
-                                                    "title": "Person or Organization name",
-                                                    "type": "string",
-                                                    "prop_key": "project_desc.scripts.authors.name"
-                                                },
-                                                {
-                                                    "key": "abbr",
-                                                    "title": "Abbreviation",
-                                                    "type": "string",
-                                                    "prop_key": "project_desc.scripts.authors.abbr"
-                                                },
-                                                {
-                                                    "key": "role",
-                                                    "title": "Role",
-                                                    "type": "string",
-                                                    "prop_key": "project_desc.scripts.authors.role"
-                                                }
-                                            ],
-                                            "prop_key": "project_desc.scripts.authors"
-                                        },
-                                        {
-                                            "key": "date",
-                                            "title": "Date",
-                                            "type": "string",
-                                            "prop_key": "project_desc.scripts.date"
-                                        },
-                                        {
-                                            "key": "format",
-                                            "title": "Format",
-                                            "type": "string",
-                                            "prop_key": "project_desc.scripts.format"
-                                        },
-                                        {
-                                            "key": "software",
-                                            "title": "Software",
-                                            "type": "string",
-                                            "prop_key": "project_desc.scripts.software"
-                                        },
-                                        {
-                                            "key": "description",
-                                            "title": "Description",
-                                            "type": "textarea",
-                                            "prop_key": "project_desc.scripts.description"
-                                        },
-                                        {
-                                            "key": "methods",
-                                            "title": "Methods",
-                                            "type": "textarea",
-                                            "prop_key": "project_desc.scripts.methods"
-                                        },
-                                        {
-                                            "key": "dependencies",
-                                            "title": "Dependencies",
-                                            "type": "textarea",
-                                            "prop_key": "project_desc.scripts.dependencies"
-                                        },
-                                        {
-                                            "key": "instructions",
-                                            "title": "Instructions",
-                                            "type": "textarea",
-                                            "prop_key": "project_desc.scripts.instructions"
-                                        },
-                                        {
-                                            "key": "source_code_repo",
-                                            "title": "Source code repository",
-                                            "type": "string",
-                                            "prop_key": "project_desc.scripts.source_code_repo"
-                                        },
-                                        {
-                                            "key": "notes",
-                                            "title": "Notes",
-                                            "type": "string",
-                                            "prop_key": "project_desc.scripts.notes"
-                                        },
-                                        {
-                                            "key": "license",
-                                            "title": "License",
-                                            "type": "array",
-                                            "props": [
-                                                {
-                                                    "key": "name",
-                                                    "title": "Name",
-                                                    "type": "text",
-                                                    "prop_key": "project_desc.scripts.license.name"
-                                                },
-                                                {
-                                                    "key": "uri",
-                                                    "title": "URI",
-                                                    "type": "text",
-                                                    "prop_key": "project_desc.scripts.license.uri"
-                                                }
-                                            ],
-                                            "prop_key": "project_desc.scripts.license"
-                                        }
-                                    ]
-                                }
-                            ]
-                        },
-                        {
-                            "key": "project_desc.data_statement",
-                            "title": "Data statement",
-                            "help_text": "An overall statement on the data used in the project. A separate field is provided to list and document the origin and key characteristics of the datasets.",
-                            "type": "textarea"
-                        },
-                        {
-                            "key": "project_desc.datasets",
-                            "title": "Datasets",
-                            "help_text": "This field is used to provide an itemized list of datasets used in the project. The data are not documented here (specific metadata are available for documenting data of different types, like the DDI for microdata, the ISO 19139 for geographic datasets, etc.)\n\n- Dataset name: The dataset name (title).\n- Dataset ID: The unique identifier of the dataset. If the dataset has multiple identifiers including a DOI, the DOI should be used here.\n- Note: A brief description of the dataset.\n- Access policy: The access policy applied to the dataset.\n- License: The access or data use license that applies to the dataset.\n- License URL: The URL of a web page where more information on the license can be obtained.\n- Data URL: The URI where the dataset (or a detailed description of it) can be obtained. This can be a link to a data catalog.",
-                            "type": "nested_array",
-                            "props": [
-                                {
-                                    "key": "name",
-                                    "title": "Name",
-                                    "type": "text",
-                                    "prop_key": "project_desc.datasets.name",
-                                    "help_text": "The dataset name (title)."
-                                },
-                                {
-                                    "key": "idno",
-                                    "title": "Dataset ID",
-                                    "type": "text",
-                                    "prop_key": "project_desc.datasets.idno",
-                                    "help_text": "The unique identifier of the dataset. If the dataset has multiple identifiers including a DOI, the DOI should be used here."
-                                },
-                                {
-                                    "key": "note",
-                                    "title": "Note",
-                                    "type": "text",
-                                    "prop_key": "project_desc.datasets.note",
-                                    "help_text": "A brief description of the dataset."
-                                },
-                                {
-                                    "key": "access_type",
-                                    "title": "Access policy",
-                                    "type": "text",
-                                    "prop_key": "project_desc.datasets.access_type",
-                                    "help_text": "The access policy applied to the dataset."
-                                },
-                                {
-                                    "key": "license",
-                                    "title": "License",
-                                    "type": "text",
-                                    "prop_key": "project_desc.datasets.license",
-                                    "help_text": "The access or data use license that applies to the dataset."
-                                },
-                                {
-                                    "key": "license_uri",
-                                    "title": "License URL",
-                                    "type": "text",
-                                    "prop_key": "project_desc.datasets.license_uri",
-                                    "help_text": "The URL of a web page where more information on the license can be obtained."
-                                },
-                                {
-                                    "key": "uri",
-                                    "type": "text",
-                                    "title": "Data URL",
-                                    "prop_key": "project_desc.datasets.uri",
-                                    "help_text": "The URL where the dataset (or a detailed description of it) can be obtained. This can be a link to a data catalog."
-                                }
-                            ]
-                        },
+                            "type": "string",
+                            "help_text": "Information on the copyright, if any, that applies to the research project metadata.",
+                            "display_type": "text"
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "type": "section",
+                    "key": "project_desc_others",
+                    "title": "Contacts",
+                    "class": "recommended",
+                    "items": [
                         {
                             "key": "project_desc.contacts",
                             "title": "Contacts",
@@ -1241,45 +1496,81 @@
                                     "title": "Name",
                                     "type": "string",
                                     "prop_key": "project_desc.contacts.name",
-                                    "help_text": "The name of the contact person that should be contacted depending on the role defined below."
+                                    "help_text": "The name of the contact person that should be contacted depending on the role defined below.",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "role",
                                     "title": "Role",
                                     "type": "string",
                                     "prop_key": "project_desc.contacts.role",
-                                    "help_text": "Role of the contact person. A research project may have contact persons depending on the output or some of the technical input. Some complex projects may have various data collection processes that have different processing channels and contacts. This section should provide for a key primary public interface that can refer the public inquiry or provide a collection of entry points."
+                                    "help_text": "Role of the contact person. A research project may have contact persons depending on the output or some of the technical input. Some complex projects may have various data collection processes that have different processing channels and contacts. This section should provide for a key primary public interface that can refer the public inquiry or provide a collection of entry points.",
+                                    "display_type": "textarea"
                                 },
                                 {
                                     "key": "affiliation",
                                     "title": "Affiliation",
                                     "type": "string",
                                     "prop_key": "project_desc.contacts.affiliation",
-                                    "help_text": "The organization or affiliation of the contact person. This is usually the organization that the contact person represents."
+                                    "help_text": "The organization or affiliation of the contact person. This is usually the organization that the contact person represents.",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "email",
                                     "title": "Email",
                                     "type": "string",
                                     "prop_key": "project_desc.contacts.email",
-                                    "help_text": "Email address of the responsible person, institution, or division in charge of the research project or output."
+                                    "help_text": "Email address of the responsible person, institution, or division in charge of the research project or output.",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "telephone",
                                     "title": "Phone",
                                     "type": "string",
                                     "prop_key": "project_desc.contacts.telephone",
-                                    "help_text": "Phone number of the responsible person, institution, or division in charge of the research project or output."
+                                    "help_text": "Phone number of the responsible person, institution, or division in charge of the research project or output.",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "uri",
                                     "title": "URL",
                                     "type": "string",
                                     "prop_key": "project_desc.contacts.uri",
-                                    "help_text": "URL of the agency or organization of the contact organization. This may be the same as the web page of the project or may be a permanent contact name at an institutional level and not project related. Eventually a project web site may be removed but there may still be need to have a contact. In this case, it is recommended to have a contact that is permanent."
+                                    "help_text": "URL of the agency or organization of the contact organization. This may be the same as the web page of the project or may be a permanent contact name at an institutional level and not project related. Eventually a project web site may be removed but there may still be need to have a contact. In this case, it is recommended to have a contact that is permanent.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
                                 }
                             ],
-                            "help_text": "The contacts element provides the public interface for questions associated with the research project. There could be various contacts provided depending upon the organization. It is important to assure that the proper contacts are provided to channel public inquiry.\n\n- Name: The name of the contact person that should be contacted depending on the role defined below.\n- Role: Role of the contact person. A research project may have contact persons depending on the output or some of the technical input. Some complex projects may have various data collection processes that have different processing channels and contacts. This section should provide for a key primary public interface that can refer the public inquiry or provide a collection of entry points.\n- Affiliation: The organization or affiliation of the contact person. This is usually the organization that the contact person represents.\n- Email: Email address of the responsible person, institution, or division in charge of the research project or output.\n- Phone: Phone number of the responsible person, institution, or division in charge of the research project or output.\n- URL: URL of the agency or organization of the contact organization. This may be the same as the web page of the project or may be a permanent contact name at an institutional level and not project related. Eventually a project web site may be removed but there may still be need to have a contact. In this case, it is recommended to have a contact that is permanent."
+                            "help_text": "The contacts element provides the public interface for questions associated with the research project. There could be various contacts provided depending upon the organization. It is important to assure that the proper contacts are provided to channel public inquiry."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "id": "tags",
+            "key": "tags_container",
+            "title": "Tags",
+            "items": [
+                {
+                    "key": "tags",
+                    "title": "Tags",
+                    "type": "array",
+                    "props": [
+                        {
+                            "key": "tag_group",
+                            "title": "Tag group",
+                            "type": "text",
+                            "prop_key": "tags.tag_group"
+                        },
+                        {
+                            "key": "tag",
+                            "title": "Tag",
+                            "type": "text",
+                            "prop_key": "tags.tag"
                         }
                     ]
                 }
