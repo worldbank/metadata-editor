@@ -568,6 +568,27 @@
                             ]
                         },
                         {
+                            "key": "database_description.dimensions",
+                            "title": "Dimensions",
+                            "help_text": "Dimensions",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "text",
+                                    "help_text": "name",
+                                    "prop_key": "database_description.dimensions.name"
+                                },
+                                {
+                                    "key": "label",
+                                    "title": "Label",
+                                    "type": "text",
+                                    "prop_key": "database_description.dimensions.label"
+                                }
+                            ]
+                        },
+                        {
                             "key": "database_description.acknowledgments",
                             "title": "Acknowledgements",
                             "type": "array",
