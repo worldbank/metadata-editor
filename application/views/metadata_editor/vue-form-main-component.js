@@ -187,7 +187,7 @@ Vue.component('form-main', {
             </div>    
         </div>
 
-        <div v-if="activeFormFieldDisplayType()=='dropdown'">
+        <div v-if="activeFormFieldDisplayType()=='dropdown' || activeFormFieldDisplayType()=='dropdown-custom'">
 
             <div class="form-group form-field" :class="['field-' + formField.key, formField.class] ">
                 <label :for="'field-' + normalizeClassID(formField.key)">{{formField.title}}</label>
@@ -195,12 +195,16 @@ Vue.component('form-main', {
                 <v-combobox
                     v-model="formData[formField.key]"
                     :items="formField.enum"
+                    item-text="label"
+                    item-value="code"
+                    :return-object="false"
                     label=""                
                     outlined
                     dense
                     clearable
                     background-color="#FFFFFF"
                 ></v-combobox>
+                
 
                 <?php /*
                 <select 

@@ -80,7 +80,7 @@
                             "title": "Production date",
                             "help_text": "The date the metadata on this project was produced (not distributed or archived), preferably entered in ISO 8601 format (YYYY-MM-DD or YYY-MM). A validation rule can be set in user templates to enforce a date format. This is a \"Recommended\" element, as information on the producer and on the date of metadata production is useful for catalog administration purposes.",
                             "is_recommended": true,
-                            "display_type": "date"
+                            "display_type": "text"
                         },
                         {
                             "key": "doc_desc.version",
@@ -165,6 +165,17 @@
                             "title": "Translated title",
                             "type": "string",
                             "help_text": "A translated version of the title (this will be used for example when a catalog documents all entries in English, but wants to preserve the title of a project in its original language when the original language is not English). Special characters should be properly displayed, such as accents and other stress marks or different alphabets.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "project_desc.project_website",
+                            "title": "Project website",
+                            "help_text": "URL of the project website.",
+                            "type": "simple_array",
+                            "enum": [],
+                            "rules": {
+                                "is_uri": true
+                            },
                             "display_type": "text"
                         }
                     ]
@@ -455,10 +466,12 @@
                     "items": [
                         {
                             "key": "project_desc.production_date",
-                            "title": "Date of production",
+                            "title": "Project completion date",
                             "help_text": "The date, preferably entered in ISO 8601 format (YYYY-MM-DD), when the project was completed (this refers to the version that is being documented and released.)",
-                            "type": "simple_array",
-                            "enum": []
+                            "type": "string",
+                            "enum": [],
+                            "display_type": "text",
+                            "is_recommended": true
                         },
                         {
                             "key": "project_desc.version_statement.version",
@@ -1014,14 +1027,15 @@
                                     "type": "string",
                                     "prop_key": "project_desc.errata.date",
                                     "help_text": "The date, preferably entered in ISO 8601 format (YYYY-MM-DD), when the erratum was released.",
-                                    "display_type": "textarea"
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "description",
                                     "title": "Description",
-                                    "type": "textarea",
+                                    "type": "string",
                                     "prop_key": "project_desc.errata.description",
-                                    "help_text": "Description of the error(s) and measures taken to address it/them."
+                                    "help_text": "Description of the error(s) and measures taken to address it/them.",
+                                    "display_type": "textarea"
                                 }
                             ]
                         }
@@ -1170,7 +1184,8 @@
                                     "help_text": "A list of libraries/packages required to run the scripts. Note that the specific version of each package is not documented here; it is expected to be found in the script or in the reproduction instructions.",
                                     "type": "simple_array",
                                     "prop_key": "project_desc.software.library",
-                                    "enum": []
+                                    "enum": [],
+                                    "display_type": "text"
                                 }
                             ]
                         },
@@ -1308,7 +1323,7 @@
                                     "prop_key": "project_desc.scripts.notes",
                                     "help_text": "Any additional information on the script.",
                                     "enum": [],
-                                    "display_type": "text"
+                                    "display_type": "textarea"
                                 },
                                 {
                                     "key": "license",
@@ -1412,16 +1427,6 @@
                     "title": "Access and rights",
                     "type": "section",
                     "items": [
-                        {
-                            "key": "project_desc.project_website",
-                            "title": "Project website",
-                            "help_text": "URL of the project website.",
-                            "type": "array_simple",
-                            "enum": [],
-                            "rules": {
-                                "is_uri": true
-                            }
-                        },
                         {
                             "key": "project_desc.disclaimer",
                             "type": "string",
@@ -1561,18 +1566,23 @@
                     "type": "array",
                     "props": [
                         {
-                            "key": "tag_group",
-                            "title": "Tag group",
-                            "type": "text",
-                            "prop_key": "tags.tag_group"
-                        },
-                        {
                             "key": "tag",
                             "title": "Tag",
-                            "type": "text",
-                            "prop_key": "tags.tag"
+                            "type": "string",
+                            "prop_key": "tags.tag",
+                            "help_text": "A user-defined tag.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "tag_group",
+                            "title": "Tag group",
+                            "type": "string",
+                            "prop_key": "tags.tag_group",
+                            "display_type": "text",
+                            "help_text": "The name of a tag group. "
                         }
-                    ]
+                    ],
+                    "help_text": "Tags, especially when organized in tag groups, provide a powerful and flexible solution to enable custom facets (filters) in data catalogs. "
                 }
             ]
         }

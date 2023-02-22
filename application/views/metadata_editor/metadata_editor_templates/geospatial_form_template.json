@@ -63,7 +63,89 @@
                                     "title": "Role",
                                     "prop_key": "metadata_information.producers.role",
                                     "help_text": "The specific role of the person or organization mentioned in \"Name\" in the production of the DDI metadata.",
-                                    "display_type": "textarea"
+                                    "display_type": "dropdown-custom",
+                                    "enum": [
+                                        {
+                                            "code": "resourceProvider",
+                                            "label": "Resource provider"
+                                        },
+                                        {
+                                            "code": "custodian",
+                                            "label": "Custodian"
+                                        },
+                                        {
+                                            "code": "owner",
+                                            "label": "Owner"
+                                        },
+                                        {
+                                            "code": "sponsor",
+                                            "label": "Sponsor"
+                                        },
+                                        {
+                                            "code": "user",
+                                            "label": "User"
+                                        },
+                                        {
+                                            "code": "distributor",
+                                            "label": "Distributor"
+                                        },
+                                        {
+                                            "code": "originator",
+                                            "label": "Originator"
+                                        },
+                                        {
+                                            "code": "pointOfContact",
+                                            "label": "Point of contact"
+                                        },
+                                        {
+                                            "code": "principalInvestigator",
+                                            "label": "Principal investigator"
+                                        },
+                                        {
+                                            "code": "processor",
+                                            "label": "Processor"
+                                        },
+                                        {
+                                            "code": "publisher",
+                                            "label": "Publisher"
+                                        },
+                                        {
+                                            "code": "author",
+                                            "label": "Author"
+                                        },
+                                        {
+                                            "code": "coAuthor",
+                                            "label": "Co-author"
+                                        },
+                                        {
+                                            "code": "collaborator",
+                                            "label": "Collaborator"
+                                        },
+                                        {
+                                            "code": "editor",
+                                            "label": "Editor"
+                                        },
+                                        {
+                                            "code": "mediator",
+                                            "label": "Mediator"
+                                        },
+                                        {
+                                            "code": "rightsHolder",
+                                            "label": "Rights holder"
+                                        },
+                                        {
+                                            "code": "contributor",
+                                            "label": "Contributor"
+                                        },
+                                        {
+                                            "code": "funder",
+                                            "label": "Funder"
+                                        },
+                                        {
+                                            "code": "stakeholder",
+                                            "label": "Stakeholder"
+                                        }
+                                    ]
                                 }
                             ],
                             "help_text": "The metadata producer is the person or organization with the financial and/or administrative responsibility for the processes whereby the metadata document was created. This is a \"Recommended\" element. For catalog administration purposes, information on the producer and on the date of metadata production is useful. ",
@@ -716,7 +798,89 @@
                                             "title": "Role",
                                             "type": "string",
                                             "prop_key": "description.identificationInfo.citation.citedResponsibleParty.role",
-                                            "display_type": "text"
+                                            "display_type": "dropdown-custom",
+                                            "enum": [
+                                                {
+                                                    "code": "resourceProvider",
+                                                    "label": "Resource provider"
+                                                },
+                                                {
+                                                    "code": "custodian",
+                                                    "label": "Custodian"
+                                                },
+                                                {
+                                                    "code": "owner",
+                                                    "label": "Owner"
+                                                },
+                                                {
+                                                    "code": "sponsor",
+                                                    "label": "Sponsor"
+                                                },
+                                                {
+                                                    "code": "user",
+                                                    "label": "User"
+                                                },
+                                                {
+                                                    "code": "distributor",
+                                                    "label": "Distributor"
+                                                },
+                                                {
+                                                    "code": "originator",
+                                                    "label": "Originator"
+                                                },
+                                                {
+                                                    "code": "pointOfContact",
+                                                    "label": "Point of contact"
+                                                },
+                                                {
+                                                    "code": "principalInvestigator",
+                                                    "label": "Principal investigator"
+                                                },
+                                                {
+                                                    "code": "processor",
+                                                    "label": "Processor"
+                                                },
+                                                {
+                                                    "code": "publisher",
+                                                    "label": "Publisher"
+                                                },
+                                                {
+                                                    "code": "author",
+                                                    "label": "Author"
+                                                },
+                                                {
+                                                    "code": "coAuthor",
+                                                    "label": "Co-author"
+                                                },
+                                                {
+                                                    "code": "collaborator",
+                                                    "label": "Collaborator"
+                                                },
+                                                {
+                                                    "code": "editor",
+                                                    "label": "Editor"
+                                                },
+                                                {
+                                                    "code": "mediator",
+                                                    "label": "Mediator"
+                                                },
+                                                {
+                                                    "code": "rightsHolder",
+                                                    "label": "Rights holder"
+                                                },
+                                                {
+                                                    "code": "contributor",
+                                                    "label": "Contributor"
+                                                },
+                                                {
+                                                    "code": "funder",
+                                                    "label": "Funder"
+                                                },
+                                                {
+                                                    "code": "stakeholder",
+                                                    "label": "Stakeholder"
+                                                }
+                                            ]
                                         },
                                         {
                                             "key": "contactInfo.address.electronicMailAddress",
@@ -1127,8 +1291,90 @@
                                             "title": "Role",
                                             "type": "string",
                                             "prop_key": "description.identificationInfo.pointOfContact.role",
-                                            "display_type": "text",
-                                            "help_text": "Function performed by the responsible party. Select all roles that best represent the function performed by the responsible party. "
+                                            "display_type": "dropdown-custom",
+                                            "help_text": "Function performed by the responsible party. Select all roles that best represent the function performed by the responsible party. ",
+                                            "enum": [
+                                                {
+                                                    "code": "resourceProvider",
+                                                    "label": "Resource provider"
+                                                },
+                                                {
+                                                    "code": "custodian",
+                                                    "label": "Custodian"
+                                                },
+                                                {
+                                                    "code": "owner",
+                                                    "label": "Owner"
+                                                },
+                                                {
+                                                    "code": "sponsor",
+                                                    "label": "Sponsor"
+                                                },
+                                                {
+                                                    "code": "user",
+                                                    "label": "User"
+                                                },
+                                                {
+                                                    "code": "distributor",
+                                                    "label": "Distributor"
+                                                },
+                                                {
+                                                    "code": "originator",
+                                                    "label": "Originator"
+                                                },
+                                                {
+                                                    "code": "pointOfContact",
+                                                    "label": "Point of contact"
+                                                },
+                                                {
+                                                    "code": "principalInvestigator",
+                                                    "label": "Principal investigator"
+                                                },
+                                                {
+                                                    "code": "processor",
+                                                    "label": "Processor"
+                                                },
+                                                {
+                                                    "code": "publisher",
+                                                    "label": "Publisher"
+                                                },
+                                                {
+                                                    "code": "author",
+                                                    "label": "Author"
+                                                },
+                                                {
+                                                    "code": "coAuthor",
+                                                    "label": "Co-author"
+                                                },
+                                                {
+                                                    "code": "collaborator",
+                                                    "label": "Collaborator"
+                                                },
+                                                {
+                                                    "code": "editor",
+                                                    "label": "Editor"
+                                                },
+                                                {
+                                                    "code": "mediator",
+                                                    "label": "Mediator"
+                                                },
+                                                {
+                                                    "code": "rightsHolder",
+                                                    "label": "Rights holder"
+                                                },
+                                                {
+                                                    "code": "contributor",
+                                                    "label": "Contributor"
+                                                },
+                                                {
+                                                    "code": "funder",
+                                                    "label": "Funder"
+                                                },
+                                                {
+                                                    "code": "stakeholder",
+                                                    "label": "Stakeholder"
+                                                }
+                                            ]
                                         },
                                         {
                                             "key": "contactInfo.phone.voice",
@@ -1476,7 +1722,8 @@
                                                     "type": "simple_array",
                                                     "title": "Use limitation",
                                                     "prop_key": "description.identificationInfo.resourceConstraints.section-1676478956897.legalConstraints.useLimitation",
-                                                    "enum": []
+                                                    "enum": [],
+                                                    "display_type": "textarea"
                                                 },
                                                 {
                                                     "key": "legalConstraints.accessConstraints",
@@ -1562,7 +1809,8 @@
                                                     "title": "Use constraints",
                                                     "prop_key": "description.identificationInfo.resourceConstraints.section-1676478956897.legalConstraints.useConstraints",
                                                     "enum": [],
-                                                    "help_text": "Use constraints. To be entered as free text. Filling this element will depend on the resource that is described. As best practice recommended to fill this element, this is where terms of use, disclaimers, preferred citation or* even data limitations can be captured"
+                                                    "help_text": "Use constraints. To be entered as free text. Filling this element will depend on the resource that is described. As best practice recommended to fill this element, this is where terms of use, disclaimers, preferred citation or* even data limitations can be captured",
+                                                    "display_type": "textarea"
                                                 },
                                                 {
                                                     "key": "legalConstraints.otherConstraints",
@@ -1570,7 +1818,8 @@
                                                     "title": "Other constraints",
                                                     "prop_key": "description.identificationInfo.resourceConstraints.section-1676478956897.legalConstraints.otherConstraints",
                                                     "enum": [],
-                                                    "help_text": "Any other legal restrictions and legal prerequisites for accessing and using the resource or metadata."
+                                                    "help_text": "Any other legal restrictions and legal prerequisites for accessing and using the resource or metadata.",
+                                                    "display_type": "textarea"
                                                 }
                                             ],
                                             "help_text": ""
@@ -1587,7 +1836,8 @@
                                                     "title": "Use limitation",
                                                     "prop_key": "description.identificationInfo.resourceConstraints.section-1676478978376.securityConstraints.useLimitation",
                                                     "enum": [],
-                                                    "help_text": "Restrictions on the access and use of a resource or metadata.\n- If no conditions apply to the access and use of the resource, ‘no conditions apply’ shall be used. If conditions are unknown, ‘conditions unknown’ shall be used.\n- Descriptions of terms and conditions, including where applicable, the corresponding fees shall be provided through this element or a link (URL) where these terms and conditions are described.\n- For detailed information it is recommended to provide a link to a license type (e.g. http://creativecommons.org/licenses/by/3.0), a website or to a document  containing the necessary information.\n"
+                                                    "help_text": "Restrictions on the access and use of a resource or metadata.\n- If no conditions apply to the access and use of the resource, ‘no conditions apply’ shall be used. If conditions are unknown, ‘conditions unknown’ shall be used.\n- Descriptions of terms and conditions, including where applicable, the corresponding fees shall be provided through this element or a link (URL) where these terms and conditions are described.\n- For detailed information it is recommended to provide a link to a license type (e.g. http://creativecommons.org/licenses/by/3.0), a website or to a document  containing the necessary information.\n",
+                                                    "display_type": "textarea"
                                                 },
                                                 {
                                                     "key": "securityConstraints.classification",
@@ -1731,7 +1981,89 @@
                                                     "title": "Role",
                                                     "type": "string",
                                                     "prop_key": "description.identificationInfo.resourceSpecificUsage.userContactInfo.role",
-                                                    "display_type": "text"
+                                                    "display_type": "dropdown-custom",
+                                                    "enum": [
+                                                        {
+                                                            "code": "resourceProvider",
+                                                            "label": "Resource provider"
+                                                        },
+                                                        {
+                                                            "code": "custodian",
+                                                            "label": "Custodian"
+                                                        },
+                                                        {
+                                                            "code": "owner",
+                                                            "label": "Owner"
+                                                        },
+                                                        {
+                                                            "code": "sponsor",
+                                                            "label": "Sponsor"
+                                                        },
+                                                        {
+                                                            "code": "user",
+                                                            "label": "User"
+                                                        },
+                                                        {
+                                                            "code": "distributor",
+                                                            "label": "Distributor"
+                                                        },
+                                                        {
+                                                            "code": "originator",
+                                                            "label": "Originator"
+                                                        },
+                                                        {
+                                                            "code": "pointOfContact",
+                                                            "label": "Point of contact"
+                                                        },
+                                                        {
+                                                            "code": "principalInvestigator",
+                                                            "label": "Principal investigator"
+                                                        },
+                                                        {
+                                                            "code": "processor",
+                                                            "label": "Processor"
+                                                        },
+                                                        {
+                                                            "code": "publisher",
+                                                            "label": "Publisher"
+                                                        },
+                                                        {
+                                                            "code": "author",
+                                                            "label": "Author"
+                                                        },
+                                                        {
+                                                            "code": "coAuthor",
+                                                            "label": "Co-author"
+                                                        },
+                                                        {
+                                                            "code": "collaborator",
+                                                            "label": "Collaborator"
+                                                        },
+                                                        {
+                                                            "code": "editor",
+                                                            "label": "Editor"
+                                                        },
+                                                        {
+                                                            "code": "mediator",
+                                                            "label": "Mediator"
+                                                        },
+                                                        {
+                                                            "code": "rightsHolder",
+                                                            "label": "Rights holder"
+                                                        },
+                                                        {
+                                                            "code": "contributor",
+                                                            "label": "Contributor"
+                                                        },
+                                                        {
+                                                            "code": "funder",
+                                                            "label": "Funder"
+                                                        },
+                                                        {
+                                                            "code": "stakeholder",
+                                                            "label": "Stakeholder"
+                                                        }
+                                                    ]
                                                 },
                                                 {
                                                     "key": "contactInfo.address.electronicMailAddress",
@@ -2264,7 +2596,89 @@
                                                     "title": "Role",
                                                     "type": "string",
                                                     "prop_key": "description.identificationInfo.resourceFormat.formatDistributor.formatDistributor.role",
-                                                    "display_type": "text"
+                                                    "display_type": "dropdown-custom",
+                                                    "enum": [
+                                                        {
+                                                            "code": "resourceProvider",
+                                                            "label": "Resource provider"
+                                                        },
+                                                        {
+                                                            "code": "custodian",
+                                                            "label": "Custodian"
+                                                        },
+                                                        {
+                                                            "code": "owner",
+                                                            "label": "Owner"
+                                                        },
+                                                        {
+                                                            "code": "sponsor",
+                                                            "label": "Sponsor"
+                                                        },
+                                                        {
+                                                            "code": "user",
+                                                            "label": "User"
+                                                        },
+                                                        {
+                                                            "code": "distributor",
+                                                            "label": "Distributor"
+                                                        },
+                                                        {
+                                                            "code": "originator",
+                                                            "label": "Originator"
+                                                        },
+                                                        {
+                                                            "code": "pointOfContact",
+                                                            "label": "Point of contact"
+                                                        },
+                                                        {
+                                                            "code": "principalInvestigator",
+                                                            "label": "Principal investigator"
+                                                        },
+                                                        {
+                                                            "code": "processor",
+                                                            "label": "Processor"
+                                                        },
+                                                        {
+                                                            "code": "publisher",
+                                                            "label": "Publisher"
+                                                        },
+                                                        {
+                                                            "code": "author",
+                                                            "label": "Author"
+                                                        },
+                                                        {
+                                                            "code": "coAuthor",
+                                                            "label": "Co-author"
+                                                        },
+                                                        {
+                                                            "code": "collaborator",
+                                                            "label": "Collaborator"
+                                                        },
+                                                        {
+                                                            "code": "editor",
+                                                            "label": "Editor"
+                                                        },
+                                                        {
+                                                            "code": "mediator",
+                                                            "label": "Mediator"
+                                                        },
+                                                        {
+                                                            "code": "rightsHolder",
+                                                            "label": "Rights holder"
+                                                        },
+                                                        {
+                                                            "code": "contributor",
+                                                            "label": "Contributor"
+                                                        },
+                                                        {
+                                                            "code": "funder",
+                                                            "label": "Funder"
+                                                        },
+                                                        {
+                                                            "code": "stakeholder",
+                                                            "label": "Stakeholder"
+                                                        }
+                                                    ]
                                                 },
                                                 {
                                                     "key": "formatDistributor.contactInfo.address.electronicMailAddress",
@@ -2493,7 +2907,8 @@
                                                     "type": "simple_array",
                                                     "title": "Use limitation",
                                                     "prop_key": "description.identificationInfo.serviceIdentification.restrictions.legalConstraints.useLimitation",
-                                                    "enum": []
+                                                    "enum": [],
+                                                    "display_type": "textarea"
                                                 },
                                                 {
                                                     "key": "accessConstraints",
@@ -3344,7 +3759,89 @@
                                                     "title": "Role",
                                                     "type": "string",
                                                     "prop_key": "description.contentInfo.featureCatalogueDescription.featureCatalogueCitation.featureCatalogueDescription.featureCatalogueCitation.citedResponsibleParty.role",
-                                                    "display_type": "text"
+                                                    "display_type": "dropdown-custom",
+                                                    "enum": [
+                                                        {
+                                                            "code": "resourceProvider",
+                                                            "label": "Resource provider"
+                                                        },
+                                                        {
+                                                            "code": "custodian",
+                                                            "label": "Custodian"
+                                                        },
+                                                        {
+                                                            "code": "owner",
+                                                            "label": "Owner"
+                                                        },
+                                                        {
+                                                            "code": "sponsor",
+                                                            "label": "Sponsor"
+                                                        },
+                                                        {
+                                                            "code": "user",
+                                                            "label": "User"
+                                                        },
+                                                        {
+                                                            "code": "distributor",
+                                                            "label": "Distributor"
+                                                        },
+                                                        {
+                                                            "code": "originator",
+                                                            "label": "Originator"
+                                                        },
+                                                        {
+                                                            "code": "pointOfContact",
+                                                            "label": "Point of contact"
+                                                        },
+                                                        {
+                                                            "code": "principalInvestigator",
+                                                            "label": "Principal investigator"
+                                                        },
+                                                        {
+                                                            "code": "processor",
+                                                            "label": "Processor"
+                                                        },
+                                                        {
+                                                            "code": "publisher",
+                                                            "label": "Publisher"
+                                                        },
+                                                        {
+                                                            "code": "author",
+                                                            "label": "Author"
+                                                        },
+                                                        {
+                                                            "code": "coAuthor",
+                                                            "label": "Co-author"
+                                                        },
+                                                        {
+                                                            "code": "collaborator",
+                                                            "label": "Collaborator"
+                                                        },
+                                                        {
+                                                            "code": "editor",
+                                                            "label": "Editor"
+                                                        },
+                                                        {
+                                                            "code": "mediator",
+                                                            "label": "Mediator"
+                                                        },
+                                                        {
+                                                            "code": "rightsHolder",
+                                                            "label": "Rights holder"
+                                                        },
+                                                        {
+                                                            "code": "contributor",
+                                                            "label": "Contributor"
+                                                        },
+                                                        {
+                                                            "code": "funder",
+                                                            "label": "Funder"
+                                                        },
+                                                        {
+                                                            "code": "stakeholder",
+                                                            "label": "Stakeholder"
+                                                        }
+                                                    ]
                                                 },
                                                 {
                                                     "key": "contactInfo.address.electronicMailAddress",
@@ -3748,7 +4245,89 @@
                                             "title": "Role",
                                             "type": "string",
                                             "prop_key": "description.distributionInfo.distributionFormat.formatDistributor.formatDistributor.role",
-                                            "display_type": "textarea"
+                                            "display_type": "dropdown-custom",
+                                            "enum": [
+                                                {
+                                                    "code": "resourceProvider",
+                                                    "label": "Resource provider"
+                                                },
+                                                {
+                                                    "code": "custodian",
+                                                    "label": "Custodian"
+                                                },
+                                                {
+                                                    "code": "owner",
+                                                    "label": "Owner"
+                                                },
+                                                {
+                                                    "code": "sponsor",
+                                                    "label": "Sponsor"
+                                                },
+                                                {
+                                                    "code": "user",
+                                                    "label": "User"
+                                                },
+                                                {
+                                                    "code": "distributor",
+                                                    "label": "Distributor"
+                                                },
+                                                {
+                                                    "code": "originator",
+                                                    "label": "Originator"
+                                                },
+                                                {
+                                                    "code": "pointOfContact",
+                                                    "label": "Point of contact"
+                                                },
+                                                {
+                                                    "code": "principalInvestigator",
+                                                    "label": "Principal investigator"
+                                                },
+                                                {
+                                                    "code": "processor",
+                                                    "label": "Processor"
+                                                },
+                                                {
+                                                    "code": "publisher",
+                                                    "label": "Publisher"
+                                                },
+                                                {
+                                                    "code": "author",
+                                                    "label": "Author"
+                                                },
+                                                {
+                                                    "code": "coAuthor",
+                                                    "label": "Co-author"
+                                                },
+                                                {
+                                                    "code": "collaborator",
+                                                    "label": "Collaborator"
+                                                },
+                                                {
+                                                    "code": "editor",
+                                                    "label": "Editor"
+                                                },
+                                                {
+                                                    "code": "mediator",
+                                                    "label": "Mediator"
+                                                },
+                                                {
+                                                    "code": "rightsHolder",
+                                                    "label": "Rights holder"
+                                                },
+                                                {
+                                                    "code": "contributor",
+                                                    "label": "Contributor"
+                                                },
+                                                {
+                                                    "code": "funder",
+                                                    "label": "Funder"
+                                                },
+                                                {
+                                                    "code": "stakeholder",
+                                                    "label": "Stakeholder"
+                                                }
+                                            ]
                                         },
                                         {
                                             "key": "section-1676484562938",
@@ -3871,7 +4450,89 @@
                                     "title": "Role",
                                     "type": "string",
                                     "prop_key": "description.distributionInfo.distributor.role",
-                                    "display_type": "text"
+                                    "display_type": "dropdown-custom",
+                                    "enum": [
+                                        {
+                                            "code": "resourceProvider",
+                                            "label": "Resource provider"
+                                        },
+                                        {
+                                            "code": "custodian",
+                                            "label": "Custodian"
+                                        },
+                                        {
+                                            "code": "owner",
+                                            "label": "Owner"
+                                        },
+                                        {
+                                            "code": "sponsor",
+                                            "label": "Sponsor"
+                                        },
+                                        {
+                                            "code": "user",
+                                            "label": "User"
+                                        },
+                                        {
+                                            "code": "distributor",
+                                            "label": "Distributor"
+                                        },
+                                        {
+                                            "code": "originator",
+                                            "label": "Originator"
+                                        },
+                                        {
+                                            "code": "pointOfContact",
+                                            "label": "Point of contact"
+                                        },
+                                        {
+                                            "code": "principalInvestigator",
+                                            "label": "Principal investigator"
+                                        },
+                                        {
+                                            "code": "processor",
+                                            "label": "Processor"
+                                        },
+                                        {
+                                            "code": "publisher",
+                                            "label": "Publisher"
+                                        },
+                                        {
+                                            "code": "author",
+                                            "label": "Author"
+                                        },
+                                        {
+                                            "code": "coAuthor",
+                                            "label": "Co-author"
+                                        },
+                                        {
+                                            "code": "collaborator",
+                                            "label": "Collaborator"
+                                        },
+                                        {
+                                            "code": "editor",
+                                            "label": "Editor"
+                                        },
+                                        {
+                                            "code": "mediator",
+                                            "label": "Mediator"
+                                        },
+                                        {
+                                            "code": "rightsHolder",
+                                            "label": "Rights holder"
+                                        },
+                                        {
+                                            "code": "contributor",
+                                            "label": "Contributor"
+                                        },
+                                        {
+                                            "code": "funder",
+                                            "label": "Funder"
+                                        },
+                                        {
+                                            "code": "stakeholder",
+                                            "label": "Stakeholder"
+                                        }
+                                    ]
                                 },
                                 {
                                     "key": "contactInfo.address.electronicMailAddress",
@@ -4110,7 +4771,8 @@
                                             "type": "simple_array",
                                             "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.nameOfMeasure",
                                             "enum": [],
-                                            "help_text": "One or more measure names used for the data quality report."
+                                            "help_text": "One or more measure names used for the data quality report.",
+                                            "display_type": "text"
                                         },
                                         {
                                             "key": "DQ_DomainConsistency.result.measureIdentification",
@@ -4147,7 +4809,8 @@
                                                     "code": "indirect"
                                                 }
                                             ],
-                                            "help_text": "Type of evaluation method. The ISO 19139 recommends the use of a controlled vocabulary with the following options: directInternal, directExternal, indirect."
+                                            "help_text": "Type of evaluation method. The ISO 19139 recommends the use of a controlled vocabulary with the following options: directInternal, directExternal, indirect.",
+                                            "display_type": "dropdown-custom"
                                         },
                                         {
                                             "key": "DQ_DomainConsistency.result.evaluationMethodDescription",
@@ -4268,7 +4931,89 @@
                                                             "title": "Role",
                                                             "type": "string",
                                                             "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.citedResponsibleParty.role",
-                                                            "display_type": "text"
+                                                            "display_type": "dropdown-custom",
+                                                            "enum": [
+                                                                {
+                                                                    "code": "resourceProvider",
+                                                                    "label": "Resource provider"
+                                                                },
+                                                                {
+                                                                    "code": "custodian",
+                                                                    "label": "Custodian"
+                                                                },
+                                                                {
+                                                                    "code": "owner",
+                                                                    "label": "Owner"
+                                                                },
+                                                                {
+                                                                    "code": "sponsor",
+                                                                    "label": "Sponsor"
+                                                                },
+                                                                {
+                                                                    "code": "user",
+                                                                    "label": "User"
+                                                                },
+                                                                {
+                                                                    "code": "distributor",
+                                                                    "label": "Distributor"
+                                                                },
+                                                                {
+                                                                    "code": "originator",
+                                                                    "label": "Originator"
+                                                                },
+                                                                {
+                                                                    "code": "pointOfContact",
+                                                                    "label": "Point of contact"
+                                                                },
+                                                                {
+                                                                    "code": "principalInvestigator",
+                                                                    "label": "Principal investigator"
+                                                                },
+                                                                {
+                                                                    "code": "processor",
+                                                                    "label": "Processor"
+                                                                },
+                                                                {
+                                                                    "code": "publisher",
+                                                                    "label": "Publisher"
+                                                                },
+                                                                {
+                                                                    "code": "author",
+                                                                    "label": "Author"
+                                                                },
+                                                                {
+                                                                    "code": "coAuthor",
+                                                                    "label": "Co-author"
+                                                                },
+                                                                {
+                                                                    "code": "collaborator",
+                                                                    "label": "Collaborator"
+                                                                },
+                                                                {
+                                                                    "code": "editor",
+                                                                    "label": "Editor"
+                                                                },
+                                                                {
+                                                                    "code": "mediator",
+                                                                    "label": "Mediator"
+                                                                },
+                                                                {
+                                                                    "code": "rightsHolder",
+                                                                    "label": "Rights holder"
+                                                                },
+                                                                {
+                                                                    "code": "contributor",
+                                                                    "label": "Contributor"
+                                                                },
+                                                                {
+                                                                    "code": "funder",
+                                                                    "label": "Funder"
+                                                                },
+                                                                {
+                                                                    "code": "stakeholder",
+                                                                    "label": "Stakeholder"
+                                                                }
+                                                            ]
                                                         },
                                                         {
                                                             "key": "contactInfo.address.electronicMailAddress",
@@ -4469,7 +5214,7 @@
                                                         }
                                                     ],
                                                     "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.presentationForm",
-                                                    "display_type": "text"
+                                                    "display_type": "dropdown-custom"
                                                 },
                                                 {
                                                     "key": "section-1676486975620",
@@ -4641,7 +5386,89 @@
                                                             "title": "Role",
                                                             "type": "string",
                                                             "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.citedResponsibleParty.role",
-                                                            "display_type": "textarea"
+                                                            "display_type": "dropdown-custom",
+                                                            "enum": [
+                                                                {
+                                                                    "code": "resourceProvider",
+                                                                    "label": "Resource provider"
+                                                                },
+                                                                {
+                                                                    "code": "custodian",
+                                                                    "label": "Custodian"
+                                                                },
+                                                                {
+                                                                    "code": "owner",
+                                                                    "label": "Owner"
+                                                                },
+                                                                {
+                                                                    "code": "sponsor",
+                                                                    "label": "Sponsor"
+                                                                },
+                                                                {
+                                                                    "code": "user",
+                                                                    "label": "User"
+                                                                },
+                                                                {
+                                                                    "code": "distributor",
+                                                                    "label": "Distributor"
+                                                                },
+                                                                {
+                                                                    "code": "originator",
+                                                                    "label": "Originator"
+                                                                },
+                                                                {
+                                                                    "code": "pointOfContact",
+                                                                    "label": "Point of contact"
+                                                                },
+                                                                {
+                                                                    "code": "principalInvestigator",
+                                                                    "label": "Principal investigator"
+                                                                },
+                                                                {
+                                                                    "code": "processor",
+                                                                    "label": "Processor"
+                                                                },
+                                                                {
+                                                                    "code": "publisher",
+                                                                    "label": "Publisher"
+                                                                },
+                                                                {
+                                                                    "code": "author",
+                                                                    "label": "Author"
+                                                                },
+                                                                {
+                                                                    "code": "coAuthor",
+                                                                    "label": "Co-author"
+                                                                },
+                                                                {
+                                                                    "code": "collaborator",
+                                                                    "label": "Collaborator"
+                                                                },
+                                                                {
+                                                                    "code": "editor",
+                                                                    "label": "Editor"
+                                                                },
+                                                                {
+                                                                    "code": "mediator",
+                                                                    "label": "Mediator"
+                                                                },
+                                                                {
+                                                                    "code": "rightsHolder",
+                                                                    "label": "Rights holder"
+                                                                },
+                                                                {
+                                                                    "code": "contributor",
+                                                                    "label": "Contributor"
+                                                                },
+                                                                {
+                                                                    "code": "funder",
+                                                                    "label": "Funder"
+                                                                },
+                                                                {
+                                                                    "code": "stakeholder",
+                                                                    "label": "Stakeholder"
+                                                                }
+                                                            ]
                                                         },
                                                         {
                                                             "key": "contactInfo.address.electronicMailAddress",
@@ -5008,7 +5835,89 @@
                                                             "title": "Role",
                                                             "type": "string",
                                                             "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.processor.role",
-                                                            "display_type": "textarea"
+                                                            "display_type": "dropdown-custom",
+                                                            "enum": [
+                                                                {
+                                                                    "code": "resourceProvider",
+                                                                    "label": "Resource provider"
+                                                                },
+                                                                {
+                                                                    "code": "custodian",
+                                                                    "label": "Custodian"
+                                                                },
+                                                                {
+                                                                    "code": "owner",
+                                                                    "label": "Owner"
+                                                                },
+                                                                {
+                                                                    "code": "sponsor",
+                                                                    "label": "Sponsor"
+                                                                },
+                                                                {
+                                                                    "code": "user",
+                                                                    "label": "User"
+                                                                },
+                                                                {
+                                                                    "code": "distributor",
+                                                                    "label": "Distributor"
+                                                                },
+                                                                {
+                                                                    "code": "originator",
+                                                                    "label": "Originator"
+                                                                },
+                                                                {
+                                                                    "code": "pointOfContact",
+                                                                    "label": "Point of contact"
+                                                                },
+                                                                {
+                                                                    "code": "principalInvestigator",
+                                                                    "label": "Principal investigator"
+                                                                },
+                                                                {
+                                                                    "code": "processor",
+                                                                    "label": "Processor"
+                                                                },
+                                                                {
+                                                                    "code": "publisher",
+                                                                    "label": "Publisher"
+                                                                },
+                                                                {
+                                                                    "code": "author",
+                                                                    "label": "Author"
+                                                                },
+                                                                {
+                                                                    "code": "coAuthor",
+                                                                    "label": "Co-author"
+                                                                },
+                                                                {
+                                                                    "code": "collaborator",
+                                                                    "label": "Collaborator"
+                                                                },
+                                                                {
+                                                                    "code": "editor",
+                                                                    "label": "Editor"
+                                                                },
+                                                                {
+                                                                    "code": "mediator",
+                                                                    "label": "Mediator"
+                                                                },
+                                                                {
+                                                                    "code": "rightsHolder",
+                                                                    "label": "Rights holder"
+                                                                },
+                                                                {
+                                                                    "code": "contributor",
+                                                                    "label": "Contributor"
+                                                                },
+                                                                {
+                                                                    "code": "funder",
+                                                                    "label": "Funder"
+                                                                },
+                                                                {
+                                                                    "code": "stakeholder",
+                                                                    "label": "Stakeholder"
+                                                                }
+                                                            ]
                                                         },
                                                         {
                                                             "key": "contactInfo.address.electronicMailAddress",
@@ -5227,7 +6136,89 @@
                                                                     "title": "Role",
                                                                     "type": "string",
                                                                     "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.source.sourceCitation.citedResponsibleParty.role",
-                                                                    "display_type": "text"
+                                                                    "display_type": "dropdown-custom",
+                                                                    "enum": [
+                                                                        {
+                                                                            "code": "resourceProvider",
+                                                                            "label": "Resource provider"
+                                                                        },
+                                                                        {
+                                                                            "code": "custodian",
+                                                                            "label": "Custodian"
+                                                                        },
+                                                                        {
+                                                                            "code": "owner",
+                                                                            "label": "Owner"
+                                                                        },
+                                                                        {
+                                                                            "code": "sponsor",
+                                                                            "label": "Sponsor"
+                                                                        },
+                                                                        {
+                                                                            "code": "user",
+                                                                            "label": "User"
+                                                                        },
+                                                                        {
+                                                                            "code": "distributor",
+                                                                            "label": "Distributor"
+                                                                        },
+                                                                        {
+                                                                            "code": "originator",
+                                                                            "label": "Originator"
+                                                                        },
+                                                                        {
+                                                                            "code": "pointOfContact",
+                                                                            "label": "Point of contact"
+                                                                        },
+                                                                        {
+                                                                            "code": "principalInvestigator",
+                                                                            "label": "Principal investigator"
+                                                                        },
+                                                                        {
+                                                                            "code": "processor",
+                                                                            "label": "Processor"
+                                                                        },
+                                                                        {
+                                                                            "code": "publisher",
+                                                                            "label": "Publisher"
+                                                                        },
+                                                                        {
+                                                                            "code": "author",
+                                                                            "label": "Author"
+                                                                        },
+                                                                        {
+                                                                            "code": "coAuthor",
+                                                                            "label": "Co-author"
+                                                                        },
+                                                                        {
+                                                                            "code": "collaborator",
+                                                                            "label": "Collaborator"
+                                                                        },
+                                                                        {
+                                                                            "code": "editor",
+                                                                            "label": "Editor"
+                                                                        },
+                                                                        {
+                                                                            "code": "mediator",
+                                                                            "label": "Mediator"
+                                                                        },
+                                                                        {
+                                                                            "code": "rightsHolder",
+                                                                            "label": "Rights holder"
+                                                                        },
+                                                                        {
+                                                                            "code": "contributor",
+                                                                            "label": "Contributor"
+                                                                        },
+                                                                        {
+                                                                            "code": "funder",
+                                                                            "label": "Funder"
+                                                                        },
+                                                                        {
+                                                                            "code": "stakeholder",
+                                                                            "label": "Stakeholder"
+                                                                        }
+                                                                    ]
                                                                 },
                                                                 {
                                                                     "key": "contactInfo.address.electronicMailAddress",
@@ -5673,7 +6664,89 @@
                                             "title": "Role",
                                             "type": "string",
                                             "prop_key": "portrayalCatalogueInfo.portrayalCatalogueCitation.citedResponsibleParty.role",
-                                            "display_type": "text"
+                                            "display_type": "dropdown-custom",
+                                            "enum": [
+                                                {
+                                                    "code": "resourceProvider",
+                                                    "label": "Resource provider"
+                                                },
+                                                {
+                                                    "code": "custodian",
+                                                    "label": "Custodian"
+                                                },
+                                                {
+                                                    "code": "owner",
+                                                    "label": "Owner"
+                                                },
+                                                {
+                                                    "code": "sponsor",
+                                                    "label": "Sponsor"
+                                                },
+                                                {
+                                                    "code": "user",
+                                                    "label": "User"
+                                                },
+                                                {
+                                                    "code": "distributor",
+                                                    "label": "Distributor"
+                                                },
+                                                {
+                                                    "code": "originator",
+                                                    "label": "Originator"
+                                                },
+                                                {
+                                                    "code": "pointOfContact",
+                                                    "label": "Point of contact"
+                                                },
+                                                {
+                                                    "code": "principalInvestigator",
+                                                    "label": "Principal investigator"
+                                                },
+                                                {
+                                                    "code": "processor",
+                                                    "label": "Processor"
+                                                },
+                                                {
+                                                    "code": "publisher",
+                                                    "label": "Publisher"
+                                                },
+                                                {
+                                                    "code": "author",
+                                                    "label": "Author"
+                                                },
+                                                {
+                                                    "code": "coAuthor",
+                                                    "label": "Co-author"
+                                                },
+                                                {
+                                                    "code": "collaborator",
+                                                    "label": "Collaborator"
+                                                },
+                                                {
+                                                    "code": "editor",
+                                                    "label": "Editor"
+                                                },
+                                                {
+                                                    "code": "mediator",
+                                                    "label": "Mediator"
+                                                },
+                                                {
+                                                    "code": "rightsHolder",
+                                                    "label": "Rights holder"
+                                                },
+                                                {
+                                                    "code": "contributor",
+                                                    "label": "Contributor"
+                                                },
+                                                {
+                                                    "code": "funder",
+                                                    "label": "Funder"
+                                                },
+                                                {
+                                                    "code": "stakeholder",
+                                                    "label": "Stakeholder"
+                                                }
+                                            ]
                                         },
                                         {
                                             "key": "contactInfo.phone.voice",
@@ -6045,7 +7118,89 @@
                                             "title": "Role",
                                             "type": "string",
                                             "prop_key": "description.thesaurusInfo.citedResponsibleParty.role",
-                                            "display_type": "textarea"
+                                            "display_type": "dropdown-custom",
+                                            "enum": [
+                                                {
+                                                    "code": "resourceProvider",
+                                                    "label": "Resource provider"
+                                                },
+                                                {
+                                                    "code": "custodian",
+                                                    "label": "Custodian"
+                                                },
+                                                {
+                                                    "code": "owner",
+                                                    "label": "Owner"
+                                                },
+                                                {
+                                                    "code": "sponsor",
+                                                    "label": "Sponsor"
+                                                },
+                                                {
+                                                    "code": "user",
+                                                    "label": "User"
+                                                },
+                                                {
+                                                    "code": "distributor",
+                                                    "label": "Distributor"
+                                                },
+                                                {
+                                                    "code": "originator",
+                                                    "label": "Originator"
+                                                },
+                                                {
+                                                    "code": "pointOfContact",
+                                                    "label": "Point of contact"
+                                                },
+                                                {
+                                                    "code": "principalInvestigator",
+                                                    "label": "Principal investigator"
+                                                },
+                                                {
+                                                    "code": "processor",
+                                                    "label": "Processor"
+                                                },
+                                                {
+                                                    "code": "publisher",
+                                                    "label": "Publisher"
+                                                },
+                                                {
+                                                    "code": "author",
+                                                    "label": "Author"
+                                                },
+                                                {
+                                                    "code": "coAuthor",
+                                                    "label": "Co-author"
+                                                },
+                                                {
+                                                    "code": "collaborator",
+                                                    "label": "Collaborator"
+                                                },
+                                                {
+                                                    "code": "editor",
+                                                    "label": "Editor"
+                                                },
+                                                {
+                                                    "code": "mediator",
+                                                    "label": "Mediator"
+                                                },
+                                                {
+                                                    "code": "rightsHolder",
+                                                    "label": "Rights holder"
+                                                },
+                                                {
+                                                    "code": "contributor",
+                                                    "label": "Contributor"
+                                                },
+                                                {
+                                                    "code": "funder",
+                                                    "label": "Funder"
+                                                },
+                                                {
+                                                    "code": "stakeholder",
+                                                    "label": "Stakeholder"
+                                                }
+                                            ]
                                         },
                                         {
                                             "key": "contactInfo.address.electronicMailAddress",
@@ -6420,7 +7575,89 @@
                                     "key": "description.feature_catalogue.producer.role",
                                     "title": "Role",
                                     "type": "string",
-                                    "display_type": "textarea"
+                                    "display_type": "dropdown-custom",
+                                    "enum": [
+                                        {
+                                            "code": "resourceProvider",
+                                            "label": "Resource provider"
+                                        },
+                                        {
+                                            "code": "custodian",
+                                            "label": "Custodian"
+                                        },
+                                        {
+                                            "code": "owner",
+                                            "label": "Owner"
+                                        },
+                                        {
+                                            "code": "sponsor",
+                                            "label": "Sponsor"
+                                        },
+                                        {
+                                            "code": "user",
+                                            "label": "User"
+                                        },
+                                        {
+                                            "code": "distributor",
+                                            "label": "Distributor"
+                                        },
+                                        {
+                                            "code": "originator",
+                                            "label": "Originator"
+                                        },
+                                        {
+                                            "code": "pointOfContact",
+                                            "label": "Point of contact"
+                                        },
+                                        {
+                                            "code": "principalInvestigator",
+                                            "label": "Principal investigator"
+                                        },
+                                        {
+                                            "code": "processor",
+                                            "label": "Processor"
+                                        },
+                                        {
+                                            "code": "publisher",
+                                            "label": "Publisher"
+                                        },
+                                        {
+                                            "code": "author",
+                                            "label": "Author"
+                                        },
+                                        {
+                                            "code": "coAuthor",
+                                            "label": "Co-author"
+                                        },
+                                        {
+                                            "code": "collaborator",
+                                            "label": "Collaborator"
+                                        },
+                                        {
+                                            "code": "editor",
+                                            "label": "Editor"
+                                        },
+                                        {
+                                            "code": "mediator",
+                                            "label": "Mediator"
+                                        },
+                                        {
+                                            "code": "rightsHolder",
+                                            "label": "Rights holder"
+                                        },
+                                        {
+                                            "code": "contributor",
+                                            "label": "Contributor"
+                                        },
+                                        {
+                                            "code": "funder",
+                                            "label": "Funder"
+                                        },
+                                        {
+                                            "code": "stakeholder",
+                                            "label": "Stakeholder"
+                                        }
+                                    ]
                                 },
                                 {
                                     "key": "description.feature_catalogue.producer.contactInfo.address.electronicMailAddress",
@@ -6582,7 +7819,8 @@
                                     "type": "simple_array",
                                     "prop_key": "description.feature_catalogue.featureType.aliases",
                                     "enum": [],
-                                    "help_text": "One or more aliases as equivalent names of the feature type."
+                                    "help_text": "One or more aliases as equivalent names of the feature type.",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "carrierOfCharacteristics",
@@ -6698,18 +7936,23 @@
                     "type": "array",
                     "props": [
                         {
-                            "key": "tag_group",
-                            "title": "Tag group",
-                            "type": "text",
-                            "prop_key": "tags.tag_group"
-                        },
-                        {
                             "key": "tag",
                             "title": "Tag",
-                            "type": "text",
-                            "prop_key": "tags.tag"
+                            "type": "string",
+                            "prop_key": "tags.tag",
+                            "help_text": "A user-defined tag.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "tag_group",
+                            "title": "Tag group",
+                            "type": "string",
+                            "prop_key": "tags.tag_group",
+                            "help_text": "A user-defined group (optional) to which the tag belongs. Grouping tags allows implementation of controlled facets in data catalogs.",
+                            "display_type": "text"
                         }
-                    ]
+                    ],
+                    "help_text": "Tags, especially when organized in tag groups, provide a powerful and flexible solution to enable custom facets (filters) in data catalogs. "
                 }
             ]
         }

@@ -84,6 +84,7 @@ Vue.component('grid-component', {
                                         background-color="#FFFFFF"
                                         item-text="label"
                                         item-value="code"
+                                        :return-object="false"
                                         class="form-field-dropdown-custom"
                                     ></v-combobox>
                             </div>

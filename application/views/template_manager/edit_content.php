@@ -59,7 +59,7 @@
 
         <v-tab-item class="p-3" v-if="ActiveNode.key && isControlField(ActiveNode.type) == true">
             <!--display-->
-            <div class="form-group">
+            <div class="form-group" v-if="ActiveNode.type!='simple_array'">
                 <label >Data type:</label>
                 <select 
                     v-model="ActiveNode.type" 

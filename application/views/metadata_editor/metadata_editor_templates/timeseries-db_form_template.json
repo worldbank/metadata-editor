@@ -1008,18 +1008,23 @@
                     "type": "array",
                     "props": [
                         {
-                            "key": "tag_group",
-                            "title": "Tag group",
-                            "type": "text",
-                            "prop_key": "tags.tag_group"
-                        },
-                        {
                             "key": "tag",
                             "title": "Tag",
-                            "type": "text",
-                            "prop_key": "tags.tag"
+                            "type": "string",
+                            "prop_key": "tags.tag",
+                            "help_text": "A user-defined tag.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "tag_group",
+                            "title": "Tag group",
+                            "type": "string",
+                            "prop_key": "tags.tag_group",
+                            "help_text": "A user-defined group (optional) to which the tag belongs. Grouping tags allows implementation of controlled facets in data catalogs.",
+                            "display_type": "text"
                         }
-                    ]
+                    ],
+                    "help_text": "Tags, especially when organized in tag groups, provide a powerful and flexible solution to enable custom facets (filters) in data catalogs. "
                 }
             ]
         }

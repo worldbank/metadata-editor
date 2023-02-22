@@ -224,19 +224,21 @@ Vue.component('v-form', {
         </div>
 
 
-        <div v-if="fieldDisplayType(item)=='dropdown'">        
+        <div v-if="fieldDisplayType(item)=='dropdown' || fieldDisplayType(item)=='dropdown-custom'">
             <div class="form-group form-field" :class="['field-' + item.key, item.class] ">
                 <label :for="'field-' + normalizeClassID(item.key)">{{item.title}}</label>
 
                 <v-combobox
                     v-model="formData[item.key]"
                     :items="item.enum"
-                    label=""                
+                    item-text="label"
+                    item-value="code"
+                    :return-object="false"
+                    label=""
                     outlined
                     dense
                     clearable
-                    background-color="#FFFFFF"
-                    :hint="formData[item.key]"
+                    background-color="#FFFFFF"                    
                 ></v-combobox>
 
                 <?php /*<select  

@@ -41,7 +41,7 @@ Vue.component('nested-section', {
                     <div v-show="showChildren(index)" class="nested-section-body">
                     <div v-for="(column,idx_col) in localColumns" scope="row" >
                         
-                            <div v-if="column.type=='nested_array'">
+                            <div v-if="fieldDisplayType(column)=='nested_array'">
                                 <label :for="'field-' + normalizeClassID(column.key)">{{column.title}}</label>
                                 <nested-section 
                                     :value="getData(index+'.'+column.key)"
@@ -53,7 +53,7 @@ Vue.component('nested-section', {
 
                             
 
-                            <div v-if="column.type=='section'"  class="form-section" >                    
+                            <div v-if="fieldDisplayType(column)=='section'"  class="form-section" >                    
                                 <template>
                                     <v-expansion-panels :value="0">
                                         <v-expansion-panel>
@@ -75,7 +75,7 @@ Vue.component('nested-section', {
                             </div>
 
                             <!-- textarea-->
-                            <div v-if="column.type=='textarea'">
+                            <div v-if="fieldDisplayType(column)=='textarea'">
 
                                 <div class="form-group form-field" :class="['field-' + column.key, column.class] ">
                                     <label :for="'field-' + normalizeClassID(column.key)">{{column.title}}</label>
@@ -90,7 +90,7 @@ Vue.component('nested-section', {
 
                             </div> 
                             
-                            <div  v-if="column.type=='text' || column.type=='string'">
+                            <div  v-if="fieldDisplayType(column)=='text'">
                                 <div class="form-group form-field" :class="['field-' + column.key] ">
                                     <label :for="'field-' + normalizeClassID(path + '-' + column.key)">{{column.title}}                                        
                                         <span class="small" v-if="column.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(path + ' ' + column.key)" ><i class="far fa-question-circle"></i></span>
@@ -107,7 +107,7 @@ Vue.component('nested-section', {
                             </div>
 
                             <!--drop down-->
-                            <div v-if="column.type=='dropdown'">
+                            <div v-if="fieldDisplayType(column)=='dropdown' || fieldDisplayType(column)=='dropdown-custom' ">
                                 <div class="form-group form-field">
                                     <label :for="'field-' + normalizeClassID(column.key)">{{column.title}}</label>
 
@@ -118,17 +118,18 @@ Vue.component('nested-section', {
                                         :id="'field-' + normalizeClassID(column.key)" 
                                     >
                                         <option value="">Select</option>
-                                        <option v-for="enum_ in column.enum" v-bind:key="enum_.key">
-                                            {{ enum_ }}
+                                        <option v-for="enum_ in column.enum" v-bind:key="enum_.code" :value="enum_.code">
+                                            {{ enum_.label }}
                                         </option>
                                     </select>
+                                    
                                     <small class="help-text form-text text-muted">{{getData(index+'.'+column.key)}}</small>
                                     <small :id="'field-toggle-' + normalizeClassID(path + '-' + column.key)" class="collapse help-text form-text text-muted">{{column.help_text}}</small>
                                 </div>
                             </div>  
                             <!--end dropdown-->
 
-                            <div v-if="column.type=='array'">
+                            <div v-if="fieldDisplayType(column)=='array'">
                                 <div class="form-group form-field form-field-table">
                                     <label :for="'field-' + path">{{column.title}}</label>
                                     <span class="small" v-if="column.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(column.key + index)" ><i class="far fa-question-circle"></i></span>
@@ -144,7 +145,7 @@ Vue.component('nested-section', {
 
 
                             <!-- simple array -->
-                            <div v-if="column.type=='simple_array'">
+                            <div v-if="fieldDisplayType(column)=='simple_array'">
                                 <div class="form-group form-field form-field-table">
                                     <label :for="'field-' + path">{{column.title}}</label>
                                     <span class="small" v-if="column.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(column.key + index)" ><i class="far fa-question-circle"></i></span>
@@ -212,6 +213,18 @@ Vue.component('nested-section', {
                 'fa-angle-down': !this.showChildren(index),
                 'fa-angle-up': this.showChildren(index)
             }
-        } 
+        },
+        fieldDisplayType(field)
+        {
+            if (field.display_type){
+                return field.display_type;
+            }
+
+            if (_.includes(['text','string','integer','boolean','number'],field.display_type)){
+                return 'text';
+            }            
+            
+            return field.type;
+        }
     }
 })

@@ -17,16 +17,18 @@
                         {
                             "key": "metadata_information.title",
                             "title": "Document title",
-                            "type": "text",
+                            "type": "string",
                             "class": "required",
-                            "help_text": "The title of the metadata document (which will usually be the same as the element \"Title\" in the \"DCMI / Image description\" section). The metadata document is the metadata file (XML or JSON file) that is being generated."
+                            "help_text": "The title of the metadata document (which will usually be the same as the element \"Title\" in the \"DCMI / Image description\" section). The metadata document is the metadata file (XML or JSON file) that is being generated.",
+                            "display_type": "text"
                         },
                         {
                             "key": "metadata_information.idno",
                             "title": "Document ID",
-                            "type": "text",
+                            "type": "string",
                             "class": "required",
-                            "help_text": "A unique identifier for the image's metadata document. This identifier must be unique in the catalog where the metadata are intended to be published. Ideally, the identifier should also be unique globally. This is different from the \"Primary ID\" in section \"Image identifiers\", although it is good practice to generate identifiers that establish a clear connection between these two identifiers. The Document ID could also include the metadata document version identifier. For example, if the \"Primary ID\" of the image is “IMG_0001”, the Document ID could be “IHSN_IMG_001_v1.0” if the metadata are produced by the IHSN and if this is version 1.0 of the metadata. Each organization should establish systematic rules to generate such IDs. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. The identifier may not contain blank spaces."
+                            "help_text": "A unique identifier for the image's metadata document. This identifier must be unique in the catalog where the metadata are intended to be published. Ideally, the identifier should also be unique globally. This is different from the \"Primary ID\" in section \"Image identifiers\", although it is good practice to generate identifiers that establish a clear connection between these two identifiers. The Document ID could also include the metadata document version identifier. For example, if the \"Primary ID\" of the image is “IMG_0001”, the Document ID could be “IHSN_IMG_001_v1.0” if the metadata are produced by the IHSN and if this is version 1.0 of the metadata. Each organization should establish systematic rules to generate such IDs. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. The identifier may not contain blank spaces.",
+                            "display_type": "text"
                         },
                         {
                             "key": "metadata_information.producers",
@@ -38,30 +40,34 @@
                                     "title": "Name",
                                     "class": "required",
                                     "required": true,
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "metadata_information.producers.name",
-                                    "help_text": "The name of the person or organization who produced the metadata or contributed to its production."
+                                    "help_text": "The name of the person or organization who produced the metadata or contributed to its production.",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "abbr",
                                     "title": "Abbrevation",
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "metadata_information.producers.abbr",
-                                    "help_text": "The abbreviation (or acronym) of the organization that is referenced in \"Name\"."
+                                    "help_text": "The abbreviation (or acronym) of the organization that is referenced in \"Name\".",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "affiliation",
                                     "title": "Affiliation",
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "metadata_information.producers.affiliation",
-                                    "help_text": "The affiliation of the person or organization mentioned in \"Name\"."
+                                    "help_text": "The affiliation of the person or organization mentioned in \"Name\".",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "role",
                                     "title": "Role",
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "metadata_information.producers.role",
-                                    "help_text": "The specific role of the person or organization mentioned in \"Name\" in the production of the metadata."
+                                    "help_text": "The specific role of the person or organization mentioned in \"Name\" in the production of the metadata.",
+                                    "display_type": "textarea"
                                 }
                             ],
                             "is_recommended": true,
@@ -70,17 +76,19 @@
                         {
                             "key": "metadata_information.production_date",
                             "title": "Production date",
-                            "type": "text",
+                            "type": "string",
                             "class": "required",
-                            "help_text": "The date the metadata on this image was produced (not distributed or archived), preferably entered in ISO 8601 format (YYYY-MM-DD or YYY-MM). A validation rule can be set in user templates to enforce a date format. This is a \"Recommended\" element, as information on the producer and on the date of metadata production is useful for catalog administration purposes.",
-                            "is_recommended": true
+                            "help_text": "The date the metadata on this image was produced (not distributed or archived), preferably entered in ISO 8601 format (YYYY-MM-DD or YYYY-MM). A validation rule can be set in user templates to enforce a date format. This is a \"Recommended\" element, as information on the producer and on the date of metadata production is useful for catalog administration purposes.",
+                            "is_recommended": true,
+                            "display_type": "text"
                         },
                         {
                             "key": "metadata_information.version",
                             "title": "Version",
-                            "type": "text",
+                            "type": "string",
                             "class": "required",
-                            "help_text": "The version of the metadata document (not the version of the image itself)."
+                            "help_text": "The version of the metadata document (not the version of the image itself).",
+                            "display_type": "text"
                         }
                     ]
                 }
@@ -100,17 +108,13 @@
                         {
                             "key": "image_description.idno",
                             "title": "Primary ID",
-                            "type": "text",
+                            "type": "string",
                             "class": "required",
                             "required": true,
                             "help_text": "A unique identifier of the image. The \"Primary ID\" (also referred to as IDNO) is a unique identification number used to identify the image. A unique identifier is required for cataloguing purpose, so this element is declared as \"Required\". The identifier will allow users to cite the table properly. The identifier must be unique within the catalog. Ideally, it should also be globally unique. A Digital Object Identifier (DOI), or the ID included in the EXIF metadata for digital pictures can be used. for the study. Alternatively, the \"Primary ID\" can be constructed by an organization using a consistent scheme. Note that the schema allows you to provide more than one identifier for a same image (in element \"Other identifiers\"); a catalog-specific identifier is thus not incompatible with a globally unique identifier like a DOI. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. The identifier may not contain blank spaces.",
-                            "rules": {
-                                "required": true,
-                                "alpha_dash": true,
-                                "min": 5,
-                                "max": 800
-                            },
-                            "is_required": true
+                            "rules": [],
+                            "is_required": true,
+                            "display_type": "text"
                         },
                         {
                             "key": "image_description.identifiers",
@@ -123,16 +127,18 @@
                                     "key": "type",
                                     "title": "Type",
                                     "description": "Type of identifier e.g. `doi`, `handle`, `other`",
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "image_description.identifiers.type",
-                                    "help_text": "The type of identifier. This could be for example “DOI”, or \"EXIF\"."
+                                    "help_text": "The type of identifier. This could be for example “DOI”, or \"EXIF\".",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "identifier",
                                     "title": "Identifier",
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "image_description.identifiers.identifier",
-                                    "help_text": "The identifier itself."
+                                    "help_text": "The identifier itself.",
+                                    "display_type": "text"
                                 }
                             ]
                         }
@@ -154,36 +160,41 @@
                         {
                             "key": "image_description.dcmi.type",
                             "title": "Resource type",
-                            "type": "text",
+                            "type": "string",
                             "default": "image",
-                            "help_text": "The Dublin Core schema is flexible and versatile, and can be used to document different types of resources. This element is used to document the type of resource being documented. The DCMI provides a list of suggested categories, including “image” which is the relevant type to be entered here. Some users may want to be more specific in the description of the type of resource, for example distinguishing color from black & white images. This distinction should not be made in this element; another element can be used for such purpose (like tags and tag groups)."
+                            "help_text": "The Dublin Core schema is flexible and versatile, and can be used to document different types of resources. This element is used to document the type of resource being documented. The DCMI provides a list of suggested categories, including “image” which is the relevant type to be entered here. Some users may want to be more specific in the description of the type of resource, for example distinguishing color from black & white images. This distinction should not be made in this element; another element can be used for such purpose (like tags and tag groups).",
+                            "display_type": "text"
                         },
                         {
                             "key": "image_description.dcmi.date",
                             "title": "Date",
-                            "type": "text",
+                            "type": "string",
                             "help_text": "The date when the photo was taken / the image was created. The date will preferably be entered in ISO 8601 format (YYYY-MM-DD). A validation rule can be set in user templates to enforce a specific date format.",
-                            "is_recommended": true
+                            "is_recommended": true,
+                            "display_type": "text"
                         },
                         {
                             "key": "image_description.dcmi.title",
                             "title": "Title",
-                            "type": "text",
+                            "type": "string",
                             "help_text": "The title of the photo.",
-                            "is_recommended": true
+                            "is_recommended": true,
+                            "display_type": "text"
                         },
                         {
                             "key": "image_description.dcmi.caption",
                             "title": "Caption",
-                            "type": "text",
+                            "type": "string",
                             "help_text": "A caption for the photo.",
-                            "is_recommended": true
+                            "is_recommended": true,
+                            "display_type": "textarea"
                         },
                         {
                             "key": "image_description.dcmi.description",
                             "title": "Description",
-                            "type": "textarea",
-                            "help_text": "A brief description of the content depicted in the image. This element will typically provide more detailed information than the title or caption. Note that other elements can be used to provide a more specific and “itemized” description of an image; the element \"Keywords\" for example can be used to list labels associated with an image (possibly generated in an automated manner using machine learning image labeling tools)."
+                            "type": "string",
+                            "help_text": "A brief description of the content depicted in the image. This element will typically provide more detailed information than the title or caption. Note that other elements can be used to provide a more specific and “itemized” description of an image; the element \"Keywords\" for example can be used to list labels associated with an image (possibly generated in an automated manner using machine learning image labeling tools).",
+                            "display_type": "textarea"
                         },
                         {
                             "key": "image_description.dcmi.keywords",
@@ -193,23 +204,29 @@
                                 {
                                     "key": "name",
                                     "title": "Keyword",
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "image_description.dcmi.keywords.name",
-                                    "help_text": "The keyword (or phrase) itself. "
+                                    "help_text": "The keyword (or phrase) itself. ",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "vocabulary",
                                     "title": "Vocabulary",
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "image_description.dcmi.keywords.vocabulary",
-                                    "help_text": "The controlled vocabulary (including version number or date) from which the keyword is extracted, if any."
+                                    "help_text": "The controlled vocabulary (including version number or date) from which the keyword is extracted, if any.",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "uri",
                                     "title": "URL",
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "image_description.dcmi.keywords.uri",
-                                    "help_text": "The URL of the controlled vocabulary from which the keyword is extracted, if any."
+                                    "help_text": "The URL of the controlled vocabulary from which the keyword is extracted, if any.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
                                 }
                             ],
                             "is_recommended": true,
@@ -223,43 +240,48 @@
                                 {
                                     "key": "id",
                                     "title": "ID",
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "image_description.dcmi.topics.id",
-                                    "help_text": "The unique identifier of the topic. It can be a sequential number, or the ID of the topic in a controlled vocabulary."
+                                    "help_text": "The unique identifier of the topic. It can be a sequential number, or the ID of the topic in a controlled vocabulary.",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "name",
-                                    "title": "Label",
-                                    "type": "text",
+                                    "title": "Topic",
+                                    "type": "string",
                                     "prop_key": "image_description.dcmi.topics.name",
-                                    "help_text": "The label of the topic. "
+                                    "help_text": "The label of the topic. ",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "parent_id",
                                     "title": "Parent ID",
                                     "help_text": "When a hierarchical (nested) controlled vocabulary is used, the \"Parent ID\" field can be used to indicate a higher-level topic to which this topic belongs.",
-                                    "type": "text",
-                                    "prop_key": "image_description.dcmi.topics.parent_id"
+                                    "type": "string",
+                                    "prop_key": "image_description.dcmi.topics.parent_id",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "vocabulary",
                                     "title": "Vocabulary",
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "image_description.dcmi.topics.vocabulary",
-                                    "help_text": "The specification (name including the version and date) of the controlled vocabulary from which the topic is taken."
+                                    "help_text": "The specification (name including the version and date) of the controlled vocabulary from which the topic is taken.",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "uri",
                                     "title": "URL",
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "image_description.dcmi.topics.uri",
                                     "help_text": "A link (URL) to the controlled vocabulary website.",
                                     "rules": {
                                         "is_uri": true
-                                    }
+                                    },
+                                    "display_type": "text"
                                 }
                             ],
-                            "help_text": "\"Topics\" indicate the broad substantive topic(s) that the image represents. A topic classification facilitates referencing and searches in electronic survey catalogs; topics should thus be selected from a standard controlled vocabulary, for example the CESSDA Topics classification (a typology of topics available in 11 languages), or the Journal of Economic Literature (JEL) Classification System. Note that you may combine topics from more than one controlled vocabulary. "
+                            "help_text": "Topics indicate the broad substantive topic(s) that the image represents. A topic classification facilitates referencing and searches in electronic survey catalogs; topics should thus be selected from a standard controlled vocabulary, for example the CESSDA Topics classification (a typology of topics available in 11 languages), or the Journal of Economic Literature (JEL) Classification System. Note that you may combine topics from more than one controlled vocabulary. "
                         },
                         {
                             "key": "image_description.dcmi.country",
@@ -269,61 +291,62 @@
                                 {
                                     "key": "name",
                                     "title": "Name",
-                                    "type": "text",
-                                    "prop_key": "image_description.dcmi.country.name"
+                                    "type": "string",
+                                    "prop_key": "image_description.dcmi.country.name",
+                                    "help_text": "The country name. Note that many organizations have their own policies on the naming of countries/regions/economies/territories, which data curators will have to comply with.",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "code",
                                     "title": "Code",
-                                    "type": "text",
-                                    "prop_key": "image_description.dcmi.country.code"
+                                    "type": "string",
+                                    "prop_key": "image_description.dcmi.country.code",
+                                    "help_text": "The country code. It is recommended to use a standard list of country codes, such as the ISO 3166. ",
+                                    "display_type": "text"
                                 }
                             ],
-                            "help_text": "Words or phrases that describe salient aspects of an image content. Can be used for building keyword indexes and for classification and retrieval purposes. A controlled vocabulary can be employed. Keywords should be selected from a standard thesaurus, preferably an international, multilingual thesaurus.\n\n- Name: Keyword (or phrase). Keywords summarize the content or subject matter of the image.\n- Vocabulary: Controlled vocabulary from which the keyword is extracted, if any.\n- URL: The URI of the controlled vocabulary used, if any.",
+                            "help_text": "The country shown in the image, if applicable. This information is highly relevant and will often be used as a filter (facet) in data catalogs. It is thus a \"Recommended\" field. An image will only represent part of a country, but we still want to capture this information in the metadata. Note that many organizations have their own policies on the naming and spelling of countries/regions/economies/territories, which data curators will have to comply with.",
                             "is_recommended": true
                         },
                         {
                             "key": "image_description.dcmi.coverage",
                             "title": "Geographic coverage",
-                            "type": "text",
-                            "help_text": "In the Dublin Core, the coverage can be either temporal or geographic. In the use of the schema, coverage is used to document the geographic coverage of the image. This element complements the \"Country\" element, and allows more specific information to be provided.",
-                            "enum": []
+                            "type": "string",
+                            "help_text": "This element complements the \"Country\" element, and allows more specific information to be provided, for example by providing the name of a province or city.",
+                            "enum": [],
+                            "display_type": "textarea"
                         },
                         {
-                            "key": "image_description.dcmi1674238733598",
-                            "title": "GPS",
-                            "type": "section",
-                            "items": [
-                                {
-                                    "key": "image_description.dcmi.gps.latitude",
-                                    "title": "Latitude",
-                                    "type": "text",
-                                    "help_text": "The latitude of the geographic location where the photo was taken.",
-                                    "enum": []
-                                },
-                                {
-                                    "key": "image_description.dcmi.gps.longitude",
-                                    "title": "Longitude",
-                                    "type": "text",
-                                    "help_text": "The longitude of the geographic location where the photo was taken.",
-                                    "enum": []
-                                },
-                                {
-                                    "key": "image_description.dcmi.gps.altitude",
-                                    "title": "Altitude",
-                                    "type": "text",
-                                    "help_text": "The altitude of the geographic location where the photo was taken.",
-                                    "enum": []
-                                }
-                            ],
-                            "help_text": ""
+                            "key": "image_description.dcmi.gps.latitude",
+                            "title": "GPS latitude",
+                            "type": "string",
+                            "help_text": "The latitude of the geographic location where the photo was taken.",
+                            "enum": [],
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "image_description.dcmi.gps.longitude",
+                            "title": "GPS longitude",
+                            "type": "string",
+                            "help_text": "The longitude of the geographic location where the photo was taken.",
+                            "enum": [],
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "image_description.dcmi.gps.altitude",
+                            "title": "GPS altitude",
+                            "type": "string",
+                            "help_text": "The altitude of the geographic location where the photo was taken.",
+                            "enum": [],
+                            "display_type": "text"
                         },
                         {
                             "key": "image_description.dcmi.format",
                             "title": "Format",
                             "type": "string",
                             "help_text": "This refers to the image file format. It is typically expressed using a MIME format.",
-                            "enum": []
+                            "enum": [],
+                            "display_type": "text"
                         },
                         {
                             "key": "image_description.dcmi.languages",
@@ -333,16 +356,18 @@
                                 {
                                     "key": "name",
                                     "title": "Name",
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "image_description.dcmi.languages.name",
-                                    "help_text": "The name of the language."
+                                    "help_text": "The name of the language.",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "code",
                                     "title": "Code",
-                                    "type": "text",
+                                    "type": "string",
                                     "prop_key": "image_description.dcmi.languages.code",
-                                    "help_text": "The code of the language."
+                                    "help_text": "The code of the language.",
+                                    "display_type": "text"
                                 }
                             ],
                             "help_text": "The language refers to the language in which the image metadata is provided. This is a repeatable field, to allow for more than one language to be listed. For the language codes and names, the use of the ISO 639-2 standard is recommended."
@@ -352,7 +377,8 @@
                             "title": "Source",
                             "type": "string",
                             "help_text": "A related resource from which the described image is derived.",
-                            "enum": []
+                            "enum": [],
+                            "display_type": "text"
                         },
                         {
                             "key": "image_description.dcmi.relations",
@@ -362,43 +388,86 @@
                                 {
                                     "key": "name",
                                     "title": "Name",
-                                    "type": "text",
-                                    "prop_key": "image_description.dcmi.relations.name"
+                                    "type": "string",
+                                    "prop_key": "image_description.dcmi.relations.name",
+                                    "help_text": "The name (title) of the related resource.",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "type",
                                     "title": "Type",
-                                    "type": "text",
+                                    "type": "string",
                                     "enum": [
-                                        "isPartOf",
-                                        "hasPart",
-                                        "isVersionOf",
-                                        "isFormatOf",
-                                        "hasFormat",
-                                        "references",
-                                        "isReferencedBy",
-                                        "isBasedOn",
-                                        "isBasisFor",
-                                        "requires",
-                                        "isRequiredBy"
+                                        {
+                                            "code": "isPartOf",
+                                            "label": "Is part of"
+                                        },
+                                        {
+                                            "code": "hasPart",
+                                            "label": "Has part"
+                                        },
+                                        {
+                                            "code": "isVersionOf",
+                                            "label": "Is version of"
+                                        },
+                                        {
+                                            "code": "isFormatOf",
+                                            "label": "Is format of"
+                                        },
+                                        {
+                                            "code": "hasFormat",
+                                            "label": "Has format"
+                                        },
+                                        {
+                                            "code": "references",
+                                            "label": "References"
+                                        },
+                                        {
+                                            "code": "isReferencedBy",
+                                            "label": "Is referenced by"
+                                        },
+                                        {
+                                            "code": "isBasedOn",
+                                            "label": "Is based on"
+                                        },
+                                        {
+                                            "code": "isBasisFor",
+                                            "label": "Is basis for"
+                                        },
+                                        {
+                                            "code": "requires",
+                                            "label": "Requires"
+                                        },
+                                        {
+                                            "code": "isRequiredBy",
+                                            "label": "Is required by"
+                                        }
                                     ],
-                                    "prop_key": "image_description.dcmi.relations.type"
+                                    "prop_key": "image_description.dcmi.relations.type",
+                                    "help_text": "A brief description of the type of relation. A controlled vocabulary could be used.",
+                                    "display_type": "dropdown-custom"
                                 },
                                 {
                                     "key": "uri",
                                     "title": "URL",
-                                    "type": "text",
-                                    "prop_key": "image_description.dcmi.relations.uri"
+                                    "type": "string",
+                                    "prop_key": "image_description.dcmi.relations.uri",
+                                    "help_text": "A link to the related resource being described.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
                                 }
                             ],
-                            "help_text": "A list of related resources (images or of other type)\n\n- Name: The name (title) of the related resource.\n- Type: A brief description of the type of relation. A controlled vocabulary could be used.\n- URL: A link to the related resource being described."
+                            "help_text": "A list of related resources (images or of other type)."
                         },
                         {
                             "key": "image_description.dcmi.note",
                             "title": "Note",
                             "type": "string",
                             "help_text": "Any additional information on the image, not captured in one of the other metadata elements.",
-                            "enum": []
+                            "enum": [],
+                            "display_type": "textarea"
                         }
                     ]
                 },
@@ -410,30 +479,34 @@
                         {
                             "key": "image_description.dcmi.creator",
                             "title": "Creator",
-                            "type": "text",
+                            "type": "string",
                             "help_text": "The name of the person (or organization) who has taken the photo or created the image.",
-                            "enum": []
+                            "enum": [],
+                            "display_type": "text"
                         },
                         {
                             "key": "image_description.dcmi.contributor",
                             "title": "Contributor",
-                            "type": "text",
+                            "type": "string",
                             "help_text": "The contributor could be a person or organization, possibly a sponsoring organization.",
-                            "enum": []
+                            "enum": [],
+                            "display_type": "text"
                         },
                         {
                             "key": "image_description.dcmi.publisher",
                             "title": "Publisher",
-                            "type": "text",
-                            "help_text": "The person or organization who publish the image.",
-                            "enum": []
+                            "type": "string",
+                            "help_text": "The person or organization who publishes the image.",
+                            "enum": [],
+                            "display_type": "text"
                         },
                         {
                             "key": "image_description.dcmi.rights",
                             "title": "Rights",
                             "type": "string",
-                            "help_text": "The copyright for the photograph. License is in another (common) element.",
-                            "enum": []
+                            "help_text": "The copyright for the photograph. Another element is available to describe the license under which the image is distributed. ",
+                            "enum": [],
+                            "display_type": "text"
                         }
                     ],
                     "help_text": ""
@@ -455,29 +528,31 @@
                         {
                             "key": "name",
                             "title": "Name",
-                            "type": "text",
+                            "type": "string",
                             "prop_key": "image_description.license.name",
-                            "help_text": "The name of the license (e.g., CC-BY 4.0)."
+                            "help_text": "The name of the license (e.g., CC-BY 4.0).",
+                            "display_type": "text"
                         },
                         {
                             "key": "uri",
                             "title": "URL",
-                            "type": "text",
+                            "type": "string",
                             "prop_key": "image_description.license.uri",
                             "help_text": "A URL where detailed information on the license / terms of use can be found.",
                             "rules": {
                                 "is_uri": true
-                            }
+                            },
+                            "display_type": "text"
                         }
                     ],
-                    "help_text": "The license under which the image is published.\n\n- Name: \n- URL: \n"
+                    "help_text": "The license under which the image is published."
                 }
             ]
         },
         {
             "type": "section_container",
             "key": "album",
-            "title": "Album",
+            "title": "Albums",
             "items": [
                 {
                     "key": "image_description.album",
@@ -487,30 +562,45 @@
                         {
                             "key": "name",
                             "title": "Name",
-                            "type": "text"
+                            "type": "string",
+                            "prop_key": "image_description.album.name",
+                            "help_text": "The name (label) of the album.",
+                            "display_type": "text"
                         },
                         {
                             "key": "description",
                             "title": "Description",
-                            "type": "text"
+                            "type": "string",
+                            "prop_key": "image_description.album.description",
+                            "help_text": "A brief description of the album.",
+                            "display_type": "textarea"
                         },
                         {
                             "key": "owner",
                             "title": "Owner",
-                            "type": "text"
+                            "type": "string",
+                            "prop_key": "image_description.album.owner",
+                            "help_text": "The owner or custodian of the album.",
+                            "display_type": "text"
                         },
                         {
                             "key": "uri",
-                            "title": "URI",
-                            "type": "text",
-                            "prop_key": "image_description.license.uri"
+                            "title": "URL",
+                            "type": "string",
+                            "prop_key": "image_description.album.uri",
+                            "help_text": "A link (URL) to the album.",
+                            "rules": {
+                                "is_uri": true
+                            },
+                            "display_type": "text"
                         }
-                    ]
+                    ],
+                    "help_text": "When an image is published in a catalog containing other images, it may be desirable to organize them by album. Albums are collections of images organized by theme, period, location, or other criteria. One image can belong to more than one album. Albums are “virtual collections”."
                 }
             ]
         },
         {
-            "type": "section_container",
+            "type": "section",
             "key": "document_tags",
             "title": "Tags",
             "class": "recommended",
@@ -521,18 +611,23 @@
                     "type": "array",
                     "props": [
                         {
-                            "key": "tag_group",
-                            "title": "Tag group",
-                            "type": "string",
-                            "prop_key": "tags.tag_group"
-                        },
-                        {
                             "key": "tag",
                             "title": "Tag",
                             "type": "string",
-                            "prop_key": "tags.tag"
+                            "prop_key": "tags.tag",
+                            "help_text": "A user-defined tag.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "tag_group",
+                            "title": "Tag group",
+                            "type": "string",
+                            "prop_key": "tags.tag_group",
+                            "help_text": "A user-defined group (optional) to which the tag belongs. Grouping tags allows implementation of controlled facets in data catalogs.",
+                            "display_type": "text"
                         }
-                    ]
+                    ],
+                    "help_text": "Tags, especially when organized in tag groups, provide a powerful and flexible solution to enable custom facets (filters) in data catalogs. "
                 }
             ]
         }

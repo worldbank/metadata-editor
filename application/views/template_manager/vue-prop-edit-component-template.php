@@ -9,7 +9,7 @@
         <v-tab-item class="p-3"  v-if="isField(prop.type)  || prop.type=='simple_array'">
 
             <!--display-->
-            <div class="form-group">
+            <div class="form-group" v-if="prop.type!='simple_array'">
                 <label >Data type:</label>
                 <select 
                     v-model="prop.type" 
