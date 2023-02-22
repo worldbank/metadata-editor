@@ -65,10 +65,52 @@ Vue.component('grid-component', {
                                 v-slot="{ errors }"                                
                                 >
                             
-                            <input type="text"
-                                v-model="field_data[index][column.key]"
-                                class="form-control form-control-sm"                                 
-                            >
+                            <div v-if="fieldDisplayType(column)=='textarea'">                                
+                                <textarea
+                                    :max-height="350"
+                                    v-model="field_data[index][column.key]"        
+                                    class="form-control form-field-textarea"
+                                ></textarea>
+                            </div>
+
+                            <div v-else-if="fieldDisplayType(column)=='dropdown-custom'">
+                                    <v-combobox
+                                        v-model="field_data[index][column.key]"
+                                        :items="column.enum"
+                                        label=""                
+                                        outlined
+                                        dense
+                                        clearable
+                                        background-color="#FFFFFF"
+                                        item-text="label"
+                                        item-value="code"
+                                        class="form-field-dropdown-custom"
+                                    ></v-combobox>
+                            </div>
+                            
+                            <div v-else-if="fieldDisplayType(column)=='dropdown'">
+                                <select 
+                                    v-model="field_data[index][column.key]" 
+                                    class="form-control form-control-sm form-field-dropdown"
+                                    :id="field_data[index][column.key]" 
+                                    style="min-width: 100px;"
+                                >
+                                    <option value="">Select</option>
+                                    <option v-for="enum_ in column.enum" v-bind:key="enum_.code" :value="enum_.code">
+                                        {{ enum_.label }}
+                                    </option>
+                                </select>
+                            </div>
+                            
+                            <div v-else>
+                                <input type="text"
+                                    v-model="field_data[index][column.key]"
+                                    class="form-control form-control-sm"                                 
+                                >
+                            </div>
+                            
+
+
                             <span v-if="errors[0]" class="error"><small>{{ errors[0] }}</small></span>
                         </validation-provider>
                             
@@ -105,6 +147,18 @@ Vue.component('grid-component', {
             }else{
                 return column.name
             }
+        },
+        fieldDisplayType(field)
+        {
+            if (field.display_type){
+                return field.display_type;
+            }
+
+            if (_.includes(['text','string','integer','boolean','number'],field.display_type)){
+                return 'text';
+            }            
+            
+            return field.type;
         }
     }
 })

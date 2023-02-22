@@ -13,6 +13,18 @@ Vue.component('v-form', {
         },
         showActiveSection(field_key,active_section){
             console.log("showActiveSection-vue-form-component",field_key,active_section);
+        },
+        fieldDisplayType(field)
+        {
+            if (field.display_type){
+                return field.display_type;
+            }
+
+            if (_.includes(['text','string','integer','boolean','number'],field.display_type)){
+                return 'text';
+            }            
+            
+            return field.type;
         }
     },
     created() {
@@ -47,7 +59,7 @@ Vue.component('v-form', {
             <template v-for="item in items">
 
             <!-- form-section-container -->
-                <div v-if="item.type=='section_container'"  class="form-section-container" >
+                <div v-if="fieldDisplayType(item)=='section_container'"  class="form-section-container" >
                     
                     <template>
                         <div style="font-size:18px;font-weight:bold;" class="section-container-title">{{item.title}} - {{item.key}}</div>                        
@@ -65,7 +77,7 @@ Vue.component('v-form', {
                 <!-- end-form-section-container -->
 
                 <!-- form-section --> 
-                <div v-if="item.type=='section'"  class="form-section" >                    
+                <div v-if="fieldDisplayType(item)=='section'"  class="form-section" >                    
                     <template>
                         <v-expansion-panels :value="0">
                             <v-expansion-panel>
@@ -90,7 +102,7 @@ Vue.component('v-form', {
                 <!-- end-form-section -->
 
                 <!-- textarea-->
-                <div v-if="item.type=='textarea'">
+                <div v-if="fieldDisplayType(item)=='textarea'">
                     <div class="form-group form-field" :class="['field-' + item.key, item.class] ">
                     
                         <label :for="'field-' + normalizeClassID(item.key)">
@@ -112,7 +124,7 @@ Vue.component('v-form', {
                 </div> 
 
 
-                <template v-if="item.type=='date'">
+                <template v-if="fieldDisplayType(item)=='date'">
                 <!--date-field-->
                     <div class="form-group form-field" :class="['field-' + item.key, item.class] ">
 
@@ -139,7 +151,7 @@ Vue.component('v-form', {
                 </template>
 
                 <!--text-field-->
-                <div v-if="item.type=='text' || item.type=='string' ">
+                <div v-if="fieldDisplayType(item)=='text'">
                     <div class="form-group form-field" :class="['field-' + item.key, item.class] ">
                         <label :for="'field-' + normalizeClassID(item.key)">
                             {{item.title}} 
@@ -170,7 +182,7 @@ Vue.component('v-form', {
                 <!--end-text-field-->
 
 
-            <div v-if="item.type=='array'">
+            <div v-if="fieldDisplayType(item)=='array'">
                 <div class="form-group form-field form-field-table">
                     <label :for="'field-' + normalizeClassID(item.key)">{{item.title}}</label>
                     <span class="small" v-if="item.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(item.key)" ><i class="far fa-question-circle"></i></span>
@@ -186,7 +198,7 @@ Vue.component('v-form', {
                 </div>    
             </div>
 
-        <div v-if="item.type=='simple_array'">
+        <div v-if="fieldDisplayType(item)=='simple_array'">
             <div class="form-group form-field form-field-table">
                 <label :for="'field-' + normalizeClassID(path)">{{item.title}}</label>
                 <span class="small" v-if="item.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(item.key)" ><i class="far fa-question-circle"></i></span>
@@ -201,27 +213,18 @@ Vue.component('v-form', {
             </div>    
         </div>
 
-        <div v-if="item.type=='nested_array'" class="mt-2 mb-3">
+        <div v-if="fieldDisplayType(item)=='nested_array'" class="mt-2 mb-3">
             <label :for="'field-' + normalizeClassID(item.key)">{{item.title}}</label>
             <nested-section 
-                :value="formData[item.key]"                                         
+                :value="formData[item.key]"
                 :columns="item.props"
                 :title="item.title"
                 :path="item.key">
             </nested-section>  
         </div>
 
-        <div v-if="item.type=='identification_section'">
-            <label :for="'field-' + normalizeClassID(field.key)">{{item.title}}</label>
-            <identification-section 
-                :value="formData[item.key]"                                         
-                :columns="item.props"
-                :path="item.key">
-            </identification-section>  
-        </div>
 
-
-        <div v-if="item.type=='dropdown'">        
+        <div v-if="fieldDisplayType(item)=='dropdown'">        
             <div class="form-group form-field" :class="['field-' + item.key, item.class] ">
                 <label :for="'field-' + normalizeClassID(item.key)">{{item.title}}</label>
 
