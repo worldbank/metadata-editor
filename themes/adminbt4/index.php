@@ -20,8 +20,8 @@ if ($languages!==FALSE)
 	}
 }
 
-$this->load->helper('site_menu');
-$site_navigation_menu=get_site_menu();
+//$this->load->helper('site_menu');
+$site_navigation_menu=[];//get_site_menu();
 ?>
 <!DOCTYPE html>
 <html>
@@ -160,7 +160,7 @@ $site_navigation_menu=get_site_menu();
 
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
-      <?php echo $site_navigation_menu;?>      
+      <?php //echo $site_navigation_menu;?>      
     </ul>
     <ul class="nav navbar-nav navbar-right float-right pull-right">
       <li class="divider-vertical"></li>
@@ -192,13 +192,6 @@ $site_navigation_menu=get_site_menu();
 
     <div class="container-fluid">
         <div>             
-             <!--breadcrumbs -->
-			      <?php $breadcrumbs_str= $this->breadcrumb->to_string();?>
-            <?php if ($breadcrumbs_str!=''):?>
-                <div id="breadcrumb" class="notabs">
-                <?php echo $breadcrumbs_str;?>
-                </div>
-            <?php endif;?>
                 
             <div id="content">
               <?php if (isset($content) ):?>
