@@ -41,6 +41,11 @@
     min-height:200px;
 }
 
+.metadata-form  td .form-field-textarea{
+    height:60px;
+    min-height:60px;
+}
+
 /*.grid-button-delete,
 .section-toggle-icon
 {
@@ -433,4 +438,27 @@ html,body {
     background:rgb(0 0 0 / 12%);
     color:black;
     border:0px;
+}
+
+.help-text{
+    white-space: pre-wrap;
+}
+
+.v-textarea-field .v-text-field__slot{
+    max-height: 300px;
+    overflow-y: auto;    
+}
+
+.v-textarea-field .v-input__slot{
+    background:#f0efef;
+    padding:10px;
+}
+
+.v-text-field{
+    padding-top:0px!important;
+}
+
+.v-text-field .v-text-field__details,
+.v-textarea-field .v-text-field__details{
+    display:none;
 }
