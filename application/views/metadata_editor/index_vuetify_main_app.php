@@ -48,6 +48,7 @@
 
             //nested
             echo $this->load->view("metadata_editor/vue-nested-section-component.js",null,true);
+            
 
             echo $this->load->view("metadata_editor/vue-simple-array-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-table-component.js",null,true);
@@ -268,6 +269,13 @@
                             ]
                         }                    
                     ]
+                },
+                formTextFieldStyle:
+                { 
+                    clearable: true,
+                    "single-line":true,
+                    dense:true,
+                    filled:true
                 }
             },
             getters: {

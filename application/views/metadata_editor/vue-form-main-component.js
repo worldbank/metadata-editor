@@ -33,6 +33,9 @@ Vue.component('form-main', {
         formField()
         {
             return this.field;
+        },
+        formTextFieldStyle(){            
+            return this.$store.state.formTextFieldStyle;
         }
         
     },
@@ -79,13 +82,21 @@ Vue.component('form-main', {
         <div v-if="activeFormFieldDisplayType()=='textarea'">
 
             <div class="form-group form-field" :class="['field-' + formField.key, formField.class] ">
-                <label :for="'field-' + normalizeClassID(formField.key)">{{formField.title}}</label>
-                <textarea-autosize
-                    :max-height="350"
-                    v-model="formData[formField.key]"        
-                    class="form-control form-field-textarea" 
-                    :id="'field-' + normalizeClassID(formField.key)"                                     
-                ></textarea-autosize>
+                <label :for="'field-' + normalizeClassID(formField.key)">{{formField.title}}</label>                
+                
+                <v-textarea
+                    variant="outlined"
+                    v-model="formData[formField.key]"
+                    class="v-textarea-field"
+                    auto-grow
+                    clearable
+                    rows="2"
+                    row-height="40"
+                    max-height="200"
+                    max-rows="5"                            
+                    density="compact"
+                ></v-textarea>
+
                 <small class="help-text form-text text-muted">{{formField.help_text}}</small>                            
             </div>
 
@@ -151,11 +162,11 @@ Vue.component('form-main', {
                     :name="formField.title"
                     >
 
-                <input type="text"
+                <v-text-field
                     v-model="formData[formField.key]"
-                    class="form-control"                            
-                    :id="'field-' + normalizeClassID(formField.key)"                                     
-                >
+                    v-bind="formTextFieldStyle"
+                ></v-text-field>
+
                 <span v-if="errors[0]" class="error">{{errors[0]}}</span>
             </validation-provider>
                 

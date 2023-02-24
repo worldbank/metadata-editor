@@ -45,6 +45,9 @@ Vue.component('v-form', {
         },
         formData () {
             return this.$deepModel('formData')
+        },
+        formTextFieldStyle(){            
+            return this.$store.state.formTextFieldStyle;
         }
     },
     /*watch: {
@@ -111,12 +114,18 @@ Vue.component('v-form', {
                             <span v-if="item.required==true" class="required-label"> * </span>
                         </label>
                     
-                        <textarea-autosize
-                            :max-height="350"
-                            v-model="formData[item.key]"        
-                            class="form-control form-field-textarea" 
-                            :id="'field-' + normalizeClassID(item.key)"                                     
-                        ></textarea-autosize>
+                        <v-textarea
+                            variant="outlined"
+                            v-model="formData[item.key]"
+                            class="v-textarea-field"
+                            auto-grow
+                            clearable
+                            rows="2"
+                            row-height="40"
+                            max-height="200"
+                            max-rows="5"                            
+                            density="compact"
+                        ></v-textarea>
                         
                         <small :id="'field-toggle-' + normalizeClassID(item.key)" class="collapse help-text form-text text-muted">{{item.help_text}}</small>
                     </div>
@@ -167,11 +176,11 @@ Vue.component('v-form', {
                             :name="item.title"
                             >
 
-                        <input type="text"
-                            v-model="formData[item.key]"
-                            class="form-control"                            
-                            :id="'field-' + normalizeClassID(item.key)"                                     
-                        >
+                        <v-text-field                            
+                            v-model="formData[item.key]"                            
+                            v-bind="formTextFieldStyle"
+                        ></v-text-field>
+
                         <span v-if="errors[0]" class="error">{{errors[0]}}</span>
                     </validation-provider>
                         
