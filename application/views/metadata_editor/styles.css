@@ -37,9 +37,6 @@
     color:red;
 }
 
-.metadata-form .form-field-textarea{
-    min-height:200px;
-}
 
 .metadata-form  td .form-field-textarea{
     height:60px;
@@ -461,4 +458,9 @@ html,body {
 .v-text-field .v-text-field__details,
 .v-textarea-field .v-text-field__details{
     display:none;
+}
+
+.v-delete-icon{
+    color:#dc3545!important;
+    cursor:pointer;
 }

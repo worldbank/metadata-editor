@@ -224,12 +224,15 @@ Vue.component('v-form', {
 
         <div v-if="fieldDisplayType(item)=='nested_array'" class="mt-2 mb-3">
             <label :for="'field-' + normalizeClassID(item.key)">{{item.title}}</label>
-            <nested-section 
-                :value="formData[item.key]"
+
+            <nested-array
+                :key="item.key"             
+                v-model="formData[item.key]"
                 :columns="item.props"
                 :title="item.title"
                 :path="item.key">
-            </nested-section>  
+            </nested-array> 
+
         </div>
 
 

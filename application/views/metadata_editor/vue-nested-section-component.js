@@ -9,20 +9,26 @@ Vue.component('nested-section', {
         }
     },
     watch: { 
-        field_data: function(newVal, oldVal) {            
-            this.$vueSet (this.$store.state.formData, this.key_path, newVal);
+        field_data: function(newVal, oldVal) {
+            console.log("watch field_data",this.key_path,JSON.stringify(newVal), JSON.stringify(oldVal));
+            this.$vueSet (this.formData, this.key_path, newVal);
         }
     },
     mounted: function () {
-        //set data to array if empty or not set
-        if (!this.field_data){
-            this.field_data=[{}];            
+        console.log("mounted nested array",this.path,this.field_data);
+        if (!this.field_data || typeof(this.field_data)!=='array'){
+            console.log("mounted nested array - no data");
+            this.field_data=[{}];
         }
     },
     computed: {
         localColumns(){
             return this.columns;
-        }               
+        },
+        formData () {
+            return this.$deepModel('formData')
+        }
+        
     },  
     template: `
             <div class="nested-section" >
@@ -61,13 +67,14 @@ Vue.component('nested-section', {
                                             {{column.title}}
                                         </v-expansion-panel-header>
                                         <v-expansion-panel-content>
-                                            <v-form
-                                                    :items="column.props" 
-                                                    :title="column.title"
-                                                    :path="column.key"
-                                                    :field="column"
-                                                >
-                                            </v-form>
+                                            
+                                            <nested-section-subsection 
+                                                :value="getData(index+'.'+column.key)"
+                                                :columns="column.props"
+                                                :title="column.title"
+                                                :path="path + '.' + index">
+                                            </nested-section-subsection> 
+
                                         </v-expansion-panel-content>
                                         </v-expansion-panel>
                                     </v-expansion-panels>
@@ -91,6 +98,7 @@ Vue.component('nested-section', {
                             </div> 
                             
                             <div  v-if="fieldDisplayType(column)=='text'">
+                            
                                 <div class="form-group form-field" :class="['field-' + column.key] ">
                                     <label :for="'field-' + normalizeClassID(path + '-' + column.key)">{{column.title}}                                        
                                         <span class="small" v-if="column.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(path + ' ' + column.key)" ><i class="far fa-question-circle"></i></span>
@@ -101,7 +109,8 @@ Vue.component('nested-section', {
                                         @input="setData(index+'.'+column.key, $event.target.value)"
                                         class="form-control" 
                                         :id="'field-' + normalizeClassID(path + '-' + column.key)"                                     
-                                    >                                                                       
+                                    >        
+                                                                                                   
                                     <small :id="'field-toggle-' + normalizeClassID(path + '-' + column.key)" class="collapse help-text form-text text-muted">{{column.help_text}}</small>
                                 </div>                                
                             </div>
@@ -185,13 +194,10 @@ Vue.component('nested-section', {
             this.field_data.splice(index,1);
         },
         getData: function(field_xpath){
-            //console.log("getData",field_xpath, 'value',JSON.stringify(_.get(this.field_data, field_xpath)));
             return _.get(this.field_data, field_xpath)
         },
         setData: function (field_xpath,event){
-            //console.log("setData",field_xpath,event);
             _.set(this.field_data,field_xpath,event);
-            //console.log(this.field_data);
             Vue.set(this.field_data, 0, this.field_data[0]);
         },
         toggleChildren(index) {

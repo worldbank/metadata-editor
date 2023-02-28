@@ -48,7 +48,8 @@
 
             //nested
             echo $this->load->view("metadata_editor/vue-nested-section-component.js",null,true);
-            
+            echo $this->load->view("metadata_editor/vue-form-input-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-nested-array-component.js",null,true);
 
             echo $this->load->view("metadata_editor/vue-simple-array-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-table-component.js",null,true);
@@ -62,6 +63,10 @@
             echo $this->load->view("metadata_editor/vue-summary-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-summary-files-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-thumbnail-component.js",null,true);
+
+            echo $this->load->view("metadata_editor/vue-table-grid-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-nested-section-subsection-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-repeated-field-component.js",null,true);
         ?>
 
         <?php if (empty($metadata)):?>
@@ -275,7 +280,9 @@
                     clearable: true,
                     "single-line":true,
                     dense:true,
-                    filled:true
+                    filled:false,
+                    outlined:true,
+                    style:"border-top:1px solid gray;"
                 }
             },
             getters: {

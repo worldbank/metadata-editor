@@ -3,7 +3,7 @@ Vue.component('nested-array', {
     props:['value','columns','path','title'],
     data: function () {    
         return {
-            field_data: this.value,
+            local_data: [],
             key_path: this.path,
             active_sections:[]
         }
@@ -16,9 +16,16 @@ Vue.component('nested-array', {
     },
     mounted: function () {
         //console.log("mounted nested array",Array.isArray(this.value),this.path,JSON.stringify(this.value));
+        let value= this.value ? this.value : [{}];
+
+        if (value.length<1){
+            value= [{}];
+        }
+
+        this.local_data= value;
     },
     computed: {
-        local(){
+        /*local(){
             let value= this.value ? this.value : [{}];
 
             if (value.length<1){
@@ -27,23 +34,67 @@ Vue.component('nested-array', {
         
             //console.log("local value",JSON.stringify(value));
             return value;
-        },
+        },*/
         localColumns(){
             return this.columns;
         }
-        /*formData () {
-            return this.$deepModel('formData')
-        },*/
-    },  
+    },
+    methods:{
+        countRows: function(){
+            return this.local_data.length;
+        },
+        addRow: function (){    
+            this.local_data.push({});
+            this.$emit('input', JSON.parse(JSON.stringify(this.local_data)));
+        },
+        remove: function (index){
+            this.local_data.splice(index,1);
+            this.$emit('input', JSON.parse(JSON.stringify(this.local_data)));
+        },
+        localValue: function(index,key)
+        {
+            return _.get(this.local_data[index],key);
+        },
+        update: function (index, key, value)
+        {
+            if (Array.isArray(this.local_data[index])){
+                this.local_data[index] = {};
+            }
+
+            if (key.indexOf(".") !== -1 && this.local_data[index][key]){
+                //let value=JSON.stringify(this.local_data[index][key]);
+                delete this.local_data[index][key];
+                //_.set(this.local_data[index],key,value);
+            }
+
+            _.set(this.local_data[index],key,value);
+            this.$emit('input', JSON.parse(JSON.stringify(this.local_data)));
+        },
+        updateSection: function (index, key, value)
+        {
+            this.local_data[index] = value;
+            this.$emit('input', JSON.parse(JSON.stringify(this.local_data)));
+        },
+
+        fieldDisplayType(field)
+        {
+            if (field.display_type){
+                return field.display_type;
+            }
+
+            if (_.includes(['text','string','integer','boolean','number'],field.display_type)){
+                return 'text';
+            }            
+            
+            return field.type;
+        }
+    },
     template: `
             <div class="nested-array" >
 
-                <div class="row">
-                <div class="col-md-12">
-
                 <template>
                     <v-expansion-panels :value="0">
-                        <v-expansion-panel v-for="(item,index) in local">
+                        <v-expansion-panel v-for="(item,index) in local_data">
                         <v-expansion-panel-header>
 
                         <v-row>
@@ -52,7 +103,7 @@ Vue.component('nested-array', {
                             </v-col>
                             <v-col sm="6" md="4" class="text-right">
                                 <button type="button" class="btn btn-xs btn-outline-danger" @click="remove(index);return false;">
-                                    <span v-if="local.length>1">Remove</span>
+                                    <span v-if="local_data.length>1">Remove</span>
                                     <span v-else>Clear</span>
                                     </button>
                             </v-col>
@@ -61,22 +112,35 @@ Vue.component('nested-array', {
                         </v-expansion-panel-header>
                         <v-expansion-panel-content>
                             <template>
-                                <div v-for="(column,idx_col) in localColumns" scope="row" >
+                                <div v-for="(column,idx_col) in localColumns" scope="row" :key="column.key" >
 
                                     <div>
-                                    <template v-if="!_.includes(['nested_array','array','simple_array','section'],column.type)">
+                                    
+                                    <template v-if="!_.includes(['nested_array','simple_array','section'],column.type)">                                    
                                         <form-input
-                                            :value="local[index][column.key]"
+                                            :value="localValue(index,column.key)"
                                             :field="column"                            
                                             @input="update(index,column.key, $event)"
                                         ></form-input>
                                     </template>
+                                    <template v-else-if="column.type=='section'">
+                                        <!-- section -->
+                                        <nested-section-subsection
+                                            :key="column.key"
+                                            :parentElement="local_data[index]"
+                                            :value="local_data[index][column.key+'section']"
+                                            @input="updateSection(index,column.key+'section', $event)"
+                                            :columns="column.props"
+                                            :title="column.title"
+                                            :path="column.key">
+                                        </nested-section-subsection>
+                                        <!-- end section -->
+                                    </template>
 
-                                    <template v-else-if="column.type=='nested_array'">
-                                    NESTED_ARRAY                                        
+                                    <template v-else-if="column.type=='nested_array'">                                                                            
                                         <nested-array
                                             :key="column.key" 
-                                            :value="local[index][column.key]"
+                                            :value="localValue(index,column.key)"
                                             @input="update(index,column.key, $event)"
                                             :columns="column.props"
                                             :title="column.title"
@@ -98,64 +162,6 @@ Vue.component('nested-array', {
                             </div>
                 </template>
 
-                
 
-                </div>
-                <div class="col-md-6" style="display:none;">
-                    inside nested array
-                            </hr>
-                            path:{{path}}
-                            </hr>
-                            <strong>local:{{local}}</strong>
-                            </HR>
-                            value:{{value}}   
-                            </HR>
-                            path:{{path}}
-                            </HR>
-                            title:{{title}}
-                            </hr>
-                            <pre>{{columns}}</pre>
-                
-                </div>
-                </div>
-
-            </div>  `,
-    methods:{
-        countRows: function(){
-            return this.local.length;
-        },
-        addRow: function (){    
-            this.local.push({});
-            //this.$emit('adding-row', this.field_data);
-            this.$emit('input', JSON.parse(JSON.stringify(this.local)));
-        },
-        remove: function (index){
-            this.local.splice(index,1);
-            this.$emit('input', JSON.parse(JSON.stringify(this.local)));
-            console.log("after removed", this.local);
-        },
-        update: function (index, key, value)
-        {
-            console.log("updating value",index,key,value);
-            if (Array.isArray(this.local[index])){
-                this.local[index] = {};
-            }
-
-            this.local[index][key] = value;
-            this.$emit('input', JSON.parse(JSON.stringify(this.local)));
-        },
-
-        fieldDisplayType(field)
-        {
-            if (field.display_type){
-                return field.display_type;
-            }
-
-            if (_.includes(['text','string','integer','boolean','number'],field.display_type)){
-                return 'text';
-            }            
-            
-            return field.type;
-        }
-    }
+            </div>  `    
 })

@@ -71,12 +71,13 @@ Vue.component('form-main', {
 
         <div v-if="activeFormFieldDisplayType()=='nested_array'" class="mt-2 mb-3">
             <label :for="'field-' + normalizeClassID(formField.key)">{{formField.title}}</label>
-            <nested-section 
-                :value="formData[formField.key]"                                         
+            <nested-array
+                :key="formField.key" 
+                v-model="formData[formField.key]"
                 :columns="formField.props"
                 :title="formField.title"
                 :path="formField.key">
-            </nested-section>  
+            </nested-array>  
         </div>
 
         <div v-if="activeFormFieldDisplayType()=='textarea'">

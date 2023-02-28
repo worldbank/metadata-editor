@@ -1,3 +1,4 @@
+<v-app>
 <!--header-->
 <div>
     <nav class="main-header sticky-top navbar navbar-expand navbar-white navbar-light bg-light border-bottom" style="margin-left:0px;">
@@ -101,9 +102,19 @@
                         <v-icon v-else-if="item.type=='section'">
                             {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
                         </v-icon>
+                        <v-icon v-else-if="item.type=='date' || item.display_type=='date'">
+                            mdi-book-clock-outline
+                        </v-icon>
+                        <v-icon v-else-if="item.type=='array' || item.type=='simple_array' || item.type=='nested_array'">
+                            mdi-file-tree
+                        </v-icon>
+                        <v-icon v-else-if="item.display_type=='dropdown' || item.display_type=='dropdown-custom'">
+                            mdi-file-document
+                        </v-icon>  
+                        
                         <v-icon v-else-if="item.file">
                             {{ files[item.file] }}
-                        </v-icon>
+                        </v-icon>                        
                         <v-icon v-else-if="item.items">
                             {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
                         </v-icon>
@@ -175,3 +186,4 @@
         <!--end right-->
     </pane>
 </splitpanes>
+</v-app>
