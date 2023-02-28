@@ -67,6 +67,7 @@
             echo $this->load->view("metadata_editor/vue-table-grid-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-nested-section-subsection-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-repeated-field-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-form-section-component.js",null,true);
         ?>
 
         <?php if (empty($metadata)):?>
@@ -281,8 +282,8 @@
                     "single-line":true,
                     dense:true,
                     filled:false,
-                    outlined:true,
-                    style:"border-top:1px solid gray;"
+                    outlined:true,                    
+                    style:"xborder-top:1px solid gray;"
                 }
             },
             getters: {

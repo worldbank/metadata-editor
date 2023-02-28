@@ -21,9 +21,25 @@ Vue.component('form-input', {
         }
     },  
     template: `
-            <div class="form-input-field mt-3" :class="'form-input-' + field.type" >
+            <div class="form-input-field mt-3" :class="'form-input-' + field.type"  >
 
-                <div v-if="field.type=='simple_array'" >
+                <div v-if="field.type=='nested_array'">
+                    <div class="form-group form-field form-field-table">
+                        <label :for="'field-' + field.key">{{field.title}}</label>
+                        <span class="small" v-if="field.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(field.key)" ><i class="far fa-question-circle"></i></span>
+                        <small :id="'field-toggle-' + normalizeClassID(field.key)" class="collapse help-text form-text text-muted mb-2">{{field.help_text}}</small>
+                        
+                        <nested-array
+                            :key="field.key" 
+                            v-model="local"
+                            :columns="field.props"
+                            :title="field.title"
+                            :path="field.key">
+                        </nested-array>
+
+                    </div>
+                </div>
+                <div v-else-if="field.type=='simple_array'" >
                     <label :for="'field-' + normalizeClassID(field.key)">{{field.title}}</label>
 
                     <div v-if="fieldDisplayType(field)=='text' ||fieldDisplayType(field)=='textarea' " >
@@ -42,6 +58,7 @@ Vue.component('form-input', {
                             :return-object="false"
                             label=""
                             :multiple="field.type=='simple_array'"
+                            small-chips
                             v-bind="formTextFieldStyle"
                             background-color="#FFFFFF"                    
                         ></v-combobox>
@@ -128,6 +145,24 @@ Vue.component('form-input', {
                         <small class="help-text form-text text-muted">{{field.help_text}}</small>                            
                     </div>
                 </div>
+
+                <div v-else-if="fieldDisplayType(field)=='date'">
+                    <div class="form-group form-field-date">
+                            <label :for="'field-' + normalizeClassID(field.key)">{{field.title}}</label>                            
+                            <validation-provider 
+                                :rules="field.rules" 
+                                :debounce=500
+                                v-slot="{ errors }"                            
+                                :name="field.title"
+                                >
+
+                                <editor-date-field v-model="local" :field="field"></editor-date-field>
+                                <span v-if="errors[0]" class="error">{{errors[0]}}</span>
+                            </validation-provider>
+
+                            <small class="help-text form-text text-muted">{{field.help_text}}</small>                            
+                    </div>
+                </div>               
                 
                 <div v-else-if="field.type=='array'">                
                     <div class="form-group form-field form-field-table">

@@ -456,6 +456,7 @@ html,body {
 }
 
 .v-text-field .v-text-field__details,
+.v-text-field legend,
 .v-textarea-field .v-text-field__details{
     display:none;
 }

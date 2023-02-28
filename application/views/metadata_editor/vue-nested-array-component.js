@@ -3,7 +3,7 @@ Vue.component('nested-array', {
     props:['value','columns','path','title'],
     data: function () {    
         return {
-            local_data: [],
+            //local_data: [],
             key_path: this.path,
             active_sections:[]
         }
@@ -16,13 +16,13 @@ Vue.component('nested-array', {
     },
     mounted: function () {
         //console.log("mounted nested array",Array.isArray(this.value),this.path,JSON.stringify(this.value));
-        let value= this.value ? this.value : [{}];
+        /*let value= this.value ? this.value : [{}];
 
         if (value.length<1){
             value= [{}];
         }
 
-        this.local_data= value;
+        this.local_data= value;*/
     },
     computed: {
         /*local(){
@@ -35,6 +35,16 @@ Vue.component('nested-array', {
             //console.log("local value",JSON.stringify(value));
             return value;
         },*/
+        local_data(){
+            let value= this.value ? this.value : [{}];
+
+            if (value.length<1){
+                value= [{}];
+            }
+        
+            //console.log("local value",JSON.stringify(value));
+            return value;
+        },
         localColumns(){
             return this.columns;
         }
@@ -93,7 +103,7 @@ Vue.component('nested-array', {
             <div class="nested-array" >
 
                 <template>
-                    <v-expansion-panels :value="0">
+                    <v-expansion-panels :value="0" :multiple="true">
                         <v-expansion-panel v-for="(item,index) in local_data">
                         <v-expansion-panel-header>
 
