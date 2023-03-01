@@ -913,7 +913,7 @@
                         {
                             "key": "video_description.media",
                             "title": "Media",
-                            "type": "string",
+                            "type": "simple_array",
                             "enum": [],
                             "help_text": "A description of the media on which the recording is stored (other than the online file format); e.g., “DVD”.",
                             "display_type": "text"
