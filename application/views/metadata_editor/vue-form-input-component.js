@@ -81,14 +81,13 @@ Vue.component('form-input', {
                         ></v-text-field>
                                                                                         
                         <small :id="'field-toggle-' + normalizeClassID(field.key)" class="collapse help-text form-text text-muted">{{field.help_text}}</small>
-                        {{field.help_text}}
                     </div>                                
                 </div>
 
                 <div v-else-if="fieldDisplayType(field)=='textarea'">
                     <div class="form-group form-field-textarea"">
                         <label :for="'field-' + normalizeClassID(field.key)">{{field.title}}</label>                
-                        
+                        <span class="small" v-if="field.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(field.key)" ><i class="far fa-question-circle"></i></span>
                         <v-textarea
                             variant="outlined"
                             v-model="local"
@@ -103,14 +102,14 @@ Vue.component('form-input', {
                             density="compact"
                         ></v-textarea>
 
-                        <small class="help-text form-text text-muted">{{field.help_text}}</small>                            
+                        <small :id="'field-toggle-' + normalizeClassID(field.key)" class="collapse help-text form-text text-muted mb-2">{{field.help_text}}</small>
                     </div>
                 </div> 
 
                 <div v-else-if="fieldDisplayType(field)=='dropdown-custom'">
                     <div class="form-group form-field-dropdown-custom">
                         <label :for="'field-' + normalizeClassID(field.key)">{{field.title}}</label>                
-                        
+                        <span class="small" v-if="field.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(field.key)" ><i class="far fa-question-circle"></i></span>
                         <v-combobox
                             v-model="local"
                             :items="field.enum"
@@ -123,13 +122,14 @@ Vue.component('form-input', {
                             background-color="#FFFFFF"                    
                         ></v-combobox>
 
-                        <small class="help-text form-text text-muted">{{field.help_text}}</small>                            
+                        <small :id="'field-toggle-' + normalizeClassID(field.key)" class="collapse help-text form-text text-muted mb-2">{{field.help_text}}</small>
                     </div>
                 </div>
                 
                 <div v-else-if="fieldDisplayType(field)=='dropdown'">
                     <div class="form-group form-field-dropdown">
-                        <label :for="'field-' + normalizeClassID(field.key)">{{field.title}}</label>                        
+                        <label :for="'field-' + normalizeClassID(field.key)">{{field.title}}</label>
+                        <span class="small" v-if="field.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(field.key)" ><i class="far fa-question-circle"></i></span>
                         <v-select
                             v-model="local"
                             :items="field.enum"  
@@ -141,8 +141,7 @@ Vue.component('form-input', {
                             clearable
                             background-color="#FFFFFF"                    
                         ></v-select>
-
-                        <small class="help-text form-text text-muted">{{field.help_text}}</small>                            
+                        <small :id="'field-toggle-' + normalizeClassID(field.key)" class="collapse help-text form-text text-muted mb-2">{{field.help_text}}</small>                        
                     </div>
                 </div>
 

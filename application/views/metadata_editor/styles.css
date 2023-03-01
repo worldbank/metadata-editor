@@ -465,3 +465,32 @@ html,body {
     color:#dc3545!important;
     cursor:pointer;
 }
+
+table .form-field-dropdown-custom .v-input__slot{
+    padding:0px;
+    margin:0px;
+    min-height:27px!important;
+    font-size:small;
+}
+
+.form-field-dropdown-custom  .v-input__append-inner{
+    margin-top:2px!important;
+}
+
+table .form-field-dropdown-custom {
+    margin-top:5px!important;
+}
+
+table .form-field-dropdown-custom  .v-input__slot .v-select__slot{
+    height:22px;
+}
+
+table .form-field-dropdown-custom  .v-input__slot .v-input__append-inner
+{
+    margin-top:0px!important;
+}
+
+table .form-field-dropdown-custom .v-input__slot fieldset{
+    border:1px solid gainsboro!important;
+    background:white!important;
+}

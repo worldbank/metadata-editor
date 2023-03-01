@@ -60,7 +60,7 @@ Vue.component('form-main', {
         
     },
     template: `
-        <div class="metadata-form mt-3" >
+        <div class="metadata-form mt-5" >
 
             <!-- form-section -->
             <div v-if="activeFormFieldDisplayType()=='section_container'"  class="form-section m-3" >
@@ -102,7 +102,6 @@ Vue.component('form-main', {
 
 
             <div v-if="activeFormFieldDisplayType()!='section'" class="mt-2 mb-3">
-                <label :for="'field-' + normalizeClassID(formField.key)">{{formField.title}}</label>
                 <form-input
                     :value="localValue(formField.key)"
                     :field="formField"

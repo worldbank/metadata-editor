@@ -83,11 +83,23 @@ Vue.component('table-grid-component', {
                       });
                 });                
             }
+        },
+        fieldDisplayType(field)
+        {
+            if (field.display_type){
+                return field.display_type;
+            }
+
+            if (_.includes(['text','string','integer','boolean','number'],field.display_type)){
+                return 'text';
+            }            
+            
+            return field.type;
         }
     },  
     template: `
             <div class="table-grid-component">
-            <table class="table table-striped table-sm">
+            <table class="table table-striped table-sm border-bottom">
                 <thead class="thead-light">
                 <tr>
                     <th></th>
@@ -109,15 +121,37 @@ Vue.component('table-grid-component', {
                 <tr  v-for="(item,index) in local">
                     <td><span class="move-row" ><i class="fas fa-grip-vertical"></i></span></td>
                     <td v-for="(column,idx_col) in localColumns" scope="row">
-                        <div>
-                            <div v-if="column.type!=='table'">
+                        <div v-if="fieldDisplayType(column)=='textarea'" >
+                            <textarea class="form-control form-control-sm"
+                                :value="local[index][column.key]"
+                                @input="update(index,column.key, $event.target.value)"
+                            >
+                            </textarea>
+                        </div>
+                        <div v-else-if="fieldDisplayType(column)=='dropdown-custom' || fieldDisplayType(column)=='dropdown'">
+                                <v-combobox
+                                    :value="local[index][column.key]"
+                                    @input="update(index,column.key, $event)"
+                                    :items="column.enum"
+                                    label=""                
+                                    outlined
+                                    dense
+                                    clearable
+                                    background-color="#FFFFFF"
+                                    item-text="label"
+                                    item-value="code"
+                                    :return-object="false"
+                                    class="form-field-dropdown-custom"
+                                ></v-combobox>
+                        </div>
+                        <div v-else>
                             <input type="text"
                                 :value="local[index][column.key]"
                                 @input="update(index,column.key, $event.target.value)"
-                                class="form-control form-control-sm"                                 
+                                class="form-control form-control-sm"
                             >
-                            </div>
                         </div>
+                        
                     </td>
                     <td scope="row">        
                         <div class="mr-1">
