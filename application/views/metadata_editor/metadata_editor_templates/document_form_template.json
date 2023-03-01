@@ -230,7 +230,7 @@
 							"key": "document_description.authors",
 							"title": "Authors",
 							"help_text": "The authors should be listed in the same order as they appear in the source itself, which is not necessarily alphabetical.",
-							"type": "array",
+							"type": "nested_array",
 							"props": [
 								{
 									"key": "first_name",
