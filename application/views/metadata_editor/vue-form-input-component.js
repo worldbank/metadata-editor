@@ -23,14 +23,6 @@ Vue.component('form-input', {
     template: `
             <div class="form-input-field mt-3" :class="'form-input-' + field.type"  >
 
-            <validation-provider 
-                :rules="field.rules" 
-                :debounce=500
-                v-slot="{ errors }"                            
-                :name="field.title"
-                >
-                                
-
                 <div v-if="field.type=='nested_array'">
                     <div class="form-field form-field-table">
                         <label :for="'field-' + field.key">{{field.title}}</label>
@@ -80,15 +72,23 @@ Vue.component('form-input', {
                             <span class="small" v-if="field.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(field.key)" ><i class="far fa-question-circle"></i></span>
                             <span v-if="field.required==true" class="required-label"> * </span>
                         </label> 
+
+                        <validation-provider 
+                            :rules="field.rules" 
+                            :debounce=500
+                            v-slot="{ errors }"                            
+                            :name="field.title"
+                            >            
                         
-                        <v-text-field
-                            v-model="local"
-                            xvalue="local"
-                            xinput="update($event)"
-                            v-bind="formTextFieldStyle"
-                        ></v-text-field>
-                                                                                        
-                        <small :id="'field-toggle-' + normalizeClassID(field.key)" class="collapse help-text form-text text-muted">{{field.help_text}}</small>
+                            <v-text-field
+                                v-model="local"
+                                v-bind="formTextFieldStyle"
+                            ></v-text-field>                                                                                        
+                            <small :id="'field-toggle-' + normalizeClassID(field.key)" class="collapse help-text form-text text-muted">{{field.help_text}}</small>
+
+                            <span v-if="errors[0]" class="field-error">{{errors[0]}}</span>
+                        </validation-provider>
+
                     </div>                                
                 </div>
 
@@ -96,21 +96,30 @@ Vue.component('form-input', {
                     <div class="form-field-textarea"">
                         <label :for="'field-' + normalizeClassID(field.key)">{{field.title}}</label>                
                         <span class="small" v-if="field.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(field.key)" ><i class="far fa-question-circle"></i></span>
-                        <v-textarea
-                            variant="outlined"
-                            v-model="local"
-                            v-bind="formTextFieldStyle"
-                            class="v-textarea-field"
-                            auto-grow
-                            clearable
-                            rows="2"
-                            row-height="40"
-                            max-height="200"
-                            max-rows="5"                            
-                            density="compact"
-                        ></v-textarea>
 
-                        <small :id="'field-toggle-' + normalizeClassID(field.key)" class="collapse help-text form-text text-muted mb-2">{{field.help_text}}</small>
+                        <validation-provider 
+                            :rules="field.rules" 
+                            :debounce=500
+                            v-slot="{ errors }"                            
+                            :name="field.title"
+                            >   
+                            <v-textarea
+                                variant="outlined"
+                                v-model="local"
+                                v-bind="formTextFieldStyle"
+                                class="v-textarea-field"
+                                auto-grow
+                                clearable
+                                rows="2"
+                                row-height="40"
+                                max-height="200"
+                                max-rows="5"                            
+                                density="compact"
+                            ></v-textarea>
+                            <small :id="'field-toggle-' + normalizeClassID(field.key)" class="collapse help-text form-text text-muted mb-2">{{field.help_text}}</small>
+
+                        <span v-if="errors[0]" class="field-error">{{errors[0]}}</span>
+                        </validation-provider>
                     </div>
                 </div> 
 
@@ -174,9 +183,6 @@ Vue.component('form-input', {
                         </table-grid-component>
                     </div>
                 </div>
-
-            <span v-if="errors[0]" class="field-error">{{errors[0]}}</span>
-            </validation-provider>
 
             </div>  `,
     methods:{        

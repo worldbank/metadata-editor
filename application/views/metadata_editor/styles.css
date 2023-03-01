@@ -147,6 +147,11 @@ label{
     border:0px;
 }
 
+.v-application .field-error{
+    color:red;
+    font-size:small;
+}
+
 .grid-component{
     background:white;
     padding-bottom:10px;
