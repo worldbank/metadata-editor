@@ -189,7 +189,7 @@
                             "key": "project_desc.authoring_entity",
                             "title": "Authoring entity",
                             "help_text": "This section will identify the person(s) and/or organization(s) in charge of the intellectual content of the research project, and specify their respective role.",
-                            "type": "array",
+                            "type": "nested_array",
                             "props": [
                                 {
                                     "key": "name",
