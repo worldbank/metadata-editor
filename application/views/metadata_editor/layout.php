@@ -105,8 +105,14 @@
                         <v-icon v-else-if="item.type=='date' || item.display_type=='date'">
                             mdi-book-clock-outline
                         </v-icon>
-                        <v-icon v-else-if="item.type=='array' || item.type=='simple_array' || item.type=='nested_array'">
+                        <v-icon v-else-if="item.type=='nested_array'">
                             mdi-file-tree
+                        </v-icon>
+                        <v-icon v-else-if="item.type=='array'">
+                            mdi-table
+                        </v-icon>
+                        <v-icon v-else-if="item.type=='simple_array'">
+                            mdi-table-column
                         </v-icon>
                         <v-icon v-else-if="item.display_type=='dropdown' || item.display_type=='dropdown-custom'">
                             mdi-file-document
