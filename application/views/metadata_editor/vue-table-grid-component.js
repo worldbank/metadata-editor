@@ -14,14 +14,18 @@ Vue.component('table-grid-component', {
     },
     computed: {
         local(){
-            console.log("bofore local value",JSON.stringify(this.value));
+            //console.log("bofore local value",JSON.stringify(this.value));
             let value= this.value ? this.value : [{}];
 
             if (value.length<1){
                 value= [{}];
             }
+
+            if (!Array.isArray(value)){
+                value=[{}];
+            }
         
-            console.log("local value",JSON.stringify(value));
+            //console.log("local value",JSON.stringify(value));
             return value;
         },
         localColumns(){
@@ -31,7 +35,7 @@ Vue.component('table-grid-component', {
     methods:{
         update: function (index, key, value)
         {
-            console.log("updating value",index,key,value);
+            //console.log("updating value",index,key,value);
             if (Array.isArray(this.local[index])){
                 this.local[index] = {};
             }
@@ -99,6 +103,7 @@ Vue.component('table-grid-component', {
     },  
     template: `
             <div class="table-grid-component">
+
             <table class="table table-striped table-sm border-bottom">
                 <thead class="thead-light">
                 <tr>
