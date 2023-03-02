@@ -4,7 +4,8 @@ Vue.component('table-grid-component', {
     data: function () {    
         return {
             sort_field:'',
-            sort_asc:true
+            sort_asc:true,
+            undo_paste:''
         }
     },
     watch: {
@@ -82,6 +83,13 @@ Vue.component('table-grid-component', {
             this.pasteFromClipBoard().then((result) => {
                 tsv=result;
                 let json=this.tsvToArray(tsv);
+
+                if (json===false){
+                    return;
+                }
+
+                //save undo
+                vm.undo_paste=JSON.parse(JSON.stringify(vm.local));
                 
                 if (pasteMode=='append'){
                     vm.$emit('input', JSON.parse(JSON.stringify(vm.local.concat(json))));
@@ -89,6 +97,11 @@ Vue.component('table-grid-component', {
                     vm.$emit('input', JSON.parse(JSON.stringify(json)));
                 }
             });
+        },
+        undoPaste: function(){
+            if (this.undo_paste){
+                this.$emit('input', JSON.parse(JSON.stringify(this.undo_paste)));
+            }            
         },
 
         jsonToTsv: function(json){
@@ -102,7 +115,8 @@ Vue.component('table-grid-component', {
               let row=[];
               console.log("csv row",i);
               for (let j=0;j<keys.length;j++){
-                row.push(json[i][keys[j]]);
+                let cell=json[i][keys[j]];
+                row.push('\"'+cell+'\"');
               }
               csv+=row.join('\t') + "\n";
             }
@@ -110,11 +124,18 @@ Vue.component('table-grid-component', {
             return csv;
           },          
         tsvToArray: function(tsv){
-            let lines=tsv.split("\n");  
-            //let keys=lines[0].split("\t");    
-            //let keys=lines[0].split("\t").map((x,i)=>{return "col"+i;});
+
+            let rows=this.CSVToArray( tsv, strDelimiter= "\t" );
+
+            console.log("rows",rows);
+
+            if (rows.length<1){
+                alert("Invalid data format. No rows found");
+                return false;
+            }
+
             let keys=this.columnKeys;
-            let colsCount=lines[0].split("\t").length;
+            let colsCount=rows[0].length;
 
             if (colsCount>keys.length){
                 alert("Invalid data format. Too many columns");
@@ -122,16 +143,21 @@ Vue.component('table-grid-component', {
             }
             
             let json=[];
-            for (let i=0;i<lines.length;i++){
-              let row=lines[i].split("\t");
+            for (let i=0;i<rows.length;i++){
+              let row=rows[i];
               let obj={};
               for (let j=0;j<colsCount;j++){
-                    obj[keys[j]]=row[j];//.trim();
-              }
+                    let cell=row[j];
+                    if (cell){
+                        cell=cell.trim();
+                    }
+                    obj[keys[j]]=cell;
+              }              
               json.push(obj);
             }
+            console.log("result json",json);
             return json;
-          },
+        },
         sortColumn: function(column_key)
         {
             if (this.sort_field==column_key){
@@ -215,6 +241,15 @@ Vue.component('table-grid-component', {
                             </v-list-item-icon>
                             <v-list-item-content>
                                 <v-list-item-title>Paste (Append)</v-list-item-title>
+                            </v-list-item-content> 
+                        </v-list-item>
+
+                        <v-list-item @click="undoPaste()" :disabled="!undo_paste">
+                            <v-list-item-icon>
+                                <v-icon>mdi-arrow-u-left-top</v-icon>
+                            </v-list-item-icon>
+                            <v-list-item-content>
+                                <v-list-item-title>Undo paste</v-list-item-title>
                             </v-list-item-content> 
                         </v-list-item>
 
