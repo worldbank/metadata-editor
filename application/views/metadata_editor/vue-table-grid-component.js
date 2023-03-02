@@ -101,7 +101,8 @@ Vue.component('table-grid-component', {
         undoPaste: function(){
             if (this.undo_paste){
                 this.$emit('input', JSON.parse(JSON.stringify(this.undo_paste)));
-            }            
+            }  
+            this.undo_paste='';          
         },
 
         jsonToTsv: function(json){
