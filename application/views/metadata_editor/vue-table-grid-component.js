@@ -107,7 +107,6 @@ Vue.component('table-grid-component', {
               csv+=row.join('\t') + "\n";
             }
             console.log("csv output",csv);
-            alert(csv);
             return csv;
           },          
         tsvToArray: function(tsv){
