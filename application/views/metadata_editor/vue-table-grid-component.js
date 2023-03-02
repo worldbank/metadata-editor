@@ -126,7 +126,7 @@ Vue.component('table-grid-component', {
               let row=lines[i].split("\t");
               let obj={};
               for (let j=0;j<colsCount;j++){
-                    obj[keys[j]]=row[j].trim();
+                    obj[keys[j]]=row[j];//.trim();
               }
               json.push(obj);
             }
