@@ -30,6 +30,13 @@ Vue.component('table-grid-component', {
         },
         localColumns(){
             return this.columns;
+        },
+        columnKeys(){
+            let keys=[];
+            for (let i=0;i<this.columns.length;i++){
+                keys.push(this.columns[i]['key']);
+            }
+            return keys;
         }
     },
     methods:{
@@ -63,6 +70,69 @@ Vue.component('table-grid-component', {
                 return column.name
             }
         },
+        copyTsv: function()
+        {
+            this.copyToClipBoard(this.jsonToTsv(this.local));
+            alert("Copied to clipboard");
+        },
+        pasteTsv: function(pasteMode='replace')
+        {
+            let vm=this;
+            let tsv='';
+            this.pasteFromClipBoard().then((result) => {
+                tsv=result;
+                let json=this.tsvToArray(tsv);
+                
+                if (pasteMode=='append'){
+                    vm.$emit('input', JSON.parse(JSON.stringify(vm.local.concat(json))));
+                }else{
+                    vm.$emit('input', JSON.parse(JSON.stringify(json)));
+                }
+            });
+        },
+
+        jsonToTsv: function(json){
+            let csv='';
+            let keys=Object.keys(json[0]);
+            
+            //include header
+            //csv+=keys.join('\t') + "\n";
+            
+            for (let i=0;i<json.length;i++){
+              let row=[];
+              console.log("csv row",i);
+              for (let j=0;j<keys.length;j++){
+                row.push(json[i][keys[j]]);
+              }
+              csv+=row.join('\t') + "\n";
+            }
+            console.log("csv output",csv);
+            alert(csv);
+            return csv;
+          },          
+        tsvToArray: function(tsv){
+            let lines=tsv.split("\n");  
+            //let keys=lines[0].split("\t");    
+            //let keys=lines[0].split("\t").map((x,i)=>{return "col"+i;});
+            let keys=this.columnKeys;
+            let colsCount=lines[0].split("\t").length;
+
+            if (colsCount>keys.length){
+                alert("Invalid data format. Too many columns");
+                return false;
+            }
+            
+            let json=[];
+            for (let i=0;i<lines.length;i++){
+              let row=lines[i].split("\t");
+              let obj={};
+              for (let j=0;j<colsCount;j++){
+                    obj[keys[j]]=row[j].trim();
+              }
+              json.push(obj);
+            }
+            return json;
+          },
         sortColumn: function(column_key)
         {
             if (this.sort_field==column_key){
@@ -107,14 +177,59 @@ Vue.component('table-grid-component', {
             <table class="table table-striped table-sm border-bottom">
                 <thead class="thead-light">
                 <tr>
-                    <th></th>
+                    <th>
+                    <!--options -->
+                    <v-menu bottom left>
+                        <template v-slot:activator="{ on, attrs }">
+                        <v-btn
+                            light
+                            icon
+                            x-small
+                            v-bind="attrs"
+                            v-on="on"
+                        >
+                            <v-icon>mdi-dots-vertical</v-icon>
+                        </v-btn>
+                        </template>
+
+                        <v-card dense>
+                        <v-list dense>
+                        <v-list-item @click="copyTsv" dense>
+                            <v-list-item-icon>
+                                <v-icon>mdi-content-copy</v-icon>
+                            </v-list-item-icon>
+                            <v-list-item-content>
+                                <v-list-item-title>Copy</v-list-item-title>
+                            </v-list-item-content>
+                        </v-list-item>
+                        <v-list-item @click="pasteTsv('replace')">
+                            <v-list-item-icon>
+                                <v-icon>mdi-content-paste</v-icon>
+                            </v-list-item-icon>
+                            <v-list-item-content>
+                                <v-list-item-title>Paste (Replace)</v-list-item-title>
+                            </v-list-item-content>                            
+                        </v-list-item>
+                        <v-list-item @click="pasteTsv('append')">
+                            <v-list-item-icon>
+                                <v-icon>mdi-file-replace</v-icon>
+                            </v-list-item-icon>
+                            <v-list-item-content>
+                                <v-list-item-title>Paste (Append)</v-list-item-title>
+                            </v-list-item-content> 
+                        </v-list-item>
+
+                        </v-list>
+                        </v-card>
+                    </v-menu>
+                    <!-- end points -->
+                    </th>
                     <th v-for="(column,idx_col) in columns" scope="col">
                         <span @click="sortColumn(column.key)" role="button" title="Click to sort">
                             {{column.title}} 
                             <i v-if="sort_field==column.key && !sort_asc" class="fas fa-caret-down"></i>
                             <i v-if="sort_field==column.key && sort_asc==true" class="fas fa-caret-up"></i>
                         </span>
-                        <span v-if="column.rules" class="required-label"> * </span>
                     </th>
                     <th scope="col">               
                     </th>

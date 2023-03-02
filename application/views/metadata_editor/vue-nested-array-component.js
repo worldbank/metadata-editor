@@ -126,7 +126,7 @@ Vue.component('nested-array', {
 
                                     <div>
                                     
-                                    <template v-if="!_.includes(['nested_array','simple_array','section'],column.type)">                                    
+                                    <template v-if="!_.includes(['nested_array','section'],column.type)">                                    
                                         <form-input
                                             :value="localValue(index,column.key)"
                                             :field="column"                            

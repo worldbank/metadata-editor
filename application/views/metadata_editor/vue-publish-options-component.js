@@ -16,7 +16,7 @@ Vue.component('publish-options', {
                         "no":"No"
                     }                    
                 },
-                "publish":
+                "published":
                 {
                     "title":"Publish",
                     "value":0,
@@ -57,6 +57,7 @@ Vue.component('publish-options', {
             publish_processing:'',
             publish_errors:[],
             publish_messages:[],
+            publish_response:{},
             file:'',
             update_status:'',
             errors:'',
@@ -84,6 +85,7 @@ Vue.component('publish-options', {
             this.publish_processing="Publishing study to the catalog...";
             this.publish_messages=[];
             this.publish_errors=[];
+            this.publis_response={};
             this.publish_processing_status=true;
             let url=CI.base_url + '/api/editor/publish_to_catalog/' +this.ProjectID +'/' + this.catalog;
         
@@ -91,6 +93,7 @@ Vue.component('publish-options', {
                 formData,
                 {}
             ).then(function(response){
+                vm.publish_response=response;
                 vm.publish_processing="Publishing completed";
                 console.log("published done", response);
                 window.response_=response;

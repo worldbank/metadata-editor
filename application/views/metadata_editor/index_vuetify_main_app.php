@@ -11,7 +11,22 @@
             methods: {
                 normalizeClassID: function(class_id){
                     return class_id.replace(/\./g, "-");
-                }                
+                },
+                copyToClipBoard: function(textToCopy){
+                    const tmpTextField = document.createElement("textarea")
+                    tmpTextField.textContent = textToCopy
+                    tmpTextField.setAttribute("style","position:absolute; right:200%;")
+                    document.body.appendChild(tmpTextField)
+                    tmpTextField.select()
+                    tmpTextField.setSelectionRange(0, 99999) /*For mobile devices*/
+                    document.execCommand("copy")
+                    tmpTextField.remove();
+                },
+
+                pasteFromClipBoard: async function() {
+                    const text = await navigator.clipboard.readText();
+                    return text;                    
+                }
             }
         })
         
