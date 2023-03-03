@@ -5,7 +5,9 @@ Vue.component('table-grid-component', {
         return {
             sort_field:'',
             sort_asc:true,
-            undo_paste:''
+            undo_paste:'',
+            snackbar:false,
+            snackbar_message:''
         }
     },
     watch: {
@@ -41,6 +43,10 @@ Vue.component('table-grid-component', {
         }
     },
     methods:{
+        showToast: function(message){
+            this.snackbar=true;
+            this.snackbar_message=message;
+        },
         update: function (index, key, value)
         {
             //console.log("updating value",index,key,value);
@@ -74,7 +80,7 @@ Vue.component('table-grid-component', {
         copyTsv: function()
         {
             this.copyToClipBoard(this.jsonToTsv(this.local));
-            alert("Copied to clipboard");
+            this.showToast("Copied to clipboard");
         },
         pasteTsv: function(pasteMode='replace')
         {
@@ -117,7 +123,11 @@ Vue.component('table-grid-component', {
               console.log("csv row",i);
               for (let j=0;j<keys.length;j++){
                 let cell=json[i][keys[j]];
-                row.push('\"'+cell+'\"');
+                if (cell){
+                    row.push('\"'+cell+'\"');
+                }else{
+                    row.push('');
+                }
               }
               csv+=row.join('\t') + "\n";
             }
@@ -127,8 +137,6 @@ Vue.component('table-grid-component', {
         tsvToArray: function(tsv){
 
             let rows=this.CSVToArray( tsv, strDelimiter= "\t" );
-
-            console.log("rows",rows);
 
             if (rows.length<1){
                 alert("Invalid data format. No rows found");
@@ -153,11 +161,21 @@ Vue.component('table-grid-component', {
                         cell=cell.trim();
                     }
                     obj[keys[j]]=cell;
-              }              
-              json.push(obj);
+              }
+                if (!this.isRowEmpty(obj)){
+                    json.push(obj);
+                }
             }
-            console.log("result json",json);
             return json;
+        },
+        isRowEmpty: function(row){
+            let keys=Object.keys(row);
+            for (let i=0;i<keys.length;i++){
+                if (row[keys[i]]){
+                    return false;
+                }
+            }
+            return true;
         },
         sortColumn: function(column_key)
         {
@@ -321,6 +339,19 @@ Vue.component('table-grid-component', {
             <div class="d-flex justify-content-center">
                 <button type="button" class="btn btn-default btn-block btn-sm border m-2" @click="addRow" ><i class="fas fa-plus-square"></i> Add row</button>
             </div>
+
+            <v-snackbar
+            
+            right
+            bottom
+                v-model="snackbar"
+                >
+                {{ snackbar_message }}
+
+                <div class="float-right">
+                    <v-icon @click="snackbar = false">mdi-close-circle-outline</v-icon>                    
+                </div>
+            </v-snackbar>
 
             </div>  `    
 })
