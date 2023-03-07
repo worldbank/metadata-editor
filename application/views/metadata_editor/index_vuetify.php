@@ -24,7 +24,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
 </head>
 
-
 <?php
   //break template into smaller templates by spliting template ['items']
   $template_parts=array();
@@ -539,15 +538,15 @@ Vue.config.errorHandler = (err, vm, info) => {
             });
           }
 
-          if (this.dataset_type!=='timeseries-db'){
-            tree_data.push({
-                title: 'External resources',
-                type: 'resources',
-                file: 'resource',
-                key:'external-resources',
-                items:this.ExternalResourcesTreeNodes
-            });
-          }
+          
+          tree_data.push({
+              title: 'External resources',
+              type: 'resources',
+              file: 'resource',
+              key:'external-resources',
+              items:this.ExternalResourcesTreeNodes
+          });
+          
 
           this.items=tree_data;
 
