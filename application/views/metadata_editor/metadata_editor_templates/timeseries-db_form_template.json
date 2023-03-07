@@ -897,7 +897,7 @@
                                 }
                             ],
                             "help_text": "This repeatable set of elements describes the different modes and formats in which the database is made accessible. When more than one mode of access is provided, describe them separately."
-                        },
+                        },                        
                         {
                             "key": "database_description.url",
                             "type": "string",
@@ -993,6 +993,36 @@
                         }
                     ],
                     "help_text": ""
+                },
+                {
+                    "key": "database_description_errata",
+                    "title": "Errata",
+                    "type": "section",
+                    "items":[
+                        {
+                            "key": "database_description.errata",
+                            "type": "array",
+                            "title": "Errata",
+                            "props": [
+                                {
+                                    "key": "type",
+                                    "title": "Date",
+                                    "type": "string",
+                                    "prop_key": "database_description.errata.date",
+                                    "help_text": "Date",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "string",
+                                    "prop_key": "database_description.errata.description",
+                                    "help_text": "Description",
+                                    "display_type": "textarea"
+                                }
+                            ]
+                        }
+                    ]
                 }
             ]
         },

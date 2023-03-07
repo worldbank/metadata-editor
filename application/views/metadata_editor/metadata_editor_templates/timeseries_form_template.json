@@ -625,6 +625,29 @@
                             "title": "Missing",
                             "help_text": "Information on missing values in the series or indicator. This information can be related to treatment of missing values, to the cause(s) of missing values, and others.",
                             "display_type": "textarea"
+                        },
+                        {
+                            "key": "series_description.errata",
+                            "type": "array",
+                            "title": "Errata",
+                            "props": [
+                                {
+                                    "key": "type",
+                                    "title": "Date",
+                                    "type": "string",
+                                    "prop_key": "series_description.errata.date",
+                                    "help_text": "Date",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "string",
+                                    "prop_key": "series_description.errata.description",
+                                    "help_text": "Description",
+                                    "display_type": "textarea"
+                                }
+                            ]
                         }
                     ],
                     "help_text": ""
