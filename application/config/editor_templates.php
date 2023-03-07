@@ -82,14 +82,14 @@ $config['image'][]=array(
 $config['image'][]=array(
     'template' => 'metadata_editor/metadata_editor_templates/image_dcmi_form_template.json',
     'lang'=>'en',
-    'uid'=>'image-system-en',
+    'uid'=>'image-system-dcmi',
     'name'=> 'Image IHSN Schema (DCMI option) 1.0 EN'
 ); 
 
 $config['image'][]=array(
     'template' => 'metadata_editor/metadata_editor_templates/image_iptc_form_template.json',
     'lang'=>'en',
-    'uid'=>'image-system-en',
+    'uid'=>'image-system-iptc',
     'name'=> 'Image IHSN Schema (IPTC option) 1.0 EN'
 ); 
 
