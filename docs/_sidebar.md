@@ -15,7 +15,7 @@
 
 * Collections and roles
 
-   * [Template manager](collections_roles.md)
+   * [Collections and roles](collections_roles.md)
 
 * Documenting data
 
