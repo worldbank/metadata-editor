@@ -16,7 +16,6 @@
 * Managing projects
 
    * [Managing projects](managing_projects.md)
-   * [Collections and roles](collections_roles.md)
 
 * Documenting data
 
