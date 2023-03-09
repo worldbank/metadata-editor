@@ -51,7 +51,12 @@ Select the template from which you want to build your own, then click “Duplica
  
 First, change the name of the template (by default, the name will be the name of the template you duplicated followed by "- copy"). Give a clear and unique name to your new template. The Metadata Editor does not force templates to have a unique name (but it automatically generated an underlying unique system identifier), so it is important that the name you chose distinguish the template you are creating from other custom templates. It is good practice to create a name that will include the data type, the organization that developed the template, and the version of the custom template. Other fields in the "Template description" page can be filled as appropriate. Although not required, no field should be left empty. When done, SAVE this page (changes are not saved automatically). You can now start customizing the content of this new template. 
 
-All standards and schemas start with a first section named either **Metadata information** or **Document description**. This section contains the metadata elements used to document the metadata (not the data themselves). This information will be useful to keep track of who documented the dataset, and when. This first section is followed by a few "hard-coded" sections specific to each standard and schema, within which metadata elements will be listed and grouped.
+All standards and schemas start with a first section named either **Metadata information** or **Document description**. This section contains the metadata elements used to document the metadata (not the data themselves). This information will be useful to keep track of who documented the dataset, and when. This first section is followed by a few "hard-coded" sections ("section containers") specific to each standard and schema, within which metadata elements will be listed and grouped. Hard-coded main groups are displayed with the icon:
+![image](https://user-images.githubusercontent.com/35276300/224107510-136d7837-fcaa-4e23-9303-1d77de0794d1.png)
+
+These section containers are hard-coded as they represent core divisions of the metadata standards, each one of which containing elements that cannot be moved to another group. 
+![image](https://user-images.githubusercontent.com/35276300/224107317-8fb883f8-0bb6-44e1-90bf-7d4b2d84f9e3.png)
+
 
 ### Description of a metadata element
 
@@ -62,12 +67,17 @@ This section describes the types of *metadata elements* found in the standards a
 - A metadata element can be *repeatable* or *non repeatable*. The title of a book for example must be unique, so the element "Title" will be non-repeatable. But the section "keywords" element may contain multiple entries, and is thus a repeatable element.
 
 - A metadata element can be simple or contain multiple sub-elements. For example, the "title" element in the DDI standard is a simple element, while the "author" element in the *document* schema contains multiple sub-elements that describe an author including first name, last name, affiliation, and more.
-The types of elements are the following:
-   - Text
+In the Template Manager, different icons indicate the type of the element. The types are the following:
+   - String
+    ![image](https://user-images.githubusercontent.com/35276300/224108908-16a31b84-420a-493e-b72b-cef7573c2e64.png)
+   - Array
+     ![image](https://user-images.githubusercontent.com/35276300/224109056-54de49b2-ba4a-44b1-a2ff-047d9e87410a.png)
    - Simple array
+   
    - Nested array
-In the Template Manager, different icons indicate the type of the element. 
+     ![image](https://user-images.githubusercontent.com/35276300/224109195-f62d1e58-2533-49d9-8dff-daecb0a97a5c.png)
 
+- Nested elements
 
 - A metadata element has a default *label*, which can be changed in custom templates.
 ![image](https://user-images.githubusercontent.com/35276300/214671331-30aefe93-0053-4710-a88b-de101810170b.png)
@@ -127,7 +137,7 @@ An single element (or sub-element) can have the following types, controlled by s
 
 ### Navigation bar and groupings
 
-Elements can be grouped in custom folders and sub-folders. This is for convenience only.
+Elements can be grouped in custom folders and sub-folders ("sections"). This grouping is for convenience only.
 ![image](https://user-images.githubusercontent.com/35276300/214395275-46bb01e0-6a43-4973-a456-4e68693001ea.png)
 They are grouped by main section of the standard or schema. This is constrained. 
 When you see:
