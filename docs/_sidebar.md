@@ -33,10 +33,6 @@
 * Publishing metadata 
 
     * [Publish metadata](publish.md)
-
-* Data deposit system
-
-   * [Data deposit system](data_deposit.md)
    
 * For developers
 
