@@ -20,15 +20,15 @@
 * Documenting data
 
     * [Microdata](template-manager/microdata.md)
-    * [Documents](template-manager/document.md)
-    * [Databases](template-manager/database.md)
-    * [Indicators/time series](template-manager/indicator.md)
-    * [Statistical tables](template-manager/table.md)
-    * [Geographic data and services](template-manager/geographic.md)
-    * [Images](template-manager/image.md)
-    * [Videos](template-manager/video.md)
-    * [Research projects and scripts](template-manager/script.md)
-    * [External resources](template-manager/external_resource.md)
+    * [Document](template-manager/document.md)
+    * [Database](template-manager/database.md)
+    * [Indicator/time series](template-manager/indicator.md)
+    * [Statistical table](template-manager/table.md)
+    * [Geographic dataset or service](template-manager/geographic.md)
+    * [Image](template-manager/image.md)
+    * [Video](template-manager/video.md)
+    * [Research project and scripts](template-manager/script.md)
+    * [External resource](template-manager/external_resource.md)
 
 * Publishing metadata 
 
