@@ -23,6 +23,18 @@ Different projects can possibly have the same ID. But catalogs cannot. So you mu
 
 Tags can be used to ...
 
+## Creating new projects
+
+
+## Importing / loading projects
+
+If you already have a project, you can import the metadata.
+
+If you have already documented a number of datasets ("projects") using one of the compatible metadata standards, you can import them all in the Metadata Editor using the API and R or Python.
+
+If you have a NADA catalog, there is another option: import from NADA. 
+Warning: This will not create project files with data etc.
+
 
 ## Managing permissions
 
