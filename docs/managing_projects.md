@@ -35,6 +35,9 @@ If you have already documented a number of datasets ("projects") using one of th
 If you have a NADA catalog, there is another option: import from NADA. 
 Warning: This will not create project files with data etc.
 
+What we recommend:
+...
+
 
 ## Managing permissions
 
