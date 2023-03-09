@@ -1,5 +1,8 @@
 # Managing projects
 
+
+## The project page
+
 A project corresponds (the documentation of) a dataset of any type.
 All projects are listed in the project page.
 The projects you see in the project page are the projects you are authorized to see, based on your credentials. 
@@ -19,6 +22,12 @@ If a project has warnings, it is shown by an icon.
 Different projects can possibly have the same ID. But catalogs cannot. So you must be careful. Duplicated IDs are shown.
 
 Tags can be used to ...
+
+
+## Managing permissions
+
+
+## Managing collections
 
 
 
