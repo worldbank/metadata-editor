@@ -13,8 +13,9 @@
 
    * [Template manager](managing_templates.md)
 
-* Collections and roles
+* Managing projects
 
+   * [Managing projects](managing projects.md)
    * [Collections and roles](collections_roles.md)
 
 * Documenting data
