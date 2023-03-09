@@ -22,13 +22,13 @@
 
     * [Microdata](template-manager/microdata.md)
     * [Documents](template-manager/document.md)
-    * [Indicators/time series](template-manager/indicator.md)
     * [Databases](template-manager/database.md)
+    * [Indicators/time series](template-manager/indicator.md)
     * [Statistical tables](template-manager/table.md)
     * [Geographic data and services](template-manager/geographic.md)
     * [Images](template-manager/image.md)
     * [Videos](template-manager/video.md)
-    * [Scripts](template-manager/script.md)
+    * [Research projects and scripts](template-manager/script.md)
     * [External resources](template-manager/external_resource.md)
 
 * Publishing metadata 
