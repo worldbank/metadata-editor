@@ -13,6 +13,10 @@
 
    * [Template manager](managing_templates.md)
 
+* Collections and roles
+
+   * [Template manager](collections_roles.md)
+
 * Documenting data
 
     * [Microdata](template-manager/microdata.md)
