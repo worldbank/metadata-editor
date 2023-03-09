@@ -2,34 +2,39 @@
 
 ## Use of templates
 
-The metadata standards and schemas embedded in the Metadata Editor contain a large number of metadata elements. These standards and schemas have been designed to accommodate the needs of different categories of users. Few users will find all elements relevant. **Templates** are created to subset and tailor the elements available in a standard or schema to the specific needs of an organization. By creating templates, users of the Metadata Editor have the possibility to: 
-- select, among all elements available in a standard or schema, those that they consider relevant; 
-- set some elements as "required" or "recommended";
-- organize the selected elements into groups;
-- control the order in which the elements will appear in metadata entry forms;
-- customize the labels and instructions associated with each metadata element;
-- set controlled vocabularies and default values where appropriate;
-- set custom validation rules for the content of the selected elements.
-
-Templates are used by the Metadata Editor to generate the metadata entry forms.
+The metadata standards and schemas embedded in the Metadata Editor contain a large number of metadata elements. These standards and schemas have been designed to accommodate the needs of different categories of users. Few users will find all elements relevant. **Templates** are created to subset and tailor the elements available in a standard or schema to the specific needs of an organization. Templates determine how the metadata entry forms that will be used by data curators will contain and look like.
 
 ![image](https://user-images.githubusercontent.com/35276300/214431708-b2eab31b-c32c-4483-9953-b086bbf63f7d.png)
 
-You will rarely need to use the Template Manager. Once a template has been designed or imported, and set as default, there is not much reason to change them. Spend some time reviewing and customizing the template to your specific needs. Using stable templates will guarantee consistency.
+By creating a template, you have the possibility to: 
+- Select, among all elements available in a standard or schema, those that are relevant to you or to your organization. This will result in lighter metadata entry forms. 
+- Declare some elements as "required" or "recommended".
+- Control the order in which the elements will appear in metadata entry forms, and organize them into customized groups. 
+- Customize the labels and instructions associated with each metadata element. Each community has its own jargon. If the terms used in the default templates are not sufficiently clear to you and your team of data curators, the template manager allows you to solve that.
+- Set controlled vocabularies and default values specific to your organization, where appropriate.
+- Set your own validation rules for the content of the metadata elements.
+
+Note that you will probably not use the Template Manager very often. Once a template suitable to your organization has been designed or imported, and set as the default one, there will not be much reason to change it. The recommendation is thus to spend some time reviewing and customizing templates that fits the needs of your organization, then to share them across the organization and use them in a consistent manner.
 
 ## Core templates vs custom templates
 
-The standard or schema for each data type is provided in the Metadata Editor as a *core* template. Core templates contain all elements of the standard or schema, with their default label and description. They contain a very small number of validation rules and controlled vocabularies. These system templates cannot be deleted or edited. But they can be duplicated then customized, allowing users to generate their own *Custom templates*. Custom templates can be exported and imported, i.e. shared with other users. Multiple custom templates can be created for a given data type.
+For each data type supported by the Metadata Editor, the full list of elements available in the standard or schema is provided as a *core* template. The core templates cannot be deleted or edited. They serve as a repository of all available elements, with their default label and description, from which you can build your own *custom* templates.
+
+Custom templates are created by duplicating then modifying an existing template (core of custom). The custom templates you create can be exported, and you can import custom templates created by others. Multiple custom templates can be created for a same data type.
+
+A template can easily be translated into any language. Just duplicate the English template, and tranlate each element label and descriptions.    
 
 ![image](https://user-images.githubusercontent.com/35276300/214394808-d752cb8e-b007-4642-9e16-e2cb26b16e91.png)
 
-The Metadata Editor application comes with a collection of pre-designed custom templates (the *IHSN templates*), covering all data types. Generating custom templates is thus not a requirement to make use of the Metadata Editor. 
+The Metadata Editor comes with pre-designed custom templates (the *IHSN templates*), covering all data types. Generating custom templates is thus not a requirement to make use of the Metadata Editor. 
 
 NOTE ON CORE TEMPLATES: 
 
-New core templates (new version, new standards): import from GitHub or IHSN.
+The IHSN may occasionally produce new core templates, either because a new version of a metadata standard becomes available, to cover new data types, or to provide core templates in languages other than English. In such case, the new core templates will be made available on GitHub and from the IHSN website, with an option to upgrade them in your version of the Metadata Editor without having to upgrade the application itself. Custom templates may also be made available publicly on the IHSN website. 
 
 NOTES ON THE USE OF CUSTOM TEMPLATES:
+
+Different organizations may use different templates. But because all templates are based on common standards and schemas, the metadata generated using different templates will always remain compatible. 
 
 1. When you document a dataset, the template is saved in the Project.
 2. Metadata generated using a template can be edited using another template. The selection /switching of the template impacts what is shown in the metadata entry forms; it does not change the content.
@@ -37,24 +42,16 @@ NOTES ON THE USE OF CUSTOM TEMPLATES:
 
 ## Creating or editing a custom template
 
-To build a custom template:
--	Duplicate and edit a core template. You will then build your template from the original standard or schema.
--	Modify a custom template. You will then build your template from a subset of the original standard or schema. 
--	Import a custom template.
-
-You will need at least one user template per data type you curate, and one to be used for external resources. One custom template per data type will be selected as the default one.
-
+To build a custom template, you will duplicate then edit the content of a core template or an existing custom template. 
 ![image](https://user-images.githubusercontent.com/35276300/214386279-82d6df69-4cf2-4694-bdfc-a8291a5c519a.png)
 
-To generate a template:
-
-Click “Duplicate”. The "Template description" page of new template will be displayed. 
+Select the template from which you want to build your own, then click “Duplicate”. The "Template description" page of new template will be displayed. 
 
 ![image](https://user-images.githubusercontent.com/35276300/214677926-79ad0824-3678-4f23-999f-390ed63e248a.png)
  
-First, change the name of the template (by default, the name will be the name of the template you duplicated followed by "- copy"). Give a clear and unique ame to the template. The Metadata Editor does not enforce templates to have a unique name (but it automatically generated an underlying unique system identifier), so it is important that the name you chose distinguish the template you are creating from other custom templates. It is good practice to create a name that will include the data type, the organization that developed the template, and the version of the custom template. Other fields should be filled as appropriate (although not required, no field should be left empty). For the "language", we suggest you enter the language code. When done, SAVE this page. You can now start customizing the template you duplicated. 
+First, change the name of the template (by default, the name will be the name of the template you duplicated followed by "- copy"). Give a clear and unique name to your new template. The Metadata Editor does not force templates to have a unique name (but it automatically generated an underlying unique system identifier), so it is important that the name you chose distinguish the template you are creating from other custom templates. It is good practice to create a name that will include the data type, the organization that developed the template, and the version of the custom template. Other fields in the "Template description" page can be filled as appropriate. Although not required, no field should be left empty. When done, SAVE this page (changes are not saved automatically). You can now start customizing the content of this new template. 
 
-All standards and schemas start with a first section named either **Metadata information** or **Document description**. This section contains the metadata elements used to document the metadata (not the data themselves). This information will be useful to keep track of who documented the dataset, and when. This first section is followed by other "hard-coded" sections specific to each standard and schema, within which metadata elements will be listed and grouped.
+All standards and schemas start with a first section named either **Metadata information** or **Document description**. This section contains the metadata elements used to document the metadata (not the data themselves). This information will be useful to keep track of who documented the dataset, and when. This first section is followed by a few "hard-coded" sections specific to each standard and schema, within which metadata elements will be listed and grouped.
 
 ### Description of a metadata element
 
@@ -65,6 +62,12 @@ This section describes the types of *metadata elements* found in the standards a
 - A metadata element can be *repeatable* or *non repeatable*. The title of a book for example must be unique, so the element "Title" will be non-repeatable. But the section "keywords" element may contain multiple entries, and is thus a repeatable element.
 
 - A metadata element can be simple or contain multiple sub-elements. For example, the "title" element in the DDI standard is a simple element, while the "author" element in the *document* schema contains multiple sub-elements that describe an author including first name, last name, affiliation, and more.
+The types of elements are the following:
+   - Text
+   - Simple array
+   - Nested array
+In the Template Manager, different icons indicate the type of the element. 
+
 
 - A metadata element has a default *label*, which can be changed in custom templates.
 ![image](https://user-images.githubusercontent.com/35276300/214671331-30aefe93-0053-4710-a88b-de101810170b.png)
