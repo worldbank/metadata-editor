@@ -115,6 +115,7 @@
                               clearable
                               @click:append="search"
                               @keyup.enter="search"
+                              @click:clear="clearSearch"
                             ></v-text-field>                            
                           </div>
                         </div>
@@ -152,7 +153,7 @@
 
                   </div>
 
-                  <div class=" p-1">
+                  <div class=" p-1" v-if="Projects">
                       <button @click="addProjectsToCollection" :disabled="selected_projects.length==0" title="Add to collection" class="btn btn-xs btn-outline-primary" ><span  class="mdi mdi-folder-plus"></span> Add to collection</button>                      
                   </div>
 
@@ -195,7 +196,7 @@
                   </div>
                 </template>
                 <template v-else class="bg-light">
-                  <table class="table table-sm" style="font-size:small;"> 
+                  <table class="table table-sm" style="font-size:small;" v-if="Projects"> 
                     <thead>
                       <tr>
                         <th><input type="checkbox" v-model="select_all_projects" @change="toggleProjectSelection"/></th>
@@ -488,6 +489,10 @@
           this.pagination_page=1;
           this.loadProjects();
         },
+        clearSearch: function(){
+          var self = this;
+          setTimeout(function () { self.search() } , 1000)
+        },
         getFacetTitleById: function(facet_name,facet_id)
         {
           if (!this.facets[facet_name]){
@@ -525,6 +530,11 @@
         },
         loadProjects: function() {
           vm = this;
+
+          if(!this.search_keywords)
+          {
+            this.search_keywords='';
+          }
 
           let url = CI.base_url + '/api/editor/?offset='+this.PaginationOffset
                     + '&' + 'keywords=' + this.search_keywords
