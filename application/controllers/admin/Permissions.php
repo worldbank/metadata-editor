@@ -18,7 +18,7 @@ class Permissions extends MY_Controller {
 		//$this->output->enable_profiler(TRUE);
 
 		//set default template
-		$this->template->set_template('admin');		
+		$this->template->set_template('admin5');		
 	}
 
 	

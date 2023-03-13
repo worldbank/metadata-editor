@@ -44,28 +44,6 @@ class Editor_model extends CI_Model {
 		'notes',
 		'metadata'
 	);
- 
-	//fields for the study description
-	private $survey_fields=array(
-		'id',
-		'type',
-		'idno',
-		'title',
-		'abbreviation',
-		'dirpath',
-		'metafile',
-		'year_start',
-		'year_end',
-		'published',
-		'varcount',
-		'created',
-		'changed',
-		'created_by',
-		'changed_by',
-		'metadata',
-		'thumbnail'
-		);
-		
 	
 	private $listing_fields=array(
 		'id',
@@ -81,7 +59,8 @@ class Editor_model extends CI_Model {
 		'changed',
 		'varcount',
 		'created_by',
-		'changed_by'
+		'changed_by',
+		'is_shared'
 		);
 	
 
@@ -96,6 +75,7 @@ class Editor_model extends CI_Model {
 		$this->load->helper("Array");
 		$this->load->library("form_validation");		
 		$this->load->model("Editor_variable_model");
+		$this->load->model("Collection_model");
 	}
 
 
@@ -169,7 +149,7 @@ class Editor_model extends CI_Model {
 	
 	/**
 	 * 
-	 * Return all datasets
+	 * Return all projects
 	 * 
 	 * @offset - offset
 	 * @limit - number of rows to return
@@ -190,7 +170,7 @@ class Editor_model extends CI_Model {
 		
 		$this->db->select(implode(",",$fields));
 		$this->db->order_by('editor_projects.changed','desc');
-		$this->db->join("users", "users.id=editor_projects.created_by");
+		$this->db->join("users", "users.id=editor_projects.changed_by");
 
 		if ($limit>0){
 			$this->db->limit($limit, $offset);
@@ -199,6 +179,8 @@ class Editor_model extends CI_Model {
 		$search_filters=$this->apply_search_filters($search_options);
 		
 		$result= $this->db->get("editor_projects");
+
+		//echo $this->db->last_query();
 		
 		if ($result){
 			$result=$result->result_array();			
@@ -206,7 +188,7 @@ class Editor_model extends CI_Model {
 			$error=$this->db->error();
 			throw  new Exception(implode(", ", $error));
 		}
-		
+
 		if ($result){
 			$result=$this->decode_encoded_fields_rows($result);
 		}
@@ -231,12 +213,43 @@ class Editor_model extends CI_Model {
 	{
 		$applied_filters=array();
 
+		//filter by ownership
+		$project_owners=$this->parse_filter_values_as_int($this->get_search_filter($search_options,'user_id'));
+
+		if ($project_owners){		
+			
+			//projects user owns by direct sharing
+			$subquery='select sid from editor_project_owners where user_id='.(int)$project_owners[0];
+
+			//projects user can access via collections
+			$collection_query='select sid from editor_collection_projects 
+					inner join editor_collection_access on editor_collection_access.collection_id=editor_collection_projects.collection_id
+					where editor_collection_access.user_id='.(int)$project_owners[0];
+			
+			$query='(editor_projects.created_by='.(int)$project_owners[0]
+				 .' OR editor_projects.id in( '. $subquery.') OR editor_projects.id in ('.$collection_query.')) ';
+			$this->db->where($query,null, false);
+			$applied_filters['user_id']=$project_owners;
+		}
+
+		//filter by collection
+		$collection_filters=$this->parse_filter_values_as_int($this->get_search_filter($search_options,'collection'));
+		
+		if ($collection_filters){
+
+			$subquery='select sid from editor_collection_projects where collection_id in ('.implode(",",$collection_filters).')';			
+			$query='(editor_projects.id in( '. $subquery.')) ';
+			$this->db->where($query,null, false);
+			$applied_filters['collection']=$project_owners;
+		}
+
+
 		//filter by type
-		$data_type_filters=$this->get_search_filter($search_options,'data_type');
+		$data_type_filters=$this->get_search_filter($search_options,'type');
 		
 		if ($data_type_filters){
 			$this->db->where_in('type',$data_type_filters);
-			$applied_filters['data_type']=$data_type_filters;
+			$applied_filters['type']=$data_type_filters;
 		}
 
 		//keywords
@@ -255,6 +268,23 @@ class Editor_model extends CI_Model {
 		return $applied_filters;		
 	}
 
+	function parse_filter_values_as_int($values)
+	{
+		$parsed_values=array();
+
+		if (!is_array($values)){
+			$values=array($values);
+		}
+
+		foreach($values as $idx=>$value){
+			if (is_numeric($value)){
+				$parsed_values[]=(int)$value;
+			}
+		}
+
+		return $parsed_values;
+	}
+
 	function get_search_filter($options,$filter_key)
 	{
 		if (!isset($options[$filter_key])){
@@ -262,6 +292,11 @@ class Editor_model extends CI_Model {
 		}
 
 		$values=$options[$filter_key];
+		
+		if (!is_array($values)){
+			$values=array($values);
+		}
+
 		foreach($values as $idx=>$value){
 			$values[$idx]=xss_clean($value);
 		}
@@ -354,7 +389,7 @@ class Editor_model extends CI_Model {
     //decode metadata to array
     public function decode_metadata($metadata_encoded)
     {
-        return unserialize(base64_decode($metadata_encoded));
+        return unserialize(base64_decode((string)$metadata_encoded));
 	}
 
 	//get the survey by id
@@ -433,6 +468,8 @@ class Editor_model extends CI_Model {
 		}
 
 		$options=array(
+			'changed'=>$options['changed'],
+			'changed_by'=>$options['changed_by'],
 			'idno'=>$this->get_project_metadata_field($type,'idno',$options),
 			'title'=>$this->get_project_metadata_field($type,'title',$options),
 			'metadata'=>$this->encode_metadata($options)
@@ -1353,6 +1390,34 @@ class Editor_model extends CI_Model {
 		$this->db->where('sid',$sid);
 		$this->db->delete("editor_variables");
 	}
+
+
+	function get_facets()
+	{
+		$facets=array();
+
+		//data types
+		$facets['type']=array(
+			array("id"=>"survey","title"=>"Microdata"),
+			array("id"=>"document","title"=>"Document"),
+			array("id"=>"table","title"=>"Table"),
+			array("id"=>"geospatial","title"=>"Geospatial"),
+			array("id"=>"image","title"=>"Image"),
+			array("id"=>"script", "title"=>"Script"),
+			array("id"=>"video","title"=>"Video"),
+			array("id"=>"timeseries","title"=>"Timeseries"),
+			array("id"=>"timeseries-db","title"=>"Timeseries DB"),
+		);
+
+		//collections
+		$facets['collection']=$this->Collection_model->collections_list();
+
+		//tags
+		
+		return $facets;
+
+	}
+
 
 	
 }//end-class

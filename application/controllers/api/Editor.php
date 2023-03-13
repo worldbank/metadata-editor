@@ -7,16 +7,13 @@ class Editor extends MY_REST_Controller
 	public function __construct()
 	{
 		parent::__construct();
-		//$this->load->model('Catalog_model'); 	
 		$this->load->helper("date");
-		//$this->load->model('Data_file_model');
-		//$this->load->model('Variable_model');	
-		//$this->load->model('Dataset_model');//remove with Datasets library
 		$this->load->model("Editor_model");
 		$this->load->model("Editor_resource_model");
 		$this->load->model("Editor_publish_model");
+		$this->load->model("Collection_model");
 		
-		//$this->load->library("Dataset_manager");
+		$this->load->library("Editor_acl");
 		$this->is_authenticated_or_die();
 	}
 
@@ -43,12 +40,13 @@ class Editor extends MY_REST_Controller
 				return $this->single_get($id);
 			}
 
-			$this->has_dataset_access('view');
+			$this->has_access($resource_='editor',$privilege='view');
 			
 			$offset=(int)$this->input->get("offset");
 			$limit=(int)$this->input->get("limit");
 
 			$search_options=$this->input->get();
+			$search_options['user_id']=$this->session->userdata('user_id');
 
 			if (!$limit){
 				$limit=10;
@@ -56,6 +54,27 @@ class Editor extends MY_REST_Controller
 			
 			$result=$this->Editor_model->get_all($limit,$offset,null,$search_options);
 			array_walk($result['result'], 'unix_date_to_gmt',array('created','changed'));
+
+			//add collections and tags to each study
+			$project_id_list=array();
+			foreach($result['result'] as $row){
+				$project_id_list[]=$row['id'];
+			}
+
+			if (count($project_id_list)>0){						
+				//get collections
+				$collections=$this->Collection_model->collections_by_projects($project_id_list);
+
+				//get tags
+				//$tags=$this->Editor_model->get_tags($project_id_list);
+
+				//add collections and tags to each study
+				foreach($result['result'] as $key=>$row){
+					$result['result'][$key]['collections']=isset($collections[$row['id']]) ? $collections[$row['id']] : array();
+					//$result['result'][$key]['tags']=$tags[$row['id']];
+				}
+			}
+
 			
 			$response=array(
 				'status'=>'success',
@@ -88,7 +107,7 @@ class Editor extends MY_REST_Controller
 	function single_get($sid=null)
 	{
 		try{
-			//$this->has_dataset_access('view',$sid);
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
 
 			$result=$this->Editor_model->get_row($sid);
 			array_walk($result, 'unix_date_to_gmt_row',array('created','changed'));
@@ -247,7 +266,7 @@ class Editor extends MY_REST_Controller
 			$options=$this->raw_json_input();
 			$user_id=$this->get_api_user_id();
 			
-			//$this->has_dataset_access('edit',$sid);
+			//$this->has_dataset_access('edit',$sid);			
 
 			//check project exists and is of correct type
 			$exists=$this->Editor_model->check_id_exists($id,$type);
@@ -255,10 +274,11 @@ class Editor extends MY_REST_Controller
 			if(!$exists){
 				throw new Exception("Project with the type [".$type ."] not found");
 			}
+
+			$this->editor_acl->user_has_project_access($id,$permission='edit');
 			
 			$options['changed_by']=$user_id;
 			$options['changed']=date("U");
-
 			
 			//validate & update project
 			$this->Editor_model->update_project($type,$id,$options,$validate);
@@ -306,7 +326,8 @@ class Editor extends MY_REST_Controller
 			$options['created_by']=$user_id;
 			$options['changed_by']=$user_id;
 			$options['sid']=$sid;
-			
+
+			$this->editor_acl->user_has_project_access($sid,$permission='edit');			
 			$this->Editor_model->set_project_options($sid,$options);
 
 			$response=array(
@@ -345,7 +366,7 @@ class Editor extends MY_REST_Controller
 
 			$user_id=$this->get_api_user_id();
 			
-			//$this->has_dataset_access('edit',$sid);
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
 
 			//validate & update project
 			$this->Editor_model->validate_schema($project['type'],$project['metadata']);
@@ -383,7 +404,7 @@ class Editor extends MY_REST_Controller
 	function delete_post($sid=null)
 	{
 		try{
-			//$this->has_dataset_access('edit');
+			$this->editor_acl->user_has_project_access($sid,$permission='edit');
 			$this->Editor_model->delete_project($sid);
 				
 			$response=array(
@@ -412,7 +433,7 @@ class Editor extends MY_REST_Controller
 	function datafiles_get($id=null)
 	{
 		try{
-			//$this->has_dataset_access('view');
+			$this->editor_acl->user_has_project_access($id,$permission='view');
 			
 			$user_id=$this->get_api_user_id();
 			$survey_datafiles=$this->Editor_model->data_files($id);
@@ -440,8 +461,7 @@ class Editor extends MY_REST_Controller
 	function datafile_by_name_get($sid=null)
 	{
 		try{
-			//$this->has_dataset_access('view');
-
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
 			$filename=$this->input->get("filename");
 
 			if(!$filename){
@@ -478,7 +498,7 @@ class Editor extends MY_REST_Controller
 	function datafile_generate_fid_get($sid=null)
 	{
 		try{
-			//$this->has_dataset_access('view');
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
 			
 			$user_id=$this->get_api_user_id();
 			$file_id=$this->Editor_model->data_file_generate_fileid($sid);
@@ -509,7 +529,7 @@ class Editor extends MY_REST_Controller
 	function datafiles_post($sid=null)
 	{
 		try{
-			$this->has_dataset_access('edit');
+			$this->editor_acl->user_has_project_access($sid,$permission='edit');
 
 			$options=$this->raw_json_input();
 			$user_id=$this->get_api_user_id();
@@ -572,9 +592,7 @@ class Editor extends MY_REST_Controller
 	function datafiles_delete_post($sid=null,$file_id=null)
 	{
 		try{
-			//$this->has_dataset_access('edit');
-
-			//delete
+			$this->editor_acl->user_has_project_access($sid,$permission='edit');
 			$this->Editor_model->data_file_delete($sid,$file_id);
 				
 			$response=array(
@@ -601,7 +619,7 @@ class Editor extends MY_REST_Controller
 	function variables_get($id=null,$file_id=null)
 	{
 		try{
-			//$this->has_dataset_access('view');			
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
 			$user_id=$this->get_api_user_id();        			
 			$variable_detailed=(int)$this->input->get("detailed");
 			$survey_variables=$this->Editor_model->variables($id,$file_id,$variable_detailed);
@@ -634,7 +652,7 @@ class Editor extends MY_REST_Controller
 	function variables_post($sid=null)
 	{
 		try{
-			//$this->has_dataset_access('edit');
+			$this->editor_acl->user_has_project_access($sid,$permission='edit');
 			$options=(array)$this->raw_json_input();
 			$user_id=$this->get_api_user_id();
 
@@ -722,6 +740,8 @@ class Editor extends MY_REST_Controller
 				throw new Exception("Project not found");
 			}
 
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
+
 			$result=$this->Editor_resource_model->files_summary($sid);
 
 			$output=array(
@@ -750,6 +770,8 @@ class Editor extends MY_REST_Controller
 			if(!$exists){
 				throw new Exception("Project not found");
 			}
+
+			$this->editor_acl->user_has_project_access($sid,$permission='edit');
 
 			if ($file_type=='thumbnail'){
 				$output=$this->Editor_resource_model->upload_thumbnail($sid,$file_field_name='file');
@@ -799,6 +821,7 @@ class Editor extends MY_REST_Controller
 			if(!$exists){
 				throw new Exception("Project not found");
 			}
+			$this->editor_acl->user_has_project_access($sid,$permission='edit');
 
 			$result=$this->Editor_model->importDDI($sid);
 
@@ -823,6 +846,8 @@ class Editor extends MY_REST_Controller
 			if(!$project){
 				throw new Exception("Project not found");
 			}
+
+			$this->editor_acl->user_has_project_access($sid,$permission='edit');
 			
 			$allowed_file_types="json|xml";
 			$uploaded_filepath=$this->Editor_resource_model->upload_temporary_file($allowed_file_types,$file_field_name='file',$temp_upload_folder=null);
@@ -879,6 +904,7 @@ class Editor extends MY_REST_Controller
 				throw new Exception("Project not found");
 			}
 
+			$this->editor_acl->user_has_project_access($sid,$permission='edit');
 			$result=$this->Editor_model->importDDI($sid,$parseOnly=true);
 
 			$output=array(
@@ -908,6 +934,7 @@ class Editor extends MY_REST_Controller
 				throw new Exception("Project not found");
 			}
 
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
 			$this->Editor_model->download_project_json($sid);
 			die();
 		}
@@ -931,6 +958,7 @@ class Editor extends MY_REST_Controller
 				throw new Exception("Project not found");
 			}
 
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
 			$this->Editor_model->generate_project_json($sid);
 
 			$output=array(
@@ -960,6 +988,7 @@ class Editor extends MY_REST_Controller
 				throw new Exception("Project not found");
 			}
 
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
 			$this->Editor_model->download_project_ddi($sid);
 			die();
 		}
@@ -982,6 +1011,7 @@ class Editor extends MY_REST_Controller
 				throw new Exception("Project not found");
 			}
 
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
 			$this->Editor_model->generate_project_ddi($sid);
 
 			$output=array(
@@ -1011,6 +1041,7 @@ class Editor extends MY_REST_Controller
 				throw new Exception("Project not found");
 			}
 
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
 			$resources=$this->Editor_resource_model->select_all($sid,$fields=null);
 
 			$remove_fields=array("sid","id");
@@ -1060,6 +1091,7 @@ class Editor extends MY_REST_Controller
 				throw new Exception("Project not found");
 			}
 
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
 			$this->Editor_resource_model->write_rdf($sid);
 			
 			$output=array(
@@ -1083,7 +1115,7 @@ class Editor extends MY_REST_Controller
 	public function resources_import_post($sid=NULL)
 	{
 		try {
-			//$this->has_dataset_access('edit',$sid);
+			$this->editor_acl->user_has_project_access($sid,$permission='edit');
 
 			$uploaded_filepath=$this->Editor_resource_model->upload_temporary_file($allowed_file_type="rdf|xml|json",$file_field_name='file',$temp_upload_folder=null);
 
@@ -1129,7 +1161,7 @@ class Editor extends MY_REST_Controller
 	function resources_get($sid=null)
 	{
 		try{
-			//$this->has_dataset_access('view');
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
 			
 			$user_id=$this->get_api_user_id();
 			$resources=$this->Editor_resource_model->select_all($sid,$fields=null);
@@ -1163,6 +1195,8 @@ class Editor extends MY_REST_Controller
 				throw new Exception("Project not found");
 			}
 
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
+
 			header('Content-type: application/xml');
 			echo $this->Editor_resource_model->generate_rdf($sid);
 			die();
@@ -1191,7 +1225,7 @@ class Editor extends MY_REST_Controller
 				
 		try{
 			
-			//$this->has_dataset_access('edit',$sid);
+			$this->editor_acl->user_has_project_access($sid,$permission='edit');
 
 			$options['sid']=$sid;
 
@@ -1267,7 +1301,7 @@ class Editor extends MY_REST_Controller
 	function resource_delete_post($sid=null,$resource_id=null)
 	{
 		try{
-			//$this->has_dataset_access('view');
+			$this->editor_acl->user_has_project_access($sid,$permission='edit');
 
 			$user_id=$this->get_api_user_id();
 			$resources=$this->Editor_resource_model->delete($sid,$resource_id);
@@ -1290,29 +1324,40 @@ class Editor extends MY_REST_Controller
 
 	function download_zip_get($sid,$generate=0)
 	{
-		$this->load->library('zip');
-		$path = $this->Editor_model->get_project_folder($sid);
+		try{
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
 
-		if (file_exists($path.'/project.zip') && $generate==0){
-			$this->load->helper('download');
-			force_download2($path.'/project.zip');
+			$this->load->library('zip');
+			$path = $this->Editor_model->get_project_folder($sid);
+
+			if (file_exists($path.'/project.zip') && $generate==0){
+				$this->load->helper('download');
+				force_download2($path.'/project.zip');
+				die();
+			}
+
+			$files=$this->Editor_resource_model->files($sid);
+			
+			foreach($files as $file){
+				$this->zip->read_file($path.$file,$file);
+			}
+
+			$this->zip->download(md5($sid).'.zip',false);
 			die();
 		}
-
-		$files=$this->Editor_resource_model->files($sid);
-		
-		foreach($files as $file){
-			$this->zip->read_file($path.$file,$file);
+		catch(Exception $e){
+			show_error($e->getMessage(),500);
+			die();
 		}
-
-		$this->zip->download(md5($sid).'.zip',false);
-		die();
 	}
 
 	function generate_zip_get($sid)
 	{
 		$this->load->library('zip');
+		
 		try{
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
+
 			$path = $this->Editor_model->get_project_folder($sid);
 			$files=$this->Editor_resource_model->files($sid);
 
@@ -1348,7 +1393,7 @@ class Editor extends MY_REST_Controller
 	 * 
 	 */
 	function thumbnail_get($sid=null)
-	{		
+	{
 		try{
 			$this->Editor_model->download_project_thumbnail($sid);
 			die();
@@ -1435,7 +1480,8 @@ class Editor extends MY_REST_Controller
 	function publish_to_catalog_post($sid=null,$catalog_connection_id=null)
 	{
 		try{
-			//$this->has_dataset_access('view');
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
+
 			$options=$this->raw_json_input();
 			$user_id=$this->get_api_user_id();
 
@@ -1472,6 +1518,8 @@ class Editor extends MY_REST_Controller
 				throw new Exception("Project not found");
 			}
 
+			$this->editor_acl->user_has_project_access($sid,$permission='edit');
+
 			$result=$this->Editor_resource_model->upload_data($sid,$fid,$file_field_name='file', $append);
 			$uploaded_file_name=$result['file_name'];
 			$uploaded_path=$result['full_path'];
@@ -1489,5 +1537,32 @@ class Editor extends MY_REST_Controller
 		}
 	}
 
+
+	/**
+	 * 
+	 * get all facets available
+	 * 
+	 */
+	function facets_get()
+	{
+		try{
+
+			$result=$this->Editor_model->get_facets();
+
+			$response=array(
+				'status'=>'success',
+				'facets'=>$result
+			);
+						
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
 
 }

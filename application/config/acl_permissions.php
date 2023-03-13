@@ -35,6 +35,23 @@ $config['acl_permissions'] = [
             ]
         ]
     ],
+    "editor"=>[ 
+        "title" => "Editor",
+        "permissions"=>[
+            [
+                "permission" => "view"
+            ],
+            [
+                "permission" => "create"
+            ],
+            [
+                "permission" => "edit"
+            ],
+            [
+                "permission" => "delete"
+            ]
+        ]
+    ],
     "menu"=>[ 
         "title" => "Site menu pages",
         "permissions"=>[

@@ -20,6 +20,12 @@
             </li>
 
             <li class="nav-item">
+                <a class="nav-link" href="<?php echo site_url('collections'); ?>" role="button">
+                Collections
+                </a>
+            </li>
+
+            <li class="nav-item">
                 <a class="nav-link" href="<?php echo site_url('editor/templates'); ?>" role="button">
                 Templates
                 </a>

@@ -13,12 +13,13 @@ class Editor extends MY_Controller {
       	parent::__construct();
 		$this->load->model('Editor_model');
 		$this->load->model('Editor_template_model');
+		$this->load->library("Editor_acl");
 	}
 
 	function index()
 	{
 		$this->template->set_template('default');
-		echo $this->load->view('metadata_editor/home',$options=array(),true);
+		echo $this->load->view('project/home',$options=array(),true);
 
 		//$this->template->write('content', $content,true);
 		//$this->template->render();
@@ -26,107 +27,90 @@ class Editor extends MY_Controller {
 
 	function edit($id=null)
 	{
-		$project=$this->Editor_model->get_row($id);
+		try{
 
-		if (!$project){
-			show_error('Project was not found');
-		}
+			$project=$this->Editor_model->get_row($id);
 
-		//$this->acl_manager->has_access_or_die('study', 'edit',null,$survey['repositoryid']);
-				 
-		$template_file="{$project['type']}_form_template.json";
-
-		$template_path='';
-		
-		//locations to look for templates
-		$template_locations=array(
-			'application/views/metadata_editor/metadata_editor_templates/custom',
-			'application/views/metadata_editor/metadata_editor_templates',
-		);
-
-		//look for template in all locations and pick the first one found
-		foreach($template_locations as $path){
-			if (file_exists($path.'/'.$template_file)){
-				$template_path=$path.'/'.$template_file;
-				break;
-			}
-		}
-		
-		$schema_path="application/schemas/{$project['type']}-schema.json";
-
-		if(!file_exists($template_path)){
-			show_error('Template not found::'. $template_path);
-		}
-
-		if(!file_exists($schema_path)){
-			show_error('Schema not found::'. $schema_path);
-		}
-
-		$options['sid']=$id;
-		$options['title']=$project['title'];
-		$options['type']=$project['type'];		
-		$options['metadata']=$project['metadata'];
-
-		//fix schema elements with mixed types
-		if ($project['type']=='survey'){
-			//coll_mode
-			$coll_mode=array_data_get($options['metadata'], 'study_desc.method.data_collection.coll_mode');
-			if(!empty($coll_mode) && !is_array($coll_mode)){
-				set_array_nested_value($options['metadata'],'study_desc.method.data_collection.coll_mode',(array)$coll_mode,'.');
-			}
-		}
-
-		$options['metadata_template']=file_get_contents($template_path);
-		$options['metadata_template_arr']=json_decode($options['metadata_template'],true);
-
-		//load template
-		if (isset($project['template_uid']) && !empty($project['template_uid'])){
-			$template=$this->Editor_template_model->get_template_by_uid($project['template_uid']);
-		}
-		
-		if (empty($template)){
-			$core_templates_by_type=$this->Editor_template_model->get_core_templates_by_type($project['type']);
-			if (!$core_templates_by_type){
-				throw new Exception("Template not found for type", $project['type']);
+			if (!$project){
+				show_error('Project was not found');
 			}
 
-			//load default core template by type
-			$template=$this->Editor_template_model->get_template_by_uid($core_templates_by_type[0]["uid"]);
+			$this->editor_acl->user_has_project_access($project['id'],$permission='edit');		
+					
+			$template_file="{$project['type']}_form_template.json";
+			$template_path='';
+			
+			//locations to look for templates
+			$template_locations=array(
+				'application/views/metadata_editor/metadata_editor_templates/custom',
+				'application/views/metadata_editor/metadata_editor_templates',
+			);
+
+			//look for template in all locations and pick the first one found
+			foreach($template_locations as $path){
+				if (file_exists($path.'/'.$template_file)){
+					$template_path=$path.'/'.$template_file;
+					break;
+				}
+			}
+			
+			$schema_path="application/schemas/{$project['type']}-schema.json";
+
+			if(!file_exists($template_path)){
+				show_error('Template not found::'. $template_path);
+			}
+
+			if(!file_exists($schema_path)){
+				show_error('Schema not found::'. $schema_path);
+			}
+
+			$options['sid']=$id;
+			$options['title']=$project['title'];
+			$options['type']=$project['type'];		
+			$options['metadata']=$project['metadata'];
+
+			//fix schema elements with mixed types
+			if ($project['type']=='survey'){
+				//coll_mode
+				$coll_mode=array_data_get($options['metadata'], 'study_desc.method.data_collection.coll_mode');
+				if(!empty($coll_mode) && !is_array($coll_mode)){
+					set_array_nested_value($options['metadata'],'study_desc.method.data_collection.coll_mode',(array)$coll_mode,'.');
+				}
+			}
+
+			$options['metadata_template']=file_get_contents($template_path);
+			$options['metadata_template_arr']=json_decode($options['metadata_template'],true);
+
+			//load template
+			if (isset($project['template_uid']) && !empty($project['template_uid'])){
+				$template=$this->Editor_template_model->get_template_by_uid($project['template_uid']);
+			}
+			
+			if (empty($template)){
+				$core_templates_by_type=$this->Editor_template_model->get_core_templates_by_type($project['type']);
+				if (!$core_templates_by_type){
+					throw new Exception("Template not found for type", $project['type']);
+				}
+
+				//load default core template by type
+				$template=$this->Editor_template_model->get_template_by_uid($core_templates_by_type[0]["uid"]);
+			}
+
+			$options['metadata_template']=json_encode($template);
+			$options['metadata_template_arr']=$template['template'];
+
+			$options['metadata_schema']=file_get_contents($schema_path);
+			$options['post_url']=site_url('api/editor/update/'.$project['type'].'/'.$project['id']);
+			$options['sub_section']=$this->uri->segment(6);
+
+					
+			//render
+			$content= $this->load->view('metadata_editor/index_vuetify',$options,true);
+			echo $content;
 		}
-
-		$options['metadata_template']=json_encode($template);
-		$options['metadata_template_arr']=$template['template'];
-/*
-
-		$template_custom_parts=[];
-		$this->get_template_custom_parts($options['metadata_template_arr']["items"],$template_custom_parts);
-		//var_dump($template_custom_parts);
-		//print_r($template_custom_parts);
-
-		//remove elements with is_editable = false
-		$custom_sections=[];
-		$items_x=$options['metadata_template_arr']["items"];
-		$this->get_template_editable_parts($items_x);
-
-*/
-/*
-		echo '<pre>';
-		print_r($template_custom_parts);
-		echo "<HR>";
-		print_r($items_x);
-		die();
-*/
-		//$user_template=$this->Editor_template_model->get_template_by_uid($uid);
-
-
-		$options['metadata_schema']=file_get_contents($schema_path);
-		$options['post_url']=site_url('api/editor/update/'.$project['type'].'/'.$project['id']);
-		$options['sub_section']=$this->uri->segment(6);
-
-				
-		//render
-		$content= $this->load->view('metadata_editor/index_vuetify',$options,true);
-		echo $content;
+		catch(Exception $e){
+			show_error($e->getMessage());
+		}
 	}
 
 	function get_template_custom_parts($items,&$output)

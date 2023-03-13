@@ -59,7 +59,7 @@ class Editor_publish_model extends ci_model {
 		$output_file=$project_folder.'/'.$filename.'.json';
 
 		if (!file_exists($output_file)){
-			throw new Exception("JSON metadata file not found");
+			throw new Exception("JSON metadata file not found" . $output_file);
 		}
 
 		return $output_file;
