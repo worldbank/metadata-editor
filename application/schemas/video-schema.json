@@ -389,7 +389,7 @@
                 "title": "Affiliation",
                 "type": "string"
               },
-              "abbreviation": {
+              "abbr": {
                 "title": "Abbreviation",
                 "type": "string"
               },
@@ -478,7 +478,10 @@
 
         "relations": {
           "type": "array",
-          "title":"Defines, as a free text field, the relation between the video being documented and other resources. This is a Dublin Core element."
+          "title":"Defines, as a free text field, the relation between the video being documented and other resources. This is a Dublin Core element.",
+          "items": {
+            "type": "string"
+          }
         },
 
         "video_provider": {
@@ -545,14 +548,18 @@
           "items": {
             "type": "object",
             "properties": {
-              "language": {
+              "language_name": {
                 "title": "Language",
+                "type": "string"
+              },
+              "language_code": {
+                "title": "Language code",
                 "type": "string"
               },
               "text": {
                 "title": "Text",
                 "type": "string"
-              }              
+              }            
             }
           },
           "required": [

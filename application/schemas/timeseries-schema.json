@@ -202,6 +202,10 @@
 					"items": {
 						"type": "object",
 						"properties": {
+							"name": {
+								"title": "Name",
+								"type": "string"
+							},
 							"label": {
 								"title": "Label",
 								"type": "string"
@@ -293,6 +297,10 @@
 				"methodology": {
 					"type": "string",
 					"title": "Methodology"
+				},
+				"derivation": {
+					"type": "string",
+					"title": "Derivation"
 				},
 				"imputation": {
 					"type": "string",
@@ -399,8 +407,16 @@
 					"items": {
 						"type": "object",
 						"properties": {
+							"id": {
+								"title": "Unique Identifier",
+								"type": "string"
+							},
 							"name": {
 								"title": "Discipline title or name",
+								"type": "string"
+							},
+							"parent_id": {
+								"title": "Parent Identifier",
 								"type": "string"
 							},
 							"vocabulary": {
@@ -436,6 +452,10 @@
 							"end": {
 								"type": "string",
 								"title": "End"
+							},
+							"notes": {
+								"type": "string",
+								"title": "Notes"
 							}
 						}
 					}
@@ -718,6 +738,26 @@
 						]
 					}
 				},
+				"errata": {
+					"type": "array",
+					"title": "Errata",
+					"description": "List of corrected errors in data or metadata",
+					"items": {
+					  "type": "object",
+					  "properties": {
+						"date": {
+						  "title": "Date of erratum",
+						  "description": "Date when the erratum was reported or published",
+						  "type": "string"
+						},
+						"description": {
+						  "title": "Description of the erratum",
+						  "description": "A description of the erratum, with information on which data or metadata were impacted",
+						  "type": "string"
+						}
+					  }
+					}
+				  },
 				"notes": {
 					"title": "Notes",
 					"description": "Notes",

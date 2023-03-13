@@ -32,7 +32,7 @@
 			]
 		},
 		"var_dcml": {
-			"type": ["integer", "string"],
+			"type": "string",
 			"title": "Variable decimal points",
 			"description": "Number of decimal points in the variable"
 		},
@@ -76,34 +76,6 @@
 			"type": "string",
 			"title": "Source of information"
 		},
-
-		"var_embargo": {
-			"type": "object",
-			"title": "Embargo",
-			"description": "Provides information on variables which are not currently available becuase of policies established by the principal investigators and/or data producers.",
-			"properties": {
-				"embargo": {
-					"type": "string",
-					"title": "Embargo description"
-				},
-				"event": {
-					"type": "string",
-					"title": "Event",
-					"default": "notBefore",
-					"enum": [
-						"notBefore",
-						"notAfter",
-						""
-					]
-				},
-				"date": {
-					"type": "string",
-					"title": "Date (YYYY-MM-DD)"
-				}				
-			}
-
-		},
-		
 		"var_qstn_preqtxt": {
 			"type": "string",
 			"title": "Pre-question text",
@@ -127,7 +99,7 @@
 			"title": "Backward skip",
 			"description": "Contains a reference to IDs of possible preceding questions. This can be used to document backward skip instructions."
 		},
-		"var_qstn_ivulnstr": {
+		"var_qstn_ivuinstr": {
 			"type": "string",
 			"title": "Interviewer instructions"
 		},
@@ -171,7 +143,7 @@
 				"type": "object",
 				"properties": {
 					"value": {
-						"type": ["integer", "string"],
+						"type": "string",
 						"title": "Value"
 					},
 					"label": {

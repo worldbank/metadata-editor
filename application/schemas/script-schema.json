@@ -267,10 +267,7 @@
         "production_date": {
           "title": "Date of production (YYYY-MM-DD)",
           "description": "Date in ISO format when the dissemination-ready version of the research project was produced. It can be a year (YYYY), year-month (YYYY-MM), or year-month-day (YYYY-MM-DD)",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+          "type": "string"
         },
         "version_statement": {
           "type": "object",
@@ -456,7 +453,7 @@
                 "title": "Funding Agency/Sponsor",
                 "type": "string"
               },
-              "abbr": {
+              "abbreviation": {
                 "title": "Abbreviation",
                 "type": "string"
               },
@@ -546,7 +543,7 @@
             }
           }
         },
-        "acknowledgements": {
+        "acknowledgments": {
           "type": "array",
           "title": "Other acknowledgments",
           "description": "Acknowledgments of persons or organizations (other than sponsors) who contributed to the project.",
@@ -571,9 +568,9 @@
             "name"
           ]
         },
-        "acknowledgement_statement": {
-          "title": "Acknowledgement statement",
-          "description": "Acknowledgement statement",
+        "acknowledgment_statement": {
+          "title": "Acknowledgment statement",
+          "description": "Acknowledgment statement",
           "type": "string"
         },
         "disclaimer": {
@@ -916,8 +913,8 @@
                       "title": "Person or organization name",
                       "type": "string"
                     },
-                    "abbr": {
-                      "title": "Abbreviation",
+                    "affiliation": {
+                      "title": "Affiliation",
                       "type": "string"
                     },
                     "role": {
@@ -979,6 +976,10 @@
                     "uri": {
                       "title": "License URI",
                       "type": "string"
+                    },
+                    "note":{
+                      "title":"Note",
+                      "type":"string"
                     }
                   }
                 }

@@ -63,9 +63,6 @@ $(function() {
         <ul>                
             <li class="username"><?php echo $user; ?></li>
             <?php //if ($this->session->userdata('group_id')==1):?>
-            <?php if ($this->ion_auth->is_site_admin()): ?>
-	            <li><a href="<?php echo site_url(); ?>/admin"><?php echo t('site_administration');?></a></li>
-            <?php endif;?>
             <li class="profile"><a href="<?php echo site_url(); ?>/auth/profile"><?php echo t('profile');?></a></li>
             <li class="password"><a href="<?php echo site_url(); ?>/auth/change_password"><?php echo t('password');?></a></li>                                    
             <li><a href="<?php echo site_url(); ?>/auth/logout"><?php echo t('logout');?></a></li>

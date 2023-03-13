@@ -569,6 +569,7 @@
           let form_data = {};
           let url = CI.base_url + '/api/editor/create/' + type;
           this.loading_status = "Creating project...";
+          this.dialog_create_project=false;
 
           axios.post(url,
               form_data
@@ -578,7 +579,7 @@
             )
             .then(function(response) {
               console.log(response);
-              vm.loadProjects();
+              vm.loadProjects();              
               if (response.data.project) {
                 window.open(CI.base_url + '/editor/edit/' + response.data.project.id);
               }

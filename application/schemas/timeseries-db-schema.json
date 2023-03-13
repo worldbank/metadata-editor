@@ -187,11 +187,6 @@
 					"title": "Dataset type",
 					"description": "Dataset type"
 				},
-				"doi": {
-					"type": "string",
-					"title": "DOI",
-					"description": "DOI handle"
-				},
 				"date_created": {
 					"type": "string",
 					"title": "Date of creation",
@@ -378,6 +373,26 @@
 							},
 							"uri": {
 								"title": "URI",
+								"type": "string"
+							}
+						},
+						"required": [
+							"name"
+						]
+					}
+				},
+				"dimensions": {
+					"type": "array",
+					"description": "Dimensions",
+					"items": {
+						"type": "object",
+						"properties": {
+							"name": {
+								"title": "Name",
+								"type": "string"
+							},
+							"label": {
+								"title": "Label",
 								"type": "string"
 							}
 						},
@@ -649,6 +664,26 @@
 						]
 					}
 				},
+				"errata": {
+					"type": "array",
+					"title": "Errata",
+					"description": "List of corrected errors in data or metadata",
+					"items": {
+					  "type": "object",
+					  "properties": {
+						"date": {
+						  "title": "Date of erratum",
+						  "description": "Date when the erratum was reported or published",
+						  "type": "string"
+						},
+						"description": {
+						  "title": "Description of the erratum",
+						  "description": "A description of the erratum, with information on which data or metadata were impacted",
+						  "type": "string"
+						}
+					  }
+					}
+				  },
 				"license": {
 					"type": "array",
 					"title": "License",
@@ -705,6 +740,13 @@
 				"title_statement"
 			],
 			"additionalProperties": false
+		},
+		"provenance": {
+			"type": "array",
+			"description": "Provenance",
+			"items": {
+				"$ref": "provenance-schema.json"
+			}
 		},
 		"additional": {
 			"type": "object",
