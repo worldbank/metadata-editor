@@ -619,7 +619,7 @@ class Editor extends MY_REST_Controller
 	function variables_get($id=null,$file_id=null)
 	{
 		try{
-			$this->editor_acl->user_has_project_access($sid,$permission='view');
+			$this->editor_acl->user_has_project_access($id,$permission='view');
 			$user_id=$this->get_api_user_id();        			
 			$variable_detailed=(int)$this->input->get("detailed");
 			$survey_variables=$this->Editor_model->variables($id,$file_id,$variable_detailed);
