@@ -1620,3 +1620,55 @@ CREATE TABLE `editor_templates_default` (
   `template_uid` varchar(255) NOT NULL,  
   PRIMARY KEY (`id`)
 ) DEFAULT CHARSET=utf8;
+
+
+create table editor_project_owners (
+  id int not null auto_increment,
+  permissions varchar(100),
+  sid int not null,
+  user_id int not null,
+  created int,
+  primary key (id)
+);
+
+create table editor_collections (
+  id int not null auto_increment,
+  title varchar(255) not null,
+  description text,
+  created int,
+  changed int,
+  created_by int,
+  changed_by int,
+  primary key (id)
+);
+
+create table editor_collection_projects (
+  id int not null auto_increment,
+  collection_id int not null,
+  sid int not null,
+  primary key (id)
+);
+
+create table editor_collection_access (
+  id int not null auto_increment,
+  collection_id int not null,
+  user_id int not null,
+  permissions varchar(100),
+  primary key (id)
+);
+
+
+create table editor_tags (
+  id int not null auto_increment,
+  tag varchar(255) not null,
+  primary key (id)
+);
+
+create table editor_project_tags (
+  id int not null auto_increment,
+  sid int not null,
+  tag_id int not null,
+  primary key (id)
+);
+
+alter table editor_projects add column is_shared int;

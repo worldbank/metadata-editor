@@ -153,7 +153,7 @@
 
                   </div>
 
-                  <div class=" p-1" v-if="Projects">
+                  <div class=" p-1" v-if="ProjectsCount>0">
                       <button @click="addProjectsToCollection" :disabled="selected_projects.length==0" title="Add to collection" class="btn btn-xs btn-outline-primary" ><span  class="mdi mdi-folder-plus"></span> Add to collection</button>                      
                   </div>
 
@@ -196,7 +196,7 @@
                   </div>
                 </template>
                 <template v-else class="bg-light">
-                  <table class="table table-sm" style="font-size:small;" v-if="Projects"> 
+                  <table class="table table-sm" style="font-size:small;" v-if="ProjectsCount>0"> 
                     <thead>
                       <tr>
                         <th><input type="checkbox" v-model="select_all_projects" @change="toggleProjectSelection"/></th>
@@ -443,6 +443,12 @@
         Projects() {
           return this.projects.projects;
         },
+        ProjectsCount(){
+          if (this.projects && this.projects.total){
+            return this.projects.total;
+          }
+          return 0;
+        },
         PaginationTotalPages()
         {
           return Math.ceil(this.projects.total/this.projects.limit);
@@ -528,7 +534,8 @@
               console.log("error", error);
             });
         },
-        loadProjects: function() {
+        loadProjects: function() 
+        {
           vm = this;
 
           if(!this.search_keywords)
