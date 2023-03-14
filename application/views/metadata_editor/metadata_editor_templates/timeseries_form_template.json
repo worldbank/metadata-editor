@@ -635,8 +635,8 @@
                                     "key": "type",
                                     "title": "Date",
                                     "type": "string",
-                                    "prop_key": "series_description.errata.date",
-                                    "help_text": "Date",
+                                    "prop_key": "series_description.errata.type",
+                                    "help_text": "The date the erratum was published, preferably in ISO format (YYYY-MM-DD).",
                                     "display_type": "text"
                                 },
                                 {
@@ -644,10 +644,11 @@
                                     "title": "Description",
                                     "type": "string",
                                     "prop_key": "series_description.errata.description",
-                                    "help_text": "Description",
+                                    "help_text": "A brief description of the error and remedy.",
                                     "display_type": "textarea"
                                 }
-                            ]
+                            ],
+                            "help_text": "A list of errata for the indicator."
                         }
                     ],
                     "help_text": ""

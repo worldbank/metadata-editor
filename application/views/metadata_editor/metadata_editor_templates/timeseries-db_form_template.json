@@ -659,6 +659,30 @@
                             "help_text": "The contacts element provides the public interface for questions associated with the development and maintenance of the database. There could be various contacts provided depending upon the organization."
                         },
                         {
+                            "key": "database_description.errata",
+                            "type": "array",
+                            "title": "Errata",
+                            "props": [
+                                {
+                                    "key": "type",
+                                    "title": "Date",
+                                    "type": "string",
+                                    "prop_key": "database_description.errata.type",
+                                    "help_text": "The date the erratum was published.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "string",
+                                    "prop_key": "database_description.errata.description",
+                                    "help_text": "A description of the error and measures taken to remedy.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "A list of errata at the database level. Note that an \"errata\" element is also available in the schema used for the description of indicators/series."
+                        },
+                        {
                             "key": "database_description.notes",
                             "title": "Notes",
                             "type": "array",
@@ -897,7 +921,7 @@
                                 }
                             ],
                             "help_text": "This repeatable set of elements describes the different modes and formats in which the database is made accessible. When more than one mode of access is provided, describe them separately."
-                        },                        
+                        },
                         {
                             "key": "database_description.url",
                             "type": "string",
@@ -993,36 +1017,6 @@
                         }
                     ],
                     "help_text": ""
-                },
-                {
-                    "key": "database_description_errata",
-                    "title": "Errata",
-                    "type": "section",
-                    "items":[
-                        {
-                            "key": "database_description.errata",
-                            "type": "array",
-                            "title": "Errata",
-                            "props": [
-                                {
-                                    "key": "type",
-                                    "title": "Date",
-                                    "type": "string",
-                                    "prop_key": "database_description.errata.date",
-                                    "help_text": "Date",
-                                    "display_type": "text"
-                                },
-                                {
-                                    "key": "description",
-                                    "title": "Description",
-                                    "type": "string",
-                                    "prop_key": "database_description.errata.description",
-                                    "help_text": "Description",
-                                    "display_type": "textarea"
-                                }
-                            ]
-                        }
-                    ]
                 }
             ]
         },
