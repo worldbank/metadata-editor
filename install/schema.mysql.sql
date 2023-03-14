@@ -1672,3 +1672,16 @@ create table editor_project_tags (
 );
 
 alter table editor_projects add column is_shared int;
+
+
+CREATE TABLE editor_tags(  
+    id int NOT NULL PRIMARY KEY AUTO_INCREMENT,    
+    tag VARCHAR(255) not null
+);
+
+
+CREATE TABLE editor_project_tags(  
+    id int NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    sid int not null,
+    tag_id int not null
+);
