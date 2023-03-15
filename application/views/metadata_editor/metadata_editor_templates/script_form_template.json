@@ -115,7 +115,7 @@
                             "display_type": "text"
                         },
                         {
-                            "key": "project_description.identifiers",
+                            "key": "project_desc.identifiers",
                             "title": "Other identifiers",
                             "type": "array",
                             "help_text": "This repeatable element is used to enter identifiers (IDs) other than the \"Primary ID\" (IDNO). It can for example be a Digital Object Identifier (DOI). The \"Primary ID\" can be repeated here (the \"Primary ID\" does not provide a \"Type\" parameter, so if a DOI or other standard ID type is used as main identifier, it is recommended to repeat it here with the identification of the type). ",
@@ -125,14 +125,14 @@
                                     "title": "Type",
                                     "type": "string",
                                     "help_text": "The type of identifier. For example: “DOI”, or \"ISBN\". ",
-                                    "prop_key": "project_description.identifiers.type",
+                                    "prop_key": "project_desc.identifiers.type",
                                     "display_type": "text"
                                 },
                                 {
                                     "key": "identifier",
                                     "title": "Identifier",
                                     "type": "string",
-                                    "prop_key": "project_description.identifiers.identifier",
+                                    "prop_key": "project_desc.identifiers.identifier",
                                     "help_text": "The identifier itself.",
                                     "display_type": "text"
                                 }
@@ -550,7 +550,7 @@
                             "is_recommended": true
                         },
                         {
-                            "key": "project_description.keywords",
+                            "key": "project_desc.keywords",
                             "type": "array",
                             "title": "Keywords",
                             "props": [
@@ -558,7 +558,7 @@
                                     "key": "name",
                                     "title": "Keyword",
                                     "type": "string",
-                                    "prop_key": "project_description.keywords.name",
+                                    "prop_key": "project_desc.keywords.name",
                                     "help_text": "The keyword itself (a word or a phrase).",
                                     "display_type": "text"
                                 },
@@ -566,7 +566,7 @@
                                     "key": "vocabulary",
                                     "title": "Vocabulary",
                                     "type": "string",
-                                    "prop_key": "project_description.keywords.vocabulary",
+                                    "prop_key": "project_desc.keywords.vocabulary",
                                     "help_text": "The controlled vocabulary (including version number or date) from which the keyword is extracted, if any.",
                                     "display_type": "text"
                                 },
@@ -574,7 +574,7 @@
                                     "key": "uri",
                                     "title": "URL",
                                     "type": "string",
-                                    "prop_key": "project_description.keywords.uri",
+                                    "prop_key": "project_desc.keywords.uri",
                                     "help_text": "The URL of the controlled vocabulary from which the keyword is extracted, if any.",
                                     "rules": {
                                         "is_uri": true
@@ -586,7 +586,7 @@
                             "is_recommended": true
                         },
                         {
-                            "key": "project_description.themes",
+                            "key": "project_desc.themes",
                             "type": "array",
                             "title": "Themes",
                             "props": [
@@ -594,7 +594,7 @@
                                     "key": "id",
                                     "title": "ID",
                                     "type": "string",
-                                    "prop_key": "project_description.themes.id",
+                                    "prop_key": "project_desc.themes.id",
                                     "help_text": "The ID of the theme, taken from a controlled vocabulary.",
                                     "display_type": "text"
                                 },
@@ -602,7 +602,7 @@
                                     "key": "name",
                                     "title": "Name",
                                     "type": "string",
-                                    "prop_key": "project_description.themes.name",
+                                    "prop_key": "project_desc.themes.name",
                                     "help_text": "The name (label) of the theme, preferably taken from a controlled vocabulary.",
                                     "display_type": "text"
                                 },
@@ -611,14 +611,14 @@
                                     "title": "Parent ID",
                                     "help_text": "The parent ID of the theme (ID of the item one level up in the hierarchy), if a hierarchical controlled vocabulary is used.",
                                     "type": "string",
-                                    "prop_key": "project_description.themes.parent_id",
+                                    "prop_key": "project_desc.themes.parent_id",
                                     "display_type": "text"
                                 },
                                 {
                                     "key": "vocabulary",
                                     "title": "Vocabulary",
                                     "type": "string",
-                                    "prop_key": "project_description.themes.vocabulary",
+                                    "prop_key": "project_desc.themes.vocabulary",
                                     "help_text": "The name (including version number) of the controlled vocabulary used, if any.",
                                     "display_type": "text"
                                 },
@@ -626,7 +626,7 @@
                                     "key": "uri",
                                     "title": "URL",
                                     "type": "string",
-                                    "prop_key": "project_description.themes.uri",
+                                    "prop_key": "project_desc.themes.uri",
                                     "help_text": "The URL to the controlled vocabulary used, if any.",
                                     "rules": {
                                         "is_uri": true
@@ -637,7 +637,7 @@
                             "help_text": "A list of themes covered by the research project. A controlled vocabulary will preferably be used. Note that themes will rarely be used as the elements topics and disciplines are more appropriate for most uses. "
                         },
                         {
-                            "key": "project_description.topics",
+                            "key": "project_desc.topics",
                             "type": "array",
                             "title": "Topics",
                             "props": [
@@ -645,7 +645,7 @@
                                     "key": "id",
                                     "title": "ID",
                                     "type": "string",
-                                    "prop_key": "project_description.topics.id",
+                                    "prop_key": "project_desc.topics.id",
                                     "help_text": "The identifier of the topic, taken from a controlled vocabulary.",
                                     "display_type": "text"
                                 },
@@ -653,7 +653,7 @@
                                     "key": "name",
                                     "title": "Name",
                                     "type": "string",
-                                    "prop_key": "project_description.topics.name",
+                                    "prop_key": "project_desc.topics.name",
                                     "help_text": "The name (label) of the topic, preferably taken from a controlled vocabulary.",
                                     "display_type": "text"
                                 },
@@ -662,14 +662,14 @@
                                     "title": "Parent ID",
                                     "help_text": "The parent identifier of the topic (identifier of the item one level up in the hierarchy), if a hierarchical controlled vocabulary is used.",
                                     "type": "string",
-                                    "prop_key": "project_description.topics.parent_id",
+                                    "prop_key": "project_desc.topics.parent_id",
                                     "display_type": "text"
                                 },
                                 {
                                     "key": "vocabulary",
                                     "title": "Vocabulary",
                                     "type": "string",
-                                    "prop_key": "project_description.topics.vocabulary",
+                                    "prop_key": "project_desc.topics.vocabulary",
                                     "help_text": "The name (including version number) of the controlled vocabulary used, if any.",
                                     "display_type": "text"
                                 },
@@ -677,7 +677,7 @@
                                     "key": "uri",
                                     "title": "URL",
                                     "type": "string",
-                                    "prop_key": "project_description.topics.uri",
+                                    "prop_key": "project_desc.topics.uri",
                                     "help_text": "The URL to the controlled vocabulary used, if any.",
                                     "rules": {
                                         "is_uri": true
@@ -688,7 +688,7 @@
                             "help_text": "Information on the topics covered in the research project. A controlled vocabulary will preferably be used, for example the CESSDA Topics classification, a typology of topics available in 11 languages; or the Journal of Economic Literature (JEL) Classification System, or the World Bank topics classification. Note that you may use more than one controlled vocabulary. "
                         },
                         {
-                            "key": "project_description.disciplines",
+                            "key": "project_desc.disciplines",
                             "type": "array",
                             "title": "Disciplines",
                             "props": [
@@ -696,7 +696,7 @@
                                     "key": "id",
                                     "title": "ID",
                                     "type": "string",
-                                    "prop_key": "project_description.disciplines.id",
+                                    "prop_key": "project_desc.disciplines.id",
                                     "help_text": "The identifier of the discipline, taken from a controlled vocabulary.",
                                     "display_type": "text"
                                 },
@@ -704,7 +704,7 @@
                                     "key": "name",
                                     "title": "Name",
                                     "type": "string",
-                                    "prop_key": "project_description.disciplines.name",
+                                    "prop_key": "project_desc.disciplines.name",
                                     "help_text": "The name (label) of the discipline, preferably taken from a controlled vocabulary.",
                                     "display_type": "text"
                                 },
@@ -713,14 +713,14 @@
                                     "title": "Parent ID",
                                     "help_text": "The parent identifier of the discipline (identifier of the item one level up in the hierarchy), if a hierarchical controlled vocabulary is used.",
                                     "type": "string",
-                                    "prop_key": "project_description.disciplines.parent_id",
+                                    "prop_key": "project_desc.disciplines.parent_id",
                                     "display_type": "text"
                                 },
                                 {
                                     "key": "vocabulary",
                                     "title": "Vocabulary",
                                     "type": "string",
-                                    "prop_key": "project_description.disciplines.vocabulary",
+                                    "prop_key": "project_desc.disciplines.vocabulary",
                                     "help_text": "The name (including version number) of the controlled vocabulary used, if any.",
                                     "display_type": "text"
                                 },
@@ -728,7 +728,7 @@
                                     "key": "uri",
                                     "title": "URL",
                                     "type": "string",
-                                    "prop_key": "project_description.disciplines.uri",
+                                    "prop_key": "project_desc.disciplines.uri",
                                     "help_text": "The URL to the controlled vocabulary used, if any.",
                                     "rules": {
                                         "is_uri": true
