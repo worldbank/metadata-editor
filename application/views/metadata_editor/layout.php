@@ -1,52 +1,58 @@
 <v-app>
 <!--header-->
-<div>
-    <nav class="main-header sticky-top navbar navbar-expand navbar-white navbar-light bg-light border-bottom" style="margin-left:0px;">
 
-        <div class="navbar-brand" style="min-width:280px;">
-            <a href="<?php echo site_url('editor/'); ?>" class="brand-link-editor p-2" style="display:block;">
-                <i class="fas fa-compass"></i>
-                <span class="brand-text font-weight-light">Metadata Editor</span>
+<nav class="main-header sticky-top navbar navbar-expand navbar-white navbar-light bg-light border-bottom" style="margin-left:0px;">
+
+    <div class="navbar-brand" style="min-width:280px;">
+        <a href="<?php echo site_url('editor/'); ?>" class="brand-link-editor p-2" style="display:block;">
+            <i class="fas fa-compass"></i>
+            <span class="brand-text font-weight-light">Metadata Editor</span>
+        </a>
+    </div>
+
+    <div class="pl-2">
+        <div><strong>{{Title}}</strong></div>
+        <div style="font-size:small;color:gray;">{{dataset_type}} - {{StudyIDNO}}</div>
+    </div>
+    <div>{{this.loading_status}}</div>
+
+
+    <ul class="navbar-nav ml-5 ml-auto">
+
+        <div class="dropdown">
+            <a class="btn btn-link dropdown-toggle" href="#" role="button" id="dropdownProjectMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Project
             </a>
-        </div>
 
-        <div class="pl-2">
-            <div><strong>{{Title}}</strong></div>
-            <div style="font-size:small;color:gray;">{{dataset_type}} - {{StudyIDNO}}</div>
-        </div>
-        <div>{{this.loading_status}}</div>
-
-
-        <ul class="navbar-nav ml-5 ml-auto">
-
-            <div class="dropdown">
-                <a class="btn btn-link dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="fas fa-random"></i> Metadata
-                </a>
-
-                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                    <a class="dropdown-item" href="#/import"><i class="fas fa-file-invoice"></i> Import project metadata</a>
-                    <a class="dropdown-item" href="#/external-resources/import"><i class="fas fa-clone"></i> Import external resources</a>
-                    <div class="dropdown-divider"></div>
-                    <a v-if="dataset_type=='survey'" class="dropdown-item" :href="'<?php echo site_url('api/editor/ddi/'); ?>' + dataset_id" target="_blank"><i class="far fa-file-alt"></i> Export DDI CodeBook (2.5)</a>
-                    <a class="dropdown-item" :href="'<?php echo site_url('api/editor/json/'); ?>' + dataset_id" target="_blank"><i class="far fa-file-code"></i> Export JSON</a>
-                    <a class="dropdown-item" :href="'<?php echo site_url('api/editor/rdf/'); ?>' + dataset_id" target="_blank"><i class="far fa-file-alt"></i> Export External Resouces (RDF/XML)</a>
-                    <a class="dropdown-item" :href="'<?php echo site_url('api/editor/resources/'); ?>' + dataset_id" target="_blank"><i class="far fa-file-alt"></i> Export External Resources (JSON)</a>
-                </div>
+            <div class="dropdown-menu" aria-labelledby="dropdownProjectMenu">
+                <a class="dropdown-item" href="#/project-package"><i class="fas fa-file-invoice"></i> Export project (zip)</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#/publish"><i class="fas fa-location-arrow"></i> Publish to NADA</a>
             </div>
+        </div>
 
-            <li class="nav-item">
-                <a class="nav-link" href="#/publish" role="button">
-                    <i class="fas fa-location-arrow"></i> Publish
-                </a>
-            </li>
+        <div class="dropdown">
+            <a class="btn btn-link dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-random"></i> Metadata
+            </a>
 
-            <li class="nav-item">
-                <?php echo $this->load->view('user_menu/user-menu', null, true); ?>
-            </li>
-        </ul>
-    </nav>
-</div>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                <a class="dropdown-item" href="#/import"><i class="fas fa-file-invoice"></i> Import project metadata</a>
+                <a class="dropdown-item" href="#/external-resources/import"><i class="fas fa-clone"></i> Import external resources</a>
+                <div class="dropdown-divider"></div>
+                <a v-if="dataset_type=='survey'" class="dropdown-item" :href="'<?php echo site_url('api/editor/ddi/'); ?>' + dataset_id" target="_blank"><i class="far fa-file-alt"></i> Export DDI CodeBook (2.5)</a>
+                <a class="dropdown-item" :href="'<?php echo site_url('api/editor/json/'); ?>' + dataset_id" target="_blank"><i class="far fa-file-code"></i> Export JSON</a>
+                <a class="dropdown-item" :href="'<?php echo site_url('api/editor/rdf/'); ?>' + dataset_id" target="_blank"><i class="far fa-file-alt"></i> Export External Resouces (RDF/XML)</a>
+                <a class="dropdown-item" :href="'<?php echo site_url('api/editor/resources/'); ?>' + dataset_id" target="_blank"><i class="far fa-file-alt"></i> Export External Resources (JSON)</a>
+            </div>
+        </div>
+
+        <li class="nav-item">
+            <?php echo $this->load->view('user_menu/user-menu', null, true); ?>
+        </li>
+    </ul>
+</nav>
+
 <!--end-header-->
 
 <splitpanes class="default-theme splitpanes splitpanes--vertical" style="min-height: 400px">
