@@ -48,8 +48,13 @@ Vue.component('nested-array', {
         localColumns(){
             return this.columns;
         }
+        
     },
     methods:{
+        localValueToString(item)
+        {
+            return this.nestedArrayToStringValue(item);
+        },
         countRows: function(){
             return this.local_data.length;
         },
@@ -109,7 +114,8 @@ Vue.component('nested-array', {
 
                         <v-row>
                             <v-col sm="6" md="8" align="start">
-                                <v-icon>mdi-file-tree-outline</v-icon> {{index + 1}} - {{title}}
+                                <div class="float-left mr-2"><v-icon>mdi-file-tree-outline</v-icon> {{index + 1}} - {{title}}</div>
+                                <div class="float-left text-wrap text-truncate text-muted text-normal" style="max-width: 300px;">{{localValueToString(item)}}</div>
                             </v-col>
                             <v-col sm="6" md="4" class="text-right">
                                 <button type="button" class="btn btn-xs btn-outline-danger" @click="remove(index);return false;">

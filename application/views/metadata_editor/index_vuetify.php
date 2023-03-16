@@ -111,7 +111,6 @@
     
 //    const { Splitpanes, Pane } = splitpanes;
 
-
 /*
 Vue.config.errorHandler = (err, vm, info) => {
   console.log("error handler",err,vm,info);

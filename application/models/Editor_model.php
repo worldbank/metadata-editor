@@ -1211,6 +1211,28 @@ class Editor_model extends CI_Model {
 		}
 	}
 
+	function get_thumbnail_file($sid)
+	{
+		$project_folder=$this->get_project_folder($sid);
+		$thumbnail=$this->get_thumbnail($sid);
+
+		if(!$thumbnail){
+			return false;
+		}
+
+		if (!$project_folder){
+			return false;
+		}
+
+		$thumbnail_path=$project_folder.'/'.$thumbnail;
+
+		if(file_exists($thumbnail_path)){
+			return $thumbnail_path;
+		}
+
+		return false;
+	}
+
 
 	function download_project_ddi($sid)
 	{		

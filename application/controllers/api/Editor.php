@@ -49,7 +49,7 @@ class Editor extends MY_REST_Controller
 			$search_options['user_id']=$this->session->userdata('user_id');
 
 			if (!$limit){
-				$limit=10;
+				$limit=100;
 			}
 			
 			$result=$this->Editor_model->get_all($limit,$offset,null,$search_options);

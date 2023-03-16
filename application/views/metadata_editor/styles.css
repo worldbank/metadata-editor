@@ -499,3 +499,7 @@ table .form-field-dropdown-custom .v-input__slot fieldset{
     border:1px solid gainsboro!important;
     background:white!important;
 }
+
+.text-normal{
+    font-weight:normal;
+}

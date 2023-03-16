@@ -50,6 +50,57 @@ class Editor_resource_model extends ci_model {
 		return $this->db->delete('editor_resources');
 	}
 
+
+	/**
+	 * 
+	 * Return all resources with files attached to a survey
+	 * 
+	 */
+	function get_resources_uploaded_files($sid,$fields=null)
+	{
+		$result=$this->files($sid);
+
+		$files=[];		
+        foreach($result as $file){
+            $file_=explode("/",substr($file,1));
+            if (count($file_)==1){
+                $files["_"][]=$file_[0];
+            }else{
+                $files[$file_[0]][]=$file_[1];
+            }            
+        }
+
+		//only files from documentation folder are considered
+		if (isset($files['documentation'])){
+			$files=$files['documentation'];
+		}
+
+		//external resources
+        $resources=$this->select_all($sid,$fields=null);
+        $resources_by_filename=[];
+        foreach($resources as $resource){
+            $resources_by_filename[$resource['filename']]=$resource;
+        }
+
+        if (isset($files)){
+            foreach($files as $key=>$file){
+                if (isset($resources_by_filename[$file])){
+                    $files[$key]=array(
+                        'file'=>$file,
+                        'resource'=>$resources_by_filename[$file]
+                    );
+                }else{
+					$files[$key]=array(
+                        'file'=>$file,
+                        'resource'=>false
+                    );
+				}
+            }
+        }
+
+		return $files;
+	}
+
     /**
 	 * 	
 	 *
@@ -643,6 +694,19 @@ class Editor_resource_model extends ci_model {
         $result=get_dir_recursive($project_folder,$make_relative_to=$project_folder);
         return $result['files'];        
     }
+
+
+	function get_resource_file_by_name($sid,$filename)
+	{
+		$project_folder=$this->Editor_model->get_project_folder($sid);		
+		$resource_file=$project_folder.'/documentation/'.$filename;
+
+		if (file_exists($resource_file)){
+			return $resource_file;
+		}
+
+		return false;
+	}
 
 
 	/**

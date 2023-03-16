@@ -12,6 +12,27 @@
                 normalizeClassID: function(class_id){
                     return class_id.replace(/\./g, "-");
                 },
+                nestedArrayToStringValue: function(arr, output='') 
+                {
+                    let vm=this;
+                    if (Array.isArray(arr)) {
+                        arr.forEach(function (item) {
+                        output = vm.nestedArrayToStringValue(item, output);
+                        });
+                    } else {
+                        if (typeof arr === 'object') {
+                        let keys = Object.keys(arr);
+                        keys.forEach(function (key) {
+                            if (typeof arr[key] === 'object'){
+                            output = vm.nestedArrayToStringValue(arr[key], output);
+                            }else{
+                            output+= " " + arr[key];
+                            }            
+                        });
+                        }
+                    }
+                    return output.trim();
+                },
                 copyToClipBoard: function(textToCopy){
                     const tmpTextField = document.createElement("textarea")
                     tmpTextField.textContent = textToCopy
@@ -159,6 +180,7 @@
 
             echo $this->load->view("metadata_editor/vue-import-options-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-publish-options-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-project-package-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-external-resources-import-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-configure-catalog-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-summary-component.js",null,true);
@@ -190,6 +212,7 @@
         const main = {props:['element_id'],template: '<div><form-main/></div>' }
         const Home = { template: '<div><summary-component/> </div>' }
         const PublishProject = { template: '<div><publish-options/> </div>' }
+        const ProjectPackage = { template: '<div><project-package/> </div>' }
         const ConfigureCatalog = { template: '<div><configure-catalog/> </div>' }
         const ImportOptions = { template: '<div><import-options/> </div>' }
         const _main = {props: ['active_section'],template: '<div><study-metadata/></div>' }
@@ -206,6 +229,7 @@
         const routes = [
             { path: '/', component: Home },
             { path: '/publish', component: PublishProject },
+            { path: '/project-package', component: ProjectPackage },
             { path: '/configure-catalog', component: ConfigureCatalog },
             { path: '/import', component: ImportOptions },
             { path: '/study/:element_id', component: main, name: 'study',props: true },
