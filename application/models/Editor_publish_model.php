@@ -173,7 +173,7 @@ class Editor_publish_model extends ci_model {
 
 
 
-	public function publish_external_resource($sid,$user_id,$connection_id,$resource_id,$overwrite=false)
+	public function publish_external_resource($sid,$user_id,$connection_id,$resource_id,$overwrite="no")
 	{
 		$conn_info=$this->Editor_model->get_catalog_connection($user_id,$connection_id);
 
@@ -196,8 +196,7 @@ class Editor_publish_model extends ci_model {
 
 		$catalog_url=$conn_info['url'].'/index.php/api/resources/'.$project['idno'];
 		$catalog_api_key=$conn_info['api_key'];
-
-		$resource['overwrite']="yes";
+		$resource['overwrite']=$overwrite;
 
 		$output=[];
 
@@ -208,16 +207,15 @@ class Editor_publish_model extends ci_model {
 		{	
 			//get resource file
 			$resource_file_path=$this->Editor_resource_model->get_resource_file_by_name($sid,$resource['filename']);
-		
-			throw new Exception($resource['filename'] . " " . $resource_file_path);
 
 			//upload resource file
 			if (file_exists($resource_file_path)){		
 				$catalog_url=$conn_info['url'].'/index.php/api/datasets/'.$project['idno'].'/files';
 				$output['resource_upload']=$this->make_post_file_request($catalog_url, $catalog_api_key, $file_field_name='file', $file_path=$resource_file_path);
-			}else{
-				throw new Exception("Resource file not found x" . ($resource_file_path));
 			}
+			/*else{
+				throw new Exception("Resource file not found" . ($resource_file_path));
+			}*/
 		}
 
 		return $output;

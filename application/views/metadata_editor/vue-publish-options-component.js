@@ -194,7 +194,7 @@ Vue.component('publish-options', {
         publishSingleResource: async function(resource)
         {
             let formData={
-                "overwrite": "no",
+                "overwrite": this.resources_overwrite,
                 "resource_id": resource.id,
                 "sid": this.ProjectID,
                 "catalog_id": this.catalog
