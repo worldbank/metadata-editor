@@ -41,13 +41,7 @@ class Editor_publish_model extends ci_model {
 		$catalog_api_key=$conn_info['api_key'];
 		
 		//project metadata
-		$result=$this->publish_metadata($sid,$catalog_url,$catalog_api_key,$options);
-
-		return $result;
-
-		//project external resources
-
-		//project files
+		return $this->publish_metadata($sid,$catalog_url,$catalog_api_key,$options);
 	}
 
 	function get_project_metadata_json_path($sid)
@@ -112,19 +106,11 @@ class Editor_publish_model extends ci_model {
 			/*if ($response_json["dataset"]){
 				return $response_json["dataset"];
 			}*/
-
 			return $response_json;
-			die();
 
-			return $response;
 		} catch (ClientException $e) {
 			$resp=$e->getResponse();
 			throw new Exception((string) $resp->getBody());
-			return;
-
-			http_response_code($resp->getStatusCode());
-			echo $resp->getBody();
-			die();			
 		}
 	}
 
@@ -170,7 +156,6 @@ class Editor_publish_model extends ci_model {
 			throw new Exception("Project not found");
 		}
 
-		//load external resources
 		$resources=$this->Editor_resource_model->select_all($sid);
 
 		$catalog_url=$conn_info['url'].'/index.php/api/resources/'.$project['idno'];
@@ -183,14 +168,7 @@ class Editor_publish_model extends ci_model {
 			$output[]=$this->make_post_request($catalog_url,$catalog_api_key,$resource);
 		}		
 
-		//var_dump($resources);
-		//die();
-
 		return $output;
-
-		//project external resources
-
-		//project files
 	}
 
 
@@ -226,15 +204,20 @@ class Editor_publish_model extends ci_model {
 		//post resource metadata
 		$output['resource']=$this->make_post_request($catalog_url, $catalog_api_key, $post_body=$resource, $body_format='json', $headers=null);
 
-		//get resource file
-		$resource_file_path=$this->Editor_resource_model->get_resource_file_by_name($sid,$resource['filename']);
+		if (!empty((string)$resource['filename']) && !is_url($resource['filename']))
+		{	
+			//get resource file
+			$resource_file_path=$this->Editor_resource_model->get_resource_file_by_name($sid,$resource['filename']);
+		
+			throw new Exception($resource['filename'] . " " . $resource_file_path);
 
-		//upload resource file
-		if (file_exists($resource_file_path)){		
-			$catalog_url=$conn_info['url'].'/index.php/api/datasets/'.$project['idno'].'/files';
-			$output['resource_upload']=$this->make_post_file_request($catalog_url, $catalog_api_key, $file_field_name='file', $file_path=$resource_file_path);
-		}else{
-			throw new Exception("Resource file not found");
+			//upload resource file
+			if (file_exists($resource_file_path)){		
+				$catalog_url=$conn_info['url'].'/index.php/api/datasets/'.$project['idno'].'/files';
+				$output['resource_upload']=$this->make_post_file_request($catalog_url, $catalog_api_key, $file_field_name='file', $file_path=$resource_file_path);
+			}else{
+				throw new Exception("Resource file not found x" . ($resource_file_path));
+			}
 		}
 
 		return $output;

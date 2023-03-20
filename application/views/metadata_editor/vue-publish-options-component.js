@@ -1,4 +1,4 @@
-/// import options
+/// publish project options
 Vue.component('publish-options', {
     props:['value'],
     data: function () {    
@@ -7,6 +7,9 @@ Vue.component('publish-options', {
             resources_selected:[],
             toggle_resources_selected:false,
             resources_overwrite:"no",
+            publish_metadata:true,
+            publish_thumbnail:true,
+            publish_resources:true,
             catalog_connections:[],
             catalog:'',
             publish_options:{
@@ -56,23 +59,40 @@ Vue.component('publish-options', {
                     "type":"text"
                 },
             },            
-            publish_processing_status:false,
-            publish_processing:'',
-            publish_errors:[],
-            publish_messages:[],
-            publish_response:{},
+            
             file:'',
             update_status:'',
-            errors:'',
-            is_processing:false,
+            publish_processing_message:'',
+            is_publishing:false,
+            is_publishing_completed:false,
             project_export_status:'',
-            collections:[]
+            collections:[],
+            publish_responses:{}//all publish responses                        
         }
     },
     created: async function(){
         this.loadCatalogConnections();
     },
     methods:{
+        initPublishResponses: function(){
+            this.publish_responses={
+                "export":[],
+                "metadata":{
+                    "messages":[],
+                    "errors":[],
+                },
+                "thumbnail":{
+                    "messages":[],
+                    "errors":[],
+                },
+                "external_resources":{
+                    "messages":[],
+                    "errors":[],
+                    //"resource.id, resource_title",
+                    //"error_response"
+                }
+            };
+        },
         toggleSelectedResources: function(){
             this.resources_selected = [];
             if (this.toggle_resources_selected == true) {                
@@ -84,79 +104,91 @@ Vue.component('publish-options', {
         publishToCatalog: async function(){
             let formData=this.PublishOptions;
             vm=this;
+
+            if(!this.publish_metadata && !this.publish_thumbnail && !this.publish_resources){
+                alert("Please select at least one option to publish");
+                return;
+            }
+
+            this.initPublishResponses();
+            this.is_publishing=true;
+            this.is_publishing_completed=false;
+
+            this.publish_processing_message="Preparing project export...";
             await this.prepareProjectExport();
-            await this.publishProjectMetadata();
-            await this.publishProjectThumbnail();
-            await this.publishExternalResoures();
-            console.log("publish done");
+
+            if (this.publish_metadata==true){
+                this.publish_processing_message="Publishing project metadata...";
+                await this.publishProjectMetadata();
+            }
+
+            if (this.publish_thumbnail==true){
+                this.publish_processing_message="Publishing project thumbnail...";
+                try{
+                    await this.publishProjectThumbnail();
+                    this.publish_responses.thumbnail.messages.push("Thumbnail published successfully");
+                }catch(error){
+                    console.log("publishing thumbnail failed", error);
+                    this.publish_responses.thumbnail.errors.push(error.response.data);
+                }
+            }
+
+            if (this.publish_resources==true){
+                this.publish_processing_message="Publishing external resources...";
+                await this.publishExternalResoures();
+            }
+
+            this.publish_processing_message="Publishing completed";
+            this.is_publishing=false;
+            this.is_publishing_completed=true;
             //await this.publishExternalResourcesFiles();
         },
         publishProjectMetadata: async function(){
             let formData=this.PublishOptions;
-            vm=this;            
-            this.publish_processing="Publishing study to the catalog...";
-            this.publish_messages=[];
-            this.publish_errors=[];
-            this.publish_response={};
-            this.publish_processing_status=true;
+            vm=this;
+
             let url=CI.base_url + '/api/publish/' +this.ProjectID +'/' + this.catalog;
+            this.publish_responses.metadata.messages.push("starting metadata publishing to: " + url);
         
             return axios.post(url,
                 formData,
                 {}
             ).then(function(response){
-                vm.publish_response=response;
-                vm.publish_processing="Publishing completed";
-                console.log("published done", response);
-                window.response_=response;
-                vm.publish_messages.push(response.data);
-                vm.publish_processing_status=false;
+                vm.publish_responses.metadata.messages.push("metadata publishing updated successfully");
             })
             .catch(function(error){
-                console.log("published failed", error);
-                vm.publish_processing="Publishing failed";
-                vm.publish_errors.push(error.response.data);
-                vm.publish_processing_status=false;
+                console.log("publishing project failed", error);
+                vm.publish_responses.metadata.errors.push(error.response.data);
             }); 
         },
         publishExternalResoures:  async function() 
         {
-            try{
-                if (this.resources_selected.length==0){
-                    return;
-                }
-
-                let formData=this.PublishOptions;
-                vm=this;
-                this.publish_processing="Publishing external resources...";
-                this.publish_messages=[];
-                this.publish_errors=[];
-                this.publish_response={};
-                this.publish_processing_status=true;
-
-                for(i=0;i<this.resources_selected.length;i++){
-                    console.log("publishing resource",this.resources_selected, i)
-
-                    try {
-                        const { data } = await vm.publishSingleResource(this.ExternalResources[this.resources_selected[i]]);
-                        console.log(`Request ${i+1}:`, data);
-                      } catch (error) {
-                        console.error(`Request ${i+1} failed:`, error.message);
-                    }
-
-                    console.log("publishing resource result");
-                }
-
-                console.log("completed all resources");
-                this.publish_processing="Publishing external resources completed";
-                this.publish_processing="";
-                this.publish_processing_status=false;
+            if (this.resources_selected.length==0){
+                return;
             }
-            catch(error){
-                console.log("publishExternalResoures failed", error, error.response);
-                vm.publish_processing="Publishing external resources failed";
-                vm.publish_errors.push(error.response);
-                vm.publish_processing_status=false;
+
+            let formData=this.PublishOptions;
+            vm=this;
+
+            for (const idx of this.resources_selected) {
+                vm.publish_processing_message="Publishing external resource: " + vm.ExternalResources[idx].title;    
+                try {
+                    const { data } = await vm.publishSingleResource(this.ExternalResources[idx]);
+                    vm.publish_responses.external_resources.messages.push( 
+                        vm.ExternalResources[idx].title + ' published successfully'
+                    );
+                } catch (error) {
+                    console.error(`Request ${idx+1} failed:`, error.response);
+                    vm.publish_responses.external_resources.errors.push({
+                        'resource_id':vm.ExternalResources[idx].id,
+                        'resource_title':vm.ExternalResources[idx].title,
+                        'error':{
+                            'status_code': error.response.status,
+                            'status_text': error.response.statusText,
+                            'data': error.response.data
+                        }
+                    });
+                }
             }
         },
         publishSingleResource: async function(resource)
@@ -178,7 +210,6 @@ Vue.component('publish-options', {
         },
         publishProjectThumbnail: async function()
         {
-            alert("start");
             let formData={
             }
 
@@ -188,115 +219,8 @@ Vue.component('publish-options', {
             return axios.post(url,
                 formData,
                 {}            
-            );        
-        },
-
-        publishExternalResourcesFiles: async function()
-        {
-            let formData=this.PublishOptions;
-            vm=this;
-            this.publish_processing="Uploading resources files...";
-            this.publish_messages=[];
-            this.publish_errors=[];
-            this.publish_response={};
-            this.publish_processing_status=true;
-            let url=CI.base_url + '/api/publish/external_resources_files/'+this.ProjectID +'/' + this.catalog;
-
-            return axios.post(url,
-                formData,
-                {}
-            ).then(function(response){
-                vm.publish_response=response;
-                vm.publish_processing="Uploading external resources completed";
-                vm.publish_messages.push(response.data);
-                vm.publish_processing_status=false;
-            })
-            .catch(function(error){
-                console.log("failed to add external resources", error);
-                vm.publish_processing="Publishing external resources failed";
-                vm.publish_errors.push(error.response.data);
-                vm.publish_processing_status=false;
-            }); 
-        },
-
-        /*publishToCatalog: function(){
-            //let formData = new FormData();
-            let formData=this.ProjectMetadata;
-            //formData.append('fileid', this.file_id);
-            //formData.append("filename",this.file.name)
-
-            vm=this;
-
-            let url=this.catalog.url + 'index.php/api/datasets/create/survey';
-        
-            return axios.post(url,
-                formData,
-                {
-                    headers: {
-                        'x-api-key': vm.catalog.api_key
-                    }
-                }
-            ).then(function(response){
-                console.log("published done", response);
-            })
-            .catch(function(response){
-                console.log("published failed", response);
-            }); 
-        },
-        async processPublishToCatalog(){
-            //publish study level metadata
-            await this.publishStudyMetadata();
-
-            if (this.ProjectType=='survey'){
-                //publish data files
-                await this.publishDatafiles();
-            //publish variables
-            }
-
-            //external resources
-            //upload external resources files
-        },
-        publishStudyMetadata: function(){
-            let formData=this.ProjectMetadata;
-            vm=this;
-
-            let url=this.catalog.url + 'index.php/api/datasets/create/'+this.projectType;
-        
-            return axios.post(url,
-                formData,
-                {
-                    headers: {
-                        'x-api-key': vm.catalog.api_key
-                    }
-                }
-            ).then(function(response){
-                console.log("published done", response);
-            })
-            .catch(function(response){
-                console.log("published failed", response);
-            }); 
-        },
-        publishDatafiles: function(){
-            let formData=this.ProjectMetadata;
-            vm=this;
-
-            let url=this.catalog.url + 'index.php/api/datafiles/';
-        
-            return axios.post(url,
-                formData,
-                {
-                    headers: {
-                        'x-api-key': vm.catalog.api_key
-                    }
-                }
-            ).then(function(response){
-                console.log("published done", response);
-            })
-            .catch(function(response){
-                console.log("published failed", response);
-            }); 
-        },*/
-        
+            );
+        },        
         async prepareProjectExport()
         {
             this.project_export_status="Exporting metadata to JSON";
@@ -473,12 +397,14 @@ Vue.component('publish-options', {
     template: `
             <div class="import-options-component mt-5 p-5">
                             
-
                 <h3>Publish project</h3>
                 <p>Publish project directly to a NADA catalog</p>
                 <div>
 
-                        <div class="form-group">
+                <v-card class="p-3 mb-5"
+                    elevation="2"
+                >
+                        <div class="form-group" elevation="10">
                             <label for="catalog_id">Select Catalog <router-link class="btn btn-sm btn-link" to="/configure-catalog">Configure new catalog</router-link></label>
                             <select class="form-control" id="catalog_id" v-model="catalog" @change="getCollections">
                                 <option value="">-Select-</option>
@@ -489,114 +415,210 @@ Vue.component('publish-options', {
                             <div v-if="catalog!=''" class="text-muted">{{getCollectionByID(catalog).url}}</div>                            
                         </div>
 
+                </v-card>
+
+                <v-expansion-panels multiple>
+                    <v-expansion-panel>
+                        <v-expansion-panel-header>
+                            Project options
+                        </v-expansion-panel-header>
+                        <v-expansion-panel-content>
+
                         <div class="mb-4">
-                        <label>Options</label>
-                        <table class="table table-sm table-bordered table-hover table-striped mb-0 pb-0" style="font-size:small;">
-                            <tr>
-                                <th>Option</th>
-                                <th>Value</th>
-                            </tr>
-                            <template v-for="(kv,kv_key) in publish_options">                                            
-                            <tr v-if="!kv.custom">
-                                <td>
-                                    {{kv.title}}
-                                    <span v-if="kv_key=='repositoryid'">
-                                    <v-icon @click="getCollections">mdi-reload</v-icon>
-                                    </span>
-                                </td>
-                                <td>
-                                    <input v-if="!kv.enum" type="text" class="form-control" v-model="kv.value"/>
-                                    <select v-if="kv.enum" class="form-control" v-model="kv.value">
-                                        <option v-for="(enum_val,enum_key) in kv.enum" v-bind:value="enum_key">
-                                            {{ enum_val }}
-                                        </option>
-                                    </select>
-                                </td>
-                            </tr>                                            
-                            </template>
-                            <tr>
-                                <td>Collection</td>
-                                <td>
-                                    <select v-if="collections" class="form-control" v-model="publish_options.repositoryid.value">
-                                        <option value="">N/A</option>
-                                        <option v-for="(collection,collection_index) in collections" v-bind:value="collection.repositoryid">
-                                            [{{ collection.repositoryid }}] {{ collection.title }}
-                                        </option>
-                                    </select>
-                                </td>
 
-                            </tr>
-                            
-                        </table>
-                            <!-- <button type="button" class="btn btn-sm btn-link" @click="AddKvRow">Add row</button> -->
+                            <label>Options</label>
+                            <table class="table table-sm table-bordered table-hover table-striped mb-0 pb-0" style="font-size:small;">
+                                <tr>
+                                    <th>Option</th>
+                                    <th>Value</th>
+                                </tr>
+                                <template v-for="(kv,kv_key) in publish_options">                                            
+                                <tr v-if="!kv.custom">
+                                    <td>
+                                        {{kv.title}}
+                                        <span v-if="kv_key=='repositoryid'">
+                                        <v-icon @click="getCollections">mdi-reload</v-icon>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <input v-if="!kv.enum" type="text" class="form-control" v-model="kv.value"/>
+                                        <select v-if="kv.enum" class="form-control" v-model="kv.value">
+                                            <option v-for="(enum_val,enum_key) in kv.enum" v-bind:value="enum_key">
+                                                {{ enum_val }}
+                                            </option>
+                                        </select>
+                                    </td>
+                                </tr>                                            
+                                </template>
+                                <tr>
+                                    <td>Collection</td>
+                                    <td>
+                                        <select v-if="collections" class="form-control" v-model="publish_options.repositoryid.value">
+                                            <option value="">N/A</option>
+                                            <option v-for="(collection,collection_index) in collections" v-bind:value="collection.repositoryid">
+                                                [{{ collection.repositoryid }}] {{ collection.title }}
+                                            </option>
+                                        </select>
+                                    </td>
+
+                                </tr>
+                                
+                            </table>                            
                         </div>
-                    
-                <h3 class="mt-5">External resources</h3>
-                <div class="mt-3">
-                        <v-switch
-                        v-model="resources_overwrite"
-                        value="yes"
-                        label="Overwrite resources"
-                    ></v-switch>
-                </div>
-                
-                <div v-if="ExternalResources.length>0" >
-                    <div>
-                        <strong>{{ExternalResources.length}}</strong> resources found
-                        <span class="ml-2"><strong>{{resources_selected.length}}</strong> selected</span>
+                        </v-expansion-panel-content>
+                    </v-expansion-panel>
+
+                    <v-expansion-panel>
+                        <v-expansion-panel-header>
+                            <div>External resources
+                            <div class="text-secondary text-muted text-xs text-small text-normal">select external resources to be published</div>
+                            </div>
+                            
+                        </v-expansion-panel-header>
+                        <v-expansion-panel-content>
+                            <div class="mt-3">
+                                    <v-switch
+                                    v-model="resources_overwrite"
+                                    value="yes"
+                                    label="Overwrite resources"
+                                ></v-switch>
+                            </div>
+                            
+                            <div v-if="ExternalResources.length>0" >
+                                <div>
+                                    <strong>{{ExternalResources.length}}</strong> resources found
+                                    <span class="ml-2"><strong>{{resources_selected.length}}</strong> selected</span>
+                                </div>
+                                <div class="border" style="max-height:300px;overflow:auto;">                    
+                                    <table class="table table-sm table-striped">
+                                        <thead>
+                                        <tr class="bg-light">
+                                            <th><input type="checkbox" v-model="toggle_resources_selected" @change="toggleSelectedResources"></th>
+                                            <th>Title</th>
+                                            <th>Type</th>
+                                        </tr>
+                                        </thead>
+                                        <tr v-for="(resource,resource_index) in ExternalResources" :key="resource.id">
+                                            <td><input type="checkbox" :value="resource_index" v-model="resources_selected"></td>
+                                            <td>
+                                                <div>{{resource.title}}</div>
+                                                <div class="text-secondary text-small">{{resource.filename}}</div>
+                                            </td>
+                                            <td>{{resource.dctype}}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div v-else class="alert alert-warning">
+                                No external resources found
+                            </div>
+                        </v-expansion-panel-content>
+                    </v-expansion-panel>
+
+                </v-expansion-panels>
+
+                                            
+                    <div class=" mb-3 mt-5 switch-control">
+                        <div><strong>Options</strong></div>
+                        
+                            <v-switch
+                                v-model="publish_metadata"
+                                :value="true"
+                                label="Publish project"
+                            ></v-switch>
+                            
+                            <v-switch
+                                v-model="publish_thumbnail"
+                                :value="true"
+                                label="Publish thumbnail"
+                            ></v-switch>
+                            
+                            <v-switch
+                                v-model="publish_resources"
+                                :value="true"
+                                :label="'External resources' + (resources_selected.length>0?' ('+resources_selected.length+')':'')"
+                            ></v-switch>
+                           
                     </div>
-                    <div class="border" style="max-height:300px;overflow:auto;">                    
-                        <table class="table table-sm table-striped">
-                            <thead>
-                            <tr class="bg-light">
-                                <th><input type="checkbox" v-model="toggle_resources_selected" @change="toggleSelectedResources"></th>
-                                <th>Title</th>
-                                <th>Type</th>
-                            </tr>
-                            </thead>
-                            <tr v-for="(resource,resource_index) in ExternalResources" :key="resource.id">
-                                <td><input type="checkbox" :value="resource_index" v-model="resources_selected"></td>
-                                <td>
-                                    <div>{{resource.title}}</div>
-                                    <div class="text-secondary text-small">{{resource.filename}}</div>
-                                </td>
-                                <td>{{resource.dctype}}</td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-                <div v-else class="alert alert-warning">
-                    No external resources found
-                </div>
 
+                    <button :disabled="!catalog || is_publishing==true" type="button" class="btn btn-primary" @click="publishToCatalog()">Publish</button>
 
-                    <div class=" mb-3"></div>
-
-                    <button :disabled="publish_processing_status==true" type="button" class="btn btn-primary" @click="publishToCatalog()">Publish</button>
-
-                    <div v-if="publish_processing!=''">
+                    <div v-if="is_publishing">
                         <div class="border p-3 mt-5 mb-5">
                             <div><strong>Update status</strong></div>
                             <template>
-                                <div>{{publish_processing}}...</div>
+                                <div>{{publish_processing_message}}...</div>
                                 <v-progress-linear
                                 indeterminate
-                                color="green"
+                                color="blue"
                                 ></v-progress-linear>
                             </template>
                         </div>                        
-                    </div>
-
-                    <div v-if="publish_messages.length>0" style="color:green">
-                        {{publish_messages}}
-                    </div>
-
-                    <div v-if="publish_errors.length>0" style="color:red">
-                        {{publish_errors}}
-                    </div>
+                    </div>                    
                     
                 </div>
 
+                <v-card v-if="is_publishing_completed" class="mt-5 p-3">
+                    <h5 class="mb-5">Publishing summary report</h5>
+
+                    <div v-if="publish_metadata==true">
+                        <strong>Project metadata</strong>
+                        <div v-if="publish_responses.metadata.errors.length>0">
+                            <span class="mdi mdi-alert text-danger"></span>
+                            <span>Failed to publish project metadata</span>
+                            <div class="border-bottom m-1 text-danger" v-for="(response,response_index) in publish_responses.metadata.errors">
+                                <div>{{response.message}} - {{response.status}}</div>
+                            </div>    
+                        </div>
+                        <div v-else>
+                            <div class="border m-1 text-success" >
+                                <div>Project metadata updated successfully</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-if="publish_thumbnail==true" class="mt-5">
+                        <strong>Thumbnail</strong>
+                        <div v-if="publish_responses.thumbnail.errors.length>0">
+                            <span class="mdi mdi-alert text-danger"></span>
+                            <span>Failed to publish thumbnail</span>
+                            <div class="border m-1 text-danger" v-for="(response,response_index) in publish_responses.thumbnail.errors">
+                                <div>{{response.message}} - {{response.status}}</div>
+                            </div>    
+                        </div>
+                        <div v-if="publish_responses.thumbnail.messages.length>0" >                            
+                            <div class="border-bottom m-1" v-for="message in publish_responses.thumbnail.messages">
+                                <div>
+                                <span class="mdi mdi-check-circle text-success"></span> {{message}}
+                                </div>                                
+                            </div>    
+                        </div>
+                        <div v-else>
+                            <div class="border m-1 text-success" >
+                                <div>Thumbnail uploaded successfully</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-if="resources_selected.length>0" class="mt-5">
+                        <strong>External resources</strong>
+                        <div v-if="publish_responses.external_resources.messages.length>0" >                            
+                            <div class="border-bottom m-1" v-for="message in publish_responses.external_resources.messages">
+                                <div>
+                                <span class="mdi mdi-check-circle text-success"></span> {{message}}
+                                </div>                                
+                            </div>    
+                        </div>
+                        <div v-if="publish_responses.external_resources.errors.length>0" >
+                            <div class="border-bottom m-1" v-for="(response,response_index) in publish_responses.external_resources.errors">
+                                <div><span class="mdi mdi-alert text-danger"></span>
+                                {{response.resource_title}}</div>
+                                <div class="text-danger">Error: {{response.error.data.message}}</div>                            
+                            </div>    
+                        </div>
+                    </div>                    
+
+                </v-card>
                 
             </div>          
             `    

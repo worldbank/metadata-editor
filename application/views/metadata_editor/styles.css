@@ -503,3 +503,16 @@ table .form-field-dropdown-custom .v-input__slot fieldset{
 .text-normal{
     font-weight:normal;
 }
+
+
+.switch-control .v-input--selection-controls{
+    margin-top:0px;
+}
+
+.switch-control .v-messages{
+    display:none;
+}
+
+.switch-control .v-label{
+    font-weight:normal;
+}
