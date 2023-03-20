@@ -190,7 +190,7 @@ class R extends MY_REST_Controller
 			}
 
 			$client = new Client([
-				'base_uri' => $this->rApiUrl.'nadar/R/datafile_dictionary/json?force=true&auto_unbox=true&digits=22'
+				'base_uri' => $this->rApiUrl.'nadar/R/datafile_dictionary_no_stats/json?force=true&auto_unbox=true&digits=22'
 			]);
 			
 			$request_body=[

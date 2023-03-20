@@ -101,7 +101,7 @@ class Rutils
 		}
 
 		$client = new Client([
-			'base_uri' => 'http://localhost:2121/ocpu/library/nadar/R/datafile_dictionary/json?force=true&auto_unbox=true&digits=22'
+			'base_uri' => 'http://localhost:2121/ocpu/library/nadar/R/datafile_dictionary_no_stats/json?force=true&auto_unbox=true&digits=22'
 		]);
 		
 		$request_body=[
