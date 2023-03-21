@@ -142,7 +142,7 @@
                           <span class="mr-3"><span class="wb-label">Last modified:</span> <span class="wb-value">{{momentDate(project.changed)}}</span></span>
                           <span><span class="wb-label">Created by:</span> <span class="wb-value capitalize">{{project.username}}</span></span>
                           <span class="ml-4 float-right">
-                            <a class="btn btn-xs btn-outline-primary" @click="EditProject(project.id)" href="#">Edit</a>
+                            <a class="btn btn-xs btn-outline-primary" @click="EditProject(project.id)" :href="CI.base_url + '/'"><span class="mdi mdi-pencil-box-outline"></span></a>
                             <a class="btn btn-xs btn-outline-danger" @click="DeleteProject(project.id)" href="#">Delete</a>
                             <a v-if="project.is_shared>0" class="btn btn-xs btn-primary" @click="ShareProject(project.id)" href="#">
                               Shared
@@ -204,14 +204,14 @@
                           <td class="text-secondary text-small text-xs">{{momentAgo(project.changed)}} <br /> <span class="text-xs">{{momentDate(project.changed)}}</span></td>
                           <td>
 
-                            <span class="ml-4">
-                              <a class="btn btn-xs btn-outline-primary" @click="EditProject(project.id)" href="#">Edit</a>
-                              <a class="btn btn-xs btn-outline-danger" @click="DeleteProject(project.id)" href="#">Delete</a>                              
-                              <a v-if="project.is_shared>0" class="btn btn-xs btn-primary" @click="ShareProject(project.id)" href="#">
-                                Shared
+                            <span>                              
+                              <a  title="Edit project" @click.prevent.stop="EditProject(project.id)" :href="projectEditUrl(project.id)"><span class="mdi mdi-pencil-box-outline"></span></a>
+                              <a  title="Delete" @click="DeleteProject(project.id)" href="#"><span class="mdi mdi-delete-outline"></span></a>                              
+                              <a title="Share project" v-if="project.is_shared>0"  @click="ShareProject(project.id)" href="#">
+                              <span class="mdi mdi-share"></span>
                               </a>
-                              <a v-else class="btn btn-xs btn-outline-primary" @click="ShareProject(project.id)" href="#">
-                                Share
+                              <a v-else  @click="ShareProject(project.id)" href="#">
+                                <span class="mdi mdi-share"></span>
                               </a>
                             </span>
 
@@ -454,6 +454,9 @@
       methods: {
         onWindowFocus: function() {
           this.search();
+        },
+        projectEditUrl: function(project_id) {
+          return CI.base_url + '/editor/edit/' + project_id;
         },
         momentDate(date) {
           //gmt to utc
