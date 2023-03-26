@@ -1,4 +1,4 @@
-# About
+# Specifications
 
 ## Specifications of the current version
 
@@ -22,11 +22,4 @@ Note to Nesstar users: You can convert your Nesstar files by ... (only Windows).
 - Plugins for AI
 - CKAN export
 - 
-
-## Acknowledgments
-
-The Metadata Editor application was developed by Mehmood Asghar (sotware developer / data engineer) with Olivier Dupriez (statistician / data scientist). Other contributors include:
-- ...
-- ...
-- ...
 
