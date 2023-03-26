@@ -2,6 +2,7 @@
 
     * [Objectives](rationale.md)
     * [Specifications](about.md)
+    * [Acknowledgments](acknowledgments.md)
 
 * Getting started
 
@@ -30,7 +31,7 @@
     * [Research project and scripts](template-manager/script.md)
     * [External resource](template-manager/external_resource.md)
 
-* Publishing metadata 
+* Publishing data and metadata 
 
     * [Publish metadata](publish.md)
    
