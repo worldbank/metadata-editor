@@ -14,9 +14,10 @@
 
    * [Template manager](managing_templates.md)
 
-* Managing projects
+* Managing projects and files
 
    * [Managing projects](managing_projects.md)
+   * [Managing files](managing_files.md)
 
 * Documenting data
 
