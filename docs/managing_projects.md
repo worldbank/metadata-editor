@@ -1,6 +1,5 @@
 # Managing projects
 
-
 ## The project page
 
 A project corresponds (the documentation of) a dataset of any type.
@@ -39,10 +38,45 @@ What we recommend:
 ...
 
 
-## Managing permissions
+## Sharing projects
 
+By default, when a project is created, it is only seen by its creator who is then also an administrator of the project.
+Projects can be shared individually with selected users, or by being attached to a collection (in which case all users with access to the collection will view your project).
 
-## Managing collections
+### Managing collections
 
+When a project is created, it belongs only to its creator and is only visible in the creator's home page. A project can be added to one or multiple collections.
+Collections are virtual containers (they are like tags). They provide a way to organize entries by theme, team, or other criteria. Also important, they allow projects to be shared with a groups of collaborators.
 
+Creating and deleting collections:
+- Who can create? Who can delete?
+- Setting permissions at the collection level
+- Deleting a collection does not delete the entries it contains. It is like removing a tag.
+- Adding indicators to a collection
+- Removing an indicator from a collection
 
+Programatically (using the API):
+
+### Managing permissions
+
+Different roles:
+- ME administrator (super admin)
+- At project level:
+  - Administrator: create, edit, delete, lock, share, add to collection
+  - Editor
+  - Reviewer
+  - View
+  - Publisher
+
+## ME and file management system
+
+The ME stores metadata and other information in a database. It does not have a direct link to your file management system.
+How to make sure you maintain copies and consistency?
+- Export projects
+- Changes made outside the ME
+- 
+
+## Migrating an existing library
+
+Recommendations for organizations that have a catalog, e.g., with Nesstar and DDI collection.
+Batch import
