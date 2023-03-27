@@ -2,20 +2,21 @@
 
     * [Objectives](rationale.md)
     * [Specifications](about.md)
+    * [Acknowledgments](acknowledgments.md)
 
 * Getting started
 
     * [Installation and upgrade](installation.md)
     * [Quick start](quick-start.md)
-    * [Where and how your metadata are saved](template-manager/file_management.md)
 
 * Managing templates
 
    * [Template manager](managing_templates.md)
 
-* Managing projects
+* Managing projects and files
 
    * [Managing projects](managing_projects.md)
+   * [Managing files](managing_files.md)
 
 * Documenting data
 
@@ -30,7 +31,7 @@
     * [Research project and scripts](template-manager/script.md)
     * [External resource](template-manager/external_resource.md)
 
-* Publishing metadata 
+* Publishing data and metadata 
 
     * [Publish metadata](publish.md)
    

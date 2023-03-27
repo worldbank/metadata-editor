@@ -1,5 +1,7 @@
 # Specifications
 
+## Specifications of the current version
+
 The Metadata Editor is a multi-platform application developed for the production of metadata compliant with multiple metadata standards and schemas. The application is highly flexible, and may in the future accommodate additional standards and schemas, as well as new versions of standards an schemas already supported.
 
 The application works as a stand-alone application or as a server application. Operating the application on a server allows curation teams to collaborate on the documentation of datasets in the context of a data archive or data library. 
@@ -14,8 +16,10 @@ The application was in part inspired by the Nesstar Publisher software applicati
 
 Note to Nesstar users: You can convert your Nesstar files by ... (only Windows).
 
-The Metadata Editor application was developed by Mehmood Asghar (sotware developer / data engineer) with Olivier Dupriez (statistician / data scientist). Other contributors include:
-- ...
-- ...
-- ...
+## Specifications considered for future versions
+
+- Multi-lingual DDIs
+- Plugins for AI
+- CKAN export
+- 
 
