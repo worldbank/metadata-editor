@@ -42,7 +42,8 @@ class Editor_model extends CI_Model {
 		'missing_data',
 		'version',
 		'notes',
-		'metadata'
+		'metadata',
+		'wght'
 	);
 	
 	private $listing_fields=array(
@@ -635,6 +636,14 @@ class Editor_model extends CI_Model {
         return $this->db->get("editor_data_files")->row_array();
 	}
 
+	function data_file_by_pk_id($sid,$id)
+    {
+        $this->db->select("*");
+        $this->db->where("sid",$sid);
+        $this->db->where("id",$id);
+        return $this->db->get("editor_data_files")->row_array();
+	}
+
 	function data_file_by_name($sid,$file_name)
     {
         $this->db->select("*");
@@ -752,7 +761,7 @@ class Editor_model extends CI_Model {
 		}
 
 		//filename
-		if ($data['file_name']){
+		if (isset($data['file_name'])){
 			$data['file_name']=$this->data_file_filename_part($data['file_name']);
 		}
 		
@@ -1301,7 +1310,7 @@ class Editor_model extends CI_Model {
 			throw new Exception("download_project_json::Project folder not found");
 		}
 
-		$filename=trim($project['idno'])!=='' ? trim($project['idno']) : md5($project['id']);
+		$filename=trim((string)$project['idno'])!=='' ? trim($project['idno']) : md5($project['id']);
 		$output_file=$project_folder.'/'.$filename.'.json';
 
 		$fp = fopen($output_file, 'w');

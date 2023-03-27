@@ -1685,3 +1685,6 @@ CREATE TABLE editor_project_tags(
     sid int not null,
     tag_id int not null
 );
+
+alter table editor_data_files
+add wght int default null;

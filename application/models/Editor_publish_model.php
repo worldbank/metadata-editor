@@ -49,7 +49,7 @@ class Editor_publish_model extends ci_model {
 		$project=$this->Editor_model->get_basic_info($sid);
 		$project_folder=$this->Editor_model->get_project_folder($sid);
 
-		$filename=trim($project['idno'])!=='' ? trim($project['idno']) : md5($project['id']);
+		$filename=trim((string)$project['idno'])!=='' ? trim($project['idno']) : md5($project['id']);
 		$output_file=$project_folder.'/'.$filename.'.json';
 
 		if (!file_exists($output_file)){
