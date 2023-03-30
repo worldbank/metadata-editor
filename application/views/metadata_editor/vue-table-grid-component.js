@@ -290,9 +290,9 @@ Vue.component('table-grid-component', {
                 </thead>
 
                 <!--start-v-for-->
-                <tbody is="draggable" :list="local" tag="tbody">
+                <tbody is="draggable" :list="local" tag="tbody" handle=".handle">
                 <tr  v-for="(item,index) in local">
-                    <td><span class="move-row" ><i class="fas fa-grip-vertical"></i></span></td>
+                    <td><span class="move-row handle" ><i class="fas fa-grip-vertical"></i></span></td>
                     <td v-for="(column,idx_col) in localColumns" scope="row">
                         <div v-if="fieldDisplayType(column)=='textarea'" >
                             <textarea class="form-control form-control-sm"

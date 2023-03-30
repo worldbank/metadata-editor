@@ -79,7 +79,7 @@ Vue.component('table-component', {
     },  
     template: `
             <div class="table-component">
-            <table class="table table-striped table-sm">
+            <table class="table table-striped table-sm border-bottom">
                 <thead class="thead-light">
                 <tr>
                     <th></th>
@@ -97,9 +97,9 @@ Vue.component('table-component', {
                 </thead>
 
                 <!--start-v-for-->
-                <tbody is="draggable" :list="field_data" tag="tbody">
+                <tbody is="draggable" :list="field_data" tag="tbody" handle=".handle">
                 <tr  v-for="(item,index) in field_data">
-                    <td><span class="move-row" ><i class="fas fa-grip-vertical"></i></span></td>
+                    <td><span class="move-row handle" ><i class="fas fa-grip-vertical"></i></span></td>
                     <td v-for="(column,idx_col) in localColumns" scope="row">
                         <div>
                             <div v-if="column.type!=='table'">
@@ -111,7 +111,9 @@ Vue.component('table-component', {
                         </div>
                     </td>
                     <td scope="row">        
-                        <button type="button"  class="btn btn-sm btn-danger grid-button-delete float-right" v-on:click="remove(index)"><i class="fas fa-trash-alt"></i></button>
+                        <div class="mr-1">
+                        <v-icon class="v-delete-icon"  v-on:click="remove(index)">mdi-close-circle-outline</v-icon>
+                        </div>
                     </td>
                 </tr>
                 <!--end-v-for -->

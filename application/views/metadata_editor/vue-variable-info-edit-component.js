@@ -29,10 +29,10 @@ Vue.component('variable-info', {
     template: `
         <div class="variable-categories-edit-component" style="height:100vh">
             <!--var-format-->
-            <div style="font-size:small;" class="mb-2">
-                <div class="section-title p-1 bg-primary"><strong>Variable information</strong></div>
+            <div style="font-size:small;" class="mb-2" >
+                <div class="section-title p-1 bg-variable"><strong>Variable information</strong></div>
 
-                <div class="p-2">
+                <div class="p-2" v-if="variable">
 
                 <div class="form-group form-field">
                     <label>Interval type</label>                     

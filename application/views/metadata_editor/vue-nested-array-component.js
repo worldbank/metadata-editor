@@ -107,12 +107,13 @@ Vue.component('nested-array', {
     template: `
             <div class="nested-array" >
 
-                <template>
+                <template>                
                     <v-expansion-panels :value="0" :multiple="true">
+                        <draggable tag="v-expansion-panel" :list="local_data" handle=".handle">
                         <v-expansion-panel v-for="(item,index) in local_data">
                         <v-expansion-panel-header>
 
-                        <v-row>
+                        <v-row class="handle">
                             <v-col sm="6" md="8" align="start">
                                 <div class="float-left mr-2"><v-icon>mdi-file-tree-outline</v-icon> {{index + 1}} - {{title}}</div>
                                 <div class="float-left text-wrap text-truncate text-muted text-normal" style="max-width: 300px;">{{localValueToString(item)}}</div>
@@ -172,10 +173,12 @@ Vue.component('nested-array', {
 
                         </v-expansion-panel-content>
                         </v-expansion-panel>
+                        </draggable>
                     </v-expansion-panels>
                     <div class="d-flex justify-content-center m-3">
-                                <button type="button" class="btn btn-light btn-sm btn-outline-primary" @click="addRow" >Add section - {{title}}</button>
-                            </div>
+                        <button type="button" class="btn btn-light btn-sm btn-outline-primary" @click="addRow" >Add section - {{title}}</button>
+                    </div>
+                
                 </template>
 
 

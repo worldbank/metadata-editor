@@ -32,6 +32,16 @@ Vue.component('variable-categories', {
             //this.field_data.push({});
         }*/
     },
+    methods:{
+        clearCategories: function(){
+            if (confirm("Are you sure you want to clear all categories?")){
+                this.variable.var_catgry=[];
+            }
+        },
+        refreshCategories: function(){
+            alert("TODO");
+        }
+    },
     computed: {        
         variable:
         {
@@ -60,14 +70,33 @@ Vue.component('variable-categories', {
         }
     },*/   
     template: `
-        <div class="variable-categories-edit-component" style="height:inherit">
+        <div class="variable-categories-edit-component section-list-container bg-white" >
             <!--categories--> 
-            <div style="font-size:small;" class="mb-2" >
-                <div class="section-title p-1 bg-primary"><strong>Categories</strong></div>
-                <div v-if="variable.var_intrvl=='discrete'">
-                    <table-component v-model="variable.var_catgry" :columns="catgry_columns" class="border m-2 pb-2"/>
+            <div style="font-size:small;height:100%;" class=" pb-5" v-if="variable">
+                <div class="section-title section-list-header p-1 bg-variable">
+                    <div class="row">
+                        <div class="col">
+                        <strong>Categories</strong>
+
+                        <div class="float-right">                           
+                            <span title="Create categories" @click="refreshCategories"><v-icon aria-hidden="false" class="var-icon">mdi-update</v-icon></span>
+                            <span title="Clear all" @click="clearCategories"><v-icon aria-hidden="false" class="var-icon">mdi-table-remove</v-icon></span>                                                                                
+                        </div>
+                        </div>
+                    </div>
                 </div>
-                <div v-else class="m-3 border text-align-center p-3 text-secondary">Only available for Discrete variables</div>
+                <div class="section-list-body">
+                    <div v-if="variable.var_intrvl=='discrete'" class="section-rows">                        
+
+                        <table-grid-component 
+                            v-model="variable.var_catgry" 
+                            :columns="catgry_columns" 
+                            class="border elevation-1 m-2 pb-2"
+                            >
+                        </table-grid-component>
+                    </div>
+                    <div v-else class="m-3 border text-align-center p-3 text-secondary">Only available for Discrete variables</div>
+                </div>
             </div>
             
             <!--categories-end-->            

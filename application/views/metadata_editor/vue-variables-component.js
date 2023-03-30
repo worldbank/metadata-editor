@@ -20,7 +20,7 @@ Vue.component('variables', {
             changeCaseType:"title",
             changeCaseUpdateStatus:'',
             edit_item:0,
-            edit_items:[],            
+            edit_items:[],    
             variableMultipleTemplate:{
                 "name": "NaN",
                 "labl": "Multiple selected",
@@ -79,6 +79,7 @@ Vue.component('variables', {
                 }
 
                 if (this.variableSelectedCount()>1){
+                    console.log("multiple variables selcted", this.selectedVariables);
                     if (JSON.stringify(val)==JSON.stringify(this.variableMultipleTemplate)){
                         //console.log("multi-variable no change detected");
                     }
@@ -94,6 +95,7 @@ Vue.component('variables', {
               }
               else{
                 //console.log("CHANGE DETECTED",val);
+                if (!val){return;}
                 this.saveVariableDebounce(val);
               }
             }
@@ -104,7 +106,7 @@ Vue.component('variables', {
             this.variable_search='';
         },
         scrollToVariableBottom: function(){
-            document.getElementById('variables-container').scrollTop= document.getElementById('variables-container').scrollHeight;
+            document.getElementById('variables-table').scrollTop= document.getElementById('variables-table').scrollHeight;
         },
         scrollToVariable: function(idx=0){
             var id=this.edit_items[0];
@@ -118,7 +120,7 @@ Vue.component('variables', {
             var myElement = document.getElementById('v-'+id);
             var topPos = myElement.offsetTop - 100;
 
-            document.getElementById('variables-container').scrollTop = topPos;
+            document.getElementById('variables-table').scrollTop = topPos;
 
         },
         varNavigate: function(direction)
@@ -222,6 +224,7 @@ Vue.component('variables', {
             this.$nextTick().then(() => {
                 this.page_action="edit";
                 this.edit_items=[index];
+                console.log("editing variable",index,this.variables[index]);
                 this.variable_copy=_.cloneDeep(this.variables[index]);
             });
         },
@@ -229,25 +232,39 @@ Vue.component('variables', {
         {
             this.variable_search="";
             this.page_action="edit";
-            this.scrollToVariableBottom();
-            //let new_idx=this.variables.push() -1;;
-                new_var={
-                "vid": "V" + (this.MaxVariableID+1),
-                "sid": this.dataset_id,
-                "file_id": this.fid,
-                "fid":this.fid,
-                "name": "untitled",
-                "labl": "untitled",
-                "var_format":{
-                    "type":null
-                },
-                "var_catgry": []
+
+            let url=CI.base_url + '/api/editor/variable_create/'+vm.dataset_id;
+            let new_var={
+                    "vid": "V" + (this.MaxVariableID+1),
+                    "sid": this.dataset_id,
+                    "file_id": this.fid,
+                    "fid":this.fid,
+                    "name": "untitled",
+                    "labl": "untitled",
+                    "var_format":{
+                        "type":''
+                    },
+                    "var_catgry": []
               }
 
-            this.$store.commit('variable_add',{fid:this.fid, variable:new_var});
-            this.saveVariable(new_var);
-            newIdx=this.variables.length -1;
-            this.editVariable(newIdx);            
+            axios.post(url, 
+                {
+                    "variable": new_var
+                }
+            )
+            .then(function (response) {
+                console.log("addVariable", response);                
+                variable=response.data.variable;
+                new_var.uid=variable.uid;
+                
+                vm.scrollToVariableBottom();
+                vm.$store.commit('variable_add',{fid:vm.fid, variable:new_var});
+                newIdx=vm.variables.length -1;
+                vm.editVariable(newIdx);
+            })
+            .catch(function (error) {
+                console.log("error deleting variables",error);
+            });
         },
         saveMultiSelectedVariables: function()
         {
@@ -286,9 +303,6 @@ Vue.component('variables', {
             let url=CI.base_url + '/api/editor/variables/'+vm.dataset_id;
             axios.post(url, 
                 data
-                /*headers: {
-                    "xname" : "value"
-                }*/
             )
             .then(function (response) {
                 console.log("saveVariable", response);
@@ -328,7 +342,35 @@ Vue.component('variables', {
         },        
         deleteVariable: function()
         {
-            alert("Not implemented");
+            let vm=this;
+            let url=CI.base_url + '/api/editor/variables_delete/'+vm.ProjectID;
+            let var_uid_list=[];
+
+            console.log("variables to be deleted",this.edit_items);
+            this.edit_items.forEach((item) => {
+                //console.log("variable delete",this.variables[item]);
+                var_uid_list.push(this.variables[item].uid);
+            });
+
+            //delete variables
+            axios.post(url, 
+                {
+                    "uid": var_uid_list
+                }
+            )
+            .then(function (response) {
+                //need to sort in descending order to delete from the end of the array
+                let edit_items_descending=vm.edit_items.sort(function(a, b){return b-a});
+
+                edit_items_descending.forEach((item) => {
+                    vm.$store.commit('variable_remove',{fid:vm.fid, idx:item});
+                });
+                vm.edit_items=[];
+            })
+            .catch(function (error) {
+                alert("Error deleting variables");
+                console.log("error deleting variables",error);
+            });
         },
         variableSelectedCount: function()
         {
@@ -337,10 +379,33 @@ Vue.component('variables', {
         initializeMultiVariable: function(){
             this.variableMultiple=JSON.parse(JSON.stringify(this.variableMultipleTemplate));
             console.log("init variableMultiple",this.variableMultiple);
+        },
+        variableActiveClass: function(idx,variable_name)
+        {
+            let classes=[];
+            variable_name=variable_name.toLowerCase().trim();
+
+            //check for duplicate variable names
+            if (this.duplicateVariableNames[variable_name]){
+                classes.push('variable-name-duplicate bg-warning');
+            }
+
+            if (variable_name.trim()==''){
+                classes.push('variable-name-empty bg-warning');
+            }
+
+            if (this.isVariableSelected(idx)){
+                classes.push('activeRow');
+            }
+
+            return classes.join(' ');
         }
 
     },
     computed: {
+        ProjectID(){
+            return this.$store.state.project_id;
+        },
         isSingleVariableSelected: function()
         {
             if (this.edit_items.length==1){
@@ -398,20 +463,50 @@ Vue.component('variables', {
             }
 
             return vars;
+        },
+        duplicateVariableNamesCount(){
+            return Object.keys(this.duplicateVariableNames).length;
+        },
+        duplicateVariableNames(){
+            let names={};
+            this.variables.forEach((variable)=>{
+                let name=variable.name;
+                //lowercase variable names and trim
+                name=variable.name.toLowerCase().trim();
+
+                if (names[name]){
+                    names[name]++;
+                }else{
+                names[name]=1;
+                }
+            });
+
+            //only return names that are duplicated
+            for (let name in names){
+                if (names[name]==1){
+                    delete names[name];
+                }
+            }
+
+            return names;
         }
     },
     template: `
-        <div style="height: 100vh;margin-top:5px;" >
+        <div style="margin-top:20px;" class="variable-list-component" >
             <splitpanes class="default-theme" >
             <pane max-size="90" size="70">
                 <splitpanes horizontal>
                     <pane min-size="5" >
                     <!--variables-start-->
-                    <div style="height:100%;background:white" xstyle="height:40%;overflow-y: scroll;background:white;font-size:small" class="border">
-                            <div class="row section-title p-1 bg-primary" style="font-size:small;position:relative;">
+                    <div  class="border section-list-container ">
+                        <!--variables-header-->
+                        <div class="section-list-header">
+                            <div class="row no-gutters section-title p-1 bg-variable" style="font-size:small;position:relative;">
                                 <div class="col-2">
+                                    <div class="p-1">
                                     <strong>Variables</strong>
-                                    <span v-if="variables" class="badge badge-light">{{variables.length}}</span>
+                                    <span v-if="variables" class="badge badge-light">{{variables.length}}</span>                                    
+                                    </div>
                                 </div>
 
                                 <div class="col-3">
@@ -433,58 +528,65 @@ Vue.component('variables', {
 
                                 <div class="col">
                                 
-                                    <div class="float-right">
+                                    <div class="float-right" >
+                                    
+                                        <span v-if="duplicateVariableNamesCount>0">
+                                            <v-icon :title="duplicateVariableNamesCount + ' duplicates'" aria-hidden="false" class="var-icon" style="color:red">mdi-alert-box</v-icon>                                            
+                                        </span>
 
-                                        <button type="button" class="btn btn-xs btn-primary" @click="changeCaseDialog=true" title="Change case">
-                                            <v-icon aria-hidden="false" style="color:white">mdi-format-letter-case</v-icon>
-                                        </button>
+                                        <span v-show="edit_items.length>0">
 
-                                        <button type="button" class="btn btn-xs btn-primary" @click="spreadMetadata" title="Spread Metadata">
-                                            <i class="fas fa-clone"></i>
-                                        </button>
+                                        <span @click="changeCaseDialog=true" title="Change case">
+                                            <v-icon aria-hidden="false" class="var-icon">mdi-format-letter-case</v-icon>
+                                        </span>
 
-                                        <button type="button" class="btn btn-xs btn-primary" @click="addVariable" title="Add new variable">
-                                            <i class="fas fa-plus-square" ></i>
-                                        </button>
+                                        <span @click="spreadMetadata" title="Spread Metadata">
+                                            <v-icon aria-hidden="false" class="var-icon">mdi-content-copy</v-icon>
+                                        </span>
+
+                                        <span @click="addVariable" title="Add new variable">
+                                            <v-icon aria-hidden="false" class="var-icon">mdi-plus-box</v-icon>                                            
+                                        </span>
 
 
-                                        <button type="button" class="btn btn-xs btn-primary" @click="deleteVariable" title="Delete selected variable(s)">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                        
-                                        
-
+                                        <span @click="deleteVariable" title="Delete selected variable(s)">
+                                            <v-icon aria-hidden="false" class="var-icon">mdi-trash-can-outline</v-icon>
+                                        </span>
                                         
                                         <span class="dropdown dropleft">
-                                        <button class="btn btn-primary btn-xs" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-expanded="false">
-                                            <i class="fas fa-ellipsis-v"></i>
-                                        </button>
-                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="font-size:small;">
-                                            <a class="dropdown-item" href="#"><i class="fas fa-spell-check"></i> Change case</a>
-                                            <a class="dropdown-item" href="#"><i class="fas fa-clone"></i> Spread metadata</a>
-                                            <a class="dropdown-item" href="#"><i class="fas fa-file-download"></i> Export variable(s)</a>
-                                        </div>
+                                            <span id="dropdownMenuButton" data-toggle="dropdown" aria-expanded="false">
+                                                <v-icon aria-hidden="false" class="var-icon">mdi-dots-vertical</v-icon>    
+                                            </span>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="font-size:small;">
+                                                <a class="dropdown-item" href="#"><i class="fas fa-spell-check"></i> Change case</a>
+                                                <a class="dropdown-item" href="#"><i class="fas fa-clone"></i> Spread metadata</a>
+                                                <a class="dropdown-item" href="#"><i class="fas fa-file-download"></i> Export variable(s)</a>
+                                            </div>
+                                        </span>
+
                                         </span>
                                     </div>
                                 </div>
 
                             </div>
+                        </div>
+                        <!--variables-header-->
 
 
                             
-                            <div style="position:relative;padding-bottom:50px;height:inherit;overflow-y: scroll;background:white;font-size:small" id="variables-container" >
-
-                                <table class="table table-striped table-bordered table-sm table-hover table-variables">                                    
+                            <div class="section-list-body" id="variables-container" >
+                                <div class="section-rows variable-rows">
+                                <table id="variables-table" class="table table-striped table-bordered table-sm table-hover table-variables">                                    
                                     <tbody>
                                     <tr v-for="(variable, index) in variables"  
                                         @click.alt.exact="editVariableMultiple(index)" 
                                         @click.ctrl.exact="editVariableMultiple(index)" 
                                         @click.shift.exact="editVariableMultiple(index,1)" 
                                         @click.exact="editVariable(index)" 
-                                        :class="{'activeRow' : isVariableSelected(index)} " 
+                                        :class="variableActiveClass(index,variable.name)"                                         
                                         :id="'v-'+index"
                                     >
-                                        <td class="bg-secondary">V{{index+1}}</td>                                        
+                                        <td class="bg-secondary">V{{index+1}} - {{variable.vid}}</td>                                        
 
                                         <td class="var-name-edit">
                                             <div><input class="var-labl-edit" type="text" v-model="variable.name" /></div>
@@ -498,8 +600,10 @@ Vue.component('variables', {
                                     </tr>
                                     </tbody>
                                 </table>
+                                
 
                                 <spread-metadata v-if="showSpreadMetadataDialog" v-model="showSpreadMetadataDialog" :variables="selectedVariables"></spread-metadata>
+                                </div>
 
                             </div>
                         </div>
@@ -507,27 +611,24 @@ Vue.component('variables', {
                     </pane>
                     <pane size="30">
                     <!--documentation-->
-                    <div class="container-fluid-x border " style="height: 100%;font-size:small;">
+                    <div class="section-list-container variable-documentation-container" >
 
-                        <div class="section-title p-1 bg-primary">
-                            <div class="row">
+                        <div class="section-title p-1 bg-variable">
+                            <div class="row no-gutters">
                                 <div class="col">
-                                    <strong>Documentation</strong>
+                                    <div class="pt-1" v-if="activeVariable">{{activeVariable.name}} - <span v-if="activeVariable.labl">{{activeVariable.labl.substring(0,50)}}</span> </div>
                                 </div>
-                                <div class="col-6">
-                                    <span v-if="activeVariable">{{activeVariable.name}} - <span v-if="activeVariable.labl">{{activeVariable.labl.substring(0,50)}}</span> </span>
-                                </div>
-                                <div class="col-2">
+                                <div class="col-2 pr-3">
                                     <div class="float-right">
-                                        <button class="btn btn-xs btn-primary" @click="varNavigate('first')"><i class="fas fa-angle-double-left"></i></button>
-                                        <button class="btn btn-xs btn-primary" @click="varNavigate('prev')"><i class="fas fa-angle-left"></i></button>
-                                        <button class="btn btn-xs btn-primary" @click="varNavigate('next')"><i class="fas fa-angle-right"></i></button>
-                                        <button class="btn btn-xs btn-primary" @click="varNavigate('last')"><i class="fas fa-angle-double-right"></i></button>
+                                        <span @click="varNavigate('first')"><v-icon aria-hidden="false" class="var-icon">mdi-chevron-double-left</v-icon></span>
+                                        <span @click="varNavigate('prev')"><v-icon aria-hidden="false" class="var-icon">mdi-chevron-left</v-icon></span>
+                                        <span @click="varNavigate('next')"><v-icon aria-hidden="false" class="var-icon">mdi-chevron-right</v-icon></span>
+                                        <span @click="varNavigate('last')"><v-icon aria-hidden="false" class="var-icon">mdi-chevron-double-right</v-icon></span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                            <div class="p3" style="height:inherit;overflow:auto;background:white;">
+                            <div class="p-1 border" style="height:inherit;overflow:auto;background:white;">
                                 <div v-show="page_action=='edit' " >
                                     <div v-if="activeVariable">
                                         <variable-edit  :variable="activeVariable" :multi_key="edit_items"  :index_key="SingleVariableIndex" ></variable-edit>
@@ -544,7 +645,7 @@ Vue.component('variables', {
                 <splitpanes horizontal>
                 <pane size="60" min-size="10">
                     <!--categories-->
-                    <div style="height:100%;overflow:auto;background:white;" class="border">
+                    <div style="height:100%;" class="border">
                     <variable-categories v-if="isSingleVariableSelected" :edit_index="SingleVariableIndex"  :value="activeVariable" ></variable-categories>
                     </div>
                     <!--categories-end-->

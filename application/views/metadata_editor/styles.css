@@ -159,9 +159,10 @@ label{
 
 html,body {
     height: 100%;
+    overflow:hidden;
 }
 .container-fluid {
-    height: 100vh;
+    xheight: 100vh;
 }
 
 .nav-link{
@@ -403,6 +404,7 @@ html,body {
     background:#dee2e6!important;
 }
 
+
 .btn-xs {
     padding: 0.125rem 0.25rem;
     font-size: .75rem;
@@ -411,7 +413,9 @@ html,body {
 }
 
 .splitpanes.default-theme .splitpanes__pane{
-    background-color: hsl(0deg 0% 100% / 70%)!important;
+    /*background-color: hsl(0deg 0% 100% / 70%)!important;*/
+    height:92vh;
+    
 }
 
 
@@ -515,4 +519,91 @@ table .form-field-dropdown-custom .v-input__slot fieldset{
 
 .switch-control .v-label{
     font-weight:normal;
+}
+
+.default-theme.splitpanes--vertical>.splitpanes__splitter, .default-theme .splitpanes--vertical>.splitpanes__splitter {
+    width: 7px;
+    border-left: 10px solid white;
+    margin-left: -1px;
+}
+
+.variables-list-component .default-theme.splitpanes--vertical>.splitpanes__splitter, .default-theme .splitpanes--vertical>.splitpanes__splitter {
+    border-left: 10px solid white;
+}
+
+
+.default-theme.splitpanes--vertical>.splitpanes__splitter:before, .default-theme .splitpanes--vertical>.splitpanes__splitter:before {
+    margin-left: -7px;
+}
+
+.default-theme.splitpanes--vertical>.splitpanes__splitter:after, .default-theme .splitpanes--vertical>.splitpanes__splitter:after {
+    margin-left: -5px;
+}
+
+/*::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 7px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, .5);
+    box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+  }
+*/
+.editor-sidebar{
+    background:#dee2e6!important;
+}
+
+.pane-main-content{
+    background:white!important;
+}
+
+.bg-variable{
+    background:rgb(0 0 0 / 12%);
+}
+
+.var-icon
+{
+    font-size:24px;    
+    padding:3px;    
+}
+.var-icon:hover{
+    /*color:rgb(251, 251, 251)!important;*/
+    background-color:rgb(208, 205, 205);
+    cursor:pointer;
+}
+
+
+.section-list-container{
+    /*height:100%;
+    background:white;*/    
+        height: 100%;
+        display: flex;
+        flex-flow: column nowrap;
+}
+
+.section-list-container .section-list-header{
+    flex: none;
+}
+
+.section-list-container .section-list-body{
+    /*position:relative;padding-bottom:50px;height:inherit;overflow-y: scroll;background:white;font-size:small*/
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    font-size:small;  
+    position:relative;      
+}
+
+.section-list-container .section-list-body  .section-rows {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    min-height: 0px;
+    position:relative;    
+}
+
+.variable-documentation-container{
+    font-size:small;
 }

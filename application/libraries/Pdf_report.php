@@ -1,14 +1,15 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /**
+ * 
+ * 
  * Generate PDF reports
  * 
- *
- *
  *
  */
 class PDF_Report{
 	
 	var $ci;
+	var $project;
 	
     //constructor
 	function __construct($params=NULL)
@@ -30,38 +31,132 @@ class PDF_Report{
 		//$this->ci->load->helper('xslt_helper');
 		//$this->ci->lang->load("ddibrowser");
 
-		$this->ci->load->model("Dataset_model");
-		$this->ci->load->model("Catalog_model");
-		$this->ci->load->model("Survey_type_model");
-        $this->ci->load->model("Survey_resource_model");
-        $this->ci->load->model("Citation_model");
-		$this->ci->load->model("Data_file_model");
-		$this->ci->load->model("Related_study_model");
-		$this->ci->load->model("Variable_model");
-		$this->ci->load->model("Timeseries_db_model");
-		$this->ci->load->model("Widget_model");
+		$this->ci->load->model("Editor_model");
+		$this->ci->load->library("Pagepreview");
 		
+		/*
 		$this->ci->load->library("Metadata_template");
 		$this->ci->load->library("Dataset_manager");
 
 		$this->ci->load->helper("resource_helper");
 		$this->ci->load->helper("metadata_view");
 		$this->ci->load->helper('array');
+		*/
     }
-	
 
-	function generate($sid, $output_filename, $options=array())
-	{		
-		$study=$this->ci->Dataset_model->get_row($sid);
+	function initialize($sid)
+	{
+		$this->project=$this->ci->Editor_model->get_row($sid);
 
-		if (!$study){
-			throw new exception("study_not_found: ".$sid);
-		}
-
-		if ($study['type']=='survey'){
-			return $this->generate_pdf_ddi($sid,$output_filename,$options);
+		if (!$this->project){
+			throw new Exception("Project not found");
 		}
 	}
+	
+	function generate($output_filename='trash/test.pdf',$options=array())
+    {
+		if (!$this->project)
+		{
+			throw new Exception("Project not initialized");
+		}
+
+		if ($this->project['type']=='survey'){
+			//return $this->generate_pdf_ddi($sid,$output_filename,$options);
+		}
+
+        $mpdf=$this->ci->my_mpdf;
+
+		$stylesheet='body,html,*{font-size:12px;font-family:arial,verdana}'."\r\n";
+		$stylesheet.= @file_get_contents(APPPATH.'views/pdf_reports/pdf.css');
+        $mpdf->WriteHTML($stylesheet,1);
+
+        //footer
+		$mpdf->defaultfooterfontsize = 8;	// in pts
+		$mpdf->defaultfooterfontstyle = '';	// blank, B, I, or BI
+		$mpdf->defaultfooterline = 0; 	// 1 to include line below header/above footer
+		$mpdf->setFooter('{PAGENO}');
+
+		//coverpage
+		$coverpage=$this->ci->load->view('pdf_reports/coverpage',array('project'=>$this->project),TRUE);
+		$mpdf->AddPage();
+		$mpdf->Bookmark(t("cover"),0);
+		$mpdf->WriteHTML( $coverpage );		
+		
+		//study description
+        $mpdf->AddPage();
+		$mpdf->Bookmark(t("overview"),0);
+		$mpdf->WriteHTML($this->project_metadata_html());
+
+
+
+
+		/*
+		//coverpage
+		$coverpage=$this->ci->load->view('pdf_reports/coverpage',$options,TRUE);	        
+		$mpdf->AddPage();
+		$mpdf->Bookmark(t("cover"),0);
+		$mpdf->WriteHTML( $coverpage );
+        
+        //header
+		$mpdf->defaultheaderfontsize = 8;	// in pts
+		$mpdf->defaultheaderfontstyle = '';	// blank, B, I, or BI
+		$mpdf->defaultheaderline = 0; 	// 1 to include line below header/above footer
+		$mpdf->SetHeader($options['study_title']);
+
+        //study description
+        $mpdf->AddPage();
+		$mpdf->Bookmark(t("overview"),0);
+		$mpdf->WriteHTML($this->study_metadata_html($sid));
+        
+        //data files list
+		$data_files_html=$this->datafiles_html($sid);
+		if ($data_files_html){
+			$mpdf->AddPage();
+			$mpdf->Bookmark(t("file_description"),0);
+			$mpdf->WriteHTML($data_files_html);
+		}
+
+        //list variables
+        if (!empty($files) && isset($options['toc_variable']) && $options['toc_variable']===1){		
+            $mpdf->AddPage();
+            $mpdf->Bookmark(t("variable_list"),0);
+
+            foreach($files as $file){            
+                $mpdf->AddPage();            
+                $mpdf->Bookmark($file['file_name'],1);
+
+                $variables=$this->data_file_variables_list($sid,$file['file_id']);
+                $mpdf->WriteHTML($variables);
+            }
+        }
+        
+        //data file and variables detailed
+        if (!empty($files) && isset($options['data_dic_desc']) && $options['data_dic_desc']===1){
+            $mpdf->AddPage();
+            $mpdf->Bookmark(t("variable_description"),0);
+
+            foreach($files as $file){            
+                $mpdf->AddPage();            
+                $mpdf->Bookmark($file['file_id'],1);
+
+                foreach($this->variables_html($sid,$file['file_id']) as $var){
+					if (strlen($var)>1000000){
+						$var_list=explode("<line-break/>",$var);
+						foreach($var_list as $var_){
+							$mpdf->WriteHTML($var_);
+						}						
+					}else{
+                    	$mpdf->WriteHTML($var);
+					}
+                }
+            }
+        }*/
+
+
+		
+        $mpdf->Output($output_filename,"F");
+		return true;
+    }
 
 	/**
 	 * 
@@ -69,7 +164,7 @@ class PDF_Report{
 	 * Generate report for Microdata
 	 * 
 	 */
-	function generate_pdf_ddi($sid=null,$output_filename,$options=array())
+	/*function generate_pdf_ddi($sid=null,$output_filename='',$options=array())
     {        
         $files=$this->ci->Data_file_model->get_all_by_survey($sid);
 
@@ -159,7 +254,7 @@ class PDF_Report{
 
         $mpdf->Output($output_filename,"F");
 		return true;
-    }
+    }*/
 
 	/**
 	 * 
@@ -167,22 +262,17 @@ class PDF_Report{
 	 * Get study level metadata as HTML
 	 * 
 	 */
-	function study_metadata_html($sid=NULL)
+	private function project_metadata_html()
 	{
-		$survey=$this->ci->Dataset_model->get_row($sid);
+		$template=$this->ci->pagepreview->get_template_project_type($this->project['type']);
+		$this->ci->pagepreview->initialize($this->project,$template['template']);
 
-		if (!$survey){
-			return false;
-		}
-
-		$survey['metadata']=(array)$this->ci->dataset_manager->get_metadata($sid,$survey['type']);
-		$survey['resources']=$this->ci->Survey_resource_model->get_survey_resources_group_by_filename($sid);
-
-        $template_path='pdf_reports/survey-template';
-		
-		$this->ci->metadata_template->initialize($survey['type'],$survey, $template_path);
-		$output=$this->ci->metadata_template->render_html();
-		return $output;
+		return $this->ci->load->view('project_preview/index',
+			array(					
+				'project'=>$this->project,
+				'template'=>$template
+			),true
+		);
 	}
 
 

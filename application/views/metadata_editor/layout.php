@@ -25,9 +25,12 @@
             </a>
 
             <div class="dropdown-menu" aria-labelledby="dropdownProjectMenu">
-                <a class="dropdown-item" href="#/project-package"><i class="fas fa-file-invoice"></i> Export project (zip)</a>
+                <a class="dropdown-item" href="#/project-package">
+                    <span style="font-size:20px;"  class="mdi mdi-package-down"></span> Export project (zip)</a>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#/publish"><i class="fas fa-location-arrow"></i> Publish to NADA</a>
+                <a class="dropdown-item" href="#/publish"><span style="font-size:20px;" class="mdi mdi-arrow-top-right-thick"></span> Publish to NADA</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#/generate-pdf"><span style="font-size:20px;" class="mdi mdi-file-pdf-box"></span> PDF Documentation</a>
             </div>
         </div>
 
@@ -55,11 +58,11 @@
 
 <!--end-header-->
 
-<splitpanes class="default-theme splitpanes splitpanes--vertical" style="min-height: 400px">
-    <pane min-size="15" max-size="35" size="20" height="100">
+<splitpanes class="default-theme splitpanes splitpanes--vertical" style="min-height: 100px">
+    <pane min-size="15" max-size="35" size="20" class="editor-sidebar">
         <!--left -->
 
-        <div class="container-fluid bg-secondary-light pt-2 pb-3" style="overflow:auto;">
+        <div class="container-fluid bg-secondary-light pt-2 pb-3">
 
             <!-- icons -->
             <div class="bg-dark-x pb-2 sidebar-menu-bar">
@@ -139,7 +142,7 @@
         </div>
         <!--end left-->
     </pane>
-    <pane size="80">
+    <pane size="80" class="pane-main-content">
         <!-- right -->
 
 
@@ -147,7 +150,7 @@
 
             <section class="content-x">
 
-                <div class="container-fluid-" style="overflow:auto;">
+                <div class="container-fluid-">
 
                     <v-login v-model="login_dialog"></v-login>
 
@@ -179,7 +182,7 @@
                 */ ?>
 
                     <validation-observer ref="form" v-slot="{ invalid }">
-                        <div class="container-fluid p-3" style="overflow:auto;">
+                        <div class="container-app pt-5 pr-2" >
                             <keep-alive include="datafiles">
                                 <router-view :key="$route.fullPath" />
                             </keep-alive>

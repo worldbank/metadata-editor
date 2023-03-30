@@ -12,8 +12,20 @@ Vue.component('datafiles', {
         }
     }, 
     mounted: function () {
-    },   
-    methods: {
+    },  
+    watch: {
+        'data_files': function(newVal,oldVal) {
+            if (oldVal.length<1){
+                return;
+            }
+            console.log("length",newVal.length,oldVal.length);
+            console.log("data_files changed", JSON.stringify(this.getRowSequence(newVal)), JSON.stringify(this.getRowSequence(oldVal)));
+
+            //update sequence
+            this.updateDataFilesWeight();
+        },
+    }, 
+    methods: {        
         editFile:function(file_id){
             this.page_action="edit";
             this.edit_item=file_id;
@@ -28,7 +40,7 @@ Vue.component('datafiles', {
         },
         saveFile: function(data)
         {
-            console.log("saving file",data);
+            console.log("saving file",data, this.edit_item);
             //this.$set(this.data_files, this.edit_item, data);
             
             vm=this;
@@ -42,15 +54,52 @@ Vue.component('datafiles', {
                 }*/
             )
             .then(function (response) {
-                vm.$set(vm.data_files, vm.edit_item, data);
+                console.log("updating",response);
+                //vm.$set(vm.data_files, vm.edit_item, JSON.parse(JSON.stringify(data)));
+                vm.$store.dispatch('loadDataFiles',{dataset_id:vm.dataset_id});
             })
             .catch(function (error) {
                 console.log(error);
-                alert("Failed to add data file: "+ error.message);
+                let message='';
+                if (error.response.data.message){
+                    message=error.response.data.message;
+                }else{
+                    message=error.message;
+                }
+                alert("Failed: "+ message);
             })
             .then(function () {
                 console.log("request completed");
             });
+        },
+        updateDataFilesWeight: function()
+        {
+            vm=this;
+            let url=CI.base_url + '/api/editor/datafiles_sequence/'+vm.dataset_id;
+            let form_data={};
+            form_data.options=this.getRowSequence(this.data_files);
+
+            axios.post(url, 
+                form_data
+            )
+            .then(function (response) {
+                console.log("updating",response);
+            })
+            .catch(function (error) {
+                console.log("failed to update datafiles sequence",error);
+                alert("Failed: "+ error.message);
+            })            
+        },
+        getRowSequence: function(rows){
+            let seq=[];
+            for (let i=0;i<rows.length;i++){
+                seq.push(
+                    {
+                       'id': rows[i]['id'],
+                        'wght': i
+                    });
+            }
+            return seq;
         },
         deleteFile:function(file_idx)
         {
@@ -91,11 +140,12 @@ Vue.component('datafiles', {
           },
     },
     template: `
-        <div>
+        <div class="datfiles-component">
 
-        <v-container>
+        
+            <div class="container-fluid mt-5">
 
-            <h1>Data files</h1>            
+            <h3>Data files</h3>
             <div v-show="page_action=='list'">
 
                 <v-row>
@@ -106,15 +156,20 @@ Vue.component('datafiles', {
                     </v-col>
                 </v-row>
 
-                <v-container>
+                
                 <table class="table table-striped">
+                    <thead>
                     <tr>
+                        <th><span class="mdi mdi-swap-vertical"></span></th>
                         <th>File ID</th>
                         <th>File name</th>
                         <th>Variables</th>
                         <th>&nbsp;</th>
                     </tr>
+                    </thead>
+                    <tbody is="draggable" :list="data_files" tag="tbody" handle=".handle" >
                     <tr v-for="(data_file, index) in data_files">
+                        <td><span title="Drag to re-order" class="mdi mdi-drag handle"></span></td>
                         <td><i class="far fa-file-alt"></i> {{data_file.file_id}}</td>
                         <td>{{data_file.file_name}}</td>
                         <td>{{data_file.var_count}}</td>
@@ -127,8 +182,9 @@ Vue.component('datafiles', {
                             </div>
                         </td>
                     </tr>
+                    </tbody>
                 </table>
-                </v-container>
+                
                 
             </div>
 
@@ -138,7 +194,8 @@ Vue.component('datafiles', {
                 </div>
             </div>
 
-        </v-container>
+            </div>
+        
         </div>
     `
 })

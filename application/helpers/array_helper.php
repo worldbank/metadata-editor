@@ -135,6 +135,28 @@ if ( ! function_exists('array_remove_nulls'))
     }
 }
 
+if ( ! function_exists('array_remove_empty'))
+{
+    function array_remove_empty(array &$array)
+    {
+        foreach ($array as $key => &$value) {
+            if (is_array($value)) {
+                $value = array_remove_empty($value);
+                if (count($value)==0){
+                    $value=null;
+                }
+            }else{
+                if(trim($value)==''){
+                    $value=null;
+                }
+            }
+            if ($value===null) {
+                unset($array[$key]);
+            }
+        }
+        return $array;
+    }
+}
 
 
 if ( ! function_exists('is_indexed_array'))

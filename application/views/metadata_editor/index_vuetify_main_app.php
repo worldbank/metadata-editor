@@ -1,8 +1,6 @@
 <script>
         Vue.use(Vuex)
         Vue.use(VueDeepSet)     
-        Vue.use(VueToast);
-   
 
         window.bus = new Vue();//todo remove?
         const EventBus = new Vue();
@@ -191,6 +189,7 @@
             echo $this->load->view("metadata_editor/vue-nested-section-subsection-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-repeated-field-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-form-section-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-generate-pdf-component.js",null,true);
         ?>
 
         <?php if (empty($metadata)):?>
@@ -213,6 +212,7 @@
         const Home = { template: '<div><summary-component/> </div>' }
         const PublishProject = { template: '<div><publish-options/> </div>' }
         const ProjectPackage = { template: '<div><project-package/> </div>' }
+        const ProjectPdf = { template: '<div><generate-pdf/> </div>' }
         const ConfigureCatalog = { template: '<div><configure-catalog/> </div>' }
         const ImportOptions = { template: '<div><import-options/> </div>' }
         const _main = {props: ['active_section'],template: '<div><study-metadata/></div>' }
@@ -230,6 +230,7 @@
             { path: '/', component: Home },
             { path: '/publish', component: PublishProject },
             { path: '/project-package', component: ProjectPackage },
+            { path: '/generate-pdf', component: ProjectPdf },            
             { path: '/configure-catalog', component: ConfigureCatalog },
             { path: '/import', component: ImportOptions },
             { path: '/study/:element_id', component: main, name: 'study',props: true },
@@ -615,6 +616,12 @@
                     }
 
                     let new_idx=state.variables[data.fid].push(data.variable)-1;
+                },
+                variable_remove(state,data){
+                    if (state.variables[data.fid]==undefined){
+                        return;
+                    }
+                    state.variables[data.fid].splice(data.idx, 1);
                 },
                 variables_active_tab(state,data){
                     state.variables_active_tab=data;

@@ -550,12 +550,30 @@ class Editor extends MY_REST_Controller
 				$options['file_uri']=$options['file_name'];
 				$options['file_name']=$this->Editor_model->data_file_filename_part($options['file_name']);
 
-				$data_file=$this->Editor_model->data_file_by_name($sid,$options['file_name']);
+				if (isset($options['id'])){
+					$data_file=$this->Editor_model->data_file_by_pk_id($sid,$options['id']);
 
-				if (!$data_file){
-					$this->Editor_model->data_file_insert($sid,$options);
-				}else{
+					if (!$data_file){
+						throw new Exception("Data file not found");
+					}
+
+					$data_file_by_name=$this->Editor_model->data_file_by_name($sid,$options['file_name']);
+
+					if($data_file_by_name && $data_file_by_name['id']!=$options['id']){
+						throw new Exception("Data file name already exists");
+					}
+
 					$this->Editor_model->data_file_update($data_file["id"],$options);
+				}else{
+
+					//check if file name exists
+					$data_file=$this->Editor_model->data_file_by_name($sid,$options['file_name']);
+
+					if ($data_file){
+						throw new Exception("Data file name already exists");
+					}
+
+					$this->Editor_model->data_file_insert($sid,$options);					
 				}
 				
 				$response=array(
@@ -565,6 +583,75 @@ class Editor extends MY_REST_Controller
 
 				$this->set_response($response, REST_Controller::HTTP_OK);
 			}
+		}
+		catch(ValidationException $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage(),
+				'errors'=>$e->GetValidationErrors()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	/**
+	 * 
+	 * 
+	 * Update data files sequence
+	 * 
+	 */
+	function datafiles_sequence_post($sid=null)
+	{
+		try{
+			$this->editor_acl->user_has_project_access($sid,$permission='edit');
+
+			$options=$this->raw_json_input();
+			$user_id=$this->get_api_user_id();			
+			$options['sid']=$sid;
+
+			$required_fields=array("wght","id");
+
+			if (!isset($options['options'])){
+				throw new Exception("Required field is missing: options");
+			}
+
+			$options=$options['options'];
+
+			for($i=0;$i<count($options);$i++){			
+				$row=$options[$i];
+
+				//var_dump($row);
+				
+				if (!isset($row['id'])){
+					throw new Exception("Required field is missing: id");
+				}
+
+				if (!isset($row['wght'])){
+					throw new Exception("Required field is missing: wght");
+				}
+
+				$update_options=array(
+					'wght'=>$row['wght']
+				);
+
+				$this->Editor_model->data_file_update($row['id'],$update_options);
+			}
+			
+				
+			$response=array(
+				'status'=>'success',
+				'datafile'=>$options
+			);
+
+			$this->set_response($response, REST_Controller::HTTP_OK);
 		}
 		catch(ValidationException $e){
 			$error_output=array(
@@ -672,31 +759,36 @@ class Editor extends MY_REST_Controller
 			//validate all variables
 			foreach($options as $key=>$variable){
 
-				if (!isset($variable['file_id'])){
-					throw new Exception("`file_id` is required");
+				if (!isset($variable['fid'])){
+					throw new Exception("`fid` is required");
 				}
 
-				if (!in_array($variable['file_id'],$valid_data_files)){
-					throw new Exception("Invalid `file_id`: valid values are: ". implode(", ", $valid_data_files ));
+				if (!in_array($variable['fid'],$valid_data_files)){
+					throw new Exception("Invalid `fid`: valid values are: ". implode(", ", $valid_data_files ));
 				}
 
-				if (isset($variable['vid']) && !empty($variable['vid'])){
+				if (!isset($variable['vid'])){
+					throw new Exception("`vid` is required");
+				}
+
+				$variable['file_id']=$variable['fid'];
+
+				if (isset($variable['uid'])){					
 					//check if variable already exists
-					$uid=$this->Editor_model->variable_uid_by_name($sid,$variable['file_id'],$variable['name']);
-					$variable['fid']=$variable['file_id'];
-
-					$this->Editor_model->validate_variable($variable);
-					$variable['metadata']=$variable;
-		
-					if($uid){						
-						$this->Editor_model->variable_update($sid,$uid,$variable);
-					}
-					else{						
-						$this->Editor_model->variable_insert($sid,$variable);
-					}
-
-					$result[]=$variable['vid'];
+					$variable_info=$this->Editor_model->variable($sid,$variable['uid']);
 				}
+
+				//$this->Editor_model->validate_variable($variable);
+				$variable['metadata']=$variable;
+		
+				if($variable_info){	
+					$this->Editor_model->variable_update($sid,$variable['uid'],$variable);
+				}
+				else{						
+					$this->Editor_model->variable_insert($sid,$variable);
+				}
+
+				$result[]=$variable['vid'];
 			}
 
 			$response=array(
@@ -721,6 +813,124 @@ class Editor extends MY_REST_Controller
 			);
 			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}
+	}
+
+
+
+	function variable_create_post($sid=null)
+	{
+		try{
+			$this->editor_acl->user_has_project_access($sid,$permission='edit');
+			$options=$this->raw_json_input();
+			$user_id=$this->get_api_user_id();
+
+			if (!isset($options['variable'])){
+				throw new Exception("`variable` is required");
+			}
+
+			$valid_data_files=$this->Editor_model->data_files_list($sid);
+			
+			//validate all variables
+			$variable=$options['variable'];
+
+			if (!isset($variable['file_id'])){
+				throw new Exception("`file_id` is required");
+			}
+
+			if (!in_array($variable['file_id'],$valid_data_files)){
+				throw new Exception("Invalid `file_id`: valid values are: ". implode(", ", $valid_data_files ));
+			}
+
+			if (!isset($variable['vid']) ){
+				throw new Exception("`vid` is required");
+			}
+				
+			$variable['fid']=$variable['file_id'];
+			$this->Editor_model->validate_variable($variable);
+			
+			$variable['metadata']=$variable;
+			$uid=$this->Editor_model->variable_insert($sid,$variable);
+
+			if(!$uid){
+				throw new Exception("Failed to create variable");
+			}
+
+			$variable=$this->Editor_model->variable($sid,$uid);
+			
+			$response=array(
+				'status'=>'success',
+				'variable'=>$variable
+			);
+
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(ValidationException $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage(),
+				'errors'=>$e->GetValidationErrors()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	/**
+	 * 
+	 * 
+	 * Delete variables by UID
+	 * 
+	 *  
+	 */
+	function variables_delete($sid=null)
+	{
+		try{
+			$this->editor_acl->user_has_project_access($sid,$permission='edit');
+			$options=(array)$this->raw_json_input();
+			$user_id=$this->get_api_user_id();
+
+			if (!isset($options['uid']) || !is_array($options['uid'])){
+				throw new Exception("`uid` is required and must be an array");
+			}
+
+			$this->load->model("Editor_variable_model");
+
+			$result=$this->Editor_variable_model->delete($sid,$options['uid']);
+			
+			$response=array(
+				'status'=>'success',
+				'variables'=>$result
+			);
+
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(ValidationException $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage(),
+				'errors'=>$e->GetValidationErrors()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	function variables_delete_post($sid=null)
+	{
+		return $this->variables_delete($sid);
 	}
 
 
@@ -1022,6 +1232,92 @@ class Editor extends MY_REST_Controller
 		}
 		catch(Exception $e){
 			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	/**
+	 * 
+	 * Download project metadata as DDI (only for Microdata)
+	 * 
+	 */
+	function pdf_get($sid=null)
+	{		
+		try{
+			$exists=$this->Editor_model->check_id_exists($sid);
+
+			if(!$exists){
+				throw new Exception("Project not found");
+			}
+
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
+			$this->Editor_model->download_project_pdf($sid);
+			die();
+		}
+		catch(Exception $e){
+			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * 
+	 * Generate project pdf documentation
+	 * 
+	 */
+	function generate_pdf_get($sid=null)
+	{		
+		try{
+			$exists=$this->Editor_model->check_id_exists($sid);
+
+			if(!$exists){
+				throw new Exception("Project not found");
+			}
+
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
+			$result=$this->Editor_model->generate_project_pdf($sid);
+
+			$output=array(
+				'status'=>'success',
+				'result'=>$result
+			);
+
+			$this->set_response($output, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	function pdf_info_get($sid=null)
+	{		
+		try{
+			$exists=$this->Editor_model->check_id_exists($sid);
+
+			if(!$exists){
+				throw new Exception("Project not found");
+			}
+
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
+			$result=$this->Editor_model->get_pdf_info($sid);
+
+			$output=array(
+				'status'=>'success',
+				'info'=>$result
+			);
+
+			$this->set_response($output, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($output, REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
 
@@ -1564,5 +1860,6 @@ class Editor extends MY_REST_Controller
 			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
+
 
 }

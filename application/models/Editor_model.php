@@ -592,11 +592,16 @@ class Editor_model extends CI_Model {
 		if(empty($files)){
 			return false;
 		}
+
+		//get varcounts
+		$varcounts=$this->data_files_get_varcount($sid);
 		
 		//add file_id as key
 		$output=array();
 		foreach($files as $file){
 			$output[$file['file_id']]=$file;
+			//add varcounts
+			$output[$file['file_id']]['var_count']=isset($varcounts[$file['file_id']]) ? $varcounts[$file['file_id']] : 0;
 		}
 
 		//apply sorting to keep files in the order - F1, F2...F9, F10, F11
@@ -775,6 +780,22 @@ class Editor_model extends CI_Model {
 		return TRUE;
 	}
 
+	function data_files_get_varcount($sid)
+	{
+		$this->db->select("sid,fid, count(*) as varcount");
+		$this->db->where("sid",$sid);
+		$this->db->group_by("sid,fid");
+		$result= $this->db->get("editor_variables")->result_array();		
+
+		$output=array();
+		foreach($result as $row)
+		{
+			$output[$row['fid']]=$row['varcount'];
+		}
+
+		return $output;
+	}
+
 
 	/**
 	 * 
@@ -933,6 +954,25 @@ class Editor_model extends CI_Model {
         }
 
         return false;
+    }
+
+
+	/**
+	 * 
+	 * Get variable by UID
+	 * 
+	 */
+	function variable($sid,$uid,$metadata_detailed=false)
+    {
+        $this->db->select("*");
+        $this->db->where("sid",$sid);
+		$this->db->where("uid",$uid);
+        $variable=$this->db->get("editor_variables")->row_array();
+
+		if(isset($variable['metadata']) && $metadata_detailed==true){
+			$variable['metadata']=$this->decode_metadata($variable['metadata']);			
+		}
+		return $variable;
     }
 
 	/**
@@ -1274,6 +1314,58 @@ class Editor_model extends CI_Model {
 		$this->editor_ddi_writer->generate_ddi($sid,$ddi_path);
 		return $ddi_path;
 	}
+
+
+	function generate_project_pdf($sid)
+	{
+		$this->load->library("Pdf_report");
+        $pdf_path=$this->get_pdf_path($sid);
+
+		$this->pdf_report->initialize($sid);
+		$this->pdf_report->generate($pdf_path);		
+		return $pdf_path;
+	}
+
+	function download_project_pdf($sid)
+	{		
+		$pdf_path=$this->get_pdf_path($sid);
+
+		if(file_exists($pdf_path)){
+			$this->load->helper("download");
+			force_download2($pdf_path);
+		}else{
+			throw new Exception("PDF file not found");
+		}
+	}
+
+	function get_pdf_info($sid)
+	{
+		$pdf_path=$this->get_pdf_path($sid);
+
+		if(file_exists($pdf_path)){
+			return array(
+				'created'=>date("c",filemtime($pdf_path)),
+				'file_size'=>format_bytes(filesize($pdf_path),2)
+			);
+		}
+
+		return false;
+	}
+
+	private function get_pdf_path($sid)
+	{
+		$project_folder=$this->get_project_folder($sid);
+
+		if (!$project_folder || !file_exists($project_folder)){
+			throw new Exception("Project folder not found");
+		}
+
+		$filename=md5($sid);
+
+		$pdf_path=$project_folder.'/'.$filename.'.pdf';
+		return $pdf_path;
+	}
+	
 
 	/**
 	 * 

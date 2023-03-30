@@ -17,11 +17,8 @@
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.3/dist/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/vue-toast-notification@0.6.3"></script>
-<link href="https://cdn.jsdelivr.net/npm/vue-toast-notification@0.6.3/dist/theme-sugar.css" rel="stylesheet">
-
-
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+<link href="<?php echo base_url();?>javascript/splitpanes.css" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
 </head>
 
 <?php
@@ -93,7 +90,7 @@
   -->
 
     <script src="<?php echo base_url();?>javascript/splitpanes.umd.min.js"></script>
-    <link href="<?php echo base_url();?>javascript/splitpanes.css" rel="stylesheet">
+    
 
 
 
