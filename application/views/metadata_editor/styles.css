@@ -607,3 +607,25 @@ table .form-field-dropdown-custom .v-input__slot fieldset{
 .variable-documentation-container{
     font-size:small;
 }
+
+.switch-field label{
+    font-weight:normal!important;
+    font-size:14px;
+}
+
+.container-app{
+    height:100vh;
+    overflow:auto;
+    padding:10px;
+}
+
+.editor-sidebar-container
+{
+    height:100vh;
+    overflow:auto;
+}
+
+.var-vid-td{
+    width: 50px;
+    font-size:small;
+}

@@ -34,7 +34,7 @@
 
       <?php echo $this->load->view('editor_common/header',null,true);?>  
 
-      <div class="content-wrapper">
+      <div class="content-wrapper" style="overflow:auto;height:100vh">
         <section class="content">
           <!-- Provides the application the proper gutter -->
           <div class="container" style="overflow:auto;">

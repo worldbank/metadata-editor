@@ -78,8 +78,10 @@ Vue.component('variables', {
                     return;
                 }
 
+                //console.log("page action",this.page_action);
+
                 if (this.variableSelectedCount()>1){
-                    console.log("multiple variables selcted", this.selectedVariables);
+                    //console.log("multiple variables selcted", this.selectedVariables);
                     if (JSON.stringify(val)==JSON.stringify(this.variableMultipleTemplate)){
                         //console.log("multi-variable no change detected");
                     }
@@ -93,9 +95,9 @@ Vue.component('variables', {
               if (JSON.stringify(val)==JSON.stringify(this.variable_copy)){
                   //console.log("no change detected");
               }
-              else{
-                //console.log("CHANGE DETECTED",val);
+              else{                
                 if (!val){return;}
+                //console.log("CHANGE DETECTED",val,oldVal);
                 this.saveVariableDebounce(val);
               }
             }
@@ -577,16 +579,17 @@ Vue.component('variables', {
                             <div class="section-list-body" id="variables-container" >
                                 <div class="section-rows variable-rows">
                                 <table id="variables-table" class="table table-striped table-bordered table-sm table-hover table-variables">                                    
-                                    <tbody>
+                                    <tbody is="draggable" :list="variables" tag="tbody" handle=".handle">
                                     <tr v-for="(variable, index) in variables"  
                                         @click.alt.exact="editVariableMultiple(index)" 
                                         @click.ctrl.exact="editVariableMultiple(index)" 
                                         @click.shift.exact="editVariableMultiple(index,1)" 
                                         @click.exact="editVariable(index)" 
+                                        
                                         :class="variableActiveClass(index,variable.name)"                                         
                                         :id="'v-'+index"
                                     >
-                                        <td class="bg-secondary">V{{index+1}} - {{variable.vid}}</td>                                        
+                                        <td class="var-vid-td bg-secondary handle">V{{index+1}}</td>                                        
 
                                         <td class="var-name-edit">
                                             <div><input class="var-labl-edit" type="text" v-model="variable.name" /></div>

@@ -66,6 +66,21 @@ Vue.component('variable-edit', {
        if (this.variable.var_concept==undefined){
            this.variable.var_concept=[{}];
        }
+
+       if (!this.variable.var_valrng){
+            this.variable.var_valrng={
+                "range":{
+                    "min":null,
+                    "max":null
+                }
+            };
+        }
+
+        if (!this.variable.var_invalrng){
+            this.variable.var_invalrng={
+                "values":[]
+            };            
+        }
     },
     computed: {
         active_tab: {
@@ -118,53 +133,78 @@ Vue.component('variable-edit', {
 
                 <v-tab-item key="statistics" value="statistics">
                 
-                    <div style="max-height:400px;overflow-y: scroll;padding:10px;font-size:smaller;">
+                    <!-- statistics tab -->
+                    <div style="overflow:auto;padding:10px;font-size:smaller;">
 
-                    <div v-if="variable.var_catgry && variable.var_intrvl=='discrete'">
-                    <h5>Frequencies</h5>
-                    <table class="table table-sm" v-if="variable.var_catgry">
-                        <tr>
-                            <th>Value</th>
-                            <th>Label</th>
-                            <th>Cases</th>
-                            <th>Weighted</th>
-                        </tr>
-                        <tr v-for="catgry in variable.var_catgry">
-                            <td>{{catgry.value}}</td>
-                            <td>{{catgry.labl}}</td>
-                            
-                            <!--non-wgt values -->
-                            <td>
-                            <template v-for="stat in catgry.stats">
-                                <template v-if="stat.wgtd!='wgtd'">{{stat.value}}</template>
-                            </template>
-                            </td>
+                    <div class="row no-gutters">
+                        <div class="col-md-3">
+                            <div><input type="checkbox"/> Weighted statistics</div>
+                            <div><input type="checkbox"/> Frequencies</div>
+                            <div><input type="checkbox"/> List missings</div>
+                            <div class="mt-3 mb-2 border-bottom w-50 ">Summary statistics:</div>
+                            <div><input type="checkbox"/> Valid</div>
+                            <div><input type="checkbox"/> Min</div>
+                            <div><input type="checkbox"/> Max</div>
+                            <div><input type="checkbox"/> Mean</div>
+                            <div><input type="checkbox"/> Weighted mean</div>
+                            <div><input type="checkbox"/> StdDev</div>
+                            <div><input type="checkbox"/> Weighted StdDev</div>                            
+                        </div>
+                        <div class="col-md-9">
 
-                            <!--wgt values -->
-                            <td>
-                            <template v-for="stat in catgry.stats">
-                                <template v-if="stat.wgtd=='wgtd'">{{stat.value}}</template>
-                            </template>                                
-                            </td>
-                        </tr>
-                    </table>
-                    </div>
+                            <div v-if="variable.var_catgry">
+                            <h5>Frequencies</h5>
+                            <table class="table table-sm" v-if="variable.var_catgry">
+                                <tr>
+                                    <th>Value</th>
+                                    <th>Label</th>
+                                    <th>Cases</th>
+                                    <th>Weighted</th>
+                                </tr>
+                                <tr v-for="catgry in variable.var_catgry">
+                                    <td>{{catgry.value}}</td>
+                                    <td>{{catgry.labl}}</td>
+                                    
+                                    <!--non-wgt values -->
+                                    <td>
+                                    <template v-for="stat in catgry.stats">
+                                        <template v-if="stat.wgtd!='wgtd'">{{stat.value}}</template>
+                                    </template>
+                                    </td>
 
-                    <br/>
+                                    <!--wgt values -->
+                                    <td>
+                                    <template v-for="stat in catgry.stats">
+                                        <template v-if="stat.wgtd=='wgtd'">{{stat.value}}</template>
+                                    </template>                                
+                                    </td>
+                                </tr>
+                            </table>
+                            </div>
 
-                    <div v-if="variable.var_sumstat" class="pb-4">
-                    <h5 class="border-bottom">Summary statistics</h5>
-                    <table>
-                        <template v-for="sumstat in variable.var_sumstat">                            
-                            <tr>
-                                <td style="width:150px;"><strong>{{sumStatCodeToLabel(sumstat.type)}} <template v-if="sumstat.wgtd=='wgtd'"> (weighted)</template></strong></td>
-                                <td>{{sumstat.value}}</td>
-                            </tr>                            
-                        </template>
-                    </table>
-                    </div>
+                            <div v-if="variable.var_sumstat" class="pb-4">
+                            <h5 class="border-bottom">Summary statistics</h5>
+                            <table>
+                                <template v-for="sumstat in variable.var_sumstat">                            
+                                    <tr>
+                                        <td style="width:150px;"><strong>{{sumStatCodeToLabel(sumstat.type)}} <template v-if="sumstat.wgtd=='wgtd'"> (weighted)</template></strong></td>
+                                        <td>{{sumstat.value}}</td>
+                                    </tr>                            
+                                </template>
+                                <template v-for="(range_value, range_key) in variable.var_valrng.range">                            
+                                    <tr>
+                                        <td style="width:150px;"><strong>{{sumStatCodeToLabel(range_key)}}</strong></td>
+                                        <td>{{range_value}}</td>
+                                    </tr>                            
+                                </template>
+                            </table>
+                            </div>
+
+                            </div>
+                            </div>
                     
                     </div>
+                    <!-- end statistics tab -->
                 
                 </v-tab-item>
                 <v-tab-item key="weights" value="weights">
@@ -176,67 +216,40 @@ Vue.component('variable-edit', {
                 <v-tab-item key="documentation" value="documentation">
 
                     <div xstyle="overflow-y: scroll;padding:10px;margin-bottom:50px;" class="mb-5">
-
-                    
-
                     <div class="row mt-1">
-                    <div class="col-auto">
-                    <template>
-                    
-                      <v-navigation-drawer
-                        v-model="drawer"
-                        :mini-variant.sync="drawer_mini"
-                        permanent                        
-                        bottom
-                        
-                      >
-                        <v-list-item class="px-2">
-                        <v-app-bar-nav-icon></v-app-bar-nav-icon>
-
-                  
-                          <v-list-item-title>Settings</v-list-item-title>
-                  
-                          <v-btn
-                            icon
-                            @click.stop="drawer_mini = !drawer_mini"
-                          >
-                            <v-icon>mdi-chevron-left</v-icon>
-                          </v-btn>
-                        </v-list-item>
-                  
-                        <v-divider></v-divider>
-                  
-                        <v-list dense v-if="!drawer_mini">
-                          <v-list-item
-                            v-for="section in variable_template.items"
-                            :key="section.key"
-                            link
-                          >
-                            <v-list-item-content>                            
-                              <v-list-item-title>{{ section.title }}</v-list-item-title>
-                               
-                              <div v-for="subitem in section.items" :key="subitem.key">
-                                <input type="checkbox" v-model="subitem.enabled"/> {{subitem.title}}
-                              </div>
-                            </v-list-item-content>
-                          </v-list-item>
-                        </v-list>
-                      </v-navigation-drawer>
-                    
-                  </template>
-                    </div>
-
-
-
-
+                        <div class="col-auto">
+                        <template>                        
+                                <v-navigation-drawer
+                                    v-model="drawer"
+                                    :mini-variant.sync="drawer_mini" permanent bottom>
+                                    <v-list-item class="px-2">
+                                        <v-app-bar-nav-icon></v-app-bar-nav-icon>
+                                            <v-list-item-title>Settings</v-list-item-title>                            
+                                            <v-btn icon @click.stop="drawer_mini = !drawer_mini">
+                                                <v-icon>mdi-chevron-left</v-icon>
+                                            </v-btn>
+                                    </v-list-item>                            
+                                    <v-divider></v-divider>                            
+                                    <v-list dense v-if="!drawer_mini">
+                                    <v-list-item
+                                        v-for="section in variable_template.items" :key="section.key" link>
+                                        <v-list-item-content>                            
+                                        <v-list-item-title>{{ section.title }}</v-list-item-title>
+                                        
+                                        <div v-for="subitem in section.items" :key="subitem.key">
+                                            <input type="checkbox" v-model="subitem.enabled"/> {{subitem.title}}
+                                        </div>
+                                        </v-list-item-content>
+                                    </v-list-item>
+                                    </v-list>
+                                </v-navigation-drawer>
+                                
+                            </template>
+                            </div>
 
                     <div class="col">
-
-
                         <template v-for="section in variable_template.items">
-
                             <div class="mb-2" v-if="sectionEnabled(section)"><strong class="text-secondary mb-2">{{section.title}}</strong></div>
-
                             <template v-for="var_field in section.items">
 
                                 <div v-if="var_field.enabled" class="form-group form-field">
@@ -246,27 +259,15 @@ Vue.component('variable-edit', {
                                 </div>
 
                             </template>
-
-                        
-
-
                         </template>
-
-
-                       
-                        
-                        
-                        </div>
-                        </div>
-                        
+                    </div>
+                    </div>                        
                     </div>
 
                 </v-tab-item>
             </v-tabs>
         </template>
 
-        
-        
         </div>          
         `
 });

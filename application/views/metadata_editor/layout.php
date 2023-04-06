@@ -62,7 +62,7 @@
     <pane min-size="15" max-size="35" size="20" class="editor-sidebar">
         <!--left -->
 
-        <div class="container-fluid bg-secondary-light pt-2 pb-3">
+        <div class="container-fluid bg-secondary-light pt-2 pb-3 editor-sidebar-container">
 
             <!-- icons -->
             <div class="bg-dark-x pb-2 sidebar-menu-bar">
@@ -182,7 +182,7 @@
                 */ ?>
 
                     <validation-observer ref="form" v-slot="{ invalid }">
-                        <div class="container-app pt-5 pr-2" >
+                        <div class="container-app pt-5 mr-2" >
                             <keep-alive include="datafiles">
                                 <router-view :key="$route.fullPath" />
                             </keep-alive>
