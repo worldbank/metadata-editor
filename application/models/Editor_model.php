@@ -32,7 +32,7 @@ class Editor_model extends CI_Model {
 		'id',
 		'sid',
 		'file_id',
-		'file_uri',
+		'file_physical_name',
 		'file_name',
 		'description', 
 		'case_count',

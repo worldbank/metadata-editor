@@ -95,12 +95,24 @@ Vue.component('datafile-import', {
                 let resp=await this.uploadFile(fileIdx);
                 console.log("finished uploading file",fileIdx,resp);
 
-                //import
+                let fileid=resp.result.file_id;
+                
+                if (!fileid){
+                    throw new Error('File upload failed for file ' + this.files[fileIdx].name);
+                }
+
+                //import basic metadata availabe as meta
                 this.update_status="Importing data dictionary " + this.files[fileIdx].name;
-                let import_resp=await this.importDataFile(fileIdx);                
+                let import_resp=await this.importDataFile(fileIdx, fileid);
                 console.log("finished importing file",fileIdx,import_resp);
 
-                let csv_resp=await this.generateCSV(fileIdx);
+                //import summary statistics
+                this.update_status="Generating summary statistics and frequencies " + this.files[fileIdx].name;
+                let stats_resp=await this.importDataFileSummaryStatistics(fileIdx, fileid);
+                console.log("finished summary statistics",fileIdx,import_resp);
+
+                this.update_status="Exporting data to CSV " + this.files[fileIdx].name;
+                let csv_resp=await this.generateCSV(fileIdx,fileid);
                 console.log("finished generating csv file",fileIdx,csv_resp);
 
                 this.upload_report.push(
@@ -130,7 +142,7 @@ Vue.component('datafile-import', {
             }*/
 
             let vm=this;
-            let url=CI.base_url + '/api/editor/files/'+ this.ProjectID + '/data';
+            let url=CI.base_url + '/api/data/datafile/'+ this.ProjectID;
 
             const resp=await axios.post( url,
                 formData,
@@ -143,31 +155,49 @@ Vue.component('datafile-import', {
 
             return resp.data;
         },
-        importDataFile: async function(fileIdx)
+        importDataFile: async function(fileIdx,file_id)
         {
             let formData = {
                 "filename":this.files[fileIdx].name
             }
             
             vm=this;            
-            let url=CI.base_url + '/api/R/import_data_file/'+this.ProjectID;
+            let url=CI.base_url + '/api/data/import_file_meta/'+this.ProjectID + '/' + file_id;
             
-            let resp = await axios.post(url, formData,{
+            let resp = await axios.get(url, formData,{
                 headers: {
                     'Content-Type': 'application/json'
                     }
             });
 
             return resp.data;                
-        }, 
-        generateCSV: async function(fileIdx)
+        },
+        importDataFileSummaryStatistics:async function(fileIdx,file_id)
         {
             let formData = {
                 "filename":this.files[fileIdx].name
             }
             
             vm=this;            
-            let url=CI.base_url + '/api/R/generate_csv/'+this.ProjectID;
+            let url=CI.base_url + '/api/data/generate_summary_stats/'+this.ProjectID + '/' + file_id;
+            
+            let resp = await axios.get(url, formData,{
+                headers: {
+                    'Content-Type': 'application/json'
+                    }
+            });
+
+            return resp.data;                
+        },
+
+        generateCSV: async function(fileIdx,file_id)
+        {
+            let formData = {
+                "filename":this.files[fileIdx].name
+            }
+
+            vm=this;            
+            let url=CI.base_url + '/api/data/generate_csv/'+this.ProjectID + '/' + file_id;
             
             let resp = await axios.post(url, formData,{
                 headers: {

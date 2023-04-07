@@ -6,6 +6,7 @@ Vue.component('variable-info', {
             //variable:this.value,            
             variable_formats:{
                 "numeric": "Numeric",
+                "character": "String",
                 "fixed": "Fixed string"
             },
             variable_intervals:{
@@ -33,11 +34,23 @@ Vue.component('variable-info', {
     computed: {
         variable: function()
         {
+            //console.log("variable info component created",JSON.stringify(this.value), this.value);
+            if (this.value){
+                if (!this.value.var_format){
+                    //console.log("variable format is missing");
+                    this.value.var_format={
+                        "type": ""
+                    }                
+                }
+                if (!this.value.var_format.type){
+                    this.value.var_format.type="";
+                }
+            }
             return this.value;
         }
     },
     template: `
-        <div class="variable-categories-edit-component" style="height:100vh">
+        <div class="variable-categories-edit-component" style="height:100vh" v-if="variable">
             <!--var-format-->
             <div style="font-size:small;" class="mb-2" >
                 <div class="section-title p-1 bg-variable"><strong>Variable information</strong></div>

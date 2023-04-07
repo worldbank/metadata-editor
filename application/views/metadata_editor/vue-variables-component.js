@@ -378,9 +378,18 @@ Vue.component('variables', {
         {
             return this.edit_items.length;
         },
+        variableSelectedNames: function()
+        {
+            let var_names=[];
+            this.edit_items.forEach((item) => {
+                var_names.push(this.variables[item].name);
+            });
+
+            return var_names;
+        },
         initializeMultiVariable: function(){
             this.variableMultiple=JSON.parse(JSON.stringify(this.variableMultipleTemplate));
-            console.log("init variableMultiple",this.variableMultiple);
+            //console.log("init variableMultiple",this.variableMultiple);
         },
         variableActiveClass: function(idx,variable_name)
         {
@@ -401,6 +410,80 @@ Vue.component('variables', {
             }
 
             return classes.join(' ');
+        },
+        refreshSummaryStats: function()
+        {
+            let formData = {
+                "var_names":this.variableSelectedNames()
+            }
+
+            vm=this;
+            let url=CI.base_url + '/api/data/generate_summary_stats_variable/'+this.ProjectID + '/' + this.fid;
+            
+            axios.post(url, formData,{
+                headers: {
+                    'Content-Type': 'application/json'
+                    }
+            }).then(function(response) {
+                vm.reloadVariables();
+            })
+            .catch(function(response) {
+                alert("Error updating summary stats");
+                console.log("summary stats update error",response);
+            });
+        },
+        reloadVariables: function()
+        {
+            let formData = {
+                "var_names":this.variableSelectedNames()
+            }
+
+            vm=this;
+            let url=CI.base_url + '/api/editor/variables_by_name/'+this.ProjectID + '/' + this.fid;
+            
+            axios.post(url, formData,{
+                headers: {
+                    'Content-Type': 'application/json'
+                    }
+            }).then(function(response) {
+                if (response.data.variables){
+                    vm.replaceVariableMetadata(response.data.variables);
+                }
+            })
+            .catch(function(response) {
+                alert("Error reloadVariables");
+                console.log("reloadVariables error",response);
+            });
+        },
+        replaceVariableMetadata: function(variables)
+        {       
+            let vm=this;     
+            variables.forEach((variable_md) => {
+                let var_idx=vm.getVariableIndexByUID(variable_md.uid);
+                Vue.set (vm.variables, var_idx, variable_md);
+            });
+        },
+        getVariableByUID: function(uid)
+        {
+            let variable=null;
+            this.variables.forEach((item) => {
+                if (item.uid==uid){
+                    variable=item;
+                }
+            });
+
+            return variable;
+        },
+        getVariableIndexByUID: function(uid)
+        {
+            let idx=-1;
+            this.variables.forEach((item, index) => {
+                if (item.uid==uid){
+                    idx=index;
+                }
+            });
+
+            return idx;
         }
 
     },
@@ -538,6 +621,12 @@ Vue.component('variables', {
 
                                         <span v-show="edit_items.length>0">
 
+                                        
+
+                                        <span @click="refreshSummaryStats" title="Refresh summary statistics">
+                                            <v-icon aria-hidden="false" class="var-icon">mdi-update</v-icon>
+                                        </span>
+
                                         <span @click="changeCaseDialog=true" title="Change case">
                                             <v-icon aria-hidden="false" class="var-icon">mdi-format-letter-case</v-icon>
                                         </span>
@@ -598,7 +687,11 @@ Vue.component('variables', {
                                             <div><input class="var-labl-edit" type="text" v-model="variable.labl"/></div>
                                         </td>
                                         <td>
-                                            {{variable.var_format.type}}
+                                            <?php /* <span v-if="variable.var_format && variable.var_format.type">{{variable.var_format.type.substr(0,1)}}</span> */ ?>
+                                            <span v-if="variable.var_catgry && variable.var_catgry.length>0" :title="variable.var_catgry.length">
+                                                <v-icon aria-hidden="false" class="vdar-icon">mdi-format-list-numbered</v-icon>
+                                            </span>
+                                            <v-icon title="Weight variable" v-if="variable.var_wgt" aria-hidden="false" class="vdar-icon">mdi-alpha-w</v-icon>
                                         </td>                                        
                                     </tr>
                                     </tbody>

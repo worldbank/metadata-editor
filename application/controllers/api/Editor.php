@@ -703,13 +703,13 @@ class Editor extends MY_REST_Controller
 	 * List dataset variables
 	 * 
 	 */
-	function variables_get($id=null,$file_id=null)
+	function variables_get($sid=null,$file_id=null)
 	{
 		try{
-			$this->editor_acl->user_has_project_access($id,$permission='view');
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
 			$user_id=$this->get_api_user_id();        			
 			$variable_detailed=(int)$this->input->get("detailed");
-			$survey_variables=$this->Editor_model->variables($id,$file_id,$variable_detailed);
+			$survey_variables=$this->Editor_model->variables($sid,$file_id,$variable_detailed);
 			
 			$response=array(
 				'variables'=>$survey_variables
@@ -724,6 +724,37 @@ class Editor extends MY_REST_Controller
 			);
 			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}
+	}
+
+	function variables_by_name_post($sid=null,$file_id=null)
+	{
+		try{
+
+			$options=(array)$this->raw_json_input();
+
+			if (!isset($options['var_names']) || !is_array($options['var_names'])){
+				throw new Exception("Invalid var_names parameter");
+			}
+
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
+			$user_id=$this->get_api_user_id();
+			
+			$variable_detailed=1;//(int)$this->input->get("detailed");
+			$survey_variables=$this->Editor_variable_model->variables_by_name($sid,$file_id,$options['var_names'],$variable_detailed);
+			
+			$response=array(
+				'variables'=>$survey_variables
+			);
+
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}		
 	}
 
 

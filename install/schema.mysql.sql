@@ -1688,3 +1688,6 @@ CREATE TABLE editor_project_tags(
 
 alter table editor_data_files
 add wght int default null;
+
+alter table editor_data_files add column `file_physical_name` varchar(500) default null;
+alter table editor_data_files drop column `file_uri`;
