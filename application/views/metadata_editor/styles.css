@@ -159,7 +159,6 @@ label{
 
 html,body {
     height: 100%;
-    overflow:hidden;
 }
 .container-fluid {
     xheight: 100vh;
