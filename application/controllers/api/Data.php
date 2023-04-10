@@ -174,6 +174,12 @@ class Data extends MY_REST_Controller
 			$response=$this->datautils->generate_summary_stats($datafile_path);
 
 			$variable_import_result=null;
+
+			if (isset($response['rows'])){
+				$datafile=$this->Editor_datafile_model->data_file_by_id($sid,$file_id);
+				$this->Editor_datafile_model->update($datafile['id'],array('case_count'=>$response['rows']));
+			}
+
 			if (isset($response['variables'])){
 				$variable_import_result=$this->Editor_variable_model->bulk_upsert($sid,$file_id,$response['variables']);
 			}
@@ -222,6 +228,12 @@ class Data extends MY_REST_Controller
 			$response=$this->datautils->generate_summary_stats_variable($datafile_path,$options['var_names']);
 
 			$variable_import_result=null;
+
+			if (isset($response['rows'])){
+				$datafile=$this->Editor_datafile_model->data_file_by_id($sid,$file_id);
+				$this->Editor_datafile_model->update($datafile['id'],array('case_count'=>$response['rows']));
+			}
+
 			if (isset($response['variables'])){
 				$variable_import_result=$this->Editor_variable_model->bulk_upsert($sid,$file_id,$response['variables']);
 			}
@@ -250,7 +262,7 @@ class Data extends MY_REST_Controller
 	 * 
 	 * 
 	 */
-	function generate_csv_post($sid,$file_id)
+	function generate_csv_get($sid,$file_id)
 	{
 		try{
 			$exists=$this->Editor_model->check_id_exists($sid);

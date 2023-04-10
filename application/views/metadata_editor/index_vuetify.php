@@ -308,6 +308,9 @@ Vue.config.errorHandler = (err, vm, info) => {
           console.log("data file nodes:",datafiles_nodes);
           return datafiles_nodes;
         },
+        VariableGroupsTreeNodes(){
+          return [];          
+        },
         ExternalResourcesTreeNodes(){
           let resources=this.$store.state.external_resources;
           if (resources.length==0){
@@ -532,6 +535,14 @@ Vue.config.errorHandler = (err, vm, info) => {
               key: 'datasets',
               items:this.DataFilesTreeNodes
             });
+
+            tree_data.push({
+              title: 'Variable Groups',
+              type:'variable-groups',
+              file: 'database',
+              key: 'variable-groups',
+              items:this.VariableGroupsTreeNodes
+            });
           }
 
           
@@ -616,6 +627,11 @@ Vue.config.errorHandler = (err, vm, info) => {
 
           if (node.type=='variables'){
             router.push('/variables/'+ node.datafile.file_id);
+            return;
+          }
+
+          if (node.type=='variable-groups'){
+            router.push('/variable-groups');
             return;
           }
 

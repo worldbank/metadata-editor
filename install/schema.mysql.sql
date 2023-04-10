@@ -1691,3 +1691,12 @@ add wght int default null;
 
 alter table editor_data_files add column `file_physical_name` varchar(500) default null;
 alter table editor_data_files drop column `file_uri`;
+
+
+
+CREATE TABLE `editor_variable_groups` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `sid` int(11) DEFAULT NULL,
+  `metadata` MEDIUMTEXT,
+  PRIMARY KEY (`id`)
+) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;

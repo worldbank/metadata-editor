@@ -8,7 +8,17 @@ Vue.component('datafiles', {
             form_errors:[],
             schema_errors:[],
             page_action:'list',
-            edit_item:null
+            edit_item:null,
+            selected_files:[],
+            select_all_files:false,
+            dialog:{
+                show:false,
+                title:'',
+                loading_message:'',
+                message_success:'',
+                message_error:'',
+                is_loading:false
+            }
         }
     }, 
     mounted: function () {
@@ -101,10 +111,27 @@ Vue.component('datafiles', {
             }
             return seq;
         },
-        deleteFile:function(file_idx)
+        batchDelete: function()
+        {
+            if (!confirm("Are you sure you want to delete the selected files?")){
+                return;
+            }
+            
+            let vm=this;
+            this.selected_files.forEach(function(file_id){
+                let file_idx=vm.data_files.findIndex(function(item){return item.file_id==file_id});
+                vm.deleteFile(file_idx,true);
+            });
+
+            this.selected_files=[];
+        },
+        deleteFile:function(file_idx,confirm_=false)
         {
             let data_file=this.data_files[file_idx];
-            alert("Are you sure you want to delete file " + data_file.file_id + "?");
+
+            if (confirm_==false && !confirm("Are you sure you want to delete file " + data_file.file_id + "?")){
+                return;
+            }
 
             vm=this;
             let url=CI.base_url + '/api/editor/datafiles_delete/'+vm.dataset_id + '/'+ data_file.file_id;
@@ -132,6 +159,70 @@ Vue.component('datafiles', {
         {
             this.page_action="list";
             this.edit_item=null;
+        },
+        importSummaryStatistics: async function(file_id){
+
+            if (!confirm("Are you sure you want to import summary statistics for this file? This will overwrite any existing summary statistics.")){
+                return;
+            }
+
+            this.dialog={
+                show:true,
+                title:'',
+                loading_message:'',
+                message_success:'',
+                message_error:'',
+                is_loading:false
+            }
+
+            this.dialog.is_loading=true;
+            this.dialog.title="Summary statistics";
+            this.dialog.loading_message="Please wait while the summary statistics are being imported...";
+            try{
+                let result=await this.$store.dispatch('importDataFileSummaryStatistics',{file_id:file_id});
+                console.log("updated",result);
+                this.dialog.is_loading=false;
+                this.dialog.message_success="Summary statistics imported successfully";                
+            }catch(e){
+                console.log("failed",e);
+                this.dialog.is_loading=false;
+                this.dialog.message_error="Failed to import summary statistics: "+e.response.data.message;
+            }
+        },
+        generateCSV: async function(file_id){
+
+            if (!confirm("Are you sure you want to generate a CSV file for this file? This will overwrite any existing CSV file.")){
+                return;
+            }
+
+            this.dialog={
+                show:true,
+                title:'Generate CSV file',
+                loading_message:'Please wait while the CSV file is being generated...',
+                message_success:'',
+                message_error:'',
+                is_loading:true
+            }
+
+            try{
+                let result=await this.$store.dispatch('generateCSV',{file_id:file_id});
+                console.log("updated",result);
+                this.dialog.is_loading=false;
+                this.dialog.message_success="CSV file generated successfully";                
+            }catch(e){
+                console.log("failed",e);
+                this.dialog.is_loading=false;
+                this.dialog.message_error="Failed to generate CSV file: "+e.response.data.message;                
+            }
+        },
+        toggleFilesSelection: function()
+        {
+            this.selected_files = [];
+          if (this.select_all_files == true) {
+            for (i = 0; i < this.data_files.length; i++) {
+              this.selected_files.push(this.data_files[i].file_id);
+            }
+          }
         }
     },
     computed: {
@@ -148,8 +239,13 @@ Vue.component('datafiles', {
             <h3>Data files</h3>
             <div v-show="page_action=='list'">
 
+            <strong>{{data_files.length}}</strong> files
+
                 <v-row>
-                    <v-col md="8"><strong>{{data_files.length}}</strong> files </v-col>
+                    <v-col md="8">
+                    <button v-if="selected_files.length>0" type="button" class="btn btn-sm btn-outline-danger" @click="batchDelete">Delete {{selected_files.length}} selected</button>
+                    
+                    </v-col>
                     <v-col md="4" align="right" class="mb-2">
                         <button type="button" class="btn btn-sm btn-outline-primary" @click="addFile">Create file</button>
                         <router-link class="btn btn-sm btn-outline-primary" :to="'datafiles/import'">Import file</router-link> 
@@ -160,25 +256,47 @@ Vue.component('datafiles', {
                 <table class="table table-striped">
                     <thead>
                     <tr>
+                        <th><input type="checkbox" v-model="select_all_files" @change="toggleFilesSelection" /></th>
                         <th><span class="mdi mdi-swap-vertical"></span></th>
-                        <th>File ID</th>
+                        <th style="width:80px;">File#</th>
                         <th>File name</th>
                         <th>Variables</th>
-                        <th>&nbsp;</th>
+                        <th>Cases</th>                        
                     </tr>
                     </thead>
                     <tbody is="draggable" :list="data_files" tag="tbody" handle=".handle" >
-                    <tr v-for="(data_file, index) in data_files">
+                    <tr v-for="(data_file, index) in data_files" :key="data_file.file_id">
+                        <td><input type="checkbox" v-model="selected_files" :value="data_file.file_id" /></td>
                         <td><span title="Drag to re-order" class="mdi mdi-drag handle"></span></td>
                         <td><i class="far fa-file-alt"></i> {{data_file.file_id}}</td>
-                        <td>{{data_file.file_name}}</td>
-                        <td>{{data_file.var_count}}</td>
                         <td>
                             <div>
-                                <button type="button" class="btn btn-sm btn-link" @click="editFile(index)"><i class="far fa-edit" title="Edit"></i></button>
+                                <button type="button" class="btn btn-sm btn-link ml-0 pl-0" @click="editFile(index)">{{data_file.file_name}}</button>
+                                <v-icon style="color:red;margin-top:-4px;" title="Physical file not found" v-if="!data_file.file_info.original.file_exists">mdi-alert-circle</v-icon></div>
+                            <div class="text-secondary text-small">
+                                <span v-if="data_file.file_info.original.file_exists" class="mr-3">
+                                    <span>{{data_file.file_info.original.filename}}</span>
+                                    <span>{{data_file.file_info.original.file_size}}</span>
+                                </span>
+                                <span v-if="data_file.file_info.csv.file_exists" >{{data_file.file_info.csv.filename}} {{data_file.file_info.csv.file_size}}</span>
+                            </div>
+
+                            <div class="mt-2 datafile-actions">                                
+                                <router-link :to="'/variables/' + data_file.file_id"><button type="button" class="btn btn-sm btn-light"><v-icon>mdi-table</v-icon> Variables</button></router-link>
+                                <router-link :to="'/data-explorer/' + data_file.file_id"><button type="button" class="btn btn-sm btn-light"><v-icon>mdi-table-eye</v-icon> Data preview</button></router-link>
+                                <button type="button" class="btn btn-sm btn-light ink ml-0 pl-0" @click="importSummaryStatistics(data_file.file_id)"><v-icon title="Refresh summary statistics" >mdi-update</v-icon>Refresh stats</button>
+                                <button type="button" class="btn btn-sm btn-light ink ml-0 pl-0" @click="generateCSV(data_file.file_id)"><v-icon title="Generate CSV" >mdi-database-export</v-icon>Export CSV</button>
+                                <button type="button" class="btn btn-sm btn-light ink ml-0 pl-0" @click="deleteFile(index)"><v-icon>mdi-trash-can</v-icon>Remove</button>
+                            </div>
+                        </td>
+                        <td>{{data_file.var_count}}</td>
+                        <td>{{data_file.case_count}}</td>
+                        <td style="display:none;">
+                            <div>                                
                                 <button type="button" class="btn btn-sm btn-link" @click="deleteFile(index)"><i class="fas fa-trash-alt" title="Delete"></i></button>
                                 <router-link :to="'/variables/' + data_file.file_id"><button type="button" class="btn btn-sm btn-link"><i class="fas fa-table"></i> Variables</button></router-link>
                                 <router-link :to="'/data-explorer/' + data_file.file_id"><button type="button" class="btn btn-sm btn-link"><i class="fas fa-table"></i> Data</button></router-link>
+                                <v-icon title="Refresh summary statistics" @click="importSummaryStatistics(data_file.file_id)">mdi-update</v-icon>
                             </div>
                         </td>
                     </tr>
@@ -195,6 +313,46 @@ Vue.component('datafiles', {
             </div>
 
             </div>
+
+            <!-- dialog -->
+            <v-dialog v-model="dialog.show" width="500" height="300" persistent>
+                <v-card>
+                    <v-card-title class="text-h5 grey lighten-2">
+                        {{dialog.title}}
+                    </v-card-title>
+
+                    <v-card-text>
+                    <div>
+                        <!-- card text -->
+                        <div v-if="dialog.is_loading">{{dialog.loading_message}}</div>
+                        <v-app>
+                        <v-progress-linear v-if="dialog.is_loading"
+                            indeterminate
+                            color="green"
+                            ></v-progress-linear>
+                        </v-app>
+
+                        <div class="alert alert-success" v-if="dialog.message_success" type="success">
+                            {{dialog.message_success}}
+                        </div>
+
+                        <div class="alert alert-danger" v-if="dialog.message_error" type="error">
+                            {{dialog.message_error}}
+                        </div>
+
+                        <!-- end card text -->
+                    </div>
+                    </v-card-text>
+
+                    <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="primary" text @click="dialog.show=false" v-if="dialog.is_loading==false">
+                        Close
+                    </v-btn>
+                    </v-card-actions>
+                </v-card>
+                </v-dialog>
+            <!-- end dialog -->
         
         </div>
     `

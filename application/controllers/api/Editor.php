@@ -10,6 +10,7 @@ class Editor extends MY_REST_Controller
 		$this->load->helper("date");
 		$this->load->model("Editor_model");
 		$this->load->model("Editor_resource_model");
+		$this->load->model("Editor_datafile_model");
 		$this->load->model("Editor_publish_model");
 		$this->load->model("Collection_model");
 		
@@ -436,7 +437,7 @@ class Editor extends MY_REST_Controller
 			$this->editor_acl->user_has_project_access($id,$permission='view');
 			
 			$user_id=$this->get_api_user_id();
-			$survey_datafiles=$this->Editor_model->data_files($id);
+			$survey_datafiles=$this->Editor_datafile_model->select_all($id,true);
 			
 			$response=array(
 				'datafiles'=>$survey_datafiles
@@ -785,7 +786,7 @@ class Editor extends MY_REST_Controller
 				$options=$tmp_options;
 			}
 
-			$valid_data_files=$this->Editor_model->data_files_list($sid);
+			$valid_data_files=$this->Editor_datafile_model->list($sid);
 			
 			//validate all variables
 			foreach($options as $key=>$variable){
@@ -859,7 +860,7 @@ class Editor extends MY_REST_Controller
 				throw new Exception("`variable` is required");
 			}
 
-			$valid_data_files=$this->Editor_model->data_files_list($sid);
+			$valid_data_files=$this->Editor_datafile_model->list($sid);
 			
 			//validate all variables
 			$variable=$options['variable'];

@@ -53,7 +53,7 @@ Vue.component('datafile-import', {
 
         dialogClose: function(){
             this.dialog_process = false,
-            this.$router.go();
+            this.$router.push('/datafiles');
         },
 
         //on button import click
@@ -174,38 +174,13 @@ Vue.component('datafile-import', {
         },
         importDataFileSummaryStatistics:async function(fileIdx,file_id)
         {
-            let formData = {
-                "filename":this.files[fileIdx].name
-            }
-            
-            vm=this;            
-            let url=CI.base_url + '/api/data/generate_summary_stats/'+this.ProjectID + '/' + file_id;
-            
-            let resp = await axios.get(url, formData,{
-                headers: {
-                    'Content-Type': 'application/json'
-                    }
-            });
-
+            let resp=await this.$store.dispatch('importDataFileSummaryStatistics',{file_id:file_id});
             return resp.data;                
         },
-
         generateCSV: async function(fileIdx,file_id)
         {
-            let formData = {
-                "filename":this.files[fileIdx].name
-            }
-
-            vm=this;            
-            let url=CI.base_url + '/api/data/generate_csv/'+this.ProjectID + '/' + file_id;
-            
-            let resp = await axios.post(url, formData,{
-                headers: {
-                    'Content-Type': 'application/json'
-                    }
-            });
-
-            return resp.data;                
+            let resp=await this.$store.dispatch('generateCSV',{file_id:file_id});
+            return resp.data; 
         }, 
 
         validateFilename: function(file){

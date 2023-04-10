@@ -278,7 +278,7 @@ class DataUtils
 
 	function import_variables($sid,$fileid,$variables)
 	{
-		$valid_data_files=$this->ci->Editor_model->data_files_list($sid);
+		$valid_data_files=$this->ci->Editor_datafile_model->list($sid);
 
 		$max_variable_id=$this->get_max_vid($sid);
 

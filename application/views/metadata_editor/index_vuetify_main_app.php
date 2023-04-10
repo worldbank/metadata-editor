@@ -190,6 +190,8 @@
             echo $this->load->view("metadata_editor/vue-repeated-field-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-form-section-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-generate-pdf-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-variable-groups-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-dialog-variable-selection-component.js",null,true);
         ?>
 
         <?php if (empty($metadata)):?>
@@ -221,6 +223,7 @@
         const DatafileExplorer = {props: ['file_id'],template: '<div><datafile-data-explorer/></div>' }
         const DatafileImport = {template: '<div><datafile-import/></div>' }
         const Variables ={props: ['file_id'],template: '<div><variables xv-if="$store.state.variables"/> </div>'}
+        const VariableGroups ={template: '<div><variable-groups /> </div>'}
         const ResourcesComp ={props: ['index'],template: '<div><external-resources /></div>'}
         const ResourcesImport ={template: '<div> <external-resources-import /></div>'}
         const ResourcesEditComp ={props: ['index'],template: '<div><external-resources-edit /></div>'}
@@ -239,6 +242,7 @@
             { path: '/datafiles', component: Datafiles },
             { path: '/datafiles/import', component: DatafileImport },
             { path: '/variables/:file_id', component: Variables, props: true },
+            { path: '/variable-groups', component: VariableGroups},
             { path: '/external-resources', component: ResourcesComp, props: true},
             { path: '/external-resources/import', component: ResourcesImport},
             { path: '/external-resources/:index', component: ResourcesEditComp, props: true}
@@ -278,6 +282,7 @@
                 },
                 external_resources:[],
                 data_files:[],
+                variable_groups:[],
                 variables:{
                     "F1":{}
                 },
@@ -492,6 +497,7 @@
                     await store.dispatch('loadDataFiles',{dataset_id:options.dataset_id});
                     await store.dispatch('loadAllVariables',{dataset_id:options.dataset_id});
                     await store.dispatch('loadExternalResources',{dataset_id:options.dataset_id});
+                    await store.dispatch('loadVariableGroups',{dataset_id:options.dataset_id});
                     store.state.variables_loaded=true;
                     store.state.variables_isloading=false;
                 },
@@ -575,6 +581,33 @@
                         console.log("external resource loading error",error);
                     });
                 },
+                async loadVariableGroups({commit},options) {
+                    let url=CI.base_url + '/api/variable_groups/'+options.dataset_id + "?variable_groups";
+                    return axios
+                    .get(url)
+                    .then(function (response) {                        
+                        if(response.data.variable_groups){                            
+                            //#commit('variable_groups',response.data.variable_groups);
+                            store.state.variable_groups=response.data.variable_groups;
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log("error loading variable groups", error);
+                    });                    
+                },
+                //generate and import data file summary statistics
+                async importDataFileSummaryStatistics({commit,getters}, options)
+                {
+                    let url=CI.base_url + '/api/data/generate_summary_stats/'+getters.getProjectID + '/' + options.file_id;                    
+                    let resp = await axios.get(url);
+                    return resp;                
+                },
+                async generateCSV({commit,getters}, options)
+                {
+                    let url=CI.base_url + '/api/data/generate_csv/'+getters.getProjectID + '/' + options.file_id;                    
+                    let resp = await axios.get(url);
+                    return resp;                
+                }                
             },
             mutations: VueDeepSet.extendMutation({
                 // other mutations

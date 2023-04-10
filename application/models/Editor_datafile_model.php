@@ -142,10 +142,53 @@ class Editor_datafile_model extends CI_Model {
 
 	/**
 	 * 
+	 * Get path for data original + csv file
+	 * 
+	 */
+	function get_files_info($sid,$file_id)
+	{
+		$datafile=$this->data_file_by_id($sid,$file_id);
+
+		if (!$datafile){
+			throw new Exception("Data file ID not found: ");
+		}
+
+		$filename=$datafile['file_physical_name'];		
+
+		if (empty($filename)){
+			throw new Exception("Data file physical name not found: ");
+		}
+
+		$filename_csv=$this->filename_part($filename).'.csv';
+		$project_folder_path=$this->Editor_model->get_project_folder($sid).'/data/';
+
+		$files=array(
+			'original'=>array(
+				'filename'=>$filename,
+				'filepath'=>$project_folder_path.$filename,
+				'file_exists'=>file_exists($project_folder_path.$filename),
+				'file_info'=>pathinfo($project_folder_path.$filename),
+				'file_size'=>format_bytes(filesize($project_folder_path.$filename)),
+			),
+			'csv'=>array(
+				'filename'=>$filename_csv,
+				'filepath'=>$project_folder_path.$filename_csv,
+				'file_exists'=>file_exists($project_folder_path.$filename_csv),
+				'file_info'=>pathinfo($project_folder_path.$filename_csv),
+				'file_size'=>format_bytes(filesize($project_folder_path.$filename_csv)),
+			)
+		);
+		
+		return $files;
+	}
+
+
+	/**
+	 * 
 	 * Get all data files by project ID
 	 * 
 	 */
-    function select_all($sid)
+    function select_all($sid, $include_file_info=false)
     {
         $this->db->select("*");
 		$this->db->where("sid",$sid);
@@ -175,6 +218,9 @@ class Editor_datafile_model extends CI_Model {
 
   		foreach ($file_keys as $key_){
 			$sorted_files[$key_] = $output[$key_];
+			if($include_file_info){
+				$sorted_files[$key_]['file_info']=$this->get_files_info($sid,$key_);
+			}
 		}
 
   		return $sorted_files;

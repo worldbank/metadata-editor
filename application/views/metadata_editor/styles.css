@@ -628,3 +628,11 @@ table .form-field-dropdown-custom .v-input__slot fieldset{
     width: 50px;
     font-size:small;
 }
+
+.datafile-actions .btn{
+    font-size:11px;
+}
+
+.text-normal{
+    font-weight:normal;
+}
