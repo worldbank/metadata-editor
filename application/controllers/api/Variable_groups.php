@@ -86,7 +86,7 @@ class Variable_groups extends MY_REST_Controller
 
 			$response=array(
 				'status'=>'success',
-				'variables'=>$result
+				'result'=>$result
 			);
 
 			$this->set_response($response, REST_Controller::HTTP_OK);
