@@ -272,8 +272,8 @@ Vue.component('datafiles', {
                         <td>
                             <div>
                                 <button type="button" class="btn btn-sm btn-link ml-0 pl-0" @click="editFile(index)">{{data_file.file_name}}</button>
-                                <v-icon style="color:red;margin-top:-4px;" title="Physical file not found" v-if="!data_file.file_info.original.file_exists">mdi-alert-circle</v-icon></div>
-                            <div class="text-secondary text-small">
+                                <v-icon style="color:red;margin-top:-4px;" title="Physical file not found" v-if="!data_file.file_info.original">mdi-alert-circle</v-icon></div>
+                            <div class="text-secondary text-small" v-if="data_file.file_info.original">
                                 <span v-if="data_file.file_info.original.file_exists" class="mr-3">
                                     <span>{{data_file.file_info.original.filename}}</span>
                                     <span>{{data_file.file_info.original.file_size}}</span>
@@ -284,8 +284,10 @@ Vue.component('datafiles', {
                             <div class="mt-2 datafile-actions">                                
                                 <router-link :to="'/variables/' + data_file.file_id"><button type="button" class="btn btn-sm btn-light"><v-icon>mdi-table</v-icon> Variables</button></router-link>
                                 <router-link :to="'/data-explorer/' + data_file.file_id"><button type="button" class="btn btn-sm btn-light"><v-icon>mdi-table-eye</v-icon> Data preview</button></router-link>
+                                <span v-if="data_file.file_info.original">
                                 <button type="button" class="btn btn-sm btn-light ink ml-0 pl-0" @click="importSummaryStatistics(data_file.file_id)"><v-icon title="Refresh summary statistics" >mdi-update</v-icon>Refresh stats</button>
                                 <button type="button" class="btn btn-sm btn-light ink ml-0 pl-0" @click="generateCSV(data_file.file_id)"><v-icon title="Generate CSV" >mdi-database-export</v-icon>Export CSV</button>
+                                </span>
                                 <button type="button" class="btn btn-sm btn-light ink ml-0 pl-0" @click="deleteFile(index)"><v-icon>mdi-trash-can</v-icon>Remove</button>
                             </div>
                         </td>

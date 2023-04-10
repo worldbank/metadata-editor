@@ -259,8 +259,8 @@ Vue.component('variable-groups', {
                     <div class="float-right" style="width:100px;" v-if="activeItem" >
                         <div><v-icon color="primary" @click="addGroup">mdi-plus</v-icon></div>
                         <div><v-icon color="primary" @click="removeGroup">mdi-minus</v-icon></div>
-                        <div><v-icon color="primary" @click="saveFile(test_data)">mdi-arrow-up-thin</v-icon></div>
-                        <div><v-icon color="primary" @click="saveFile(test_data)">mdi-arrow-down-thin</v-icon></div>
+                        <div><v-icon color="primary" >mdi-arrow-up-thin</v-icon></div>
+                        <div><v-icon color="primary" >mdi-arrow-down-thin</v-icon></div>
                     </div>
 
                     <v-treeview 
