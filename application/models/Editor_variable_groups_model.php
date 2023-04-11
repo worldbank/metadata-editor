@@ -58,6 +58,7 @@ class editor_variable_groups_model extends CI_Model {
     public function insert($sid,$metadata)
     {
         $options=array(
+            'sid'=>$sid,
             'metadata'=>$this->encode_metadata($metadata)
         );
 
@@ -73,7 +74,7 @@ class editor_variable_groups_model extends CI_Model {
      */
     public function update($sid,$metadata)
     {
-        $options=array(
+        $options=array(            
             'metadata'=>$this->encode_metadata($metadata)
         );
 

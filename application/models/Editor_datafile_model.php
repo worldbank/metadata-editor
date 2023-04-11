@@ -156,7 +156,8 @@ class Editor_datafile_model extends CI_Model {
 		$filename=$datafile['file_physical_name'];		
 
 		if (empty($filename)){
-			throw new Exception("Data file physical name not found: ");
+			return[
+			];
 		}
 
 		$filename_csv=$this->filename_part($filename).'.csv';
