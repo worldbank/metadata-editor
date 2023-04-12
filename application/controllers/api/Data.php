@@ -127,6 +127,10 @@ class Data extends MY_REST_Controller
 			$this->editor_acl->user_has_project_access($sid,$permission='edit',$this->api_user());
 			$datafile_path=$this->Editor_datafile_model->get_file_path($sid,$file_id);
 
+			if (!$datafile_path){
+				throw new Exception("Data file not found");
+			}
+
 			//get file basic metadata [rows, columns, variable name and label]
 			$response=$this->datautils->import_file_meta($datafile_path);
 
@@ -169,6 +173,10 @@ class Data extends MY_REST_Controller
 
 			$this->editor_acl->user_has_project_access($sid,$permission='edit',$this->api_user());
 			$datafile_path=$this->Editor_datafile_model->get_file_path($sid,$file_id);
+
+			if (!$datafile_path){
+				throw new Exception("Data file not found");
+			}
 
 			//get file basic metadata [rows, columns, variable name and label]
 			$response=$this->datautils->generate_summary_stats($datafile_path);
@@ -224,6 +232,10 @@ class Data extends MY_REST_Controller
 			$this->editor_acl->user_has_project_access($sid,$permission='edit',$this->api_user());
 			$datafile_path=$this->Editor_datafile_model->get_file_path($sid,$file_id);
 
+			if (!$datafile_path){
+				throw new Exception("Data file not found");
+			}
+
 			//get file basic metadata [rows, columns, variable name and label]
 			$response=$this->datautils->generate_summary_stats_variable($datafile_path,$options['var_names']);
 
@@ -273,6 +285,10 @@ class Data extends MY_REST_Controller
 
 			$this->editor_acl->user_has_project_access($sid,$permission='edit',$this->api_user());
 			$datafile_path=$this->Editor_datafile_model->get_file_path($sid,$file_id);
+
+			if (!$datafile_path){
+				throw new Exception("Data file not found");
+			}
 
 			//get file basic metadata [rows, columns, variable name and label]
 			$response=$this->datautils->generate_csv($datafile_path);

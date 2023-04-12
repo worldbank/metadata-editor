@@ -127,7 +127,8 @@ class Editor_datafile_model extends CI_Model {
 		$filename=$datafile['file_physical_name'];
 
 		if (empty($filename)){
-			throw new Exception("Data file physical name not found: ");
+			//throw new Exception("Data file physical name not found: ");
+			return false;
 		}
 
 		$filepath=$this->Editor_model->get_project_folder($sid).'/data/'.$filename;
