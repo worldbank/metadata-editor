@@ -7,7 +7,7 @@ All projects are listed in the project page.
 The projects you see in the project page are the projects you are authorized to see, based on your credentials. 
 If the Metadata Editor is installed on a stand-alone PC, you will see and have access to all projects as you are the owner/administrator of the list. If the application is installed on a server, each user with access to the application will have some roles and permissions. Based on the login/profile, you will see a list of projects that may differ from the list of projects seen by another person with access to the same site. Administrator of the application have access and see all.
 
-![image](https://user-images.githubusercontent.com/35276300/231586094-216ba1f8-7a5d-45ed-8268-9fe779e63a47.png)
+![image](https://user-images.githubusercontent.com/35276300/231586542-5818c1a2-1c71-4105-ad3e-1984ecd9a2a2.png)
 
 The permissions/roles can limit what you can do with a project. Add, edit, delete, publish.
 
