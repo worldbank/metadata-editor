@@ -25,28 +25,24 @@ Go to the "Projects" page of the Metadata Editor. If you are using it for the fi
 The book we will document is titled "The Analysis of Household Surveys: A Microeconometric Approach to Development Policy" by Angus Deaton (2019), openly available from the World Bank's Open Knowledge Repository at http://hdl.handle.net/10986/30394.
 
 Click on "Create project" and select "Document".
-<br>
-![image](https://user-images.githubusercontent.com/35276300/231555537-3b7d3770-45a5-404b-be5c-0996eb44bfac.png)
-<br>
 
+<p align="center">
+![image](https://user-images.githubusercontent.com/35276300/231555537-3b7d3770-45a5-404b-be5c-0996eb44bfac.png)
+</p>
+  
 The new project page will be displayed in a new tab.
-<br>
+
 ![image](https://user-images.githubusercontent.com/35276300/231556271-faf830ff-8144-4b70-a7cf-a8428e464ce2.png)
-<br>
 
 In "Project thumbnail", select "Change image" and upload an image of the cover page (a jpg file is provided in the demo files; you may of course create such a file by taking a screenshot of the coverpage of a document, or through other means).
 
-<br>
 ![image](https://user-images.githubusercontent.com/35276300/231557017-955ebfa4-6ad1-4058-8477-42209c0fa7d7.png)
-<br>
 
 We will use the default Template, so there is no need to Switch template.
 
 A description of each metadata element is available in the Metadata Editor itself, and in our [Schema Guide](). To display the description of an element in the Metadata Editor, click on the "?" icon next to the element's label.
 
-<br>
 ![image](https://user-images.githubusercontent.com/35276300/231560970-7d844b03-8e5e-49ed-bbdf-6e66a9ad6b39.png)
-<br>
 
 In the left bar navigation tree, select "Metadata information". This section of the metadata standard is only used to provide information on who documented the Publication and when. All these fields are optional. We recommend to enter the name of the person who generate the metadata, and the date the metadata was created (dates should always be entered in ISO format YYYY-MM-DD).
 
