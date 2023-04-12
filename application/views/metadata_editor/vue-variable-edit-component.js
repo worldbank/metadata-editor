@@ -96,15 +96,33 @@ Vue.component('variable-edit', {
         }
 
         //Vue.set(this.variable, 'sum_stats_options', JSON.parse(JSON.stringify(this.sum_stats_options)));
-        if (!this.variable.sum_stats_options){  
-            this.variable.sum_stats_options = JSON.parse(JSON.stringify(this.sum_stats_options));
+        /*if (!this.variable.sum_stats_options){              
+            Vue.set(this.variable, 'sum_stats_options', this.sum_stats_options);
         }
-        if(!this.variable.sum_stats_options.min){
-            this.variable.sum_stats_options = JSON.parse(JSON.stringify(this.sum_stats_options));
-        }
+        if(!this.variable.sum_stats_options.min){        
+            Vue.set(this.variable, 'sum_stats_options', this.sum_stats_options);
+        }*/
+
+        
         
     },
     computed: {
+        Variable:{
+            get(){
+                if (!this.variable.sum_stats_options){              
+                    //Vue.set(this.variable, 'sum_stats_options', this.sum_stats_options);
+                    this.variable.sum_stats_options=this.sum_stats_options;
+                }
+                if(!this.variable.sum_stats_options.min){        
+                    //Vue.set(this.variable, 'sum_stats_options', this.sum_stats_options);
+                    this.variable.sum_stats_options=this.sum_stats_options;
+                }
+                return this.variable;
+            },
+            set(newValue){
+                this.variable=newValue;
+            }
+        },
         active_tab: {
             get() {
               return this.$store.getters["getVariablesActiveTab"];
@@ -112,7 +130,7 @@ Vue.component('variable-edit', {
             set(newValue) {
               return this.$store.commit("variables_active_tab", newValue);
             },
-          },
+          },          
         variable_template: function(){
             return this.$store.getters["getVariableDocumentationTemplate"];
         }
@@ -174,7 +192,11 @@ Vue.component('variable-edit', {
         },
         variableSumStatEnabled: function (stat){
             if (this.variable.sum_stats_options[stat]){
-                return true;
+                console.log("stats",this.variable.sum_stats_options[stat]);
+                return this.variable.sum_stats_options[stat];
+            }
+            else{
+                console.log("stats not found",stat);
             }
             return false;
         }
@@ -196,22 +218,24 @@ Vue.component('variable-edit', {
 
                     <div class="row no-gutters">
                         <div class="col-md-3">
-                            <div><label class="text-normal text-small"><input type="checkbox" v-model="variable.sum_stats_options.wgt" value="1" /> Weighted statistics</label></div>
-                            <div><label class="text-normal text-small"><input type="checkbox" v-model="variable.sum_stats_options.freq" value="1" /> Frequencies</label></div>
-                            <div><label class="text-normal text-small"><input type="checkbox" v-model="variable.sum_stats_options.missing" value="1"/> List missings</label></div>
+                            <div><label class="text-normal text-small"><input type="checkbox" v-model="Variable.sum_stats_options.wgt" value="1" /> Weighted statistics</label></div>
+                            <div><label class="text-normal text-small"><input type="checkbox" v-model="Variable.sum_stats_options.freq" value="1" /> Frequencies</label></div>
+                            <div><label class="text-normal text-small"><input type="checkbox" v-model="Variable.sum_stats_options.missing" value="1"/> List missings</label></div>
                             <div class="mt-3 mb-2 border-bottom w-50 ">Summary statistics:</div>
-                            <div><input type="checkbox" v-model="variable.sum_stats_options.vald" value="1"/> Valid</div>
-                            <div><input type="checkbox" v-model="variable.sum_stats_options.min" value="1"/> Min</div>
-                            <div><input type="checkbox" v-model="variable.sum_stats_options.max" value="1"/> Max</div>
-                            <div><input type="checkbox" v-model="variable.sum_stats_options.mean" value="1"/> Mean</div>
-                            <div><input type="checkbox" v-model="variable.sum_stats_options.mean_wgt" value="1"/> Weighted mean</div>
-                            <div><input type="checkbox" v-model="variable.sum_stats_options.stdev" value="1"/> StdDev</div>
-                            <div><input type="checkbox" v-model="variable.sum_stats_options.stdev_wgt" value="1"/> Weighted StdDev</div>                            
+                            <div><label class="text-normal text-small"><input type="checkbox" v-model="Variable.sum_stats_options.vald" value="1"/> Valid</label></div>
+                            <div><label class="text-normal text-small"><input type="checkbox" v-model="Variable.sum_stats_options.min" value="1"/> Min</label></div>
+                            <div><label class="text-normal text-small"><input type="checkbox" v-model="Variable.sum_stats_options.max" value="1"/> Max</label></div>
+                            <div><label class="text-normal text-small"><input type="checkbox" v-model="Variable.sum_stats_options.mean" value="1"/> Mean</label></div>
+                            <div><label class="text-normal text-small"><input type="checkbox" v-model="Variable.sum_stats_options.mean_wgt" value="1"/> Weighted mean</label></div>
+                            <div><label class="text-normal text-small"><input type="checkbox" v-model="Variable.sum_stats_options.stdev" value="1"/> StdDev</label></div>
+                            <div>
+                                <label class="text-normal text-small"><input type="checkbox" v-model="Variable.sum_stats_options.stdev_wgt" value="1"/> Weighted StdDev</label>
+                            </div>                            
                         </div>
                         <div class="col-md-9">
 
-                            <div v-if="variable.var_catgry && variable.var_catgry.length>0 && variableSumStatEnabled('freq')">
-                            <h5>Frequencies</h5>
+                            <div v-if="variable.var_catgry && variable.var_catgry.length>0 && variable.sum_stats_options.freq==true">
+                            <h5>Frequencies - {{variable.sum_stats_options.freq}}</h5>
                             <table class="table table-sm">
                                 <tr>
                                     <th>Value</th>
@@ -240,14 +264,14 @@ Vue.component('variable-edit', {
                                     <td>
                                         <v-progress-linear
                                             v-model="VariablePercent(variable, catgry)"
-                                            color="amber"
+                                            color="#FFCC80"
                                             height="15"
                                             >
                                             <strong>{{  Math.ceil(VariablePercent(variable, catgry)) }}%</strong>
                                         </v-progress-linear>
                                     </td>
                                 </tr>
-                                <tr v-if="variableStatsInValidCount(variable)>0 && variableSumStatEnabled('missing')">
+                                <tr v-if="variableStatsInValidCount(variable)>0 && Variable.sum_stats_options.missing">
                                     <td>Sysmiss</td>
                                     <td></td>                                    
                                     <td>{{variableStatsInValidCount(variable)}}</td>
