@@ -19,7 +19,7 @@ Go to the "Projects" page of the Metadata Editor. If you are using it for the fi
 ![image](https://user-images.githubusercontent.com/35276300/231555203-fb3184c0-d93d-4417-8411-4d21afe655a1.png)
 
 
-## Example 1: Documenting and cataloguing a working paper
+## Example 1: Documenting and cataloguing a book
 
 The book we will document is titled "The Analysis of Household Surveys: A Microeconometric Approach to Development Policy" by Angus Deaton (2019), openly available from the World Bank's Open Knowledge Repository at http://hdl.handle.net/10986/30394.
 
@@ -50,7 +50,7 @@ In the left bar navigation tree, select "Metadata information". This section of 
 ![image](https://user-images.githubusercontent.com/35276300/231557524-ab9a2faa-902b-4956-a344-f9d6745f91e3.png)
 
 
-Note that the information you enter or edit is automatically saved.
+> Note that the information you enter or edit is automatically saved.
 
 Now we can start entering the metadata related to the document itself. The metadata elements used for this purpose are found in the "Document Description" section of the metadata standard. In the navigation tree, select "Title statement" and enter a unique identifier, possibly an alternate identifier, and the title. Note that most elements are optional, but the main unique identifier and the title are required.
 
@@ -118,20 +118,21 @@ The book is now available in your catalog.
 
 ## Example 2: Documenting and cataloguing a survey dataset
 
-The dataset we will document and publish in a NADA catalog 
-files included in this small demo package are the data and metadata related to the 2010 Population Census of an imaginary country named Popstan. This very basic package includes the following files:
+In this second example, we will document a survey dataset (microdata) using the DDI Codebook 2.5. metadata standard. The example will only show some of the core features of the Metadata Editor. See the next sections for a complete overview of the many features of the software.
 
-- popstan_2010_hld.dta (household-level data file, in Stata 17 format, with 13 variables and 37,000 observations)
-- popstan_2010_ind.dta (individual-level data file, in Stata 17 format, with 14 variables and 151,728 observations)
-- Popstan_2010_questionnaire.pdf (a very simplified census questionnaire, in PDF format)
-- Popstan_2010_Interviewer_Manual.pdf (a very simplified interviewer manual, in PDF format)
-- popstan_2010_census_logo.JPG (a logo, in JPG format)
+The dataset we will document --and publish in a NADA catalog-- is a synthetic data representative of a sample household survey for an imaginary country. The dataset and related resources are available in the "demo" folder of the installation package and from the Metadata Editor GitHub repository. The materials include the following files:
+- training_survey_data_hh.dta (household-level data file, in Stata 17 format, with 47 variables and 7,975 observations)
+- training_survey_data_ind.dta (individual-level data file, in Stata 17 format, with 26 variables and 30,986 observations)
+- questionnaire.pdf (a very simplified census questionnaire, in PDF format)
+- interviewer_manual.pdf (a very simplified interviewer manual, in PDF format)
+- survey_report.pdf (a simplified survey report, with information on the sampling design)
+- survey_logo.JPG (a logo, in JPG format)
 
 ![image](https://user-images.githubusercontent.com/35276300/215505821-7833f0a5-8c60-45ce-aa69-f08d65fef6f3.png)
 
-All variables and values in the Stata files are labeled. The variable *serial* found in both data files provides a unique identifier of each household and is the key variable to be used to merge the data files. The questionnaire and the interviewer manual are very basic, but contain information that will be used to demonstrate how information on literal questions and universe can be extracted to document variables.
+All variables and values in the Stata files are labeled. The variable *hid* found in both data files provides a unique identifier of each household and is the key variable to be used to merge the data files. The questionnaire and the interviewer manual are very basic, but contain information that will be used to demonstrate how information on literal questions and universe can be extracted to document variables.
 
-To start documenting the Popstan Census dataset, open the Metadata Editor and login. In the Metadata Editor Home page, select "Create new project" and when prompted select "Microdata".
+To start documenting the dataset, open the Metadata Editor and login. Then in the Project page, click on "Create new project" and select "Microdata".
 
 ![image](https://user-images.githubusercontent.com/35276300/215510952-f91ec49d-8c4e-451e-8242-12d192000e80.png)
 
@@ -139,15 +140,15 @@ A new project home page will open. The navigation bar shown on the left will ref
 
 ![image](https://user-images.githubusercontent.com/35276300/215838912-357f1791-406c-4f6c-96c4-da828b9f029a.png)
 
-As we have a logo for the Census, you may change the image that will be used as thumbnail for the project (this is optional). Click on "change image" and select the file "census_logo.JPG". The logo will be displayed.
+As we have a survey logo, we can change the image that will be used as thumbnail for the project (this is optional). Click on "Change image" and select the file "survey_logo.JPG". The logo will be displayed.
 
 ![image](https://user-images.githubusercontent.com/35276300/215513036-95c7d60a-d5b0-44fe-8f76-5a5623185f08.png)
 
-We will use the default metadata template to document the dataset. There is thus no need to "switch template". To use another template, you would simply click on "Swith template" and select an available template from the list.
+We will use the default metadata template to document the dataset. There is thus no need to "Switch template". 
 
 ![image](https://user-images.githubusercontent.com/35276300/215835375-203514e6-9f01-4773-a07e-ba9a2ee55c74.png)
 
-You are now ready to start documenting the dataset.
+You are now ready to start documenting the dataset. A description of the metadata elements is available in the Metadata Editor (click on the "?" button next to each metadata element label).
 
 In the section **Document description**, provide information on the metadata.
 
