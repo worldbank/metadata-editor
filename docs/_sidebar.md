@@ -35,7 +35,11 @@
 
     * [Publish metadata](publish.md)
    
-* For developers
+* Feedback
+
+    * [Feedback](feedback.md)
+   
+* For developers and translators
 
     * [Developers](developers.md)
 
