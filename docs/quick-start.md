@@ -165,6 +165,7 @@ In the section **Study description**, enter the relevant information on the surv
 
 ![image](https://user-images.githubusercontent.com/35276300/215514878-988856fc-ef26-42c0-9b4e-02ba6c12d8f7.png)
 
+
 When the Study information is entered, click on **Data files** in the navigation bar. In the Data files page, click on "Import data". Select the two Stata data files to be imported, then click on "Import files".
 
 ![image](https://user-images.githubusercontent.com/35276300/231763763-c4d8a6d3-789b-4cb6-94f3-77680f15cfbf.png)
@@ -185,10 +186,19 @@ The Data files page will now display your two files, with some information (numb
 You will now document the files and variables. 
 Click on the filename of a data file in the navigation tree, and add a brief description of the file (and Save the information entered in the page; this is not automatically saved). Then do the same for the other data file.
 
-@@
-![image](https://user-images.githubusercontent.com/35276300/215515702-fb3448ae-81e4-4c34-a27e-8c32eb3dcc49.png)
+![image](https://user-images.githubusercontent.com/35276300/231770783-00000083-5ede-4588-87b4-a5f5cf58fb74.png)
 
-You will then add or edit the information available on each variable, for each data file. The list of variables is provided in the form of a table. The variable labels imported from Stata can be edited directly in the table. 
+
+You will then add or edit the information available on each variable, for each data file. The list of variables is provided in the form of a table. The variable labels imported from Stata can be edited directly in the table. What you can do in this page:
+- Edit the variables and value labels
+- If necessary, rename and re-order variables (delete variables)
+- Change the variable type
+- Identify a variable as being a sample weight
+- Add documentation of the variable: literal question, etc.
+- Select the summary statistics to be included
+
+
+
 
 ![image](https://user-images.githubusercontent.com/35276300/215516149-43bb069f-5db8-42cc-8915-b5f653a5b7ec.png)
 
