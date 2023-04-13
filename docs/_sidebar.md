@@ -35,13 +35,13 @@
 
     * [Publish metadata](publish.md)
    
-* Feedback
-
-    * [Feedback](feedback.md)
-   
 * For developers and translators
 
     * [Developers](developers.md)
+
+* Providing feedback
+
+    * [Feedback and contacts](feedback.md)
 
 * References and links
 
