@@ -154,16 +154,22 @@ In the section **Document description**, provide information on the metadata. Th
 
 
 In the section **Study description**, enter the relevant information on the survey. Create a unique identifier, e.g., "DEMO_SVY_001". Then use information you find in the *Survey report* PDF document. It contains the following elements:
-- **Title** should be ... The *dates of data collection* should have 2010 as year. The *Country* should be "Popstan". 
+- **Title**  
+- **Alternate title** (acronym)
 - **Abstract**
 - ** Producer**
+- **Type of data**
 - Country
 - Dates
 - Topics
+- Universe
 - Sampling
 - ...
 
-![image](https://user-images.githubusercontent.com/35276300/215514878-988856fc-ef26-42c0-9b4e-02ba6c12d8f7.png)
+![image](https://user-images.githubusercontent.com/35276300/231866451-6a274792-b279-4b83-b43c-8e4479b15824.png)
+
+
+![image](https://user-images.githubusercontent.com/35276300/231866637-0070b16d-e3af-4239-8581-c32b4cb48020.png)
 
 
 When the Study information is entered, click on **Data files** in the navigation bar. In the Data files page, click on "Import data". Select the two Stata data files to be imported, then click on "Import files".
@@ -184,35 +190,56 @@ The Data files page will now display your two files, with some information (numb
 
 
 You will now document the files and variables. 
-Click on the filename of a data file in the navigation tree, and add a brief description of the file (and Save the information entered in the page; this is not automatically saved). Then do the same for the other data file.
+
+First, click on the filename of a data file in the navigation tree, and add a brief description of the file (and Save the information entered in the page; this is not automatically saved). Then do the same for the other data file.
 
 ![image](https://user-images.githubusercontent.com/35276300/231770783-00000083-5ede-4588-87b4-a5f5cf58fb74.png)
 
 
-You will then add or edit the information available on each variable, for each data file. The list of variables is provided in the form of a table. The variable labels imported from Stata can be edited directly in the table. What you can do in this page:
-- Edit the variables and value labels
-- If necessary, rename and re-order variables (delete variables)
-- Change the variable type
+You will then add or edit the information available on each variable, for each data file. In the navigation bar, select "Variables" in the "Data files / *name of the data file*"
+
+![image](https://user-images.githubusercontent.com/35276300/231869134-90b80436-fd54-414e-a74f-99ef86086626.png)
+
+The page will display a list of variables for the selected file, with multiple options to edit and complete the metadata related to the variables. What you can do in this page:
+
+- Edit the variable labels, directly in the variable labels that have been imported from the Stata files can be edited here. What you can do in this page:
+- Edit the variables and value labels directly in the variable list
+- Edit the value labes for the variable (for Discrete/categorical variables only)
+- If necessary, rename, re-order, and delete variables 
+- Change the variable type if the type was not correctly identified when the file was imported
 - Identify a variable as being a sample weight
-- Add documentation of the variable: literal question, etc.
-- Select the summary statistics to be included
+- Add metadata related to the variable (literal question, interviewer instructions, derivation and imputation, and more) in the "DOCUMENTATION" tab.
+- Identify values to be considered as "missing". The system missing values in Stata or SPSS will be automatically identified as "missing". But in some cases, one (or multiple) values may be used to represent missing values (e.g., "99" representing missing or unknown for a variable *age*)
+- Set the weighting coefficient (if relevant) to be applied to generate summary statistics.
+- Select the summary statistics you want to be included in the metadata (in tab "STATISTICS")
 
+![image](https://user-images.githubusercontent.com/35276300/231868627-0b5a3fd1-d6c1-49e9-a46f-f6b87d9b17a2.png)
 
+We assume that all variable labels and value labels are good as imported.  
 
+Browse the list of variables to check that their type has been properly detected. The variable hhsize (Household size) in file *training_survey_data_hh.dta* has been imported as a deiscrete variable. This may be fine, but let's assume you want it to be imported as a continuous variable. Change the type from Discrete to Continuous. In that case, you may want to include the mean and standard deviation in the summary statistics.  
 
-![image](https://user-images.githubusercontent.com/35276300/215516149-43bb069f-5db8-42cc-8915-b5f653a5b7ec.png)
-
-Summary statistics are displayed. You may control the statistics to be included in the metadata.
 
 ![image](https://user-images.githubusercontent.com/35276300/215844294-82c6d847-d126-44a3-bd46-67120992549a.png)
 
-More important, metadata can be added. We will add the formulation of the question, the universe, and the interviewer instructions. This can be copy/pasted from the PDF files.
+You can now add the metadata at the variable level. The tab "DOCUMENTATION" shows the metadata for the variable(s) selected in the list of variables. As we have the questionnaire and a description of the derived variables, we can add the following information: 
+- Universe of the variable
+- Literal question (for collected variables, not for derived variables)
+- Skip instructions
+- Interviewer's instructions
+- Derivation or imputation methods (for derived variables)
 
-![image](https://user-images.githubusercontent.com/35276300/215517055-b5df50ac-e647-4c09-a46a-3f510430cfed.png)
+![image](https://user-images.githubusercontent.com/35276300/231875036-f3634de3-2775-423b-909b-80f03b0ad33a.png)
 
 Note that you can enter common metadata to more than one variable by selecting multiple variables (using the SHft or Ctrl key) and entering information for the relevant element(s). For example, the three variables related to education in the individual dataset have the same universe ("Population aged 6 and above"). The three variables can be selected and the information entered in "Universe" will be automatically applied to the 3 variables. 
 
-After entering the variable-level metadata, you can add the *external resources*. Here, we will create 3 external resources: the questionnaire, the interviewer manual, and the dataset (the two data files compressed as a zip file).
+
+Set variable "weight" as a sample weight (in both data files). A weight variable should be a continuous variable.
+
+![image](https://user-images.githubusercontent.com/35276300/231873892-4a2d595a-e9e3-42d0-8d04-3d355e3ae89c.png)
+
+
+After entering the variable-level metadata for both files, you can add the *external resources*. Here, we will add 4 external resources to our survey metadata: the questionnaire, the interviewer manual, the report, and the dataset (the two data files compressed as a zip file).
 
 ![image](https://user-images.githubusercontent.com/35276300/215517537-c1d921bc-f75f-4990-83a6-fa150c21f1dc.png)
 
@@ -229,5 +256,6 @@ The documentation of your dataset is now complete. You can export the DDI and th
 ![image](https://user-images.githubusercontent.com/35276300/215518944-1b817abb-9b8c-4862-9e85-17a3df30ca19.png)
 
 If you have a NADA catalog: ready to be published. In NADA:
+
 
 
