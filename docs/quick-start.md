@@ -134,11 +134,10 @@ All variables and values in the Stata files are labeled. The variable *hid* foun
 
 To start documenting the dataset, open the Metadata Editor and login. Then in the Project page, click on "Create new project" and select "Microdata".
 
-![image](https://user-images.githubusercontent.com/35276300/215510952-f91ec49d-8c4e-451e-8242-12d192000e80.png)
-
 A new project home page will open. The navigation bar shown on the left will reflect the content of the default metadata template for "Microdata" (default templates can be changed in the Template Manager).
 
-![image](https://user-images.githubusercontent.com/35276300/215838912-357f1791-406c-4f6c-96c4-da828b9f029a.png)
+![image](https://user-images.githubusercontent.com/35276300/231760101-17cceff8-fdc4-4364-ad21-ba189435f3b3.png)
+
 
 As we have a survey logo, we can change the image that will be used as thumbnail for the project (this is optional). Click on "Change image" and select the file "survey_logo.JPG". The logo will be displayed.
 
@@ -146,32 +145,49 @@ As we have a survey logo, we can change the image that will be used as thumbnail
 
 We will use the default metadata template to document the dataset. There is thus no need to "Switch template". 
 
-![image](https://user-images.githubusercontent.com/35276300/215835375-203514e6-9f01-4773-a07e-ba9a2ee55c74.png)
-
 You are now ready to start documenting the dataset. A description of the metadata elements is available in the Metadata Editor (click on the "?" button next to each metadata element label).
 
-In the section **Document description**, provide information on the metadata.
+In the section **Document description**, provide information on the metadata. This information is optional. Enter your name and the date the metadata was created.
 
-![image](https://user-images.githubusercontent.com/35276300/215514475-5cb765e9-6b81-4830-a62d-49bb28fb7f90.png)
+![image](https://user-images.githubusercontent.com/35276300/231762296-ada64cb1-7ffd-43df-9242-036be6b5f05b.png)
 
-In the section **Study description**, enter the relevant information on the Census. As not all information is provided in the demo files, feel free to create information. The *Title* should be ... The *dates of data collection* should have 2010 as year. The *Country* should be "Popstan". 
+
+In the section **Study description**, enter the relevant information on the survey. Create a unique identifier, e.g., "DEMO_SVY_001". Then use information you find in the *Survey report* PDF document. It contains the following elements:
+- **Title** should be ... The *dates of data collection* should have 2010 as year. The *Country* should be "Popstan". 
+- **Abstract**
+- ** Producer**
+- Country
+- Dates
+- Topics
+- Sampling
+- ...
 
 ![image](https://user-images.githubusercontent.com/35276300/215514878-988856fc-ef26-42c0-9b4e-02ba6c12d8f7.png)
 
-When the Study information is entered, click on **Data files** in the navigation bar. You will first import the two data files.
+When the Study information is entered, click on **Data files** in the navigation bar. In the Data files page, click on "Import data". Select the two Stata data files to be imported, then click on "Import files".
 
-![image](https://user-images.githubusercontent.com/35276300/215515050-6ba3a072-cb37-45c2-9136-27618121ea5d.png)
+![image](https://user-images.githubusercontent.com/35276300/231763763-c4d8a6d3-789b-4cb6-94f3-77680f15cfbf.png)
 
-![image](https://user-images.githubusercontent.com/35276300/215515365-18c932ef-d45f-40ff-8732-368f94cf0ec1.png)
+If the import has been successful, you will be notified. The import will extract all available metadata (variable list, names, variable labels, value labels), and also generate summary statistics. 
 
-You can preview the data by clicking on "Data". The data cannot be edited in the Metadata Editor, but can be displayed.
+![image](https://user-images.githubusercontent.com/35276300/231763936-aac0aea2-eb90-4969-bd37-06a313418816.png)
+
+The Data files page will now display your two files, with some information (number of variables and observations). The two files will be listed in the navigation bar, where you have the option to open a page to view data and to open the variable page for the selected data file.
+
+![image](https://user-images.githubusercontent.com/35276300/231764424-665e13d0-10dd-4cbd-8cc2-2c5af74206fe.png)
+
+> Note: You can preview the data by clicking on "Data". The data cannot be edited in the Metadata Editor, but can be displayed.
+
 ![image](https://user-images.githubusercontent.com/35276300/215519930-04363e7a-eb09-423b-abd5-5dc98ee1197a.png)
 
-For each data file, add a brief description (and Save the information entered in the page).
 
+You will now document the files and variables. 
+Click on the filename of a data file in the navigation tree, and add a brief description of the file (and Save the information entered in the page; this is not automatically saved). Then do the same for the other data file.
+
+@@
 ![image](https://user-images.githubusercontent.com/35276300/215515702-fb3448ae-81e4-4c34-a27e-8c32eb3dcc49.png)
 
-You may now add or edit the information available on each variable, for each data file. The list of variables is provided in the form of a table. The variable labels imported from Stata can be edited directly in the table. 
+You will then add or edit the information available on each variable, for each data file. The list of variables is provided in the form of a table. The variable labels imported from Stata can be edited directly in the table. 
 
 ![image](https://user-images.githubusercontent.com/35276300/215516149-43bb069f-5db8-42cc-8915-b5f653a5b7ec.png)
 
