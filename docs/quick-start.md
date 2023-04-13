@@ -116,6 +116,7 @@ The book is now available in your catalog.
 
 
 
+
 ## Example 2: Documenting and cataloguing a survey dataset
 
 In this second example, we will document a survey dataset (microdata) using the DDI Codebook 2.5. metadata standard. The example will only show some of the core features of the Metadata Editor. See the next sections for a complete overview of the many features of the software.
