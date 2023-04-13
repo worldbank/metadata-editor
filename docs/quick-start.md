@@ -157,13 +157,13 @@ In the section **Study description**, enter the relevant information on the surv
 - **Title**  
 - **Alternate title** (acronym)
 - **Abstract**
-- ** Producer**
+- **Producer**
 - **Type of data**
-- Country
-- Dates
-- Topics
-- Universe
-- Sampling
+- **Country**
+- **Dates of data collection**
+- **Topics**
+- **Universe**
+- **Sampling**
 - ...
 
 ![image](https://user-images.githubusercontent.com/35276300/231866451-6a274792-b279-4b83-b43c-8e4479b15824.png)
@@ -219,8 +219,8 @@ We assume that all variable labels and value labels are good as imported.
 
 Browse the list of variables to check that their type has been properly detected. The variable hhsize (Household size) in file *training_survey_data_hh.dta* has been imported as a deiscrete variable. This may be fine, but let's assume you want it to be imported as a continuous variable. Change the type from Discrete to Continuous. In that case, you may want to include the mean and standard deviation in the summary statistics.  
 
+![image](https://user-images.githubusercontent.com/35276300/231877710-515e9a3e-3304-4a99-a8e4-c6f492432ac9.png)
 
-![image](https://user-images.githubusercontent.com/35276300/215844294-82c6d847-d126-44a3-bd46-67120992549a.png)
 
 You can now add the metadata at the variable level. The tab "DOCUMENTATION" shows the metadata for the variable(s) selected in the list of variables. As we have the questionnaire and a description of the derived variables, we can add the following information: 
 - Universe of the variable
@@ -234,12 +234,16 @@ You can now add the metadata at the variable level. The tab "DOCUMENTATION" show
 Note that you can enter common metadata to more than one variable by selecting multiple variables (using the SHft or Ctrl key) and entering information for the relevant element(s). For example, the three variables related to education in the individual dataset have the same universe ("Population aged 6 and above"). The three variables can be selected and the information entered in "Universe" will be automatically applied to the 3 variables. 
 
 
-Set variable "weight" as a sample weight (in both data files). A weight variable should be a continuous variable.
+Set variable "weight" and "popweight" as weighting variables (in both data files). A weight variable should be a continuous variable.
 
 ![image](https://user-images.githubusercontent.com/35276300/231873892-4a2d595a-e9e3-42d0-8d04-3d355e3ae89c.png)
 
+Apply the weights to the variables as relevant.
 
-After entering the variable-level metadata for both files, you can add the *external resources*. Here, we will add 4 external resources to our survey metadata: the questionnaire, the interviewer manual, the report, and the dataset (the two data files compressed as a zip file).
+@@@
+
+
+After entering the variable-level metadata for both files, you will finalize the documentation of the dataset by adding the *external resources*. The external resources are all materials that you want to make accessible to the users of your data catalog when you publish the dataset in a catalog. This includes the microdata, if you want to disseminate them (openly or under restrictions). We will add 4 external resources to our survey metadata: the questionnaire, the interviewer manual, the report, and the dataset (the two Stata files compressed as one zip file; note that you could provide the data in more than one format, e.g., also share a version of the files in CSV and SPSS formats for user convenience).
 
 ![image](https://user-images.githubusercontent.com/35276300/215517537-c1d921bc-f75f-4990-83a6-fa150c21f1dc.png)
 
@@ -256,6 +260,14 @@ The documentation of your dataset is now complete. You can export the DDI and th
 ![image](https://user-images.githubusercontent.com/35276300/215518944-1b817abb-9b8c-4862-9e85-17a3df30ca19.png)
 
 If you have a NADA catalog: ready to be published. In NADA:
+
+![image](https://user-images.githubusercontent.com/35276300/231880085-adbebea7-0f98-412b-93b2-5318b061dca1.png)
+
+![image](https://user-images.githubusercontent.com/35276300/231879990-7cfa6408-7f5f-4c2c-ab74-1cdf39d97a9d.png)
+
+The dataset will now be accessible and discoverable in your NADA catalog, with detailed metadata including the data dictionary.  
+
+@@@
 
 
 
