@@ -113,7 +113,8 @@ Vue.component('table-grid-component', {
 
         jsonToTsv: function(json){
             let csv='';
-            let keys=Object.keys(json[0]);
+            //let keys=Object.keys(json[0]);
+            let keys=this.columnKeys;
             
             //include header
             //csv+=keys.join('\t') + "\n";
@@ -131,7 +132,7 @@ Vue.component('table-grid-component', {
               }
               csv+=row.join('\t') + "\n";
             }
-            console.log("csv output",csv);
+            //console.log("csv output",csv);
             return csv;
           },          
         tsvToArray: function(tsv){
