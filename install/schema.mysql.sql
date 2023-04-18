@@ -1700,3 +1700,31 @@ CREATE TABLE `editor_variable_groups` (
   `metadata` MEDIUMTEXT,
   PRIMARY KEY (`id`)
 ) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+
+
+
+alter table editor_variables drop column keywords;
+
+alter table editor_variables drop column wght;
+
+alter table editor_variables drop column catgry;
+alter table editor_variables drop column qstn;
+
+alter table editor_variables add column sort_order int(11) default 0;
+alter table editor_variables add column user_missings varchar(300);
+alter table editor_variables add column is_weight int default 0;
+alter table editor_variables add column field_dtype varchar(30);
+alter table editor_variables add column field_format varchar(50);
+
+
+alter table editor_variables add column var_wgt_id int default null;
+
+
+
+CREATE TABLE editor_variables_sort_tmp(  
+    id int NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    sid int not null,
+    var_uid int not null,
+    sort_order int not null
+);

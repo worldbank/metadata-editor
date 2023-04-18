@@ -58,7 +58,10 @@ Vue.component('variables', {
                 "var_qstn_ivuinstr",
                 "var_resp_unit"
             ],
-            showSpreadMetadataDialog: false
+            showSpreadMetadataDialog: false,
+            summaryStatsDialog:{
+                show:false                
+            }
         }
     }, 
     created: async function(){
@@ -78,6 +81,7 @@ Vue.component('variables', {
                     return;
                 }
 
+                console.log("variable CHANGE DETECTED",val);
                 //console.log("page action",this.page_action);
 
                 if (this.variableSelectedCount()>1){
@@ -235,7 +239,7 @@ Vue.component('variables', {
             this.variable_search="";
             this.page_action="edit";
 
-            let url=CI.base_url + '/api/editor/variable_create/'+vm.dataset_id;
+            let url=CI.base_url + '/api/variables/create/'+vm.dataset_id;
             let new_var={
                     "vid": "V" + (this.MaxVariableID+1),
                     "sid": this.dataset_id,
@@ -302,7 +306,7 @@ Vue.component('variables', {
         saveVariable: function(data){///_.debounce(function(data) {
             console.log("variable saved in db", data);
             vm=this;
-            let url=CI.base_url + '/api/editor/variables/'+vm.dataset_id;
+            let url=CI.base_url + '/api/variables/'+vm.dataset_id;
             axios.post(url, 
                 data
             )
@@ -345,7 +349,7 @@ Vue.component('variables', {
         deleteVariable: function()
         {
             let vm=this;
-            let url=CI.base_url + '/api/editor/variables_delete/'+vm.ProjectID;
+            let url=CI.base_url + '/api/variables/delete/'+vm.ProjectID;
             let var_uid_list=[];
 
             console.log("variables to be deleted",this.edit_items);
@@ -411,35 +415,86 @@ Vue.component('variables', {
 
             return classes.join(' ');
         },
-        refreshSummaryStats: function()
+        /*refreshSummaryStats: async function()
         {
-            let formData = {
-                "var_names":this.variableSelectedNames()
+            if (this.selectedVariables.length==0){
+                alert("Please select one or more variables to refresh summary statistics");
+                return;
             }
 
-            vm=this;
-            let url=CI.base_url + '/api/data/generate_summary_stats_variable/'+this.ProjectID + '/' + this.fid;
-            
-            axios.post(url, formData,{
-                headers: {
-                    'Content-Type': 'application/json'
-                    }
-            }).then(function(response) {
+            let wgt_vars=[];
+            for (let i=0;i<this.selectedVariables.length;i++){
+                if (this.selectedVariables[i].var_wgt_id){
+                    wgt_vars.push({
+                        'weight_field':this.getVariableNameByUID(this.selectedVariables[i].var_wgt_id),
+                        'field':this.selectedVariables[i].name
+                    });
+                }
+            }
+
+            if (!confirm("Are you sure you want to import summary statistics? This will overwrite any existing summary statistics.")){
+                return;
+            }
+
+            this.summaryStatsDialog={
+                show:true,
+                title:'Refresh summary stats',
+                loading_message:'Please wait while the summary statistics are being imported...',                
+                message_success:'',
+                message_error:'',
+                is_loading:true
+            }
+
+            try{
+                let result=await this.$store.dispatch('importVariableSummaryStatistics',{
+                    file_id:this.fid,
+                    var_names:this.variableSelectedNames(),
+                    weights:wgt_vars
+                });
+                console.log("updated variables stats",result);
+                this.summaryStatsDialog.is_loading=false;
+                this.summaryStatsDialog.message_success="Summary statistics imported successfully";
                 vm.reloadVariables();
-            })
-            .catch(function(response) {
-                alert("Error updating summary stats");
-                console.log("summary stats update error",response);
-            });
+            }catch(e){
+                console.log("failed",e);
+                this.summaryStatsDialog.is_loading=false;
+                this.summaryStatsDialog.message_error="Failed to import summary statistics: "+e.response.data.message;
+            }
+        },*/
+        refreshSummaryStats: async function(file_id){
+
+            if (!confirm("Are you sure you want to import summary statistics for this file? This will overwrite any existing summary statistics.")){
+                return;
+            }
+
+            this.summaryStatsDialog={
+                show:true,
+                title:'Refresh summary stats',
+                loading_message:'Please wait while the summary statistics are being imported...',                
+                message_success:'',
+                message_error:'',
+                is_loading:true
+            }
+            
+            try{
+                let result=await this.$store.dispatch('importDataFileSummaryStatistics',{file_id:this.fid});
+                console.log("updated",result);
+                this.summaryStatsDialog.is_loading=false;
+                this.summaryStatsDialog.message_success="Summary statistics imported successfully";                
+            }catch(e){
+                console.log("failed",e);
+                this.summaryStatsDialog.is_loading=false;
+                this.summaryStatsDialog.message_error="Failed to import summary statistics: "+e.response.data.message;
+            }
         },
-        reloadVariables: function()
+        /*reloadVariables: function()
         {
             let formData = {
                 "var_names":this.variableSelectedNames()
             }
 
             vm=this;
-            let url=CI.base_url + '/api/editor/variables_by_name/'+this.ProjectID + '/' + this.fid;
+            let url=CI.base_url + '/api/variables_by_name/'+this.ProjectID + '/' + this.fid;
             
             axios.post(url, formData,{
                 headers: {
@@ -462,6 +517,13 @@ Vue.component('variables', {
                 let var_idx=vm.getVariableIndexByUID(variable_md.uid);
                 Vue.set (vm.variables, var_idx, variable_md);
             });
+        },*/
+        getVariableNameByUID: function(uid)
+        {
+            let variable=this.getVariableByUID(uid);
+            if (variable){
+                return variable.name;
+            }
         },
         getVariableByUID: function(uid)
         {
@@ -484,6 +546,52 @@ Vue.component('variables', {
             });
 
             return idx;
+        },
+        OnVariableUpdate: function(variable)
+        {
+            if (this.edit_items.length<1){
+                return;
+            }
+
+            for (let i=0;i<this.edit_items.length;i++){
+                Vue.set (this.variables, this.edit_items[i], variable);
+            }
+        },
+        onVariableDrag: function(event)
+        {
+            console.log("onVariableDrag",event);
+
+            this.editVariable(event.newIndex);
+            
+            let sorted_variables=[];
+            let vm=this;
+                        
+            this.variables.forEach((item, index) => {
+                sorted_variables.push(item.uid);                
+            });
+
+            console.log("sorted_variables",JSON.stringify(sorted_variables));
+            this.updateVariablesOrder(sorted_variables);
+        },
+        updateVariablesOrder: function(sorted_variables)
+        {
+            let vm=this;
+            let formData = {
+                "sorted_uid":sorted_variables
+            }
+
+            let url=CI.base_url + '/api/variables/order/'+this.ProjectID + '/' + this.fid;
+            axios.post(url, formData,{
+                headers: {
+                    'Content-Type': 'application/json'
+                    }
+            }).then(function(response) {
+                console.log("variables order updated",response);                
+            })
+            .catch(function(response) {
+                alert("Error updateVariablesOrder");
+                console.log("updateVariablesOrder error",response);
+            });
         }
 
     },
@@ -624,7 +732,7 @@ Vue.component('variables', {
                                         
 
                                         <span @click="refreshSummaryStats" title="Refresh summary statistics">
-                                            <v-icon aria-hidden="false" class="var-icon">mdi-update</v-icon>
+                                            <v-icon aria-hidden="false" class="var-icon">mdi-database-sync</v-icon>
                                         </span>
 
                                         <span @click="changeCaseDialog=true" title="Change case">
@@ -668,7 +776,7 @@ Vue.component('variables', {
                             <div class="section-list-body" id="variables-container" >
                                 <div class="section-rows variable-rows">
                                 <table id="variables-table" class="table table-striped table-bordered table-sm table-hover table-variables">                                    
-                                    <tbody is="draggable" :list="variables" tag="tbody" handle=".handle">
+                                    <tbody is="draggable" :list="variables" tag="tbody" handle=".handle" @end="onVariableDrag">
                                     <tr v-for="(variable, index) in variables"  
                                         @click.alt.exact="editVariableMultiple(index)" 
                                         @click.ctrl.exact="editVariableMultiple(index)" 
@@ -691,7 +799,8 @@ Vue.component('variables', {
                                             <span v-if="variable.var_catgry && variable.var_catgry.length>0" :title="variable.var_catgry.length">
                                                 <v-icon aria-hidden="false" class="vdar-icon">mdi-format-list-numbered</v-icon>
                                             </span>
-                                            <v-icon title="Weight variable" v-if="variable.var_wgt" aria-hidden="false" class="vdar-icon">mdi-alpha-w</v-icon>
+                                            <v-icon title="Weight variable" v-if="variable.var_wgt==1" aria-hidden="false" class="vdar-icon">mdi-alpha-w</v-icon>
+                                            <v-icon title="Weighted" v-if="variable.var_wgt_id && variable.var_wgt_id.length>0" aria-hidden="false" class="vdar-icon">mdi-scale-balance</v-icon>
                                         </td>                                        
                                     </tr>
                                     </tbody>
@@ -727,7 +836,7 @@ Vue.component('variables', {
                             <div class="p-1 border" style="height:inherit;overflow:auto;background:white;">
                                 <div v-show="page_action=='edit' " >
                                     <div v-if="activeVariable">
-                                        <variable-edit  :variable="activeVariable" :multi_key="edit_items"  :index_key="SingleVariableIndex" ></variable-edit>
+                                        <variable-edit  :variable="activeVariable" @input="OnVariableUpdate" :multi_key="edit_items"  :index_key="SingleVariableIndex" ></variable-edit>
                                     </div>
                                 </div>                                
                             </div>
@@ -756,6 +865,8 @@ Vue.component('variables', {
             </splitpanes>
 
             <?php echo $this->load->view("metadata_editor/modal-dialog-changecase",null,true); ?>
+            
+            <vue-dialog-component v-model="summaryStatsDialog"></vue-dialog-component> 
         </div>
     `
 })

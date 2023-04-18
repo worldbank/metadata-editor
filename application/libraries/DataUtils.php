@@ -105,17 +105,24 @@ class DataUtils
 	}
 
 
-	
-	public function generate_summary_stats_variable($datafile_path, $var_names=[])
+	/**
+	 * 
+	 * 
+	 *  $options - array of options
+	 * 	- var_names - array of variable names
+	 *  - weights - array of weights [weight_field, field]
+	 * 
+	 */
+	public function generate_summary_stats_variable($datafile_path, $options)
 	{
 		$client = new Client([
 			'base_uri' => $this->DataApiUrl.'data-dictionary-variable'
 		]);
-		
-		$request_body=[
-			"file_path"=> realpath($datafile_path),
-			"var_names"=>$var_names
-		];
+
+		//$options['weights'][]=['weight_field'=>'a3_1','field'=>'a1'];
+
+		$request_body=$options;		
+		$request_body["file_path"]=realpath($datafile_path);
 			
 		$api_response = $client->request('POST', '', [
 			'json' => 

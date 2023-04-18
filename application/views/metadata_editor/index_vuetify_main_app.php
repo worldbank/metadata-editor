@@ -192,6 +192,8 @@
             echo $this->load->view("metadata_editor/vue-generate-pdf-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-variable-groups-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-dialog-variable-selection-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-dialog-weight-variable-selection-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-dialog-component.js",null,true);
         ?>
 
         <?php if (empty($metadata)):?>
@@ -550,7 +552,7 @@
                     }
                 },
                 async loadVariables({commit}, options) {//options {dataset_idno,fid}
-                    let url=CI.base_url + '/api/editor/variables/'+options.dataset_id + '/'+ options.fid + '?detailed=1';
+                    let url=CI.base_url + '/api/variables/'+options.dataset_id + '/'+ options.fid + '?detailed=1';
                     return axios
                     .get(url)
                     .then(function (response) {
@@ -600,6 +602,18 @@
                 {
                     let url=CI.base_url + '/api/data/generate_summary_stats/'+getters.getProjectID + '/' + options.file_id;                    
                     let resp = await axios.get(url);
+                    return resp;                
+                },
+                //generate and import variable summary statistics for a selected variables
+                async importVariableSummaryStatistics({commit,getters}, options)
+                {
+                    let formData = {
+                        "var_names": options.var_names,//this.variableSelectedNames()
+                        "weights": options.weights
+                    }
+
+                    let url=CI.base_url + '/api/data/generate_summary_stats_variable/'+getters.getProjectID + '/' + options.file_id;
+                    let resp = await axios.post(url,formData);
                     return resp;                
                 },
                 async generateCSV({commit,getters}, options)

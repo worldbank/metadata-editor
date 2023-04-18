@@ -8,6 +8,7 @@ Vue.component('variable-edit', {
             //variable: this.value,            
             //variable:{},
             form_local:{},
+            show_weights_dialog:false,
             sum_stats_options:
             {
                 'wgt':1,
@@ -95,6 +96,14 @@ Vue.component('variable-edit', {
             };            
         }
 
+        if (!this.variable.var_wgt_id){
+            this.variable.var_wgt_id=''
+        }
+
+        if (this.variable.var_wgt && Array.isArray(this.variable.var_wgt_id)){
+            this.variable.var_wgt_id=this.variable.var_wgt_id[0];
+        }
+
         //Vue.set(this.variable, 'sum_stats_options', JSON.parse(JSON.stringify(this.sum_stats_options)));
         /*if (!this.variable.sum_stats_options){              
             Vue.set(this.variable, 'sum_stats_options', this.sum_stats_options);
@@ -133,9 +142,65 @@ Vue.component('variable-edit', {
           },          
         variable_template: function(){
             return this.$store.getters["getVariableDocumentationTemplate"];
-        }
-       
+        },
+        Variables(){         
+            variablesByFile= this.$store.getters.getVariablesAll;
+            if (!variablesByFile){
+                return [];
+            }
 
+            variables = variablesByFile[this.VariableFileID];
+            return variables;
+        },
+        VariableFileID()
+        {
+            return this.Variable.fid;
+        },
+        VariablesForWeight(){
+           let variables = [];
+        
+            for (var variable in this.Variables){
+                if (this.Variables[variable].uid==this.variable.var_wgt_id){
+                    variables.push(this.Variables[variable]);
+                }
+            }
+            
+            return variables;
+        },
+        //combine categories and frequencies values
+        variableCategoriesAndFrequencies()
+        {
+            let categories=JSON.parse(JSON.stringify(this.Variable.var_catgry));
+
+            if (!this.Variable.var_catgry_labels){
+                return categories;
+            }
+
+            for (var i=0;i<categories.length;i++){
+                console.log("adding label",categories[i].value);
+                categories[i].labl=this.VariableLabelByValue(categories[i].value);
+            }
+
+            //add categories that are not in the frequencies
+            for (var i=0;i<this.Variable.var_catgry_labels.length;i++){
+                let found=false;
+                for (var j=0;j<categories.length;j++){
+                    if (categories[j].value==this.Variable.var_catgry_labels[i].value){
+                        found=true;
+                        break;
+                    }
+                }
+
+                if (!found){
+                    categories.push({
+                        value:this.Variable.var_catgry_labels[i].value,
+                        labl:this.Variable.var_catgry_labels[i].labl
+                    });
+                }
+            }
+
+            return categories;
+        }
     },
     methods: {
         sectionEnabled: function(section){
@@ -192,11 +257,35 @@ Vue.component('variable-edit', {
         },
         variableSumStatEnabled: function (stat){
             if (this.variable.sum_stats_options[stat]){
-                console.log("stats",this.variable.sum_stats_options[stat]);
                 return this.variable.sum_stats_options[stat];
             }
-            else{
-                console.log("stats not found",stat);
+            return false;
+        },
+        OnWeightVariableSelection: function(e)
+        {
+            this.variable.var_wgt_id=e;
+            this.$emit('input', JSON.parse(JSON.stringify(this.variable)));
+        },
+        RemoveWeightVariable: function(){
+            this.variable.var_wgt_id='';
+            this.$emit('input', JSON.parse(JSON.stringify(this.variable)));
+        },
+        VariableLabelByValue: function(value){
+            if (this.variable.var_catgry_labels){
+                for(i=0;i<this.variable.var_catgry_labels.length;i++){
+                    if (this.variable.var_catgry_labels[i].value==value && this.variable.var_catgry_labels[i].labl){
+                        return this.variable.var_catgry_labels[i].labl;
+                    }
+                }
+            }
+        },
+        VariableIsMissing: function(value){
+            if (this.variable.var_invalrng && this.variable.var_invalrng.values){
+                for(i=0;i<this.variable.var_invalrng.values.length;i++){
+                    if (this.variable.var_invalrng.values[i]==value){
+                        return true;
+                    }
+                }
             }
             return false;
         }
@@ -207,7 +296,8 @@ Vue.component('variable-edit', {
         <template>
             <v-tabs v-model="active_tab">
                 <v-tab key="statistics" href="#statistics">Statistics</v-tab>
-                <v-tab key="weights" href="#weights">Weights</v-tab>
+                <v-tab key="weights" href="#weights">
+                    Weights <span v-if="variable.var_wgt_id"><v-icon style="color:green;">mdi-circle-medium</v-icon></span></v-tab>
                 <v-tab key="documentation" href="#documentation">Documentation</v-tab>
                 <v-tab key="json" href="#json">JSON</v-tab>
 
@@ -235,16 +325,17 @@ Vue.component('variable-edit', {
                         <div class="col-md-9">
 
                             <div v-if="variable.var_catgry && variable.var_catgry.length>0 && variable.sum_stats_options.freq==true">
-                            <h5>Frequencies - {{variable.sum_stats_options.freq}}</h5>
+                            <h5>Frequencies</h5>
+                            
                             <table class="table table-sm">
                                 <tr>
                                     <th>Value</th>
                                     <th>Label</th>
                                     <th>Cases</th>
-                                    <th v-if="variable.var_wgt && variable.var_wgt==1">Weighted</th>
+                                    <th>Weighted</th>
                                     <th>Percent</th>
                                 </tr>
-                                <tr v-for="catgry in variable.var_catgry">
+                                <tr v-for="catgry in variableCategoriesAndFrequencies">
                                     <td>{{catgry.value}}</td>
                                     <td>{{catgry.labl}}</td>
                                     
@@ -256,13 +347,14 @@ Vue.component('variable-edit', {
                                     </td>
 
                                     <!--wgt values -->
-                                    <td v-if="variable.var_wgt && variable.var_wgt==1">
+                                    <td>
                                     <template v-for="stat in catgry.stats">
                                         <template v-if="stat.wgtd=='wgtd'">{{stat.value}}</template>
                                     </template>                                
                                     </td>
                                     <td>
-                                        <v-progress-linear
+                                        <div v-if="catgry.is_missing==1 || VariableIsMissing(catgry.value)">Missing</div>
+                                        <v-progress-linear v-else
                                             v-model="VariablePercent(variable, catgry)"
                                             color="#FFCC80"
                                             height="15"
@@ -276,7 +368,7 @@ Vue.component('variable-edit', {
                                     <td></td>                                    
                                     <td>{{variableStatsInValidCount(variable)}}</td>
                                     <td></td>
-                                    <td></td>
+                                    <td>Missing</td>
                                 </tr>
                             </table>
                             </div>
@@ -313,7 +405,38 @@ Vue.component('variable-edit', {
                 
                 </v-tab-item>
                 <v-tab-item key="weights" value="weights">
-                    weights
+                    <div class="p-3">                    
+
+                        <dialog-weight-variable-selection 
+                            :variables="Variables" 
+                            v-model="show_weights_dialog"
+                            @selected="OnWeightVariableSelection"
+                        ></dialog-weight-variable-selection>
+                        <div v-if="variable.var_wgt==1">
+                            <div class="border p-2 m-3 text-center text-danger">Cannot add weights to a weight variable</div>
+                        </div>
+                        <div v-else>
+                            <table class="table table-sm table-bordered" v-if="variable.var_wgt_id">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Label</th>
+                                    <td><button class="btn btn-sm btn-xs btn-link" @click="RemoveWeightVariable">Remove</button></td>
+                                </tr>
+                                <tr v-for="var_ in VariablesForWeight" :key="var_.uid">
+                                    <td>{{var_.name}}</td>
+                                    <td>{{var_.labl}}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-xs btn-link" @click="RemoveWeightVariable">Remove</button>
+                                        <button class="btn btn-sm btn-xs btn-link" @click="show_weights_dialog=true">Change</button>
+                                    </td>
+                                </tr>
+                            </table>
+                            <div v-else>
+                                <div class="border p-2 m-3 text-center " ><button class="btn btn-sm btn-xs btn-link" @click="show_weights_dialog=true">Select variable</button></div>
+                            </div>
+                        </div>
+
+                    </div>
                 </v-tab-item>
                 <v-tab-item key="json" value="json">
                     <pre>{{variable}}</pre>

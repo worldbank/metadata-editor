@@ -636,3 +636,7 @@ table .form-field-dropdown-custom .v-input__slot fieldset{
 .text-normal{
     font-weight:normal;
 }
+
+.activeRow .mdi {
+    color: white;
+}

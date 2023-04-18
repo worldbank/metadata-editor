@@ -57,7 +57,7 @@ Vue.component('variable-info', {
 
                 <div class="p-2" v-if="variable">
 
-                <div class="form-group form-field switch-field">                    
+                <div class="form-group form-field switch-field" >
                     <v-switch
                     v-model="variable.var_wgt"
                     label="is weight variable?"

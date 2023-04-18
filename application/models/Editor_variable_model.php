@@ -7,6 +7,20 @@
  * 
  */
 class Editor_variable_model extends ci_model {
+
+    private $fields=array(
+        'name',
+        'labl',
+        'sid',
+        'fid',
+        'vid',
+        'sort_order',
+        'is_weight',
+        'user_missings',
+        'field_dtype',
+        'var_wgt_id',
+        'metadata'
+    );
  
     public function __construct()
     {
@@ -74,6 +88,103 @@ class Editor_variable_model extends ci_model {
             'query'=>$this->db->last_query()
         ];
     }
+
+    function bulk_upsert_dictionary($sid,$fileid,$variables)
+    {
+        $valid_data_files=$this->Editor_datafile_model->list($sid);
+		$max_variable_id=$this->get_max_vid($sid);
+			
+		foreach($variables as $idx=>$variable)
+        {
+			$max_variable_id=$max_variable_id+1;
+			$variable['file_id']=$fileid;
+			$variable['vid']= 'V'.$max_variable_id;
+
+			if (!in_array($fileid,$valid_data_files)){
+				throw new Exception("Invalid `file_id`: valid values are: ". implode(", ", $valid_data_files ));
+			}
+
+			//check if variable already exists
+			$variable_info=$this->variable_by_name($sid,$fileid,$variable['name'],true);
+
+			$variable['fid']=$fileid;
+
+			$this->validate($variable);
+			#$variable['metadata']=$variable;
+
+			if($variable_info){
+                // for existing variables, merge metadata with existing metadata
+                // update only few fields e.g. sum_stats, catgry, etc
+                $variable_info['metadata']=$this->update_summary_stats($sid,$variable_info['uid'],$variable_info['metadata'],$variable);
+                #$variable_info['metadata']=$variable_info;
+                if (!isset($variable_info['uid'])){
+                    var_dump($variable_info);
+                    die();
+                }
+                
+				$this->update($sid,$variable_info['uid'],$variable_info);
+			}
+			else{
+                $variable['metadata']=$variable;
+				$this->insert($sid,$variable);
+			}
+
+			$result[]=$variable['vid'];
+		}
+
+		return $result;
+    }
+
+
+    function update_summary_stats($sid, $uid, $variable, $stats)
+    {
+        $summary_stats_elements=array(
+            "var_intrvl",
+            "var_valrng",
+            "var_sumstat",
+            "var_catgry",
+            "var_format",
+            "var_invalrng"
+        );
+
+        foreach($summary_stats_elements as $element)
+        {
+            if (isset($stats[$element])){
+                $variable[$element]=$stats[$element];
+            }
+        }
+
+        /*
+        //update var_catgry stats keeping the value/labl pairs        
+        if (isset($stats['var_catgry'])){
+            $new_cat=array();
+            foreach($stats['var_catgry'] as $idx=>$val){
+                if (isset($val['value'])){
+                    $new_cat[$val['value']]=$val;
+                }
+            }
+
+            //apply to existing categories
+            if (isset($variable['var_catgry'])){
+                foreach($variable['var_catgry'] as $idx=>$val){
+                    if (isset($val['value']) && isset($new_cat[$val['value']])){
+                        $variable['var_catgry'][$idx]=$new_cat[$val['value']];
+                    }
+                }
+
+                //replace categories stats
+                foreach($variable['var_catgry'] as $idx=>$catgry){
+                    if (array_key_exists($catgry['value'], $new_cat)){
+                        if (isset($new_cat[$idx]['stats'])){
+                            $variable['var_catgry'][$idx]['stats']=$new_cat[$idx]['stats'];
+                        }
+                    }
+                }
+            }
+        }*/
+
+        return $variable;
+     }
 
 
     function bulk_upsert($sid,$fileid,$variables)
@@ -149,13 +260,14 @@ class Editor_variable_model extends ci_model {
     function select_all($sid,$file_id=null,$metadata_detailed=false)
     {
         if ($metadata_detailed==true){
-            $fields="uid,sid,fid,vid,name,labl,metadata";
+            $fields="uid,sid,fid,vid,name,labl,sort_order,metadata";
         }else{
-            $fields="uid,sid,fid,vid,name,labl";
+            $fields="uid,sid,fid,vid,name,labl,sort_order";
         }
         
         $this->db->select($fields);
         $this->db->where("sid",$sid);
+        $this->db->order_by("sort_order,uid","asc");
 
         if($file_id){
             $this->db->where("fid",$file_id);
@@ -247,6 +359,20 @@ class Editor_variable_model extends ci_model {
 		return $variable;
     }
 
+    function variable_by_name($sid,$fid,$name,$metadata_detailed=false)
+    {
+        $this->db->select("*");
+        $this->db->where("sid",$sid);
+        $this->db->where("fid",$fid);
+		$this->db->where("name",$name);
+        $variable=$this->db->get("editor_variables")->row_array();
+
+		if(isset($variable['metadata']) && $metadata_detailed==true){
+			$variable['metadata']=$this->Editor_model->decode_metadata($variable['metadata']);
+		}
+		return $variable;
+    }
+
 
     function variables_by_name($sid,$fid,$var_names,$metadata_detailed=false)
     {
@@ -319,20 +445,8 @@ class Editor_variable_model extends ci_model {
      */
     public function insert($sid,$options)
     {
-        $valid_fields=array(
-            'name',
-            'labl',
-            'qstn',
-            'catgry',
-            'keywords',
-            'sid',
-            'fid',
-            'vid',
-            'metadata'
-        );
-
         foreach($options as $key=>$value){
-            if(!in_array($key,$valid_fields)){
+            if(!in_array($key,$this->fields)){
                 unset($options[$key]);
             }
         }
@@ -341,6 +455,8 @@ class Editor_variable_model extends ci_model {
 
         //metadata
         if(isset($options['metadata'])){
+            $core=$this->get_variable_core_fields($options['metadata']);
+            $options=array_merge($options,$core);
             $options['metadata']=$this->Editor_model->encode_metadata($options['metadata']);
         }
 
@@ -351,28 +467,19 @@ class Editor_variable_model extends ci_model {
 
     public function update($sid,$uid,$options)
     {
-        $valid_fields=array(
-            'name',
-            'labl',
-            'qstn',
-            'catgry',
-            'keywords',
-            'sid',
-            'fid',
-            'vid',
-            'metadata'
-        );
-
         foreach($options as $key=>$value){
-            if(!in_array($key,$valid_fields)){
+            if(!in_array($key,$this->fields)){
                 unset($options[$key]);
             }
         }
-
+                
         $options['sid']=$sid;
+        
 
         //metadata
         if(isset($options['metadata'])){            
+            $core=$this->get_variable_core_fields($options['metadata']);
+            $options=array_merge($options,$core);
             $options['metadata']=$this->Editor_model->encode_metadata($options['metadata']);
         }
 
@@ -380,6 +487,123 @@ class Editor_variable_model extends ci_model {
         $this->db->where('uid',$uid);
         $this->db->update("editor_variables",$options);
         return $uid;
+    }
+
+
+    function get_variable_core_fields($variable)
+    {
+        //fid,vid,name,labl,sort_order,user_missings,is_weight,field_dtype, field_format
+        $missings=(array)array_data_get($variable,'var_invalrng.values','');
+        $missings=implode(",",$missings);
+        $dtype=array_data_get($variable,'var_format.type','');
+
+        $core_fields=array(
+            'fid'=>$variable['fid'],
+            'vid'=>$variable['vid'],
+            'name'=>$variable['name'],
+            'labl'=>$variable['labl'],
+            'user_missings'=>$missings,
+            'is_weight'=> isset($variable['var_wgt']) ? (int)$variable['var_wgt'] : 0,
+            'field_dtype'=>$dtype            
+            //'field_format'=>$variable['field_format'],
+        );
+
+        return $core_fields;
+    }
+
+
+    /**
+     * 
+     *  Create params for data dictionary generation
+     * 
+     */
+    function prepare_data_dictionary_params($sid, $fid)
+    {
+
+        $datafile_path=$this->Editor_datafile_model->get_file_path($sid,$fid);
+
+        if (!$datafile_path){
+            throw new Exception("Data file not found");
+        }
+			
+        $this->db->select("name,field_dtype,user_missings,is_weight,var_wgt_id");
+        $this->db->where("sid",$sid);
+        $this->db->where("fid",$fid);        
+        $variables=$this->db->get("editor_variables")->result_array();
+
+        $params=array(
+            'datafile'=> realpath($datafile_path)
+        );
+
+        foreach($variables as $variable){
+            if (isset($variable['var_wgt_id']) && $variable['var_wgt_id']>0 ){
+                $params['weights'][]=array(
+                    'field'=>$variable['name'],
+                    'weight_field'=>$this->get_name_by_var_wgt_id($sid,$variable['var_wgt_id'])
+                );
+            }
+            if ($variable['user_missings']!=''){
+                $params['missings'][]=array(
+                    "field"=>$variable['name'],
+                    "missings"=> explode(",",$variable['user_missings'])
+                );
+            }            
+        }
+
+        return $params;
+    }
+
+
+    function get_name_by_var_wgt_id($sid,$uid)
+    {
+        $this->db->select("uid,name");
+        $this->db->where("sid",$sid);
+        $this->db->where("uid",$uid);
+        $row=$this->db->get("editor_variables")->row_array();
+        
+        if ($row){
+            return $row['name'];
+        }
+
+        return '';
+    }
+
+
+    function set_sort_order($sid, $values)
+    {
+        //delete existing sort order
+        $this->delete_sort_tmp($sid);
+
+        //insert into a temp table
+        $this->insert_sort_tmp($sid,$values);
+
+        //update sort order
+        $this->db->query('update editor_variables v                             
+                                inner join editor_variables_sort_tmp tmp on tmp.var_uid=v.uid  
+                                set v.sort_order=tmp.sort_order
+                                where v.sid='.(int)$sid);
+
+        $this->delete_sort_tmp($sid);
+    }
+
+    function insert_sort_tmp($sid,$values)
+    {
+        $options=array();
+        foreach($values as $idx=>$value){
+            $options[]=array(
+                'sid'=>$sid,
+                'var_uid'=>$value,
+                'sort_order'=>$idx
+            );
+        }
+
+        $this->db->insert_batch("editor_variables_sort_tmp",$options);
+    }
+
+    function delete_sort_tmp($sid)
+    {
+        $this->db->where('sid',$sid);
+        $this->db->delete("editor_variables_sort_tmp");
     }
     
 

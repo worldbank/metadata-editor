@@ -89,7 +89,7 @@ Vue.component('variable-categories', {
                     <div v-if="variable.var_intrvl=='discrete'" class="section-rows">                        
 
                         <table-grid-component 
-                            v-model="variable.var_catgry" 
+                            v-model="variable.var_catgry_labels" 
                             :columns="catgry_columns" 
                             class="border elevation-1 m-2 pb-2"
                             >
