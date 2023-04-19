@@ -76,6 +76,7 @@ class Editor_model extends CI_Model {
 		$this->load->helper("Array");
 		$this->load->library("form_validation");		
 		$this->load->model("Editor_variable_model");
+		$this->load->model("Editor_datafile_model");		
 		$this->load->model("Collection_model");
 	}
 
@@ -1378,7 +1379,7 @@ class Editor_model extends CI_Model {
 
 		if($project['type']=='survey'){			
 			$output['data_files'] = function () use ($sid) {
-				$files=$this->data_files($sid);
+				$files=$this->Editor_datafile_model->select_all($sid, $include_file_info=false);
 				if ($files){
 					foreach($files as $file){
 						unset($file['id']);
