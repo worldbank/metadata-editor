@@ -842,6 +842,11 @@ class Editor extends MY_REST_Controller
 					$result=$this->Editor_model->importDDI($sid);		
 				}
 			}else{
+				$this->load->library('ImportJsonMetadata');
+
+				$result=$this->importjsonmetadata->import($sid,$uploaded_filepath);
+
+				/*
 				$json_data=json_decode(file_get_contents($uploaded_filepath),true);
 				
 				if (!$json_data){
@@ -849,6 +854,7 @@ class Editor extends MY_REST_Controller
 				}
 
 				$result=$this->Editor_model->importJSON($sid,$type=$project['type'],$json_data,$validate=true);
+				*/
 			}
 
 			$output=array(
@@ -1628,4 +1634,35 @@ class Editor extends MY_REST_Controller
 	}
 
 
+	/**
+	 * 
+	 * 
+	 * Fix category labels
+	 * 
+	 */	
+	function populate_category_labels_get($sid=null)
+	{
+		try{
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
+
+			$result=$this->Editor_variable_model->populate_categry_labels($sid);			
+				
+			if(!$result){
+				throw new Exception("PROJECT_NOT_FOUND");
+			}
+
+			$response=array(
+				'status'=>'success',
+				'result'=>$result
+			);			
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
 }

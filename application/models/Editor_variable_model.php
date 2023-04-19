@@ -605,6 +605,66 @@ class Editor_variable_model extends ci_model {
         $this->db->where('sid',$sid);
         $this->db->delete("editor_variables_sort_tmp");
     }
+
+
+    /**
+     * 
+     * Populate variable category value/labels 
+     * 
+     * Note: this will replace existing values/labels from variable var_catgry field
+     * 
+     * 
+     */
+    function populate_categry_labels($sid)
+    {     
+        $output=[
+            'skipped'=>[],
+            'updated'=>[],
+        ];
+        foreach($this->chunk_reader_generator($sid) as $variable){
+
+            if (isset($variable['metadata']['var_catgry_labels']) && 
+                    is_array($variable['metadata']['var_catgry_labels']) && 
+                    count($variable['metadata']['var_catgry_labels'])>0)
+                {
+                $output['skipped'][]=$variable['uid'];
+                continue;
+            }
+
+            if (isset($variable['metadata']['var_catgry'])){
+
+                //ignore if stats_option is set to not include frequencies
+                if (isset($variable['metadata']['sum_stats_options']) && 
+                    isset($variable['metadata']['sum_stats_options']['freq']) &&
+                    $variable['metadata']['sum_stats_options']['freq'] == false
+                    ){
+                    $output['skipped_stats'][]=$variable['uid'];
+                    continue;
+                }
+
+                $labels=array();                
+                foreach($variable['metadata']['var_catgry'] as $i=>$catgry){
+
+                    if (!isset($catgry['value'])) {
+                        continue;
+                    }
+
+                    $labels[]=array(
+                        'value'=>$catgry['value'],
+                        'labl'=> isset($catgry['labl']) ? $catgry['labl'] :''
+                    );                    
+                }
+
+                $variable['metadata']['var_catgry_labels']=$labels;
+                $output['updated'][]=$variable['uid'];
+                $this->update($sid,$variable['uid'],array('metadata'=>$variable['metadata']));
+            }
+            else {
+                $output['skipped'][]=$variable['uid'];
+            }
+        }
+        return $output;  
+    }
     
 
 }    
