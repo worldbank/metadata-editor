@@ -35,7 +35,7 @@ Vue.component('variable-categories', {
     methods:{
         clearCategories: function(){
             if (confirm("Are you sure you want to clear all categories?")){
-                this.variable.var_catgry=[];
+                this.variable.var_catgry_labels=[];
             }
         },
         refreshCategories: function(){
