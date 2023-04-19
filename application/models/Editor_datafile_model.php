@@ -170,16 +170,25 @@ class Editor_datafile_model extends CI_Model {
 				'filepath'=>$project_folder_path.$filename,
 				'file_exists'=>file_exists($project_folder_path.$filename),
 				'file_info'=>pathinfo($project_folder_path.$filename),
-				'file_size'=>format_bytes(filesize($project_folder_path.$filename)),
+				#'file_size'=>format_bytes(filesize($project_folder_path.$filename)),
 			),
 			'csv'=>array(
 				'filename'=>$filename_csv,
 				'filepath'=>$project_folder_path.$filename_csv,
 				'file_exists'=>file_exists($project_folder_path.$filename_csv),
 				'file_info'=>pathinfo($project_folder_path.$filename_csv),
-				'file_size'=>format_bytes(filesize($project_folder_path.$filename_csv)),
+				#'file_size'=>format_bytes(filesize($project_folder_path.$filename_csv)),
 			)
 		);
+
+		//file sizes
+		if ($files['original']['file_exists']){
+			$files['original']['file_size']=format_bytes(filesize($project_folder_path.$filename));
+		}
+
+		if ($files['csv']['file_exists']){
+			$files['csv']['file_size']=format_bytes(filesize($project_folder_path.$filename_csv));
+		}
 		
 		return $files;
 	}
