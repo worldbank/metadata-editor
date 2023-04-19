@@ -172,6 +172,9 @@ class Data extends MY_REST_Controller
 			}
 
 			$this->editor_acl->user_has_project_access($sid,$permission='edit',$this->api_user());
+
+			$dict_params=$this->Editor_variable_model->prepare_data_dictionary_params($sid,$file_id);
+
 			$datafile_path=$this->Editor_datafile_model->get_file_path($sid,$file_id);
 
 			if (!$datafile_path){
@@ -179,7 +182,8 @@ class Data extends MY_REST_Controller
 			}
 
 			//get file basic metadata [rows, columns, variable name and label]
-			$response=$this->datautils->generate_summary_stats($datafile_path);
+			#$response=$this->datautils->generate_summary_stats($datafile_path);
+			$response=$this->datautils->generate_summary_stats_variable($datafile_path,$dict_params);
 
 			$variable_import_result=null;
 
@@ -189,13 +193,15 @@ class Data extends MY_REST_Controller
 			}
 
 			if (isset($response['variables'])){
-				$variable_import_result=$this->Editor_variable_model->bulk_upsert($sid,$file_id,$response['variables']);
+				$variable_import_result=$this->Editor_variable_model->bulk_upsert_dictionary($sid,$file_id,$response['variables']);
 			}
 
 			$output=array(
 				'status'=>'success',
+				'params'=>$dict_params,
 				'result'=>realpath($datafile_path),
-				'variables_imported'=>$variable_import_result
+				'variables_imported'=>$variable_import_result,
+				'variables'=>$response['variables']
 			);
 						
 			$this->set_response($output, REST_Controller::HTTP_OK);			
@@ -237,7 +243,7 @@ class Data extends MY_REST_Controller
 			}
 
 			//get file basic metadata [rows, columns, variable name and label]
-			$response=$this->datautils->generate_summary_stats_variable($datafile_path,$options['var_names']);
+			$response=$this->datautils->generate_summary_stats_variable($datafile_path,$options);
 
 			$variable_import_result=null;
 
@@ -253,7 +259,8 @@ class Data extends MY_REST_Controller
 			$output=array(
 				'status'=>'success',
 				'result'=>realpath($datafile_path),
-				'variables_imported'=>$variable_import_result
+				'variables_imported'=>$variable_import_result,
+				'response'=>$response
 			);
 						
 			$this->set_response($output, REST_Controller::HTTP_OK);			
