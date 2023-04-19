@@ -9,6 +9,7 @@ class Editor_DDI_Writer
     public function __construct()
     {
         $this->ci =& get_instance();
+        $this->ci->load->model('Editor_datafile_model');
     }
 
 
@@ -140,7 +141,7 @@ class Editor_DDI_Writer
         $writer->writeRaw($this->get_study_desc_xml($dataset));
 
         //file description
-        $files=$this->ci->Editor_model->data_files($id);
+        $files=$this->ci->Editor_datafile_model->select_all($id,$include_file_info=false);
         $writer->writeRaw("\n");
         
         if (!empty($files)){

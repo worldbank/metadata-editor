@@ -344,14 +344,16 @@ $ddi=$this->editor_ddi_writer;
      </anlyInfo>
      <stdyClas><![CDATA[<?php $ddi->el('study_desc/method/study_class');?>]]></stdyClas>
 
-     <dataProcessing type="<?php $ddi->el('study_desc/method/data_processing_type');?>"><?php $ddi->el('study_desc/method/data_processing');?></dataProcessing>
+     <?php $dataprocess_arr=(array)$ddi->get_el('study_desc/method/data_processing');?>
+     <?php foreach($dataprocess_arr as $dp):?>
+        <dataProcessing type="<?php echo $ddi->attr_val($dp,'type');?>"><?php echo $ddi->el_val($dp,'description');?></dataProcessing>
+      <?php endforeach;?>
 
      <codingInstructions relatedProcesses="<?php $ddi->el('study_desc/method/coding_instructions/related_processes');?>" type="<?php $ddi->el('study_desc/method/coding_instructions/type');?>"> 
         <txt><?php $ddi->el('study_desc/method/coding_instructions/txt');?></txt> 
         <command formalLanguage="<?php $ddi->el('study_desc/method/coding_instructions/command_language');?>"><?php $ddi->el('study_desc/method/coding_instructions/command');?></command> 
      </codingInstructions>
   </method>
-
 
 
   <dataAccs>
