@@ -232,11 +232,13 @@ Provide a link to the resource, or select the file you want to upload in your on
 
 ![image](https://user-images.githubusercontent.com/35276300/233708637-2432c485-6ac4-472f-a2f4-2e5f010ef195.png)
 
-The documentation of your dataset is now complete. You can export the DDI and the RDF metadata, and save the package.
+The documentation of your dataset is now complete. You can export the DDI and the RDF metadata, and save the full package as a project zip file.
 
-![image](https://user-images.githubusercontent.com/35276300/215518944-1b817abb-9b8c-4862-9e85-17a3df30ca19.png)
+![image](https://user-images.githubusercontent.com/35276300/233710677-e6260860-91d9-4c3d-bed3-753996663e1d.png)
 
-If you have a NADA catalog and the credentials, you can publish your data and metadata in the catalog.
+
+
+If you have a NADA catalog and the credentials, you can also publish your data and metadata in the catalog.
 
 ![image](https://user-images.githubusercontent.com/35276300/233709774-c049244a-fea6-45f4-93fc-8f3057bf7ec3.png)
 
