@@ -236,7 +236,7 @@ The documentation of your dataset is now complete. You can export the DDI and th
 
 ![image](https://user-images.githubusercontent.com/35276300/215518944-1b817abb-9b8c-4862-9e85-17a3df30ca19.png)
 
-If you have a NADA catalog: ready to be published. In NADA:
+If you have a NADA catalog and the credentials, you can publish your data and metadata in the catalog.
 
 ![image](https://user-images.githubusercontent.com/35276300/233709774-c049244a-fea6-45f4-93fc-8f3057bf7ec3.png)
 
