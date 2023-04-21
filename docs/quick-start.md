@@ -110,83 +110,63 @@ The book is now available in your NADA catalog.
 In this second example, we will document a survey dataset (microdata) using the DDI Codebook metadata standard. We only show some of the core features of the Metadata Editor. See the next sections for a complete overview of the many features provided by the software.
 
 The dataset we will document --and publish in a NADA catalog-- is a synthetic data representative of a sample household survey for an imaginary country. The dataset and related resources are available in the "demo" folder of the installation package and from the Metadata Editor GitHub repository. The materials include the following files:
-- training_survey_data_hh.dta (household-level data file, in Stata 17 format, with 47 variables and 7,975 observations)
-- training_survey_data_ind.dta (individual-level data file, in Stata 17 format, with 26 variables and 30,986 observations)
-- questionnaire.pdf (a very simplified census questionnaire, in PDF format)
-- interviewer_manual.pdf (a very simplified interviewer manual, in PDF format)
-- survey_report.pdf (a simplified survey report, with information on the sampling design)
-- survey_logo.JPG (a logo, in JPG format)
+- Stata (version 17) data files with all variables and values labeled:
+  - training_survey_data_hh.dta (household-level data file, in Stata 17 format, with 47 variables and 7,975 observations). 
+  - training_survey_data_ind.dta (individual-level data file, in Stata 17 format, with 26 variables and 30,986 observations). All variables and values are labeled.
+ - Survey questionnaire and documentation in MS-Excel file "synthetic_survey_questionnaire_info.xlsx". This file contains:
+  - A simplified survey questionnaire (sheets "Household form EN" for variables collected at the household level, and "Individual form EN" for variables collected at the individual level.)
+  - A simplified survey report, with information on the sampling design (sheet "Survey info")
+- Other:
+  - survey_logo.JPG (a logo for the survey, in JPG format)
 
-![image](https://user-images.githubusercontent.com/35276300/215505821-7833f0a5-8c60-45ce-aa69-f08d65fef6f3.png)
+![image](https://user-images.githubusercontent.com/35276300/233700458-8e1526d5-8e02-433d-af6a-086b6219cc65.png)
+ 
 
-All variables and values in the Stata files are labeled. The variable *hid* found in both data files provides a unique identifier of each household and is the key variable to be used to merge the data files. The questionnaire and the interviewer manual are very basic, but contain information that will be used to demonstrate how information on literal questions and universe can be extracted to document variables.
-
-To start documenting the dataset, open the Metadata Editor and login. Then in the Project page, click on "Create new project" and select "Microdata".
-
-A new project home page will open. The navigation bar shown on the left will reflect the content of the default metadata template for "Microdata" (default templates can be changed in the Template Manager).
+To start documenting the dataset, open the Metadata Editor and login. Then in the Project page, click on "Create new project" and select "Microdata". A new project home page will open. The navigation bar shown on the left will reflect the content of the default metadata template for "Microdata" (default templates can be changed in the Template Manager).
 
 ![image](https://user-images.githubusercontent.com/35276300/231760101-17cceff8-fdc4-4364-ad21-ba189435f3b3.png)
 
 
-As we have a survey logo, we can change the image that will be used as thumbnail for the project (this is optional). Click on "Change image" and select the file "survey_logo.JPG". The logo will be displayed.
+We can change the image that will be used as thumbnail for the project (this is optional). Click on "Change image" and select the file "survey_logo.JPG". 
 
 ![image](https://user-images.githubusercontent.com/35276300/215513036-95c7d60a-d5b0-44fe-8f76-5a5623185f08.png)
 
-We will use the default metadata template to document the dataset. There is thus no need to "Switch template". 
+We will use the default metadata template to document the dataset. There is thus no need to "Switch template". You are now ready to start documenting the dataset. 
 
-You are now ready to start documenting the dataset. A description of the metadata elements is available in the Metadata Editor (click on the "?" button next to each metadata element label).
-
-In the section **Document description**, provide information on the metadata. This information is optional. Enter your name and the date the metadata was created.
+In the section **Document description**, enter information on the metadata. This information is optional. Enter your name and the date the metadata was created.
 
 ![image](https://user-images.githubusercontent.com/35276300/231762296-ada64cb1-7ffd-43df-9242-036be6b5f05b.png)
 
 
-In the section **Study description**, enter the relevant information on the survey. Create a unique identifier, e.g., "DEMO_SVY_001". Then use information you find in the *Survey report* PDF document. It contains the following elements:
-- **Title**  
-- **Alternate title** (acronym)
-- **Abstract**
-- **Producer**
-- **Type of data**
-- **Country**
-- **Dates of data collection**
-- **Topics**
-- **Universe**
-- **Sampling**
-- ...
+In the section **Study description**, enter the relevant information on the survey. First, create a unique identifier for the dataset, e.g., "DEMO_SVY_001". Then use information you find in sheet "Survey info" of the Excel file. All information contained in this sheet should be entered in the corresponding metadata elements. Browse the navigation tree and find the most appropriate elements for each piece of information. Use the "?" next to each element label to view a description if necessary.
 
-![image](https://user-images.githubusercontent.com/35276300/231866451-6a274792-b279-4b83-b43c-8e4479b15824.png)
+![image](https://user-images.githubusercontent.com/35276300/233703241-b06145e0-e4e3-4486-93ca-37296a0e04c6.png)
 
-
-![image](https://user-images.githubusercontent.com/35276300/231866637-0070b16d-e3af-4239-8581-c32b4cb48020.png)
-
-
-When the Study information is entered, click on **Data files** in the navigation bar. In the Data files page, click on "Import data". Select the two Stata data files to be imported, then click on "Import files".
+When all available "Study information" is entered, click on **Data files** in the navigation bar. In the Data files page, click on "Import data". Select the two Stata data files to be imported, then click on "Import files".
 
 ![image](https://user-images.githubusercontent.com/35276300/231763763-c4d8a6d3-789b-4cb6-94f3-77680f15cfbf.png)
 
-If the import has been successful, you will be notified. The import will extract all available metadata (variable list, names, variable labels, value labels), and also generate summary statistics. 
+The import will extract all available metadata (variable list, names, variable labels, value labels), and also generate summary statistics. 
 
 ![image](https://user-images.githubusercontent.com/35276300/231763936-aac0aea2-eb90-4969-bd37-06a313418816.png)
 
-The Data files page will now display your two files, with some information (number of variables and observations). The two files will be listed in the navigation bar, where you have the option to open a page to view data and to open the variable page for the selected data file.
+The "Data files" page will now display your two files. The two files will also be listed in the navigation bar.
 
-![image](https://user-images.githubusercontent.com/35276300/231764424-665e13d0-10dd-4cbd-8cc2-2c5af74206fe.png)
+![image](https://user-images.githubusercontent.com/35276300/233703124-0c4c098d-7cfb-4389-8d65-abc27e1d7d8e.png)
 
-> Note: You can preview the data by clicking on "Data". The data cannot be edited in the Metadata Editor, but can be displayed.
+You can preview the data by clicking on "Data". Note that the data cannot be edited in the Metadata Editor.
 
-![image](https://user-images.githubusercontent.com/35276300/215519930-04363e7a-eb09-423b-abd5-5dc98ee1197a.png)
+![image](https://user-images.githubusercontent.com/35276300/233704435-4c4f6229-6b80-46b9-8b51-7755776dd8df.png)
 
+You will now document the data files and the variables they contain. 
 
-You will now document the files and variables. 
-
-First, click on the filename of a data file in the navigation tree, and add a brief description of the file (and Save the information entered in the page; this is not automatically saved). Then do the same for the other data file.
+First, click on the filename of a data file in the navigation tree, and add a brief description of the file (and save the information entered in the page, which is not automatically saved). Then do the same for the other data file.
 
 ![image](https://user-images.githubusercontent.com/35276300/231770783-00000083-5ede-4588-87b4-a5f5cf58fb74.png)
 
-
 You will then add or edit the information available on each variable, for each data file. In the navigation bar, select "Variables" in the "Data files / *name of the data file*"
 
-![image](https://user-images.githubusercontent.com/35276300/231869134-90b80436-fd54-414e-a74f-99ef86086626.png)
+![image](https://user-images.githubusercontent.com/35276300/233704533-62d1362a-cfe3-46eb-a77f-cb4a1a69bf8e.png)
 
 The page will display a list of variables for the selected file, with multiple options to edit and complete the metadata related to the variables. What you can do in this page:
 
@@ -201,47 +181,56 @@ The page will display a list of variables for the selected file, with multiple o
 - Set the weighting coefficient (if relevant) to be applied to generate summary statistics.
 - Select the summary statistics you want to be included in the metadata (in tab "STATISTICS")
 
-![image](https://user-images.githubusercontent.com/35276300/231868627-0b5a3fd1-d6c1-49e9-a46f-f6b87d9b17a2.png)
+![image](https://user-images.githubusercontent.com/35276300/233704709-a211367a-53e2-42fe-b472-b07fff4e6d99.png)
 
 We assume that all variable labels and value labels are good as imported.  
 
-Browse the list of variables to check that their type has been properly detected. The variable hhsize (Household size) in file *training_survey_data_hh.dta* has been imported as a deiscrete variable. This may be fine, but let's assume you want it to be imported as a continuous variable. Change the type from Discrete to Continuous. In that case, you may want to include the mean and standard deviation in the summary statistics.  
+Browse the list of variables to check that their type has been properly detected. The variable hhsize (Household size) in file *training_survey_data_hh.dta* has been imported as a deiscrete variable. This may be fine, but let's assume you want it to be imported as a continuous variable. Change the type from Discrete to Continuous.  
 
 ![image](https://user-images.githubusercontent.com/35276300/231877710-515e9a3e-3304-4a99-a8e4-c6f492432ac9.png)
 
-
-You can now add the metadata at the variable level. The tab "DOCUMENTATION" shows the metadata for the variable(s) selected in the list of variables. As we have the questionnaire and a description of the derived variables, we can add the following information: 
+Now, add the metadata specific to each variable. Most of the metadata at variable level will typically be found in the survey questionnaire and in the interviewer manual. The tab "DOCUMENTATION" shows the metadata for the variable(s) selected in the list of variables. Add the following information: 
 - Universe of the variable
-- Literal question (for collected variables, not for derived variables)
-- Skip instructions
-- Interviewer's instructions
+- Pre-question, literal question, and post-question (for collected variables, not for derived variables)
+- Skip instructions if any
 - Derivation or imputation methods (for derived variables)
 
-![image](https://user-images.githubusercontent.com/35276300/231875036-f3634de3-2775-423b-909b-80f03b0ad33a.png)
+![image](https://user-images.githubusercontent.com/35276300/233705597-9b6a4e8b-c65b-4f65-8994-1d029cc60900.png)
 
 Note that you can enter common metadata to more than one variable by selecting multiple variables (using the SHft or Ctrl key) and entering information for the relevant element(s). For example, the three variables related to education in the individual dataset have the same universe ("Population aged 6 and above"). The three variables can be selected and the information entered in "Universe" will be automatically applied to the 3 variables. 
 
-
-Set variable "weight" and "popweight" as weighting variables (in both data files). A weight variable should be a continuous variable.
+Set variable "weight" (and also "popweight" in the household-level data file) as weighting variables. 
 
 ![image](https://user-images.githubusercontent.com/35276300/231873892-4a2d595a-e9e3-42d0-8d04-3d355e3ae89c.png)
 
-Apply the weights to the variables as relevant.
+If you want to display and store weighted summary statistics, apply the weights to the variables as relevant. You do this in the tab WEIGHTS.
 
-@@@
+![image](https://user-images.githubusercontent.com/35276300/233706439-577b3451-9470-4104-ae2d-5bd8e880a94c.png)
+
+First, select the variables to which you want to apply a weighting coefficient, then selecting the weight variable. For the household-level file, you may first select all variables except the quintile variables, then select weigh variable "hhweight" (only variables that have been tagged as weight will be listed in the selection).
+
+![image](https://user-images.githubusercontent.com/35276300/233706693-b4193d98-8cc6-41aa-af6f-39448a3f7272.png)
+
+Then do the same for the 3 quintile variables, but using the "popweight" variable.
+
+![image](https://user-images.githubusercontent.com/35276300/233706968-8f314f5f-8c8a-4fa1-bb2c-d9ea4b5da48a.png)
+
+The summary statistics will now display both the unweighted and weighted values.
+
+As a last step in documenting variables, browse the variables and check that the summary statistics that have been selected for each variable correspond to what you want to store in your metadata. Do not include means or standard deviation for categorical variables.
+
+![image](https://user-images.githubusercontent.com/35276300/233707524-17819c81-00fc-49d0-b464-6206526b3fbc.png)
 
 
-After entering the variable-level metadata for both files, you will finalize the documentation of the dataset by adding the *external resources*. The external resources are all materials that you want to make accessible to the users of your data catalog when you publish the dataset in a catalog. This includes the microdata, if you want to disseminate them (openly or under restrictions). We will add 4 external resources to our survey metadata: the questionnaire, the interviewer manual, the report, and the dataset (the two Stata files compressed as one zip file; note that you could provide the data in more than one format, e.g., also share a version of the files in CSV and SPSS formats for user convenience).
+After entering the variable-level metadata for both files, you will finalize the documentation of the dataset by documenting and attaching the *external resources* to the survey metadata. The external resources are all materials that you want to make accessible to the users when you publish the dataset in a catalog. This includes the microdata files, if you want to disseminate them (openly or under restrictions). We will add 2 external resources to our survey metadata: the Excel file that contains the questionnaire, and the dataset (the two Stata files compressed as one zip file; note that you could provide the data in more than one format, e.g., also share a version of the files in CSV and SPSS formats for user convenience).
 
-![image](https://user-images.githubusercontent.com/35276300/215517537-c1d921bc-f75f-4990-83a6-fa150c21f1dc.png)
+Click on "External resources" in the navigation tree, then click on "Create resource". Select the file type (respectively "questionnaire" and "microdata" for our two external resources, and give each a short Title).
 
-![image](https://user-images.githubusercontent.com/35276300/215517712-0daf6bed-84cc-452c-9210-b43a57537c3a.png)
+![image](https://user-images.githubusercontent.com/35276300/233708077-2830f860-5720-4ccd-b1a6-ad937eb4fff4.png)
 
-![image](https://user-images.githubusercontent.com/35276300/215517972-0ecf6611-f555-4594-b0d2-d5f2cbf51ee6.png)
+Provide a link to the resource, or select the file you want to upload in your online catalog. Then click SAVE.
 
-![image](https://user-images.githubusercontent.com/35276300/215518111-d469812d-13c0-477d-8fb8-55aa2a9ba35a.png)
-
-![image](https://user-images.githubusercontent.com/35276300/215518729-e5253055-3485-4ffd-80ae-74de48590475.png)
+![image](https://user-images.githubusercontent.com/35276300/233708637-2432c485-6ac4-472f-a2f4-2e5f010ef195.png)
 
 The documentation of your dataset is now complete. You can export the DDI and the RDF metadata, and save the package.
 
@@ -249,13 +238,11 @@ The documentation of your dataset is now complete. You can export the DDI and th
 
 If you have a NADA catalog: ready to be published. In NADA:
 
-![image](https://user-images.githubusercontent.com/35276300/231880085-adbebea7-0f98-412b-93b2-5318b061dca1.png)
-
-![image](https://user-images.githubusercontent.com/35276300/231879990-7cfa6408-7f5f-4c2c-ab74-1cdf39d97a9d.png)
+![image](https://user-images.githubusercontent.com/35276300/233709774-c049244a-fea6-45f4-93fc-8f3057bf7ec3.png)
 
 The dataset will now be accessible and discoverable in your NADA catalog, with detailed metadata including the data dictionary.  
 
-@@@
+![image](https://user-images.githubusercontent.com/35276300/233710003-ae1dcaf6-f744-4380-b177-a707bd06300b.png)
 
 
 
