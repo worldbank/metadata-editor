@@ -133,25 +133,26 @@ The navigation bar on the right of the page reflects the content of the template
 
 ![image](https://user-images.githubusercontent.com/35276300/214939873-1a6bfb5f-da4f-4824-94cc-9677e2066f49.png)
 
-The project home page provides an option to select a project thumbnail. It can for example be the logo of your survey or census. The thumbnail will be used by the NADA cataloguing application. It will also be displayed in the Metadata Home page. The thumbnail is an image in JPG or PNG format. 
+The project home page provides an option to select a project thumbnail. It can for example be the logo of your survey or census. The thumbnail will be used by the NADA cataloguing application. It will also be displayed in the Metadata Home page. The thumbnail is an image in JPG or PNG format. To select a thumbnail, click on "Change image" and select an image file.
 
-![image](https://user-images.githubusercontent.com/35276300/214940035-d99d65fe-7764-45b7-b498-d367d52c98c5.png)
+![image](https://user-images.githubusercontent.com/35276300/233796909-1d465b5d-2a63-4171-a35a-a42c595f2268.png)
 
-To select a thumbnail, click on "Change image" and select an image file.
+![image](https://user-images.githubusercontent.com/35276300/233796889-bdcd8d1e-ff14-4d2a-be09-1ab5c99cd68d.png)
 
-![image](https://user-images.githubusercontent.com/35276300/214941199-bb5fd48d-47dc-4638-a355-9e068da77279.png)
 
-![image](https://user-images.githubusercontent.com/35276300/214941280-2493b610-1c2b-4c25-b8e5-37c07d1c6dde.png)
+## Capturing metadata
 
-### Document description and Study description
+Once the project has been created, you will use the forms (generated automatically based on the selected template) to capture all relevant metadata. In the DDI, metadata is available at different levels:
+- Document description section: Metadata on the metadata
+- Study description: Metadata on the study (survey, census, or other)
+- Data file description
+- Variable description
+- Variable groupings (optional)
+- Related resources
 
-The navigation tree in the left frame allows you to navigate the metadata entry pages. The metadata can be entered in any sequence. 
+In the forms:
 
-Fill out the sections **Document description** and **Study description** sections. Try and provide as much and as relevant information in all relevant metadata elements.
-
-![image](https://user-images.githubusercontent.com/35276300/214941497-887f698d-e763-48fe-8297-0e45bf6d2f73.png)
-
-A description of the content of each element is available by clicking on the "?". You will find more information on the metadata elements in the Schemna Guide (https://ihsn.github.io/editor/#/template-manager/microdata).
+A description of the content of each element is available by clicking on the "?". You will find more information on the metadata elements in the Schema Guide (https://ihsn.github.io/editor/#/template-manager/microdata).
 
 If the content you enter violates a validation rule entered in the template, an error message will be displayed in red. All violation of rules will also be displayed in the project Home page. 
 
@@ -166,6 +167,24 @@ When an element is "repeatable", an option to "Add rows" is provided.
 When a controlled vocabulary has been entered in the template, a drop down menu will appear.
 
 ![image](https://user-images.githubusercontent.com/35276300/214942534-d47df5a3-93f0-4d61-b956-46bbc89f0632.png)
+
+
+### Document description 
+
+Fill out the section **Document description** of the DDI. This optional section provides information on the metadata itself (metadata on the metadata), not on the dataset. This is not useful for the end-user of the data. This information if more useful to catalog administrator. The most important information is who documented the study, and when. 
+
+![image](https://user-images.githubusercontent.com/35276300/233796948-011d6a7f-bd4d-4b94-8e16-1c97379458e4.png)
+
+
+### Study description
+
+Try and provide as much and as relevant information in all relevant metadata elements.
+
+![image](https://user-images.githubusercontent.com/35276300/214941497-887f698d-e763-48fe-8297-0e45bf6d2f73.png)
+
+Options to make it more efficient:
+
+- Apply default 
 
 Importing metadata: 
 You can import metadata from another project (another DDI). To import metadata, click on ...
