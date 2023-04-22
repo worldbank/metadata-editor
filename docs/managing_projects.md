@@ -7,25 +7,28 @@ A "project" corresponds to a dataset of any type covered by the Metadata Editor.
 ![image](https://user-images.githubusercontent.com/35276300/233735017-3f2f6642-1fd5-47f5-9f69-e49496a6cd17.png)
 
 The Project page allows you to:
-- Create a new project from scratch
-- Create a new project by importing metadata
+- Create a project from scratch
+- Create a project by importing metadata
 - Load an existing project from a zip package
 - Duplicate a project
 - Open a project for editing
 - Share a project
+- Lock a project
 - Delete a project
 - Archive projects
 
 
 > WARNING: The Project page is not a catalog. You may have multiple projects with the same title and/or the same identifier in your list of projects (which you cannot have in a catalog, where the project identifier has to be unique). Duplicated identifiers are flagged in the project page.
 
+> NOTE: Batch action: ...
 
-## Creating a new project from scratch
+
+## Creating a project from scratch
 
 To create a new project, click on "Create project", and select a data type when prompted. This will open a new project page specific to the selected type of data, with the default metadata template for the data type. When you create a new project, only you (and the system administrator) will have access to it. You may share your project with others (when the Metadata Editor runs on a server). See section "Sharing projects".
 
 
-## Creating a new project by importing metadata
+## Creating a project by importing metadata
 
 If you have already documented a dataset using one of the metadata standards or schemas supported by the Metadata Editor, you can import it in the Metadata Editor. 
 You may also import metadata directly from a NADA catalog, by providing the URL of the catalog entry in NADA. 
@@ -43,24 +46,29 @@ The Metadata Editor provides an option to package projects into a zip file that 
 There may be situations where you want to duplicate a project. For example, if you have a series of datasets that have most of the metadata in common, duplicating a project then editing a few elements may be an efficient solution. When you duplicate a project, the title and identifier are not replicated as is. The prefix "Copy of" is automatically added to prevent the risk of accidentally generating entries that would be considered as the same when published in a catalog. To duplicate a project, click on the "Duplicate" icon. 
 
 
-## Opening projects
+## Opening a project
 
 By clicking on the title of a project, you will open the project page where you have all options to edit the metadata.
 
 
-## Sharing projects
+## Sharing a project
 
 By default, when a project is created, it is only seen by its creator (and by the administrtaor of the Metadata Editor server when installed on a server). To share a project with other users of the Metadata Editor (when installed on a server):
 - Click on the "Share" icon, then select the user(s) you want to share your project with, and set their role (editor, reviewer).
 - Attach your project to a collection. All users who have access to the collection will then have access to your project (as editor or as reviewer, depending on the other user's credentials for the collection). Note that a same project can be attached to multiple collections. To add one or multiple project(s) to a collection, check the projects you want to attach to a collection, then press the "Add to collection" button and select the collection. See section "Managing collections" below for information on how to create a collection. 
 
 
-## Deleting projects
+## Locking a project
+
+Use case: team of curators in charge of generating metadata; when done, submit to supervisor. Supervisor reviews and approves, then locks the project to prevent further change. Can unlock / request unlocking.
+
+
+## Deleting a project
 
 To delete a project, click on the "Delete" icon. Note that if you have not previously exported your project as a package (or your metadata as a JSON or XML file), the information will not be recoverable.
 
 
-## Archiving projects
+## Archiving a project
 
 Backup
 
@@ -88,6 +96,5 @@ Different roles:
   - Administrator: create, edit, delete, lock, share, add to collection
   - Editor
   - Reviewer
-  - View
   - Publisher
 
