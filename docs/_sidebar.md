@@ -20,6 +20,7 @@
 
 * Documenting data
 
+    * [Common principles](general_instructions.md)
     * [Microdata](template-manager/microdata.md)
     * [Document](template-manager/document.md)
     * [Database](template-manager/database.md)
