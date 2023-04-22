@@ -1,4 +1,4 @@
-# Managing projects
+# Managing projects, collections, and permissions
 
 ## The project page
 
@@ -65,7 +65,7 @@ To delete a project, click on the "Delete" icon. Note that if you have not previ
 Backup
 
 
-### Managing collections
+## Managing collections
 
 When a project is created, it belongs only to its creator and is only visible in the creator's home page. A project can be added to one or multiple collections.
 Collections are virtual containers (they are like tags). They provide a way to organize entries by theme, team, or other criteria. Also important, they allow projects to be shared with a groups of collaborators.
@@ -80,7 +80,7 @@ Creating and deleting collections:
 Programatically (using the API):
 
 
-### Managing permissions
+## Managing permissions
 
 Different roles:
 - ME administrator (super admin)
