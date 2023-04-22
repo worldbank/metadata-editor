@@ -115,7 +115,7 @@ Statistical software like Stata provide a "compress" or equivalent function to o
 
 ## Creating a new project
 
-A *project* consists of a survey, a census, or another type of activity that generates microdata). To create a new project, click on "Create new project" in the Project page and, when prompted, select "Microdata" as data type.
+To create a new microdata project, click on "Create new project" in the Project page and, when prompted, select "Microdata" as data type.
 
 ![image](https://user-images.githubusercontent.com/35276300/214939118-1c290c3b-52c2-4f05-88ac-31952c04e668.png)
 
@@ -129,45 +129,14 @@ The template identified  the Template Manager as the default template for Microd
 
 ![image](https://user-images.githubusercontent.com/35276300/214939822-f513121c-b659-45d1-bb7b-45a0243d471b.png)
 
-The navigation bar on the right of the page reflects the content of the template you selected. Note that you may change the template at any time without losing any information. The templates are only "masks" used to generate the metadata entry forms in the Metadata Editor.
-
-![image](https://user-images.githubusercontent.com/35276300/214939873-1a6bfb5f-da4f-4824-94cc-9677e2066f49.png)
-
-The project home page provides an option to select a project thumbnail. It can for example be the logo of your survey or census. The thumbnail will be used by the NADA cataloguing application. It will also be displayed in the Metadata Home page. The thumbnail is an image in JPG or PNG format. To select a thumbnail, click on "Change image" and select an image file.
+To select a thumbnail, click on "Change image" and select an image file.
 
 ![image](https://user-images.githubusercontent.com/35276300/233796909-1d465b5d-2a63-4171-a35a-a42c595f2268.png)
 
 ![image](https://user-images.githubusercontent.com/35276300/233796889-bdcd8d1e-ff14-4d2a-be09-1ab5c99cd68d.png)
 
 
-## Capturing metadata
-
-Once the project has been created, you will use the forms (generated automatically based on the selected template) to capture all relevant metadata. In the DDI, metadata is available at different levels:
-- Document description section: Metadata on the metadata
-- Study description: Metadata on the study (survey, census, or other)
-- Data file description
-- Variable description
-- Variable groupings (optional)
-- Related resources
-
-In the forms:
-
-A description of the content of each element is available by clicking on the "?". You will find more information on the metadata elements in the Schema Guide (https://ihsn.github.io/editor/#/template-manager/microdata).
-
-If the content you enter violates a validation rule entered in the template, an error message will be displayed in red. All violation of rules will also be displayed in the project Home page. 
-
-The *Required* elements are indicated by a red asterisk. 
-
-![image](https://user-images.githubusercontent.com/35276300/214941921-3e765962-8573-486c-af2c-a2168e79ebf2.png)
-
-When an element is "repeatable", an option to "Add rows" is provided.
-
-![image](https://user-images.githubusercontent.com/35276300/214942382-a69a9dab-2410-4493-8b1e-8d2469b14868.png)
-
-When a controlled vocabulary has been entered in the template, a drop down menu will appear.
-
-![image](https://user-images.githubusercontent.com/35276300/214942534-d47df5a3-93f0-4d61-b956-46bbc89f0632.png)
-
+## Capturing study-level metadata
 
 ### Document description 
 
@@ -175,30 +144,16 @@ Fill out the section **Document description** of the DDI. This optional section 
 
 ![image](https://user-images.githubusercontent.com/35276300/233796948-011d6a7f-bd4d-4b94-8e16-1c97379458e4.png)
 
-
 ### Study description
 
 Try and provide as much and as relevant information in all relevant metadata elements.
 
 ![image](https://user-images.githubusercontent.com/35276300/214941497-887f698d-e763-48fe-8297-0e45bf6d2f73.png)
 
-Options to make it more efficient:
 
-- Apply default 
+## Importing or creating data files
 
-Importing metadata: 
-You can import metadata from another project (another DDI). To import metadata, click on ...
-Select the project of DDI (XML/JSON) file containing the metadata.
-You have the option to select what you want to import:
-- Document description
-- Study description
-- File description
-- Variable description
-
-All fields with content will be imported and overwrite the contentif any. Empty fields will not replace elements with content.
-For file and variable description, import will only take place if the file names and variable names are a match (see nex sections).
-
-### Importing data files
+### Importing from Stata, SPSS, CSV
 
 If you have data files available in CSV, Stata (.dta), or SPSS (.sav) format, you can import the data to automatically populate some of the content of the *File description* section and much of the content of the *Variable description* section. The Metadata Editor relies on the R software and on the Haven library to import (and export) data files. 
 
@@ -219,25 +174,24 @@ Select the data files you want to import.
 Success
 ![image](https://user-images.githubusercontent.com/35276300/214952439-00f9a702-16a9-4b82-8bb1-690d68aaf966.png)
 
+You can preview the data you imported by selecting *Data* in the navigation bar for one of the imported data files. The data can be viewed and exported. The Metadata Editor does not provide an option to modify the data. The data can be exported for this data file from here. You can display values or labels by clicking on ...
+
+![image](https://user-images.githubusercontent.com/35276300/214965888-3af24fa2-8fa4-4d3a-a225-bc90f62130a8.png)
+
+
 ### Creating data files
 
 In some cases, you may want to document data files that you do not have. In such case, you will not be able to automatically generate the data dictionary. But you can enter it manually.
 ...
 
-### File description
+
+## File description
 
 Enter a brief description of each file by select the filename in the navigation bar, and filling out the metadata entry form. Then save.
 ![image](https://user-images.githubusercontent.com/35276300/214966052-85ffabc6-7d04-4ca3-b3c0-800c44499b68.png)
 
-### Preview data
 
-You can preview the data you imported by selecting *Data* in the navigation bar for one of the imported data files. The data can be viewed and exported. The Metadata Editor does not provide an option to modify the data. The data can be exported for this data file from here.
-
-![image](https://user-images.githubusercontent.com/35276300/214965888-3af24fa2-8fa4-4d3a-a225-bc90f62130a8.png)
-
-You can display values or labels by clicking on ...
-
-### Variable description and statistics
+## Variable description and statistics
 
 For each data file, the Variables section shows a variable list and metadata. Additional metadata can be entered for each variable.
 ![image](https://user-images.githubusercontent.com/35276300/214965734-f5d357e0-af79-4d08-9f12-1025adccf605.png)
@@ -286,9 +240,9 @@ Summary statistics:
 
 Weights
 
-Keys
+Keys: checking if variables form a key: ...
 
-If you change the weights, missing, 
+If you change the weights, missing, ... 
 
 ### Variable groups
 
@@ -303,6 +257,23 @@ If you change the weights, missing,
 ### Exporting data
 
 ### Diagnostics
+
+
+## Options to make it more efficient:
+
+- Apply default 
+- Import metadata: You can import metadata from another project (another DDI). To import metadata, click on ...
+Select the project of DDI (XML/JSON) file containing the metadata.
+
+You have the option to select what you want to import:
+- Document description
+- Study description
+- File description
+- Variable description
+
+All fields with content will be imported and overwrite the contentif any. Empty fields will not replace elements with content.
+For file and variable description, import will only take place if the file names and variable names are a match (see nex sections).
+
 
 ## Editing an existing project
 
