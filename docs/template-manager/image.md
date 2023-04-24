@@ -58,6 +58,10 @@ Finally, add the image file(s) or a link to the file(s) as an external resource.
 
 ![image](https://user-images.githubusercontent.com/35276300/216649633-3b6274df-ec3e-4cf0-85a8-59f656f29222.png)
 
-With this, the documentation process is complete. If there is no validation error in the Project page, the image is ready to be published in the NADA catalog.
+With this, the documentation process is complete. If there is no validation error in the Project page, the image is ready to be published in the NADA catalog. In NADA, images will appear in a specific tab "Images.
+
+![image](https://user-images.githubusercontent.com/35276300/234132904-4a5983ff-29fd-4247-b24c-a8b76eeb6994.png)
+
+
 
 
