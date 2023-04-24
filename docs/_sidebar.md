@@ -36,6 +36,10 @@
 
     * [Publish metadata](publish.md)
    
+* Tools for administrators
+
+   * [Administrator toolset](admin_tools.md)  
+   
 * The Metadata Editor API
 
    * [Using the API](ME_API.md)
