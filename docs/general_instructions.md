@@ -10,17 +10,12 @@ A *project* consists of a catalog entry of any type supported by the Metadata Ed
 
 The page contains 6 main elements:
 
-1 - The project title 
-
-2 - The navigation bar 
-
-3 - The project thumbnail
-
-4 - The metadata template identification and selection
-
-5 - A summary of the project validation, where warnings and validation errors will be reported
-
-6 - A block (empty when the project is created) where additional information on the project will be displayed.
+1. The project title 
+2. The navigation bar 
+3. The project thumbnail
+4. The metadata template identification and selection
+5. A summary of the project validation, where warnings and validation errors will be reported
+6. A block (empty when the project is created) where additional information on the project will be displayed.
 
 The **project title** will only be shown after you enter a title for your project in the metadata entry form.
 
