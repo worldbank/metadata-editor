@@ -18,7 +18,19 @@ You create a new database project by clicking on "Create new project" in the Pro
 ## Publishing in NADA
 
 A database can be published as an entry in a NADA catalog, in which case a tab "Databases" will be displayed, or as a complement of information to indicators/time series (in which case the database metadata will only be displayed in a tab, and not indexed). 
+
+For the database to be displayed as a complement of information to an indicator page, the database must be published in NADA, and its unique identifier must be entered in the indicator's metadata.
+
+In the database metadata:
+![image](https://user-images.githubusercontent.com/35276300/234084921-7ad19a28-210f-4e11-a33e-61b21cce0aba.png)
+
+In the indicator/time series metadata:
+![image](https://user-images.githubusercontent.com/35276300/234085195-80b9ede8-fdd8-438a-947d-8898d12e8fc1.png)
+
+
+
+
 @@@
 
-![image](https://user-images.githubusercontent.com/35276300/217015089-c28370c9-1650-4292-8af9-c82962c944f3.png)
+![image](https://user-images.githubusercontent.com/35276300/234084293-e3b4aa64-f2a2-4bec-ad47-af5d8f1b25a7.png)
 
