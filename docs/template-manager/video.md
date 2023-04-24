@@ -2,61 +2,46 @@
 
 ## The Video metadata schema
 
-The schema we propose to document video files is a combination of elements extracted from the Dublin Core Metadata Initiative (DCMI) and from the VideoObject (from schema.org) schemas. This schema is very similar to the schema we proposed for audio files (see chapter 10).
+The schema proposed for documenting video files is a combination of elements extracted from the Dublin Core Metadata Initiative (DCMI) and the VideoObject schema (from schema.org), which is very similar to the schema proposed for audio files in chapter 10.
 
-The Dublin Core is a generic and versatile standard, which we also use (in an augmented form) for the documentation of Documents (Chapter 4), Images (Chapter 9), and Audio files (chapter 10). It contains 15 core elements, to which we added a selection of elements from VideoObject. We also included the elements keywords, topics, tags, provenance and additional that are found in other schemas documented in the Guide.
+The Dublin Core is a versatile and generic standard that is also used (in an augmented form) for documenting publications and images. The schema contains 15 core elements, supplemented with a selection of elements from VideoObject, as well as keywords, topics, tags, provenance, and additional elements found in other schemas documented in the Guide.
 
-The resulting metadata schema is simple, but it contains the elements needed to document the resources and their content in a way that will foster their discoverability in data catalogs. Compliance with the VideoObject elements contributes to search engine optimization, as search engines like Google, Bing and others “reward” metadata published in formats compatible with the schema.org recommendations.
+The resulting metadata schema is simple but includes the necessary elements to document resources and their content, which will improve their discoverability in data catalogs. Compliance with VideoObject elements also contributes to search engine optimization, as search engines like Google, Bing, and others "reward" metadata published in formats compatible with the schema.org recommendations.
+
 
 ## Preparing your video
 
-Recommendations
+Before you document a video recording, we suggest you take some time preparing the materials. This includes getting a link to an embedded version, and obtaining a transcript of the text.
 
-- **Embedded version**. To be embedded, a video must be hosted on a video sharing platform like Youtube (www.youtube.com). To obtain the “embed link” from youtube, click on the “Share” button, then “Embed”. In the result box, select the content of the element "src =".
+- **Embedded version**. To be embedded in a NADA catalog, a video must be hosted on a video sharing platform like Youtube (www.youtube.com). To obtain the “embed link” from youtube, click on the “Share” button, then “Embed”. In the result box, select the content of the element "src =".
 
 ![image](https://user-images.githubusercontent.com/35276300/216690631-1dbd98ff-97e0-4f25-8acf-b7417dc3c6de.png)
 
-- **Get transcript**. Videos typically come with limited metadata. To make them more discoverable, a transcription of the video content can be generated, stored, and indexed in the catalog. The metadata schema we propose includes an element transcription that can store transcriptions (and possibly their automatically-generated translations) in the video metadata. Word embedding models and topic models can be applied to the transcriptions to further augment the metadata. This will significantly increase the discoverability of the resource, and offer the possibility to apply semantic searchability on video metadata.
+- **Get transcript**. Videos usually have limited metadata. To enhance their discoverability, a transcription of the video content can be generated, stored, and indexed in the catalog. Our proposed metadata schema includes a transcription element that can store transcriptions (and possibly their automatically-generated translations) in the video metadata. Word embedding models and topic models can be applied to the transcriptions to further enhance the metadata. This will significantly increase the discoverability of the resource and offer the possibility of applying semantic searchability on video metadata.
 
-Machine learning speech-to-text solutions are available (although not for all languages) to automatically generate transcriptions at a low cost. This includes commercial applications like Microsoft Azure’s , Google Cloud, Amazon Transcribe, or IBM Watson. Open source solutions in Python also exist.
+Machine learning speech-to-text solutions are available (although not for all languages) to automatically generate transcriptions at a low cost. This includes commercial applications like openAI's Whisper, Microsoft Azure, Google Cloud, or Amazon Transcribe. Open source solutions in Python also exist.
 
-Transcriptions of videos published on Youtube are available on-line (the example below was extracted from https://www.youtube.com/watch?v=Axs8NPVYmms).
+Transcriptions of videos published on YouTube are available online (the example below was extracted from https://www.youtube.com/watch?v=Axs8NPVYmms).
 
 ![image](https://user-images.githubusercontent.com/35276300/216690359-71acc69b-8072-425e-8c18-bda307f49482.png)
 
-Note that some care must be taken when adding automatic speech transcriptions into your metadata, as the transcriptions are not always perfect and may return unexpected results. This will be the case when the sound quality is low, or when the video includes sections in an unknown language (see the example below, of a video in English that includes a brief segmnent in Somali; the speech-to-text algorithm may in such case attempt to transcribe text it does not recognize, returning invalid information).
+Note that some care must be taken when adding automatic speech transcriptions to your metadata, as the transcriptions are not always perfect and may yield unexpected results. This is especially true when the sound quality is poor, or when the video contains segments in an unfamiliar language (as in the example we present below, where the video is in English but includes a brief segment in Somali; the speech-to-text algorithm may try to transcribe unrecognized text, resulting in inaccurate information).
 
-## Creating a new project
 
-From the Project page, click on "Create new project". When prompted, select "Video".
-![image](https://user-images.githubusercontent.com/35276300/216628250-5427e25d-6064-4b27-9c32-ac5edca22f50.png)
+## Documenting the video
 
-The default template is activated. If you need to change the template, select "Switch template".
-[image]
+Once you have all materials ready, you can document your video by creating a new project of type "Video". 
 
-We describe the documentation process with an example. 
-Video used as example: Somalia: Guterres in Mogadishu (available on YouTube at https://www.youtube.com/watch?v=7Aif1xjstws)
+We describe the documentation process with an example of a video available on youtube: "Somalia: Guterres in Mogadishu" (available at https://www.youtube.com/watch?v=7Aif1xjstws)
+
 ![video_somalia](https://user-images.githubusercontent.com/35276300/216694636-c629b6f1-e775-44cc-a2ad-bdf9386ce317.JPG)
 
-An image is used as thumbnail (in a NADA catalog). 
-[image]
+A screenshot of a frame of the video can be used as thumbnail.  
 
-Enter the metadata. Be as complete as you can.
+Then enter as much metadata as possible, including the edited transcript.
 
 ![image](https://user-images.githubusercontent.com/35276300/216693842-a80255ff-c67a-4909-983b-f86096695d24.png)
 
-Add external resources. The video should be embedded somewhere. Otherwise, put the file.
-Can repeat the link that was provided in the metadata.
+Add a link to the video as an external resources. If your project page shows no validation error, you are ready to publish the video metadata in your catalog. In NADA, videos will appear in a specific tab "Video". If you have provided an embedded link in the metadata, the NADA catalog will provide the possibility to view the video in the NADA page itself. 
 
-SAVE.
-
-All complete. No validation error.
-[image]
-
-Saving the metadata:
-JSON
-
-The metadata can now be published in a NADA catalog. 
-
-![image](https://user-images.githubusercontent.com/35276300/216690847-08d5c82d-b66c-4e2e-9aef-43cb2b9c4192.png)
-
+![image](https://user-images.githubusercontent.com/35276300/234133046-43ad87d0-2c66-4f51-b3f5-80e7ac78822c.png)
