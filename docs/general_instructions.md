@@ -17,15 +17,27 @@ The page contains 6 main elements:
 5. A summary of the project validation, where warnings and validation errors will be reported
 6. A block (empty when the project is created) where additional information on the project will be displayed.
 
+
+### Project title
+
 The **project title** will only be shown after you enter a title for your project in the metadata entry form.
 
+
+### Navigation bar
+
 The **navigation bar** list the sections and elements included in the selected metadata template. You will use this bar to navigate the varioous pages of the metadata entry forms.
+
+
+### Project thumbnail
 
 The **project thumbnail** is an image that you may (optional) select to be used as thumbnail in a NADA catalog. It can for example be the logo of a survey (for microdata), the cover page of a publication (for documents), a low-resolution version of a photo (for an image), a screenshot of an image of a video, etc. The thumbnail must be an image file in JPG or PNG format. To add or replace a thumbnail, click on "Change image" and select an image file. Pay attention to the size (proportions) of the image; keep in mind that it will be used as a thumbnail in a catalog. You may for example chose to make all thumbnail square. 
 
 ![image](https://user-images.githubusercontent.com/35276300/233796909-1d465b5d-2a63-4171-a35a-a42c595f2268.png)
 
 ![image](https://user-images.githubusercontent.com/35276300/233796889-bdcd8d1e-ff14-4d2a-be09-1ab5c99cd68d.png)
+
+
+### Metadata template
 
 The **metadata template** in a new project page will be the default template for the selected data type (see the *Template manager* section for information on how to create, edit, and import templates, and how to set a template as the default one). If you want to use a template other than the default one, click on "Switch template" and select the one to be used. The navigation bar will immediately reflect the new selection. You can only select among available templates for the selected data type. Note that you may change the template of a project at any time (it does not have to be done at the time the project is created). When you change the template of an existing project, the information already entered using a different template will not be deleted if the new template excludes a metadata element that had bee used previously. The templates are only used for the purpose of generating the metadata entry forms. 
 
