@@ -2,13 +2,17 @@
 
 The approach to document a resource using the Metadata Editor is very much standard across data types. The process consists of creating a new project, selecting a metadata template (a customized selection of the metadata elements to be used to document the resource), entering all available information in metadata entry forms, then saving the metadata and/or publishing it in a catalog. Although the templates are specific to each data type (as each data type makes use of a different metadata standard), their looka nd feel will be similar across data types. Some features of the Metadata Editor are however specific to some data types. Microdata in particular requires some additional functionalities, as much of the metadata to be generated is imported from data files. We present here the core components of the Metadata Editor that are common to all data types. The following sections of the User Guide will provide instructions and recommendations that are specific to each data type.
 
-## Creating a new project
+## Creating or editing a project
 
-A *project* consists of a catalog entry of any type supported by the Metadata Editor. It can be a microdataset (from a census, as survey, or other), a database, an indicator or time series, a geographic daatset or service, a document, a statistical table, an image, a video, or a research project. To create a new project, click on "Create new project" in the **Projects** and, when prompted, select the project type. A new project home page will be displayed. This new project page will be the same for all data types, except for the Template being shown, which will be specific to the selected data type.  
+A *project* consists of a catalog entry of any type supported by the Metadata Editor. It can be a microdataset (from a census, as survey, or other), a database, an indicator or time series, a geographic daatset or service, a document, a statistical table, an image, a video, or a research project. 
+
+To **create** a new project, click on "Create new project" in the **Projects** and, when prompted, select the project type. A new project home page will be displayed. This new project page will be the same for all data types, except for the Template being shown, which will be specific to the selected data type.  
 
 ![image](https://user-images.githubusercontent.com/35276300/234024941-e6221556-2cc6-493d-96f0-87a276dcca25.png)
 
-The page contains 6 main elements:
+To **edit** an existing project, just click on the project title in the "Projects" page, and you will have access to the exact same page as when you create a new project.
+
+The Project home page contains 6 main elements:
 
 1. The project title 
 2. The navigation bar 
