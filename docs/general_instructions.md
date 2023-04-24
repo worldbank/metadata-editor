@@ -1,4 +1,4 @@
-## General instructions
+# General instructions
 
 The process of documenting a resource using the Metadata Editor follows a standard approach across data types. It involves creating a new project, selecting a metadata template (a customized selection of metadata elements used to document the resource), entering all available information in metadata entry forms, and then saving or publishing the metadata in a catalog. Although the templates are specific to each data type (as each data type uses a different metadata standard), their appearance will be similar across data types. However, some features of the Metadata Editor are specific to certain data types. Microdata, in particular, requires additional functionalities, as much of the metadata to be generated is imported from data files. This section presents the core components of the Metadata Editor that are common to all data types. The User Guide's following sections will provide specific instructions and recommendations for each data type.
 
