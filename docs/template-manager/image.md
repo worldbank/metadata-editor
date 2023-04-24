@@ -27,15 +27,13 @@ To document a new image, click on "Create new project" in the Project page and s
 
 ![image](https://user-images.githubusercontent.com/35276300/216628250-5427e25d-6064-4b27-9c32-ac5edca22f50.png)
 
-
 An image usually has limited metadata, such as the date it was generated or the name of the author/photographer, which is useful but not very relevant when indexed in a catalog with semantic search capability. Ideally, the metadata should include a description of the content and location of the image. A title or caption provided by the image producer or curator is highly valuable, but additional information can be generated to enhance the metadata. If the GPS location of a photo is known, it can be used to extract information on the geographic area where the photo was taken (country/province/town/locality). Machine learning tools can also be used to automatically generate labels describing the contents of the image, which can be stored as keywords in the image metadata. While these solutions are powerful, they are not perfect, and should be used as a supplement to human curation, rather than a replacement. 
-
 
 We describe this process with an example. We selected an image from the World Bank Flickr collection. The image is available at [https://www.flickr.com/photos/worldbank/8120361619/in/album-72157648790716931/](https://www.flickr.com/photos/worldbank/1129045136/in/album-72157608066422023/)
 
 ![image](https://user-images.githubusercontent.com/35276300/216649118-10c7030f-ff77-4782-a04e-875ceadc58bb.png)
 
-Some metadata is provided with the photo. Enter all available metadata in the appropriate metadata fields.
+Some metadata is provided with the photo, including tags (which may be captured as "keywords", a brief description, and information on the geographic location. All this information should be entered in the appropriate metadata fields available in the selected template.
 
 ![image](https://user-images.githubusercontent.com/35276300/216649278-fd13571a-7cd5-4970-b684-b0c04e4f2a1d.png)
 
@@ -44,16 +42,15 @@ Some metadata is provided with the photo. Enter all available metadata in the ap
 ![image](https://user-images.githubusercontent.com/35276300/216682630-8feb34dc-5b6c-4547-b875-6019440f6a52.png)
 
 You may use a low resolution JPG copy of the image as thumbnail. 
-The image itself (low resolution) will be used as thumbnail (in a NADA catalog). 
 
-To generate labels for the image, which may be stored as keywords, you may use an AI application like Google Vision:
+To suggest labels to be used as keywords to describe the image, you may also use an AI application like Google Vision:
 https://cloud.google.com/vision
 
 ![image](https://user-images.githubusercontent.com/35276300/216649741-a3ea08ed-d30d-4f53-8824-28b54a980d42.png)
 
 ![image](https://user-images.githubusercontent.com/35276300/216650120-5c5146c8-7e2d-4b12-b07e-eb25121f2095.png)
 
-The labels that will be returned will not always be accurate. You will have to select the ones you consider relevant. And of course, you may add your own labels.
+The labels that will be returned will not always be accurate. The results for the image we use as an example are mostly irrelevant; in many cases however, the AI tool will provide useful suggestions. But you will always have to inspect them and select the ones you consider relevant. And you are of course not limited to labels suggested by an AI application. You may enter your own.
 
 ![image](https://user-images.githubusercontent.com/35276300/216650257-1ebf6baf-494d-4391-b87e-aefc03187b7d.png)
 
