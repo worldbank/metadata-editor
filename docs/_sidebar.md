@@ -36,6 +36,10 @@
 
     * [Publish metadata](publish.md)
    
+* The Metadata Editor API
+
+   * [Using the API](ME_API.md)
+   
 * For developers and translators
 
     * [Developers](developers.md)
