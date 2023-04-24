@@ -96,5 +96,5 @@ The information you enter in metadata entry pages are saved automatically (with 
 
 ![image](https://user-images.githubusercontent.com/35276300/234041377-0705c7a0-e5ca-45f8-9e3e-dadc5ba0a5dd.png)
 
-The **Project** main menu item also provides you with an option to generate a PDF copy of the metadata for your project, and to publish your metadata in a NADA catalog (if you have such a catalog and have credentials as catalog administrator).
+The **Project** main menu item also provides you with an option to generate a PDF copy of the metadata for your project, and to publish your metadata in a NADA catalog (if you have such a catalog and have credentials as catalog administrator; see section "Publishing metadata" for more information).
 
