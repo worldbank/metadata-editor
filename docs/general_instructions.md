@@ -76,16 +76,25 @@ Some elements are "composite elements", i.e. they are made of more than one fiel
 ![image](https://user-images.githubusercontent.com/35276300/234033852-ee6537f4-0c2a-4099-ad43-b86dbe79fe85.png)
 ![image](https://user-images.githubusercontent.com/35276300/234034226-6e71146e-8bab-4136-8bd4-ec5d9c401352.png)
 
-This functionality may be very handy for some elements, like *keywords*. Here is an example of how it could be used in combination with an external application. Suppose you are documenting an indicator " 
+This functionality may be very handy for some elements, like *keywords*. Here is an example of how it could be used in combination with an external application (chatGPT in this case). Suppose you are documenting the indicator "child mortality" and want to add a series of closely related keywords to the metadata to improve the discoverability of the indicator in your on-line catalog. We can ask chatGPT to suggest a list of keywords.  
+
+![image](https://user-images.githubusercontent.com/35276300/234036928-53450137-f83a-4699-b9be-9f3e2f1f43d8.png)
+
+From the chatGPT page, you may copy the list (do not copy the whole answer - just the list of 20 keywords). Then you can paste it using the "Paste (Append)" or "Paste (Replace)" option in the Metadata Editor, and delete the keywords you may find non-relevant.
+
+![image](https://user-images.githubusercontent.com/35276300/234038095-07977207-4c6d-4083-b4b4-e811c8b998d1.png)
 
 
+In some cases, you will want to import metadata from another project. You may do so by ...
+
+![image](https://user-images.githubusercontent.com/35276300/234041042-299c7717-488f-4fc7-9661-7c5d9f993a9e.png)
+
+The Metadata Editor saves all your metadata in a JSON format. You may export the JSON file from the main menu.
 
 
-Type of elements
+The information you enter in metadata entry pages are saved automatically (with a few exceptions, like external resources) in the Metadata Editor database. If you want to save your project as a (collection of) file(s), you may generate a project package. A project package is a zip file that will contain all data, metadata, template, and external resources related to your project. This package can then be stored, shared, and reimported in the Metadata Editor. To generate such a package, click on "Export project" in the **Project** main menu item.
 
-Import
-Default values
-Save
-Export
-Publish
+![image](https://user-images.githubusercontent.com/35276300/234041377-0705c7a0-e5ca-45f8-9e3e-dadc5ba0a5dd.png)
+
+The **Project** main menu item also provides you with an option to generate a PDF copy of the metadata for your project, and to publish your metadata in a NADA catalog (if you have such a catalog and have credentials as catalog administrator).
 
