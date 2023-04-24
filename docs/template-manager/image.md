@@ -46,8 +46,6 @@ Some metadata is provided with the photo. Enter all available metadata in the ap
 You may use a low resolution JPG copy of the image as thumbnail. 
 The image itself (low resolution) will be used as thumbnail (in a NADA catalog). 
 
-[image]
-
 To generate labels for the image, which may be stored as keywords, you may use an AI application like Google Vision:
 https://cloud.google.com/vision
 
@@ -65,5 +63,4 @@ Finally, add the image file(s) or a link to the file(s) as an external resource.
 
 With this, the documentation process is complete. If there is no validation error in the Project page, the image is ready to be published in the NADA catalog.
 
-[image]
 
