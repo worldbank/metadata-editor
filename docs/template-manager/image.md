@@ -24,6 +24,7 @@ Extract information from the EXIF metadata if available. Modern digital cameras 
 ## Documenting an image
 
 To document a new image, click on "Create new project" in the Project page and select "Image" when prompted. A new project page will open with the default template which you can change if needed by clicking "Switch template". To edit an image, find and click on the image title in the list in the Projects page.
+
 ![image](https://user-images.githubusercontent.com/35276300/216628250-5427e25d-6064-4b27-9c32-ac5edca22f50.png)
 
 
@@ -31,29 +32,38 @@ An image usually has limited metadata, such as the date it was generated or the 
 
 
 We describe this process with an example. We selected an image from the World Bank Flickr collection. The image is available at [https://www.flickr.com/photos/worldbank/8120361619/in/album-72157648790716931/](https://www.flickr.com/photos/worldbank/1129045136/in/album-72157608066422023/)
+
 ![image](https://user-images.githubusercontent.com/35276300/216649118-10c7030f-ff77-4782-a04e-875ceadc58bb.png)
 
 Some metadata is provided with the photo. Enter all available metadata in the appropriate metadata fields.
+
 ![image](https://user-images.githubusercontent.com/35276300/216649278-fd13571a-7cd5-4970-b684-b0c04e4f2a1d.png)
+
 ![image](https://user-images.githubusercontent.com/35276300/216649380-2ed6da5d-0795-4c67-862c-39e852cfb8ef.png)
+
 ![image](https://user-images.githubusercontent.com/35276300/216682630-8feb34dc-5b6c-4547-b875-6019440f6a52.png)
 
 You may use a low resolution JPG copy of the image as thumbnail. 
 The image itself (low resolution) will be used as thumbnail (in a NADA catalog). 
+
 [image]
 
 To generate labels for the image, which may be stored as keywords, you may use an AI application like Google Vision:
 https://cloud.google.com/vision
+
 ![image](https://user-images.githubusercontent.com/35276300/216649741-a3ea08ed-d30d-4f53-8824-28b54a980d42.png)
 
 ![image](https://user-images.githubusercontent.com/35276300/216650120-5c5146c8-7e2d-4b12-b07e-eb25121f2095.png)
 
 The labels that will be returned will not always be accurate. You will have to select the ones you consider relevant. And of course, you may add your own labels.
+
 ![image](https://user-images.githubusercontent.com/35276300/216650257-1ebf6baf-494d-4391-b87e-aefc03187b7d.png)
 
 Finally, add the image file(s) or a link to the file(s) as an external resource. The World Bank image we use as example is available in multiple resolutions. We assume that we want to only provide access to the small, medium and original version of the image available in our NADA catalog.
+
 ![image](https://user-images.githubusercontent.com/35276300/216649633-3b6274df-ec3e-4cf0-85a8-59f656f29222.png)
 
 With this, the documentation process is complete. If there is no validation error in the Project page, the image is ready to be published in the NADA catalog.
+
 [image]
 
