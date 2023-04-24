@@ -6,26 +6,41 @@ The process of documenting a resource using the Metadata Editor follows a standa
 
 A *project* in the Metadata Editor is a catalog entry that can represent any type of data. It can be a microdataset (from a census or survey), a database, an indicator or time series, a geographic dataset or service, a document, a statistical table, an image, a video, or a research project.
 
-To **create** a new project, click on "Create new project" in the Projects section, and then select the project type when prompted. A new project homepage will be displayed, which is the same for all data types except for the specific template displayed based on the selected data type.
+To **create** a new project, click on "Create new project" in the Projects section, and then select the project type when prompted. 
 
-![image](https://user-images.githubusercontent.com/35276300/234024941-e6221556-2cc6-493d-96f0-87a276dcca25.png)
+![image](https://user-images.githubusercontent.com/35276300/234115577-1623cf4b-8fb5-4b7a-8a5e-cbf5acd497a0.png)
+
+A project homepage will be displayed, which is the same for all data types except for the specific template displayed based on the selected data type.
+
+To **edit** an existing project, click on the project title in the "Projects" page, and you will have access to the same page as when you create a new project. If the project is not in your list but is available as a Metadata Editor zip package or as a metadata file (XML or JSON) compliant with one the the metadata standards supported by the Editor, click on **Import** and select the project file (the type of project will automatically be detected by the application).
+
+![image](https://user-images.githubusercontent.com/35276300/234115238-5a1819e7-3ab1-4246-aa78-243ccd2ed484.png)
+
+The Project homepage contains 8 main elements:
+
+1. The Metadata Editor home page 
+2. The project title
+3. The application's main menu
+4. The navigation bar
+5. The project thumbnail
+6. The metadata template identification and selection
+7. A summary of the project validation, where warnings and validation errors will be reported
+8. A block (empty when a new project is created) where additional information about the project will be displayed.
 
 
-To **edit** an existing project, click on the project title on the "Projects" page, and you will have access to the same page as when you create a new project.
+### Metadata Editor home page
 
-The Project homepage contains six main elements:
-
-1. The project title
-2. The navigation bar
-3. The project thumbnail
-4. The metadata template identification and selection
-5. A summary of the project validation, where warnings and validation errors will be reported
-6. A block (empty whne a new project is created) where additional information about the project will be displayed.
+The application's home page is also referred to as the "Projects page". This page will list all projects you have access to.
 
 
 ### Project title
 
 The **project title** will be displayed only after you enter a title for your project in the metadata entry form.
+
+
+### Main menu
+
+The main menu provides access to the commands that are common to all data types. It also includes the user login/logout page, where you have the option to edit your profile. 
 
 
 ### Navigation bar
