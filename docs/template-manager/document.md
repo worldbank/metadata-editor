@@ -39,8 +39,7 @@ The Metadata Editor also makes use of the Dublin Core metadata standard to docum
 From the Project page, click on "Create new project". When prompted, select "Document".
 ![image](https://user-images.githubusercontent.com/35276300/216628250-5427e25d-6064-4b27-9c32-ac5edca22f50.png)
 
-The default template is activated. If you need to change the template, select "Switch template".
-![image](https://user-images.githubusercontent.com/35276300/216628394-6ddaae2d-3a08-4f4b-b0f5-75560386ebab.png)
+
 
 We describe the documentation process with an example. This document is the World Bank Policy Working Paper No 9412, titled “Predicting Food Crises” published in September 2020 under a CC-By 4.0 license. The list of authors is provided on the cover page; an abstract, a list of acknowledgments, and a list of keywords are also provided.
 
@@ -71,9 +70,4 @@ Options: RDF and JSON.
 The metadata can be published in a NADA catalog. 
 ![image](https://user-images.githubusercontent.com/35276300/216627755-eab6373f-eaf1-430c-b891-2a591863dfe4.png)
 
-
-
-
-
-## Editing a project
 

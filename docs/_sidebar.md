@@ -20,6 +20,7 @@
 
 * Documenting data
 
+    * [Common principles](general_instructions.md)
     * [Microdata](template-manager/microdata.md)
     * [Document](template-manager/document.md)
     * [Database](template-manager/database.md)
@@ -34,6 +35,14 @@
 * Publishing data and metadata 
 
     * [Publish metadata](publish.md)
+   
+* Tools for administrators
+
+   * [Administrator toolset](admin_tools.md)  
+   
+* The Metadata Editor API
+
+   * [Using the API](ME_API.md)
    
 * For developers and translators
 
