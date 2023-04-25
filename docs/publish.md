@@ -43,7 +43,7 @@ To publish your project in NADA:
 
 - **Overwrite if already exists**: Select "Yes" if you want the project to overwrite the project if it has been previously published in the catalog. Note that a project will be considered as being the same **if it has the same unique identifier**. It is thus critical to ensure that you give your projects proper identifiers. 
 - **Publish**: An entry in NADA can have two statuses: *Published* or *Draft*. If you select *Draft*, the project will be published in NADA but only visible to the catalog administrator (not to visitors). Use this option if you want the NADA administrator to review the content before it is made visible to all. If you select option *Publish*, the entry will be visible to all users who have access to the catalog. 
-- **Data access**: This option only applies when your project has external resources declared as "Microdata" or "Database". In such case, NADA will apply a dissemination policy that depends on the type of data access you select here. The access types are:
+- **Data access**: This option only applies when a project --of any type-- has one or multiple external resource(s) declared as "Microdata" or "Database". In such case, NADA will apply a dissemination policy that depends on the type of data access you select here. The access types are:
    - Open access: Data are published and available for download under an open license
    - Direct access: Data are available for download, but are not shared under an open licese (some restrictions to the data use apply)
    - Public use files: interested users will need to register to the NADA catalog to obtain access
