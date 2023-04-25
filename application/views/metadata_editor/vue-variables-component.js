@@ -414,54 +414,8 @@ Vue.component('variables', {
             }
 
             return classes.join(' ');
-        },
-        /*refreshSummaryStats: async function()
-        {
-            if (this.selectedVariables.length==0){
-                alert("Please select one or more variables to refresh summary statistics");
-                return;
-            }
-
-            let wgt_vars=[];
-            for (let i=0;i<this.selectedVariables.length;i++){
-                if (this.selectedVariables[i].var_wgt_id){
-                    wgt_vars.push({
-                        'weight_field':this.getVariableNameByUID(this.selectedVariables[i].var_wgt_id),
-                        'field':this.selectedVariables[i].name
-                    });
-                }
-            }
-
-            if (!confirm("Are you sure you want to import summary statistics? This will overwrite any existing summary statistics.")){
-                return;
-            }
-
-            this.summaryStatsDialog={
-                show:true,
-                title:'Refresh summary stats',
-                loading_message:'Please wait while the summary statistics are being imported...',                
-                message_success:'',
-                message_error:'',
-                is_loading:true
-            }
-
-            try{
-                let result=await this.$store.dispatch('importVariableSummaryStatistics',{
-                    file_id:this.fid,
-                    var_names:this.variableSelectedNames(),
-                    weights:wgt_vars
-                });
-                console.log("updated variables stats",result);
-                this.summaryStatsDialog.is_loading=false;
-                this.summaryStatsDialog.message_success="Summary statistics imported successfully";
-                vm.reloadVariables();
-            }catch(e){
-                console.log("failed",e);
-                this.summaryStatsDialog.is_loading=false;
-                this.summaryStatsDialog.message_error="Failed to import summary statistics: "+e.response.data.message;
-            }
-        },*/
-        refreshSummaryStats: async function(file_id){
+        },        
+        refreshSummaryStats: async function(){
 
             if (!confirm("Are you sure you want to import summary statistics for this file? This will overwrite any existing summary statistics.")){
                 return;
@@ -469,55 +423,51 @@ Vue.component('variables', {
 
             this.summaryStatsDialog={
                 show:true,
-                title:'Refresh summary stats',
-                loading_message:'Please wait while the summary statistics are being imported...',                
+                title:'Summary statistics',
+                loading_message:'Please wait while the summary statistics are being imported...',     
                 message_success:'',
                 message_error:'',
                 is_loading:true
             }
-            
+
             try{
-                let result=await this.$store.dispatch('importDataFileSummaryStatistics',{file_id:this.fid});
-                console.log("updated",result);
-                this.summaryStatsDialog.is_loading=false;
-                this.summaryStatsDialog.message_success="Summary statistics imported successfully";                
+                let result=await this.$store.dispatch('importDataFileSummaryStatisticsQueue',{file_id:this.fid});
+                console.log("sumstats queued",result);
+                this.importSummaryStatisticsQueueStatusCheck(this.fid,result.data.job_id);
             }catch(e){
                 console.log("failed",e);
                 this.summaryStatsDialog.is_loading=false;
                 this.summaryStatsDialog.message_error="Failed to import summary statistics: "+e.response.data.message;
             }
         },
-        /*reloadVariables: function()
-        {
-            let formData = {
-                "var_names":this.variableSelectedNames()
-            }
-
-            vm=this;
-            let url=CI.base_url + '/api/variables_by_name/'+this.ProjectID + '/' + this.fid;
-            
-            axios.post(url, formData,{
-                headers: {
-                    'Content-Type': 'application/json'
-                    }
-            }).then(function(response) {
-                if (response.data.variables){
-                    vm.replaceVariableMetadata(response.data.variables);
+        importSummaryStatisticsQueueStatusCheck: async function(file_id,job_id){
+            this.summaryStatsDialog.is_loading=true;
+            this.summaryStatsDialog.loading_message="Please wait while the summary statistics are being imported...";
+            try{
+                await this.sleep(5000);
+                let result=await this.$store.dispatch('importDataFileSummaryStatisticsQueueStatusCheck',{file_id:file_id, job_id:job_id});
+                console.log("job updated",result);
+                                
+                if (result.data.job_status!=='done'){
+                    this.importSummaryStatisticsQueueStatusCheck(file_id,job_id);
+                }else if (result.data.job_status==='done'){
+                    await this.reloadDataFileVariables();
+                    this.summaryStatsDialog.is_loading=false;
+                    this.summaryStatsDialog.message_success="Summary statistics imported successfully";                
                 }
-            })
-            .catch(function(response) {
-                alert("Error reloadVariables");
-                console.log("reloadVariables error",response);
-            });
+                
+            }catch(e){
+                console.log("failed",e);
+                this.summaryStatsDialog.is_loading=false;
+                this.summaryStatsDialog.message_error="Failed to import summary statistics: "+e.response.data.message;
+            }
         },
-        replaceVariableMetadata: function(variables)
-        {       
-            let vm=this;     
-            variables.forEach((variable_md) => {
-                let var_idx=vm.getVariableIndexByUID(variable_md.uid);
-                Vue.set (vm.variables, var_idx, variable_md);
-            });
-        },*/
+        reloadDataFileVariables: async function(){
+            return await this.$store.dispatch('loadVariables',{dataset_id:this.ProjectID, fid:this.fid});
+        },
+        sleep: function(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        },
         getVariableNameByUID: function(uid)
         {
             let variable=this.getVariableByUID(uid);

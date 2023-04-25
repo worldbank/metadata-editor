@@ -135,6 +135,57 @@ class DataUtils
 		return $response;
 	}
 
+	/**
+	 * 
+	 * 
+	 *  $options - array of options
+	 * 	- var_names - array of variable names
+	 *  - weights - array of weights [weight_field, field]
+	 * 
+	 */
+	public function generate_summary_stats_queue($datafile_path, $options)
+	{
+		$client = new Client([
+			'base_uri' => $this->DataApiUrl.'data-dictionary-queue'
+		]);
+
+		//$options['weights'][]=['weight_field'=>'a3_1','field'=>'a1'];
+
+		$request_body=$options;		
+		$request_body["file_path"]=realpath($datafile_path);
+			
+		$api_response = $client->request('POST', '', [
+			'json' => 
+				$request_body
+			,
+			['debug' => false]
+		]);
+
+		$response=json_decode($api_response->getBody()->getContents(),true);
+		return [
+			'response'=>$response,
+			'status_code'=>$api_response->getStatusCode() //e.g. 200
+		];
+	}
+
+	//get summary stats queue job status
+	public function get_job_status($job_id)
+	{
+		$client = new Client([
+			'base_uri' => $this->DataApiUrl.'jobs/'.$job_id
+		]);
+			
+		$api_response = $client->request('GET', '', [
+			['debug' => false]
+		]);
+
+		$response=json_decode($api_response->getBody()->getContents(),true);
+		return [
+			'response'=>$response,
+			'status_code'=>$api_response->getStatusCode() //e.g. 200
+		];
+	}
+
 
 	public function generate_csv($datafile_path)
 	{
@@ -155,6 +206,31 @@ class DataUtils
 
 		$response=json_decode($api_response->getBody()->getContents(),true);
 		return $response;
+	}
+
+
+	public function generate_csv_queue($datafile_path)
+	{
+		$client = new Client([
+			'base_uri' => $this->DataApiUrl.'generate-csv-queue'
+		]);
+		
+		$request_body=[
+			"file_path"=> realpath($datafile_path)
+		];
+			
+		$api_response = $client->request('POST', '', [
+			'json' => 
+				$request_body
+			,
+			['debug' => false]
+		]);
+
+		$response=json_decode($api_response->getBody()->getContents(),true);
+		return [
+			'response'=>$response,
+			'status_code'=>$api_response->getStatusCode() //e.g. 200
+		];
 	}
 
 

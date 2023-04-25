@@ -179,15 +179,51 @@ Vue.component('datafiles', {
             this.dialog.title="Summary statistics";
             this.dialog.loading_message="Please wait while the summary statistics are being imported...";
             try{
-                let result=await this.$store.dispatch('importDataFileSummaryStatistics',{file_id:file_id});
+                let result=await this.$store.dispatch('importDataFileSummaryStatisticsQueue',{file_id:file_id});
                 console.log("updated",result);
-                this.dialog.is_loading=false;
-                this.dialog.message_success="Summary statistics imported successfully";                
+                this.dialog.loading_message="Queued for import..." + result.data.message;
+                this.importSummaryStatisticsQueueStatusCheck(file_id,result.data.job_id);
             }catch(e){
                 console.log("failed",e);
                 this.dialog.is_loading=false;
                 this.dialog.message_error="Failed to import summary statistics: "+e.response.data.message;
             }
+        },
+        importSummaryStatisticsQueueStatusCheck: async function(file_id,job_id){
+
+            this.dialog={
+                show:true,
+                title:'',
+                loading_message:'',
+                message_success:'',
+                message_error:'',
+                is_loading:false
+            }
+
+            this.dialog.is_loading=true;
+            this.dialog.title="Summary statistics job status";
+            this.dialog.loading_message="Please wait while the summary statistics are being imported...";
+            try{
+                await this.sleep(5000);
+                let result=await this.$store.dispatch('importDataFileSummaryStatisticsQueueStatusCheck',{file_id:file_id, job_id:job_id});
+                console.log("job updated",result);
+                this.dialog.is_loading=true;
+                this.dialog.loading_message="Job status: " + result.data.job_status;
+                if (result.data.job_status!=='done'){
+                    this.importSummaryStatisticsQueueStatusCheck(file_id,job_id);
+                }else if (result.data.job_status==='done'){
+                    this.dialog.is_loading=false;
+                    this.dialog.message_success="Summary statistics imported successfully";                
+                }
+                
+            }catch(e){
+                console.log("failed",e);
+                this.dialog.is_loading=false;
+                this.dialog.message_error="Failed to import summary statistics: "+e.response.data.message;
+            }
+        },
+        sleep: function(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
         },
         generateCSV: async function(file_id){
 
@@ -205,14 +241,46 @@ Vue.component('datafiles', {
             }
 
             try{
-                let result=await this.$store.dispatch('generateCSV',{file_id:file_id});
+                let result=await this.$store.dispatch('generateCsvQueue',{file_id:file_id});
                 console.log("updated",result);
-                this.dialog.is_loading=false;
-                this.dialog.message_success="CSV file generated successfully";                
+                this.generateCsvQueueStatusCheck(file_id,result.data.job_id);
             }catch(e){
                 console.log("failed",e);
                 this.dialog.is_loading=false;
                 this.dialog.message_error="Failed to generate CSV file: "+e.response.data.message;                
+            }
+        },
+        generateCsvQueueStatusCheck: async function(file_id,job_id){
+
+            this.dialog={
+                show:true,
+                title:'',
+                loading_message:'',
+                message_success:'',
+                message_error:'',
+                is_loading:false
+            }
+
+            this.dialog.is_loading=true;
+            this.dialog.title="Generate CSV file";
+            this.dialog.loading_message="Please wait while the CSV file is being generated...";
+            try{
+                await this.sleep(5000);
+                let result=await this.$store.dispatch('generateCsvQueueStatusCheck',{file_id:file_id, job_id:job_id});
+                console.log("csv updated",result);
+                this.dialog.is_loading=true;
+                this.dialog.loading_message="Job status: " + result.data.job_status;
+                if (result.data.job_status!=='done'){
+                    this.generateCsvQueueStatusCheck(file_id,job_id);
+                }else if (result.data.job_status==='done'){
+                    this.dialog.is_loading=false;
+                    this.dialog.message_success="Finished generating CSV file";                
+                }
+                
+            }catch(e){
+                console.log("failed",e);
+                this.dialog.is_loading=false;
+                this.dialog.message_error="Failed to generate CSV file: "+e.response.data.message;
             }
         },
         toggleFilesSelection: function()

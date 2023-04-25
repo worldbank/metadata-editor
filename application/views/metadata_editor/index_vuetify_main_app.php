@@ -602,8 +602,20 @@
                 {
                     let url=CI.base_url + '/api/data/generate_summary_stats/'+getters.getProjectID + '/' + options.file_id;                    
                     let resp = await axios.get(url);
-                    return resp;                
+                    return resp;
                 },
+                async importDataFileSummaryStatisticsQueue({commit,getters}, options)
+                {
+                    let url=CI.base_url + '/api/data/generate_summary_stats_queue/'+getters.getProjectID + '/' + options.file_id;                    
+                    let resp = await axios.get(url);
+                    return resp;
+                },
+                async importDataFileSummaryStatisticsQueueStatusCheck({commit,getters}, options)
+                {
+                    let url=CI.base_url + '/api/data/summary_stats_queue_status/'+getters.getProjectID + '/' + options.file_id + '/' +  options.job_id;
+                    let resp = await axios.get(url);
+                    return resp;
+                },                 
                 //generate and import variable summary statistics for a selected variables
                 async importVariableSummaryStatistics({commit,getters}, options)
                 {
@@ -616,12 +628,18 @@
                     let resp = await axios.post(url,formData);
                     return resp;                
                 },
-                async generateCSV({commit,getters}, options)
+                async generateCsvQueue({commit,getters}, options)
                 {
-                    let url=CI.base_url + '/api/data/generate_csv/'+getters.getProjectID + '/' + options.file_id;                    
+                    let url=CI.base_url + '/api/data/generate_csv_queue/'+getters.getProjectID + '/' + options.file_id;
                     let resp = await axios.get(url);
                     return resp;                
-                }                
+                },
+                async generateCsvQueueStatusCheck({commit,getters}, options)
+                {
+                    let url=CI.base_url + '/api/data/generate_csv_job_status/'+getters.getProjectID + '/' + options.file_id + '/' +  options.job_id;
+                    let resp = await axios.get(url);
+                    return resp;                
+                }                 
             },
             mutations: VueDeepSet.extendMutation({
                 // other mutations

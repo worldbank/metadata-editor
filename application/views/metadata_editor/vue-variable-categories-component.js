@@ -39,7 +39,22 @@ Vue.component('variable-categories', {
             }
         },
         refreshCategories: function(){
-            alert("TODO");
+            if (!confirm("This will remove existing categories, are you sure?")){
+                return;
+            }
+
+            labels=[];
+
+            for (let i=0;i<this.variable.var_catgry.length;i++){
+                labels.push(
+                    {
+                        "value":this.variable.var_catgry[i].value,
+                        "labl":this.variable.var_catgry[i].labl
+                    }
+                )
+            }
+
+            Vue.set(this.variable, 'var_catgry_labels', labels);
         }
     },
     computed: {        
