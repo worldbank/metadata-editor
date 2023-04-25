@@ -749,20 +749,15 @@
 				"hierarchyLevel": {
 					"title": "Scope(s) / Hierarchy Level(s)",
 					"description": "List of Scope(s), or 'hierarchy level(s)'. e.g. `dataset`, `service`. Recommended code following the [ISO/TS 19139](http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MX_ScopeCode) Scope codelist.  (string)",
-					"type": "array",
-					"_xpath": "gmd:hierarchyLevel",
-					"items": {
-						"type": "string"
-					}
+					"type": "string",
+					"_xpath": "gmd:hierarchyLevel"
+					
 				},
 				"hierarchyLevelName": {
 					"title": "Scope / hierarchy level names.",
 					"description": "List of scope / hierarchy level names. Alternative to the use of 'hierarchyLevel' code items.",
-					"type": "array",
-					"_xpath": "gmd:hierarchyLevelName",
-					"items": {
-						"type": "string"
-					}
+					"type": "string",
+					"_xpath": "gmd:hierarchyLevelName"
 				},
 				"contact": {
 					"title": "Contacts",
@@ -1177,42 +1172,24 @@
 										}
 									}
 								},
-								"temporalElement": {
+								"temporalElementExtent": {
 									"type": "array",
 									"title": "Temporal extent(s)",
 									"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_TemporalExtent",
 									"items": {
 										"type": "object",
 										"properties": {
-											"extent": {
-												"TimePeriod": {
-													"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_TemporalExtent/gmd:extent/gml:TimePeriod",
-													"properties": {
-														"beginPosition": {
-															"title": "Begin time position",
-															"description": "Begin time position. Requires an extended ISO 8601 formatted combined UTC date and time string (2009-11-17T10:00:00)",
-															"type": "string",
-															"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_TemporalExtent/gmd:extent/gml:TimePeriod/gml:beginPosition"
-														},
-														"endPosition": {
-															"title": "End time position",
-															"description": "End time position. Requires an extended ISO 8601 formatted combined UTC date and time string (2009-11-17T10:00:00)",
-															"type": "string",
-															"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_TemporalExtent/gmd:extent/gml:TimePeriod/gml:endPosition"
-														}
-													}
-												},
-												"TimeInstant": {
-													"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_TemporalExtent/gmd:extent/gml:TimeInstant",
-													"properties": {
-														"timePosition": {
-															"title": "Time Position",
-															"description": "Time position. Requires an extended ISO 8601 formatted combined UTC date and time string (2009-11-17T10:00:00)",
-															"type": "string",
-															"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_TemporalExtent/gmd:extent/gml:TimeInstant/gml:timePosition"
-														}
-													}
-												}
+											"beginPosition": {
+												"title": "Begin time position",
+												"description": "Begin time position. Requires an extended ISO 8601 formatted combined UTC date and time string (2009-11-17T10:00:00)",
+												"type": "string",
+												"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_TemporalExtent/gmd:extent/gml:TimePeriod/gml:beginPosition"
+											},
+											"endPosition": {
+												"title": "End time position",
+												"description": "End time position. Requires an extended ISO 8601 formatted combined UTC date and time string (2009-11-17T10:00:00)",
+												"type": "string",
+												"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_TemporalExtent/gmd:extent/gml:TimePeriod/gml:endPosition"
 											}
 										}
 									}
