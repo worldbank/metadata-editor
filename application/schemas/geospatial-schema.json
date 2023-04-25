@@ -1164,6 +1164,20 @@
 													}
 												}
 											},
+											"geohash": {
+												"title": "Geohash",												
+												"type": "object",
+												"properties": {
+													"geohash": {
+														"title": "Geohash",
+														"type": "string"
+													},
+													"note": {
+														"title": "Note",
+														"type": "string"
+													}													
+												}
+											},
 											"geographicDescription": {
 												"title": "Geographic description identifier",
 												"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/EX_GeographicDescription/gmd:geographicIdentifier/gmd:MD_Identifier/gmd:code/gco:CharacterString",
