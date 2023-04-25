@@ -210,7 +210,7 @@ The summary statistics will now display both the unweighted and weighted values.
 
 As a last step in documenting variables, browse the variables and verify that the selected summary statistics for each variable correspond to what you want to store in your metadata. Note that means or standard deviations should not be included for categorical variables.
 
-![image](https://user-images.githubusercontent.com/35276300/233707524-17819c81-00fc-49d0-b464-6206526b3fbc.png)
+![image](https://user-images.githubusercontent.com/35276300/234379255-45de7402-3955-40ad-b68c-d750c7f00631.png)
 
 
 Once you have entered the variable-level metadata for both files, you can finalize the documentation of the dataset by documenting and attaching external resources to the survey metadata. External resources include all materials you want to make accessible to users when you publish the dataset in a catalog. This includes the microdata files, if you want to disseminate them openly or under restrictions. For our survey metadata, we will add two external resources: the Excel file that contains the questionnaire and the dataset (the two Stata files compressed as one zip file). Note that you could provide the data in more than one format, for example, you could also share a version of the files in CSV and SPSS formats for user convenience.
