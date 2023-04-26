@@ -46,7 +46,7 @@
                 <div class=" mb-5">
                     <h2>Template Manager</h2>
                     <div class="pull-right float-right">
-                      <button type="button" @click="dialog_import_template=true" class="btn btn-sm btn-outline-primary">Import Template</button>
+                      <button type="button" @click="dialog_import_template=true" class="btn btn-sm btn-outline-primary">Import template</button>
                     </div>
                 </div>
 
@@ -54,7 +54,7 @@
                   <div v-if="!templates"> There are no templates!</div>
 
                   <div v-for="(data_type_label,data_type) in data_types" class="mb-3">
-                    <h4 class="p-2">{{data_type_label}}</h4>
+                    <h4 class="p-2"><i :class="getProjectIcon(data_type)"></i> {{data_type_label}}</h4>
 
                     <table class="table table-sm table-striped border bg-white mb-5">
                       <tr class="bg-secondary">
@@ -238,10 +238,17 @@
         facet_panel: [],
         pagination_page: 1,
         dialog_create_project: false,
-        search_keywords: '',
+        search_keywords: '',        
         project_types_icons: {
-          "survey": "fas fa-database",
-          "document": "fas fa-file-alt",
+          "document": "fa fa-file-code",
+          "survey": "fa fa-database",
+          "geospatial": "fa fa-globe-americas",
+          "table": "fa fa-database",
+          "timeseries": "fa fa-chart-line",
+          "timeseries-db": "fa fa-chart-line",
+          "image": "fa fa-image",
+          "video": "fa fa-video",
+          "script": "fa fa-file-code"
         },
         dialog_import_template:false,
         dialog_import:{},
