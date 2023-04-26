@@ -455,6 +455,10 @@ class Editor_model extends CI_Model {
 
 		$options['type']=$type;
 
+		if (!isset($options['metadata'])){
+			$options['metadata']=$this->encode_metadata(array());
+		}
+
 		$this->db->insert('editor_projects',$options);
 		return $this->db->insert_id();
 	}
@@ -1370,7 +1374,7 @@ class Editor_model extends CI_Model {
 
 		$fp = fopen($output_file, 'w');
 
-		$metadata=$project['metadata'];
+		$metadata=(array)$project['metadata'];
 		$basic_info=array(
 			'type'=>$project['type']
 		);
