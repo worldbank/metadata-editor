@@ -761,7 +761,7 @@ class Editor_resource_model extends ci_model {
 		$files['external_resources']=$resources;
 
 		//data files
-		$data_files=$this->Editor_model->data_files($sid);
+		$data_files=$this->Editor_datafile_model->select_all($sid);
 
 		$data_files_by_name=array();
 		if (is_array($data_files)){

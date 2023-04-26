@@ -102,8 +102,7 @@
                               </span>
                             </td>
                             <td>
-                              <a href="#"  @click="editTemplate(template.uid)">{{template.name}}</a>
-                              <div>{{template.uid}}</div>
+                              <a href="#"  @click="editTemplate(template.uid)">{{template.name}}</a>                              
                             </td>
                             <td>{{template.lang}}</td>
                             <td>{{template.version}}</td>

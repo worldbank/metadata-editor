@@ -35,30 +35,8 @@ class Editor extends MY_Controller {
 				show_error('Project was not found');
 			}
 
-			$this->editor_acl->user_has_project_access($project['id'],$permission='edit');		
-					
-			$template_file="{$project['type']}_form_template.json";
-			$template_path='';
-			
-			//locations to look for templates
-			$template_locations=array(
-				'application/views/metadata_editor/metadata_editor_templates/custom',
-				'application/views/metadata_editor/metadata_editor_templates',
-			);
-
-			//look for template in all locations and pick the first one found
-			foreach($template_locations as $path){
-				if (file_exists($path.'/'.$template_file)){
-					$template_path=$path.'/'.$template_file;
-					break;
-				}
-			}
-			
+			$this->editor_acl->user_has_project_access($project['id'],$permission='edit');					
 			$schema_path="application/schemas/{$project['type']}-schema.json";
-
-			if(!file_exists($template_path)){
-				show_error('Template not found::'. $template_path);
-			}
 
 			if(!file_exists($schema_path)){
 				show_error('Schema not found::'. $schema_path);
@@ -78,33 +56,17 @@ class Editor extends MY_Controller {
 				}
 			}
 
-			$options['metadata_template']=file_get_contents($template_path);
-			$options['metadata_template_arr']=json_decode($options['metadata_template'],true);
+			$template=$this->get_project_template($project);
 
-			//load template
-			if (isset($project['template_uid']) && !empty($project['template_uid'])){
-				$template=$this->Editor_template_model->get_template_by_uid($project['template_uid']);
-			}
-			
-			if (empty($template)){
-				$core_templates_by_type=$this->Editor_template_model->get_core_templates_by_type($project['type']);
-				if (!$core_templates_by_type){
-					throw new Exception("Template not found for type", $project['type']);
-				}
-
-				//load default core template by type
-				$template=$this->Editor_template_model->get_template_by_uid($core_templates_by_type[0]["uid"]);
+			if (!$template){
+				show_error("Template not found for project");
 			}
 
 			$options['metadata_template']=json_encode($template);
 			$options['metadata_template_arr']=$template['template'];
-
 			$options['metadata_schema']=file_get_contents($schema_path);
 			$options['post_url']=site_url('api/editor/update/'.$project['type'].'/'.$project['id']);
-			$options['sub_section']=$this->uri->segment(6);
 
-					
-			//render
 			$content= $this->load->view('metadata_editor/index_vuetify',$options,true);
 			echo $content;
 		}
@@ -112,6 +74,47 @@ class Editor extends MY_Controller {
 			show_error($e->getMessage());
 		}
 	}
+
+
+	/***
+	 * 
+	 * Get project template or the default template for the project type
+	 * 
+	 */
+	function get_project_template($project)
+	{
+		$template=NULL;
+		
+		//load template set for the project
+		if (isset($project['template_uid']) && !empty($project['template_uid'])){
+			$template=$this->Editor_template_model->get_template_by_uid($project['template_uid']);
+		}
+
+		if (!$template){		
+			//load default template for the project type
+			$default_template=$this->Editor_template_model->get_default_template($project['type']);
+
+			if (isset($default_template['template_uid'])){
+				$template=$this->Editor_template_model->get_template_by_uid($default_template['template_uid']);
+			}
+		}
+		
+		//load core template for the project type
+		if (empty($template)){
+			$core_templates_by_type=$this->Editor_template_model->get_core_templates_by_type($project['type']);
+
+			if (!$core_templates_by_type){
+				throw new Exception("Template not found for type", $project['type']);
+			}
+
+			//load default core template by type
+			$template=$this->Editor_template_model->get_template_by_uid($core_templates_by_type[0]["uid"]);
+		}
+		
+		return $template;
+	}
+
+
 
 	function get_template_custom_parts($items,&$output)
 	{

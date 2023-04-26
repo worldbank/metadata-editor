@@ -377,7 +377,8 @@ class Editor_template_model extends ci_model {
 	function get_default_template($type)
 	{
 		$this->db->select("*");
-		return $this->db->where("data_type",$type)->row_array();
+		$this->db->where("data_type",$type);
+		return $this->db->get("editor_templates_default")->row_array();
 	}
 
 	function set_default_template($type,$template_uid)
