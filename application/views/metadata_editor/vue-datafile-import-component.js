@@ -102,9 +102,9 @@ Vue.component('datafile-import', {
                 }
 
                 //import basic metadata availabe as meta
-                this.update_status="Importing data dictionary " + this.files[fileIdx].name;
-                let import_resp=await this.importDataFile(fileIdx, fileid);
-                console.log("finished importing file",fileIdx,import_resp);
+                //this.update_status="Importing data dictionary " + this.files[fileIdx].name;
+                //let import_resp=await this.importDataFile(fileIdx, fileid);
+                //console.log("finished importing file",fileIdx,import_resp);
 
                 //import summary statistics
                 this.update_status="Generating summary statistics and frequencies " + this.files[fileIdx].name;
@@ -174,14 +174,50 @@ Vue.component('datafile-import', {
         },
         importDataFileSummaryStatistics:async function(fileIdx,file_id)
         {
-            let resp=await this.$store.dispatch('importDataFileSummaryStatistics',{file_id:file_id});
-            return resp.data;                
+            //let resp=await this.$store.dispatch('importDataFileSummaryStatistics',{file_id:file_id});
+            //return resp.data;
+
+            let result=await this.$store.dispatch('importDataFileSummaryStatisticsQueue',{file_id:file_id});
+            console.log("sumstats queued",result);
+            return await this.importSummaryStatisticsQueueStatusCheck(file_id,result.data.job_id);
+            
+        },
+        importSummaryStatisticsQueueStatusCheck: async function(file_id,job_id){
+            await this.sleep(5000);
+            let result=await this.$store.dispatch('importDataFileSummaryStatisticsQueueStatusCheck',{file_id:file_id, job_id:job_id});
+            console.log("job updated",result);
+                                
+            if (result.data.job_status!=='done'){
+                return await this.importSummaryStatisticsQueueStatusCheck(file_id,job_id);
+            }else if (result.data.job_status==='done'){
+                //await this.reloadDataFileVariables();
+                return true;
+            }                
+        },
+        sleep: function(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
         },
         generateCSV: async function(fileIdx,file_id)
         {
-            let resp=await this.$store.dispatch('generateCSV',{file_id:file_id});
-            return resp.data; 
-        }, 
+            //let resp=await this.$store.dispatch('generateCSV',{file_id:file_id});
+            //return resp.data; 
+
+            let result=await this.$store.dispatch('generateCsvQueue',{file_id:file_id});
+            console.log("updated",result);
+            let status=await this.generateCsvQueueStatusCheck(file_id,result.data.job_id);
+            return status;
+        },         
+        generateCsvQueueStatusCheck: async function(file_id,job_id){
+            await this.sleep(5000);
+            let result=await this.$store.dispatch('generateCsvQueueStatusCheck',{file_id:file_id, job_id:job_id});
+            console.log("csv updated",result);
+
+            if (result.data.job_status!=='done'){
+                return await this.generateCsvQueueStatusCheck(file_id,job_id);
+            }else if (result.data.job_status==='done'){
+                return true;
+            }                
+        },
 
         validateFilename: function(file){
             return /^[a-zA-Z0-9\.\-_ ()]*$/.test(file.name);

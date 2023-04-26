@@ -8,12 +8,35 @@ Vue.component('import-options', {
             file:'',
             update_status:'',
             errors:'',
-            is_processing:false
+            is_processing:false,
+            import_options:{
+                "survey":{
+                    'document_description':'Document description',
+                    'study_description':'Study description',
+                    'data_files':'File description',
+                    'variables':'Variable information',
+                    'variable_categories':'Variable categories',
+                    'variable_questions':'Variable questions',
+                    'variable_weights':'Variable weights',                    
+                    'variable_groups':'Variable groups'
+                }
+            },
+            import_options_selected:[]
         }
     },
     created: async function(){
+        this.defaultOptionsSelection();
     },
     methods:{
+        defaultOptionsSelection: function(){
+            this.import_options_selected=[];
+            if (this.import_options[this.ProjectType]){
+                for (let opt in this.import_options[this.ProjectType]){
+                    console.log(opt);
+                    this.import_options_selected.push(opt);
+                }
+            }
+        },
         importDDI: function(){
             let formData = new FormData();
             formData.append('file', this.file);
@@ -32,11 +55,14 @@ Vue.component('import-options', {
             ).then(function(response){
                 vm.$store.dispatch('loadProject',{dataset_id:vm.ProjectID});
                 vm.$store.dispatch('initData',{dataset_id:vm.ProjectID});
-                router.push('/study/study_description');
+                router.push('/study/study_desc');
             })
             .catch(function(response){
                 vm.errors=response;
             }); 
+        },
+        onCancel: function(){
+            router.push('/study/study_desc');
         },
         handleFileUpload( event ){
             this.file = event.target.files[0];
@@ -55,28 +81,41 @@ Vue.component('import-options', {
     template: `
             <div class="import-options-component">
             
-                <v-container>
+                <div class="container-fluid mt-3 p-3">
 
                 <h3>Import Metadata</h3>
 
-                <div class="bg-white p-3" >
+                <div class="bg-white" >
 
-                    <h4>Import metadata from file</h4>                    
                     <div class="form-container-x" >
 
                         <div class="text-primary mb-3">
                             <span v-if="ProjectType=='survey'">This will overwrite any existing study level, data files and variable metadata.</span>
                         </div>
 
-                        <div class="file-group form-field mb-3">
+                        <div class="file-group form-field mb-3" style="max-width:600px;">
                             <label class="l" for="customFile">
                                 <span v-if="ProjectType=='survey'">Choose DDI/XML or a JSON file</span></label>
                                 <span v-if="ProjectType!='survey'">Choose a JSON file</span></label>
                             <input type="file" class="form-control" id="customFile" @change="handleFileUpload( $event )">                
                         </div>
 
-                        <button type="button" class="btn btn-primary" @click="importDDI">Import file</button>
-                        <button type="button" class="btn btn-danger" >Cancel</button>
+                        <div>
+
+                            <strong>Import options</strong>
+
+                            <div v-if="ProjectType=='survey'" class="ml-2">
+                                <div class="form-group form-check mb-0" v-for="(opt,opt_key) in import_options.survey" :key="opt_key">
+                                    <input type="checkbox" class="form-check-input" :id="opt_key" :value="opt_key" v-model="import_options_selected">
+                                    <label class="form-check-label" :for="opt_key">{{opt}}</label>
+                                </div>
+                                {{import_options_selected}}
+                            </div>
+                        
+                        </div>
+
+                        <button type="button" class="btn btn-sm btn-primary" @click="importDDI">Import file</button>
+                        <button type="button" class="btn btn-sm btn-danger" @click="onCancel">Cancel</button>
 
                     </div>
 
@@ -123,7 +162,7 @@ Vue.component('import-options', {
                 </div>
 
 
-            </v-container>
+            </div>
 
             </div>          
             `    
