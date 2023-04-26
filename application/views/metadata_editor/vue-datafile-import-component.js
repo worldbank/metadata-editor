@@ -109,7 +109,7 @@ Vue.component('datafile-import', {
                 //import summary statistics
                 this.update_status="Generating summary statistics and frequencies " + this.files[fileIdx].name;
                 let stats_resp=await this.importDataFileSummaryStatistics(fileIdx, fileid);
-                console.log("finished summary statistics",fileIdx,import_resp);
+                console.log("finished summary statistics",fileIdx,stats_resp);
 
                 this.update_status="Exporting data to CSV " + this.files[fileIdx].name;
                 let csv_resp=await this.generateCSV(fileIdx,fileid);
