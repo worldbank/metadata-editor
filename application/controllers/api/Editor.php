@@ -266,6 +266,7 @@ class Editor extends MY_REST_Controller
 		try{			
 			$options=$this->raw_json_input();
 			$user_id=$this->get_api_user_id();
+			$user=$this->api_user();
 			
 			//$this->has_dataset_access('edit',$sid);			
 
@@ -276,7 +277,7 @@ class Editor extends MY_REST_Controller
 				throw new Exception("Project with the type [".$type ."] not found");
 			}
 
-			$this->editor_acl->user_has_project_access($id,$permission='edit');
+			$this->editor_acl->user_has_project_access($id,$permission='edit',$user);
 			
 			$options['changed_by']=$user_id;
 			$options['changed']=date("U");
