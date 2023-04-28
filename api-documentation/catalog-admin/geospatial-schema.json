@@ -269,10 +269,7 @@
 				"presentationForm": {
 					"title": "Presentation form",
 					"description": "The resource presentation form. e.g. 'mapDigital'. Recommended code following the [ISO/TS 19139](http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_PresentationFormCode) PresentationForm codelist. Suggested values: {`documentDigital`, `imageDigital`, `documentHardcopy`, `imageHardcopy`, `mapDigital`, `mapHardcopy`, `modelDigital`, `modelHardcopy`, `profileDigital`, `profileHardcopy`, `tableDigital`, `tableHardcopy`, `videoDigital`, `videoHardcopy`, `audioDigital`, `audioHardcopy`, `multimediaDigital`, `multimediaHardcopy`, `physicalSample`, `diagramDigital`, `diagramHardcopy`}",
-					"type": "array",
-					"items": {
-						"type": "string"
-					}
+					"type": "string"					
 				},
 				"series": {
 					"title": "Series",
