@@ -2228,10 +2228,10 @@
                                         {
                                             "key": "geographicBoundingBox",
                                             "title": "Bounding box",
-                                            "type": "array",
+                                            "type": "section",
                                             "props": [
                                                 {
-                                                    "key": "westBoundLongitude",
+                                                    "key": "geographicBoundingBox.westBoundLongitude",
                                                     "type": "string",
                                                     "title": "West bound longitude",
                                                     "prop_key": "description.identificationInfo.extent.geographicElement.geographicBoundingBox.westBoundLongitude",
@@ -2239,7 +2239,7 @@
                                                     "display_type": "text"
                                                 },
                                                 {
-                                                    "key": "eastBoundLongitude",
+                                                    "key": "geographicBoundingBox.eastBoundLongitude",
                                                     "type": "string",
                                                     "title": "East bound longitude",
                                                     "help_text": "East",
@@ -2247,7 +2247,7 @@
                                                     "display_type": "text"
                                                 },
                                                 {
-                                                    "key": "southBoundLatitude",
+                                                    "key": "geographicBoundingBox.southBoundLatitude",
                                                     "type": "string",
                                                     "title": "South bound latitude",
                                                     "help_text": "South",
@@ -2255,7 +2255,7 @@
                                                     "display_type": "text"
                                                 },
                                                 {
-                                                    "key": "northBoundLatitude",
+                                                    "key": "geographicBoundingBox.northBoundLatitude",
                                                     "type": "string",
                                                     "title": "North bound latitude",
                                                     "help_text": "North",
@@ -2296,7 +2296,7 @@
                                             "type": "string",
                                             "prop_key": "description.identificationInfo.extent.geographicElement.geographicDescription",
                                             "display_type": "textarea"
-                                        }
+                                        }                                        
                                     ],
                                     "prop_key": "description.identificationInfo.extent.geographicElement",
                                     "help_text": "Spatial (horizontal) extent element. This can be defined either with a Bounding Box (recommended); or using Geographic Description - free text that defines the area covered. When the dataset covers one or more countries, it is recommended to enter the country names in this element, as it can then be used in data catalogs for filtering by geography.\n\nThe bounding box shall be as small as possible.\nThe bounding box shall be expressed in decimal degree with a precision of at least 2 decimals.",
