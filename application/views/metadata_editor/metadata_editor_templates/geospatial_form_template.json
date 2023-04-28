@@ -2405,7 +2405,20 @@
                                     "title": "Spatial resolution",
                                     "prop_key": "description.identificationInfo.spatialResolution",
                                     "help_text": "The spatial resolution of the data as numeric value associated to a unit of measure. Spatial resolution refers to the level of detail of the data set. It shall be expressed as a set of zero to many resolution distances (typically for gridded data and imagery-derived products) or equivalent scales (typically for maps or map-derived products). An equivalent scale is generally expressed as an integer value expressing the scale denominator. A resolution distance shall be expressed as a numerical value associated with a unit of length.\n\nEXAMPLES:\n- 50000 (e.g. 1:50000 scale map)\n- 0.25 (degrees)\n\nNOTES:\n- For services, it is not possible to express the restriction of a service concerning the spatial resolution in the current version of ISO 19119. While the problem is addressed by the standardization community, spatial resolution restrictions for services shall be expressed in the Abstract.\n- When two equivalent scales or two ground sample distances are expressed, the spatial resolution is an interval bounded by these two values",
-                                    "display_type": "textarea"
+                                    "items":[
+                                        {
+                                            "key": "description.identificationInfo.spatialResolution.uom",
+                                            "type": "string",
+                                            "title": "Spatial resolution UOM",
+                                            "prop_key": "description.identificationInfo.spatialResolution.uom"
+                                        },
+                                        {
+                                            "key": "description.identificationInfo.spatialResolution.value",
+                                            "type": "string",
+                                            "title": "Spatial resolution UOM",
+                                            "prop_key": "description.identificationInfo.spatialResolution.value"
+                                        }
+                                    ]
                                 }
                             ],
                             "help_text": ""
