@@ -25,7 +25,7 @@ Vue.component('external-resources-import', {
             }
 
             vm=this;
-            let url=CI.base_url + '/api/editor/resources_import/'+ this.ProjectID;
+            let url=CI.base_url + '/api/resources/import/'+ this.ProjectID;
 
             axios.post( url,
                 formData,

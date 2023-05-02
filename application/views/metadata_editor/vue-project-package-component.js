@@ -130,7 +130,7 @@ Vue.component('project-package', {
             });            
         },
         async exportExternalResourcesJSON() {
-            let url=CI.base_url + '/api/editor/write_resources_json/'+this.ProjectID;
+            let url=CI.base_url + '/api/resources/write_json/'+this.ProjectID;
             return axios
             .get(url)
             .then(function (response) {
@@ -144,7 +144,7 @@ Vue.component('project-package', {
             });            
         },
         async exportExternalResourcesRDF() {
-            let url=CI.base_url + '/api/editor/write_resources_rdf/'+this.ProjectID;
+            let url=CI.base_url + '/api/resources/write_rdf/'+this.ProjectID;
             return axios
             .get(url)
             .then(function (response) {

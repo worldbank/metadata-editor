@@ -185,18 +185,28 @@ class Editor extends MY_REST_Controller
 	{
 		try{			
 			$user_id=$this->get_api_user_id();
+			$project_options=$this->raw_json_input();
+
+			$idno='';
+			if (isset($project_options['idno'])){
+				$idno=$project_options['idno'];
+			}else{
+				$idno=$this->Editor_model->generate_uuid();
+			}
+
+			$this->validate_project_idno($idno);
 			
 			$options=array(
-				'title'=>'untitled',
-				'type'=>$type
+				'title'=> 'untitled',
+				'type'=> $type,
+				'idno'=> $idno
 			);
-
+ 
 			$options['created_by']=$user_id;
 			$options['changed_by']=$user_id;
 			$options['created']=date("U");
 			$options['changed']=date("U");
 			
-
 			//$this->has_dataset_access('edit',null,$options['repositoryid']);
 
 			//validate & create dataset
@@ -206,30 +216,16 @@ class Editor extends MY_REST_Controller
 				throw new Exception("FAILED_TO_CREATE_DATASET");
 			}
 
-			$this->Editor_model->create_project_folder($dataset_id);
-			$project=$this->Editor_model->get_row($dataset_id);
-
-			$project_options=$this->raw_json_input();
+			$this->Editor_model->create_project_folder($dataset_id);			
+			
 			
 			if (!empty($project_options)){
 				$this->update_post($type,$dataset_id);
 			}
 
-			/*
-			//create dataset project folder
-			$dataset['dirpath']=$this->dataset_manager->setup_folder($repositoryid='central', $folder_name=md5($dataset['idno']));
-
-			$update_options=array(
-				'dirpath'=>$dataset['dirpath']
-			);
-
-			$this->dataset_manager->update_options($dataset_id,$update_options);
-			*/
-
 			$response=array(
 				'status'=>'success',
-				'id'=>$dataset_id,
-				'project'=>$project
+				'id'=>$dataset_id
 			);
 
 			$this->set_response($response, REST_Controller::HTTP_OK);
@@ -267,9 +263,8 @@ class Editor extends MY_REST_Controller
 			$options=$this->raw_json_input();
 			$user_id=$this->get_api_user_id();
 			$user=$this->api_user();
+			$id=$this->get_sid($id);
 			
-			//$this->has_dataset_access('edit',$sid);			
-
 			//check project exists and is of correct type
 			$exists=$this->Editor_model->check_id_exists($id,$type);
 
@@ -278,6 +273,7 @@ class Editor extends MY_REST_Controller
 			}
 
 			$this->editor_acl->user_has_project_access($id,$permission='edit',$user);
+			
 			
 			$options['changed_by']=$user_id;
 			$options['changed']=date("U");
@@ -325,6 +321,8 @@ class Editor extends MY_REST_Controller
 
 			$options=$this->raw_json_input();
 			$user_id=$this->get_api_user_id();
+			$sid=$this->get_sid($sid);
+
 			$options['created_by']=$user_id;
 			$options['changed_by']=$user_id;
 			$options['sid']=$sid;
@@ -360,6 +358,7 @@ class Editor extends MY_REST_Controller
 	function validate_get($sid=null)
 	{
 		try{
+			$sid=$this->get_sid($sid);
 			$project=$this->Editor_model->get_row($sid);
 
 			if (!$project){
@@ -406,6 +405,7 @@ class Editor extends MY_REST_Controller
 	function delete_post($sid=null)
 	{
 		try{
+			$sid=$this->get_sid($sid);
 			$this->editor_acl->user_has_project_access($sid,$permission='edit');
 			$this->Editor_model->delete_project($sid);
 				
@@ -425,364 +425,6 @@ class Editor extends MY_REST_Controller
 	}
 
 
-	//data files
-
-	/**
-	 * 
-	 * list study data files
-	 * 
-	 */
-	function datafiles_get($id=null)
-	{
-		try{
-			$this->editor_acl->user_has_project_access($id,$permission='view');
-			
-			$user_id=$this->get_api_user_id();
-			$survey_datafiles=$this->Editor_datafile_model->select_all($id,true);
-			
-			$response=array(
-				'datafiles'=>$survey_datafiles
-			);
-
-			$this->set_response($response, REST_Controller::HTTP_OK);
-		}
-		catch(Exception $e){
-			$error_output=array(
-				'status'=>'failed',
-				'message'=>$e->getMessage()
-			);
-			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
-		}
-	}
-
-	/**
-	 * 
-	 * Get data file by name
-	 * 
-	 */
-	function datafile_by_name_get($sid=null)
-	{
-		try{
-			$this->editor_acl->user_has_project_access($sid,$permission='view');
-			$filename=$this->input->get("filename");
-
-			if(!$filename){
-				throw new Exception("Missing required parameter: filename");
-			}
-			
-			$user_id=$this->get_api_user_id();
-			$survey_datafiles=$this->Editor_model->data_file_by_name($sid,$filename);
-
-			if (!$survey_datafiles){
-				throw new Exception("Data file not found");
-			}
-			
-			$response=array(
-				'datafile'=>$survey_datafiles
-			);
-
-			$this->set_response($response, REST_Controller::HTTP_OK);
-		}
-		catch(Exception $e){
-			$error_output=array(
-				'status'=>'failed',
-				'message'=>$e->getMessage()
-			);
-			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
-		}
-	}
-
-	/**
-	 * 
-	 * Get a new file id 
-	 * 
-	 */
-	function datafile_generate_fid_get($sid=null)
-	{
-		try{
-			$this->editor_acl->user_has_project_access($sid,$permission='view');
-			
-			$user_id=$this->get_api_user_id();
-			$file_id=$this->Editor_model->data_file_generate_fileid($sid);
-
-			$response=array(
-				'file_id'=>$file_id
-			);
-
-			$this->set_response($response, REST_Controller::HTTP_OK);
-		}
-		catch(Exception $e){
-			$error_output=array(
-				'status'=>'failed',
-				'message'=>$e->getMessage()
-			);
-			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
-		}
-	}
-
-
-
-	/**
-	 * 
-	 * 
-	 * Create or update a data file
-	 * 
-	 */
-	function datafiles_post($sid=null)
-	{
-		try{
-			$this->editor_acl->user_has_project_access($sid,$permission='edit');
-
-			$options=$this->raw_json_input();
-			$user_id=$this->get_api_user_id();
-			$options['created_by']=$user_id;
-			$options['changed_by']=$user_id;
-			$options['sid']=$sid;
-
-			/*$required_fields=array("file_id","file_name");
-
-			foreach($required_fields as $field_){
-				if(!isset($options[$field_])){
-					throw new Exception("Required field is missing: ".$field_);
-				}
-			}*/
-
-			//validate 
-			if ($this->Editor_model->validate_data_file($options)){
-				$options['file_uri']=$options['file_name'];
-				$options['file_name']=$this->Editor_model->data_file_filename_part($options['file_name']);
-
-				if (isset($options['id'])){
-					$data_file=$this->Editor_model->data_file_by_pk_id($sid,$options['id']);
-
-					if (!$data_file){
-						throw new Exception("Data file not found");
-					}
-
-					$data_file_by_name=$this->Editor_model->data_file_by_name($sid,$options['file_name']);
-
-					if($data_file_by_name && $data_file_by_name['id']!=$options['id']){
-						throw new Exception("Data file name already exists");
-					}
-
-					$this->Editor_model->data_file_update($data_file["id"],$options);
-				}else{
-
-					//check if file name exists
-					$data_file=$this->Editor_model->data_file_by_name($sid,$options['file_name']);
-
-					if ($data_file){
-						throw new Exception("Data file name already exists");
-					}
-
-					$this->Editor_model->data_file_insert($sid,$options);					
-				}
-				
-				$response=array(
-					'status'=>'success',
-					'datafile'=>$options
-				);
-
-				$this->set_response($response, REST_Controller::HTTP_OK);
-			}
-		}
-		catch(ValidationException $e){
-			$error_output=array(
-				'status'=>'failed',
-				'message'=>$e->getMessage(),
-				'errors'=>$e->GetValidationErrors()
-			);
-			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
-		}
-		catch(Exception $e){
-			$error_output=array(
-				'status'=>'failed',
-				'message'=>$e->getMessage()
-			);
-			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
-		}
-	}
-
-
-	/**
-	 * 
-	 * 
-	 * Update data files sequence
-	 * 
-	 */
-	function datafiles_sequence_post($sid=null)
-	{
-		try{
-			$this->editor_acl->user_has_project_access($sid,$permission='edit');
-
-			$options=$this->raw_json_input();
-			$user_id=$this->get_api_user_id();			
-			$options['sid']=$sid;
-
-			$required_fields=array("wght","id");
-
-			if (!isset($options['options'])){
-				throw new Exception("Required field is missing: options");
-			}
-
-			$options=$options['options'];
-
-			for($i=0;$i<count($options);$i++){			
-				$row=$options[$i];
-
-				//var_dump($row);
-				
-				if (!isset($row['id'])){
-					throw new Exception("Required field is missing: id");
-				}
-
-				if (!isset($row['wght'])){
-					throw new Exception("Required field is missing: wght");
-				}
-
-				$update_options=array(
-					'wght'=>$row['wght']
-				);
-
-				$this->Editor_model->data_file_update($row['id'],$update_options);
-			}
-			
-				
-			$response=array(
-				'status'=>'success',
-				'datafile'=>$options
-			);
-
-			$this->set_response($response, REST_Controller::HTTP_OK);
-		}
-		catch(ValidationException $e){
-			$error_output=array(
-				'status'=>'failed',
-				'message'=>$e->getMessage(),
-				'errors'=>$e->GetValidationErrors()
-			);
-			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
-		}
-		catch(Exception $e){
-			$error_output=array(
-				'status'=>'failed',
-				'message'=>$e->getMessage()
-			);
-			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
-		}
-	}
-
-	/**
-	 * 
-	 * 
-	 * Delete a data file
-	 * 
-	 */
-	function datafiles_delete_post($sid=null,$file_id=null)
-	{
-		try{
-			$this->editor_acl->user_has_project_access($sid,$permission='edit');
-			$this->Editor_model->data_file_delete($sid,$file_id);
-				
-			$response=array(
-				'status'=>'success'					
-			);
-
-			$this->set_response($response, REST_Controller::HTTP_OK);
-		}
-		catch(Exception $e){
-			$error_output=array(
-				'status'=>'failed',
-				'message'=>$e->getMessage()
-			);
-			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
-		}
-	}
-
-
-
-	/**
-	 * 
-	 * Project files
-	 * 
-	 * Return all files for a project
-	 * 
-	 **/ 
-	function files_get($sid=null)
-	{		
-		try{
-			$exists=$this->Editor_model->check_id_exists($sid);
-
-			if(!$exists){
-				throw new Exception("Project not found");
-			}
-
-			$this->editor_acl->user_has_project_access($sid,$permission='view');
-
-			$result=$this->Editor_resource_model->files_summary($sid);
-
-			$output=array(
-				'files'=>$result
-			);
-
-			$this->set_response($output, REST_Controller::HTTP_OK);			
-		}
-		catch(Exception $e){
-			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
-		}
-	}
-
-
-	/**
-	 * 
-	 * upload file
-	 * @file_type data | documentation | thumbnail
-	 * 
-	 **/ 
-	function files_post($sid=null,$file_type='documentation')
-	{		
-		try{
-			$exists=$this->Editor_model->check_id_exists($sid);
-
-			if(!$exists){
-				throw new Exception("Project not found");
-			}
-
-			$this->editor_acl->user_has_project_access($sid,$permission='edit');
-
-			if ($file_type=='thumbnail'){
-				$output=$this->Editor_resource_model->upload_thumbnail($sid,$file_field_name='file');
-				$this->Editor_model->set_project_options($sid,$options=array('thumbnail'=>$output['thumbnail_filename']));
-			}else{
-				$result=$this->Editor_resource_model->upload_file($sid,$file_type,$file_field_name='file', $remove_spaces=false);
-				$uploaded_file_name=$result['file_name'];
-				$uploaded_path=$result['full_path'];
-				
-				$output=array(
-					'status'=>'success',
-					'uploaded_file_name'=>$uploaded_file_name,
-					'base64'=>base64_encode($uploaded_file_name)				
-				);
-			}
-						
-			//attach to resource if provided
-			/*if(is_numeric($resource_id)){
-				$options=array(
-					'filename'=>$uploaded_file_name
-				);
-				$this->Survey_resource_model->update($resource_id,$options);
-			}*/
-
-			$this->set_response($output, REST_Controller::HTTP_OK);			
-		}
-		catch(Exception $e){
-			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
-		}
-	}
-
-	
-
-
 
 	/**
 	 * 
@@ -793,6 +435,7 @@ class Editor extends MY_REST_Controller
 	function import_ddi_post($sid=null)
 	{		
 		try{
+			$sid=$this->get_sid($sid);
 			$exists=$this->Editor_model->check_id_exists($sid);
 
 			if(!$exists){
@@ -818,11 +461,20 @@ class Editor extends MY_REST_Controller
 	function import_metadata_post($sid=null)
 	{		
 		try{
+			$sid=$this->get_sid($sid);
 			$project=$this->Editor_model->get_basic_info($sid);
 
 			if(!$project){
 				throw new Exception("Project not found");
 			}
+
+			$user_id=$this->get_api_user_id();
+			
+			$options=array();
+			$options['created_by']=$user_id;
+			$options['changed_by']=$user_id;
+			$options['created']=date("U");
+			$options['changed']=date("U");
 
 			$this->editor_acl->user_has_project_access($sid,$permission='edit');
 			
@@ -840,7 +492,7 @@ class Editor extends MY_REST_Controller
 
 			if ($file_ext=='xml'){
 				if ($project['type']=='survey'){
-					$result=$this->Editor_model->importDDI($sid);		
+					$result=$this->Editor_model->importDDI($sid, $parseOnly=false,$options);
 				}
 			}else{
 				$this->load->library('ImportJsonMetadata');
@@ -881,6 +533,7 @@ class Editor extends MY_REST_Controller
 	function convert_ddi_post($sid=null)
 	{		
 		try{
+			$sid=$this->get_sid($sid);
 			$exists=$this->Editor_model->check_id_exists($sid);
 
 			if(!$exists){
@@ -911,6 +564,7 @@ class Editor extends MY_REST_Controller
 	function json_get($sid=null)
 	{		
 		try{
+			$sid=$this->get_sid($sid);
 			$exists=$this->Editor_model->check_id_exists($sid);
 
 			if(!$exists){
@@ -935,6 +589,7 @@ class Editor extends MY_REST_Controller
 	function generate_json_get($sid=null)
 	{		
 		try{
+			$sid=$this->get_sid($sid);
 			$exists=$this->Editor_model->check_id_exists($sid);
 
 			if(!$exists){
@@ -965,6 +620,7 @@ class Editor extends MY_REST_Controller
 	function ddi_get($sid=null)
 	{		
 		try{
+			$sid=$this->get_sid($sid);
 			$exists=$this->Editor_model->check_id_exists($sid);
 
 			if(!$exists){
@@ -988,6 +644,7 @@ class Editor extends MY_REST_Controller
 	function generate_ddi_get($sid=null)
 	{		
 		try{
+			$sid=$this->get_sid($sid);
 			$exists=$this->Editor_model->check_id_exists($sid);
 
 			if(!$exists){
@@ -1017,6 +674,7 @@ class Editor extends MY_REST_Controller
 	function pdf_get($sid=null)
 	{		
 		try{
+			$sid=$this->get_sid($sid);
 			$exists=$this->Editor_model->check_id_exists($sid);
 
 			if(!$exists){
@@ -1040,6 +698,7 @@ class Editor extends MY_REST_Controller
 	function generate_pdf_get($sid=null)
 	{		
 		try{
+			$sid=$this->get_sid($sid);
 			$exists=$this->Editor_model->check_id_exists($sid);
 
 			if(!$exists){
@@ -1069,6 +728,7 @@ class Editor extends MY_REST_Controller
 	function pdf_info_get($sid=null)
 	{		
 		try{
+			$sid=$this->get_sid($sid);
 			$exists=$this->Editor_model->check_id_exists($sid);
 
 			if(!$exists){
@@ -1095,305 +755,11 @@ class Editor extends MY_REST_Controller
 	}
 
 
-	
-	/**
-	 * 
-	 * Generate resources JSON and save to project folder
-	 * 
-	 */
-	function write_resources_json_get($sid=null)
-	{		
-		try{
-			$exists=$this->Editor_model->check_id_exists($sid);
-
-			if(!$exists){
-				throw new Exception("Project not found");
-			}
-
-			$this->editor_acl->user_has_project_access($sid,$permission='view');
-			$resources=$this->Editor_resource_model->select_all($sid,$fields=null);
-
-			$remove_fields=array("sid","id");
-			foreach($resources as $idx=>$resource){
-				foreach($remove_fields as $f){
-					if (isset($resources[$idx][$f])){
-						unset($resources[$idx][$f]);
-					}
-				}
-			}
-
-			$path = $this->Editor_model->get_project_folder($sid);
-			$resource_file=$path.'/resources.json';
-
-			if (file_exists($resource_file)){
-				unlink($resource_file);
-				//$this->load->helper('download');
-				//force_download2($path.'/project.zip');
-				//die();
-
-			}
-
-			file_put_contents($resource_file,json_encode($resources,JSON_PRETTY_PRINT));
-
-			$output=array(
-				'status'=>'success'
-			);
-
-			$this->set_response($output, REST_Controller::HTTP_OK);
-		}
-		catch(Exception $e){
-			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
-		}
-	}
-
-	/**
-	 * 
-	 * Generate resources RDF and save to project folder
-	 * 
-	 */
-	function write_resources_rdf_get($sid=null)
-	{		
-		try{
-			$exists=$this->Editor_model->check_id_exists($sid);
-
-			if(!$exists){
-				throw new Exception("Project not found");
-			}
-
-			$this->editor_acl->user_has_project_access($sid,$permission='view');
-			$this->Editor_resource_model->write_rdf($sid);
-			
-			$output=array(
-				'status'=>'success'
-			);
-
-			$this->set_response($output, REST_Controller::HTTP_OK);
-		}
-		catch(Exception $e){
-			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
-		}
-	}
-
-
-
-	/**
-	 * 
-	 * import RDF or JSON
-	 * 
-	 */
-	public function resources_import_post($sid=NULL)
-	{
-		try {
-			$this->editor_acl->user_has_project_access($sid,$permission='edit');
-
-			$uploaded_filepath=$this->Editor_resource_model->upload_temporary_file($allowed_file_type="rdf|xml|json",$file_field_name='file',$temp_upload_folder=null);
-
-			if (!file_exists($uploaded_filepath)){
-				throw new Exception("File upload failed");
-			}
-
-			$file_info=pathinfo($uploaded_filepath);
-
-			if (strtolower($file_info['extension'])=='rdf'){
-				$imported_count=$this->Editor_resource_model->import_rdf($sid,$uploaded_filepath);
-			}else if (strtolower($file_info['extension'])=='json'){
-				$imported_count=$this->Editor_resource_model->import_json($sid,$uploaded_filepath);
-			}
-			else{
-				throw new Exception("File type is not supported: ".$file_info['extension']);
-			}
-			
-			@unlink($uploaded_filepath);
-
-			$output=array(
-				'status'=>'success',
-				'entries_imported'=>$imported_count
-			);
-
-			$this->set_response($output, REST_Controller::HTTP_OK);			
-		}
-		catch(Exception $e){
-			$output=array(
-				'status'=>'error',
-				'message'=>$e->getMessage()
-			);
-			$this->set_response($output, REST_Controller::HTTP_BAD_REQUEST);
-		}		
-	}
-
-
-	/**
-	 * 
-	 * list external resources
-	 * 
-	 */
-	function resources_get($sid=null)
-	{
-		try{
-			$this->editor_acl->user_has_project_access($sid,$permission='view');
-			
-			$user_id=$this->get_api_user_id();
-			$resources=$this->Editor_resource_model->select_all($sid,$fields=null);
-			
-			$response=array(
-				'resources'=>$resources
-			);
-
-			$this->set_response($response, REST_Controller::HTTP_OK);
-		}
-		catch(Exception $e){
-			$error_output=array(
-				'status'=>'failed',
-				'message'=>$e->getMessage()
-			);
-			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
-		}
-	}
-
-	/**
-	 * 
-	 * Download external resources as RDF/XML
-	 * 
-	 */
-	function rdf_get($sid=null)
-	{		
-		try{
-			$exists=$this->Editor_model->check_id_exists($sid);
-
-			if(!$exists){
-				throw new Exception("Project not found");
-			}
-
-			$this->editor_acl->user_has_project_access($sid,$permission='view');
-
-			header('Content-type: application/xml');
-			echo $this->Editor_resource_model->generate_rdf($sid);
-			die();
-		}
-		catch(Exception $e){
-			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
-		}
-	}
-
-
-	/**
-	 * 
-	 * 
-	 * create or update external resource
-	 * 
-	 **/ 
-	function resources_post($sid=null,$resource_id=null)
-	{
-		//multipart/form-data
-		$options=$this->input->post(null, true);
-
-		//raw json input
-		if (empty($options)){
-			$options=$this->raw_json_input();
-		}
-				
-		try{
-			
-			$this->editor_acl->user_has_project_access($sid,$permission='edit');
-
-			$options['sid']=$sid;
-
-			//get dctype by code
-			if(isset($options['dctype'])){ 
-				$options['dctype']=$this->Editor_resource_model->get_dctype_label_by_code($options['dctype']);
-			}
-
-			if(isset($options['dcformat'])){ 
-				$options['dcformat']=$this->Editor_resource_model->get_dcformat_label_by_code($options['dcformat']);
-			}
-
-			//validate resource
-			if ($this->Editor_resource_model->validate_resource($options)){
-
-				$upload_result=null;
-
-				if(!empty($_FILES)){
-					//upload file?					
-					$upload_result=$this->Editor_resource_model->upload_file($sid,$file_type='documentation', $file_field_name='file', $remove_spaces=false);
-					$uploaded_file_name=$upload_result['file_name'];
-				
-					//set filename to uploaded file
-					$options['filename']=$uploaded_file_name;
-				}
-
-				if(!isset($options['filename'])){
-					$options['filename']=null;
-				}				
-
-				if($resource_id){
-					$resource=$this->Editor_resource_model->select_single($sid,$resource_id);
-					if (!$resource){
-						throw new Exception("Resource not found");
-					}
-					
-					$resource_id=$this->Editor_resource_model->update($resource_id,$options);
-				}				
-				else{
-					//insert new resource
-					$resource_id=$this->Editor_resource_model->insert($options);
-				}
-
-				$resource=$this->Editor_resource_model->select_single($sid,$resource_id);
-				
-				$response=array(
-					'status'=>'success',
-					'resource'=>$resource,
-					'uploaded_file'=>$upload_result
-				);
-
-				$this->set_response($response, REST_Controller::HTTP_OK);
-			}
-		}
-		catch(ValidationException $e){
-			$error_output=array(
-				'message'=>'VALIDATION_ERROR',
-				'errors'=>$e->GetValidationErrors()
-			);
-			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
-		}
-		catch(Exception $e){
-			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
-		}		
-	}
-
-
-	/**
-	 * 
-	 * Delete external resource
-	 * 
-	 */
-	function resource_delete_post($sid=null,$resource_id=null)
-	{
-		try{
-			$this->editor_acl->user_has_project_access($sid,$permission='edit');
-
-			$user_id=$this->get_api_user_id();
-			$resources=$this->Editor_resource_model->delete($sid,$resource_id);
-			
-			$response=array(
-				'resources'=>$resources
-			);
-
-			$this->set_response($response, REST_Controller::HTTP_OK);
-		}
-		catch(Exception $e){
-			$error_output=array(
-				'status'=>'failed',
-				'message'=>$e->getMessage()
-			);
-			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
-		}
-	}
-
 
 	function download_zip_get($sid,$generate=0)
 	{
 		try{
+			$sid=$this->get_sid($sid);
 			$this->editor_acl->user_has_project_access($sid,$permission='view');
 
 			$this->load->library('zip');
@@ -1425,6 +791,7 @@ class Editor extends MY_REST_Controller
 		$this->load->library('zip');
 		
 		try{
+			$sid=$this->get_sid($sid);
 			$this->editor_acl->user_has_project_access($sid,$permission='view');
 
 			$path = $this->Editor_model->get_project_folder($sid);
@@ -1464,6 +831,7 @@ class Editor extends MY_REST_Controller
 	function thumbnail_get($sid=null)
 	{
 		try{
+			$sid=$this->get_sid($sid);
 			$this->Editor_model->download_project_thumbnail($sid);
 			die();
 		}
@@ -1549,6 +917,7 @@ class Editor extends MY_REST_Controller
 	function publish_to_catalog_post($sid=null,$catalog_connection_id=null)
 	{
 		try{
+			$sid=$this->get_sid($sid);
 			$this->editor_acl->user_has_project_access($sid,$permission='view');
 
 			$options=$this->raw_json_input();
@@ -1581,6 +950,7 @@ class Editor extends MY_REST_Controller
 	function import_data_post($sid=null, $fid=null, $append=0)
 	{		
 		try{
+			$sid=$this->get_sid($sid);
 			$exists=$this->Editor_model->check_id_exists($sid);
 
 			if(!$exists){
@@ -1644,6 +1014,7 @@ class Editor extends MY_REST_Controller
 	function populate_category_labels_get($sid=null)
 	{
 		try{
+			$sid=$this->get_sid($sid);
 			$this->editor_acl->user_has_project_access($sid,$permission='view');
 
 			$result=$this->Editor_variable_model->populate_categry_labels($sid);			
@@ -1666,4 +1037,21 @@ class Editor extends MY_REST_Controller
 			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
+
+
+
+	private function validate_project_idno($idno,$sid=null)
+	{
+		//validate idno format
+		$this->Editor_model->validate_idno($idno);
+
+		$idno_exists=$this->Editor_model->idno_exists($idno,$sid);
+				
+		if ($idno_exists){
+			throw new Exception("Project IDNO already exists. IDNO must be a unique value.");
+		}
+
+		return true;
+	}
+	
 }

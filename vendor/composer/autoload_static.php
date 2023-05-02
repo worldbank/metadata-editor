@@ -7,13 +7,16 @@ namespace Composer\Autoload;
 class ComposerStaticInitab9d8e64f1fcd2c6192dafeec2ffec2d
 {
     public static $files = array (
-        '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
-        'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
+        '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
-        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
+        '23c18046f52bef3eea034657bafda50f' => __DIR__ . '/..' . '/symfony/polyfill-php81/bootstrap.php',
+        'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
+        '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
         'd767e4fc2dc52fe66584ab8c6684783e' => __DIR__ . '/..' . '/adbario/php-dot-notation/src/helpers.php',
+        '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         '9e4824c5afbdc1482b6025ce3d4dfde8' => __DIR__ . '/..' . '/league/csv/src/functions_include.php',
+        'e39a8b23c42d4e1452234d762b03835a' => __DIR__ . '/..' . '/ramsey/uuid/src/functions.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -23,12 +26,19 @@ class ComposerStaticInitab9d8e64f1fcd2c6192dafeec2ffec2d
         ),
         'S' => 
         array (
+            'Symfony\\Polyfill\\Php81\\' => 23,
             'Symfony\\Polyfill\\Php80\\' => 23,
+            'Symfony\\Polyfill\\Ctype\\' => 23,
             'Symfony\\Contracts\\EventDispatcher\\' => 34,
             'Symfony\\Component\\EventDispatcher\\' => 34,
             'Spatie\\ArrayToXml\\' => 18,
             'Solarium\\' => 9,
             'Slim\\Csrf\\' => 10,
+        ),
+        'R' => 
+        array (
+            'Ramsey\\Uuid\\' => 12,
+            'Ramsey\\Collection\\' => 18,
         ),
         'P' => 
         array (
@@ -59,6 +69,10 @@ class ComposerStaticInitab9d8e64f1fcd2c6192dafeec2ffec2d
         array (
             'Firebase\\JWT\\' => 13,
         ),
+        'B' => 
+        array (
+            'Brick\\Math\\' => 11,
+        ),
         'A' => 
         array (
             'Adbar\\' => 6,
@@ -70,9 +84,17 @@ class ComposerStaticInitab9d8e64f1fcd2c6192dafeec2ffec2d
         array (
             0 => __DIR__ . '/..' . '/violet/streaming-json-encoder/src',
         ),
+        'Symfony\\Polyfill\\Php81\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-php81',
+        ),
         'Symfony\\Polyfill\\Php80\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-php80',
+        ),
+        'Symfony\\Polyfill\\Ctype\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/polyfill-ctype',
         ),
         'Symfony\\Contracts\\EventDispatcher\\' => 
         array (
@@ -93,6 +115,14 @@ class ComposerStaticInitab9d8e64f1fcd2c6192dafeec2ffec2d
         'Slim\\Csrf\\' => 
         array (
             0 => __DIR__ . '/..' . '/slim/csrf/src',
+        ),
+        'Ramsey\\Uuid\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/ramsey/uuid/src',
+        ),
+        'Ramsey\\Collection\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/ramsey/collection/src',
         ),
         'Psr\\Http\\Message\\' => 
         array (
@@ -151,6 +181,10 @@ class ComposerStaticInitab9d8e64f1fcd2c6192dafeec2ffec2d
         array (
             0 => __DIR__ . '/..' . '/firebase/php-jwt/src',
         ),
+        'Brick\\Math\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/brick/math/src',
+        ),
         'Adbar\\' => 
         array (
             0 => __DIR__ . '/..' . '/adbario/php-dot-notation/src',
@@ -160,6 +194,7 @@ class ComposerStaticInitab9d8e64f1fcd2c6192dafeec2ffec2d
     public static $classMap = array (
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
+        'ReturnTypeWillChange' => __DIR__ . '/..' . '/symfony/polyfill-php81/Resources/stubs/ReturnTypeWillChange.php',
         'Stringable' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Stringable.php',
         'UnhandledMatchError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/UnhandledMatchError.php',
         'ValueError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/ValueError.php',

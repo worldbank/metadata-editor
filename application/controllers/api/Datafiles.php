@@ -53,6 +53,186 @@ class Datafiles extends MY_REST_Controller
 			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
+
+	/**
+	 * 
+	 * 
+	 * Create or update a data file
+	 * 
+	 */
+	function index_post($sid=null)
+	{
+		try{
+			$sid=$this->get_sid($sid);
+			$this->editor_acl->user_has_project_access($sid,$permission='edit');
+
+			$options=$this->raw_json_input();
+			$user_id=$this->get_api_user_id();
+			$options['created_by']=$user_id;
+			$options['changed_by']=$user_id;
+			$options['sid']=$sid;
+
+			/*$required_fields=array("file_id","file_name");
+
+			foreach($required_fields as $field_){
+				if(!isset($options[$field_])){
+					throw new Exception("Required field is missing: ".$field_);
+				}
+			}*/
+
+			//validate 
+			if ($this->Editor_model->validate_data_file($options)){
+				$options['file_uri']=$options['file_name'];
+				$options['file_name']=$this->Editor_model->data_file_filename_part($options['file_name']);
+
+				if (isset($options['id'])){
+					$data_file=$this->Editor_model->data_file_by_pk_id($sid,$options['id']);
+
+					if (!$data_file){
+						throw new Exception("Data file not found");
+					}
+
+					$data_file_by_name=$this->Editor_model->data_file_by_name($sid,$options['file_name']);
+
+					if($data_file_by_name && $data_file_by_name['id']!=$options['id']){
+						throw new Exception("Data file name already exists");
+					}
+
+					$this->Editor_model->data_file_update($data_file["id"],$options);
+				}else{
+
+					//check if file name exists
+					$data_file=$this->Editor_model->data_file_by_name($sid,$options['file_name']);
+
+					if ($data_file){
+						throw new Exception("Data file name already exists");
+					}
+
+					$this->Editor_model->data_file_insert($sid,$options);					
+				}
+				
+				$response=array(
+					'status'=>'success',
+					'datafile'=>$options
+				);
+
+				$this->set_response($response, REST_Controller::HTTP_OK);
+			}
+		}
+		catch(ValidationException $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage(),
+				'errors'=>$e->GetValidationErrors()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	/**
+	 * 
+	 * 
+	 * Update data files sequence
+	 * 
+	 */
+	function sequence_post($sid=null)
+	{
+		try{
+			$sid=$this->get_sid($sid);
+			$this->editor_acl->user_has_project_access($sid,$permission='edit');
+
+			$options=$this->raw_json_input();
+			$user_id=$this->get_api_user_id();			
+			$options['sid']=$sid;
+
+			$required_fields=array("wght","id");
+
+			if (!isset($options['options'])){
+				throw new Exception("Required field is missing: options");
+			}
+
+			$options=$options['options'];
+
+			for($i=0;$i<count($options);$i++){			
+				$row=$options[$i];
+
+				//var_dump($row);
+				
+				if (!isset($row['id'])){
+					throw new Exception("Required field is missing: id");
+				}
+
+				if (!isset($row['wght'])){
+					throw new Exception("Required field is missing: wght");
+				}
+
+				$update_options=array(
+					'wght'=>$row['wght']
+				);
+
+				$this->Editor_model->data_file_update($row['id'],$update_options);
+			}
+			
+				
+			$response=array(
+				'status'=>'success',
+				'datafile'=>$options
+			);
+
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(ValidationException $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage(),
+				'errors'=>$e->GetValidationErrors()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * 
+	 * 
+	 * Delete a data file
+	 * 
+	 */
+	function delete_post($sid=null,$file_id=null)
+	{
+		try{
+			$sid=$this->get_sid($sid);
+			$this->editor_acl->user_has_project_access($sid,$permission='edit');
+			$this->Editor_model->data_file_delete($sid,$file_id);
+				
+			$response=array(
+				'status'=>'success'					
+			);
+
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
 	
 
 
@@ -94,4 +274,75 @@ class Datafiles extends MY_REST_Controller
 			$this->set_response($error, REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
+
+	/**
+	 * 
+	 * Get data file by name
+	 * 
+	 */
+	function by_name_get($sid=null)
+	{
+		try{
+			$sid=$this->get_sid($sid);
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
+			$filename=$this->input->get("filename");
+
+			if(!$filename){
+				throw new Exception("Missing required parameter: filename");
+			}
+			
+			$user_id=$this->get_api_user_id();
+			$survey_datafiles=$this->Editor_model->data_file_by_name($sid,$filename);
+
+			if (!$survey_datafiles){
+				throw new Exception("Data file not found");
+			}
+			
+			$response=array(
+				'datafile'=>$survey_datafiles
+			);
+
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+
+	/**
+	 * 
+	 * Get a new file id 
+	 * 
+	 */
+	function generate_fid_get($sid=null)
+	{
+		try{
+			$sid=$this->get_sid($sid);
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
+			
+			$user_id=$this->get_api_user_id();
+			$file_id=$this->Editor_model->data_file_generate_fileid($sid);
+
+			$response=array(
+				'file_id'=>$file_id
+			);
+
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
 }

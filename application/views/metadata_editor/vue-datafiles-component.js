@@ -54,7 +54,7 @@ Vue.component('datafiles', {
             //this.$set(this.data_files, this.edit_item, data);
             
             vm=this;
-            let url=CI.base_url + '/api/editor/datafiles/'+vm.dataset_id;
+            let url=CI.base_url + '/api/datafiles/'+vm.dataset_id;
             form_data=data;
 
             axios.post(url, 
@@ -85,7 +85,7 @@ Vue.component('datafiles', {
         updateDataFilesWeight: function()
         {
             vm=this;
-            let url=CI.base_url + '/api/editor/datafiles_sequence/'+vm.dataset_id;
+            let url=CI.base_url + '/api/datafiles/sequence/'+vm.dataset_id;
             let form_data={};
             form_data.options=this.getRowSequence(this.data_files);
 
@@ -134,7 +134,7 @@ Vue.component('datafiles', {
             }
 
             vm=this;
-            let url=CI.base_url + '/api/editor/datafiles_delete/'+vm.dataset_id + '/'+ data_file.file_id;
+            let url=CI.base_url + '/api/datafiles/delete/'+vm.dataset_id + '/'+ data_file.file_id;
             form_data={};
 
             axios.post(url, 

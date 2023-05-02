@@ -16,7 +16,7 @@ Vue.component('external-resources', {
         addResource:function(){
 
             vm=this;
-            let url=CI.base_url + '/api/editor/resources/'+ this.ProjectID;
+            let url=CI.base_url + '/api/resources/'+ this.ProjectID;
 
             formData={
                 "title": "untitled",
@@ -44,7 +44,7 @@ Vue.component('external-resources', {
         deleteResource:function(id)
         {            
             vm=this;
-            let url=CI.base_url + '/api/editor/resource_delete/'+ this.ProjectID + '/'+id;
+            let url=CI.base_url + '/api/resources/delete/'+ this.ProjectID + '/'+id;
 
             axios.post( url
             ).then(function(response){

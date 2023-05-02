@@ -364,7 +364,7 @@ Vue.component('datafile-import', {
         },
         checkFileExists: async function()
         {
-            let url=CI.base_url + '/api/editor/datafile_by_name/'+this.ProjectID+'?filename='+this.file.name;
+            let url=CI.base_url + '/api/datafiles/by_name/'+this.ProjectID+'?filename='+this.file.name;
             this.errors='';
             vm=this;
 

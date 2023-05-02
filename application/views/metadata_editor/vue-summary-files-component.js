@@ -18,7 +18,7 @@ Vue.component('summary-files', {
     methods:{
         loadData: function() {
             vm=this;
-            let url=CI.base_url + '/api/editor/files/'+this.ProjectID;
+            let url=CI.base_url + '/api/files/'+this.ProjectID;
             axios.get(url)
             .then(function (response) {
                 if(response.data){                    

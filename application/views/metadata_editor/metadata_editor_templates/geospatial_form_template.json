@@ -2415,7 +2415,7 @@
                                         {
                                             "key": "description.identificationInfo.spatialResolution.value",
                                             "type": "string",
-                                            "title": "Spatial resolution UOM",
+                                            "title": "Value",
                                             "prop_key": "description.identificationInfo.spatialResolution.value"
                                         }
                                     ]

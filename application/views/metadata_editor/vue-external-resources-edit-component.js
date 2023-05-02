@@ -72,7 +72,7 @@ Vue.component('external-resources-edit', {
             }            
 
             vm=this;
-            let url=CI.base_url + '/api/editor/resources/'+ this.ProjectID + '/' + this.Resource['id'];
+            let url=CI.base_url + '/api/resources/'+ this.ProjectID + '/' + this.Resource['id'];
 
             axios.post( url,
                 formData,
@@ -106,7 +106,7 @@ Vue.component('external-resources-edit', {
             this.errors!=''
 
             vm=this;
-            let url=CI.base_url + '/api/editor/files/'+ this.ProjectID + '/documentation';
+            let url=CI.base_url + '/api/files/'+ this.ProjectID + '/documentation';
 
             axios.post( url,
                 formData,

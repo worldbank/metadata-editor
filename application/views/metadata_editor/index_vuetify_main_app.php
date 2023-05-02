@@ -528,8 +528,8 @@
                         console.log("error loading project",error);
                     });
                 },
-                async loadDataFiles({commit},options) {
-                    let url=CI.base_url + '/api/editor/datafiles/'+options.dataset_id;
+                async loadDataFiles({commit},options) {                    
+                    let url=CI.base_url + '/api/datafiles/'+options.dataset_id;
                     return axios
                     .get(url)
                     .then(function (response) {
@@ -571,7 +571,7 @@
                     });
                 },
                 async loadExternalResources({commit}, options) {
-                    let url=CI.base_url + '/api/editor/resources/'+options.dataset_id;
+                    let url=CI.base_url + '/api/resources/'+options.dataset_id;
                     return axios
                     .get(url)
                     .then(function (response) {

@@ -45,8 +45,8 @@
                 <div class="dropdown-divider"></div>
                 <a v-if="dataset_type=='survey'" class="dropdown-item" :href="'<?php echo site_url('api/editor/ddi/'); ?>' + dataset_id" target="_blank"><i class="far fa-file-alt"></i> Export DDI CodeBook (2.5)</a>
                 <a class="dropdown-item" :href="'<?php echo site_url('api/editor/json/'); ?>' + dataset_id" target="_blank"><i class="far fa-file-code"></i> Export JSON</a>
-                <a class="dropdown-item" :href="'<?php echo site_url('api/editor/rdf/'); ?>' + dataset_id" target="_blank"><i class="far fa-file-alt"></i> Export External Resouces (RDF/XML)</a>
-                <a class="dropdown-item" :href="'<?php echo site_url('api/editor/resources/'); ?>' + dataset_id" target="_blank"><i class="far fa-file-alt"></i> Export External Resources (JSON)</a>
+                <a class="dropdown-item" :href="'<?php echo site_url('api/resources/rdf/'); ?>' + dataset_id" target="_blank"><i class="far fa-file-alt"></i> Export External Resouces (RDF/XML)</a>
+                <a class="dropdown-item" :href="'<?php echo site_url('api/resources/'); ?>' + dataset_id" target="_blank"><i class="far fa-file-alt"></i> Export External Resources (JSON)</a>
             </div>
         </div>
 

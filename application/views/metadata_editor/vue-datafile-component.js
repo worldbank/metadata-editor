@@ -28,7 +28,7 @@ Vue.component('datafile', {
         saveFile: function(data)
         {
             vm=this;
-            let url=CI.base_url + '/api/editor/datafiles/'+vm.ProjectID;
+            let url=CI.base_url + '/api/datafiles/'+vm.ProjectID;
             form_data=data;
 
             axios.post(url, 

@@ -216,4 +216,33 @@ abstract class MY_REST_Controller extends REST_Controller {
         }
     }
 
+    /**
+	 * 
+	 * 
+	 * Return ID from IDNO
+	 * 
+	 * 
+	 * @idno 		- ID | IDNO
+	 * 
+	 * 
+	 */
+	function get_sid($idno=null)
+	{		
+		if(!$idno){
+			throw new Exception("IDNO-NOT-PROVIDED");
+		}
+
+		if (is_numeric($idno)){
+			return $idno;
+		}
+
+		$sid=$this->Editor_model->get_project_id_by_idno($idno);
+
+		if(!$sid){
+			throw new Exception("IDNO-NOT-FOUND");
+		}
+
+		return $sid;
+	}
+
 }

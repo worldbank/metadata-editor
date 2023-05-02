@@ -26,7 +26,7 @@ Vue.component('project-thumbnail', {
 
             vm=this;
             this.errors='';
-            let url=CI.base_url + '/api/editor/files/'+ this.ProjectID + '/thumbnail';
+            let url=CI.base_url + '/api/files/'+ this.ProjectID + '/thumbnail';
 
             axios.post( url,
                 formData,

@@ -4,6 +4,7 @@ use JsonSchema\SchemaStorage;
 use JsonSchema\Validator;
 use JsonSchema\Constraints\Factory;
 use JsonSchema\Constraints\Constraint;
+use Ramsey\Uuid\Uuid;
 
 
 /**
@@ -474,9 +475,9 @@ class Editor_model extends CI_Model {
 		}
 
 		$options=array(
-			'changed'=>$options['changed'],
+			'changed'=>isset($options['changed']) ? $options['changed'] : date("U"),
 			'changed_by'=>$options['changed_by'],
-			'idno'=>$this->get_project_metadata_field($type,'idno',$options),
+			'idno'=>isset($options['idno']) ? $options['idno'] : $this->generate_uuid(),
 			'title'=>$this->get_project_metadata_field($type,'title',$options),
 			'metadata'=>$this->encode_metadata($options)
 		);
@@ -975,44 +976,6 @@ class Editor_model extends CI_Model {
     }
 
 
-	/**
-     * 
-     * 
-     * insert new variable
-     * 
-     * 
-     */
-    public function variable_insert($sid,$options)
-    {
-        $valid_fields=array(
-            'name',
-            'labl',
-            'qstn',
-            'catgry',
-            'keywords',
-            'sid',
-            'fid',
-            'vid',
-            'metadata'
-        );
-
-        foreach($options as $key=>$value){
-            if(!in_array($key,$valid_fields)){
-                unset($options[$key]);
-            }
-        }
-
-        $options['sid']=$sid;
-
-        //metadata
-        if(isset($options['metadata'])){
-            $options['metadata']=$this->encode_metadata($options['metadata']);
-        }
-
-        $this->db->insert("editor_variables",$options);
-        $insert_id=$this->db->insert_id();
-        return $insert_id;
-    }
 
     public function variable_update($sid,$uid,$options)
     {
@@ -1065,7 +1028,7 @@ class Editor_model extends CI_Model {
 	 * 
 	 * @parseOnly true|false - if true, no data import is done
 	 */
-	function importDDI($sid, $parseOnly=false)
+	function importDDI($sid, $parseOnly=false, $options=array())
 	{
 		//temporary folder
 		$temp_upload_folder='datafiles/tmp';
@@ -1114,7 +1077,9 @@ class Editor_model extends CI_Model {
 		$this->load->library('DDI2_import');
 		$this->load->library('Metadata_parser', $parser_params);
 		$parser=$this->metadata_parser->get_reader();		
-		$output=$this->ddi2_import->transform_ddi_fields($parser->get_metadata_array()); 
+		$output=$this->ddi2_import->transform_ddi_fields($parser->get_metadata_array());
+
+		$output=array_merge($output,$options);
 
 		//import study description
 		if (!$parseOnly){
@@ -1173,7 +1138,7 @@ class Editor_model extends CI_Model {
 				$variable=$var_obj->get_metadata_array();
 				$variable['fid']=$variable['file_id'];
 				$variable['metadata']=$variable;
-				$this->variable_insert($sid,$variable);
+				$this->Editor_variable_model->insert($sid,$variable);
 			}
 		}
 
@@ -1505,9 +1470,61 @@ class Editor_model extends CI_Model {
 		//tags
 		
 		return $facets;
-
 	}
 
+
+	function generate_uuid()
+	{
+		return Uuid::uuid4();
+	}
+
+
+	function get_project_id_by_idno($idno)
+	{
+		$this->db->select("id");
+		$this->db->where("idno",$idno);
+		$result=$this->db->get("editor_projects")->row_array();
+
+		if (isset($result['id'])){
+			return $result['id'];
+		}
+	}
+
+
+	function get_project_idno_by_id($sid)
+	{
+		$this->db->select("idno");
+		$this->db->where("id",$sid);
+		$result=$this->db->get("editor_projects")->row_array();
+
+		if (isset($result['idno'])){
+			return $result['idno'];
+		}
+	}
+
+	function validate_idno($idno){
+		if (is_numeric($idno)){
+			throw new Exception("IDNO cannot be numeric");
+		}
+	}
+
+	
+	function idno_exists($idno,$sid=null)
+	{
+		$this->db->select("id");
+		$this->db->where("idno",$idno);
+
+		if ($sid){
+			$this->db->where("id !=",$sid);
+		}
+
+		$result=$this->db->get("editor_projects")->row_array();
+
+		if (isset($result['id'])){
+			return true;
+		}
+		return false;
+	}
 
 	
 }//end-class

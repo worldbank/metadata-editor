@@ -13,7 +13,8 @@
         "spatie/array-to-xml": "^2.15",
         "guzzlehttp/guzzle": "^7.0",
         "symfony/event-dispatcher": "^5.3",
-        "firebase/php-jwt": "^5.4"
+        "firebase/php-jwt": "^5.4",
+        "ramsey/uuid": "^4.2"
     },
     "config": {
         "platform": {
