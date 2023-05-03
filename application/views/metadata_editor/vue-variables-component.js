@@ -751,6 +751,7 @@ Vue.component('variables', {
                                             </span>
                                             <v-icon title="Weight variable" v-if="variable.var_wgt==1" aria-hidden="false" class="vdar-icon">mdi-alpha-w</v-icon>
                                             <v-icon title="Weighted" v-if="variable.var_wgt_id && variable.var_wgt_id.length>0" aria-hidden="false" class="vdar-icon">mdi-scale-balance</v-icon>
+                                            <v-icon title="Change requires updating summary statistics" v-if="variable.update_required" aria-hidden="false" class="vdar-icon text-danger">mdi-sync-alert</v-icon>
                                         </td>                                        
                                     </tr>
                                     </tbody>

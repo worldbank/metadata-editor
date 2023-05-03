@@ -121,6 +121,10 @@ class Editor_variable_model extends ci_model {
                     var_dump($variable_info);
                     die();
                 }
+
+                if (isset($variable_info['metadata']['update_required'])){
+                    unset($variable_info['metadata']['update_required']);
+                }
                 
 				$this->update($sid,$variable_info['uid'],$variable_info);
 			}

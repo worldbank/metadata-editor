@@ -22,31 +22,33 @@ Vue.component('variable-info', {
             ],
         }
     },
-    /*methods: {
-        updateValue: function () {
-            console.log("emitting variable change",this.value);
-          this.$emit('updateVariable', this.value);
+    methods: {
+        OnValueUpdate: function () {
+          this.variable.update_required = true;
+          this.$emit('input', this.variable);
         }
-    },*/
+    },
     created: function(){
         
     },
-    computed: {
-        variable: function()
-        {
-            //console.log("variable info component created",JSON.stringify(this.value), this.value);
-            if (this.value){
-                if (!this.value.var_format){
-                    //console.log("variable format is missing");
-                    this.value.var_format={
-                        "type": ""
-                    }                
+    computed: {       
+        variable:{
+            get(){
+                if (this.value){
+                    if (!this.value.var_format){
+                        this.value.var_format={
+                            "type": ""
+                        }                
+                    }
+                    if (!this.value.var_format.type){
+                        this.value.var_format.type="";
+                    }
                 }
-                if (!this.value.var_format.type){
-                    this.value.var_format.type="";
-                }
+                return this.value;
+            },
+            set(newValue){
+                this.$emit('input', newValue);                
             }
-            return this.value;
         }
     },
     template: `
@@ -79,7 +81,6 @@ Vue.component('variable-info', {
                             {{ option_key }}
                         </option>
                     </select>
-                    <small class="help-text form-text text-muted">{{variable.var_intrvl}}</small> 
                 </div>
                 
                 <div class="form-group form-field">
@@ -94,7 +95,6 @@ Vue.component('variable-info', {
                             {{ option_key }}
                         </option>
                     </select>
-                    <small class="help-text form-text text-muted">{{variable.var_format.type}}</small>                    
                 </div>
 
                 <div class="form-group form-field">                                        
@@ -116,9 +116,13 @@ Vue.component('variable-info', {
 
                 <div class="form-group form-field" v-if="variable.var_invalrng">
                     <label>Missing</label>
-                    <div v-for="i in 5">
-                        <input type="text" class="form-control form-control-sm form-control-xs" v-model="variable.var_invalrng.values[i-1]" />
-                    </div>
+                    
+                        <repeated-field
+                                @input="OnValueUpdate"  
+                                v-model="variable.var_invalrng.values"
+                                :field="missing_template"
+                            >
+                        </repeated-field>
                 </div>
 
                 </div>

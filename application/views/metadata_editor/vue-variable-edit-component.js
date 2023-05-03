@@ -74,7 +74,7 @@ Vue.component('variable-edit', {
             }]
         }        
     },
-    watch: { 
+    watch: {        
     },    
     created: function () {
        if (this.variable.var_concept==undefined){
@@ -200,7 +200,76 @@ Vue.component('variable-edit', {
             }
 
             return categories;
-        }
+        },
+        isWeighted(){
+            if (this.Variable['var_wgt_id']){
+                return true;
+            }
+            return false;
+        },        
+        WeightedValidRangeCount(){
+            let count=0;
+            if (!this.Variable.var_catgry){
+                return 0;
+            }
+
+            for(i=0;i<this.Variable.var_catgry.length;i++){                
+                let catgry=this.Variable.var_catgry[i]; 
+                
+                if (!catgry.stats){
+                    continue;
+                }
+
+                //skip missing values
+                /*if (catgry.value && this.VariableIsMissing(catgry.value)){
+                    continue;
+                }*/
+
+                if (catgry.is_missing && catgry.is_missing=='1'){
+                    continue;
+                }
+
+                for(j=0;j<catgry.stats.length;j++){
+                    if (catgry.stats[j]['type'] && catgry.stats[j].type=='freq' && (catgry.stats[j]['wgtd'] && catgry.stats[j].wgtd=='wgtd') ){
+                        if (catgry.stats[j]['value']){
+                            count=count+ Number(catgry.stats[j].value);
+                        }
+                    }
+                }
+            }
+            return count;
+        },
+        ValidRangeCount(){
+            let count=0;
+            if (!this.Variable.var_catgry){
+                return 0;
+            }
+
+            for(i=0;i<this.Variable.var_catgry.length;i++){                
+                let catgry=this.Variable.var_catgry[i]; 
+                
+                if (!catgry.stats){
+                    continue;
+                }
+
+                if (catgry.is_missing && catgry.is_missing=='1'){
+                    continue;
+                }
+
+                for(j=0;j<catgry.stats.length;j++){
+                    if (catgry.stats[j]['wgtd'] && catgry.stats[j].wgtd=='wgtd'){
+                        continue;
+                    }
+                    if (catgry.stats[j]['type'] && catgry.stats[j].type=='freq'  ){
+                        if (catgry.stats[j]['value']){
+                            count=count + Number(catgry.stats[j].value);
+                        }
+                    }
+                }
+            }
+            console.log("ValidRangeCount",count);
+            return count;
+        },
     },
     methods: {
         sectionEnabled: function(section){
@@ -231,14 +300,34 @@ Vue.component('variable-edit', {
         VariablePercent(variable, catgry){
            if (variable && variable.var_valrng && variable.var_valrng.range && variable.var_valrng.range.count){
                 let catgry_freq=this.VariableCategoryFrequency(catgry);
-                return (catgry_freq/variable.var_valrng.range.count)*100;                
+                return (catgry_freq/this.ValidRangeCount)*100;                
            }
            return 0;           
         },
+        VariablePercentWeighted(variable, catgry){
+            if (variable && variable.var_valrng && variable.var_valrng.range && variable.var_valrng.range.count){
+                 let catgry_freq=this.VariableCategoryFrequencyWeighted(catgry);
+                 return (catgry_freq/this.WeightedValidRangeCount)*100;                
+            }
+            return 0;           
+         },        
         VariableCategoryFrequency(catgry){
             if (catgry && catgry.stats){
                 for(i=0;i<catgry.stats.length;i++){
+                    if (catgry.stats[i]['wgtd'] && catgry.stats[i].wgtd=='wgtd'){
+                        continue;
+                    }
                     if (catgry.stats[i].type=='freq'){
+                        return catgry.stats[i].value;
+                    }
+                }
+            }
+            return 0;
+        },
+        VariableCategoryFrequencyWeighted(catgry){
+            if (catgry && catgry.stats){
+                for(i=0;i<catgry.stats.length;i++){
+                    if (catgry.stats[i].type=='freq' && (catgry.stats[i]['wgtd'] && catgry.stats[i].wgtd=='wgtd') ){
                         return catgry.stats[i].value;
                     }
                 }
@@ -288,6 +377,21 @@ Vue.component('variable-edit', {
                 }
             }
             return false;
+        },
+        getWgtFieldValue: function(field,value)
+        {
+            if (!this.Variable.sum_stats_options.wgt){
+                return false;
+            }
+
+            return value;
+        },
+        OnWghtdStatsChange: function(e)
+        {
+            if (!this.Variable.sum_stats_options.wgt){
+                this.Variable.sum_stats_options.mean_wgt=false;
+                this.Variable.sum_stats_options.stdev_wgt=false
+            }
         }
 
     },
@@ -308,7 +412,7 @@ Vue.component('variable-edit', {
 
                     <div class="row no-gutters">
                         <div class="col-md-3">
-                            <div><label class="text-normal text-small"><input type="checkbox" v-model="Variable.sum_stats_options.wgt" value="1" /> Weighted statistics</label></div>
+                            <div><label class="text-normal text-small"><input type="checkbox" @change="OnWghtdStatsChange" v-model="Variable.sum_stats_options.wgt" value="1" /> Weighted statistics</label></div>
                             <div><label class="text-normal text-small"><input type="checkbox" v-model="Variable.sum_stats_options.freq" value="1" /> Frequencies</label></div>
                             <div><label class="text-normal text-small"><input type="checkbox" v-model="Variable.sum_stats_options.missing" value="1"/> List missings</label></div>
                             <div class="mt-3 mb-2 border-bottom w-50 ">Summary statistics:</div>
@@ -316,7 +420,10 @@ Vue.component('variable-edit', {
                             <div><label class="text-normal text-small"><input type="checkbox" v-model="Variable.sum_stats_options.min" value="1"/> Min</label></div>
                             <div><label class="text-normal text-small"><input type="checkbox" v-model="Variable.sum_stats_options.max" value="1"/> Max</label></div>
                             <div><label class="text-normal text-small"><input type="checkbox" v-model="Variable.sum_stats_options.mean" value="1"/> Mean</label></div>
-                            <div><label class="text-normal text-small"><input type="checkbox" v-model="Variable.sum_stats_options.mean_wgt" value="1"/> Weighted mean</label></div>
+                            <div>
+                                <label class="text-normal text-small">
+                                <input  type="checkbox" v-model="Variable.sum_stats_options.mean_wgt" value="1"/> Weighted mean</label>
+                            </div>
                             <div><label class="text-normal text-small"><input type="checkbox" v-model="Variable.sum_stats_options.stdev" value="1"/> StdDev</label></div>
                             <div>
                                 <label class="text-normal text-small"><input type="checkbox" v-model="Variable.sum_stats_options.stdev_wgt" value="1"/> Weighted StdDev</label>
@@ -332,8 +439,8 @@ Vue.component('variable-edit', {
                                     <th>Value</th>
                                     <th>Label</th>
                                     <th>Cases</th>
-                                    <th>Weighted</th>
-                                    <th>Percent</th>
+                                    <th v-if="isWeighted">Weighted</th>
+                                    <th>&nbsp;</th>
                                 </tr>
                                 <tr v-for="catgry in variableCategoriesAndFrequencies">
                                     <td>{{catgry.value}}</td>
@@ -347,27 +454,39 @@ Vue.component('variable-edit', {
                                     </td>
 
                                     <!--wgt values -->
-                                    <td>
+                                    <td v-if="isWeighted">
                                     <template v-for="stat in catgry.stats">
                                         <template v-if="stat.wgtd=='wgtd'">{{stat.value}}</template>
                                     </template>                                
                                     </td>
-                                    <td>
+                                    <td style="min-width:80px;">
                                         <div v-if="catgry.is_missing==1 || VariableIsMissing(catgry.value)">Missing</div>
-                                        <v-progress-linear v-else
+                                        <div v-else>
+
+                                        <v-progress-linear v-if="isWeighted==false"
                                             v-model="VariablePercent(variable, catgry)"
                                             color="#FFCC80"
                                             height="15"
                                             >
                                             <strong>{{  Math.ceil(VariablePercent(variable, catgry)) }}%</strong>
                                         </v-progress-linear>
+
+                                        
+                                        <v-progress-linear v-if="isWeighted==true && Variable.sum_stats_options.wgt"
+                                            v-model="VariablePercentWeighted(variable, catgry)"
+                                            color="#FFCC80"
+                                            height="15"
+                                            >
+                                            <strong>{{  Math.ceil(VariablePercentWeighted(variable, catgry)) }}%</strong>
+                                        </v-progress-linear>
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr v-if="variableStatsInValidCount(variable)>0 && Variable.sum_stats_options.missing">
                                     <td>Sysmiss</td>
                                     <td></td>                                    
                                     <td>{{variableStatsInValidCount(variable)}}</td>
-                                    <td></td>
+                                    <td v-if="isWeighted"></td>
                                     <td>Missing</td>
                                 </tr>
                             </table>
@@ -378,11 +497,18 @@ Vue.component('variable-edit', {
                             <table>
                                 <template v-for="sumstat in variable.var_sumstat">                            
                                 
-                                    <tr v-if="variableSumStatEnabled(sumstat.type)">
+                                    <tr v-if="variableSumStatEnabled(sumstat.type) && !sumstat.wgtd">
                                         <td style="width:150px;">
-                                            <strong>{{sumStatCodeToLabel(sumstat.type)}} <template v-if="sumstat.wgtd=='wgtd'"> (weighted)</template></strong></td>
+                                            <strong> {{sumStatCodeToLabel(sumstat.type)}}</strong>
+                                        </td>
                                         <td>{{sumstat.value}}</td>
-                                    </tr>                            
+                                    </tr>
+                                    <tr v-else-if="variableSumStatEnabled(sumstat.type + '_wgt') && (sumstat.wgtd && sumstat.wgtd=='wgtd') ">
+                                        <td style="width:150px;">
+                                            <strong> {{sumStatCodeToLabel(sumstat.type)}} (weighted)</strong>
+                                        </td>
+                                        <td>{{sumstat.value}}</td>
+                                    </tr>
                                                                
                                 </template>
                                 <!-- range -->

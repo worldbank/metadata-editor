@@ -29,7 +29,7 @@ Vue.component('repeated-field', {
             }*/
 
             this.local[index] = value;
-            this.$emit('input', JSON.parse(JSON.stringify(this.local)));
+            this.$emit('input', JSON.parse(JSON.stringify(this.local)));            
         },
         countRows: function(){
             return this.local.length;
