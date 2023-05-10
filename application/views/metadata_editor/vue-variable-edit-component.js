@@ -250,8 +250,7 @@ Vue.component('variable-edit', {
                         }
                     }
                 }
-            }
-            console.log("ValidRangeCount",count);
+            }            
             return count;
         },
     },

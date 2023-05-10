@@ -303,15 +303,17 @@ Vue.component('variables', {
                     if(this.variableMultiple[field_name]!=null){
 
                         if (field_name=='sum_stats_options'){
+                            let sum_stats_options_={}
                             //Vue.set(variable_,'sum_stats_options',JSON.parse(JSON.stringify(this.variableMultiple[field_name])));
                             sum_stats_keys=Object.keys(this.variableMultiple[field_name]);
                             for(s=0;s<sum_stats_keys.length;s++){
                                 sum_stats_key=sum_stats_keys[s];
                                 if (this.variableMultiple[field_name][sum_stats_key]==true || this.variableMultiple[field_name][sum_stats_key]==false){
-                                    variable_.sum_stats_options[sum_stats_key]=this.variableMultiple[field_name][sum_stats_key];
+                                    sum_stats_options_[sum_stats_key]=this.variableMultiple[field_name][sum_stats_key];
                                 }
                             }
-                            //Vue.set(variable_,'sum_stats_options',JSON.parse(JSON.stringify(variable_.sum_stats_options)));
+                            //variable_.sum_stats_options=sum_stats_options_;
+                            Vue.set(variable_,'sum_stats_options',JSON.parse(JSON.stringify(sum_stats_options_)));
                         }
                         else{
                             variable_[field_name]=JSON.parse(JSON.stringify(this.variableMultiple[field_name]));
@@ -428,10 +430,9 @@ Vue.component('variables', {
         },
         //on selection of multiple variables
         initializeMultiVariable: function(){
-            console.log("initializeMultiVariable xxxxxxxxxkjsadklfjskdlfjlkasdjfklajsdflkjsdkfjsakldjflasjdfljasdfjslfj");
             this.variableMultiple=JSON.parse(JSON.stringify(this.variableMultipleTemplate));
 
-            console.log("initializeMultiVariable", this.variableMultiple);
+            //console.log("initializeMultiVariable", this.variableMultiple);
 
             //initialize variableMultiple using the first variable from the selection
             let fields=Object.keys(this.variableMultipleTemplate);
@@ -457,12 +458,7 @@ Vue.component('variables', {
                 let field=fields[k];
                 for(i=1;i<this.selectedVariables.length;i++){
                     let variable=this.selectedVariables[i];
-                        
-                        if (field=="var_txt"){
-                            //console.log(variable);
-                            console.log("var_txt comparison",variable.name,JSON.stringify(variable[field]),JSON.stringify(first_variable[field]));
-                        }
-                        
+                                                
                         if (field=="sum_stats_options"){
                             this.variableMultiple[field]=this.compareObjects(this.variableMultiple[field],variable[field]);                    
                         }
@@ -477,12 +473,16 @@ Vue.component('variables', {
             }
 
 
-            console.log("init variableMultiple",this.variableMultiple);
+            //console.log("init variableMultiple",this.variableMultiple);
         },
         //function to compare two objects
         // for props that are same, keep the value
         // for props that are different, set to null
-        compareObjects: function(obj1,obj2){
+        compareObjects: function(obj1,obj2){            
+            if (!obj2){           
+                return obj1;
+            }
+
             let fields=Object.keys(obj1);
             for(i=0;i<fields.length;i++){
                 let field=fields[i];
