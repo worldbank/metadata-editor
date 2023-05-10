@@ -608,8 +608,27 @@ Vue.component('variables', {
                 Vue.set (this.variables, this.edit_items[i], variable);
             }
         },
-        onVariableKeydown: function(event,idx){
-            //this.editVariable(idx+1);
+        onVariableKeydown: function(event,idx,field_name){
+            let UP = 38;
+            let DOWN = 40;
+
+            if (idx<0 || idx>=this.variables.length){
+                return;
+            }
+
+            let mv_idx=idx;
+
+            if (event.keyCode==UP){
+                mv_idx=idx-1;
+            }else if (event.keyCode==DOWN){
+                mv_idx=idx+1;
+            }
+            
+            let el =this.$refs[field_name][mv_idx];
+            if (el){
+                this.editVariable(mv_idx);
+                el.focus();
+            }
         },
         onVariableDrag: function(event)
         {
@@ -846,8 +865,7 @@ Vue.component('variables', {
                                         @click.alt.exact="editVariableMultiple(index)" 
                                         @click.ctrl.exact="editVariableMultiple(index)" 
                                         @click.shift.exact="editVariableMultiple(index,1)" 
-                                        @click.exact="editVariable(index)" 
-                                        v-on:keydown="onVariableKeydown($event,index)"
+                                        @click.exact="editVariable(index)"                                         
                                         
                                         :class="variableActiveClass(index,variable.name)"                                         
                                         :id="'v-'+index"
@@ -855,10 +873,10 @@ Vue.component('variables', {
                                         <td class="var-vid-td bg-secondary handle">V{{index+1}}</td>                                        
 
                                         <td class="var-name-edit">
-                                            <div><input class="var-labl-edit" type="text" v-model="variable.name" /></div>
+                                            <div><input v-on:keydown="onVariableKeydown($event,index,'var_name')" class="var-labl-edit" type="text" v-model="variable.name" ref="var_name" /></div>
                                         </td>
                                         <td>
-                                            <div><input class="var-labl-edit" type="text" v-model="variable.labl"/></div>
+                                            <div><input v-on:keydown="onVariableKeydown($event,index,'var_labl')"  class="var-labl-edit" type="text" v-model="variable.labl" ref="var_labl"/></div>
                                         </td>
                                         <td>
                                             <?php /* <span v-if="variable.var_format && variable.var_format.type">{{variable.var_format.type.substr(0,1)}}</span> */ ?>
