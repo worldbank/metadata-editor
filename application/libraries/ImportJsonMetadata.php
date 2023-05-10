@@ -38,7 +38,10 @@ class ImportJsonMetadata
 
         //fix for geospatial
         if ($type=='geospatial'){
-			if (isset($json_data['description']['identificationInfo']) && is_array($json_data['description']['identificationInfo']) ){
+			if (isset($json_data['description']['identificationInfo']) && 
+                    is_array($json_data['description']['identificationInfo']) &&
+                    isset($json_data['description']['identificationInfo'][0])
+                ){
 				$json_data['description']['identificationInfo']=$json_data['description']['identificationInfo'][0];
 			}
 		}

@@ -156,6 +156,7 @@
 
             echo $this->load->view("metadata_editor/vue-variables-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-variable-edit-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-variable-weights-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-variable-categories-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-variable-info-edit-component.js",null,true);
 

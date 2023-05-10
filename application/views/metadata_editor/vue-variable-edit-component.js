@@ -8,19 +8,18 @@ Vue.component('variable-edit', {
             //variable: this.value,            
             //variable:{},
             form_local:{},
-            show_weights_dialog:false,
             sum_stats_options:
             {
-                'wgt':1,
-                'freq':1,
-                'missing':1,
-                'vald':1,
-                'min':1,
-                'max':1,
-                'mean':1,
-                'mean_wgt':1,
-                'stdev':1,
-                'stdev_wgt':1
+                'wgt':true,
+                'freq':true,
+                'missing':true,
+                'vald':true,
+                'min':true,
+                'max':true,
+                'mean':true,
+                'mean_wgt':true,
+                'stdev':true,
+                'stdev_wgt':true
             },
             concept_columns:[
                 {
@@ -120,11 +119,7 @@ Vue.component('variable-edit', {
             get(){
                 if (!this.variable.sum_stats_options){              
                     //Vue.set(this.variable, 'sum_stats_options', this.sum_stats_options);
-                    this.variable.sum_stats_options=this.sum_stats_options;
-                }
-                if(!this.variable.sum_stats_options.min){        
-                    //Vue.set(this.variable, 'sum_stats_options', this.sum_stats_options);
-                    this.variable.sum_stats_options=this.sum_stats_options;
+                    this.variable.sum_stats_options=JSON.parse(JSON.stringify(this.sum_stats_options));
                 }
                 return this.variable;
             },
@@ -156,17 +151,7 @@ Vue.component('variable-edit', {
         {
             return this.Variable.fid;
         },
-        VariablesForWeight(){
-           let variables = [];
         
-            for (var variable in this.Variables){
-                if (this.Variables[variable].uid==this.variable.var_wgt_id){
-                    variables.push(this.Variables[variable]);
-                }
-            }
-            
-            return variables;
-        },
         //combine categories and frequencies values
         variableCategoriesAndFrequencies()
         {
@@ -177,7 +162,6 @@ Vue.component('variable-edit', {
             }
 
             for (var i=0;i<categories.length;i++){
-                console.log("adding label",categories[i].value);
                 categories[i].labl=this.VariableLabelByValue(categories[i].value);
             }
 
@@ -350,15 +334,7 @@ Vue.component('variable-edit', {
             }
             return false;
         },
-        OnWeightVariableSelection: function(e)
-        {
-            this.variable.var_wgt_id=e;
-            this.$emit('input', JSON.parse(JSON.stringify(this.variable)));
-        },
-        RemoveWeightVariable: function(){
-            this.variable.var_wgt_id='';
-            this.$emit('input', JSON.parse(JSON.stringify(this.variable)));
-        },
+                
         VariableLabelByValue: function(value){
             if (this.variable.var_catgry_labels){
                 for(i=0;i<this.variable.var_catgry_labels.length;i++){
@@ -411,23 +387,18 @@ Vue.component('variable-edit', {
                     <div style="overflow:auto;padding:10px;font-size:smaller;">
 
                     <div class="row no-gutters">
-                        <div class="col-md-3">
-                            <div><label class="text-normal text-small"><input type="checkbox" @change="OnWghtdStatsChange" v-model="Variable.sum_stats_options.wgt" value="1" /> Weighted statistics</label></div>
-                            <div><label class="text-normal text-small"><input type="checkbox" v-model="Variable.sum_stats_options.freq" value="1" /> Frequencies</label></div>
-                            <div><label class="text-normal text-small"><input type="checkbox" v-model="Variable.sum_stats_options.missing" value="1"/> List missings</label></div>
+                        <div class="col-md-3 v-checkbox-rm-styles v-checkbox-summary-stats">
+                            <div><v-checkbox @change="OnWghtdStatsChange" v-model="Variable.sum_stats_options.wgt" :indeterminate="Variable.sum_stats_options.wgt==null" label="Weighted statistics"></v-checkbox></div>
+                            <div><v-checkbox v-model="Variable.sum_stats_options.freq" :indeterminate="Variable.sum_stats_options.freq==null" label="Frequencies"></v-checkbox></div>
+                            <div><v-checkbox v-model="Variable.sum_stats_options.missing" :indeterminate="Variable.sum_stats_options.missing==null" label="List missings"></v-checkbox></div>
                             <div class="mt-3 mb-2 border-bottom w-50 ">Summary statistics:</div>
-                            <div><label class="text-normal text-small"><input type="checkbox" v-model="Variable.sum_stats_options.vald" value="1"/> Valid</label></div>
-                            <div><label class="text-normal text-small"><input type="checkbox" v-model="Variable.sum_stats_options.min" value="1"/> Min</label></div>
-                            <div><label class="text-normal text-small"><input type="checkbox" v-model="Variable.sum_stats_options.max" value="1"/> Max</label></div>
-                            <div><label class="text-normal text-small"><input type="checkbox" v-model="Variable.sum_stats_options.mean" value="1"/> Mean</label></div>
-                            <div>
-                                <label class="text-normal text-small">
-                                <input  type="checkbox" v-model="Variable.sum_stats_options.mean_wgt" value="1"/> Weighted mean</label>
-                            </div>
-                            <div><label class="text-normal text-small"><input type="checkbox" v-model="Variable.sum_stats_options.stdev" value="1"/> StdDev</label></div>
-                            <div>
-                                <label class="text-normal text-small"><input type="checkbox" v-model="Variable.sum_stats_options.stdev_wgt" value="1"/> Weighted StdDev</label>
-                            </div>                            
+                            <div><v-checkbox v-model="Variable.sum_stats_options.vald" :indeterminate="Variable.sum_stats_options.vald==null"  label="Valid"></v-checkbox></div>
+                            <div><v-checkbox v-model="Variable.sum_stats_options.min" :indeterminate="Variable.sum_stats_options.min==null"  label="Min"></v-checkbox></div>
+                            <div><v-checkbox v-model="Variable.sum_stats_options.max" :indeterminate="Variable.sum_stats_options.max==null" label="Max"></v-checkbox></div>
+                            <div><v-checkbox v-model="Variable.sum_stats_options.mean" :indeterminate="Variable.sum_stats_options.mean==null" label="Mean"></v-checkbox></div>
+                            <div><v-checkbox v-model="Variable.sum_stats_options.mean_wgt" :indeterminate="Variable.sum_stats_options.mean_wgt==null" label="Weighted mean"></v-checkbox></div>
+                            <div><v-checkbox v-model="Variable.sum_stats_options.stdev" :indeterminate="Variable.sum_stats_options.stdev==null" label="StdDev"></v-checkbox></div>
+                            <div><v-checkbox v-model="Variable.sum_stats_options.stdev_wgt" :indeterminate="Variable.sum_stats_options.stdev_wgt==null" label="Weighted StdDev"></v-checkbox></div>                            
                         </div>
                         <div class="col-md-9">
 
@@ -531,37 +502,11 @@ Vue.component('variable-edit', {
                 
                 </v-tab-item>
                 <v-tab-item key="weights" value="weights">
-                    <div class="p-3">                    
-
-                        <dialog-weight-variable-selection 
-                            :variables="Variables" 
-                            v-model="show_weights_dialog"
-                            @selected="OnWeightVariableSelection"
-                        ></dialog-weight-variable-selection>
-                        <div v-if="variable.var_wgt==1">
-                            <div class="border p-2 m-3 text-center text-danger">Cannot add weights to a weight variable</div>
-                        </div>
-                        <div v-else>
-                            <table class="table table-sm table-bordered" v-if="variable.var_wgt_id">
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Label</th>
-                                    <td><button class="btn btn-sm btn-xs btn-link" @click="RemoveWeightVariable">Remove</button></td>
-                                </tr>
-                                <tr v-for="var_ in VariablesForWeight" :key="var_.uid">
-                                    <td>{{var_.name}}</td>
-                                    <td>{{var_.labl}}</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-xs btn-link" @click="RemoveWeightVariable">Remove</button>
-                                        <button class="btn btn-sm btn-xs btn-link" @click="show_weights_dialog=true">Change</button>
-                                    </td>
-                                </tr>
-                            </table>
-                            <div v-else>
-                                <div class="border p-2 m-3 text-center " ><button class="btn btn-sm btn-xs btn-link" @click="show_weights_dialog=true">Select variable</button></div>
-                            </div>
-                        </div>
-
+                    <div class="p-3">
+                        <variable-weights-component 
+                            v-model="variable.var_wgt_id" 
+                            :variables="Variables">
+                        </variable-weights-component>
                     </div>
                 </v-tab-item>
                 <v-tab-item key="json" value="json">
@@ -608,8 +553,15 @@ Vue.component('variable-edit', {
 
                                 <div v-if="var_field.enabled" class="form-group form-field">
                                     <label>{{var_field.title}}</label> 
-                                    <span v-if="var_field.type!='array'"><textarea class="form-control form-control-sm" v-model="variable[var_field.key]"/></span>
-                                    <table-component v-if="var_field.type=='array'" v-model="variable[var_field.key]" :columns="var_field.props"/>
+                                    <span v-if="var_field.type!='array'">
+                                        <textarea class="form-control form-control-sm" v-model="variable[var_field.key]"/>
+                                    </span>
+                                    <span v-else-if="var_field.type=='array'">
+                                    <table-grid-component                                        
+                                        v-model="variable[var_field.key]" 
+                                        :columns="var_field.props">
+                                    </table-grid-component>
+                                    </span>
                                 </div>
 
                             </template>

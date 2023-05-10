@@ -13,11 +13,11 @@ Vue.component('table-grid-component', {
     watch: {
     },
     
-    mounted: function () {        
+    mounted: function () {   
+        
     },
     computed: {
         local(){
-            //console.log("bofore local value",JSON.stringify(this.value));
             let value= this.value ? this.value : [{}];
 
             if (value.length<1){
@@ -28,7 +28,6 @@ Vue.component('table-grid-component', {
                 value=[{}];
             }
         
-            //console.log("local value",JSON.stringify(value));
             return value;
         },
         localColumns(){
@@ -49,7 +48,6 @@ Vue.component('table-grid-component', {
         },
         update: function (index, key, value)
         {
-            //console.log("updating value",index,key,value);
             if (Array.isArray(this.local[index])){
                 this.local[index] = {};
             }
@@ -67,7 +65,6 @@ Vue.component('table-grid-component', {
         remove: function (index){
             this.local.splice(index,1);
             this.$emit('input', JSON.parse(JSON.stringify(this.local)));
-            console.log("after removed", this.local);
         },
         columnName: function(column,path)
         {
@@ -132,7 +129,6 @@ Vue.component('table-grid-component', {
               }
               csv+=row.join('\t') + "\n";
             }
-            //console.log("csv output",csv);
             return csv;
           },          
         tsvToArray: function(tsv){

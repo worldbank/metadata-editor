@@ -1241,6 +1241,22 @@
                                         "is_uri": true
                                     },
                                     "display_type": "text"
+                                },
+                                {
+                                    "key": "relationship",
+                                    "title": "Relationship",
+                                    "type": "string",
+                                    "prop_key": "series_description.related_indicators.relationship",
+                                    "help_text": "",                                    
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "type",
+                                    "title": "Type",
+                                    "type": "string",
+                                    "prop_key": "series_description.related_indicators.type",
+                                    "help_text": "",                                    
+                                    "display_type": "text"
                                 }
                             ],
                             "help_text": "This element allows to reference indicators that are often associated with the indicator being documented."

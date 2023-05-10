@@ -47,13 +47,15 @@ Vue.component('dialog-weight-variable-selection', {
         },
         Variables(){
             //return only variables with var_wgt==1
-            $variables = [];
-            for (var i=0; i<this.variables.length; i++){
-                if (this.variables[i].var_wgt==1){
-                    $variables.push(this.variables[i]);
+            variables = [];
+            if (Array.isArray(this.variables)){
+                for (var i=0; i<this.variables.length; i++){
+                    if (this.variables[i].var_wgt==1){
+                        variables.push(this.variables[i]);
+                    }
                 }
             }
-            return $variables;
+            return variables;
         },
         ProjectID(){
             return this.$store.state.project_id;

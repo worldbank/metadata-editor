@@ -640,3 +640,25 @@ table .form-field-dropdown-custom .v-input__slot fieldset{
 .activeRow .mdi {
     color: white;
 }
+
+/* remove extra padding and spacing from vuetify  checkbox */
+.v-checkbox-rm-styles .v-input--selection-controls{
+    margin: 0px;
+    padding: 0px;
+}
+
+.v-checkbox-rm-styles .v-input__slot{
+    margin:0px;
+}
+.v-checkbox-rm-styles .v-label{
+    font-size:14px;
+    font-weight:normal;
+}
+
+.v-checkbox-rm-styles .v-messages{
+    display:none;
+}
+
+.v-checkbox-summary-stats .v-label{
+    font-size:12px;
+}

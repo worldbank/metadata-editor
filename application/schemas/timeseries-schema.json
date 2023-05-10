@@ -789,6 +789,14 @@
 							"uri": {
 								"title": "URI",
 								"type": "string"
+							},
+							"relationship": {
+								"title": "Relationship",
+								"type": "string"
+							},
+							"type": {
+								"title": "Type",
+								"type": "string"
 							}
 						}
 					},
