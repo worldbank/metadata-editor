@@ -875,10 +875,10 @@ Vue.component('variables', {
                                         <td class="var-vid-td bg-secondary handle">V{{index+1}}</td>                                        
 
                                         <td class="var-name-edit">
-                                            <div><input v-on:keydown="onVariableKeydown($event,index,'var_name')" class="var-labl-edit" type="text" v-model="variable.name" ref="var_name" /></div>
+                                            <div><input vonkeydown="onVariableKeydown($event,index,'var_name')" class="var-labl-edit" type="text" v-model="variable.name" ref="var_name" /></div>
                                         </td>
                                         <td>
-                                            <div><input v-on:keydown="onVariableKeydown($event,index,'var_labl')"  class="var-labl-edit" type="text" v-model="variable.labl" ref="var_labl"/></div>
+                                            <div><input vonkeydown="onVariableKeydown($event,index,'var_labl')"  class="var-labl-edit" type="text" v-model="variable.labl" ref="var_labl"/></div>
                                         </td>
                                         <td>
                                             <?php /* <span v-if="variable.var_format && variable.var_format.type">{{variable.var_format.type.substr(0,1)}}</span> */ ?>
