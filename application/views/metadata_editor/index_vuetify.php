@@ -750,5 +750,20 @@ Vue.config.errorHandler = (err, vm, info) => {
     }
     })
   </script>
+
+  <script>
+    function resize_variable_list(){
+      console.log("resizing variable list");
+        $(".variable-list-component").height($(".pane-main-content").height()-45)
+      }
+
+    $(document).ready(function(){
+      jQuery(window).resize(function() {
+        resize_variable_list();
+      });
+
+      resize_variable_list();
+    });
+  </script>
 </body>
 </html>

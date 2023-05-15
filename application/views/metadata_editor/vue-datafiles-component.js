@@ -302,7 +302,7 @@ Vue.component('datafiles', {
         <div class="datfiles-component">
 
         
-            <div class="container-fluid mt-5 mb-5 pb-5">
+            <div class="container-fluid pt-5 mt-5 mb-5 pb-5">
 
             <h3>Data files</h3>
             <div v-show="page_action=='list'">

@@ -14,7 +14,8 @@
         "guzzlehttp/guzzle": "^7.0",
         "symfony/event-dispatcher": "^5.3",
         "firebase/php-jwt": "^5.4",
-        "ramsey/uuid": "^4.2"
+        "ramsey/uuid": "^4.2",
+        "nelexa/zip": "^3.3"
     },
     "config": {
         "platform": {

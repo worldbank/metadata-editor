@@ -44,16 +44,16 @@ Vue.component('variables', {
                 "var_txt": "",
                 "var_universe": "",
                 "sum_stats_options":{
-                    "wgt": 1,
-                    "freq": 1,
-                    "missing": 1,
-                    "vald": 1,
-                    "min": 1,
-                    "max": 1,
-                    "mean": 1,
-                    "mean_wgt": 1,
-                    "stdev": 1,
-                    "stdev_wgt": 1
+                    "wgt": true,
+                    "freq": true,
+                    "missing": true,
+                    "vald": true,
+                    "min": true,
+                    "max": true,
+                    "mean": true,
+                    "mean_wgt": true,
+                    "stdev": true,
+                    "stdev_wgt": true
                 },
                 "time_stamp":0
               },
@@ -449,36 +449,38 @@ Vue.component('variables', {
                 }        
             }
 
-            //console.log("first variable", JSON.stringify(this.variableMultiple));
+            let sum_stats_props=Object.keys(this.variableMultipleTemplate.sum_stats_options);
 
             //loop all variables
             //compare with first_variable
             //if different, set to null
-            for(k=0;k<fields.length;k++){
-                let field=fields[k];
-                for(i=1;i<this.selectedVariables.length;i++){
-                    let variable=this.selectedVariables[i];
-                                                
-                        if (field=="sum_stats_options"){
-                            this.variableMultiple[field]=this.compareObjects(this.variableMultiple[field],variable[field]);                    
-                        }
-                        else {
-                            if (JSON.stringify(variable[field])!==JSON.stringify(this.variableMultiple[field])){
-                                //console.log("different",field,JSON.stringify(variable[field]),JSON.stringify(first_variable[field]));
-                                this.variableMultiple[field]=null;
+            for(i=1;i<this.selectedVariables.length;i++){
+                let variable=this.selectedVariables[i];
+                for(k=0;k<fields.length;k++){
+                    let field=fields[k];
+                    console.log("field",field);
+                    if (field=="sum_stats_options"){
+                        //this.variableMultiple[field]=this.compareObjects(this.variableMultiple[field],variable[field]);                    
+                        for(p=0;p<sum_stats_props;p++){
+                            if (this.variableMultiple[field][sum_stats_props[p]]!==variable[field][sum_stats_props[p]]){
+                                this.variableMultiple[field][sum_stats_props[p]]=null;
                             }
                         }
-
+                    }
+                    else {
+                        if (JSON.stringify(variable[field])!==JSON.stringify(this.variableMultiple[field])){
+                            //console.log("different",field,JSON.stringify(variable[field]),JSON.stringify(first_variable[field]));
+                            this.variableMultiple[field]=null;
+                        }
+                    }
                 }
             }
 
-
-            //console.log("init variableMultiple",this.variableMultiple);
         },
         //function to compare two objects
         // for props that are same, keep the value
         // for props that are different, set to null
-        compareObjects: function(obj1,obj2){            
+        /*compareObjects: function(obj1,obj2){            
             if (!obj2){           
                 return obj1;
             }
@@ -491,7 +493,7 @@ Vue.component('variables', {
                 }
             }
             return obj1;
-        },
+        },*/
         variableActiveClass: function(idx,variable_name)
         {
             if (!variable_name){
@@ -690,7 +692,7 @@ Vue.component('variables', {
         },
         activeVariable: function()
         {
-            //console.log("activeVariable",this.edit_items);
+            console.log("activeVariable",this.edit_items);
 
             if (this.edit_items.length>1){
                 return this.variableMultiple;

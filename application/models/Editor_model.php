@@ -476,7 +476,7 @@ class Editor_model extends CI_Model {
 
 		$options=array(
 			'changed'=>isset($options['changed']) ? $options['changed'] : date("U"),
-			'changed_by'=>$options['changed_by'],
+			'changed_by'=>isset($options['changed_by']) ? $options['changed_by'] : '',
 			'idno'=>isset($options['idno']) ? $options['idno'] : $this->generate_uuid(),
 			'title'=>$this->get_project_metadata_field($type,'title',$options),
 			'metadata'=>$this->encode_metadata($options)
@@ -492,6 +492,8 @@ class Editor_model extends CI_Model {
 			"thumbnail",
 			"template_uid",
 			"created",
+			"created_by",
+			"changed_by",
 			"changed"			
 		);
 
@@ -1247,7 +1249,6 @@ class Editor_model extends CI_Model {
 		return $ddi_path;
 	}
 
-
 	function generate_project_pdf($sid)
 	{
 		$this->load->library("Pdf_report");
@@ -1525,6 +1526,7 @@ class Editor_model extends CI_Model {
 		}
 		return false;
 	}
+
 
 	
 }//end-class

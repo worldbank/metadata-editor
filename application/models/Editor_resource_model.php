@@ -775,11 +775,58 @@ class Editor_resource_model extends ci_model {
        return $files;
     }
 
+	/**
+	 * 
+	 * Generate resources JSON and save to project folder
+	 * 
+	 */
+	function write_json($sid)
+	{
+		$project=$this->Editor_model->get_basic_info($sid);
+		$project_folder=$this->Editor_model->get_project_folder($sid);
+
+		if (!$project_folder || !file_exists($project_folder)){
+			throw new Exception("write_json::Project folder not found");
+		}		
+
+		$resources=$this->Editor_resource_model->select_all($sid,$fields=null);
+
+		$remove_fields=array("sid","id");
+		foreach($resources as $idx=>$resource){
+			foreach($remove_fields as $f){
+				if (isset($resources[$idx][$f])){
+					unset($resources[$idx][$f]);
+				}
+			}
+		}
+
+		$filename=trim($project['idno'])!=='' ? trim($project['idno']) : md5($project['id']);
+		$filename.='.rdf.json';
+
+		$path = $this->Editor_model->get_project_folder($sid);
+		$resource_file=$path.'/'.$filename;
+
+		if (file_exists($resource_file)){
+			unlink($resource_file);
+		}
+
+		file_put_contents($resource_file,json_encode($resources,JSON_PRETTY_PRINT));		
+		return $resource_file;
+	}
+
 
     function write_rdf($sid)
     {
+		$project=$this->Editor_model->get_basic_info($sid);
         $path = $this->Editor_model->get_project_folder($sid);
-		$resource_file=$path.'/resources.rdf';
+
+		if (!$path || !file_exists($path)){
+			throw new Exception("write_rdf::Project folder not found");
+		}
+
+		$filename=trim($project['idno'])!=='' ? trim($project['idno']) : md5($project['id']);
+		$filename.='.rdf';
+		$resource_file=$path.'/'.$filename;
 
         if (file_exists($resource_file)){
             unlink($resource_file);

@@ -148,9 +148,9 @@
 
         <div class="content-wrapper" style="margin-left:0px;">
 
-            <section class="content-x">
+            <section class="content-main-container mt-3">
 
-                <div class="container-fluid-">
+                <div class="container-fluid-x">
 
                     <v-login v-model="login_dialog"></v-login>
 
@@ -182,7 +182,7 @@
                 */ ?>
 
                     <validation-observer ref="form" v-slot="{ invalid }">
-                        <div class="container-app pt-5 mr-2" >
+                        <div class="container-app" >
                             <keep-alive include="datafiles">
                                 <router-view :key="$route.fullPath" />
                             </keep-alive>

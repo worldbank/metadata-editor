@@ -41,30 +41,8 @@ class Resources extends MY_REST_Controller
 			}
 
 			$this->editor_acl->user_has_project_access($sid,$permission='view');
-			$resources=$this->Editor_resource_model->select_all($sid,$fields=null);
-
-			$remove_fields=array("sid","id");
-			foreach($resources as $idx=>$resource){
-				foreach($remove_fields as $f){
-					if (isset($resources[$idx][$f])){
-						unset($resources[$idx][$f]);
-					}
-				}
-			}
-
-			$path = $this->Editor_model->get_project_folder($sid);
-			$resource_file=$path.'/resources.json';
-
-			if (file_exists($resource_file)){
-				unlink($resource_file);
-				//$this->load->helper('download');
-				//force_download2($path.'/project.zip');
-				//die();
-
-			}
-
-			file_put_contents($resource_file,json_encode($resources,JSON_PRETTY_PRINT));
-
+			$this->Editor_resource_model->write_json($sid);
+			
 			$output=array(
 				'status'=>'success'
 			);

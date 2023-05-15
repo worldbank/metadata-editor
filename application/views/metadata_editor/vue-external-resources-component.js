@@ -68,8 +68,8 @@ Vue.component('external-resources', {
         }
     },
     template: `
-        <div class="external resources mt-3">
-            <h1>External resources</h1>            
+        <div class="external-resources container-fluid pt-5 mt-5">
+            <h3>External resources</h3>
             <v-row>
                 <v-col md="8"><strong>{{ExternalResources.length}}</strong> resources </v-col>
                 <v-col md="4" class="mb-2">

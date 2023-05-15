@@ -179,9 +179,9 @@ Vue.component('external-resources-edit', {
 
     },
     template: `
-        <div>
-            <v-container v-if="Resource">
-            <h1>Edit resource</h1>
+        <div class="container-fluid edit-resource-container mt-5">
+            <div v-if="Resource">
+            <h3>Edit resource</h3>
             
             <div class="form-group form-field" >
                 <label>File type *</label>
@@ -310,7 +310,7 @@ Vue.component('external-resources-edit', {
             <button type="button" class="btn btn-secondary" @click="cancelSave">Cancel</button>
 
             
-        </v-container>
+        </div>
         </div>
     `
 })

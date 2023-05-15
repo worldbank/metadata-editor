@@ -60,7 +60,7 @@ Vue.component('form-main', {
         
     },
     template: `
-        <div class="metadata-form mt-5" >
+        <div class="metadata-form p-3 pt-5 mb-3" >
 
             <!-- form-section -->
             <div v-if="activeFormFieldDisplayType()=='section_container'"  class="form-section m-3" >

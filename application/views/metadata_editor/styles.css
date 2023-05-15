@@ -1,3 +1,11 @@
+ .editor-sidebar{
+    overflow:auto;
+}
+
+.pane-main-content{
+    overflow:auto;
+}
+
 .bg-light-2{
     background:#e9ecef!important;
 }
@@ -90,25 +98,12 @@
     border:1px solid #0062cc;
 }
 
-/*.form-section {
-    background: #03A9F4;
-    color: #ffffff;
-    font-size: 14px;
-    font-weight: bold;
-    padding: 10px;
-}*/
-
 label{
     font-size: 14px;
         font-weight: bold;
         margin-bottom: .1rem;
     }
 
-
-/*.sidebar{            
-    border:1px solid gainsboro;
-    padding-left:10px;
-}*/
 
 .sidebar-content{
     padding:15px;
@@ -121,8 +116,6 @@ label{
 }
 
 .main-content{
-    /*overflow-y: scroll;*/
-    height:100%;
     padding-top:10px;
 }
 
@@ -157,13 +150,6 @@ label{
     padding-bottom:10px;
 }
 
-html,body {
-    height: 100%;
-}
-.container-fluid {
-    xheight: 100vh;
-}
-
 .nav-link{
     color:black;
 }
@@ -176,22 +162,7 @@ html,body {
     display:none;
 }
 
-/* .metadata-form-container .field-type-section {
-    border: 1px solid gainsboro;
-    margin-bottom: 5px;
-    background: transparent;
-    padding-bottom: 0px;
-}
 
-
-.form-section {
-    background: #f6f8fa;
-    color: #000000;
-    font-size: 14px;
-    border-bottom: 1px solid gainsboro;
-    font-weight: bold;
-    padding: 10px;
-}*/
 
 .list-group-item{
     padding:.3rem 1.25rem;
@@ -411,11 +382,6 @@ html,body {
     border-radius: 0.15rem;
 }
 
-.splitpanes.default-theme .splitpanes__pane{
-    /*background-color: hsl(0deg 0% 100% / 70%)!important;*/
-    height:92vh;
-    
-}
 
 
 .sidebar-menu-bar .icon{
@@ -612,17 +578,7 @@ table .form-field-dropdown-custom .v-input__slot fieldset{
     font-size:14px;
 }
 
-.container-app{
-    height:100vh;
-    overflow:auto;
-    padding:10px;
-}
 
-.editor-sidebar-container
-{
-    height:100vh;
-    overflow:auto;
-}
 
 .var-vid-td{
     width: 50px;
@@ -661,4 +617,21 @@ table .form-field-dropdown-custom .v-input__slot fieldset{
 
 .v-checkbox-summary-stats .v-label{
     font-size:12px;
+}
+
+::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 7px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, .5);
+    box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+  }
+
+  .variable-list-component{
+    height:100vh;
+    overflow:auto;
+    padding:10px;
 }

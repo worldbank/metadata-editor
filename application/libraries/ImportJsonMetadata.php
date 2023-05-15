@@ -24,8 +24,8 @@ class ImportJsonMetadata
         $this->ci->load->model("Editor_variable_model");
         $this->ci->load->model("Editor_variable_groups_model");
 	}
-
-    function import($sid,$json_file_path,$validate=true)
+    
+    function import($sid,$json_file_path,$validate=true,$options=array())
     {
         $json = file_get_contents($json_file_path);
         $json_data = json_decode($json, true);
@@ -35,6 +35,12 @@ class ImportJsonMetadata
         }
 
         $type=$json_data['type'];
+
+        if (isset($options['type']) && $options['type']!=$type){
+            throw new Exception("Project type mismatched. The metadata 'type' is set to '".$json_data['type']."', but the project type is set to '".$options['type']."'.");
+        }
+
+        $json_data=array_merge($json_data, $options);
 
         //fix for geospatial
         if ($type=='geospatial'){

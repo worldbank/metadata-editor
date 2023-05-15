@@ -795,17 +795,36 @@ class Editor extends MY_REST_Controller
 			$this->editor_acl->user_has_project_access($sid,$permission='view');
 
 			$path = $this->Editor_model->get_project_folder($sid);
-			$files=$this->Editor_resource_model->files($sid);
+			//$files=$this->Editor_resource_model->files($sid);
 
 			if (file_exists($path.'/project.zip')){
 				unlink($path.'/project.zip');
 			}
 			
+			/*
 			foreach($files as $file){
 				$this->zip->read_file($path.$file,$file);
 			}
 
 			$this->zip->archive($path.'/project.zip');
+			*/
+
+			// create new archive
+			$zipFile = new \PhpZip\ZipFile();
+			try{
+				set_time_limit(0);
+				$zipFile
+					->addDirRecursive($path) // add files from the directory
+					->saveAsFile($path.'/project.zip') // save the archive to a file
+					->close(); // close archive						
+			}
+			catch(\PhpZip\Exception\ZipException $e){
+				// handle exception
+				throw new Exception("Failed to generate zip file". $e->getMessage());
+			}
+			finally{
+				$zipFile->close();
+			}
 
 			$response=array(
 				'status'=>'success',
@@ -822,6 +841,8 @@ class Editor extends MY_REST_Controller
 			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
+
+
 
 	/**
 	 * 

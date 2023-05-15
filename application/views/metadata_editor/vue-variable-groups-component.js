@@ -249,7 +249,7 @@ Vue.component('variable-groups', {
         <div class="variable-groups-component">
         <dialog-variable-selection v-if="activeItem" :key="activeItem.vgid" v-model="showDialog" :selected_items="ActiveItemVariables" @selected="OnVariableSelection"></dialog-variable-selection>
         
-            <div class="container-fluid mt-5">
+            <div class="container-fluid mt-5 pt-5 ">
 
             <h3>Variable Groups</h3>
 
