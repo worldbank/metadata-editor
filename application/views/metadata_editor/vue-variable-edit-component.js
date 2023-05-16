@@ -434,7 +434,7 @@ Vue.component('variable-edit', {
                                         <div v-else>
 
                                         <v-progress-linear v-if="isWeighted==false"
-                                            v-model="VariablePercent(variable, catgry)"
+                                            :value="VariablePercent(variable, catgry)"
                                             color="#FFCC80"
                                             height="15"
                                             >
@@ -443,7 +443,7 @@ Vue.component('variable-edit', {
 
                                         
                                         <v-progress-linear v-if="isWeighted==true && Variable.sum_stats_options.wgt"
-                                            v-model="VariablePercentWeighted(variable, catgry)"
+                                            :value="VariablePercentWeighted(variable, catgry)"
                                             color="#FFCC80"
                                             height="15"
                                             >

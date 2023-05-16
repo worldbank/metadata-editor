@@ -272,6 +272,84 @@
     </template>
 
 
+
+    <template class="import-project">
+      <div class="text-center">
+        <v-dialog v-model="dialog_import_project" width="500">
+
+          <v-card>
+            <v-card-title class="text-h5 grey lighten-2">
+              Import Project
+            </v-card-title>
+
+            <v-card-text style="min-height:200px;">
+              <div class="mb-2">
+                <div  class="pb-1">Select project type</div>
+                <v-select
+                    :items="ProjectTypes"
+                    label=""
+                    item-text="text"
+                    item-value="value"
+                    label="Select"
+                    persistent-hint
+                    return-object
+                    dense
+                    outlined
+                    v-model="import_project_type"
+                ></v-select>
+                
+              </div>
+              <div class="mb-2">
+                <div class="pb-1">Upload file</div>
+                <v-file-input
+                  accept=".json,.xml,.zip"
+                  label=""                  
+                  truncate-length="50"                  
+                  dense
+                  outlined
+                  v-model="import_file"
+                  prepend-icon="mdi-file-upload"
+                ></v-file-input>
+                
+              </div>
+
+
+              <div v-if="import_project_loading">
+                <div class="mb-2 mt-3 pl-4 pr-4">
+                  <v-app>
+                  <v-progress-linear
+                    indeterminate
+                    color="primary"
+                  ></v-progress-linear>
+                  </v-app>
+                </div>
+              </div>
+              <div v-if="import_file_errors">
+                <div class="mb-2 text-color-danger text-danger">
+                  <div class="pb-1">Import failed</div>
+                  <div>{{import_file_errors.response.data}}</div>
+                </div>
+              </div>
+
+            </v-card-text>
+
+            <v-divider></v-divider>
+
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="secondary" text @click="dialog_import_project = false">
+                Close
+              </v-btn>
+              <v-btn color="primary" text @click="importProject" :disabled="!this.import_file || this.import_project_loading">
+                Import
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </div>
+    </template>
+
+
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
@@ -356,6 +434,11 @@
         facet_panel: [0,1,2,3,4,5],
         pagination_page: 0,
         dialog_create_project: false,
+        dialog_import_project: false,
+        import_file: null,
+        import_project_type: null,
+        import_project_loading: false,
+        import_file_errors:null,
         dialog_share_project: false,
         dialog_share_options: [],
         dialog_share_collection: false,
@@ -414,6 +497,19 @@
           }
           return sorted;
         },
+        ProjectTypes() {
+          let types = [];
+          for (k in this.data_types) {
+            types.push(
+              {
+                value: k,
+                text: this.data_types[k]                
+              }
+            );
+          }
+          return types;
+        },
+        
         Projects() {
           return this.projects.projects;
         },
@@ -552,11 +648,10 @@
               }*/
             )
             .then(function(response) {
-              console.log(response);
-              vm.loadProjects();
-              if (response.data.project) {
-                window.open(CI.base_url + '/editor/edit/' + response.data.project.id);
+              if (response.data.id) {
+                vm.EditProject(response.data.id);
               }
+              vm.loadProjects();
             })
             .catch(function(error) {
               console.log("error", error);
@@ -568,7 +663,8 @@
             });
         },
         EditProject: function(id) {
-          window.open(CI.base_url + '/editor/edit/' + id);
+          let window_ = window.open(CI.base_url + '/editor/edit/' + id, 'project-' + id);
+          window_.focus();
         },
         ShareProject: async function(id) {
           try {
@@ -778,6 +874,44 @@
             console.log("removeCollection error", e);
             alert("Failed", JSON.stringify(e));
           }
+        },
+        importProject: function(){
+            let formData = new FormData();
+            formData.append('file', this.import_file);
+            formData.append('type', this.import_project_type.value);
+
+            if (!this.import_file)
+            {
+                alert("Please select a file to import");
+                return false;
+            }
+
+            vm=this;
+            this.import_file_errors=null;
+            this.import_project_loading=true;
+            let url=CI.base_url + '/api/importproject/';
+
+            axios.post( url,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
+            ).then(function(response){
+                console.log("import project response", response);
+                vm.import_project_loading=false;
+                if (response.data.sid){
+                  vm.EditProject(response.data.sid);
+                }
+                vm.dialog_import_project=false;
+                vm.loadProjects();
+            })
+            .catch(function(response){
+                vm.import_file_errors=response;
+                vm.import_project_loading=false;
+                console.log("error", response);
+            }); 
         },
 
       }

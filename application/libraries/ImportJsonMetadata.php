@@ -59,6 +59,8 @@ class ImportJsonMetadata
             //import project metadata
             $this->import_project_metadata($type, $sid,$json_data,$validate);
         }
+
+        return true;
     }
 
 
@@ -205,9 +207,7 @@ class ImportJsonMetadata
         }
 
         return $labels;
-
     }
-
     
 
 }
