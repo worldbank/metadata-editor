@@ -753,7 +753,6 @@ Vue.config.errorHandler = (err, vm, info) => {
 
   <script>
     function resize_variable_list(){
-      console.log("resizing variable list");
         $(".variable-list-component").height($(".pane-main-content").height()-45)
       }
 

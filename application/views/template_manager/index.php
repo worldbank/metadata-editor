@@ -109,7 +109,7 @@
   <div id="app" data-app>
     <v-app>
 
-      <div class="container-fluid-x">
+      <div class="container-fluid">
 
         <div class="row no-gutters sticky-top border-bottom bg-white">
 

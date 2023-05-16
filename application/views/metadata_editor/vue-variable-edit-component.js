@@ -73,7 +73,8 @@ Vue.component('variable-edit', {
             }]
         }        
     },
-    watch: {        
+    watch: {          
+        
     },    
     created: function () {
        if (this.variable.var_concept==undefined){
@@ -124,7 +125,7 @@ Vue.component('variable-edit', {
                 return this.variable;
             },
             set(newValue){
-                this.variable=newValue;
+                this.variable=newValue;                
             }
         },
         active_tab: {
@@ -255,6 +256,9 @@ Vue.component('variable-edit', {
         },
     },
     methods: {
+        OnVariableWeightChange(e){
+            this.variable.update_required=true;
+        },
         sectionEnabled: function(section){
             
             if (section.items==undefined){
@@ -502,8 +506,10 @@ Vue.component('variable-edit', {
                 </v-tab-item>
                 <v-tab-item key="weights" value="weights">
                     <div class="p-3">
-                        <variable-weights-component 
-                            v-model="variable.var_wgt_id" 
+                        <variable-weights-component
+                            :key="variable.var_wgt_id" 
+                            v-model="variable.var_wgt_id"
+                            @input="OnVariableWeightChange"
                             :variables="Variables">
                         </variable-weights-component>
                     </div>

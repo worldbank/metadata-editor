@@ -19,7 +19,7 @@ Vue.component('datafile-edit', {
     computed: {
     },  
     template: `
-            <div class="datafile-edit-component">
+            <div class="datafile-edit-component container-fluid">
 
             <div class="row">
                 <div class="col-md-8">
@@ -78,11 +78,11 @@ Vue.component('datafile-edit', {
                             <label>Variables:</label>
                             <div>{{form_local.var_count}}</div>
                         </div>
-                        <div class="mt-2">
+                        <div class="mt-2" v-if="form_local.file_info">
                             <label>File size:</label>
                             <div>{{form_local.file_info.original.file_size}}</div>                        
                         </div>
-                    </div>                    
+                    </div> 
                 </div>
                 </div>
 

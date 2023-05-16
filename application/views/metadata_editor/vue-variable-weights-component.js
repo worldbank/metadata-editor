@@ -9,7 +9,7 @@ Vue.component('variable-weights-component', {
     watch: {
     },
     
-    mounted: function () {   
+    mounted: function () {
 
     },
     computed: {
@@ -19,6 +19,9 @@ Vue.component('variable-weights-component', {
         var_wgt_id:
         {
             get(){
+                if (!this.value){
+                    return '';
+                }
                 return this.value;
             },
             set(val){
@@ -40,7 +43,10 @@ Vue.component('variable-weights-component', {
     methods:{
         OnWeightVariableSelection: function(e)
         {
-            this.var_wgt_id=e;
+            if (e && e.length>0){
+                this.var_wgt_id=e;
+            }
+            
         },
         RemoveWeightVariable: function(){
             this.var_wgt_id='';            
@@ -50,6 +56,7 @@ Vue.component('variable-weights-component', {
             <div class="variable-weights-component">
 
                 <dialog-weight-variable-selection 
+                    :key="var_wgt_id"
                     :variables="Variables" 
                     v-model="show_weights_dialog"
                     @selected="OnWeightVariableSelection"
@@ -57,11 +64,11 @@ Vue.component('variable-weights-component', {
 
                         
                 <div>
-                    <table class="table table-sm table-bordered" v-if="var_wgt_id">
+                    <table class="table table-sm table-bordered" v-if="var_wgt_id" :key="var_wgt_id">
                         <tr>
                             <th>Name</th>
                             <th>Label</th>
-                            <td><button class="btn btn-sm btn-xs btn-link" @click="RemoveWeightVariable">Remove</button></td>
+                            <td></td>
                         </tr>
                         <tr v-for="var_ in VariablesForWeight" :key="var_.uid">
                             <td>{{var_.name}}</td>

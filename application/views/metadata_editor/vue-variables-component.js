@@ -692,7 +692,6 @@ Vue.component('variables', {
         },
         activeVariable: function()
         {
-            console.log("activeVariable",this.edit_items);
 
             if (this.edit_items.length>1){
                 return this.variableMultiple;
@@ -713,7 +712,7 @@ Vue.component('variables', {
         MaxVariableID(){
             return this.$store.getters["getMaxVariableId"];
         },
-        variables(){            
+        variables(){    
             vars=this.$store.getters.getVariablesByFid(this.fid);
             
             if (vars==undefined){
@@ -730,6 +729,10 @@ Vue.component('variables', {
                 })
                 
                 return tmpVars;
+            }
+
+            if (!Array.isArray(vars)){
+                return [];
             }
 
             return vars;
@@ -881,7 +884,18 @@ Vue.component('variables', {
                                             <div><input vonkeydown="onVariableKeydown($event,index,'var_labl')"  class="var-labl-edit" type="text" v-model="variable.labl" ref="var_labl"/></div>
                                         </td>
                                         <td>
-                                            <?php /* <span v-if="variable.var_format && variable.var_format.type">{{variable.var_format.type.substr(0,1)}}</span> */ ?>
+                                            <span v-if="variable.var_format && variable.var_format.type">
+                                                <span v-if="variable.var_format.type=='character' || variable.var_format.type=='fixed'" :title="variable.var_format.type">
+                                                    <v-icon aria-hidden="false" class="vdar-icon">mdi-alpha-s</v-icon>
+                                                </span>
+                                                <span v-if="variable.var_format.type=='numeric'" :title="variable.var_format.type">
+                                                    <v-icon aria-hidden="false" class="vdar-icon">mdi-alpha-n</v-icon>
+                                                </span>
+                                                <span v-else :title="variable.var_format.type">
+                                                    <v-icon aria-hidden="false" class="vdar-icon">mdi-alpha-{{variable.var_format.type.substr(0,1).toLowerCase()}}</v-icon>
+                                                </span>
+
+                                            </span>
                                             <span v-if="variable.var_catgry && variable.var_catgry.length>0" :title="variable.var_catgry.length">
                                                 <v-icon aria-hidden="false" class="vdar-icon">mdi-format-list-numbered</v-icon>
                                             </span>

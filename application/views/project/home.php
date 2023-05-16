@@ -664,7 +664,9 @@
         },
         EditProject: function(id) {
           let window_ = window.open(CI.base_url + '/editor/edit/' + id, 'project-' + id);
-          window_.focus();
+          if (window_){
+            window_.focus();
+          }
         },
         ShareProject: async function(id) {
           try {
