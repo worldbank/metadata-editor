@@ -699,7 +699,13 @@ Vue.component('variables', {
 
             //for single variable selected
             if (this.edit_items.length==1){
-                return this.variables[this.edit_items[0]];
+                let variable_= this.variables[this.edit_items[0]];
+                if (variable_ && !variable_.var_invalrng){
+                    Vue.set(variable_, 'var_invalrng', {
+                        "values":[]
+                    });
+                }
+                return variable_;
             }
         },        
         selectedVariables: function(){

@@ -386,12 +386,24 @@ label{
 
 .sidebar-menu-bar .icon{
     color:gray!important;
-    font-size:12px;
+    font-size:16px;
     margin-top:-2px;
 }
 
+.sidebar-menu-bar .icon:hover{
+    color:rgb(0, 0, 0)!important;
+    font-size:16px;
+    margin-top:-2px;
+}
+
+.sidebar-menu-bar .btn.active .icon,
+.sidebar-menu-bar .btn:hover .icon{
+    color:rgb(0,0,0)!important;
+}
+
+/*
 .sidebar-menu-bar .btn{
-    background:rgb(0 0 0 / 12%);
+    background:none;
     color:black;
     border:0px;
 }
@@ -410,6 +422,7 @@ label{
     color:black;
     border:0px;
 }
+*/
 
 .help-text{
     white-space: pre-wrap;
@@ -634,4 +647,9 @@ table .form-field-dropdown-custom .v-input__slot fieldset{
     height:100vh;
     overflow:auto;
     padding:10px;
+}
+
+.variable-frequencies .progress-text{
+    font-size:10px;    
+    padding-left:3px;
 }

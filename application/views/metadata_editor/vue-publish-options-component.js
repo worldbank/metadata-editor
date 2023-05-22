@@ -11,6 +11,7 @@ Vue.component('publish-options', {
             publish_thumbnail:true,
             publish_resources:true,
             catalog_connections:[],
+            panels: [0, 1,2],
             catalog:'',
             publish_options:{
                 "overwrite": {
@@ -270,7 +271,7 @@ Vue.component('publish-options', {
             });            
         },
         async exportExternalResourcesJSON() {
-            let url=CI.base_url + '/api/editor/write_resources_json/'+this.ProjectID;
+            let url=CI.base_url + '/api/resources/write_json/'+this.ProjectID;
             return axios
             .get(url)
             .then(function (response) {
@@ -284,7 +285,7 @@ Vue.component('publish-options', {
             });            
         },
         async exportExternalResourcesRDF() {
-            let url=CI.base_url + '/api/editor/write_resources_rdf/'+this.ProjectID;
+            let url=CI.base_url + '/api/resources/write_rdf/'+this.ProjectID;
             return axios
             .get(url)
             .then(function (response) {
@@ -417,7 +418,7 @@ Vue.component('publish-options', {
 
                 </v-card>
 
-                <v-expansion-panels multiple>
+                <v-expansion-panels multiple v-model="panels">
                     <v-expansion-panel>
                         <v-expansion-panel-header>
                             Project options
@@ -425,8 +426,7 @@ Vue.component('publish-options', {
                         <v-expansion-panel-content>
 
                         <div class="mb-4">
-
-                            <label>Options</label>
+                            
                             <table class="table table-sm table-bordered table-hover table-striped mb-0 pb-0" style="font-size:small;">
                                 <tr>
                                     <th>Option</th>
@@ -572,7 +572,10 @@ Vue.component('publish-options', {
                         </div>
                         <div v-else>
                             <div class="border m-1 text-success" >
-                                <div>Project metadata updated successfully</div>
+                                <div>
+                                    <span class="mdi mdi-check-circle text-success"></span>
+                                    <span>Project metadata updated successfully</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -588,16 +591,11 @@ Vue.component('publish-options', {
                         </div>
                         <div v-if="publish_responses.thumbnail.messages.length>0" >                            
                             <div class="border-bottom m-1" v-for="message in publish_responses.thumbnail.messages">
-                                <div>
+                                <div class="text-success">
                                 <span class="mdi mdi-check-circle text-success"></span> {{message}}
                                 </div>                                
                             </div>    
-                        </div>
-                        <div v-else>
-                            <div class="border m-1 text-success" >
-                                <div>Thumbnail uploaded successfully</div>
-                            </div>
-                        </div>
+                        </div>                       
                     </div>
 
                     <div v-if="resources_selected.length>0" class="mt-5">

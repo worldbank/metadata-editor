@@ -316,7 +316,7 @@ Vue.component('datafiles', {
                     </v-col>
                     <v-col md="4" align="right" class="mb-2">
                         <button type="button" class="btn btn-sm btn-outline-primary" @click="addFile">Create file</button>
-                        <router-link class="btn btn-sm btn-outline-primary" :to="'datafiles/import'">Import file</router-link> 
+                        <router-link class="btn btn-sm btn-outline-primary" :to="'datafiles/import'">Import files</router-link> 
                     </v-col>
                 </v-row>
 

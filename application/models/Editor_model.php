@@ -51,6 +51,7 @@ class Editor_model extends CI_Model {
 		'id',
 		'type',
 		'idno',
+		'study_idno',
 		'title',
 		'abbreviation',
 		'nation',
@@ -295,6 +296,14 @@ class Editor_model extends CI_Model {
 		}
 
 		$values=$options[$filter_key];
+
+		if (!$values){
+			return false;
+		}
+
+		if ($values!=""){
+			$values=explode(",",$values);
+		}
 		
 		if (!is_array($values)){
 			$values=array($values);
@@ -413,7 +422,7 @@ class Editor_model extends CI_Model {
 	//get project basic info
     function get_basic_info($sid)
     {
-		$this->db->select("id,idno,type");		
+		$this->db->select("id,idno,study_idno,type");		
 		$this->db->where("id",$sid);
 		
 		$survey=$this->db->get("editor_projects")->row_array();
@@ -477,7 +486,8 @@ class Editor_model extends CI_Model {
 		$options=array(
 			'changed'=>isset($options['changed']) ? $options['changed'] : date("U"),
 			'changed_by'=>isset($options['changed_by']) ? $options['changed_by'] : '',
-			'idno'=>isset($options['idno']) ? $options['idno'] : $this->generate_uuid(),
+			//'idno'=>isset($options['idno']) ? $options['idno'] : $this->generate_uuid(),
+			'study_idno'=>$this->get_project_metadata_field($type,'idno',$options),
 			'title'=>$this->get_project_metadata_field($type,'title',$options),
 			'metadata'=>$this->encode_metadata($options)
 		);
@@ -1361,6 +1371,7 @@ class Editor_model extends CI_Model {
 
 			$output['variables'] = function () use ($sid) {
 				foreach($this->Editor_variable_model->chunk_reader_generator($sid) as $variable){
+					$variable=$this->transform_variable($variable);
 					yield $variable['metadata'];
 				}
 			};
@@ -1384,6 +1395,67 @@ class Editor_model extends CI_Model {
 		fclose($fp);
 		
 		return $output_file;
+	}
+
+	function transform_variable($variable)
+	{
+		$sid=(int)$variable['sid'];
+		unset($variable['metadata']['uid']);
+		unset($variable['metadata']['sid']);
+		//process summary statistics
+		$sum_stats_options = isset($variable['metadata']['sum_stats_options']) ? $variable['metadata']['sum_stats_options'] : [];
+		$sum_stats_enabled_list=[];
+		foreach($sum_stats_options as $option=>$value){
+			if ($value===true || $value==1){
+				$sum_stats_enabled_list[]=$option;
+			}
+		}
+
+		if (isset($variable['metadata']['var_sumstat']) && is_array($variable['metadata']['var_sumstat']) ){
+			foreach($variable['metadata']['var_sumstat'] as $idx=>$sumstat){
+				if (!in_array($sumstat['type'], $sum_stats_enabled_list)){
+					unset($variable['metadata']['var_sumstat'][$idx]);
+				}
+			}
+		}
+
+		//value ranges [counts, min, max] - remove min and max if not enabled
+		if (isset($variable['metadata']['var_valrng']['range']) && is_array($variable['metadata']['var_valrng']['range']) ){
+			foreach($variable['metadata']['var_valrng']['range'] as $range_key=>$range){
+				//only check for min and max
+				if (!in_array($range_key, array("min", "max"))){
+					continue;
+				}
+
+				if (!in_array($range_key, $sum_stats_enabled_list)){
+					unset($variable['metadata']['var_valrng']['range'][$range_key]);
+				}
+			}
+		}
+
+		//remove category freq if not enabled
+		if (!in_array('freq', $sum_stats_enabled_list)){
+			if (isset($variable['metadata']['var_catgry']) && is_array($variable['metadata']['var_catgry']) ){
+				foreach($variable['metadata']['var_catgry'] as $idx=>$cat){
+
+					if (isset($cat['stats']) && is_array($cat['stats']) ){
+						foreach($cat['stats'] as $stat_idx=>$stat){
+							if ($stat['type']=='freq'){
+								unset($variable['metadata']['var_catgry'][$idx]['stats'][$stat_idx]);
+							}
+						}						
+					}
+				}
+			}
+		}
+
+		//var_wgt_id field - replace UID with VID
+		if (isset($variable['metadata']['var_wgt_id']) && $variable['metadata']['var_wgt_id']!==''){
+			$variable['metadata']['var_wgt_id']=$this->Editor_variable_model->vid_by_uid($sid,$variable['metadata']['var_wgt_id']);
+		}
+
+
+		return $variable;
 	}
 
 	

@@ -13,14 +13,15 @@ $user=$this->session->userdata('username');
     <?php if ($user!=''): ?>
         <div class="dropdown ml-auto">
             <a class="nav-link dropdown-toggle capitalize" href="#" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fas fa-user-circle fa-lg"></i> <?php echo $user; ?>
+                <i class="fas fa-user-circle fa-lg"></i> 
             </a>
 
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
                 <?php /* if ($this->ion_auth->can_access_site_admin()): ?>
                     <a class="dropdown-item" href="<?php echo site_url('admin'); ?>"><?php echo t('site_administration');?></a>
                 <?php endif; */?>
-                <a class="dropdown-item" href="<?php echo site_url('auth/profile'); ?>"><?php echo t('profile');?></a>
+                <span class="dropdown-item capitalize"><?php echo $user; ?></span>
+                <a class="dropdown-item" href="<?php echo site_url('auth/profile'); ?>"><?php echo t('profile');?> </a>
                 <a class="dropdown-item" href="<?php echo site_url('auth/change_password'); ?>"><?php echo t('password');?></a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="<?php echo site_url('auth/logout'); ?>"><?php echo t('logout');?></a>

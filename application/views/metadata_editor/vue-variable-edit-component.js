@@ -256,6 +256,14 @@ Vue.component('variable-edit', {
         },
     },
     methods: {
+        RoundNumbers(value, decimals){
+            if (!value){
+                return value;
+            }
+
+            value=Number(value);
+            return value.toFixed(decimals);
+        },
         OnVariableWeightChange(e){
             this.variable.update_required=true;
         },
@@ -287,14 +295,24 @@ Vue.component('variable-edit', {
         VariablePercent(variable, catgry){
            if (variable && variable.var_valrng && variable.var_valrng.range && variable.var_valrng.range.count){
                 let catgry_freq=this.VariableCategoryFrequency(catgry);
-                return (catgry_freq/this.ValidRangeCount)*100;                
+                let percent=(catgry_freq/this.ValidRangeCount)*100;
+
+                if (!Number.isInteger(percent)){
+                    return percent.toFixed(1);
+                }
+                return percent;
            }
            return 0;           
         },
         VariablePercentWeighted(variable, catgry){
             if (variable && variable.var_valrng && variable.var_valrng.range && variable.var_valrng.range.count){
                  let catgry_freq=this.VariableCategoryFrequencyWeighted(catgry);
-                 return (catgry_freq/this.WeightedValidRangeCount)*100;                
+                 let percent= (catgry_freq/this.WeightedValidRangeCount)*100;                
+
+                if (!Number.isInteger(percent)){
+                    return percent.toFixed(1);
+                }
+                return percent;
             }
             return 0;           
          },        
@@ -408,7 +426,7 @@ Vue.component('variable-edit', {
                             <div v-if="variable.var_catgry && variable.var_catgry.length>0 && variable.sum_stats_options.freq==true">
                             <h5>Frequencies</h5>
                             
-                            <table class="table table-sm">
+                            <table class="table table-sm variable-frequencies">
                                 <tr>
                                     <th>Value</th>
                                     <th>Label</th>
@@ -436,23 +454,17 @@ Vue.component('variable-edit', {
                                     <td style="min-width:80px;">
                                         <div v-if="catgry.is_missing==1 || VariableIsMissing(catgry.value)">Missing</div>
                                         <div v-else>
-
-                                        <v-progress-linear v-if="isWeighted==false"
-                                            :value="VariablePercent(variable, catgry)"
-                                            color="#FFCC80"
-                                            height="15"
-                                            >
-                                            <strong>{{  Math.ceil(VariablePercent(variable, catgry)) }}%</strong>
-                                        </v-progress-linear>
-
                                         
-                                        <v-progress-linear v-if="isWeighted==true && Variable.sum_stats_options.wgt"
-                                            :value="VariablePercentWeighted(variable, catgry)"
-                                            color="#FFCC80"
-                                            height="15"
-                                            >
-                                            <strong>{{  Math.ceil(VariablePercentWeighted(variable, catgry)) }}%</strong>
-                                        </v-progress-linear>
+                                        <div class="progress" v-if="isWeighted==false">
+                                            <div class="progress-bar progress-bar bg-warning" role="progressbar" :style="'width: ' + VariablePercent(variable, catgry) + '%'" :aria-valuenow="VariablePercent(variable, catgry)"  aria-valuemin="0" aria-valuemax="100"></div>
+                                            <span class="progress-text">{{VariablePercent(variable, catgry)}}%</span>
+                                        </div>
+
+                                        <div class="progress" v-if="isWeighted==true && Variable.sum_stats_options.wgt">
+                                            <div class="progress-bar progress-bar bg-warning" role="progressbar" :style="'width: ' + VariablePercentWeighted(variable, catgry) + '%'" :aria-valuenow="VariablePercentWeighted(variable, catgry)"  aria-valuemin="0" aria-valuemax="100"></div>
+                                            <span class="progress-text">{{VariablePercentWeighted(variable, catgry)}}%</span>
+                                        </div>
+                                        
                                         </div>
                                     </td>
                                 </tr>
@@ -475,13 +487,13 @@ Vue.component('variable-edit', {
                                         <td style="width:150px;">
                                             <strong> {{sumStatCodeToLabel(sumstat.type)}}</strong>
                                         </td>
-                                        <td>{{sumstat.value}}</td>
+                                        <td>{{RoundNumbers(sumstat.value,2)}}</td>
                                     </tr>
                                     <tr v-else-if="variableSumStatEnabled(sumstat.type + '_wgt') && (sumstat.wgtd && sumstat.wgtd=='wgtd') ">
                                         <td style="width:150px;">
                                             <strong> {{sumStatCodeToLabel(sumstat.type)}} (weighted)</strong>
                                         </td>
-                                        <td>{{sumstat.value}}</td>
+                                        <td>{{RoundNumbers(sumstat.value,2)}}</td>
                                     </tr>
                                                                
                                 </template>

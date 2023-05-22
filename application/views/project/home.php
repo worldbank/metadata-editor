@@ -25,6 +25,11 @@
   .cursor-pointer {
     cursor: pointer;
   }
+
+  .v-text-field--filled.v-input--dense.v-text-field--single-line .v-label, .v-text-field--full-width.v-input--dense.v-text-field--single-line .v-label
+  {
+    font-weight:normal;
+  }
 </style>
 
 <body class="layout-top-nav">
@@ -47,7 +52,6 @@
           <!-- Provides the application the proper gutter -->
           <div class="container-fluid">
 
-
             <div class="row">
 
               <!--sidebar -->
@@ -62,7 +66,7 @@
                       </v-expansion-panel-header>
                       <v-expansion-panel-content>
                         <div class="form-check" v-for="facet in facet_values">
-                          <input class="form-check-input" type="checkbox" v-model="search_filters[facet_key]" :value="facet.id" :id="facet_key+facet.id">
+                          <input class="form-check-input" @click="onFilterClick(facet_key,facet)" type="checkbox" v-model="search_filters[facet_key]" :value="facet.id" :id="facet_key+facet.id">
                           <label class="form-check-label" :for="facet_key+facet.id">{{facet.title}}</label>
                         </div>
                       </v-expansion-panel-content>
@@ -170,7 +174,7 @@
                           <th></th>
                           <th>Title</th>
                           <th>Updated by</th>
-                          <th>Updated</th>
+                          <th>Updated on</th>
                           <th></th>
                         </tr>
                         <tr v-for="(project,index) in Projects" class="project-row" :key="index">
@@ -205,14 +209,14 @@
                           <td>
 
                             <span>                              
-                              <a  title="Edit project" @click.prevent.stop="EditProject(project.id)" :href="projectEditUrl(project.id)"><span class="mdi mdi-pencil-box-outline"></span></a>
-                              <a  title="Delete" @click="DeleteProject(project.id)" href="#"><span class="mdi mdi-delete-outline"></span></a>                              
+                              <a  title="Edit project" @click.prevent.stop="EditProject(project.id)" :href="projectEditUrl(project.id)"><span class="mdi mdi-pencil-box-outline"></span></a>                              
                               <a title="Share project" v-if="project.is_shared>0"  @click="ShareProject(project.id)" href="#">
-                              <span class="mdi mdi-share"></span>
+                                <span class="mdi mdi-share"></span>
                               </a>
                               <a v-else  @click="ShareProject(project.id)" href="#">
                                 <span class="mdi mdi-share"></span>
                               </a>
+                              <a  title="Delete" @click="DeleteProject(project.id)" href="#"><span class="text-danger mdi mdi-close-circle-outline"></span></a>                              
                             </span>
 
                           </td>
@@ -397,10 +401,11 @@
 
     //routes
     const routes = [{
-        path: '/',
+        path: '<?php echo site_url("editor");?>',
         component: Home,
         name: 'home'
       },
+      //{ path: '/editor/trash/vue-search.php', component: SearchComp, name:"search" },
       {
         path: '/share',
         component: ShareProject,
@@ -408,15 +413,15 @@
       }
     ]
 
-    //router instance
     const router = new VueRouter({
-      routes // short for `routes: routes`
-    })
+    routes, // short for `routes: routes`
+    mode: 'history'
+  })
 
 
-    router.beforeEach((to, from, next) => {
-      console.log("router", to, from);
-    })
+    /*router.beforeEach((to, from, next) => {
+      console.log("router beforeEach", to, from);
+    })*/
 
     vue_app = new Vue({
       el: '#app',
@@ -459,12 +464,12 @@
           "timeseries-db": "Timeseries DB",
         },
         project_types_icons: {
-          "document": "fa fa-file-code",
+          "document": "fas fa-file-alt",
           "survey": "fa fa-database",
           "geospatial": "fa fa-globe-americas",
           "table": "fa fa-database",
           "timeseries": "fa fa-chart-line",
-          "timeseries-db": "fa fa-chart-line",
+          "timeseries-db": "fas fa-project-diagram",
           "image": "fa fa-image",
           "video": "fa fa-video",
           "script": "fa fa-file-code"
@@ -481,9 +486,12 @@
         });
       },
 
-      mounted: function() {
+      mounted: function() {        
+        this.is_loading = true;
         this.loadProjects();
         this.loadFacets();
+        //this.ReadFilterQS();
+        
       },
       computed: {
         Title() {
@@ -525,7 +533,11 @@
         PaginationOffset() {
           let pageSize = this.projects.limit;
           let currentPage = this.pagination_page - 1;
-          return pageSize * currentPage;
+          let result= pageSize * currentPage;
+          if (!result){
+            return 0;
+          }
+          return result;
         },
         PaginationCurrentPage() {
           let offset = this.projects.offset;
@@ -534,20 +546,66 @@
         },
         SearchFiltersQuerystring() {
           return jQuery.param(this.search_filters);
-          /*let qs='';
-          for(i=0;i<Object.keys(this.search_filters).length;i++){
-            let filter_name=Object.keys(this.search_filters)[i];
-            for (k=0;this.search_filters[filter_name]
-          }*/
         }
       },
 
       watch: {
         SearchFiltersQuerystring: function(new_, old_) {
-          this.search();
+            this.search();
+        },      
+        $route: {
+          handler: function(newRouteValue){
+            console.log("route changed",newRouteValue);
+            this.ReadFilterQS();            
+          },
+          deep: true
         }
       },
       methods: {
+        onFilterClick: function(facet_key, facet) {
+        },
+        CreateFilterQS: function(){
+          let search_filters = {};
+          for(i=0;i<Object.keys(this.search_filters).length;i++){
+            let filter_name=Object.keys(this.search_filters)[i];
+            search_filters[filter_name]=this.search_filters[filter_name].join(",");
+          }
+
+          //keyword search
+          search_filters.keywords=this.search_keywords;
+          this.$router.push({ path: '', query: search_filters})
+        },
+        ReadFilterQS: function()
+        {
+          let urlParams = new URLSearchParams(window.location.search);
+
+          //get from querystring
+          let search_filters = {};
+          for(i=0;i<Object.keys(this.search_filters).length;i++){
+            let filter_name=Object.keys(this.search_filters)[i];
+            let values=urlParams.get(filter_name);
+            console.log("filter_name",filter_name,"values",values);
+            if (values && values.length>0){
+              search_filters[filter_name]=values.split(",");
+            }
+          }
+
+            //this.searchText=urlParams.get('searchText');
+
+          //apply filters
+          for(f=0;f<Object.keys(search_filters).length;f++){
+            let filter_name=Object.keys(search_filters)[f];
+            this.search_filters[filter_name]=search_filters[filter_name];
+          }
+
+          //keyword search
+          this.search_keywords=urlParams.get('keywords');
+
+          /*this.filter1=search_filters.filter1;
+          this.filter2=search_filters.filter2;
+          this.filter3=search_filters.filter3;
+          this.countries=search_filters.countries.split(",");*/
+        },
         onWindowFocus: function() {
           this.search();
         },
@@ -565,6 +623,7 @@
         },
         search: function() {
           this.pagination_page = 1;
+          this.CreateFilterQS();
           this.loadProjects();
         },
         clearSearch: function() {
@@ -577,7 +636,6 @@
           if (!this.facets[facet_name]) {
             return '';
           }
-
 
           //find facet by id
           let facet = this.facets[facet_name].find(x => x.id == facet_id);
@@ -601,6 +659,7 @@
                 let facet_name = facet_types[i];
                 Vue.set(vm.search_filters, facet_name, []);
               }
+              vm.ReadFilterQS();
             })
             .catch(function(error) {
               console.log("error", error);
@@ -609,13 +668,19 @@
         loadProjects: function() {
           vm = this;
 
-          if (!this.search_keywords) {
+          let urlParams = new URLSearchParams(window.location.search);          
+          
+          /*if (!this.search_keywords) {
             this.search_keywords = '';
           }
 
           let url = CI.base_url + '/api/editor/?offset=' + this.PaginationOffset +
             '&' + 'keywords=' + this.search_keywords +
             '&' + this.SearchFiltersQuerystring;
+          */
+
+          let url = CI.base_url + '/api/editor/?offset=' + this.PaginationOffset +
+            '&' + urlParams.toString();
 
           this.loading_status = "Loading projects...";
 

@@ -209,7 +209,8 @@
             var project_sid=<?php echo $sid;?>;
         <?php endif;?>
 
-        let project_idno='<?php echo isset($survey['idno']) ? $survey['idno'] : '';?>';
+
+        let project_idno='<?php echo isset($idno) ? $idno : '';?>';
         let project_type='<?php echo isset($type) ? $type : '';?>';
 
         //Define route components

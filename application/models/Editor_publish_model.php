@@ -134,7 +134,11 @@ class Editor_publish_model extends ci_model {
 			throw new Exception("Thumbnail file not found");
 		}
 
-		$catalog_url=$conn_info['url'].'/index.php/api/datasets/thumbnail/'.$project['idno'];
+		if (!$project['study_idno']){
+			throw new Exception("Study IDNO is not set");
+		}
+
+		$catalog_url=$conn_info['url'].'/index.php/api/datasets/thumbnail/'.$project['study_idno'];
 		$catalog_api_key=$conn_info['api_key'];
 		
 		$api_response=$this->make_post_file_request($catalog_url, $catalog_api_key, $file_field_name='file', $file_path=$thumbnail_file);
@@ -158,7 +162,7 @@ class Editor_publish_model extends ci_model {
 
 		$resources=$this->Editor_resource_model->select_all($sid);
 
-		$catalog_url=$conn_info['url'].'/index.php/api/resources/'.$project['idno'];
+		$catalog_url=$conn_info['url'].'/index.php/api/resources/'.$project['study_idno'];
 		$catalog_api_key=$conn_info['api_key'];
 		
 		$output=[];
@@ -194,7 +198,7 @@ class Editor_publish_model extends ci_model {
 			throw new Exception("Resource not found");
 		}
 
-		$catalog_url=$conn_info['url'].'/index.php/api/resources/'.$project['idno'];
+		$catalog_url=$conn_info['url'].'/index.php/api/resources/'.$project['study_idno'];
 		$catalog_api_key=$conn_info['api_key'];
 		$resource['overwrite']=$overwrite;
 
@@ -210,7 +214,7 @@ class Editor_publish_model extends ci_model {
 
 			//upload resource file
 			if (file_exists($resource_file_path)){		
-				$catalog_url=$conn_info['url'].'/index.php/api/datasets/'.$project['idno'].'/files';
+				$catalog_url=$conn_info['url'].'/index.php/api/datasets/'.$project['study_idno'].'/files';
 				$output['resource_upload']=$this->make_post_file_request($catalog_url, $catalog_api_key, $file_field_name='file', $file_path=$resource_file_path);
 			}
 			/*else{
@@ -326,87 +330,6 @@ class Editor_publish_model extends ci_model {
 		}
 	}
 
-	public function make_post_filex_request($url, $api_key, $post_body=null, $file_field_name='file', $file_path='')
-	{
-
-		var_dump("file_path",$file_path);
-		var_dump($post_body);
-
-		$client = new Client([				
-			'base_uri' => $url,
-			'headers' => ['x-api-key' => $api_key]
-		]);
-					
-		try{
-			/*$api_response = $client->request('POST', '', [
-				//'auth' => [$username, $password],
-				'json' => $post_body,
-				['debug' => true]
-			]);*/
-
-			$body=[
-				'multipart' => [
-					[
-						'Content-type' => 'multipart/form-data',
-						'name'     => $file_field_name,
-						'contents' => fopen($file_path, 'r'),
-						'filename' => basename($file_path)
-					],
-					$post_body
-				]
-			];
-
-			/*if ($file_path!=''){
-				$body['multipart'][] =
-				[
-					'name'     => $file_field_name,
-					'contents' => fopen($file_path, 'r')
-					//'headers'  => ['Content-Type' => 'video/mp4']
-				];
-			}*/
-
-			var_dump($file_path);
-
-			$api_response = $client->request('POST','', $body);
-
-			$response=array(
-				'status'=>'success',				
-				//'options'=>$body_options,
-				'code' => $api_response->getStatusCode(),// 200
-				'reason' => $api_response->getReasonPhrase(), // OK
-				'response_' =>$api_response->getBody()
-			);
-
-			$response_text=(string) $api_response->getBody();
-			$response_json=json_decode($response_text,true);
-
-			var_dump($response_text);
-
-			if(!$response_json){
-				return $response_text;
-			}
-
-			/*if ($response_json["dataset"]){
-				return $response_json["dataset"];
-			}*/
-
-			return $response_json;
-			die();
-
-			return $response;
-		} catch (ClientException $e) {
-			$resp=$e->getResponse();
-			//var_dump($resp);
-			throw new Exception((string) $resp->getBody());
-			return;
-
-			http_response_code($resp->getStatusCode());
-			echo $resp->getBody();
-			die();			
-		}
-		catch (Exception $e) {
-			throw new Exception("request failed: ". $e->getMessage());
-		}
-	}
+	
 
 }    

@@ -44,7 +44,7 @@
               <div class="projects col">
 
                 <div class=" mb-5">
-                    <h2>Template Manager</h2>
+                    <h2>Template manager</h2>
                     <div class="pull-right float-right">
                       <button type="button" @click="dialog_import_template=true" class="btn btn-sm btn-outline-primary">Import template</button>
                     </div>

@@ -16,6 +16,9 @@ Vue.component('summary-component', {
         ProjectID(){
             return this.$store.state.project_id;
         },
+        ProjectIDNo(){
+            return this.$store.state.idno;
+        },
         ProjectTemplates()
         {
             return this.$store.state.templates;
@@ -99,7 +102,6 @@ Vue.component('summary-component', {
                                 max-width="700px"
                                 scrollable
                                 >
-
                                 <v-card >
                                     <v-card-title class="text-h5 grey lighten-2">
                                     Template {{template_idx}}

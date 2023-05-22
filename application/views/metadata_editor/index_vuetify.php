@@ -179,7 +179,18 @@ Vue.config.errorHandler = (err, vm, info) => {
         show_fields_recommended:false,
         show_fields_empty:false,
         show_fields_nonempty:false,
-        show_fields_validation_errors:false
+        show_fields_validation_errors:false,
+        project_types_icons: {
+          "document": "fas fa-file-alt",
+          "survey": "fa fa-database",
+          "geospatial": "fa fa-globe-americas",
+          "table": "fa fa-database",
+          "timeseries": "fa fa-chart-line",
+          "timeseries-db": "fas fa-project-diagram",
+          "image": "fa fa-image",
+          "video": "fa fa-video",
+          "script": "fa fa-file-code"
+        }
       },
       created: async function(){
         await this.$store.dispatch('initData',{dataset_id:this.dataset_id});

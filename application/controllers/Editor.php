@@ -43,6 +43,7 @@ class Editor extends MY_Controller {
 			}
 
 			$options['sid']=$id;
+			$options['idno']=$project['idno'];
 			$options['title']=$project['title'];
 			$options['type']=$project['type'];		
 			$options['metadata']=$project['metadata'];
