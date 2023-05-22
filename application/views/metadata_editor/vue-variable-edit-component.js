@@ -293,7 +293,7 @@ Vue.component('variable-edit', {
             return code;
         },
         VariablePercent(variable, catgry){
-           if (variable && variable.var_valrng && variable.var_valrng.range && variable.var_valrng.range.count){
+           if (variable && variable.var_valrng && variable.var_valrng.range){
                 let catgry_freq=this.VariableCategoryFrequency(catgry);
                 let percent=(catgry_freq/this.ValidRangeCount)*100;
 
@@ -305,7 +305,7 @@ Vue.component('variable-edit', {
            return 0;           
         },
         VariablePercentWeighted(variable, catgry){
-            if (variable && variable.var_valrng && variable.var_valrng.range && variable.var_valrng.range.count){
+            if (variable && variable.var_valrng && variable.var_valrng.range){
                  let catgry_freq=this.VariableCategoryFrequencyWeighted(catgry);
                  let percent= (catgry_freq/this.WeightedValidRangeCount)*100;                
 
