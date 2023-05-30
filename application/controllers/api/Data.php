@@ -115,7 +115,7 @@ class Data extends MY_REST_Controller
 	 * 
 	 * 
 	 */
-	function import_file_meta_get($sid,$file_id)
+	/*function import_file_meta_get($sid,$file_id)
 	{
 		try{
 			$exists=$this->Editor_model->check_id_exists($sid);
@@ -155,65 +155,9 @@ class Data extends MY_REST_Controller
 			);
 			$this->set_response($response, REST_Controller::HTTP_BAD_REQUEST);
 		}
-	}
+	}*/
 
-	/**
-	 * 
-	 * Generate summary statistics for a data file and import into database
-	 * 
-	 */
-	function generate_summary_stats_get($sid,$file_id)
-	{
-		try{
-			$exists=$this->Editor_model->check_id_exists($sid);
-
-			if(!$exists){
-				throw new Exception("Project not found");
-			}
-
-			$this->editor_acl->user_has_project_access($sid,$permission='edit',$this->api_user());
-
-			$dict_params=$this->Editor_variable_model->prepare_data_dictionary_params($sid,$file_id);
-
-			$datafile_path=$this->Editor_datafile_model->get_file_path($sid,$file_id);
-
-			if (!$datafile_path){
-				throw new Exception("Data file not found");
-			}
-
-			//get file basic metadata [rows, columns, variable name and label]
-			#$response=$this->datautils->generate_summary_stats($datafile_path);
-			$response=$this->datautils->generate_summary_stats_variable($datafile_path,$dict_params);
-
-			$variable_import_result=null;
-
-			if (isset($response['rows'])){
-				$datafile=$this->Editor_datafile_model->data_file_by_id($sid,$file_id);
-				$this->Editor_datafile_model->update($datafile['id'],array('case_count'=>$response['rows']));
-			}
-
-			if (isset($response['variables'])){
-				$variable_import_result=$this->Editor_variable_model->bulk_upsert_dictionary($sid,$file_id,$response['variables']);
-			}
-
-			$output=array(
-				'status'=>'success',
-				'params'=>$dict_params,
-				'result'=>realpath($datafile_path),
-				'variables_imported'=>$variable_import_result,
-				'variables'=>$response['variables']
-			);
-						
-			$this->set_response($output, REST_Controller::HTTP_OK);			
-		}
-		catch(Exception $e){
-			$response=array(
-				'status'=>'failed',
-				'message'=>$e->getMessage()
-			);
-			$this->set_response($response, REST_Controller::HTTP_BAD_REQUEST);
-		}
-	}
+	
 
 	/**
 	 * 
@@ -233,7 +177,13 @@ class Data extends MY_REST_Controller
 
 			$dict_params=$this->Editor_variable_model->prepare_data_dictionary_params($sid,$file_id);
 
-			$datafile_path=$this->Editor_datafile_model->get_file_path($sid,$file_id);
+			$data_file_var_count=$this->Editor_datafile_model->get_file_varcount($sid,$file_id);//if not 0 then use CSV
+
+			if ($data_file_var_count==0){
+				$datafile_path=$this->Editor_datafile_model->get_file_path($sid,$file_id);
+			}else{
+				$datafile_path=$this->Editor_datafile_model->get_file_csv_path($sid,$file_id);
+			}
 
 			if (!$datafile_path){
 				throw new Exception("Data file not found");
@@ -246,7 +196,7 @@ class Data extends MY_REST_Controller
 			$output=array(
 				'status'=>'success',
 				'params'=>$dict_params,
-				'file'=>realpath($datafile_path),				
+				'file'=>realpath($datafile_path),
 				//'job_id'=>$api_response['job_id']
 			);
 			$output=array_merge($output,$api_response['response']);
@@ -424,6 +374,49 @@ class Data extends MY_REST_Controller
 		}
 	}
 
+	/**
+	 * 
+	 * 
+	 * Export data files
+	 * 	- format:
+	 * 		- csv
+	 * 		- stata
+	 * 		- spss
+	 * 		- json
+	 * 
+	 */
+	function export_datafile_queue_post($sid,$file_id)
+	{
+		try{
+			$exists=$this->Editor_model->check_id_exists($sid);
+
+			if(!$exists){
+				throw new Exception("Project not found");
+			}
+
+			$options=(array)$this->raw_json_input();
+
+			if(!isset($options['format'])){
+				throw new Exception("No value provided for `format` parameter");
+			}
+
+			$format=$options['format'];
+
+			$this->editor_acl->user_has_project_access($sid,$permission='edit',$this->api_user());
+
+			$api_response=$this->datautils->export_datafile_queue($sid,$file_id,$format);
+			$status_code=$api_response['status_code'];
+			$this->set_response($api_response['response'], $status_code);
+		}
+		catch(Exception $e){
+			$response=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($response, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
 
 	function generate_csv_queue_get($sid,$file_id)
 	{
@@ -487,5 +480,94 @@ class Data extends MY_REST_Controller
 		}
 	}
 
+
+	/**
+	 * 
+	 * 
+	 * Return Job status for a given job id
+	 */
+	function job_status_get($job_id)
+	{
+		try{
+			$api_response=$this->datautils->get_job_status($job_id);
+
+			$api_http_status=isset($api_response['status_code']) ? $api_response['status_code'] : REST_Controller::HTTP_BAD_REQUEST;
+			$job_status=isset($api_response['response']['status']) ? $api_response['response']['status'] : '';
+
+			if (!$api_http_status==REST_Controller::HTTP_OK){
+				throw new Exception("Job failed");
+			}
+
+			$output=array(
+				'status'=>'success',
+				'api_response'=>$api_response,
+				'job_status'=>$job_status				
+			);
+						
+			$this->set_response($output, REST_Controller::HTTP_OK);			
+		}
+		catch(Exception $e){
+			$response=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($response, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	/**
+	 * 
+	 * Replace/append data file
+	 * 
+	 * 
+	 * 
+	 * @file_type data
+	 * 
+	 **/ 
+	function replace_datafile_post($sid=null, $file_id=null)
+	{		
+		$this->load->library("Datafile_update");
+
+		try{
+			$exists=$this->Editor_model->check_id_exists($sid);
+
+			if(!$exists){
+				throw new Exception("Project not found");
+			}
+
+			$datafile=$this->Editor_datafile_model->data_file_by_id($sid,$file_id);
+
+			if (!$datafile){
+				throw new Exception("Data file not found: ". $file_id);
+			}
+
+			$this->editor_acl->user_has_project_access($sid,$permission='edit',$this->api_user());
+
+			//upload file to a temporary location
+			$result=$this->Editor_datafile_model->temp_upload_file($sid);
+
+			if (!isset($result['uploaded_path'])){
+				throw new Exception("File upload failed");
+			}
+
+
+			$result=$this->datafile_update->update($sid, $file_id,$result['uploaded_path']);
+			
+			$output=array(
+				'status'=>'success',
+				'result'=>$result
+			);
+						
+			$this->set_response($output, REST_Controller::HTTP_OK);			
+		}
+		catch(Exception $e){
+			$response=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($response, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
 
 }

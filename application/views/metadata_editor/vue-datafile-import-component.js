@@ -111,9 +111,11 @@ Vue.component('datafile-import', {
                 let stats_resp=await this.importDataFileSummaryStatistics(fileIdx, fileid);
                 console.log("finished summary statistics",fileIdx,stats_resp);
 
-                this.update_status="Exporting data to CSV " + this.files[fileIdx].name;
-                let csv_resp=await this.generateCSV(fileIdx,fileid);
-                console.log("finished generating csv file",fileIdx,csv_resp);
+                if (!this.files[fileIdx].type.match('csv.*')) {
+                    this.update_status="Exporting data to CSV " + this.files[fileIdx].name;
+                    let csv_resp=await this.generateCSV(fileIdx,fileid);
+                    console.log("finished generating csv file",fileIdx,csv_resp);
+                }
 
                 this.upload_report.push(
                     {
@@ -253,99 +255,7 @@ Vue.component('datafile-import', {
             });*/
             Vue.delete(this.files,file_idx);      
             this.files.splice(file_idx, 0);
-        },
-        /*processImport: async function(){
-            await this.uploadDatafiles();
-
-            this.update_status="completed";
-            this.is_processing=false;
-            this.$store.dispatch('initData',{dataset_id:this.ProjectID});
-        },
-        uploadDatafiles: async function(){
-            this.errors='';
-
-            for(i=0;i<this.files.length;)
-            {
-                await this.uploadDataFile(i);
-                i++;
-
-                if (this.errors!=''){
-                    return false;
-                }
-            }
-        },
-        uploadDataFile: async function (fileIdx)
-        {            
-            let formData = new FormData();
-            formData.append('file', this.files[fileIdx]);
-
-            if (this.errors!=''){
-                return false;
-            }
-
-            let vm=this;
-            let url=CI.base_url + '/api/editor/files/'+ this.ProjectID + '/data';
-
-            await axios.post( url,
-                formData,
-                {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                }
-            ).then(function(response){
-                vm.importDataFile(fileIdx);
-                return true;
-            })
-            .catch(function(response){
-                vm.errors=response;
-                return false;
-            });            
-        }, 
-        importDataFile_old: async function(fileIdx){
-            this.is_processing=true;
-            this.update_status="Importing data dictionary " + this.files[fileIdx].name;
-
-            let formData = {
-                "filename":this.files[fileIdx].name
-            }
-            
-            vm=this;            
-            let url=CI.base_url + '/api/R/import_data_file/'+this.ProjectID;
-            
-            try{
-                let resp = await axios.post(url, formData,{
-                    headers: {
-                        'Content-Type': 'application/json'
-                      }
-                });
-
-                this.update_status="";
-
-            }catch(error){
-                vm.errors=error;
-                console.log(Object.keys(error), error.message);
-            }
-        },
-        generateCSVFromR: async function (file)
-        {
-            let formData = new FormData();
-            //formData.append('fileid', this.file_id);
-            formData.append("filename",file.name)
-
-            vm=this;
-            this.update_status="Generating CSV...";
-            let url=CI.base_url + '/api/R/generate_csv/'+this.ProjectID + '/' +  file.name;
-
-            axios.get( url,formData,{}
-            ).then(function(response){
-                console.log('SUCCESS!!',response);
-                vm.update_status="CSV file generated...";
-            })
-            .catch(function(){
-                console.log('FAILURE!!');
-            });            
-        },  */
+        },        
         handleFileUpload(event)
         {
             this.file = event.target.files[0];
@@ -383,11 +293,10 @@ Vue.component('datafile-import', {
         }
     },
     template: `
-            <div class="datafile-import-component">
-            <v-container>
+            <div class="datafile-import-component container-fluid mt-5 p-3">
 
                 <h3>Import data files</h3>                
-                <div class="bg-white p-3" >
+                <div class="bg-white" >
 
                     <div class="form-container-x" >
 
@@ -400,7 +309,7 @@ Vue.component('datafile-import', {
                             <div class="mt-3">or</div>
                             
                             <div class="custom-file" style="max-width:300px;">
-                                <input type="file" class="custom-file-input" id="customFile" multiple @change="handleMultiFileUpload( $event )">
+                                <input type="file" class="custom-file-input" id="customFile" multiple @change="handleMultiFileUpload( $event )" >
                                 <label class="custom-file-label" for="customFile">Choose files</label>
                             </div>
 
@@ -433,7 +342,7 @@ Vue.component('datafile-import', {
                 </div>
 
 
-            </v-container>
+            
 
 
             <v-dialog v-model="dialog_process" width="700" height="600" persistent>

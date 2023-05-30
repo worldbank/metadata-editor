@@ -369,3 +369,29 @@ if (! function_exists('is_assoc_array')) {
     return $keys !== array_keys($keys);
   }
 }
+
+
+
+if (! function_exists('array_merge_replace_recursive')) {
+    /**
+	 * 
+	 * Merge and replace nested deep nested array + indexed array
+	 * 
+	 * @metadata - original array
+	 * @replace - partial array
+	 * 
+	 */
+	function array_merge_replace_recursive($metadata, $replace)
+    {
+        $metadata=array_replace_recursive($metadata,$replace);
+        $metadata_indexed_fields=array_indexed_elements($metadata);
+
+        foreach($metadata_indexed_fields as $path){
+            if ($replace_value=get_array_nested_value($replace,$path,"/")){
+                set_array_nested_value($metadata,$path,$replace_value,"/");
+            }
+        }
+
+        return $metadata;
+	}
+}

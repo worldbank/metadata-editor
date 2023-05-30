@@ -553,6 +553,12 @@ class Editor_variable_model extends ci_model {
             'datafile'=> realpath($datafile_path)
         );
 
+        $dtype_map=array(
+            //'numeric'=>'float',
+            'string'=>'object',
+            'character'=>'object'
+        );
+
         foreach($variables as $variable){
             if (isset($variable['var_wgt_id']) && $variable['var_wgt_id']>0 ){
                 $params['weights'][]=array(
@@ -565,7 +571,12 @@ class Editor_variable_model extends ci_model {
                     "field"=>$variable['name'],
                     "missings"=> explode(",",$variable['user_missings'])
                 );
-            }            
+            }
+            if ($variable['field_dtype']!=''){
+                if (isset($dtype_map[$variable['field_dtype']])){
+                    $params['dtypes'][$variable['name']]= $dtype_map[$variable['field_dtype']];
+                }
+            }
         }
 
         return $params;
@@ -682,6 +693,45 @@ class Editor_variable_model extends ci_model {
             }
         }
         return $output;  
+    }
+
+
+    function get_variable_names_by_file($sid,$file_id)
+    {
+        $this->db->select("name");
+        $this->db->where("sid",$sid);
+        $this->db->where("fid",$file_id);
+        $result=$this->db->get("editor_variables")->result_array();
+
+        $names=array();
+        foreach($result as $row){
+            $names[]=$row['name'];
+        }
+
+        return $names;
+    }
+
+
+    /**
+     * 
+     * Return variable by data file name + variable name
+     * 
+     */
+    function get_variable_by_filename($sid,$file_name, $var_name)
+    {
+        $this->db->select("v.*");
+        $this->db->from("editor_variables v");
+        $this->db->join("editor_data_files f","f.file_id=v.fid");
+        $this->db->where("v.sid",$sid);
+        $this->db->where("f.file_name",$file_name);
+        $this->db->where("v.name",$var_name);
+        $variable=$this->db->get()->row_array();
+
+        if(isset($variable['metadata'])){
+			$variable['metadata']=$this->Editor_model->decode_metadata($variable['metadata']);
+		}
+
+        return $variable;
     }
     
 

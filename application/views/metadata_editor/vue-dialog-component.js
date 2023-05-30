@@ -71,4 +71,5 @@ Vue.component('vue-dialog-component', {
         
         </div>
     `
-})
+});
+

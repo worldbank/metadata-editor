@@ -140,6 +140,54 @@ class Editor_datafile_model extends CI_Model {
 		return $filepath;
 	}
 
+	function get_file_csv_path($sid, $file_id)
+	{
+		$files=$this->get_files_info($sid,$file_id);
+
+		if (!isset($files['csv'])){
+			throw new Exception("CSV file not found");
+		}
+
+		$csv_path=$files['csv']['filepath'];
+
+		if (!file_exists($csv_path)){
+			throw new Exception("Data file CSV not found: ".$csv_path);
+		}
+
+		return $csv_path;
+	}
+
+
+	function get_tmp_file_info($sid,$fid,$type)
+	{
+		$datafile=$this->data_file_by_id($sid,$fid);
+
+		if (!$datafile){
+			throw new Exception("Data file ID not found: ");
+		}
+
+		$filename=$datafile['file_physical_name'];
+
+		if (empty($filename)){
+			throw new Exception("Data file not set");
+		}
+
+		$filename=$this->filename_part($filename).'.'.$type;
+		$project_folder_path=$this->Editor_model->get_project_folder($sid).'/data/tmp/';
+
+
+		if (!file_exists(realpath($project_folder_path.$filename))){
+			throw new Exception("Data file not found: ".$project_folder_path.$filename);
+		}
+
+		return [
+			'filename'=>$filename,
+			'filepath'=>$project_folder_path.$filename,				
+			'file_info'=>pathinfo($project_folder_path.$filename),
+			'file_size'=>format_bytes(filesize($project_folder_path.$filename)),
+		];		
+	}
+
 
 	/**
 	 * 
@@ -203,7 +251,8 @@ class Editor_datafile_model extends CI_Model {
     {
         $this->db->select("*");
 		$this->db->where("sid",$sid);
-		$this->db->order_by('file_name');
+		$this->db->order_by('wght','ASC');
+		$this->db->order_by('file_name','ASC');
 		$files=$this->db->get("editor_data_files")->result_array();
 
 		if(empty($files)){
@@ -223,7 +272,7 @@ class Editor_datafile_model extends CI_Model {
 
 		//apply sorting to keep files in the order - F1, F2...F9, F10, F11
 		$file_keys = array_keys($output);
-  		natsort($file_keys);
+  		//natsort($file_keys);
 
 		$sorted_files=array();
 
@@ -270,6 +319,27 @@ class Editor_datafile_model extends CI_Model {
 
 		return false;
 	}
+
+
+	/**
+	 * 
+	 * Get a list of all file names with file_id
+	 */
+	function file_id_name_list($sid)
+	{
+		$this->db->select("file_id, file_name");
+		$this->db->where("sid",$sid);
+		$result= $this->db->get("editor_data_files")->result_array();
+
+		$output=array();
+		foreach($result as $row)
+		{
+			$output[$row['file_name']]=$row['file_id'];
+		}
+
+		return $output;
+	}
+
 
 	//get data file by file_id
     function data_file_by_id($sid,$file_id)
@@ -433,6 +503,41 @@ class Editor_datafile_model extends CI_Model {
 		return TRUE;
 	}
 
+
+	/**
+	 * 
+	 * 
+	 * Update data file by file name
+	 * 
+	 * @sid - project ID
+	 * @file_name - data file name without file extension
+	 * @options - array of fields
+	 * 
+	 */
+	function update_by_filename($sid,$file_name,$options)
+	{
+		foreach($options as $key=>$value){
+			if ($key=='id'){
+				unset($options[$key]);
+			}
+
+			if (!in_array($key,$this->data_file_fields) ){
+				unset($options[$key]);
+			}
+		}
+		
+		$this->db->where('sid',$sid);
+		$this->db->where('file_name',$file_name);
+		$result=$this->db->update('editor_data_files', $options);
+
+		if ($result===false){
+			throw new MY_Exception($this->db->_error_message());
+		}
+		
+		return TRUE;
+	}
+
+
 	function get_varcount($sid)
 	{
 		$this->db->select("sid,fid, count(*) as varcount");
@@ -447,6 +552,16 @@ class Editor_datafile_model extends CI_Model {
 		}
 
 		return $output;
+	}
+
+
+	function get_file_varcount($sid,$file_id)
+	{
+		$this->db->select("count(sid) as varcount");
+		$this->db->where("sid",$sid);
+		$this->db->where("fid",$file_id);
+		$result= $this->db->get("editor_variables")->row_array();
+		return $result['varcount'];
 	}
 
 
@@ -556,6 +671,26 @@ class Editor_datafile_model extends CI_Model {
     public function decode_metadata($metadata_encoded)
     {
         return unserialize(base64_decode((string)$metadata_encoded));
+	}
+
+
+	/**
+	 * 
+	 * Create new data file by uploading a data file (csv, dta, sav)
+	 * 
+	 */
+	function temp_upload_file($sid)
+	{
+		//upload file
+		$upload_result=$this->Editor_resource_model->upload_file($sid,$file_type='_tmp',$file_field_name='file', $remove_spaces=false);
+		$uploaded_file_name=$upload_result['file_name'];
+		$uploaded_path=$upload_result['full_path'];
+
+		return [
+			'uploaded_file_name'=>$uploaded_file_name,
+			'base64'=>base64_encode($uploaded_file_name),
+			'uploaded_path'=>$uploaded_path
+		];
 	}
 
 	

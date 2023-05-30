@@ -892,14 +892,11 @@ Vue.component('variables', {
                                         <td>
                                             <span v-if="variable.var_format && variable.var_format.type">
                                                 <span v-if="variable.var_format.type=='character' || variable.var_format.type=='fixed'" :title="variable.var_format.type">
-                                                    <v-icon aria-hidden="false" class="vdar-icon">mdi-alpha-s</v-icon>
+                                                    <v-icon aria-hidden="false" class="vdar-icon">mdi-alpha-a-box-outline</v-icon>
                                                 </span>
                                                 <span v-if="variable.var_format.type=='numeric'" :title="variable.var_format.type">
-                                                    <v-icon aria-hidden="false" class="vdar-icon">mdi-alpha-n</v-icon>
-                                                </span>
-                                                <span v-else :title="variable.var_format.type">
-                                                    <v-icon aria-hidden="false" class="vdar-icon">mdi-alpha-{{variable.var_format.type.substr(0,1).toLowerCase()}}</v-icon>
-                                                </span>
+                                                    <v-icon aria-hidden="false" class="vdar-icon">mdi-numeric-1-box-outline</v-icon>
+                                                </span>                                                
 
                                             </span>
                                             <span v-if="variable.var_catgry && variable.var_catgry.length>0" :title="variable.var_catgry.length">

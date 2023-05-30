@@ -211,11 +211,12 @@ class DdiVariable
 
         //range
         $range=$this->get_simple_element('range',$this->get_simple_element('valrng'));
-        $output['var_val_range']=array(
-            'min'=>$this->get_attribute_value($range,'min'),
-            'max'=>$this->get_attribute_value($range,'max')
-        );
-        
+        $output['var_valrng']=array(
+            "range"=>array(
+                'min'=>$this->get_attribute_value($range,'min'),
+                'max'=>$this->get_attribute_value($range,'max')
+            )
+        );                
         return $output;
     }
 

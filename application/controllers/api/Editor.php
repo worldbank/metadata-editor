@@ -530,7 +530,7 @@ class Editor extends MY_REST_Controller
 	}
 
 
-	function convert_ddi_post($sid=null)
+	/*function convert_ddi_post($sid=null)
 	{		
 		try{
 			$sid=$this->get_sid($sid);
@@ -553,7 +553,7 @@ class Editor extends MY_REST_Controller
 		catch(Exception $e){
 			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
 		}
-	}
+	}*/
 
 
 	/**

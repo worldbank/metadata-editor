@@ -82,6 +82,27 @@ class DataUtils
 		return $response;
 	}
 
+	public function get_file_name_labels($datafile_path)
+	{
+		$client = new Client([
+			'base_uri' => $this->DataApiUrl.'name-labels'
+		]);
+		
+		$request_body=[
+			"file_path"=> realpath($datafile_path)
+		];
+			
+		$api_response = $client->request('POST', '', [
+			'json' => 
+				$request_body
+			,
+			['debug' => false]
+		]);
+
+		$response=json_decode($api_response->getBody()->getContents(),true);
+		return $response;
+	}
+
 	
 	public function generate_summary_stats($datafile_path)
 	{
@@ -208,6 +229,29 @@ class DataUtils
 		return $response;
 	}
 
+	public function export_datafile_queue($sid,$file_id,$format)
+	{
+		$this->ci->load->library("Datafile_export");
+
+		$client = new Client([
+			'base_uri' => $this->DataApiUrl.'export-data-queue'
+		]);
+
+		$request_body=$this->ci->datafile_export->get_export_params($sid,$file_id,$format);
+			
+		$api_response = $client->request('POST', '', [
+			'json' => 
+				$request_body
+			,
+			['debug' => false]
+		]);
+
+		$response=json_decode($api_response->getBody()->getContents(),true);
+		return [
+			'response'=>$response,
+			'status_code'=>$api_response->getStatusCode() //e.g. 200
+		];
+	}
 
 	public function generate_csv_queue($datafile_path)
 	{

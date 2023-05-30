@@ -653,3 +653,15 @@ table .form-field-dropdown-custom .v-input__slot fieldset{
     font-size:10px;    
     padding-left:3px;
 }
+
+
+.v-labels-remove-space .v-label{
+    font-weight:normal;
+}
+.v-labels-remove-space .v-input{
+    margin:0px;
+}
+
+.v-labels-remove-space .v-messages{
+display:none;
+}

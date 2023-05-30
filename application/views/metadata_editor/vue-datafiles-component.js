@@ -5,6 +5,8 @@ Vue.component('datafiles', {
             dataset_id:project_sid,
             dataset_idno:project_idno,
             dataset_type:project_type,
+            dialog_datafile_import:false,
+            dialog_datafile_import_fid:null,
             form_errors:[],
             schema_errors:[],
             page_action:'list',
@@ -125,6 +127,74 @@ Vue.component('datafiles', {
 
             this.selected_files=[];
         },
+        replaceFile:function(file_idx){
+            let data_file=this.data_files[file_idx];
+
+            if (!confirm("Are you sure you want to replace file " + data_file.file_id + "?")){
+                return;
+            }
+            this.dialog_datafile_import_fid=data_file.file_id;
+            this.dialog_datafile_import=true;
+        },
+        exportFile: async function(file_idx,format){
+            let data_file=this.data_files[file_idx];
+
+            this.dialog={
+                show:true,
+                title:'Export file' + '[' + format + ']',
+                loading_message:'Please wait while the file is being generated...',
+                message_success:'',
+                message_error:'',
+                is_loading:true
+            }
+
+            try{
+                //add to queue
+                let result=await this.$store.dispatch('exportDatafileQueue',{file_id:data_file.file_id, format:format});
+                console.log("queued for export",result);
+                this.exportFileStatusCheck(data_file.file_id,result.data.job_id,format);
+            }catch(e){
+                console.log("failed",e);
+                this.dialog.is_loading=false;
+                this.dialog.message_error="Failed to generate file: "+e.response.data.message;                
+            }
+        },        
+        exportFileStatusCheck: async function(file_id,job_id,format){
+                this.dialog={
+                    show:true,
+                    title:'',
+                    loading_message:'',
+                    message_success:'',
+                    message_error:'',
+                    is_loading:false
+                }
+    
+                this.dialog.is_loading=true;
+                this.dialog.title="Export file";
+                this.dialog.loading_message="Please wait while the file is being generated...";
+                try{
+                    await this.sleep(5000);
+                    let result=await this.$store.dispatch('getJobStatus',{job_id:job_id});
+                    console.log("export status",result);
+                    this.dialog.is_loading=true;
+                    this.dialog.loading_message="Job status: " + result.data.job_status;
+                    if (result.data.job_status!=='done'){
+                        this.exportFileStatusCheck(file_id,job_id,format);
+                    }else if (result.data.job_status==='done'){
+                        this.dialog.is_loading=false;
+                        this.dialog.message_success="Finished exporting file";
+
+                        let download_url=CI.base_url + '/api/datafiles/download_tmp_file/'+this.dataset_id + '/' + file_id + '/' + format;
+                        window.open(download_url, '_blank').focus();
+                    }
+                    
+                }catch(e){
+                    console.log("failed",e);
+                    this.dialog.is_loading=false;
+                    this.dialog.message_error="Failed to export file: "+e.response.data.message;
+                }
+            },
+
         deleteFile:function(file_idx,confirm_=false)
         {
             let data_file=this.data_files[file_idx];
@@ -319,7 +389,6 @@ Vue.component('datafiles', {
                         <router-link class="btn btn-sm btn-outline-primary" :to="'datafiles/import'">Import files</router-link> 
                     </v-col>
                 </v-row>
-
                 
                 <table class="table table-striped">
                     <thead>
@@ -357,6 +426,35 @@ Vue.component('datafiles', {
                                 <button type="button" class="btn btn-sm btn-light ink ml-0 pl-0" @click="generateCSV(data_file.file_id)"><v-icon title="Generate CSV" >mdi-database-export</v-icon>Export CSV</button>
                                 </span>
                                 <button type="button" class="btn btn-sm btn-light ink ml-0 pl-0" @click="deleteFile(index)"><v-icon>mdi-trash-can</v-icon>Remove</button>
+                                <button type="button" class="btn btn-sm btn-light ink ml-0 pl-0" @click="replaceFile(index)"><v-icon>mdi-trash-can</v-icon>Replace file</button>
+                                
+                                        
+                                        <v-menu offset-y>
+                                            <template v-slot:activator="{ on, attrs }">
+                                                <button type="button" class="btn btn-sm btn-light ink ml-0 pl-2"  v-bind="attrs" v-on="on">
+                                                    Export <v-icon title="More options">mdi-dots-vertical</v-icon>
+                                                </button>                                                
+                                            </template>
+                                            <v-list>
+                                                <v-list-item @click="exportFile(index,'sav')">
+                                                    <v-list-item-title>SPSS</v-list-item-title>
+                                                </v-list-item>
+                                                <v-list-item  @click="exportFile(index,'dta')">
+                                                    <v-list-item-title>Stata</v-list-item-title>
+                                                </v-list-item>
+                                                <v-list-item  @click="exportFile(index,'csv')">
+                                                    <v-list-item-title>CSV</v-list-item-title>
+                                                </v-list-item>
+                                                <v-list-item  @click="exportFile(index,'json')">
+                                                    <v-list-item-title>JSON</v-list-item-title>
+                                                </v-list-item>
+                                                <v-list-item  @click="exportFile(index,'sas')">
+                                                    <v-list-item-title>SAS</v-list-item-title>
+                                                </v-list-item>
+                                            </v-list>
+                                        </v-menu>
+
+
                             </div>
                         </td>
                         <td>{{data_file.var_count}}</td>
@@ -423,6 +521,8 @@ Vue.component('datafiles', {
                 </v-card>
                 </v-dialog>
             <!-- end dialog -->
+
+            <dialog-datafile-import v-model="dialog_datafile_import" :file_id="dialog_datafile_import_fid"></dialog-datafile-import>            
         
         </div>
     `

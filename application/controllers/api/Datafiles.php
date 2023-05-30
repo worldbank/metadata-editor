@@ -275,6 +275,47 @@ class Datafiles extends MY_REST_Controller
 		}
 	}
 
+
+
+	/**
+	 * 
+	 * Exported temporary files
+	 * 
+	 */
+	function download_tmp_file_get($sid=null,$fid=null,$type=null)
+	{
+		try{			
+			if (!$sid || !$fid || !$type){
+				throw new Exception("Missing required parameters");
+			}
+
+			$this->load->helper("download");
+			$valid_types=array('dta','csv','sav','json', 'sas');
+
+			if (!in_array($type,$valid_types)){
+				throw new Exception("Invalid file type");
+			}
+
+			$this->editor_acl->user_has_project_access($sid,$permission='edit');
+			$tmp_file_info=$this->Editor_datafile_model->get_tmp_file_info($sid,$fid,$type);
+
+			if (file_exists($tmp_file_info['filepath'])){
+				force_download2($tmp_file_info['filepath']);
+				#unlink($tmp_file_info['filepath']);
+			}
+			else{
+				throw new Exception("File not found");
+			}
+			
+		}
+		catch(Exception $e){
+			$error=array(
+				'error'=>$e->getMessage()
+			);
+			$this->set_response($error, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
 	/**
 	 * 
 	 * Get data file by name

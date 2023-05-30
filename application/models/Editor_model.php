@@ -15,6 +15,7 @@ use Ramsey\Uuid\Uuid;
 class Editor_model extends CI_Model {
 
 	private $storage_path='datafiles/editor';
+	private $tmp_storage_path='datafiles/editor';
 
 	private $types=array(
         'survey'=>'microdata',
@@ -91,6 +92,11 @@ class Editor_model extends CI_Model {
 	function get_storage_path()
 	{
 		return $this->storage_path;
+	}
+
+	function get_temp_storage_path()
+	{
+		return $this->tmp_storage_path;
 	}
 
 
@@ -1149,6 +1155,7 @@ class Editor_model extends CI_Model {
 			}else{
 				$variable=$var_obj->get_metadata_array();
 				$variable['fid']=$variable['file_id'];
+				$variable['var_catgry_labels']=$this->get_variable_category_value_labels($variable);
 				$variable['metadata']=$variable;
 				$this->Editor_variable_model->insert($sid,$variable);
 			}
@@ -1165,6 +1172,29 @@ class Editor_model extends CI_Model {
 	
 		//return $output;
 		
+	}
+
+	/** 
+	 * 
+	 * return variable category value/labels 
+	 * 
+	 * */
+	function get_variable_category_value_labels($variable)
+	{
+		$var_catgry_labels=[];
+		if (!isset($variable['var_catgry'])){
+			return $var_catgry_labels;
+		}
+
+		foreach($variable['var_catgry'] as $catgry)
+		{
+			$var_catgry_labels[]=array(
+				'value'=>$catgry['value'],
+				'labl'=>$catgry['labl']
+			);
+		}
+
+		return $var_catgry_labels;
 	}
 
 	

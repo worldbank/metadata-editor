@@ -195,6 +195,7 @@
             echo $this->load->view("metadata_editor/vue-dialog-variable-selection-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-dialog-weight-variable-selection-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-dialog-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-dialog-datafile-component.js",null,true);
         ?>
 
         <?php if (empty($metadata)):?>
@@ -641,7 +642,23 @@
                     let url=CI.base_url + '/api/data/generate_csv_job_status/'+getters.getProjectID + '/' + options.file_id + '/' +  options.job_id;
                     let resp = await axios.get(url);
                     return resp;                
-                }                 
+                },
+                async exportDatafileQueue({commit,getters}, options)
+                {
+                    let url=CI.base_url + '/api/data/export_datafile_queue/'+getters.getProjectID + '/' + options.file_id;
+                    let formData = {
+                        "format": options.format                        
+                    }
+
+                    let resp = await axios.post(url,formData);
+                    return resp;                
+                },
+                async getJobStatus({commit,getters}, options)
+                {
+                    let url=CI.base_url + '/api/data/job_status/'+ options.job_id;
+                    let resp = await axios.get(url);
+                    return resp;                
+                }                   
             },
             mutations: VueDeepSet.extendMutation({
                 // other mutations

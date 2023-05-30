@@ -252,6 +252,7 @@ class Variables extends MY_REST_Controller
 	{
 		try{
 			$this->editor_acl->user_has_project_access($sid,$permission='edit');
+
 			$options=(array)$this->raw_json_input();
 			$user_id=$this->get_api_user_id();
 
@@ -287,7 +288,7 @@ class Variables extends MY_REST_Controller
 		}
 	}
 
-	function index_delete_post($sid=null)
+	function delete_post($sid=null)
 	{
 		return $this->index_delete($sid);
 	}
