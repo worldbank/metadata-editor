@@ -80,7 +80,10 @@
 
                 <!-- icons -->
                 <div class="pb-2 sidebar-menu-bar d-flex justify-content-center">
-                    <button type="button" title="Expand/Collapse" class="btn btn-xs btn-link">
+
+                
+
+                    <button type="button" title="Expand/Collapse" class="btn btn-xs btn-link" @click="toggleTree">
                         <i class="icon fas fa-compress-arrows-alt"></i>
                     </button>
 
@@ -102,6 +105,20 @@
 
                 </div>
                 <!-- end-icons -->
+
+                <?php /*
+                <div>
+                    <!--search box -->
+                <v-text-field
+                    min-height="6px"
+                    filled
+                    rounded dense
+                    label=""
+                    append-icon="mdi-magnify"
+                 ></v-text-field>
+                 <!--end search box -->
+                </div>
+                */ ?>
 
 
 

@@ -290,7 +290,7 @@ class Datafiles extends MY_REST_Controller
 			}
 
 			$this->load->helper("download");
-			$valid_types=array('dta','csv','sav','json', 'sas');
+			$valid_types=array('dta','csv','sav','json', 'sas','xpt');
 
 			if (!in_array($type,$valid_types)){
 				throw new Exception("Invalid file type");

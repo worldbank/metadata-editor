@@ -154,6 +154,7 @@ Vue.config.errorHandler = (err, vm, info) => {
           form_errors:[],
           schema_errors:[],
           initiallyOpen: [],
+          toggleTreeExpand: false,
           files: {
             html: 'mdi-language-html5',
             js: 'mdi-nodejs',
@@ -242,6 +243,11 @@ Vue.config.errorHandler = (err, vm, info) => {
 
           if (titles[this.dataset_type]){
             title_= _.get(this.ProjectMetadata, titles[this.dataset_type]);
+
+            if (!title_){
+              return "Untitled";
+            }
+
             return _.truncate(title_, {
               'length': 60,
               'separator': ' '
@@ -489,6 +495,17 @@ Vue.config.errorHandler = (err, vm, info) => {
         {
           return _.get(this.ProjectMetadata,path);
         },
+        toggleTree: function()
+        {
+          this.toggleTreeExpand=!this.toggleTreeExpand;
+          if (!this.toggleTreeExpand){
+            this.initiallyOpen=[];
+          }else{
+            for(let item of this.items){
+              this.initiallyOpen.push(item.key);
+            }
+          }
+        },        
         toggleFields: function(field_type)
         {
           if (field_type=='mandatory'){
@@ -535,7 +552,15 @@ Vue.config.errorHandler = (err, vm, info) => {
               title: 'Home',
               type:'home',
               file: 'database',
-              key: 'home'              
+              key: 'home',
+              "items":[
+                {
+                title: 'Preview',
+                type:'home',
+                file: 'txt',
+                key: 'home.preview'
+                }
+              ]
             });
 
           if (this.dataset_type=='survey'){

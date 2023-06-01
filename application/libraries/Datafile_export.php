@@ -70,8 +70,14 @@ class Datafile_export
 			//value/labels
 			$variable['metadata']=$this->ci->Editor_model->decode_metadata($variable['metadata']);
 			if (isset($variable['metadata']['var_catgry_labels']) && is_array($variable['metadata']['var_catgry_labels']) && count($variable['metadata']['var_catgry_labels'])>0){
-				$params['value_labels'][$variable['name']]=$variable['metadata']['var_catgry_labels'];
+				$catgry_labels=(array)$variable['metadata']['var_catgry_labels'];
+				foreach($catgry_labels as $cat_value_label){
+					$params['value_labels'][$variable['name']][$cat_value_label['value']]=$cat_value_label['labl'];
+				}					
 			}
+
+			//name/labels
+			$params['name_labels'][$variable['name']]=$variable['metadata']['labl'];
 
         }
 

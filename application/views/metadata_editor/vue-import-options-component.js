@@ -14,7 +14,8 @@ Vue.component('import-options', {
                     'document_description':'Document description',
                     'study_description':'Study description',
                     'data_files':'File description',
-                    'variables':'Variable information',
+                    'variable_info':'Variable information',
+                    'variable_documentation':'Variable documentation',
                     'variable_categories':'Variable categories',
                     'variable_questions':'Variable questions',
                     'variable_weights':'Variable weights',                    
@@ -40,10 +41,13 @@ Vue.component('import-options', {
         importDDI: function(){
             let formData = new FormData();
             formData.append('file', this.file);
+            formData.append('options', this.import_options_selected.join(','));
 
             vm=this;
             this.errors='';
-            let url=CI.base_url + '/api/editor/import_metadata/'+ this.ProjectID;
+            let url=CI.base_url + '/api/import_metadata/'+ this.ProjectID;
+
+            alert(url);
 
             axios.post( url,
                 formData,
@@ -53,6 +57,8 @@ Vue.component('import-options', {
                     }
                 }
             ).then(function(response){
+                alert("done");
+                return;
                 vm.$store.dispatch('loadProject',{dataset_id:vm.ProjectID});
                 vm.$store.dispatch('initData',{dataset_id:vm.ProjectID});
                 router.push('/study/study_desc');
@@ -89,10 +95,6 @@ Vue.component('import-options', {
 
                     <div class="form-container-x" >
 
-                        <div class="text-primary mb-3">
-                            <span v-if="ProjectType=='survey'">This will overwrite any existing study level, data files and variable metadata.</span>
-                        </div>
-
                         <div class="file-group form-field mb-3" style="max-width:600px;">
                             <label class="l" for="customFile">
                                 <span v-if="ProjectType=='survey'">Choose DDI/XML or a JSON file</span></label>
@@ -102,14 +104,13 @@ Vue.component('import-options', {
 
                         <div>
 
-                            <strong>Import options</strong>
+                            <strong>Options</strong>
 
                             <div v-if="ProjectType=='survey'" class="ml-2">
                                 <div class="form-group form-check mb-0" v-for="(opt,opt_key) in import_options.survey" :key="opt_key">
                                     <input type="checkbox" class="form-check-input" :id="opt_key" :value="opt_key" v-model="import_options_selected">
                                     <label class="form-check-label" :for="opt_key">{{opt}}</label>
-                                </div>
-                                {{import_options_selected}}
+                                </div>                                
                             </div>
                         
                         </div>

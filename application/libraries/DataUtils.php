@@ -205,7 +205,7 @@ class DataUtils
 			'response'=>$response,
 			'status_code'=>$api_response->getStatusCode() //e.g. 200
 		];
-	}
+	}	
 
 
 	public function generate_csv($datafile_path)
