@@ -17,6 +17,7 @@
 
    * [Managing projects](managing_projects.md)
    * [Managing files](managing_files.md)
+   * [Packaging projects](packaging_projects.md)
 
 * Documenting data
 
