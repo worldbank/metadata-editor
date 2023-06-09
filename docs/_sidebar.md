@@ -17,10 +17,11 @@
 
    * [Managing projects](managing_projects.md)
    * [Managing files](managing_files.md)
+   * [Packaging projects](packaging_projects.md)
 
 * Documenting data
 
-    * [Common principles](general_instructions.md)
+    * [General instructions](general_instructions.md)
     * [Microdata](template-manager/microdata.md)
     * [Document](template-manager/document.md)
     * [Database](template-manager/database.md)
@@ -47,6 +48,7 @@
 * For developers and translators
 
     * [Developers](developers.md)
+    * [Translators](translators.md)
 
 * Providing feedback
 
