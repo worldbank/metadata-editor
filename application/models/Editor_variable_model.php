@@ -566,12 +566,24 @@ class Editor_variable_model extends ci_model {
                     'weight_field'=>$this->get_name_by_var_wgt_id($sid,$variable['var_wgt_id'])
                 );
             }
-            if ($variable['user_missings']!=''){
+            /*if ($variable['user_missings']!=''){
                 $params['missings'][]=array(
                     "field"=>$variable['name'],
                     "missings"=> explode(",",$variable['user_missings'])
                 );
+            }*/
+
+            if ($variable['user_missings']!=''){
+				$missings=explode(",",$variable['user_missings']);
+				foreach($missings as $idx=>$missing){
+					if (is_numeric($missing)){												
+						$params['missings'][trim($variable['name'])][]=intval($missing);
+					}
+				}
             }
+
+
+
             if ($variable['field_dtype']!=''){
                 if (isset($dtype_map[$variable['field_dtype']])){
                     $params['dtypes'][$variable['name']]= $dtype_map[$variable['field_dtype']];
