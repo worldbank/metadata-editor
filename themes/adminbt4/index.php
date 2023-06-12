@@ -20,8 +20,8 @@ if ($languages!==FALSE)
 	}
 }
 
-//$this->load->helper('site_menu');
-$site_navigation_menu=[];//get_site_menu();
+$this->load->helper('site_menu');
+$site_navigation_menu=get_site_menu();
 ?>
 <!DOCTYPE html>
 <html>
@@ -153,14 +153,14 @@ $site_navigation_menu=[];//get_site_menu();
 
 
 <nav class="navbar navbar-inverse navbar-expand-lg navbar-secondary bg-dark nada-site-admin-nav">  
-  <a class="navbar-brand site-title" href="<?php echo site_url();?>/admin">NADA <?php echo APP_VERSION;?></a>
+  <a class="navbar-brand site-title" href="<?php echo site_url();?>/admin">Editor <?php echo APP_VERSION;?></a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
 
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
-      <?php //echo $site_navigation_menu;?>      
+      <?php echo $site_navigation_menu;?>      
     </ul>
     <ul class="nav navbar-nav navbar-right float-right pull-right">
       <li class="divider-vertical"></li>

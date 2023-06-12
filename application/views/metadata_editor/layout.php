@@ -3,13 +3,31 @@
 
     <nav class="main-header sticky-top navbar navbar-expand navbar-white navbar-light bg-light border-bottom" style="margin-left:0px;">
 
-        <div class="pl-2">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a href="<?php echo site_url();?>" title="Home" role="button" class="nav-link"><i class="mdi mdi-home-outline"></i> 
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="<?php echo site_url('editor');?>" title="My projects" class="nav-link"><i class="mdi mdi-folder-multiple-outline"></i> My projects
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a href="<?php echo site_url('editor/templates');?>" title="Templates" role="button" class="nav-link btn btn-link"><i class="mdi mdi-alpha-t-box-outline"></i> Templates</a>
+            </li>
+        </ul>
+
+        <div class="pl-2 border-left ml-5">
             <div class="d-flex flex-row">
+
+            
+
                 <div>
-                    <i style="font-size:xx-large;" :class="project_types_icons[dataset_type]"></i>
+                    <i style="font-size:x-large;" :class="project_types_icons[dataset_type]"></i>
                 </div>
                 <div>
-                    <div style="font-size:22px;">&nbsp; <strong>{{Title}}</strong></div>                    
+                    <div style="font-size:20px;">&nbsp; <strong>{{Title}}</strong></div>                    
                 </div>
             </div>
         </div>
@@ -50,23 +68,13 @@
                 </div>
             </div>
 
-        </ul>
-
-        <ul class="navbar-nav ml-5 ml-auto">
-
-            <li class="nav-item">
-                <a href="<?php echo site_url('editor');?>" role="button" class="nav-link"><i class="mdi mdi-folder-multiple-outline"></i> My projects
-                </a>
-            </li>
-
-            <li class="nav-item"><a href="<?php echo site_url('templates');?>" role="button" class="nav-link"><i class="mdi mdi-alpha-t-box-outline"></i> Templates
-                </a></li>
-
-
             <li class="nav-item">
                 <?php echo $this->load->view('user_menu/user-menu', null, true); ?>
             </li>
+
         </ul>
+
+        
 
     </nav>
 

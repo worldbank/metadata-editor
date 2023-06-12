@@ -43,38 +43,12 @@ class Site_Menu
 		}
 
 		$options['items']=$items;
-		$options['collections']=$this->get_collections_menu();
+		$options['collections']=[];//$this->get_collections_menu();
 		$content=$this->ci->load->view('admin/site_menu.php',$options,true);
 		return $content;		
 	}
 	
 	
-	/**
-	*
-	* Formatted list of collections
-	**/
-	function get_collections_menu()
-	{
-		$repos=$this->ci->Repository_model->select_all();
-
-		/*$repos=array();
-
-		//show collections that the active user has access to
-		foreach($repos_ as $repo){
-			try{
-				$this->ci->acl_manager->has_access('study', 'view',null,$repositoryid=$repo['repositoryid']);
-				$repos[]=$repo;
-			}
-			catch(Exception $e){
-			}			
-		}*/	
 		
-		//add central collection
-		array_unshift($repos, $this->ci->Repository_model->get_central_catalog_array());
-
-		//html formatted list
-		return $this->ci->load->view("admin/site_menu_collections",array('collections'=>$repos),true);
-	}
-	
 }
 

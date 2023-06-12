@@ -53,6 +53,7 @@ $use_cdn = true;
 
     <!-- site header -->
     <?php include_once 'header.php'; ?>
+    <?php //echo $this->load->view("editor_common/header.php",null,true);?>
 
     <!-- page body -->
     <div class="wp-page-body <?php echo $content_wrap_class; ?> mt-5">

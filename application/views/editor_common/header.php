@@ -2,7 +2,7 @@
     <nav class="main-header shadow sticky-top navbar navbar-expand-md navbar-light navbar-white">
 
     
-        <a href="<?php echo site_url('editor'); ?>" class="navbar-brand"><i class="fas fa-compass"></i> <span class="brand-text font-weight-light">Metadata Editor</span></a>
+        <a href="<?php echo site_url(''); ?>" class="navbar-brand"><i class="fas fa-compass"></i> <span class="brand-text font-weight-light">Metadata Editor</span></a>
 
 
         <ul class="navbar-nav ml-auto">

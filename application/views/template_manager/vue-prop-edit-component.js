@@ -114,39 +114,6 @@ Vue.component('prop-edit', {
       }
       
     },
-    template: `
-            <div class="prop-edit-component">
-                                    
-              <div v-if="prop.key">
-                <div class="form-group">
-                    <label for="name">Label:</label>
-                    <input type="text" class="form-control" v-model="prop.title">
-                    <div class="text-secondary font-small" style="margin-top:4px;font-size:small">
-                        <span class="pl-3">Name: {{prop.key}}</span>
-                        <span class="pl-3">Type: {{prop.type}}</span>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="name">Description:</label>
-                    <textarea class="form-control" v-model="prop.help_text"/>
-                </div>
-
-                <div class="form-group">
-                    <label for="name">Type:</label>
-                    <input type="text" class="form-control" v-model="prop.type">
-                </div>
-
-                <div class="form-group">
-                    <label for="name">Key/name:</label>
-                    <input type="text" class="form-control" v-model="prop.key">
-                </div>
-              </div>
-
-
-              <?php require_once 'vue-prop-edit-component-template.php';?>
-
-            </div>          
-            `    
+    template: `<?php require_once 'vue-prop-edit-component-template.php';?>`    
 });
 

@@ -167,14 +167,14 @@ Vue.component('nada-treeview-field', {
             
             <v-switch
               v-model="switchShowAll"
-              label="Show all elements"
+              :label="$t('show_all_elements')"
             ></v-switch>
             
 
             <div class="row">
               <div class="col-md-6" style="height: 100vh; overflow: auto;">
 
-                <div class="p-3 border m-3 text-center" v-if="filteredItems.length==0">No elements are available</div>
+                <div class="p-3 border m-3 text-center" v-if="filteredItems.length==0">{{$t("no_items_available")}}</div>
 
                 <v-treeview                   
                     color="warning"
@@ -227,36 +227,36 @@ Vue.component('nada-treeview-field', {
               <div class="col-md-6" style="height: 100vh; overflow: auto;">
                 <div v-if="activeNode.key" class="p-3">
                 
-                  <div><strong>Element description</strong></div>
+                  <div><strong>{{$t("description")}}</strong></div>
                   <table class="table table-sm table-bordered table-striped">
                     <tr>
-                      <td>Element</td>
+                      <td>{{$t("field")}}</td>
                       <td>{{activeNode.key}}</td>
                     </tr>
                     <tr>
-                      <td>Type</td>
+                      <td>{{$t("type")}}</td>
                       <td>{{activeNode.type}}</td>
                     </tr>
                     <tr>
-                      <td>Title</td>
+                      <td>{{$t("title")}}</td>
                       <td>{{activeNode.title}}</td>
                     </tr>
                     <tr>
-                      <td>Description</td>
+                      <td>{{$t("description")}}</td>
                       <td><div style="white-space: pre-wrap;">{{activeNode.help_text}}</div></td>
                     </tr>                    
                   </table>
 
                   <div v-if="activeNode.props" >
-                      <strong>Array properties</strong>
+                      <strong>{{$t("array_properties")}}</strong>
                       
                           <table class="table table-sm">
                             <thead>
                             <tr>
-                              <th>Key</th>
-                              <th>Title</th>
-                              <th>Type</th>
-                              <th>Description</th>
+                              <th>{{$t("key")}}</th>
+                              <th>{{$t("title")}}</th>
+                              <th>{{$t("type")}}</th>
+                              <th>{{$t("description")}}</th>
                             </tr>
                           </thead>
                           <template v-for="prop in activeNode.props">
@@ -272,7 +272,7 @@ Vue.component('nada-treeview-field', {
                 
                 </div>
                 <div v-else class="p-3 border m-3 text-center">
-                  <template v-if="switchShowAll==true">Click on an element to view information</template>
+                  <template v-if="switchShowAll==true">{{$t("click_to_edit")}}</template>
                 </div>
 
 

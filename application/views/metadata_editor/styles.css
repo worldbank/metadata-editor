@@ -151,7 +151,7 @@ label{
 }
 
 .nav-link{
-    color:black;
+    color:#007bff!important;
 }
 .nav-active{
     font-weight:bold;
@@ -301,18 +301,6 @@ label{
     width:150px;
 }
 
-/*
-::-webkit-scrollbar {
-    -webkit-appearance: none;
-    width: 10px;
-  }
-  
-  ::-webkit-scrollbar-thumb {
-    border-radius: 5px;
-    background-color: rgba(0,0,0,.5);
-    -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);
-  }
-  */
 
   .form-check-label{font-weight:normal}
 
@@ -518,17 +506,6 @@ table .form-field-dropdown-custom .v-input__slot fieldset{
     margin-left: -5px;
 }
 
-/*::-webkit-scrollbar {
-    -webkit-appearance: none;
-    width: 7px;
-  }
-  
-  ::-webkit-scrollbar-thumb {
-    border-radius: 4px;
-    background-color: rgba(0, 0, 0, .5);
-    box-shadow: 0 0 1px rgba(255, 255, 255, .5);
-  }
-*/
 .editor-sidebar{
     background:#dee2e6!important;
 }
@@ -632,7 +609,7 @@ table .form-field-dropdown-custom .v-input__slot fieldset{
     font-size:12px;
 }
 
-::-webkit-scrollbar {
+/*::-webkit-scrollbar {
     -webkit-appearance: none;
     width: 7px;
   }
@@ -642,7 +619,7 @@ table .form-field-dropdown-custom .v-input__slot fieldset{
     background-color: rgba(0, 0, 0, .5);
     box-shadow: 0 0 1px rgba(255, 255, 255, .5);
   }
-
+*/
   .variable-list-component{
     height:100vh;
     overflow:auto;

@@ -1,132 +1,73 @@
 <?php 
 
-$lang['confirm_delete_records']="Are you sure you want to delete the selected record(s)?";
-$lang['form_update_success']="Your changes have been saved!";
-$lang['form_update_fail']="Failed to update database";
-$lang['callback_error_url_exists']="The %s already exists. Choose a different URL.";
-$lang['page_next']="Next";
-$lang['page_prev']="Prev";
-$lang['page_first']="First";
-$lang['page_last']="Last";
-$lang['last']="Last";
-$lang['batch_actions']="Batch actions";
-$lang['apply']="Apply";
-$lang['all_fields']="All fields";
-$lang['title']="Title";
-$lang['url']="URL";
-$lang['link']="Link";
 $lang['type']="Type";
-$lang['modified']="Modified";
-$lang['actions']="Actions";
-$lang['edit']="Edit";
-$lang['remove']="Remove";
-$lang['refresh']="Refresh";
-$lang['print']="Print";
-$lang['clear']="Clear";
-$lang['pdf']="PDF";
-$lang['delete']="Delete";
-$lang['upload']="Upload";
-$lang['submit']="Submit";
-$lang['create']="Create";
-$lang['filename']="Filename";
-$lang['permissions']="Permissions";
-$lang['search']="Search";
-$lang['reset']="Reset";
-$lang['no_records_found']="No records were found";
-$lang['showing %d-%d of %d']="Showing %d-%d of %d";
-$lang['yes']="Yes";
-$lang['no']="No";
-$lang['update']="Update";
-$lang['cancel']="Cancel";
-$lang['confirm_delete']="Confirm Delete";
-$lang['callback_email_exists']="%s already in use, use a different email.";
-$lang['callback_username_exists']="%s already in use, use a different name.";
 $lang['name']="Name";
-$lang['size']="Size";
-$lang['date']="Date";
-$lang['site_administration']="Site administration";
-$lang['login']="Login";
-$lang['register']="Register";
-$lang['logout']="Logout";
-$lang['profile']="Profile";
-$lang['password']="Password";
-$lang['__select__']="--SELECT--";
-$lang['error_invalid_parameters']="Invalid Parameters were provided.";
-$lang['js_no_item_selected']="You have not selected any items";
-$lang['js_confirm_delete']="Are you sure you want to delete the selected item(s)?";
-$lang['searching_please_wait']="Searching, please wait...";
-$lang['dashboard']="Dashboard";
-$lang['menu']="Menu";
-$lang['licensed_survey_requests']="Licensed Survey Requests";
-$lang['users']="Users";
-$lang['citations']="Citations";
-$lang['vocabularies']="Vocabularies";
-$lang['site_configurations']="Site Configurations";
-$lang['reports']="Reports";
-$lang['nada_administration']="NADA Administration";
-$lang['change_password']="Change Password";
-$lang['home_page']="Home";
-$lang['data_catalog']="Data Catalog";
-$lang['captcha_provide_answer']="Provide an answer to the above math question";
-$lang['accept']="Accept";
-$lang['download']="Download";
-$lang['form_already_saved']="The form has already been saved, it cannot be re-submitted.";
-$lang['email_failed']="System failed to send email message, please try again.";
-$lang['js_loading']="Loading, please wait...";
-$lang['file_not_found']="File was not found";
-$lang['invalid_id']="Invalid ID was provided";
-$lang['sort_results_by']="Sort results by";
-$lang['select_number_of_records_per_page']="Select number of records to show per page";
-$lang['share']="Share";
-$lang['share_with_facebook']="Share with Facebook";
-$lang['share_with_twitter']="Share with Twitter";
-$lang['share_with_delicious']="Share with Delicious";
-$lang['share_with_linkedin']="Share with LinkedIn";
-$lang['share_with_digg']="Share with Digg";
-$lang['share_with_buzz']="Share with Google Buzz";
-$lang['share_with_stumpleupon']="Share with Stumbleupon";
-$lang['study_home']="Home";
-$lang['captcha_answer_not_matched']="%s answer didn't match.";
-$lang['repositories']="Collections";
-$lang['contributing_repositories']="Contributing collections";
-$lang['home']="Home";
-$lang['regional_catalogs']="Regional catalogs";
-$lang['specialized_catalogs']="Specialized catalogs";
-$lang['central_data_catalog']="Central Data Catalog";
-$lang['created']="Created";
-$lang['visit_catalog']="Visit Catalog";
-$lang['reason_login_data_access']="Please login to download data";
-$lang['public_title']="Public use files";
-$lang['licensed_title']="Licensed data files";
-$lang['direct_title']="Direct access files";
-$lang['data_na_title']="Studies with no data available";
-$lang['remote_title']="Data available from external repository";
-$lang['data_is_available_from_external_repository']="Data for the study is available from an external website, please use the link below:";
-$lang['exit_impersonate']="Exit impersonate mode";
-$lang['content_is_not_published']="The content for the current page is not published yet and is only available for reviewing.";
-$lang['licensed_requests']="Licensed requests";
-$lang['create_region']="Create region";
-$lang['tab_about']="About";
-$lang['tab_datasets']="Datasets";
-$lang['tab_citations']="Citations";
-$lang['tab_collections']="Collections";
-$lang['collection']="Collection";
-$lang['add_country']="Add new country";
-$lang['countries']="Countries";
-$lang['iso']="ISO";
-$lang['edit_country']="Edit country";
-$lang['country_mappings']="Country mappings";
-$lang['latest_additions']='Latest additions';
+$lang['default']="Default";
+$lang['title']="Title";
+$lang['language']="Language";
+$lang['version']="Version";
+$lang['last_updated']="Last updated";
+
+$lang['description']="Description";
+$lang['name']="Name";
+$lang['organisation']="Organisation";
+$lang['author']="Author";
 
 
-$lang['idno']="IDNO";
-$lang['related_datasets']="Related datasets";
-$lang['JSON']="JSON";
-$lang['DDI/XML']="DDI/XML";
-$lang['page not found']='Page not found';
-$lang['export_to_csv']="Export to CSV";
+$lang['microdata']="Microdata";
+$lang['timeseries']="Timeseries";
+$lang['geospatial']="Geospatial";
+$lang['script']="Script";
+$lang['document']="Document";
+$lang['table']="Table";
+$lang['image']="Image";
+$lang['video']="Video";
+$lang['external-resources']="External resources";
+$lang['timeseries-db']="Timeseries database";
 
-$lang['translate']="Translate";
+$lang['core']="Core";
+$lang['custom']="Custom";
+
+$lang['duplicate']="Duplicate";
+$lang['export']="Export";
+$lang['import']="Import";
+$lang['cancel']="Cancel";
+
+$lang['edit']="Edit";
+$lang['delete']="Delete";
+
+$lang['save']="Save";
+$lang['close']="Close";
+$lang['label']="Label";
+
+$lang['required']="Required";
+$lang['recommended']="Recommended";
+$lang['required']="Required";
+
+$lang['na']="N/A";
+$lang['json']="JSON";
+$lang['key']="Key";
+$lang['keywords']="Keywords";
+$lang['field']="Field";
+
+$lang['add_row']="Add row";
+
+$lang['data_type']="Data type";
+
+
+$lang['changes_saved']="Your changes have been saved";
+$lang['failed_to_save']="Failed to save your changes";
+
+
+$lang['form_update_success']="Your changes have been saved";
+
+
+
+
+$lang['select_file']="Select file";
+$lang['invalid_file_failed_to_read']="Invalid file, failed to read the file!";
+
+
 
 /* End of file general_lang.php */
-/* Location: ./application/language/english/general_lang.php */
+/* Location: ./application/language/base/general_lang.php */

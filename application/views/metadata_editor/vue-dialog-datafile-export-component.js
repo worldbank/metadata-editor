@@ -1,12 +1,7 @@
-Vue.component('dialog-datafile-import', {
-    props:['value','file_id'],
+Vue.component('dialog-datafile-export', {
+    props:['value', 'files'],
     data() {
         return {
-            selection:[],
-            file:null,
-            import_options:{
-                data_update:'replace',
-            },
         }
     }, 
     mounted: function () {
@@ -15,8 +10,6 @@ Vue.component('dialog-datafile-import', {
     methods: {   
         closeDialog: function(){
             this.dialog = false;
-            this.$emit('selected', this.selection);
-            this.selection = [];
         },
         handleFileUpload(event)
         {
@@ -24,7 +17,7 @@ Vue.component('dialog-datafile-import', {
             this.errors='';
             //this.checkFileExists();
         },
-        importFile(){            
+        exportFile(){            
             let formData = new FormData();
             formData.append('file', this.file);
 
@@ -64,60 +57,23 @@ Vue.component('dialog-datafile-import', {
         }        
     },
     template: `
-        <div class="vue-dialog-datafile-import-component">
+        <div class="vue-dialog-datafile-export-component">
 
             <!-- dialog -->
             <v-dialog v-model="dialog" width="700" height="400" persistent>
                 <v-card>
                     <v-card-title class="text-h5 grey lighten-2">
-                        Import data file
+                        Export data
                     </v-card-title>
 
                     <v-card-text>
                     <div>
                         <!-- card text -->
 
-                        <div class="">
-
-                        <label class="" for="customFile">Select a file (CSV, DTA, SAV, JSON)</label>
-                        <v-file-input
-                            accept=".csv,.json,.dta,.sav"
-                            label=""
-                            outlined
-                            truncate-length="50"
-                            dense
-                            prepend-icon=""
-                            prepend-inner-icon="mdi-paperclip"
-                            @change="handleFileUpload( $event )"                            
-                         ></v-file-input>
-
-                        </div>
-                        
-
-                        <div class="files-container mt-3 mb-3 p-2 v-labels-remove-space">
-
-                            <div><strong>Options:</strong></div>
-                            <v-radio-group
-                                v-model="import_options.data_update"
-                                column
-                                >
-                                <v-radio
-                                    label="Replace existing data?"
-                                    value="replace"
-                                ></v-radio>
-                                <v-radio
-                                    label="Append to existing data?"
-                                    value="append"
-                                ></v-radio>
-                                </v-radio-group>
-                                <hr>
-
-                            {{import_options}}
-
-                        </div>
+                        <pre>{{files}}</pre>
                                             
-                        <div xv-if="update_status==''">
-                            <button type="button" :disabled="!file" class="btn btn-primary" @click="importFile">Import file</button>
+                        <div>
+                            <button type="button" class="btn btn-primary" @click="exportFile">Export</button>
                         </div> 
                         
 

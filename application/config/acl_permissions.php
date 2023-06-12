@@ -37,55 +37,45 @@ $config['acl_permissions'] = [
     ],
     "editor"=>[ 
         "title" => "Editor",
+        "description"=> "Allow user to manage projects",
         "permissions"=>[
             [
                 "permission" => "view"
-            ],
-            [
-                "permission" => "create"
             ],
             [
                 "permission" => "edit"
             ],
             [
                 "permission" => "delete"
+            ],
+            [
+                "permission" => "publish"
+            ],
+            [
+                "permission" => "admin"
             ]
         ]
     ],
-    "menu"=>[ 
-        "title" => "Site menu pages",
+
+    "template_manager"=>[ 
+        "title" => "Template manager",
+        "description"=> "Allow user to manage templates",
         "permissions"=>[
             [
                 "permission" => "view"
-            ],
-            [
-                "permission" => "create"
             ],
             [
                 "permission" => "edit"
             ],
             [
                 "permission" => "delete"
+            ],
+            [
+                "permission" => "admin"
             ]
         ]
     ],
-    "citation"=>[ 
-        "title" => "Citations",
-        "permissions"=>[
-            [
-                "permission" => "view"
-            ],
-            [
-                "permission" => "create"
-            ],
-            [
-                "permission" => "edit"
-            ],
-            [
-                "permission" => "delete"
-            ]
-        ]
-    ],
+   
     "user"=>[ 
         "title" => "Users",
         "permissions"=>[
@@ -103,83 +93,9 @@ $config['acl_permissions'] = [
             ]
         ]
     ],
-    "licensed_request"=>[ 
-        "title" => "Licensed requests",
-        "permissions"=>[
-            [
-                "permission" => "view"
-            ],
-            [
-                "permission" => "create"
-            ],
-            [
-                "permission" => "edit"
-            ],
-            [
-                "permission" => "delete"
-            ]
-        ]
-    ],
-    "collection"=>[ 
-        "title" => "Manage collections",
-        "description" => "Allows access to create, view, edit and delete collections",
-        "permissions"=>[
-            [
-                "permission" => "view",
-                "description" => "Browse and search collections"
-            ],
-            [
-                "permission" => "create",
-                "description" => "Create a new collection"
-            ],
-            [
-                "permission" => "edit",
-                "description" => "Edit collection information"
-            ],
-            [
-                "permission" => "delete",
-                "description" => "Delete a collection"
-            ],
-            [
-                "permission" => "publish",
-                "description" => "Publish or unpublish a collection"
-            ]
-        ]
-    ], 
-    "study"=>[ 
-        "title" => "Manage studies",
-        "description"=> "Global access to studies in all collections. For restricting access by collection, see <i>'Permissions by collection'</i> section below",
-        "permissions"=>[
-            [
-                "permission" => "view"
-            ],
-            [
-                "permission" => "create",
-                "description" => "Allows creating new studies including importing from DDI"
-            ],
-            [
-                "permission" => "edit",
-                "description" => "Edit study options, file uploads and external resources"
-            ],
-            [
-                "permission" => "delete",
-                "description" => "Delete a study"
-            ],
-            [
-                "permission" => "publish",
-                "description" => "Publish or unpublish a study"
-            ]
-        ]
-    ],    
-    "reports"=>[ 
-        "title" => "Reports",
-        "description"=> "Reports",
-        "permissions"=>[
-            [
-                "permission" => "view"
-            ]
-        ]
-    ],
+    
+   
+    
     "configurations"=>[ 
         "title" => "Site configurations",
         "description"=> "Manage site configurations",
@@ -189,33 +105,7 @@ $config['acl_permissions'] = [
             ]
         ]
     ],
-    "vocabularies"=>[ 
-        "title" => "Vocabularies",
-        "description"=> "Manage vocabularies and terms",
-        "permissions"=>[
-            [
-                "permission" => "edit"
-            ]
-        ]
-    ],
-    "countries"=>[ 
-        "title" => "Countries configurations",
-        "description"=> "Manage countries list",
-        "permissions"=>[
-            [
-                "permission" => "edit"
-            ]
-        ]
-    ],
-    "regions"=>[ 
-        "title" => "Regions",
-        "description"=> "Manage regions",
-        "permissions"=>[
-            [
-                "permission" => "edit"
-            ]
-        ]
-    ],
+    
     "translate"=>[ 
         "title" => "Site translations",
         "description"=> "Manage translations",
@@ -229,5 +119,5 @@ $config['acl_permissions'] = [
 ];
 
 //permissions by collections
-$config['acl_permissions_collections'] = ['study','licensed_request'];
+//$config['acl_permissions_collections'] = ['study','licensed_request'];
 

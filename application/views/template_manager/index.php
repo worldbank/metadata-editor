@@ -4,7 +4,7 @@
 
   <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css" crossorigin="anonymous" /> 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css" crossorigin="anonymous" />
 
   <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
@@ -13,6 +13,7 @@
   <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
   <script src="https://unpkg.com/vuex@2.0.0"></script>
   <script src="<?php echo base_url(); ?>javascript/axios.min.js"></script>
+  <script src="https://unpkg.com/vue-i18n@8"></script>
 
   <script src="//cdn.jsdelivr.net/npm/sortablejs@1.8.4/Sortable.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.20.0/vuedraggable.umd.min.js"></script>
@@ -40,22 +41,21 @@
       color: #e56767;
     }
 
-    .disabled-button-color{
-      color:rgb(0 0 0 / 12%) !important;
+    .disabled-button-color {
+      color: rgb(0 0 0 / 12%) !important;
     }
 
-    .isactive{
-      color:#fb8c00;
-      background:#fb8c0021
+    .isactive {
+      color: #fb8c00;
+      background: #fb8c0021
     }
 
-    .text-crop{
+    .text-crop {
       max-width: 40em;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-    }    
-
+    }
   </style>
 
 
@@ -103,7 +103,6 @@
     let core_template_parts = <?php echo json_encode($core_template_parts, JSON_PRETTY_PRINT); ?>;
 
     let user_template = <?php echo $user_template; ?>;
-    //let user_template_parts = <?php //echo json_encode($user_template_parts, JSON_PRETTY_PRINT); ?>;
   </script>
 
   <div id="app" data-app>
@@ -114,35 +113,35 @@
         <div class="row no-gutters sticky-top border-bottom bg-white">
 
           <div class="col-md-3">
-            <div class="color-white branding-icon" style="padding:5px;padding-left:30px;font-weight:bold;"> 
+            <div class="color-white branding-icon" style="padding:5px;padding-left:30px;font-weight:bold;">
               <v-icon large color="#007bff">mdi-alpha-t-box</v-icon>
-              Template manager
+              {{$t('template_manager')}}
             </div>
           </div>
 
           <div class="col-md-9">
-          <!-- header -->
-          <div class="header" >
-                <div class="row">
-                  <div class="col-md-9">
-                    
-                    <div class="ml-5 pt-2" > 
-                      <div class="text-crop">
-                        <i :class="project_types_icons[user_template_info.data_type]"></i>
-                        <strong style="font-size:large;">{{user_template_info.name}}</strong>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-md-3">
-                    <div class="float-right pt-1 mr-5">
-                      <button type="button" class="btn btn-sm btn-success" @click="saveTemplate()"><v-icon style="color:white;">mdi-content-save-check</v-icon> Save</button>
-                      <button type="button" class="btn btn-sm btn-default" @click="cancelTemplate()"><v-icon>mdi-exit-to-app</v-icon> Close</button>
+            <!-- header -->
+            <div class="header">
+              <div class="row">
+                <div class="col-md-9">
+
+                  <div class="ml-5 pt-2">
+                    <div class="text-crop">
+                      <i :class="project_types_icons[user_template_info.data_type]"></i>
+                      <strong style="font-size:large;">{{user_template_info.name}}</strong>
                     </div>
                   </div>
                 </div>
-
+                <div class="col-md-3">
+                  <div class="float-right pt-1 mr-5">
+                    <button type="button" class="btn btn-sm btn-success" @click="saveTemplate()"><v-icon style="color:white;">mdi-content-save-check</v-icon> {{$t('save')}}</button>
+                    <button type="button" class="btn btn-sm btn-default" @click="cancelTemplate()"><v-icon>mdi-exit-to-app</v-icon> {{$t('close')}}</button>
+                  </div>
+                </div>
               </div>
-              <!-- end header -->
+
+            </div>
+            <!-- end header -->
           </div>
 
 
@@ -154,12 +153,12 @@
 
             <div class="row no-gutters border-right pt-2" style="height:100vh;overflow:auto;">
               <div class="col-md-11" style="height:100vh;">
-                <div @click="isEditingDescription=true" style="padding:5px;padding-left:38px;cursor:pointer;" class="pb-2" :class="{isactive: isEditingDescription}" ><v-icon>mdi-ballot-outline</v-icon>Template Description</div>
+                <div @click="isEditingDescription=true" style="padding:5px;padding-left:38px;cursor:pointer;" class="pb-2" :class="{isactive: isEditingDescription}"><v-icon>mdi-ballot-outline</v-icon>{{$t('description')}}</div>
                 <div @click="isEditingDescription=false">
                   <nada-treeview v-model="UserTreeItems" :cut_fields="cut_fields" :initially_open="initiallyOpen" :tree_active_items="tree_active_items"></nada-treeview>
                 </div>
               </div>
-              <div class="col-md-1 col-xs-2" style="position:relative;" >
+              <div class="col-md-1 col-xs-2" style="position:relative;">
                 <div class="pr-1" v-if="!isEditingDescription" style="position:fixed;">
 
                   <div>
@@ -208,7 +207,7 @@
           <!--content section-->
           <div class="col-md-9 bg-light" style="height:100vh;">
 
-              
+
 
             <!-- content -->
             <div class="main-content-container p-3" style="height:100vh;overflow:auto;">
@@ -218,42 +217,42 @@
               </div>
               <div v-if="isEditingDescription==true" class="pl-4 pt-2">
 
-                <h5>Template description</h5>
-                
+                <h5>{{$t('description')}}</h5>
+
                 <div class="form-group">
-                  <label>Type:</label>
+                  <label>{{$t('type')}}:</label>
                   <input type="text" class="form-control" disabled="disabled" v-model="user_template_info.data_type">
                 </div>
-                
+
 
                 <div class="form-group">
-                  <label>Language:</label>
-                  <input type="text" class="form-control" placeholder="EN" v-model="user_template_info.lang"  maxlength="30">
+                  <label>{{$t('language')}}:</label>
+                  <input type="text" class="form-control" placeholder="EN" v-model="user_template_info.lang" maxlength="30">
                 </div>
 
                 <div class="form-group">
-                  <label>Name:</label>
+                  <label>{{$t('name')}}:</label>
                   <input type="text" class="form-control" v-model="user_template_info.name" maxlength="150">
                 </div>
 
                 <div class="form-group">
-                  <label>Version:</label>
+                  <label>{{$t('version')}}:</label>
                   <input type="text" class="form-control" v-model="user_template_info.version" maxlength="50">
                 </div>
 
                 <div class="form-group">
-                  <label>Organization:</label>
-                  <input type="text" class="form-control" v-model="user_template_info.organization"  maxlength="150">
+                  <label>{{$t('organisation')}}:</label>
+                  <input type="text" class="form-control" v-model="user_template_info.organization" maxlength="150">
                 </div>
 
                 <div class="form-group">
-                  <label>Author:</label>
-                  <input type="text" class="form-control" v-model="user_template_info.author"  maxlength="150">
+                  <label>{{$t('author')}}:</label>
+                  <input type="text" class="form-control" v-model="user_template_info.author" maxlength="150">
                 </div>
 
                 <div class="form-group">
-                  <label>Description:</label>
-                  <textarea style="height:200px;"  maxlength="1000" class="form-control" v-model="user_template_info.description"></textarea>
+                  <label>{{$t('description')}}:</label>
+                  <textarea style="height:200px;" maxlength="1000" class="form-control" v-model="user_template_info.description"></textarea>
                 </div>
 
               </div>
@@ -288,11 +287,19 @@
     <?php echo include_once("vue-tree-component.js"); ?>
     <?php echo include_once("vue-tree-field-component.js"); ?>
     <?php echo include_once("vue-table-component.js"); ?>
-    <?php echo include_once("vue-list-component.js"); ?>
     <?php echo include_once("vue-validation-rules-component.js"); ?>
     <?php echo include_once("vue-props-tree-component.js"); ?>
     <?php echo include_once("vue-prop-edit-component.js"); ?>
 
+
+    const translation_messages = {
+      default: <?php echo json_encode($translations,JSON_HEX_APOS);?>
+    }
+
+    const i18n = new VueI18n({
+      locale: 'default', // set locale
+      messages: translation_messages, // set locale messages
+    });
 
     Vue.mixin({
       methods: {}
@@ -370,6 +377,7 @@
 
     new Vue({
       el: "#app",
+      i18n,
       store,
       vuetify: new Vuetify(),
       data() {
@@ -415,25 +423,25 @@
             "boolean"
           ],
           cut_fields: [],
-          data_types:{
-            "survey":"Microdata",
-            "document":"Document",
-            "table":"Table",
-            "geospatial":"Geospatial",
-            "image":"Image",
+          data_types: {
+            "survey": "Microdata",
+            "document": "Document",
+            "table": "Table",
+            "geospatial": "Geospatial",
+            "image": "Image",
             "script": "Script",
-            "video":"Video"
-        },
-        project_types_icons: {
-          "document": "fa fa-file-code",
-          "survey": "fa fa-database",
-          "geospatial": "fa fa-globe-americas",
-          "table": "fa fa-database",
-          "timeseries": "fa fa-chart-line",
-          "image": "fa fa-image",
-          "video": "fa fa-video",
-          "script": "fa fa-file-code"
-        }
+            "video": "Video"
+          },
+          project_types_icons: {
+            "document": "fa fa-file-code",
+            "survey": "fa fa-database",
+            "geospatial": "fa fa-globe-americas",
+            "table": "fa fa-database",
+            "timeseries": "fa fa-chart-line",
+            "image": "fa fa-image",
+            "video": "fa fa-video",
+            "script": "fa fa-file-code"
+          }
         }
       },
       created: function() {
@@ -470,8 +478,7 @@
             this.$set(this.ActiveNode, "default", [{}]);
           }
         },
-        RulesUpdate: function (e)
-        {
+        RulesUpdate: function(e) {
           this.$set(this.ActiveNode, "rules", e);
         },
         removeField: function() {
@@ -544,7 +551,7 @@
           return false;
         },
         isControlField: function(field_type) {
-          let field_types= ["text", "string", "integer", "textarea", "dropdown", "date", "boolean","simple_array"];
+          let field_types = ["text", "string", "integer", "textarea", "dropdown", "date", "boolean", "simple_array"];
           return field_types.includes(field_type);
         },
         addField: function() {
@@ -696,11 +703,11 @@
               }
             ).then(function(response) {
               //window.location.href = CI.base_url + '/editor/templates';
-              alert("Your changes have been saved!");
+              alert(vm.$t("changes_saved"));
             })
             .catch(function(response) {
               vm.errors = response;
-              alert("Failed to save", response);
+              alert(vm.$t("failed_to_save"), response);
             });
         },
         cancelTemplate: function() {
@@ -714,10 +721,9 @@
         }
       },
       watch: {
-        isEditingDescription: function(val)
-        {
-          if (val==true){
-            this.tree_active_items=new Array();
+        isEditingDescription: function(val) {
+          if (val == true) {
+            this.tree_active_items = new Array();
           }
         }
       },
@@ -743,7 +749,7 @@
         userTreeKeys() {
           return this.$store.state.user_tree_keys;
         },
-        coreTemplateParts() {          
+        coreTemplateParts() {
           return this.$store.state.core_template_parts;
         },
         ActiveNode: {
@@ -756,27 +762,26 @@
         },
         ActiveNodeEnum: {
           get: function() {
-            if (this.ActiveNode.enum && this.ActiveNode.enum.length>0 && typeof(this.ActiveNode.enum[0]) =='string')
-            {
-              let enum_list=[];
-              this.ActiveNode.enum.forEach(function(item){
+            if (this.ActiveNode.enum && this.ActiveNode.enum.length > 0 && typeof(this.ActiveNode.enum[0]) == 'string') {
+              let enum_list = [];
+              this.ActiveNode.enum.forEach(function(item) {
                 enum_list.push({
-                  'code':item,
-                  'label':item
+                  'code': item,
+                  'label': item
                 });
               });
-              Vue.set(this.ActiveNode,"enum",enum_list);
+              Vue.set(this.ActiveNode, "enum", enum_list);
               return enum_list;
             }
             return this.ActiveNode.enum;
           },
           set: function(newValue) {
-            console.log("updating enum value",newValue);
+            console.log("updating enum value", newValue);
             this.ActiveNode.enum = newValue;
           }
         },
-        ActiveNodeEnumCount(){
-          if (this.ActiveNode.enum){
+        ActiveNodeEnumCount() {
+          if (this.ActiveNode.enum) {
             return this.ActiveNode.enum.length;
           }
           return 0;
@@ -797,30 +802,29 @@
           return false;
         },
         ActiveNodeSimpleControlledVocabColumns() {
-          return [
-            {
-              'type':'text',
-              'key':'code',
-              'title':'Code'
+          return [{
+              'type': 'text',
+              'key': 'code',
+              'title': 'Code'
             },
             {
-              'type':'text',
-              'key':'label',
-              'title':'Label'
+              'type': 'text',
+              'key': 'label',
+              'title': 'Label'
             }
           ]
-          
+
         },
         ActiveArrayNodeIsNested() {
-          if (this.ActiveNode.type =='array'  || this.ActiveNode.type =='nested_array' ) {            
-            let isNested=false;
-            this.ActiveNode.props.forEach((prop, index) => { 
-              if (prop.props){
-                isNested=true;
+          if (this.ActiveNode.type == 'array' || this.ActiveNode.type == 'nested_array') {
+            let isNested = false;
+            this.ActiveNode.props.forEach((prop, index) => {
+              if (prop.props) {
+                isNested = true;
               }
             });
 
-            return isNested;            
+            return isNested;
           }
           return false;
         },

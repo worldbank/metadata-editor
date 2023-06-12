@@ -129,10 +129,6 @@ Vue.component('datafiles', {
         },
         replaceFile:function(file_idx){
             let data_file=this.data_files[file_idx];
-
-            if (!confirm("Are you sure you want to replace file " + data_file.file_id + "?")){
-                return;
-            }
             this.dialog_datafile_import_fid=data_file.file_id;
             this.dialog_datafile_import=true;
         },
@@ -422,38 +418,36 @@ Vue.component('datafiles', {
                                 <router-link :to="'/variables/' + data_file.file_id"><button type="button" class="btn btn-sm btn-default"><v-icon>mdi-table</v-icon> Variables</button></router-link>
                                 <router-link :to="'/data-explorer/' + data_file.file_id"><button type="button" class="btn btn-sm btn-default"><v-icon>mdi-table-eye</v-icon> Data preview</button></router-link>
                                 <span v-if="data_file.file_info.original">
-                                <button type="button" class="btn btn-sm btn-link ink ml-0 pl-0" @click="importSummaryStatistics(data_file.file_id)"><v-icon title="Refresh summary statistics" >mdi-update</v-icon>Refresh stats</button>
-                                <button type="button" class="btn btn-sm btn-link ink ml-0 pl-0" @click="generateCSV(data_file.file_id)"><v-icon title="Generate CSV" >mdi-database-export</v-icon>Export CSV</button>
+                                <button type="button" class="btn btn-sm btn-link ink ml-0 pl-0" @click="importSummaryStatistics(data_file.file_id)"><v-icon title="Refresh summary statistics" >mdi-update</v-icon> Refresh stats</button>
+                                <button type="button" class="btn btn-sm btn-link ink ml-0 pl-0" @click="generateCSV(data_file.file_id)"><v-icon title="Generate CSV" >mdi-file-delimited-outline</v-icon> Export CSV</button>
                                 </span>
-                                <button type="button" class="btn btn-sm btn-link ink ml-0 pl-0" @click="deleteFile(index)"><v-icon>mdi-trash-can</v-icon>Remove</button>
+                                <button type="button" class="btn btn-sm btn-link ink ml-0 pl-0" @click="deleteFile(index)"><v-icon>mdi-delete-outline</v-icon>Remove</button>
                                 <button type="button" class="btn btn-sm btn-link ink ml-0 pl-0" @click="replaceFile(index)"><v-icon>mdi-file-upload-outline</v-icon>Replace file</button>
-                                
-                                        
-                                        <v-menu offset-y>
-                                            <template v-slot:activator="{ on, attrs }">
-                                                <button type="button" class="btn btn-sm btn-link ink ml-0 pl-2"  v-bind="attrs" v-on="on">
-                                                    <v-icon title="More options">mdi-export</v-icon> Export <v-icon title="More options">mdi-dots-vertical</v-icon>
-                                                </button>                                                
-                                            </template>
-                                            <v-list>
-                                                <v-list-item @click="exportFile(index,'sav')">
-                                                    <v-list-item-title>SPSS</v-list-item-title>
-                                                </v-list-item>
-                                                <v-list-item  @click="exportFile(index,'dta')">
-                                                    <v-list-item-title>Stata</v-list-item-title>
-                                                </v-list-item>
-                                                <v-list-item  @click="exportFile(index,'csv')">
-                                                    <v-list-item-title>CSV</v-list-item-title>
-                                                </v-list-item>
-                                                <v-list-item  @click="exportFile(index,'json')">
-                                                    <v-list-item-title>JSON</v-list-item-title>
-                                                </v-list-item>
-                                                <v-list-item  @click="exportFile(index,'xpt')">
-                                                    <v-list-item-title>SAS</v-list-item-title>
-                                                </v-list-item>
-                                            </v-list>
-                                        </v-menu>
-
+                                                                    
+                                <v-menu offset-y>
+                                    <template v-slot:activator="{ on, attrs }">
+                                        <button type="button" class="btn btn-sm btn-link ink ml-0 pl-2"  v-bind="attrs" v-on="on">
+                                            <v-icon title="More options">mdi-export</v-icon> Export <v-icon title="More options">mdi-dots-vertical</v-icon>
+                                        </button>                                                
+                                    </template>
+                                    <v-list>
+                                        <v-list-item @click="exportFile(index,'sav')">
+                                            <v-list-item-title>SPSS</v-list-item-title>
+                                        </v-list-item>
+                                        <v-list-item  @click="exportFile(index,'dta')">
+                                            <v-list-item-title>Stata</v-list-item-title>
+                                        </v-list-item>
+                                        <v-list-item  @click="exportFile(index,'csv')">
+                                            <v-list-item-title>CSV</v-list-item-title>
+                                        </v-list-item>
+                                        <v-list-item  @click="exportFile(index,'json')">
+                                            <v-list-item-title>JSON</v-list-item-title>
+                                        </v-list-item>
+                                        <v-list-item  @click="exportFile(index,'xpt')">
+                                            <v-list-item-title>SAS</v-list-item-title>
+                                        </v-list-item>
+                                    </v-list>
+                                </v-menu>
 
                             </div>
                         </td>

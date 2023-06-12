@@ -176,11 +176,15 @@ class Editor_model extends CI_Model {
 			$fields[$idx]="editor_projects.".$field;
 		}
 
-		$fields[]="users.username";
-		
+		$fields[]="users.username, users_cr.username as username_cr";
+
+		//sort [sort_by sort_order]
+		$sort_=$this->get_sort_order($search_options);
+				
 		$this->db->select(implode(",",$fields));
-		$this->db->order_by('editor_projects.changed','desc');
+		$this->db->order_by($sort_['sort_by'],$sort_['sort_order']);
 		$this->db->join("users", "users.id=editor_projects.changed_by");
+		$this->db->join("users as users_cr", "users_cr.id=editor_projects.created_by","left");
 
 		if ($limit>0){
 			$this->db->limit($limit, $offset);
@@ -216,6 +220,40 @@ class Editor_model extends CI_Model {
 	{
 		$this->apply_search_filters(($search_options));
 		return $this->db->count_all_results('editor_projects');
+	}
+
+
+	function get_sort_order($search_options)
+	{
+		$sort_by=isset($search_options['sort_by']) ? $search_options['sort_by'] : '';
+
+		switch($sort_by){
+			case 'title_asc':
+				$sort_by='editor_projects.title';
+				$sort_order='asc';
+				break;
+			case 'title_desc':
+				$sort_by='editor_projects.title';
+				$sort_order='desc';
+				break;
+			case 'updated_asc':
+				$sort_by='editor_projects.changed';
+				$sort_order='asc';
+				break;
+			case 'updated_desc':
+				$sort_by='editor_projects.changed';
+				$sort_order='desc';
+				break;
+			default:
+				$sort_by='editor_projects.changed';
+				$sort_order='desc';
+				break;
+		}
+
+		return [
+			'sort_by'=>$sort_by,
+			'sort_order'=>$sort_order
+		];
 	}
 
 

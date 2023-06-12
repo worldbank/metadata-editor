@@ -5,55 +5,8 @@ $menu[]=array(
 			'title'	=>'Dashboard',
 			'url'	=>'admin',
 		);
-$menu[]=array(
-		'title'	=>'Studies',
-		'url'	=>'admin/catalog',
-		'items'	=>array(
-			array(
-				'title'	=>'Manage studies',
-				'url'	=>'admin/catalog'
-			),
-			array(
-				'type'	=>'divider'
-			),
-			array(
-				'title'	=>'Licensed requests',
-				'url'	=>'admin/licensed_requests'
-			),
-			array(
-				'type'	=>'divider'
-			),
-			array(
-				'title'	=>'Manage collections',
-				'url'	=>'admin/repositories'
-			),
-			array(
-				'type'	=>'divider'
-			),
-			array(
-				'title'	=>'Bulk data access',
-				'url'	=>'admin/da_collections'
-			)
-		)
-);
-$menu[]=array(
-	'title'	=>'Citations',
-	'url'	=>'admin/citations',
-	'items'	=>array(
-		array(
-			'title'	=>'All citations',
-			'url'	=>'admin/citations'
-		),
-		array(
-			'title'	=>'Import citations',
-			'url'	=>'admin/citations/import'
-		),
-		array(
-			'title'	=>'Export citations',
-			'url'	=>'admin/citations/export'
-		)
-	)
-);
+
+
 $menu[]=array(
 	'title'	=>'Users',
 	'url'	=>'admin/users',
@@ -73,35 +26,6 @@ $menu[]=array(
 	)
 );
 
-$menu[]=array(
-	'title'	=>'Menu',
-	'url'	=>'admin/menu',
-	'items'	=>array(
-		array(
-			'title'	=>'All pages',
-			'url'	=>'admin/menu'
-		)
-	)
-);
-
-$menu[]=array(
-	'title'	=>'Data deposit',
-	'url'	=>'admin/datadeposit',
-);
-
-
-$menu[]=array(
-	'title'	=>'Reports',
-	'url'	=>'admin/reports',
-	'items'	=>array(
-		array(
-			'title'	=>'All reports',
-			'url'	=>'admin/reports'
-		)
-	)
-);
-
-
 
 $menu[]=array(
 	'title'	=>'Settings',
@@ -115,37 +39,9 @@ $menu[]=array(
 			'type'	=>'divider'
 		),
 		array(
-			'title'	=>'Regions',
-			'url'	=>'admin/Regions'
-		),
-		array(
-			'type'	=>'divider'
-		),
-		array(
-			'title'	=>'Countries',
-			'url'	=>'admin/countries'
-		),
-		array(
-			'type'	=>'divider'
-		),
-		array(
 			'title'	=>'Translate',
 			'url'	=>'admin/translate'
-		),
-		array(
-			'type'	=>'divider'
-		),
-		/*array(
-			'title'	=>'Vocabularies',
-			'url'	=>'admin/vocabularies'
-		),
-		array(
-			'type'	=>'divider'
-		),*/
-		array(
-			'title'	=>'Facets',
-			'url'	=>'admin/facets'
-		),
+		)
 	)
 );
 

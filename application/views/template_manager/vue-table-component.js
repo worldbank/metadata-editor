@@ -88,7 +88,7 @@ Vue.component('table-component', {
                     <th></th>
                     <th v-for="(column,idx_col) in columns" scope="col">
                         <span @click="sortColumn(column.key)" role="button" title="Click to sort">
-                            {{column.title}} 
+                            {{column.title}}
                             <i v-if="sort_field==column.key && !sort_asc" class="fas fa-caret-down"></i>
                             <i v-if="sort_field==column.key && sort_asc==true" class="fas fa-caret-up"></i>
                         </span>
@@ -126,7 +126,7 @@ Vue.component('table-component', {
             </table>
 
             <div class="d-flex justify-content-center">
-                <button type="button" class="btn btn-default btn-block btn-sm border m-2" @click="addRow" ><i class="fas fa-plus-square"></i> Add row</button>    
+                <button type="button" class="btn btn-default btn-block btn-sm border m-2" @click="addRow" ><i class="fas fa-plus-square"></i> {{$t("add_row")}}</button>    
             </div>
 
             </div>  `    

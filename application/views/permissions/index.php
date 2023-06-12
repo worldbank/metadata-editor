@@ -22,23 +22,24 @@
 </style>
 
 <div class="container-fluid">
-<?php $this->load->view('permissions/links');?>
-<h1><?php echo t('manage_permissions');?></h1>
+	<?php $this->load->view('permissions/links');?>
+	<h1><?php echo t('manage_permissions');?></h1>
 
-<?php if (validation_errors() ) : ?>
-    <div class="error">
-	    <?php echo validation_errors(); ?>
-    </div>
-<?php endif; ?>
+	<?php if (validation_errors() ) : ?>
+		<div class="error">
+			<?php echo validation_errors(); ?>
+		</div>
+	<?php endif; ?>
 
-<?php $error=$this->session->flashdata('error');?>
-<?php echo ($error!="") ? '<div class="error">'.$error.'</div>' : '';?>
+	<?php $error=$this->session->flashdata('error');?>
+	<?php echo ($error!="") ? '<div class="error">'.$error.'</div>' : '';?>
 
-<?php $message=$this->session->flashdata('message');?>
-<?php echo ($message!="") ? '<div class="success">'.$message.'</div>' : '';?>
+	<?php $message=$this->session->flashdata('message');?>
+	<?php echo ($message!="") ? '<div class="success">'.$message.'</div>' : '';?>
 
 <?php //$post_values=$this->input->post('resource');?>
 
+<div class="row">
 <div class="col-md-2" >
 	
 	<ul class="list-group">
@@ -98,7 +99,7 @@
 		<tr class="br"><td colspan="2">&nbsp;</td></tr>
 	<?php endforeach;?>
 
-
+	<?php /*				
 	<tr>
 		<td colspan="3"><h2><?php echo t('Permissions by collections');?></h2></td>
 	</tr>
@@ -146,6 +147,8 @@
 				
 			</td> 
 	<?php endforeach;?>
+	
+	*/?>
 
 
 
@@ -194,6 +197,7 @@
 	</table>
 	<button type="submit" class="btn btn-primary"><?php echo t('submit');?></button>
 </form>
+</div>
 </div>
 
 </div>

@@ -14,12 +14,16 @@ class Editor extends MY_Controller {
 		$this->load->model('Editor_model');
 		$this->load->model('Editor_template_model');
 		$this->load->library("Editor_acl");
+		$this->lang->load("general");
+		$this->lang->load("template_manager");		
 	}
 
 	function index()
 	{
+		$this->lang->load("project");
 		$this->template->set_template('default');
-		echo $this->load->view('project/home',$options=array(),true);
+		$options['translations']=$this->lang->language;
+		echo $this->load->view('project/home',$options,true);
 
 		//$this->template->write('content', $content,true);
 		//$this->template->render();
@@ -118,8 +122,7 @@ class Editor extends MY_Controller {
 
 
 	function get_template_custom_parts($items,&$output)
-	{
-		
+	{		
 		foreach($items as $item){
 			if (isset($item['items'])){
 				$this->get_template_custom_parts($item['items'],$output);
@@ -153,8 +156,9 @@ class Editor extends MY_Controller {
 		if ($uid){
 			return $this->template_edit($uid);
 		}
-		
-		echo $this->load->view('metadata_editor/templates_index',$options=array(),true);
+
+		$options['translations']=$this->lang->language;
+		echo $this->load->view('templates/index',$options,true);
 	}
 
 	function template_edit($uid)
@@ -177,7 +181,8 @@ class Editor extends MY_Controller {
 		$options=array(
 			'user_template_info'=>$user_template,
 			'core_template'=>$core_template,
-			'user_template'=>$user_template
+			'user_template'=>$user_template,
+			'translations'=>$this->lang->language
 		);
 
 		unset($options['user_template_info']['template']);

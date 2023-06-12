@@ -5,12 +5,12 @@
   <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 
   <script src="https://adminlte.io/themes/v3/plugins/jquery/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
-  <script src="https://unpkg.com/moment@2.26.0/moment.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment-with-locales.min.js"></script>
+  <script src="https://unpkg.com/vue-i18n@8"></script>
 
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
 </head>
@@ -49,7 +49,7 @@
 
       <div class="content-wrapperx">
         <section class="content">
-          <!-- Provides the application the proper gutter -->
+
           <div class="container-fluid">
 
             <div class="row">
@@ -62,7 +62,7 @@
 
                     <v-expansion-panel v-for="(facet_values,facet_key) in facets">
                       <v-expansion-panel-header class="capitalize">
-                        {{facet_key}}
+                        {{$t(facet_key)}}
                       </v-expansion-panel-header>
                       <v-expansion-panel-content>
                         <div class="form-check" v-for="facet in facet_values">
@@ -78,7 +78,12 @@
               <!-- end sidebar -->
 
               <div class="projects col">
-                <?php echo $this->load->view('project/home_buttons', null, true); ?>
+                <div class="mt-5 mb-5">
+                  <h3>{{$t("my_projects")}}</h3>
+                  <button type="button" class="btn btn-sm btn-outline-primary" @click="dialog_create_project=true">{{$t("create_project")}}</button>        
+                  <button type="button" class="btn btn-sm btn-outline-primary" @click="dialog_import_project=true">{{$t("import")}}</button>
+                  <a href="<?php echo site_url('collections');?>" type="button" class="btn btn-sm btn-outline-primary float-right" >{{$t("collections")}}</a>    
+                </div>
 
                 <div>
 
@@ -87,7 +92,7 @@
 
                       <div class="text-center">
                         <div class="input-group">
-                          <v-text-field v-model="search_keywords" append-icon="mdi-magnify" label="keywords" single-line filled rounded dense clearable @click:append="search" @keyup.enter="search" @click:clear="clearSearch"></v-text-field>
+                          <v-text-field v-model="search_keywords" append-icon="mdi-magnify" label="" single-line filled rounded dense clearable @click:append="search" @keyup.enter="search" @click:clear="clearSearch"></v-text-field>
                         </div>
                       </div>
 
@@ -95,7 +100,7 @@
                   </div>
 
                   <div v-if="SearchFiltersQuerystring" class="mt-2">
-                    Filters:
+                    {{$t("filters")}}:
                     <template v-for="(filter_values, filter_type) in search_filters">
                       <template v-for="(filter_value,idx) in filter_values">
                         <span class="badge badge-primary mr-1" @click="removeFilter(filter_type,idx)">{{getFacetTitleById(filter_type,filter_value)}}
@@ -108,13 +113,13 @@
                   <div class="mt-5 p-3 border text-center text-danger" v-if="!Projects || projects.found<1"> No projects found!</div>
 
                   <div v-if="!Projects || projects.found>0" class="row mb-2 border-bottom  mt-3">
-                    <div class="col-md-6">
+                    <div class="col-md-5">
                       <div class="p-2" v-if="Projects">
-                        <strong>{{parseInt(projects.offset) +1}}</strong> - <strong>{{parseInt(projects.offset + projects.projects.length)}}</strong> of <strong>{{projects.total}}</strong> projects
+                        <strong>{{$t("showing_range_of_n", { row: parseInt(projects.offset) +1, page_size: parseInt(projects.offset + projects.projects.length), total:projects.total })}}</strong>
                       </div>
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-7">
                       <template>
                         <div class="float-right" v-if="PaginationTotalPages">
                           <v-pagination v-model="pagination_page" :length="PaginationTotalPages" :total-visible="6" @input="PaginatePage"></v-pagination>
@@ -122,10 +127,6 @@
                       </template>
                     </div>
 
-                  </div>
-
-                  <div class=" p-1" v-if="ProjectsCount>0">
-                    <button @click="addProjectsToCollection" :disabled="selected_projects.length==0" title="Add to collection" class="btn btn-xs btn-outline-primary"><span class="mdi mdi-folder-plus"></span> Add to collection</button>
                   </div>
 
                   <template v-if="page_layout=='detail'">
@@ -146,7 +147,7 @@
                           <span class="mr-3"><span class="wb-label">Last modified:</span> <span class="wb-value">{{momentDate(project.changed)}}</span></span>
                           <span><span class="wb-label">Created by:</span> <span class="wb-value capitalize">{{project.username}}</span></span>
                           <span class="ml-4 float-right">
-                            <a class="btn btn-xs btn-outline-primary" @click="EditProject(project.id)" :href="CI.base_url + '/'"><span class="mdi mdi-pencil-box-outline"></span></a>
+                            <a class="btn btn-xs btn-outline-primary" @click="EditProject(project.id)" href="CI.base_url + '/'"><span class="mdi mdi-pencil-box-outline"></span></a>
                             <a class="btn btn-xs btn-outline-danger" @click="DeleteProject(project.id)" href="#">Delete</a>
                             <a v-if="project.is_shared>0" class="btn btn-xs btn-primary" @click="ShareProject(project.id)" href="#">
                               Shared
@@ -167,6 +168,35 @@
                     </div>
                   </template>
                   <template v-else class="bg-light">
+
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class=" p-1" v-if="ProjectsCount>0">
+                          <button @click="addProjectsToCollection" :disabled="selected_projects.length==0"  class="btn btn-xs btn-outline-primary"><span class="mdi mdi-folder-plus"></span> {{$t("add_to_collection")}}</button>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                      
+                      <!-- sort button -->
+                      <div class="btn-group float-right mr-3">
+                        <button type="button" class="btn btn-sm btn-outline-primary"><v-icon>mdi-sort-alphabetical-ascending</v-icon> {{sort_by_options[sort_by]}}</button>
+                        <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          <span class="sr-only">Toggle Dropdown</span>
+                        </button>
+                        <div class="dropdown-menu">
+                          <a class="dropdown-item" href="#" @click="sort_by='title_asc'">Title (A-Z)</a>
+                          <a class="dropdown-item" href="#" @click="sort_by='title_desc'">Title (Z-A)</a>
+                          <a class="dropdown-item" href="#" @click="sort_by='updated_desc'">Recent ↑</a>
+                          <a class="dropdown-item" href="#" @click="sort_by='updated_asc'">Oldest ↓</a>                          
+                        </div>
+                      </div>
+
+                      <!-- end sort button -->
+
+
+                      </div>
+                    </div>
+
                     <table class="table table-sm border-bottom"  v-if="ProjectsCount>0">
                       <thead>
                         <tr style="font-size:small;">
@@ -245,20 +275,20 @@
 
           <v-card>
             <v-card-title class="text-h5 grey lighten-2">
-              Create new Project
+              {{$t("create_project")}}
             </v-card-title>
 
             <v-card-text>
               <div>
-                <a class="dropdown-item" href="#" @click="createProject('survey')"><i :class="project_types_icons['survey']"></i> Microdata</a>
-                <a class="dropdown-item" href="#" @click="createProject('timeseries')"><i :class="project_types_icons['timeseries']"></i> Timeseries</a>
-                <a class="dropdown-item" href="#" @click="createProject('timeseries-db')"><i :class="project_types_icons['timeseries-db']"></i> Timeseries database</a>
-                <a class="dropdown-item" href="#" @click="createProject('document')"><i :class="project_types_icons['document']"></i> Document</a>
-                <a class="dropdown-item" href="#" @click="createProject('table')"><i :class="project_types_icons['table']"></i> Table</a>
-                <a class="dropdown-item" href="#" @click="createProject('image')"><i :class="project_types_icons['image']"></i> Image</a>
-                <a class="dropdown-item" href="#" @click="createProject('script')"><i :class="project_types_icons['script']"></i> Script</a>
-                <a class="dropdown-item" href="#" @click="createProject('video')"><i :class="project_types_icons['video']"></i> Video</a>
-                <a class="dropdown-item" href="#" @click="createProject('geospatial')"><i :class="project_types_icons['geospatial']"></i> Geospatial</a>
+                <a class="dropdown-item" href="#" @click="createProject('survey')"><i :class="project_types_icons['survey']"></i> {{$t("microdata")}}</a>
+                <a class="dropdown-item" href="#" @click="createProject('timeseries')"><i :class="project_types_icons['timeseries']"></i> {{$t("timeseries")}}</a>
+                <a class="dropdown-item" href="#" @click="createProject('timeseries-db')"><i :class="project_types_icons['timeseries-db']"></i> {{$t("timeseries-db")}}</a>
+                <a class="dropdown-item" href="#" @click="createProject('document')"><i :class="project_types_icons['document']"></i> {{$t("document")}}</a>
+                <a class="dropdown-item" href="#" @click="createProject('table')"><i :class="project_types_icons['table']"></i> {{$t("table")}}</a>
+                <a class="dropdown-item" href="#" @click="createProject('image')"><i :class="project_types_icons['image']"></i> {{$t("image")}}</a>
+                <a class="dropdown-item" href="#" @click="createProject('script')"><i :class="project_types_icons['script']"></i> {{$t("script")}}</a>
+                <a class="dropdown-item" href="#" @click="createProject('video')"><i :class="project_types_icons['video']"></i> {{$t("video")}}</a>
+                <a class="dropdown-item" href="#" @click="createProject('geospatial')"><i :class="project_types_icons['geospatial']"></i> {{$t("geospatial")}}</a>
               </div>
             </v-card-text>
 
@@ -267,7 +297,7 @@
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="primary" text @click="dialog_create_project = false">
-                Close
+                {{$t("close")}}
               </v-btn>
             </v-card-actions>
           </v-card>
@@ -276,19 +306,18 @@
     </template>
 
 
-
     <template class="import-project">
       <div class="text-center">
         <v-dialog v-model="dialog_import_project" width="500">
 
           <v-card>
             <v-card-title class="text-h5 grey lighten-2">
-              Import Project
+              {{$t("import_project")}}
             </v-card-title>
 
             <v-card-text style="min-height:200px;">
               <div class="mb-2">
-                <div  class="pb-1">Select project type</div>
+                <div  class="pb-1">{{$t("select_project_type")}}</div>
                 <v-select
                     :items="ProjectTypes"
                     label=""
@@ -296,7 +325,7 @@
                     item-value="value"
                     label="Select"
                     persistent-hint
-                    return-object
+                    return-object                    
                     dense
                     outlined
                     v-model="import_project_type"
@@ -304,16 +333,32 @@
                 
               </div>
               <div class="mb-2">
-                <div class="pb-1">Upload file</div>
-                <v-file-input
+                <div class="pb-1">
+                {{$t("upload_file")}}
+                  <?php /* 
+                  <span><button type="button" class="btn btn-sm btn-link" @click="upload_type='file'">Upload file</button></span>
+                  <span><button type="button" class="btn btn-sm btn-link" @click="upload_type='url'">URL</button></span>
+                  */ ?>
+                </div>
+                <v-file-input v-if="upload_type=='file'"
                   accept=".json,.xml,.zip"
                   label=""                  
                   truncate-length="50"                  
                   dense
                   outlined
                   v-model="import_file"
-                  prepend-icon="mdi-file-upload"
+                  prepend-icon=""
+                  prepend-inner-icon="mdi-file-upload"
                 ></v-file-input>
+
+                <v-text-field v-if="upload_type=='url'"
+                  label=""
+                  dense
+                  outlined
+                  v-model="import_url"
+                  prepend-icon=""
+                  prepend-inner-icon="mdi-link">
+                </v-text-field>
                 
               </div>
 
@@ -330,7 +375,7 @@
               </div>
               <div v-if="import_file_errors">
                 <div class="mb-2 text-color-danger text-danger">
-                  <div class="pb-1">Import failed</div>
+                  <div class="pb-1">{{$t("failed")}}</div>
                   <div>{{import_file_errors.response.data}}</div>
                 </div>
               </div>
@@ -342,10 +387,10 @@
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="secondary" text @click="dialog_import_project = false">
-                Close
+              {{$t("close")}}
               </v-btn>
               <v-btn color="primary" text @click="importProject" :disabled="!this.import_file || this.import_project_loading">
-                Import
+              {{$t("import")}}
               </v-btn>
             </v-card-actions>
           </v-card>
@@ -389,6 +434,15 @@
     echo $this->load->view("project/vue-collection-share-component.js", null, true);
     ?>
 
+    const translation_messages = {
+      default: <?php echo json_encode($translations,JSON_HEX_APOS);?>
+    }
+
+    const i18n = new VueI18n({
+      locale: 'default', // set locale
+      messages: translation_messages, // set locale messages
+    })
+
     // 1. Define route components.        
     const Home = {
       template: '<div>Home -todo </div>'
@@ -425,6 +479,7 @@
 
     vue_app = new Vue({
       el: '#app',
+      i18n,
       vuetify: new Vuetify(),
       router: router,
       data: {
@@ -441,7 +496,9 @@
         dialog_create_project: false,
         dialog_import_project: false,
         import_file: null,
+        import_url:null,
         import_project_type: null,
+        upload_type:'file',
         import_project_loading: false,
         import_file_errors:null,
         dialog_share_project: false,
@@ -473,7 +530,14 @@
           "image": "fa fa-image",
           "video": "fa fa-video",
           "script": "fa fa-file-code"
-        }
+        },
+        sort_by_options:{
+          "title_asc":"Title (A-Z)",
+          "title_desc":"Title (Z-A)",
+          "updated_asc":"Oldest ↓",
+          "updated_desc":"Recent ↑" 
+        },
+        sort_by:"updated_desc",
 
 
       },
@@ -490,8 +554,8 @@
         this.is_loading = true;
         this.loadProjects();
         this.loadFacets();
-        //this.ReadFilterQS();
-        
+        this.initDataTypes();
+        //this.ReadFilterQS();        
       },
       computed: {
         Title() {
@@ -552,7 +616,10 @@
       watch: {
         SearchFiltersQuerystring: function(new_, old_) {
             this.search();
-        },      
+        },
+        sort_by: function(new_, old_) {
+            this.search();
+        },
         $route: {
           handler: function(newRouteValue){
             console.log("route changed",newRouteValue);
@@ -562,6 +629,20 @@
         }
       },
       methods: {
+        initDataTypes: function()
+        {
+          this.data_types={
+            "survey": this.$t("microdata"),
+            "timeseries": this.$t("timeseries"),
+            "timeseries-db": this.$t("timeseries-db"),
+            "script": this.$t("script"),
+            "geospatial": this.$t("geospatial"),
+            "document": this.$t("document"),
+            "table": this.$t("table"),
+            "image": this.$t("image"),
+            "video": this.$t("video")
+          }
+        },
         onFilterClick: function(facet_key, facet) {
         },
         CreateFilterQS: function(){
@@ -570,6 +651,9 @@
             let filter_name=Object.keys(this.search_filters)[i];
             search_filters[filter_name]=this.search_filters[filter_name].join(",");
           }
+
+          //sort
+          search_filters.sort_by=this.sort_by;
 
           //keyword search
           search_filters.keywords=this.search_keywords;
@@ -618,6 +702,7 @@
           return moment.utc(utc_date).format("YYYY-MM-DD")
         },
         momentAgo(date) {
+          //moment.locale('fr');
           let utc_date = moment(date, "YYYY-MM-DD HH:mm:ss").toDate();
           return moment.utc(date).fromNow();
         },
@@ -703,7 +788,7 @@
           vm = this;
           let form_data = {};
           let url = CI.base_url + '/api/editor/create/' + type;
-          this.loading_status = "Creating project...";
+          this.loading_status = this.$t("processing_please_wait");
           this.dialog_create_project = false;
 
           axios.post(url,
@@ -753,7 +838,7 @@
           }
         },
         DeleteProject: function(id) {
-          if (!confirm("Are you sure you want to delete the project?")) {
+          if (!confirm(this.$t("confirm_delete"))) {
             return false;
           }
 
@@ -945,7 +1030,14 @@
         importProject: function(){
             let formData = new FormData();
             formData.append('file', this.import_file);
-            formData.append('type', this.import_project_type.value);
+            
+            if (this.import_project_type && this.import_project_type.value){
+              formData.append('type', this.import_project_type.value);
+            }
+            else{
+              alert("Please select a project type");
+              return false;
+            }
 
             if (!this.import_file)
             {
@@ -966,7 +1058,6 @@
                     }
                 }
             ).then(function(response){
-                console.log("import project response", response);
                 vm.import_project_loading=false;
                 if (response.data.sid){
                   vm.EditProject(response.data.sid);

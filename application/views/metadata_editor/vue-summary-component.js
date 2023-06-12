@@ -77,7 +77,7 @@ Vue.component('summary-component', {
         }
     },     
     template: `
-            <div class="summary-component mt-3">
+            <div class="summary-component mt-3 container-fluid">
 
                 <div class="row" >
                     <div class="col-6" >
@@ -87,10 +87,10 @@ Vue.component('summary-component', {
 
                         <div class="template-selection-container border mb-3 p-3 bg-white">
                             <h5><v-icon style="font-size:25px;">mdi-alpha-t-box</v-icon> Template</h5>
-                            <div class="border p-1">
-                                <span class="float-right btn btn-link" @click="dialog_template=true">Switch template</span>
-                                <strong>{{ProjectTemplate.name}}</strong> <br/>
-                                {{ProjectTemplate.uid}}                                
+                            <div class="border-top p-1">
+                                <span class="btn btn-link" @click="dialog_template=true">
+                                    <strong>{{ProjectTemplate.name}}</strong> [switch]
+                                </span>
                             </div>
                         </div>
 
