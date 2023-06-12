@@ -1,7 +1,5 @@
 <?php
 
-use function Ramsey\Uuid\v1;
-
 $lang['my_projects']="Mes projets";
 $lang['create_project']="Créer un nouveau projet";
 $lang['import_project']="Importer un projet";
@@ -19,17 +17,6 @@ $lang['filters']="Filtres";
 $lang['collection']="Collection";
 $lang['collections']="Collections";
 $lang['add_to_collection']="Ajouter à la collection";
-$lang['']="";
-$lang['']="";
-$lang['']="";
-$lang['']="";
-$lang['']="";
-$lang['']="";
-$lang['']="";
-$lang['']="";
-$lang['']="";
-$lang['']="";
-$lang['']="";
 
 
 

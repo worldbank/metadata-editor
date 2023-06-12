@@ -1,7 +1,5 @@
 <?php
 
-use function Ramsey\Uuid\v1;
-
 $lang['my_projects']="My projects";
 $lang['create_project']="Create new project";
 $lang['import_project']="Import project";
