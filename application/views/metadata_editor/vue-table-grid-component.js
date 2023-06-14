@@ -240,7 +240,7 @@ Vue.component('table-grid-component', {
                                 <v-icon>mdi-content-copy</v-icon>
                             </v-list-item-icon>
                             <v-list-item-content>
-                                <v-list-item-title>Copy</v-list-item-title>
+                                <v-list-item-title>{{$t("copy")}}</v-list-item-title>
                             </v-list-item-content>
                         </v-list-item>
                         <v-list-item @click="pasteTsv('replace')">
@@ -248,7 +248,7 @@ Vue.component('table-grid-component', {
                                 <v-icon>mdi-content-paste</v-icon>
                             </v-list-item-icon>
                             <v-list-item-content>
-                                <v-list-item-title>Paste (Replace)</v-list-item-title>
+                                <v-list-item-title>{{$t("paste_replace")}}</v-list-item-title>
                             </v-list-item-content>                            
                         </v-list-item>
                         <v-list-item @click="pasteTsv('append')">
@@ -256,7 +256,7 @@ Vue.component('table-grid-component', {
                                 <v-icon>mdi-file-replace</v-icon>
                             </v-list-item-icon>
                             <v-list-item-content>
-                                <v-list-item-title>Paste (Append)</v-list-item-title>
+                                <v-list-item-title>{{$t("paste_append")}}</v-list-item-title>
                             </v-list-item-content> 
                         </v-list-item>
 
@@ -265,7 +265,7 @@ Vue.component('table-grid-component', {
                                 <v-icon>mdi-arrow-u-left-top</v-icon>
                             </v-list-item-icon>
                             <v-list-item-content>
-                                <v-list-item-title>Undo paste</v-list-item-title>
+                                <v-list-item-title>{{$t("undo_paste")}}</v-list-item-title>
                             </v-list-item-content> 
                         </v-list-item>
 
@@ -334,7 +334,7 @@ Vue.component('table-grid-component', {
             </table>
 
             <div class="d-flex justify-content-center">
-                <button type="button" class="btn btn-default btn-block btn-sm border m-2" @click="addRow" ><i class="fas fa-plus-square"></i> Add row</button>
+                <button type="button" class="btn btn-default btn-block btn-sm border m-2" @click="addRow" ><i class="fas fa-plus-square"></i> {{$t("add_row")}}</button>
             </div>
 
             <v-snackbar

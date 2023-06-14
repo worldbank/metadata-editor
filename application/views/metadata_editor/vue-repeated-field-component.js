@@ -81,7 +81,7 @@ Vue.component('repeated-field', {
         </table>
 
         <div class="d-flex justify-content-center">
-            <button type="button" class="btn btn-link btn-block btn-sm" @click="addRow" ><i class="fas fa-plus-square"></i> Add row</button>    
+            <button type="button" class="btn btn-link btn-block btn-sm" @click="addRow" ><i class="fas fa-plus-square"></i> {{$t("add_row")}}</button>    
         </div>
 
         </div>`    

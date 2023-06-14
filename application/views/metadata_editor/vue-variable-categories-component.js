@@ -34,12 +34,12 @@ Vue.component('variable-categories', {
     },
     methods:{
         clearCategories: function(){
-            if (confirm("Are you sure you want to clear all categories?")){
+            if (confirm(this.$t("confirm_clear_categories"))){
                 this.variable.var_catgry_labels=[];
             }
         },
         refreshCategories: function(){
-            if (!confirm("This will remove existing categories, are you sure?")){
+            if (!confirm(this.$t("confirm_reload_categories"))){
                 return;
             }
 
@@ -91,7 +91,7 @@ Vue.component('variable-categories', {
                 <div class="section-title section-list-header p-1 bg-variable">
                     <div class="row">
                         <div class="col">
-                        <strong>Categories</strong> <span v-if="variable.var_catgry && variable.var_catgry.length>0"><span class="badge badge-light">{{variable.var_catgry.length}}</span></span>
+                        <strong>{{$t("categories")}}</strong> <span v-if="variable.var_catgry && variable.var_catgry.length>0"><span class="badge badge-light">{{variable.var_catgry.length}}</span></span>
 
                         <div class="float-right">                           
                             <span title="Create categories" @click="refreshCategories"><v-icon aria-hidden="false" class="var-icon">mdi-update</v-icon></span>
@@ -110,7 +110,7 @@ Vue.component('variable-categories', {
                             >
                         </table-grid-component>
                     </div>
-                    <div v-else class="m-3 border text-align-center p-3 text-secondary">Only available for Discrete variables</div>
+                    <div v-else class="m-3 border text-align-center p-3 text-secondary">{{$t("only_for_discrete_variables")}}</div>
                 </div>
             </div>
             

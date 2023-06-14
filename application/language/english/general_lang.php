@@ -1,5 +1,7 @@
 <?php 
 
+$lang['home']="Home";
+$lang['my_projects']="My projects";
 $lang['type']="Type";
 $lang['name']="Name";
 $lang['default']="Default";
@@ -51,23 +53,39 @@ $lang['keywords']="Keywords";
 $lang['field']="Field";
 
 $lang['add_row']="Add row";
-
 $lang['data_type']="Data type";
-
-
 $lang['changes_saved']="Your changes have been saved";
 $lang['failed_to_save']="Failed to save your changes";
-
-
 $lang['form_update_success']="Your changes have been saved";
-
-
-
-
 $lang['select_file']="Select file";
 $lang['invalid_file_failed_to_read']="Invalid file, failed to read the file!";
 
+$lang['template']="Template";
+$lang['templates']="Templates";
+$lang['switch_template']="Switch template";
+
+$lang['validation_errors']="Validation errors";
+$lang['project_validation']="Project validation";
+$lang['no_validation_errors']="No validation errors found";
 
 
+$lang['clear']="Clear";
+$lang['delete_selection']="Delete selection";
+
+$lang['search']="Search";
+
+
+$lang['recent']=" Recent ↑";
+$lang['oldest']=" Oldest ↓";
+$lang['title_az']="Title (A-Z)";
+$lang['title_za']="Title (Z-A)";
+
+$lang['']="";
+$lang['']="";
+$lang['']="";
+$lang['']="";
+$lang['']="";
+$lang['']="";
+$lang['']="";
 /* End of file general_lang.php */
 /* Location: ./application/language/base/general_lang.php */

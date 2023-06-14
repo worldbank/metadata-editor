@@ -31,7 +31,7 @@ $user=$this->session->userdata('username');
 
     <?php else: ?>
             <a class="nav-link dropdown-toggle" href="" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fas fa-user-circle fa-lg"></i><?php echo t('login');?>
+                <i class="fas fa-user-circle fa-lg"></i> <?php echo t('login');?>
             </a>
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
                 <a class="dropdown-item" href="<?php echo site_url('auth/login'); ?>"><?php echo t('login');?></a>

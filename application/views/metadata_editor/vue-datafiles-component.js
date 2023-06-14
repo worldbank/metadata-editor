@@ -30,8 +30,8 @@ Vue.component('datafiles', {
             if (oldVal.length<1){
                 return;
             }
-            console.log("length",newVal.length,oldVal.length);
-            console.log("data_files changed", JSON.stringify(this.getRowSequence(newVal)), JSON.stringify(this.getRowSequence(oldVal)));
+            //console.log("length",newVal.length,oldVal.length);
+            //console.log("data_files changed", JSON.stringify(this.getRowSequence(newVal)), JSON.stringify(this.getRowSequence(oldVal)));
 
             //update sequence
             this.updateDataFilesWeight();
@@ -44,7 +44,7 @@ Vue.component('datafiles', {
         },
         addFile:function(){
             this.page_action="edit";
-            console.log(this.data_files);
+            //console.log(this.data_files);
             //let new_idx=this.data_files.push({file_name:""}) -1;
             this.$store.commit('data_files_add',{file_name:'untitled'});
             newIdx=this.data_files.length -1;
@@ -52,7 +52,7 @@ Vue.component('datafiles', {
         },
         saveFile: function(data)
         {
-            console.log("saving file",data, this.edit_item);
+            //console.log("saving file",data, this.edit_item);
             //this.$set(this.data_files, this.edit_item, data);
             
             vm=this;
@@ -66,7 +66,6 @@ Vue.component('datafiles', {
                 }*/
             )
             .then(function (response) {
-                console.log("updating",response);
                 //vm.$set(vm.data_files, vm.edit_item, JSON.parse(JSON.stringify(data)));
                 vm.$store.dispatch('loadDataFiles',{dataset_id:vm.dataset_id});
             })
@@ -115,7 +114,7 @@ Vue.component('datafiles', {
         },
         batchDelete: function()
         {
-            if (!confirm("Are you sure you want to delete the selected files?")){
+            if (!confirm(this.$t("confirm_delete_selected"))){
                 return;
             }
             
@@ -137,8 +136,8 @@ Vue.component('datafiles', {
 
             this.dialog={
                 show:true,
-                title:'Export file' + '[' + format + ']',
-                loading_message:'Please wait while the file is being generated...',
+                title:this.$t('export_file') + '[' + format + ']',
+                loading_message:this.$t('processing_please_wait'),
                 message_success:'',
                 message_error:'',
                 is_loading:true
@@ -152,7 +151,7 @@ Vue.component('datafiles', {
             }catch(e){
                 console.log("failed",e);
                 this.dialog.is_loading=false;
-                this.dialog.message_error="Failed to generate file: "+e.response.data.message;                
+                this.dialog.message_error=this.$t("failed")+": "+e.response.data.message;                
             }
         },        
         exportFileStatusCheck: async function(file_id,job_id,format){
@@ -166,8 +165,8 @@ Vue.component('datafiles', {
                 }
     
                 this.dialog.is_loading=true;
-                this.dialog.title="Export file";
-                this.dialog.loading_message="Please wait while the file is being generated...";
+                this.dialog.title=this.$t('export_file');
+                this.dialog.loading_message=this.$t('processing_please_wait');
                 try{
                     await this.sleep(5000);
                     let result=await this.$store.dispatch('getJobStatus',{job_id:job_id});
@@ -178,7 +177,7 @@ Vue.component('datafiles', {
                         this.exportFileStatusCheck(file_id,job_id,format);
                     }else if (result.data.job_status==='done'){
                         this.dialog.is_loading=false;
-                        this.dialog.message_success="Finished exporting file";
+                        this.dialog.message_success=this.$t('finished_processing');
 
                         let download_url=CI.base_url + '/api/datafiles/download_tmp_file/'+this.dataset_id + '/' + file_id + '/' + format;
                         window.open(download_url, '_blank').focus();
@@ -187,7 +186,7 @@ Vue.component('datafiles', {
                 }catch(e){
                     console.log("failed",e);
                     this.dialog.is_loading=false;
-                    this.dialog.message_error="Failed to export file: "+e.response.data.message;
+                    this.dialog.message_error=this.$t("failed")+": "+e.response.data.message;
                 }
             },
 
@@ -195,7 +194,7 @@ Vue.component('datafiles', {
         {
             let data_file=this.data_files[file_idx];
 
-            if (confirm_==false && !confirm("Are you sure you want to delete file " + data_file.file_id + "?")){
+            if (confirm_==false && !confirm(this.$t("confirm_delete") + " " + data_file.file_id + "?")){
                 return;
             }
 
@@ -228,7 +227,7 @@ Vue.component('datafiles', {
         },
         importSummaryStatistics: async function(file_id){
 
-            if (!confirm("Are you sure you want to import summary statistics for this file? This will overwrite any existing summary statistics.")){
+            if (!confirm(this.$t("confirm_import_summary_statistics"))){
                 return;
             }
 
@@ -242,8 +241,8 @@ Vue.component('datafiles', {
             }
 
             this.dialog.is_loading=true;
-            this.dialog.title="Summary statistics";
-            this.dialog.loading_message="Please wait while the summary statistics are being imported...";
+            this.dialog.title=this.$t("summary_stats");
+            this.dialog.loading_message=this.$t("processing_please_wait");
             try{
                 let result=await this.$store.dispatch('importDataFileSummaryStatisticsQueue',{file_id:file_id});
                 console.log("updated",result);
@@ -252,7 +251,7 @@ Vue.component('datafiles', {
             }catch(e){
                 console.log("failed",e);
                 this.dialog.is_loading=false;
-                this.dialog.message_error="Failed to import summary statistics: "+e.response.data.message;
+                this.dialog.message_error=this.$t("failed") +  ": " + e.response.data.message;
             }
         },
         importSummaryStatisticsQueueStatusCheck: async function(file_id,job_id){
@@ -267,8 +266,8 @@ Vue.component('datafiles', {
             }
 
             this.dialog.is_loading=true;
-            this.dialog.title="Summary statistics job status";
-            this.dialog.loading_message="Please wait while the summary statistics are being imported...";
+            this.dialog.title=this.$t("summary_stats_job_status");
+            this.dialog.loading_message=this.$t("processing_please_wait");
             try{
                 await this.sleep(5000);
                 let result=await this.$store.dispatch('importDataFileSummaryStatisticsQueueStatusCheck',{file_id:file_id, job_id:job_id});
@@ -279,7 +278,7 @@ Vue.component('datafiles', {
                     this.importSummaryStatisticsQueueStatusCheck(file_id,job_id);
                 }else if (result.data.job_status==='done'){
                     this.dialog.is_loading=false;
-                    this.dialog.message_success="Summary statistics imported successfully";                
+                    this.dialog.message_success=this.$t("sum_stats_imported_success");
                 }
                 
             }catch(e){
@@ -370,10 +369,10 @@ Vue.component('datafiles', {
         
             <div class="container-fluid pt-5 mt-5 mb-5 pb-5">
 
-            <h3>Data files</h3>
+            <h3>{{$t("data-files")}}</h3>
             <div v-show="page_action=='list'">
 
-            <strong>{{data_files.length}}</strong> files
+            <strong>{{data_files.length}}</strong> {{$t("files")}}
 
                 <v-row>
                     <v-col md="8">
@@ -381,8 +380,8 @@ Vue.component('datafiles', {
                     
                     </v-col>
                     <v-col md="4" align="right" class="mb-2">
-                        <button type="button" class="btn btn-sm btn-outline-primary" @click="addFile">Create file</button>
-                        <router-link class="btn btn-sm btn-outline-primary" :to="'datafiles/import'">Import files</router-link> 
+                        <!-- <button type="button" class="btn btn-sm btn-outline-primary" @click="addFile">Create file</button> -->
+                        <router-link class="btn btn-sm btn-outline-primary" :to="'datafiles/import'">{{$t("import_files")}}</router-link> 
                     </v-col>
                 </v-row>
                 
@@ -391,10 +390,10 @@ Vue.component('datafiles', {
                     <tr>
                         <th><input type="checkbox" v-model="select_all_files" @change="toggleFilesSelection" /></th>
                         <th><span class="mdi mdi-swap-vertical"></span></th>
-                        <th style="width:80px;">File#</th>
-                        <th>File name</th>
-                        <th>Variables</th>
-                        <th>Cases</th>                        
+                        <th style="width:80px;">{{$t("file")}}#</th>
+                        <th>{{$t("file_name")}}</th>
+                        <th>{{$t("variables")}}</th>
+                        <th>{{$t("cases")}}</th>                        
                     </tr>
                     </thead>
                     <tbody is="draggable" :list="data_files" tag="tbody" handle=".handle" >
@@ -415,19 +414,19 @@ Vue.component('datafiles', {
                             </div>
 
                             <div class="mt-2 datafile-actions">                                
-                                <router-link :to="'/variables/' + data_file.file_id"><button type="button" class="btn btn-sm btn-default"><v-icon>mdi-table</v-icon> Variables</button></router-link>
-                                <router-link :to="'/data-explorer/' + data_file.file_id"><button type="button" class="btn btn-sm btn-default"><v-icon>mdi-table-eye</v-icon> Data preview</button></router-link>
+                                <router-link :to="'/variables/' + data_file.file_id"><button type="button" class="btn btn-sm btn-default"><v-icon>mdi-table</v-icon> {{$t("variables")}}</button></router-link>
+                                <router-link :to="'/data-explorer/' + data_file.file_id"><button type="button" class="btn btn-sm btn-default"><v-icon>mdi-table-eye</v-icon> {{$t("preview")}}</button></router-link>
                                 <span v-if="data_file.file_info.original">
-                                <button type="button" class="btn btn-sm btn-link ink ml-0 pl-0" @click="importSummaryStatistics(data_file.file_id)"><v-icon title="Refresh summary statistics" >mdi-update</v-icon> Refresh stats</button>
-                                <button type="button" class="btn btn-sm btn-link ink ml-0 pl-0" @click="generateCSV(data_file.file_id)"><v-icon title="Generate CSV" >mdi-file-delimited-outline</v-icon> Export CSV</button>
+                                <button type="button" class="btn btn-sm btn-link ink ml-0 pl-0" @click="importSummaryStatistics(data_file.file_id)"><v-icon title="Refresh summary statistics" >mdi-update</v-icon> {{$t("refresh_stats")}}</button>
+                                <button type="button" class="btn btn-sm btn-link ink ml-0 pl-0" @click="generateCSV(data_file.file_id)"><v-icon title="Generate CSV" >mdi-file-delimited-outline</v-icon> {{$t("export_csv")}}</button>
                                 </span>
-                                <button type="button" class="btn btn-sm btn-link ink ml-0 pl-0" @click="deleteFile(index)"><v-icon>mdi-delete-outline</v-icon>Remove</button>
-                                <button type="button" class="btn btn-sm btn-link ink ml-0 pl-0" @click="replaceFile(index)"><v-icon>mdi-file-upload-outline</v-icon>Replace file</button>
+                                <button type="button" class="btn btn-sm btn-link ink ml-0 pl-0" @click="deleteFile(index)"><v-icon>mdi-delete-outline</v-icon>{{$t("remove")}}</button>
+                                <button type="button" class="btn btn-sm btn-link ink ml-0 pl-0" @click="replaceFile(index)"><v-icon>mdi-file-upload-outline</v-icon>{{$t("replace_file")}}</button>
                                                                     
                                 <v-menu offset-y>
                                     <template v-slot:activator="{ on, attrs }">
                                         <button type="button" class="btn btn-sm btn-link ink ml-0 pl-2"  v-bind="attrs" v-on="on">
-                                            <v-icon title="More options">mdi-export</v-icon> Export <v-icon title="More options">mdi-dots-vertical</v-icon>
+                                            <v-icon title="More options">mdi-export</v-icon> {{$t("export")}} <v-icon title="More options">mdi-dots-vertical</v-icon>
                                         </button>                                                
                                     </template>
                                     <v-list>
@@ -456,8 +455,8 @@ Vue.component('datafiles', {
                         <td style="display:none;">
                             <div>                                
                                 <button type="button" class="btn btn-sm btn-link" @click="deleteFile(index)"><i class="fas fa-trash-alt" title="Delete"></i></button>
-                                <router-link :to="'/variables/' + data_file.file_id"><button type="button" class="btn btn-sm btn-link"><i class="fas fa-table"></i> Variables</button></router-link>
-                                <router-link :to="'/data-explorer/' + data_file.file_id"><button type="button" class="btn btn-sm btn-link"><i class="fas fa-table"></i> Data</button></router-link>
+                                <router-link :to="'/variables/' + data_file.file_id"><button type="button" class="btn btn-sm btn-link"><i class="fas fa-table"></i> {{$t("variables")}}</button></router-link>
+                                <router-link :to="'/data-explorer/' + data_file.file_id"><button type="button" class="btn btn-sm btn-link"><i class="fas fa-table"></i> {{$t("data")}}</button></router-link>
                                 <v-icon title="Refresh summary statistics" @click="importSummaryStatistics(data_file.file_id)">mdi-update</v-icon>
                             </div>
                         </td>

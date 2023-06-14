@@ -59,27 +59,27 @@ Vue.component('datafile-edit', {
                     <span><textarea id="description" class="form-control" v-model="form_local.notes"/></span> 
                 </div>
 
-                <button type="button" class="btn btn-primary" @click="saveForm">Save</button>
-                <button type="button" class="btn btn-danger" @click="cancelForm">Cancel</button>
+                <button type="button" class="btn btn-primary" @click="saveForm">{{$t("save")}}</button>
+                <button type="button" class="btn btn-danger" @click="cancelForm">{{$t("cancel")}}</button>
 
                 </div>
                 <div class="col-md-4">
-                    <div><strong>File information</strong></div>
+                    <div><strong>{{$t("file_information")}}</strong></div>
                     <div class="mt-2">
                         <div>
-                            <label>Physical name:</label>
+                            <label>{{$t("physical_name")}}:</label>
                             <div>{{form_local.file_physical_name}}</div>
                         </div>                            
                         <div class="mt-2">
-                            <label>Rows:</label>
+                            <label>{{$t("rows")}}:</label>
                             <div>{{form_local.case_count}}</div>
                         </div>
                         <div class="mt-2">
-                            <label>Variables:</label>
+                            <label>{{$t("variables")}}:</label>
                             <div>{{form_local.var_count}}</div>
                         </div>
                         <div class="mt-2" v-if="form_local.file_info">
-                            <label>File size:</label>
+                            <label>{{$t("file_size")}}:</label>
                             <div>{{form_local.file_info.original.file_size}}</div>                        
                         </div>
                     </div> 

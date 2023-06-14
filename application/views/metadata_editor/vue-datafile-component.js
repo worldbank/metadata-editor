@@ -62,8 +62,8 @@ Vue.component('datafile', {
     template: `
             <div class="datafile-component">
             <div v-for="file in dataFiles">
-                <div v-if="file.file_id==fid" class="mt-3 p-2">
-                    <h2>Edit file - {{file.file_name}} [{{file.file_id}}]</h2>
+                <div v-if="file.file_id==fid" class="mt-5 p-2">
+                    <h2 class="mb-3">{{file.file_name}} [{{file.file_id}}]</h2>
                     <datafile-edit :value="file" @input="saveFile" @exit-edit="exitEditMode"></datafile-edit>                
                 </div>
             </div>

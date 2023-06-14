@@ -86,10 +86,10 @@ Vue.component('summary-component', {
                         </div>
 
                         <div class="template-selection-container border mb-3 p-3 bg-white">
-                            <h5><v-icon style="font-size:25px;">mdi-alpha-t-box</v-icon> Template</h5>
+                            <h5><v-icon style="font-size:25px;">mdi-alpha-t-box</v-icon> {{$t("template")}}</h5>
                             <div class="border-top p-1">
                                 <span class="btn btn-link" @click="dialog_template=true">
-                                    <strong>{{ProjectTemplate.name}}</strong> [switch]
+                                    <strong>{{ProjectTemplate.name}}</strong> [{{$t("switch_template")}}]
                                 </span>
                             </div>
                         </div>
@@ -104,7 +104,7 @@ Vue.component('summary-component', {
                                 >
                                 <v-card >
                                     <v-card-title class="text-h5 grey lighten-2">
-                                    Template {{template_idx}}
+                                    {{$t("template")}}
                                     </v-card-title>
 
                                     <v-card-text style="max-height:400px;">
@@ -195,17 +195,17 @@ Vue.component('summary-component', {
 
 
                         <div class="project-validation-container border mt-3 p-3 bg-white">
-                            <h5>Project validation</h5>                            
+                            <h5>{{$t("project_validation")}}</h5>                            
 
                             <div class="validation-errors mt-2 border" v-if="validation_errors!=''" style="color:red;font-size:small;" >
-                                <div class="border-bottom p-2 mb-2"><strong>Validation errors</strong></div>
+                                <div class="border-bottom p-2 mb-2"><strong>{{$t("validation_errors")}}</strong></div>
                                 <ul v-for="error in validation_errors.errors" class="mb-2 ml-3">
                                     <li><strong>{{error.message}}</strong><br/>
                                     Property: {{error.property}}
                                     </li>                                    
                                 </ul>
                             </div>
-                            <div class="mt-3 p-2 border" style="color:green" v-else>No issues found</div>
+                            <div class="mt-3 p-2 border" style="color:green" v-else>{{$t("no_validation_errors")}}</div>
                         </div>
 
 

@@ -520,14 +520,14 @@ Vue.component('variables', {
         },        
         refreshSummaryStats: async function(){
 
-            if (!confirm("Are you sure you want to import summary statistics for this file? This will overwrite any existing summary statistics.")){
+            if (!confirm(this.$t("confirm_import_summary_statistics"))){
                 return;
             }
 
             this.summaryStatsDialog={
                 show:true,
-                title:'Summary statistics',
-                loading_message:'Please wait while the summary statistics are being imported...',     
+                title:this.$t("summary_stats"),
+                loading_message:this.$t("processing_please_wait"),
                 message_success:'',
                 message_error:'',
                 is_loading:true
@@ -540,12 +540,12 @@ Vue.component('variables', {
             }catch(e){
                 console.log("failed",e);
                 this.summaryStatsDialog.is_loading=false;
-                this.summaryStatsDialog.message_error="Failed to import summary statistics: "+e.response.data.message;
+                this.summaryStatsDialog.message_error=this.$t("failed_to_import_stats") + ": " + e.response.data.message;
             }
         },
         importSummaryStatisticsQueueStatusCheck: async function(file_id,job_id){
             this.summaryStatsDialog.is_loading=true;
-            this.summaryStatsDialog.loading_message="Please wait while the summary statistics are being imported...";
+            this.summaryStatsDialog.loading_message=this.$t("processing_please_wait");
             try{
                 await this.sleep(5000);
                 let result=await this.$store.dispatch('importDataFileSummaryStatisticsQueueStatusCheck',{file_id:file_id, job_id:job_id});
@@ -556,13 +556,13 @@ Vue.component('variables', {
                 }else if (result.data.job_status==='done'){
                     await this.reloadDataFileVariables();
                     this.summaryStatsDialog.is_loading=false;
-                    this.summaryStatsDialog.message_success="Summary statistics imported successfully";                
+                    this.summaryStatsDialog.message_success=this.$t("sum_stats_imported_success");
                 }
                 
             }catch(e){
                 console.log("failed",e);
                 this.summaryStatsDialog.is_loading=false;
-                this.summaryStatsDialog.message_error="Failed to import summary statistics: "+e.response.data.message;
+                this.summaryStatsDialog.message_error=this.$t("failed") + ": " + e.response.data.message;
             }
         },
         reloadDataFileVariables: async function(){
@@ -792,21 +792,21 @@ Vue.component('variables', {
                             <div class="row no-gutters section-title p-1 bg-variable" style="font-size:small;position:relative;">
                                 <div class="col-2">
                                     <div class="p-1">
-                                    <strong>Variables</strong>
+                                    <strong>{{$t("variables")}}</strong>
                                     <span v-if="variables" class="badge badge-light">{{variables.length}}</span>                                    
                                     </div>
                                 </div>
 
                                 <div class="col-3">
                                     <div class="input-group">
-                                        <input type="text" class="bg-light form-control form-control-xs" placeholder="Search variables" v-model="variable_search">
+                                        <input type="text" class="bg-light form-control form-control-xs" :placeholder="$t('search')" v-model="variable_search">
                                         <div class="input-group-append">
                                         <button class="btn btn-secondary btn-sm btn-xs" type="button">
                                             <i class="fa fa-search"></i>
                                         </button>
 
                                         <button class="btn btn-link-outline btn-sm btn-xs" type="button" v-show="variable_search.length>0" @click="clearVariableSearch">
-                                            Clear
+                                        {{$t("clear")}}
                                         </button>
                                         
                                         </div>
@@ -826,24 +826,25 @@ Vue.component('variables', {
 
                                         
 
-                                        <span @click="refreshSummaryStats" title="Refresh summary statistics">
+                                        <span @click="refreshSummaryStats" :title="$t('refresh_stats')">
                                             <v-icon aria-hidden="false" class="var-icon">mdi-database-sync</v-icon>
                                         </span>
 
-                                        <span @click="changeCaseDialog=true" title="Change case">
+                                        <span @click="changeCaseDialog=true" :title="$t('change_case')">
                                             <v-icon aria-hidden="false" class="var-icon">mdi-format-letter-case</v-icon>
                                         </span>
 
-                                        <span @click="spreadMetadata" title="Spread Metadata">
+                                        <span @click="spreadMetadata" :title="$t('spread_metadata')">
                                             <v-icon aria-hidden="false" class="var-icon">mdi-content-copy</v-icon>
                                         </span>
 
-                                        <span @click="addVariable" title="Add new variable">
+                                        <!-- 
+                                        <span @click="addVariable" :title="$t('add_new_variable')">
                                             <v-icon aria-hidden="false" class="var-icon">mdi-plus-box</v-icon>                                            
                                         </span>
+                                        -->
 
-
-                                        <span @click="deleteVariable" title="Delete selected variable(s)">
+                                        <span @click="deleteVariable" :title="$t('delete_selection')">
                                             <v-icon aria-hidden="false" class="var-icon">mdi-trash-can-outline</v-icon>
                                         </span>
                                         
@@ -852,9 +853,9 @@ Vue.component('variables', {
                                                 <v-icon aria-hidden="false" class="var-icon">mdi-dots-vertical</v-icon>    
                                             </span>
                                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="font-size:small;">
-                                                <a class="dropdown-item" href="#"><i class="fas fa-spell-check"></i> Change case</a>
-                                                <a class="dropdown-item" href="#"><i class="fas fa-clone"></i> Spread metadata</a>
-                                                <a class="dropdown-item" href="#"><i class="fas fa-file-download"></i> Export variable(s)</a>
+                                                <a class="dropdown-item" href="#"><i class="fas fa-spell-check"></i> {{$t('change_case')}}</a>
+                                                <a class="dropdown-item" href="#"><i class="fas fa-clone"></i> {{$t('spread_metadata')}}</a>
+                                                <!-- <a class="dropdown-item" href="#"><i class="fas fa-file-download"></i> Export variable(s)</a> -->
                                             </div>
                                         </span>
 
@@ -884,17 +885,18 @@ Vue.component('variables', {
                                         <td class="var-vid-td bg-secondary handle">V{{index+1}}</td>                                        
 
                                         <td class="var-name-edit">
-                                            <div><input vonkeydown="onVariableKeydown($event,index,'var_name')" class="var-labl-edit" type="text" v-model="variable.name" ref="var_name" /></div>
+                                            <!-- <div><input vonkeydown="onVariableKeydown($event,index,'var_name')" class="var-labl-edit" type="text" v-model="variable.name" ref="var_name" /></div> -->
+                                            {{variable.name}}
                                         </td>
                                         <td>
                                             <div><input vonkeydown="onVariableKeydown($event,index,'var_labl')"  class="var-labl-edit" type="text" v-model="variable.labl" ref="var_labl"/></div>
                                         </td>
                                         <td>
                                             <span v-if="variable.var_format && variable.var_format.type">
-                                                <span v-if="variable.var_format.type=='character' || variable.var_format.type=='fixed'" :title="variable.var_format.type">
+                                                <span v-if="variable.var_format.type=='character' || variable.var_format.type=='fixed'" :title="$t(variable.var_format.type)">
                                                     <v-icon aria-hidden="false" class="vdar-icon">mdi-alpha-a-box-outline</v-icon>
                                                 </span>
-                                                <span v-if="variable.var_format.type=='numeric'" :title="variable.var_format.type">
+                                                <span v-if="variable.var_format.type=='numeric'" :title="$t(variable.var_format.type)">
                                                     <v-icon aria-hidden="false" class="vdar-icon">mdi-numeric-1-box-outline</v-icon>
                                                 </span>                                                
 
@@ -902,9 +904,9 @@ Vue.component('variables', {
                                             <span v-if="variable.var_catgry && variable.var_catgry.length>0" :title="variable.var_catgry.length">
                                                 <v-icon aria-hidden="false" class="vdar-icon">mdi-format-list-numbered</v-icon>
                                             </span>
-                                            <v-icon title="Weight variable" v-if="variable.var_wgt==1" aria-hidden="false" class="vdar-icon">mdi-alpha-w</v-icon>
-                                            <v-icon title="Weighted" v-if="variable.var_wgt_id && variable.var_wgt_id.length>0" aria-hidden="false" class="vdar-icon">mdi-scale-balance</v-icon>
-                                            <v-icon title="Change requires updating summary statistics" v-if="variable.update_required" aria-hidden="false" class="vdar-icon text-danger">mdi-sync-alert</v-icon>
+                                            <v-icon :title="$t('weight_variable')" v-if="variable.var_wgt==1" aria-hidden="false" class="vdar-icon">mdi-alpha-w</v-icon>
+                                            <v-icon :title="$t('weighted')" v-if="variable.var_wgt_id && variable.var_wgt_id.length>0" aria-hidden="false" class="vdar-icon">mdi-scale-balance</v-icon>
+                                            <v-icon :title="$t('require_stats_update')" v-if="variable.update_required" aria-hidden="false" class="vdar-icon text-danger">mdi-sync-alert</v-icon>
                                         </td>                                        
                                     </tr>
                                     </tbody>

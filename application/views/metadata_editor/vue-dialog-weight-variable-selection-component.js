@@ -68,7 +68,7 @@ Vue.component('dialog-weight-variable-selection', {
             <v-dialog v-model="dialog" width="600" height="350" persistent>
                 <v-card>
                     <v-card-title class="text-h5 grey lighten-2">
-                        Select weight variable {{selection}}
+                        {{$t("select_weight_variable")}} {{selection}}
                     </v-card-title>
 
                     <v-card-text>
@@ -112,14 +112,14 @@ Vue.component('dialog-weight-variable-selection', {
                         <!-- end card text -->
                     </div>
                     <div v-else class="border p-2 m-2 text-center text-danger">
-                        <p>No weight variables found</p>
+                        <p>{{$t("no_weight_variable_found")}}</p>
                     </div>
                     </v-card-text>
 
                     <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn color="primary" text @click="closeDialog" >
-                        Close
+                    {{$t("close")}}
                     </v-btn>
                     </v-card-actions>
                 </v-card>

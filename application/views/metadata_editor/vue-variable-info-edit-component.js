@@ -55,14 +55,14 @@ Vue.component('variable-info', {
         <div class="variable-categories-edit-component" style="height:100vh" v-if="variable">
             <!--var-format-->
             <div style="font-size:small;" class="mb-2" >
-                <div class="section-title p-1 bg-variable"><strong>Variable information</strong></div>
+                <div class="section-title p-1 bg-variable"><strong>{{$t("variable_information")}}</strong></div>
 
                 <div class="p-2" v-if="variable">
 
                 <div class="form-group form-field switch-field" >
                     <v-switch
                     v-model="variable.var_wgt"
-                    label="is weight variable?"
+                    :label="$t('is_weight_variable')"
                     true-value="1"
                     false-value="0"
                     ></v-switch>                    
@@ -70,7 +70,7 @@ Vue.component('variable-info', {
 
 
                 <div class="form-group form-field">
-                    <label>Interval type</label>                     
+                    <label>{{$t("interval_type")}}</label>                     
                     <select 
                         v-model="variable.var_intrvl" 
                         class="form-control  form-control-sm form-field-dropdown"
@@ -78,13 +78,13 @@ Vue.component('variable-info', {
                     >
                         <option value="">Select</option>
                         <option v-for="(option_key,option_value) in variable_intervals" v-bind:value="option_value">
-                            {{ option_key }}
+                            {{ $t(option_value) }}
                         </option>
                     </select>
                 </div>
                 
                 <div class="form-group form-field">
-                    <label>Format</label>
+                    <label>{{$t("format")}}</label>
                     <select 
                         v-model="variable.var_format.type" 
                         class="form-control  form-control-sm form-field-dropdown"
@@ -92,7 +92,7 @@ Vue.component('variable-info', {
                     >
                         <option value="">Select</option>
                         <option v-for="(option_key,option_value) in variable_formats" v-bind:value="option_value">
-                            {{ option_key }}
+                        {{$t(option_value)}}
                         </option>
                     </select>
                 </div>
@@ -100,22 +100,22 @@ Vue.component('variable-info', {
                 <div class="form-group form-field">                                        
                     <div class="row no-gutters">
                         <div class="col">
-                            <label>Min</label>
+                            <label>{{$t("min")}}</label>
                             <input type="number" class="form-control form-control-sm form-control-xs" v-model="variable.var_valrng.range.min" />
                         </div>
                         <div class="col mr-1 ml-1">
-                            <label>Max</label>
+                            <label>{{$t("max")}}</label>
                             <input type="number" class="form-control form-control-sm form-control-xs" v-model="variable.var_valrng.range.max" />
                         </div>
                         <div class="col">
-                            <label>Decimals</label>
+                            <label>{{$t("decimals")}}</label>
                             <input type="number" class="form-control form-control-sm form-control-xs" v-model="variable.var_dcml" />
                         </div>
                     </div>    
                 </div>
 
                 <div class="form-group form-field" v-if="variable.var_invalrng">
-                    <label>Missing</label>
+                    <label>{{$t("missing")}}</label>
                     
                         <repeated-field
                                 @input="OnValueUpdate"  

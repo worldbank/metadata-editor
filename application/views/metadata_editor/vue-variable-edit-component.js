@@ -283,14 +283,14 @@ Vue.component('variable-edit', {
         sumStatCodeToLabel: function(code)
         {
             if (code=='vald'){
-                return 'Valid';
+                return this.$t('valid');
             }
             
             if (code=='invd'){
-                return 'Invalid';
+                return this.$t('invalid');
             }
 
-            return code;
+            return this.$t(code);
         },
         VariablePercent(variable, catgry){
            if (variable && variable.var_valrng && variable.var_valrng.range){
@@ -396,10 +396,10 @@ Vue.component('variable-edit', {
         <div class="variable-edit-component pb-5">
         <template>
             <v-tabs v-model="active_tab">
-                <v-tab key="statistics" href="#statistics">Statistics</v-tab>
+                <v-tab key="statistics" href="#statistics">{{$t('statistics')}}</v-tab>
                 <v-tab key="weights" href="#weights">
                     Weights <span v-if="variable.var_wgt_id"><v-icon style="color:green;">mdi-circle-medium</v-icon></span></v-tab>
-                <v-tab key="documentation" href="#documentation">Documentation</v-tab>
+                <v-tab key="documentation" href="#documentation">{{$t('documentation')}}</v-tab>
                 <v-tab key="json" href="#json">JSON</v-tab>
 
                 <v-tab-item key="statistics" value="statistics">
@@ -409,29 +409,29 @@ Vue.component('variable-edit', {
 
                     <div class="row no-gutters">
                         <div class="col-md-3 v-checkbox-rm-styles v-checkbox-summary-stats">
-                            <div><v-checkbox @change="OnWghtdStatsChange" v-model="Variable.sum_stats_options.wgt" :indeterminate="Variable.sum_stats_options.wgt==null" label="Weighted statistics"></v-checkbox></div>
-                            <div><v-checkbox v-model="Variable.sum_stats_options.freq" :indeterminate="Variable.sum_stats_options.freq==null" label="Frequencies"></v-checkbox></div>
-                            <div><v-checkbox v-model="Variable.sum_stats_options.missing" :indeterminate="Variable.sum_stats_options.missing==null" label="List missings"></v-checkbox></div>
-                            <div class="mt-3 mb-2 border-bottom w-50 ">Summary statistics:</div>
-                            <div><v-checkbox v-model="Variable.sum_stats_options.vald" :indeterminate="Variable.sum_stats_options.vald==null"  label="Valid"></v-checkbox></div>
-                            <div><v-checkbox v-model="Variable.sum_stats_options.min" :indeterminate="Variable.sum_stats_options.min==null"  label="Min"></v-checkbox></div>
-                            <div><v-checkbox v-model="Variable.sum_stats_options.max" :indeterminate="Variable.sum_stats_options.max==null" label="Max"></v-checkbox></div>
-                            <div><v-checkbox v-model="Variable.sum_stats_options.mean" :indeterminate="Variable.sum_stats_options.mean==null" label="Mean"></v-checkbox></div>
-                            <div><v-checkbox v-model="Variable.sum_stats_options.mean_wgt" :indeterminate="Variable.sum_stats_options.mean_wgt==null" label="Weighted mean"></v-checkbox></div>
-                            <div><v-checkbox v-model="Variable.sum_stats_options.stdev" :indeterminate="Variable.sum_stats_options.stdev==null" label="StdDev"></v-checkbox></div>
-                            <div><v-checkbox v-model="Variable.sum_stats_options.stdev_wgt" :indeterminate="Variable.sum_stats_options.stdev_wgt==null" label="Weighted StdDev"></v-checkbox></div>                            
+                            <div><v-checkbox @change="OnWghtdStatsChange" v-model="Variable.sum_stats_options.wgt" :indeterminate="Variable.sum_stats_options.wgt==null" :label="$t('weighted_statistics')"></v-checkbox></div>
+                            <div><v-checkbox v-model="Variable.sum_stats_options.freq" :indeterminate="Variable.sum_stats_options.freq==null" :label="$t('frequencies')"></v-checkbox></div>
+                            <div><v-checkbox v-model="Variable.sum_stats_options.missing" :indeterminate="Variable.sum_stats_options.missing==null" :label="$t('list_missings')"></v-checkbox></div>
+                            <div class="mt-3 mb-2 border-bottom w-50 ">{{$t('summary_stats')}}:</div>
+                            <div><v-checkbox v-model="Variable.sum_stats_options.vald" :indeterminate="Variable.sum_stats_options.vald==null"  :label="$t('valid')"></v-checkbox></div>
+                            <div><v-checkbox v-model="Variable.sum_stats_options.min" :indeterminate="Variable.sum_stats_options.min==null"  :label="$t('min')"></v-checkbox></div>
+                            <div><v-checkbox v-model="Variable.sum_stats_options.max" :indeterminate="Variable.sum_stats_options.max==null" :label="$t('max')"></v-checkbox></div>
+                            <div><v-checkbox v-model="Variable.sum_stats_options.mean" :indeterminate="Variable.sum_stats_options.mean==null" :label="$t('mean')"></v-checkbox></div>
+                            <div><v-checkbox v-model="Variable.sum_stats_options.mean_wgt" :indeterminate="Variable.sum_stats_options.mean_wgt==null" :label="$t('weighted_mean')"></v-checkbox></div>
+                            <div><v-checkbox v-model="Variable.sum_stats_options.stdev" :indeterminate="Variable.sum_stats_options.stdev==null" :label="$t('stddev')"></v-checkbox></div>
+                            <div><v-checkbox v-model="Variable.sum_stats_options.stdev_wgt" :indeterminate="Variable.sum_stats_options.stdev_wgt==null" :label="$t('weighted_stddev')"></v-checkbox></div>                            
                         </div>
                         <div class="col-md-9">
 
                             <div v-if="variable.var_catgry && variable.var_catgry.length>0 && variable.sum_stats_options.freq==true">
-                            <h5>Frequencies</h5>
+                            <h5>{{$t('frequencies')}}</h5>
                             
                             <table class="table table-sm variable-frequencies">
                                 <tr>
-                                    <th>Value</th>
-                                    <th>Label</th>
-                                    <th>Cases</th>
-                                    <th v-if="isWeighted">Weighted</th>
+                                    <th>{{$t('value')}}</th>
+                                    <th>{{$t('label')}}</th>
+                                    <th>{{$t('cases')}}</th>
+                                    <th v-if="isWeighted">{{$t('weighted')}}</th>
                                     <th>&nbsp;</th>
                                 </tr>
                                 <tr v-for="catgry in variableCategoriesAndFrequencies">
@@ -452,7 +452,7 @@ Vue.component('variable-edit', {
                                     </template>                                
                                     </td>
                                     <td style="min-width:80px;">
-                                        <div v-if="catgry.is_missing==1 || VariableIsMissing(catgry.value)">Missing</div>
+                                        <div v-if="catgry.is_missing==1 || VariableIsMissing(catgry.value)">{{$t('missing')}}</div>
                                         <div v-else>
                                         
                                         <div class="progress" v-if="isWeighted==false">
@@ -469,17 +469,17 @@ Vue.component('variable-edit', {
                                     </td>
                                 </tr>
                                 <tr v-if="variableStatsInValidCount(variable)>0 && Variable.sum_stats_options.missing">
-                                    <td>Sysmiss</td>
+                                    <td>{{$t('sysmiss')}}</td>
                                     <td></td>                                    
                                     <td>{{variableStatsInValidCount(variable)}}</td>
                                     <td v-if="isWeighted"></td>
-                                    <td>Missing</td>
+                                    <td>{{$t('missing')}}</td>
                                 </tr>
                             </table>
                             </div>
 
                             <div v-if="variable.var_sumstat" class="pb-4">
-                            <h5 class="border-bottom">Summary statistics</h5>                            
+                            <h5 class="border-bottom">{{$t('summary_stats')}}</h5>                            
                             <table>
                                 <template v-for="sumstat in variable.var_sumstat">                            
                                 

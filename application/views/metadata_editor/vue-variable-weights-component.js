@@ -66,29 +66,29 @@ Vue.component('variable-weights-component', {
                 <div>
                     <table class="table table-sm table-bordered" v-if="var_wgt_id" :key="var_wgt_id">
                         <tr>
-                            <th>Name</th>
-                            <th>Label</th>
+                            <th>{{$t('name')}}</th>
+                            <th>{{$t('label')}}</th>
                             <td></td>
                         </tr>
                         <tr v-for="var_ in VariablesForWeight" :key="var_.uid">
                             <td>{{var_.name}}</td>
                             <td>{{var_.labl}}</td>
                             <td>
-                                <button class="btn btn-sm btn-xs btn-link" @click="RemoveWeightVariable">Remove</button>
-                                <button class="btn btn-sm btn-xs btn-link" @click="show_weights_dialog=true">Change</button>
+                                <button class="btn btn-sm btn-xs btn-link" @click="RemoveWeightVariable">{{$t('remove')}}</button>
+                                <button class="btn btn-sm btn-xs btn-link" @click="show_weights_dialog=true">{{$t('change')}}</button>
                             </td>
                         </tr>
                         <tr v-if="VariablesForWeight.length<1">
                             <td>{{var_wgt_id}}</td>
-                            <td>NA</td>
+                            <td>{{$t('na')}}</td>
                             <td>
-                                <button class="btn btn-sm btn-xs btn-link" @click="RemoveWeightVariable">Remove</button>
-                                <button class="btn btn-sm btn-xs btn-link" @click="show_weights_dialog=true">Change</button>
+                                <button class="btn btn-sm btn-xs btn-link" @click="RemoveWeightVariable">{{$t('remove')}}</button>
+                                <button class="btn btn-sm btn-xs btn-link" @click="show_weights_dialog=true">{{$t('change')}}</button>
                             </td>
                         </tr>
                     </table>
                     <div v-else>
-                        <div class="border p-2 m-3 text-center " ><button class="btn btn-sm btn-xs btn-link" @click="show_weights_dialog=true">Select variable</button></div>
+                        <div class="border p-2 m-3 text-center " ><button class="btn btn-sm btn-xs btn-link" @click="show_weights_dialog=true">{{$t('select_weight_variable')}}</button></div>
                     </div>
                 </div>
 

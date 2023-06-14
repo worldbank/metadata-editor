@@ -5,16 +5,16 @@
 
         <ul class="navbar-nav">
             <li class="nav-item">
-                <a href="<?php echo site_url();?>" title="Home" role="button" class="nav-link"><i class="mdi mdi-home-outline"></i> 
+                <a href="<?php echo site_url();?>" title="<?php echo t("home");?>" role="button" class="nav-link"><i class="mdi mdi-home-outline"></i> 
                 </a>
             </li>
             <li class="nav-item">
-                <a href="<?php echo site_url('editor');?>" title="My projects" class="nav-link"><i class="mdi mdi-folder-multiple-outline"></i> My projects
+                <a href="<?php echo site_url('editor');?>" class="nav-link"><i class="mdi mdi-folder-multiple-outline"></i> <?php echo t("my_projects");?>
                 </a>
             </li>
 
             <li class="nav-item">
-                <a href="<?php echo site_url('editor/templates');?>" title="Templates" role="button" class="nav-link btn btn-link"><i class="mdi mdi-alpha-t-box-outline"></i> Templates</a>
+                <a href="<?php echo site_url('editor/templates');?>"  role="button" class="nav-link btn btn-link"><i class="mdi mdi-alpha-t-box-outline"></i> <?php echo t("templates");?></a>
             </li>
         </ul>
 

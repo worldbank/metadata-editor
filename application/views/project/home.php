@@ -184,10 +184,10 @@
                           <span class="sr-only">Toggle Dropdown</span>
                         </button>
                         <div class="dropdown-menu">
-                          <a class="dropdown-item" href="#" @click="sort_by='title_asc'">Title (A-Z)</a>
-                          <a class="dropdown-item" href="#" @click="sort_by='title_desc'">Title (Z-A)</a>
-                          <a class="dropdown-item" href="#" @click="sort_by='updated_desc'">Recent ↑</a>
-                          <a class="dropdown-item" href="#" @click="sort_by='updated_asc'">Oldest ↓</a>                          
+                          <a class="dropdown-item" href="#" @click="sort_by='title_asc'">{{$t("title_az")}}</a>
+                          <a class="dropdown-item" href="#" @click="sort_by='title_desc'">{{$t("title_za")}}</a>
+                          <a class="dropdown-item" href="#" @click="sort_by='updated_desc'">{{$t("recent")}}</a>
+                          <a class="dropdown-item" href="#" @click="sort_by='updated_asc'">{{$t("oldest")}}</a>                          
                         </div>
                       </div>
 
@@ -555,6 +555,7 @@
         this.loadProjects();
         this.loadFacets();
         this.initDataTypes();
+        this.initSortOptions();
         //this.ReadFilterQS();        
       },
       computed: {
@@ -641,6 +642,14 @@
             "table": this.$t("table"),
             "image": this.$t("image"),
             "video": this.$t("video")
+          }
+        },
+        initSortOptions: function(){
+          this.sort_by_options={
+            "title_asc":this.$t("title_az"),
+            "title_desc":this.$t("title_za"),
+            "updated_asc":this.$t("oldest"),
+            "updated_desc":this.$t("recent") 
           }
         },
         onFilterClick: function(facet_key, facet) {

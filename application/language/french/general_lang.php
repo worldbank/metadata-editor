@@ -1,4 +1,6 @@
 <?php 
+$lang['home']="Page d'accueil";
+$lang['my_projects']="Mes projets";
 $lang['type']="Type";
 $lang['name']="Nom";
 $lang['default']="Par défaut";
@@ -8,7 +10,6 @@ $lang['version']="Version";
 $lang['last_updated']="Dernière mise à jour";
 
 $lang['description']="Description";
-$lang['nom']="Nom";
 $lang['organisation']="Organisation";
 $lang['author']="Auteur";
 
@@ -57,12 +58,24 @@ $lang['data_type']="Type de données";
 $lang['changes_saved']="Vos modifications ont été enregistrées";
 $lang['failed_to_save']="Échec de l'enregistrement de vos modifications";
 
-
-
-
-
-
 $lang['select_file']="Sélectionner un fichier";
 $lang['invalid_file_failed_to_read']="Fichier invalide, échec de lecture du fichier !";
 
 $lang['form_update_success']="Your changes have been saved";
+
+$lang['template']="Modèle";
+$lang['templates']="Modèles";
+$lang['switch_template']="Changer de modèle";
+
+$lang['validation_errors']="Erreurs de validation";
+$lang['project_validation']="Validation du projet";
+$lang['no_validation_errors']="Aucune erreur de validation trouvée";
+
+$lang['clear']="Effacer";
+$lang['delete_selection']="Supprimer la sélection";
+$lang['search']="Rechercher";
+
+$lang['recent']=" Récent ↑";
+$lang['oldest']=" Le plus ancien ↓";
+$lang['title_az']="Titre (A-Z)";
+$lang['title_za']="Titre (Z-A)";
