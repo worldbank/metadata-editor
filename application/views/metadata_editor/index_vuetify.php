@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html >
 <html>
 <head>
   <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
@@ -76,6 +76,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ajv/6.12.2/ajv.bundle.js" integrity="sha256-u9xr+ZJ5hmZtcwoxwW8oqA5+MIkBpIp3M2a4AgRNH1o=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/deepdash/browser/deepdash.standalone.min.js"></script>
     <script src="https://unpkg.com/moment@2.26.0/moment.js"></script>
+    <script src="https://unpkg.com/vue-i18n@8"></script>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css" crossorigin="anonymous" />   
     
@@ -106,13 +107,14 @@
 
   <script>
     
-//    const { Splitpanes, Pane } = splitpanes;
+    const translation_messages = {
+      default: <?php echo json_encode($translations,JSON_HEX_APOS);?>
+    }
 
-/*
-Vue.config.errorHandler = (err, vm, info) => {
-  console.log("error handler",err,vm,info);
-};
-*/
+    const i18n = new VueI18n({
+      locale: 'default',
+      messages: translation_messages
+    })
 
     Vue.filter('truncate', function (text, stop, clamp) {
         return text.slice(0, stop) + (stop < text.length ? clamp || '...' : '')
@@ -136,6 +138,7 @@ Vue.config.errorHandler = (err, vm, info) => {
 
     vue_app=new Vue({
       el: '#app',
+      i18n,
       vuetify: new Vuetify(),
       router:router,
       store,
@@ -305,14 +308,14 @@ Vue.config.errorHandler = (err, vm, info) => {
                 file: 'datafile',
                 datafile:  file,
                 items:[{
-                    title:'Variables',
+                    title:this.$t('variables'),
                     type: 'variables',
                     file: 'variable',
                     datafile: file,
                     key:'variables/'+file.file_id
                 },
                 {
-                    title:'Data',
+                    title:this.$t('data'),
                     type: 'variable_data',
                     file: 'table',
                     datafile: file,
@@ -549,7 +552,7 @@ Vue.config.errorHandler = (err, vm, info) => {
           }
 
           tree_data.unshift({
-              title: 'Home',
+              title: this.$t('home'),
               type:'home',
               file: 'database',
               key: 'home',
@@ -565,7 +568,7 @@ Vue.config.errorHandler = (err, vm, info) => {
 
           if (this.dataset_type=='survey'){
             tree_data.push({
-              title: 'Data files',
+              title: this.$t('data-files'),
               type:'datasets',
               file: 'database',
               key: 'datasets',
@@ -573,7 +576,7 @@ Vue.config.errorHandler = (err, vm, info) => {
             });
 
             tree_data.push({
-              title: 'Variable Groups',
+              title: this.$t('variable-groups'),
               type:'variable-groups',
               file: 'database',
               key: 'variable-groups',
@@ -583,7 +586,7 @@ Vue.config.errorHandler = (err, vm, info) => {
 
           
           tree_data.push({
-              title: 'External resources',
+              title: this.$t('external-resources'),
               type: 'resources',
               file: 'resource',
               key:'external-resources',
@@ -623,7 +626,7 @@ Vue.config.errorHandler = (err, vm, info) => {
               continue;
             }
 
-            if (this.items[k]["title"]=="Data files"){
+            if (this.items[k]["key"]=="datasets"){
               this.items[k]["items"]=this.DataFilesTreeNodes
             }
 

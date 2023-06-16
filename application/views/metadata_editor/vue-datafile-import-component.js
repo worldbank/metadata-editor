@@ -56,7 +56,6 @@ Vue.component('datafile-import', {
             this.$router.push('/datafiles');
         },
 
-        //on button import click
         processImport: async function()
         {
             this.errors='';
@@ -64,14 +63,9 @@ Vue.component('datafile-import', {
             this.upload_report=[];
             this.dialog_process=true;
 
-            for(i=0;i<this.files.length;)
-            {
+            for(i=0;i<this.files.length;){
                 await this.processFile(i);
                 i++;
-
-                /*if (this.errors!=''){
-                    return false;
-                }*/
             }
 
             this.update_status="completed";
@@ -83,7 +77,7 @@ Vue.component('datafile-import', {
          * 
          *  - Upload file
          *  - Generate data dictionary
-         *  - Generete CSV
+         *  - Generate CSV
          *  - import data dictionary
          *  - import csv
          */
@@ -235,7 +229,6 @@ Vue.component('datafile-import', {
         addFile(e) {
             let droppedFiles = e.dataTransfer.files;
             if(!droppedFiles) return;
-            // this tip, convert FileList to array, credit: https://www.smashingmagazine.com/2018/01/drag-drop-file-uploader-vanilla-js/
             ([...droppedFiles]).forEach(f => {
                 if (!this.checkFileDuplicate(f.name) && this.isAllowedFileType(f.name)){
                     this.files.push(f);
@@ -295,28 +288,28 @@ Vue.component('datafile-import', {
     template: `
             <div class="datafile-import-component container-fluid mt-5 p-3">
 
-                <h3>Import data files</h3>                
+                <h3>{{$t("import_data_files")}}</h3>                
                 <div class="bg-white" >
 
                     <div class="form-container-x" >
 
-                        <p>Upload one or more data files. Supported file types are: Stata(.dta), SPSS(.sav) and CSV</p>
+                        <p>{{$t("upload_one_or_more_data_files")}}</p>
 
                         <div @drop.prevent="addFile" @dragover.prevent class="border p-2 mb-2 bg-light text-center">
                             <div class="p-4"><i style="font-size:40px;color:gray;" class="fas fa-upload"></i></div>
-                            <strong>Drag and drop data files here</strong>
+                            <strong>{{$t("drag_drop_data_files")}}</strong>
 
-                            <div class="mt-3">or</div>
+                            <div class="mt-3">{{$t("or")}}</div>
                             
                             <div class="custom-file" style="max-width:300px;">
                                 <input type="file" class="custom-file-input" id="customFile" multiple @change="handleMultiFileUpload( $event )" >
-                                <label class="custom-file-label" for="customFile">Choose files</label>
+                                <label class="custom-file-label" for="customFile">{{$t("choose_files")}}</label>
                             </div>
 
                         </div>
 
                         <div class="files-container mt-3 mb-3 p-2" v-if="files.length>0" >
-                            <h5 class="mb-1">{{files.length}} files selected</h5>
+                            <h5 class="mb-1">{{files.length}} {{$t("selected")}}</h5>
                             <div class="border row mt-2" v-for="(file,file_index) in files" :key="file.name">
                                 <div class="col-10" style="font-size:small;"><strong>{{ file.name }}</strong>  <div class="text-secondary">{{ file.size | kbmb }}</div> {{file.type}}</div>
                                 <div class="col-2"><button class="float-right" @click="removeFile(file_index)" title="Remove"><i class="fas fa-trash"></i></button> </div>
@@ -325,13 +318,13 @@ Vue.component('datafile-import', {
                         </div>
                                                 
                         <div xv-if="update_status==''">
-                            <button type="button" :disabled="!FilesCount>0" class="btn btn-primary" @click="processImport">Import files</button>
+                            <button type="button" :disabled="!FilesCount>0" class="btn btn-primary" @click="processImport">{{$t("import")}}</button>
                         </div>
                         
                     </div>
 
                     <div v-if="errors" class="p-3" style="color:red">
-                        <div><strong>Errors</strong></div>
+                        <div><strong>{{$t("errors")}}</strong></div>
                         {{errors}}
                         <div v-if="errors.response">{{errors.response.data.message}}</div>
                     </div>
@@ -348,7 +341,7 @@ Vue.component('datafile-import', {
             <v-dialog v-model="dialog_process" width="700" height="600" persistent>
                 <v-card>
                     <v-card-title class="text-h5 grey lighten-2">
-                    Importing data files
+                    {{$t("import_data_files")}}
                     </v-card-title>
 
                     <v-card-text>
@@ -357,7 +350,7 @@ Vue.component('datafile-import', {
 
                         <v-row class="mt-3 text-center" v-if="update_status=='completed' && errors==''">
                             <v-col class="text-center" >
-                                <i class="far fa-check-circle" style="font-size:24px;color:green;"></i> Data import completed                                
+                                <i class="far fa-check-circle" style="font-size:24px;color:green;"></i> {{$t("import_completed")}}                               
                             </v-col>
                         </v-row>
                 
@@ -406,7 +399,7 @@ Vue.component('datafile-import', {
                     <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn color="primary" text @click="dialogClose()">
-                        Close
+                    {{$t("close")}}
                     </v-btn>
                     </v-card-actions>
                 </v-card>

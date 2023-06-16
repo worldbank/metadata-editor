@@ -476,24 +476,7 @@ Vue.component('variables', {
                 }
             }
 
-        },
-        //function to compare two objects
-        // for props that are same, keep the value
-        // for props that are different, set to null
-        /*compareObjects: function(obj1,obj2){            
-            if (!obj2){           
-                return obj1;
-            }
-
-            let fields=Object.keys(obj1);
-            for(i=0;i<fields.length;i++){
-                let field=fields[i];
-                if (obj1[field]!==obj2[field]){
-                    obj1[field]=null;
-                }
-            }
-            return obj1;
-        },*/
+        },        
         variableActiveClass: function(idx,variable_name)
         {
             if (!variable_name){

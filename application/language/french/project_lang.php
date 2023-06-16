@@ -44,7 +44,6 @@ $lang['summary_stats']="Statistiques récapitulatives";
 $lang['failed_to_import_stats']="Échec de l'importation des statistiques récapitulatives";
 
 $lang['sum_stats_imported_success']="Statistiques récapitulatives importées avec succès";
-$lang['summary_stats_job_status']="Statut de la tâche de statistiques récapitulatives";
 
 $lang['change_case']="Changer la casse";
 $lang['spread_metadata']="Diffusion des métadonnées";
@@ -100,7 +99,13 @@ $lang['contin']="Continue";
 $lang['discrete']="Discrète";
 $lang['fixed']="Fixed";
 
-
+$lang['import_data_files']="Importer des fichiers de données";
+$lang['upload_one_or_more_data_files']="Téléchargez un ou plusieurs fichiers de données. Les types de fichiers pris en charge sont : Stata(.dta), SPSS(.sav) et CSV";
+$lang['drag_drop_data_files']="Faites glisser et déposez les fichiers de données ici";
+$lang['or']="Ou";
+$lang['choose_files']="Choisir des fichiers";
+$lang['browse']="Parcourir";
+$lang['import_completed']="Import terminé";
 
 /* End of file template_manager_lang.php */
 /* Location: ./application/language/base/template_manager_lang.php */

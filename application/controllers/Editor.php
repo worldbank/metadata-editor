@@ -32,7 +32,7 @@ class Editor extends MY_Controller {
 	function edit($id=null)
 	{
 		try{
-
+			$this->lang->load("project");
 			$project=$this->Editor_model->get_row($id);
 
 			if (!$project){
@@ -51,6 +51,7 @@ class Editor extends MY_Controller {
 			$options['title']=$project['title'];
 			$options['type']=$project['type'];		
 			$options['metadata']=$project['metadata'];
+			$options['translations']=$this->lang->language;
 
 			//fix schema elements with mixed types
 			if ($project['type']=='survey'){

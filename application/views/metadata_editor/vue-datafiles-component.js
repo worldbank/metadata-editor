@@ -225,10 +225,26 @@ Vue.component('datafiles', {
             this.page_action="list";
             this.edit_item=null;
         },
-        importSummaryStatistics: async function(file_id){
+        hasCsvFile: function (file_id){
+            for (let i=0;i<this.data_files.length;i++){
+                if (this.data_files[i].file_id==file_id){
+                    let file_=this.data_files[i];
 
+                    if (file_.file_info && file_.file_info.csv && file_.file_info.csv.file_exists && file_.file_info.csv.file_exists==true){
+                        return true;
+                    }
+                }
+            }
+            return false;
+        },
+        importSummaryStatistics: async function(file_id)
+        {                        
             if (!confirm(this.$t("confirm_import_summary_statistics"))){
                 return;
+            }
+
+            if (!this.hasCsvFile(file_id)){
+                await this.generateCSV(file_id);
             }
 
             this.dialog={
@@ -266,7 +282,7 @@ Vue.component('datafiles', {
             }
 
             this.dialog.is_loading=true;
-            this.dialog.title=this.$t("summary_stats_job_status");
+            this.dialog.title=this.$t("summary_stats");
             this.dialog.loading_message=this.$t("processing_please_wait");
             try{
                 await this.sleep(5000);
@@ -290,12 +306,8 @@ Vue.component('datafiles', {
         sleep: function(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
         },
-        generateCSV: async function(file_id){
-
-            if (!confirm("Are you sure you want to generate a CSV file for this file? This will overwrite any existing CSV file.")){
-                return;
-            }
-
+        generateCSV: async function(file_id)
+        {
             this.dialog={
                 show:true,
                 title:'Generate CSV file',
@@ -308,15 +320,15 @@ Vue.component('datafiles', {
             try{
                 let result=await this.$store.dispatch('generateCsvQueue',{file_id:file_id});
                 console.log("updated",result);
-                this.generateCsvQueueStatusCheck(file_id,result.data.job_id);
+                await this.generateCsvQueueStatusCheck(file_id,result.data.job_id);
             }catch(e){
                 console.log("failed",e);
                 this.dialog.is_loading=false;
                 this.dialog.message_error="Failed to generate CSV file: "+e.response.data.message;                
             }
         },
-        generateCsvQueueStatusCheck: async function(file_id,job_id){
-
+        generateCsvQueueStatusCheck: async function(file_id,job_id)
+        {
             this.dialog={
                 show:true,
                 title:'',
@@ -405,10 +417,10 @@ Vue.component('datafiles', {
                             <div>
                                 <button type="button" class="btn btn-sm btn-link ml-0 pl-0" @click="editFile(index)">{{data_file.file_name}}</button>
                                 <v-icon style="color:red;margin-top:-4px;" title="Physical file not found" v-if="!data_file.file_info.original">mdi-alert-circle</v-icon></div>
-                            <div class="text-secondary text-small" v-if="data_file.file_info.original">
-                                <span v-if="data_file.file_info.original.file_exists" class="mr-3">
+                            <div class="text-secondary text-small" v-if="data_file.file_info.original">                            
+                                <!-- <span v-if="data_file.file_info.original.file_exists" class="mr-3">
                                     <span>{{data_file.file_info.original.filename}}</span>
-                                    <span>{{data_file.file_info.original.file_size}}</span>
+                                    <span>{{data_file.file_info.original.file_size}}</span> -->
                                 </span>
                                 <span v-if="data_file.file_info.csv.file_exists" >{{data_file.file_info.csv.filename}} {{data_file.file_info.csv.file_size}}</span>
                             </div>
@@ -418,7 +430,7 @@ Vue.component('datafiles', {
                                 <router-link :to="'/data-explorer/' + data_file.file_id"><button type="button" class="btn btn-sm btn-default"><v-icon>mdi-table-eye</v-icon> {{$t("preview")}}</button></router-link>
                                 <span v-if="data_file.file_info.original">
                                 <button type="button" class="btn btn-sm btn-link ink ml-0 pl-0" @click="importSummaryStatistics(data_file.file_id)"><v-icon title="Refresh summary statistics" >mdi-update</v-icon> {{$t("refresh_stats")}}</button>
-                                <button type="button" class="btn btn-sm btn-link ink ml-0 pl-0" @click="generateCSV(data_file.file_id)"><v-icon title="Generate CSV" >mdi-file-delimited-outline</v-icon> {{$t("export_csv")}}</button>
+                                <!-- <button type="button" class="btn btn-sm btn-link ink ml-0 pl-0" @click="generateCSV(data_file.file_id)"><v-icon title="Generate CSV" >mdi-file-delimited-outline</v-icon> {{$t("export_csv")}}</button> -->
                                 </span>
                                 <button type="button" class="btn btn-sm btn-link ink ml-0 pl-0" @click="deleteFile(index)"><v-icon>mdi-delete-outline</v-icon>{{$t("remove")}}</button>
                                 <button type="button" class="btn btn-sm btn-link ink ml-0 pl-0" @click="replaceFile(index)"><v-icon>mdi-file-upload-outline</v-icon>{{$t("replace_file")}}</button>

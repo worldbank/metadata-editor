@@ -157,6 +157,22 @@ class Editor_datafile_model extends CI_Model {
 		return $csv_path;
 	}
 
+	/**
+	 * 
+	 * Check data file CSV exists
+	 * 
+	 */
+	function check_csv_exists($sid, $file_id)
+	{
+		try{
+			$csv_path=$this->get_file_csv_path($sid,$file_id);
+			return $csv_path;
+		}
+		catch(Exception $e){
+			return false;
+		}
+	}
+
 
 	function get_tmp_file_info($sid,$fid,$type)
 	{
