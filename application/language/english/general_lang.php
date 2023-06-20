@@ -80,7 +80,7 @@ $lang['oldest']=" Oldest ↓";
 $lang['title_az']="Title (A-Z)";
 $lang['title_za']="Title (Z-A)";
 
-$lang['']="";
+$lang['site_administration']="Site administration";
 $lang['']="";
 $lang['']="";
 $lang['']="";

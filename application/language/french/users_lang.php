@@ -2,7 +2,7 @@
 
 $lang['title_user_management']="Gestion des utilisateurs";
 $lang['create_user_account']="Créer un nouveau compte utilisateur";
-$lang['username']="Username";
+$lang['username']="Non d'utilisateur";
 $lang['email']="Adresse e-mail";
 $lang['first_name']="Prénom";
 $lang['last_name']="Nom de famille";
@@ -18,9 +18,9 @@ $lang['user_account_status']="Statut du compte utilisateur ?";
 $lang['user_active']="Actif";
 $lang['user_blocked']="Bloqué";
 $lang['select_user_group']="Sélectionner le groupe d'utilisateurs";
-$lang['remember']="Remember";
+$lang['remember']="Mémoriser";
 $lang['remember_me']="Se souvenir de moi";
-$lang['register']="Register";
+$lang['register']="S'enregistrer";
 $lang['forgot_password']="Mot de passe oublié";
 $lang['user_registration']="Enregistrement de l'utilisateur";
 $lang['captcha_question']="Question";
@@ -57,14 +57,14 @@ $lang['login']="Connexion";
 $lang['profile_updated']="Le profil a été mis à jour.";
 $lang['forgot_password_failed']="Échec de la réinitialisation de votre mot de passe, veuillez réessayer.";
 $lang['account_activation_successful']="Activation du compte réussie";
-$lang['activation_email_unsuccessful']="L'email d'activation n'a pas été envoyé.";
+$lang['activation_email_unsuccessful']="L'e-mail d'activation n'a pas été envoyé.";
 $lang['notification']="Notification";
 $lang['new_user_registration']="Enregistrement d'un nouvel utilisateur";
 $lang['new_user_registration_received']="Un nouvel enregistrement d'utilisateur a été reçu. Les détails de l'utilisateur sont :";
 $lang['thank_you_for_registration']="Merci de vous être inscrit sur le site Web <em>%s</em>. Pour terminer votre inscription et activer votre compte utilisateur, veuillez visiter l'URL suivante :";
 $lang['your_account_details']="Les détails de votre compte sont";
 $lang['do_not_reply_to_this_email']="NE PAS RÉPONDRE À CET E-MAIL";
-$lang['click_url_to_reset_password']="Pour réinitialiser votre mot de passe, cliquez sur le lien ci-dessous ou ouvrez l'url dans un navigateur Web";
+$lang['click_url_to_reset_password']="Pour réinitialiser votre mot de passe, cliquez sur le lien ci-dessous ou ouvrez le lien dans un navigateur Web";
 $lang['request_password_ignore']="Si vous n'avez pas demandé la réinitialisation du mot de passe, ignorez ce message.";
 $lang['enter_email_to_reset_password']="Veuillez saisir votre adresse e-mail afin que nous puissions vous envoyer un e-mail pour réinitialiser votre mot de passe.";
 $lang['password_is_sent']="Votre mot de passe a été réinitialisé et un nouveau mot de passe a été envoyé à votre adresse e-mail.";
@@ -75,7 +75,7 @@ $lang['forgot_password_verification']="Vérification du mot de passe oublié";
 $lang['account_activation']="Activation du compte";
 $lang['callback_country_invalid']="Le champ Pays est obligatoire.";
 $lang['log_in']="Connexion";
-$lang['site_login_privacy_terms']="Les informations que vous fournissez en vous inscrivant ou en vous connectant à notre catalogue seront utilisées conformément aux termes de la politique de confidentialité de l'ONS.";
+$lang['site_login_privacy_terms']="Les informations que vous fournissez en vous inscrivant ou en vous connectant à notre catalogue seront utilisées conformément aux termes de notre politique de confidentialité.";
 $lang['impersonate_user']="Se faire passer pour un autre utilisateur";
 $lang['impersonate_msg']="Sélectionnez le compte ci-dessous pour vous faire passer pour";
 $lang['general_user_accounts']="Comptes d'utilisateurs généraux (pas d'accès administrateur)";
@@ -96,6 +96,9 @@ $lang['api_keys']="Clés API";
 $lang['no_api_keys_found']="Aucune clé API trouvée.";
 $lang['generate_api_key']="Générer la clé API";
 
+$lang['profile']="Profil";
+$lang['password']="Mot de passe";
+$lang['logout']="Déconnexion";
 
 /* End of file users_lang.php */
 /* Location: ./application/language/english/users_lang.php */

@@ -83,21 +83,20 @@ Vue.component('project-package', {
         },
         async prepareProjectExport()
         {
-            this.project_export_status="Exporting metadata to JSON";
+            this.project_export_status=this.$t("exporting_to_json");
             await this.exportProjectJSON();
 
             if (this.ProjectType=='survey'){
-                this.project_export_status="Exporting metadata to DDI";
+                this.project_export_status=this.$t("exporting_ddi");
                 await this.exportProjectDDI();
                 //this.project_export_status="Exporting data files";
                 //await this.exportProjectDatafiles();
             }
             
-            this.project_export_status="Exporting external resources metadata as JSON";
+            this.project_export_status=this.$t("processing_please_wait");
             await this.exportExternalResourcesJSON();
-            this.project_export_status="Exporting external resources as RDF/XML ";
             await this.exportExternalResourcesRDF();
-            this.project_export_status="Creating project ZIP file";
+            this.project_export_status= this.$t("writing_zip");
             await this.writeProjectZip();
             this.project_export_status="done";
         },
@@ -192,15 +191,14 @@ Vue.component('project-package', {
         }
     },  
     template: `
-            <div class="import-options-component mt-5">
+            <div class="import-options-component p-3 mt-5">
             
-                <h3>Project package</h3>
+                <h3>{{$t("project_package")}}</h3>
                                 
-                <div>Create a zip package with all documentation</div>
+                <div>{{$t("project_package_note")}}</div>
 
-                <button :disabled="project_export_status!=''" type="button" class="mt-3 btn btn-primary" @click="downloadZip()">Download zip package</button>
+                <button :disabled="project_export_status!=''" type="button" class="mt-3 btn btn-primary" @click="downloadZip()">{{$t("download_zip_package")}}</button>
                 <span v-if="project_export_status!='done' && project_export_status!=''"><i class="fas fa-circle-notch fa-spin"></i> {{project_export_status}}</span>
-
 
             </div>          
             `    

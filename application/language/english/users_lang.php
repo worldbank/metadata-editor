@@ -96,6 +96,10 @@ $lang['api_keys']="API keys";
 $lang['no_api_keys_found']="No API keys found.";
 $lang['generate_api_key']="Generate API key";
 
+$lang['profile']="Profile";
+$lang['password']="Password";
+$lang['logout']="Logout";
+
 
 
 /* End of file users_lang.php */

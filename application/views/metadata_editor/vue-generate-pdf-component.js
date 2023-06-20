@@ -71,17 +71,17 @@ Vue.component('generate-pdf', {
         }
     },  
     template: `
-            <div class="import-options-component mt-5">
+            <div class="import-options-component p-3 mt-5">
             
-                <h3>PDF documentation</h3>
+                <h3>{{$t("pdf_documentation")}}</h3>
                                 
-                <div>Generate PDF documentation for the project</div>
+                <div>{{$t("pdf_documentation_note")}}</div>
 
-                <button :disabled="is_processing" type="button" class="mt-3 btn btn-primary" @click="generatePDF()">Generate PDF</button>
-                <span v-if="is_processing"><i class="fas fa-circle-notch fa-spin"></i> Generating PDF documentation...</span>
+                <button :disabled="is_processing" type="button" class="mt-3 btn btn-primary" @click="generatePDF()">{{$t("generate_pdf")}}</button>
+                <span v-if="is_processing"><i class="fas fa-circle-notch fa-spin"></i> {{$t("processing_please_wait")}}</span>
 
                 <div class="mt-5" v-if="pdf_info">
-                    <button type="button" class="btn btn-outline-primary" @click="downloadPDF()">Download PDF</button>
+                    <button type="button" class="btn btn-outline-primary" @click="downloadPDF()">{{$t("download_pdf")}}</button>
                     <span class="text-secondary text-muted">Created {{momentAgo(pdf_info.created)}}, Size: {{pdf_info.file_size}}</span>
                 </div>
 

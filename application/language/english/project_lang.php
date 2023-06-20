@@ -43,7 +43,6 @@ $lang['confirm_import_summary_statistics']="Are you sure you want to import summ
 $lang['summary_stats']="Summary statistics";
 
 $lang['sum_stats_imported_success']="Summary statistics imported successfully";
-$lang['summary_stats_job_status']="Summary statistics job status";
 
 $lang['failed_to_import_stats']="Failed to import summary statistics";
 $lang['change_case']="Change case";
@@ -98,6 +97,65 @@ $lang['string']="String";
 $lang['contin']="Continuous";
 $lang['discrete']="Discrete";
 $lang['fixed']="Fixed";
+
+
+$lang['import_data_files']="Import data files";
+$lang['upload_one_or_more_data_files']="Upload one or more data files. Supported file types are: Stata(.dta), SPSS(.sav) and CSV";
+$lang['drag_drop_data_files']="Drag and drop data files here";
+$lang['or']="Or";
+$lang['choose_files']="Choose files";
+$lang['browse']="Browse";
+$lang['import_completed']="Import completed";
+
+$lang['project']="Project";
+$lang['export_package_zip']="Export package (ZIP)";
+$lang['publish_to_nada']="Publish to NADA";
+$lang['pdf_documentation']="PDF documentation";
+$lang['project_package']="Project package";
+$lang['download_zip_package']="Download zip package";
+$lang['exporting_to_json']="Exporting metadata to JSON";
+$lang['exporting_ddi']="Exporting metadata to DDI";
+$lang['writing_zip']="Writing zip file";
+$lang['project_package_note']="Create zip package with all documentation";
+
+$lang['metadata']="Metadata";
+$lang['import_project_metadata']="Import project metadata";
+$lang['import_external_resources']="Import external resources";
+$lang['export_ddi']="Export DDI";
+$lang['export_json']="Export JSON";
+$lang['export_external_resources']="Export external resources";
+$lang['publish_to_nada_note']="Publish project directly to a NADA catalog";
+$lang['catalog']="Catalog";
+$lang['configure_catalog']="Configure new catalog";
+
+$lang['project_options']="Project options";
+$lang['option']="Option";
+$lang['options']="Options";
+$lang['value']="Value";
+
+$lang['overwrite']="Overwrite";
+$lang['publish']="Publish";
+$lang['data_access']="Data access";
+
+$lang['select_external_resources_to_be_published']="Select external resources to publish";
+$lang['overwrite_resources']="Overwrite resources";
+$lang['n_resources_found']="resources found";
+$lang['n_selected']="selected";
+$lang['no_external_resources_found']="No external resources found";
+$lang['external_resources']="External resources";
+$lang['publish_project']="Publish project";
+$lang['publish_thumbnail']="Publish thumbnail";
+
+
+$lang['download_pdf']="Download PDF";
+$lang['generate_pdf']="Generate PDF";
+$lang['pdf_documentation_note']="Generate PDF documentation for the project";
+$lang['']="";
+$lang['']="";
+$lang['']="";
+$lang['']="";
+$lang['']="";
+
 
 
 

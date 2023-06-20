@@ -8,6 +8,7 @@ Vue.component('publish-options', {
             toggle_resources_selected:false,
             resources_overwrite:"no",
             publish_metadata:true,
+            dialog_process:false,
             publish_thumbnail:true,
             publish_resources:true,
             catalog_connections:[],
@@ -94,7 +95,8 @@ Vue.component('publish-options', {
                 }
             };
         },
-        toggleSelectedResources: function(){
+        toggleSelectedResources: function()
+        {
             this.resources_selected = [];
             if (this.toggle_resources_selected == true) {                
                 for (i = 0; i < this.ExternalResources.length; i++) {
@@ -102,7 +104,9 @@ Vue.component('publish-options', {
                 }
             }
         },
-        publishToCatalog: async function(){
+        publishToCatalog: async function()
+        {
+            this.dialog_process=true;
             let formData=this.PublishOptions;
             vm=this;
 
@@ -398,15 +402,15 @@ Vue.component('publish-options', {
     template: `
             <div class="import-options-component mt-5 p-5">
                             
-                <h3>Publish project</h3>
-                <p>Publish project directly to a NADA catalog</p>
+                <h3>{{$t("publish_to_nada")}}</h3>
+                <p>{{$t("publish_to_nada_note")}}</p>
                 <div>
 
                 <v-card class="p-3 mb-5"
                     elevation="2"
                 >
                         <div class="form-group" elevation="10">
-                            <label for="catalog_id">Select Catalog <router-link class="btn btn-sm btn-link" to="/configure-catalog">Configure new catalog</router-link></label>
+                            <label for="catalog_id">{{$t("catalog")}} <router-link class="btn btn-sm btn-link" to="/configure-catalog">{{$t("configure_catalog")}}</router-link></label>
                             <select class="form-control" id="catalog_id" v-model="catalog" @change="getCollections">
                                 <option value="">-Select-</option>
                                 <option v-for="option in catalog_connections" v-bind:value="option.id">
@@ -421,7 +425,7 @@ Vue.component('publish-options', {
                 <v-expansion-panels multiple v-model="panels">
                     <v-expansion-panel>
                         <v-expansion-panel-header>
-                            Project options
+                            {{$t("project_options")}}
                         </v-expansion-panel-header>
                         <v-expansion-panel-content>
 
@@ -429,8 +433,8 @@ Vue.component('publish-options', {
                             
                             <table class="table table-sm table-bordered table-hover table-striped mb-0 pb-0" style="font-size:small;">
                                 <tr>
-                                    <th>Option</th>
-                                    <th>Value</th>
+                                    <th>{{$t("option")}}</th>
+                                    <th>{{$t("value")}}</th>
                                 </tr>
                                 <template v-for="(kv,kv_key) in publish_options">                                            
                                 <tr v-if="!kv.custom">
@@ -451,7 +455,7 @@ Vue.component('publish-options', {
                                 </tr>                                            
                                 </template>
                                 <tr>
-                                    <td>Collection</td>
+                                    <td>{{$t("collection")}}</td>
                                     <td>
                                         <select v-if="collections" class="form-control" v-model="publish_options.repositoryid.value">
                                             <option value="">N/A</option>
@@ -470,8 +474,8 @@ Vue.component('publish-options', {
 
                     <v-expansion-panel>
                         <v-expansion-panel-header>
-                            <div>External resources
-                            <div class="text-secondary text-muted text-xs text-small text-normal">select external resources to be published</div>
+                            <div>{{$t("external_resources")}}
+                                <div class="text-secondary text-muted text-xs text-small text-normal">{{$t("select_external_resources_to_be_published")}}</div>
                             </div>
                             
                         </v-expansion-panel-header>
@@ -480,22 +484,22 @@ Vue.component('publish-options', {
                                     <v-switch
                                     v-model="resources_overwrite"
                                     value="yes"
-                                    label="Overwrite resources"
+                                    :label="$t('overwrite_resources')"
                                 ></v-switch>
                             </div>
                             
                             <div v-if="ExternalResources.length>0" >
                                 <div>
-                                    <strong>{{ExternalResources.length}}</strong> resources found
-                                    <span class="ml-2"><strong>{{resources_selected.length}}</strong> selected</span>
+                                    <strong>{{ExternalResources.length}}</strong> {{$t("n_resources_found")}}
+                                    <span class="ml-2"><strong>{{resources_selected.length}}</strong> {{$t("n_selected")}}</span>
                                 </div>
                                 <div class="border" style="max-height:300px;overflow:auto;">                    
                                     <table class="table table-sm table-striped">
                                         <thead>
                                         <tr class="bg-light">
                                             <th><input type="checkbox" v-model="toggle_resources_selected" @change="toggleSelectedResources"></th>
-                                            <th>Title</th>
-                                            <th>Type</th>
+                                            <th>{{$t("title")}}</th>
+                                            <th>{{$t("type")}}</th>
                                         </tr>
                                         </thead>
                                         <tr v-for="(resource,resource_index) in ExternalResources" :key="resource.id">
@@ -510,7 +514,7 @@ Vue.component('publish-options', {
                                 </div>
                             </div>
                             <div v-else class="alert alert-warning">
-                                No external resources found
+                            {{$t("no_external_resources_found")}}
                             </div>
                         </v-expansion-panel-content>
                     </v-expansion-panel>
@@ -519,104 +523,134 @@ Vue.component('publish-options', {
 
                                             
                     <div class=" mb-3 mt-5 switch-control">
-                        <div><strong>Options</strong></div>
+                        <div><strong>{{$t("options")}}</strong></div>
                         
                             <v-switch
                                 v-model="publish_metadata"
                                 :value="true"
-                                label="Publish project"
+                                :label="$t('publish_project')"
                             ></v-switch>
                             
                             <v-switch
                                 v-model="publish_thumbnail"
                                 :value="true"
-                                label="Publish thumbnail"
+                                :label="$t('publish_thumbnail')"
                             ></v-switch>
                             
                             <v-switch
                                 v-model="publish_resources"
                                 :value="true"
-                                :label="'External resources' + (resources_selected.length>0?' ('+resources_selected.length+')':'')"
+                                :label="$t('external_resources') + (resources_selected.length>0?' ('+resources_selected.length+')':'')"
                             ></v-switch>
                            
                     </div>
 
-                    <button :disabled="!catalog || is_publishing==true" type="button" class="btn btn-primary" @click="publishToCatalog()">Publish</button>
-
-                    <div v-if="is_publishing">
-                        <div class="border p-3 mt-5 mb-5">
-                            <div><strong>Update status</strong></div>
-                            <template>
-                                <div>{{publish_processing_message}}...</div>
-                                <v-progress-linear
-                                indeterminate
-                                color="blue"
-                                ></v-progress-linear>
-                            </template>
-                        </div>                        
-                    </div>                    
-                    
+                    <button :disabled="!catalog || is_publishing==true" type="button" class="btn btn-primary" @click="publishToCatalog()">{{$t("publish")}}</button>
                 </div>
 
-                <v-card v-if="is_publishing_completed" class="mt-5 p-3">
-                    <h5 class="mb-5">Publishing summary report</h5>
+                
 
-                    <div v-if="publish_metadata==true">
-                        <strong>Project metadata</strong>
-                        <div v-if="publish_responses.metadata.errors.length>0">
-                            <span class="mdi mdi-alert text-danger"></span>
-                            <span>Failed to publish project metadata</span>
-                            <div class="border-bottom m-1 text-danger" v-for="(response,response_index) in publish_responses.metadata.errors">
-                                <div>{{response.message}} - {{response.status}}</div>
-                            </div>    
-                        </div>
-                        <div v-else>
-                            <div class="border m-1 text-success" >
-                                <div>
-                                    <span class="mdi mdi-check-circle text-success"></span>
-                                    <span>Project metadata updated successfully</span>
-                                </div>
+
+                <!-- dialog -->
+                <v-dialog v-model="dialog_process" width="500" height="300" persistent>
+                    <v-card>
+                        <v-card-title class="text-h5 grey lighten-2">
+                            <div class="text-h5">{{$t('publish_project')}}</div>
+                        </v-card-title>
+
+                        <v-card-text>
+                        <div>
+                            <!-- card text -->
+                            <!-- show-status -->
+                            <div v-if="is_publishing">
+                                <div class="border p-3 mt-5 mb-5">
+                                    <div><strong>Update status</strong></div>
+                                    <template>
+                                        <div>{{publish_processing_message}}...</div>
+                                        <v-progress-linear
+                                        indeterminate
+                                        color="blue"
+                                        ></v-progress-linear>
+                                    </template>
+                                </div>                        
                             </div>
-                        </div>
-                    </div>
+                            <!-- end show-status --> 
+                            
+                            <div v-if="is_publishing_completed" class="p-2">
 
-                    <div v-if="publish_thumbnail==true" class="mt-5">
-                        <strong>Thumbnail</strong>
-                        <div v-if="publish_responses.thumbnail.errors.length>0">
-                            <span class="mdi mdi-alert text-danger"></span>
-                            <span>Failed to publish thumbnail</span>
-                            <div class="border m-1 text-danger" v-for="(response,response_index) in publish_responses.thumbnail.errors">
-                                <div>{{response.message}} - {{response.status}}</div>
-                            </div>    
-                        </div>
-                        <div v-if="publish_responses.thumbnail.messages.length>0" >                            
-                            <div class="border-bottom m-1" v-for="message in publish_responses.thumbnail.messages">
-                                <div class="text-success">
-                                <span class="mdi mdi-check-circle text-success"></span> {{message}}
-                                </div>                                
-                            </div>    
-                        </div>                       
-                    </div>
+                                <div v-if="publish_metadata==true">
+                                    <strong>{{$t('metadata')}}</strong>
+                                    <div v-if="publish_responses.metadata.errors.length>0">
+                                        <span class="mdi mdi-alert text-danger"></span>
+                                        <span>Failed to publish project metadata</span>
+                                        <div class="border-bottom m-1 text-danger" v-for="(response,response_index) in publish_responses.metadata.errors">
+                                            <div>{{response.message}} - {{response.status}}</div>
+                                        </div>    
+                                    </div>
+                                    <div v-else>
+                                        <div class="border m-1 text-success" >
+                                            <div>
+                                                <span class="mdi mdi-check-circle text-success"></span>
+                                                <span>Project metadata updated successfully</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
-                    <div v-if="resources_selected.length>0" class="mt-5">
-                        <strong>External resources</strong>
-                        <div v-if="publish_responses.external_resources.messages.length>0" >                            
-                            <div class="border-bottom m-1" v-for="message in publish_responses.external_resources.messages">
-                                <div>
-                                <span class="mdi mdi-check-circle text-success"></span> {{message}}
-                                </div>                                
-                            </div>    
-                        </div>
-                        <div v-if="publish_responses.external_resources.errors.length>0" >
-                            <div class="border-bottom m-1" v-for="(response,response_index) in publish_responses.external_resources.errors">
-                                <div><span class="mdi mdi-alert text-danger"></span>
-                                {{response.resource_title}}</div>
-                                <div class="text-danger">Error: {{response.error.data.message}}</div>                            
-                            </div>    
-                        </div>
-                    </div>                    
+                                <div v-if="publish_thumbnail==true" class="mt-5">
+                                    <strong>{{$t('thumbnail')}}</strong>
+                                    <div v-if="publish_responses.thumbnail.errors.length>0">
+                                        <span class="mdi mdi-alert text-danger"></span>
+                                        <span>Failed to publish thumbnail</span>
+                                        <div class="border m-1 text-danger" v-for="(response,response_index) in publish_responses.thumbnail.errors">
+                                            <div>{{response.message}} - {{response.status}}</div>
+                                        </div>    
+                                    </div>
+                                    <div v-if="publish_responses.thumbnail.messages.length>0" >                            
+                                        <div class="border-bottom m-1" v-for="message in publish_responses.thumbnail.messages">
+                                            <div class="text-success">
+                                            <span class="mdi mdi-check-circle text-success"></span> {{message}}
+                                            </div>                                
+                                        </div>    
+                                    </div>                       
+                                </div>
 
-                </v-card>
+                                <div v-if="resources_selected.length>0" class="mt-5">
+                                    <strong>External resources</strong>
+                                    <div v-if="publish_responses.external_resources.messages.length>0" >                            
+                                        <div class="border-bottom m-1" v-for="message in publish_responses.external_resources.messages">
+                                            <div>
+                                            <span class="mdi mdi-check-circle text-success"></span> {{message}}
+                                            </div>                                
+                                        </div>    
+                                    </div>
+                                    <div v-if="publish_responses.external_resources.errors.length>0" >
+                                        <div class="border-bottom m-1" v-for="(response,response_index) in publish_responses.external_resources.errors">
+                                            <div><span class="mdi mdi-alert text-danger"></span>
+                                            {{response.resource_title}}</div>
+                                            <div class="text-danger">Error: {{response.error.data.message}}</div>                            
+                                        </div>    
+                                    </div>
+                                </div>                    
+
+                            </div>
+                            
+                            <!-- end card text -->
+                        </div>
+                        </v-card-text>
+
+                        <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn color="primary" text @click="dialog_process=false" v-if="is_publishing==false">
+                        {{$t('close')}}
+                        </v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-dialog>
+                <!-- end dialog -->
+
+
+
                 
             </div>          
             `    

@@ -38,33 +38,33 @@
 
             <div class="dropdown">
                 <a class="btn btn-link dropdown-toggle" href="#" role="button" id="dropdownProjectMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="far fa-folder-open"></i> Project
+                    <i class="far fa-folder-open"></i> <?php echo t("project");?>
                 </a>
 
                 <div class="dropdown-menu" aria-labelledby="dropdownProjectMenu">
                     <a class="dropdown-item" href="#/project-package">
-                        <span style="font-size:20px;" class="mdi mdi-package-down"></span> Export package (zip)</a>
+                        <span style="font-size:20px;" class="mdi mdi-package-down"></span> <?php echo t("export_package_zip");?></a>
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="#/publish">
-                        <span style="font-size:20px;" class="mdi mdi-arrow-top-right-thick"></span> Publish to NADA</a>
+                        <span style="font-size:20px;" class="mdi mdi-arrow-top-right-thick"></span> <?php echo t("publish_to_nada");?></a>
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#/generate-pdf"><span style="font-size:20px;" class="mdi mdi-file-pdf-box"></span> PDF Documentation</a>
+                    <a class="dropdown-item" href="#/generate-pdf"><span style="font-size:20px;" class="mdi mdi-file-pdf-box"></span> <?php echo t("pdf_documentation");?></a>
                 </div>
             </div>
 
             <div class="dropdown">
                 <a class="btn btn-link dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="fas fa-random"></i> Metadata
+                    <i class="fas fa-random"></i> <?php echo t("metadata");?>
                 </a>
 
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                    <a class="dropdown-item" href="#/import"><i class="fas fa-file-invoice"></i> Import project metadata</a>
-                    <a class="dropdown-item" href="#/external-resources/import"><i class="fas fa-clone"></i> Import external resources</a>
+                    <a class="dropdown-item" href="#/import"><i class="fas fa-file-invoice"></i> <?php echo t("import_project_metadata");?></a>
+                    <a class="dropdown-item" href="#/external-resources/import"><i class="fas fa-clone"></i> <?php echo t("import_external_resources");?></a>
                     <div class="dropdown-divider"></div>
-                    <a v-if="dataset_type=='survey'" class="dropdown-item" :href="'<?php echo site_url('api/editor/ddi/'); ?>' + dataset_id" target="_blank"><i class="far fa-file-alt"></i> Export DDI CodeBook (2.5)</a>
-                    <a class="dropdown-item" :href="'<?php echo site_url('api/editor/json/'); ?>' + dataset_id" target="_blank"><i class="far fa-file-code"></i> Export JSON</a>
-                    <a class="dropdown-item" :href="'<?php echo site_url('api/resources/rdf/'); ?>' + dataset_id" target="_blank"><i class="far fa-file-alt"></i> Export External Resouces (RDF/XML)</a>
-                    <a class="dropdown-item" :href="'<?php echo site_url('api/resources/'); ?>' + dataset_id" target="_blank"><i class="far fa-file-alt"></i> Export External Resources (JSON)</a>
+                    <a v-if="dataset_type=='survey'" class="dropdown-item" :href="'<?php echo site_url('api/editor/ddi/'); ?>' + dataset_id" target="_blank"><i class="far fa-file-alt"></i> <?php echo t("export_ddi");?></a>
+                    <a class="dropdown-item" :href="'<?php echo site_url('api/editor/json/'); ?>' + dataset_id" target="_blank"><i class="far fa-file-code"></i> <?php echo t("export_json");?></a>
+                    <a class="dropdown-item" :href="'<?php echo site_url('api/resources/rdf/'); ?>' + dataset_id" target="_blank"><i class="far fa-file-alt"></i> <?php echo t("export_external_resources");?> (RDF/XML)</a>
+                    <a class="dropdown-item" :href="'<?php echo site_url('api/resources/'); ?>' + dataset_id" target="_blank"><i class="far fa-file-alt"></i> <?php echo t("export_external_resources");?> (JSON)</a>
                 </div>
             </div>
 

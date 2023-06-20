@@ -15,17 +15,17 @@ $lang['author']="Auteur";
 
 
 $lang['microdata']="Microdonnées";
-$lang['timeseries']="Timeseries";
-$lang['geospatial']="Géospatial";
-$lang['script']="Script";
+$lang['timeseries']="Séries temporelles";
+$lang['geospatial']="Données géographiques";
+$lang['script']="Code";
 $lang['document']="Document";
-$lang['table']="Table";
+$lang['table']="Tableau";
 $lang['image']="Image";
 $lang['video']="Vidéo";
 $lang['external-resources']="Ressources externes";
 $lang['timeseries-db']="Base de données de séries temporelles";
 
-$lang['core']="Core";
+$lang['core']="Système";
 $lang['custom']="Personnalisé";
 
 $lang['duplicate']="Dupliquer";
@@ -43,7 +43,7 @@ $lang['field']="Champ";
 
 $lang['required']="Required";
 $lang['recommended']="Recommandé";
-$lang['required']="Required";
+$lang['required']="Requis";
 
 $lang['na']="N/A";
 $lang['json']="JSON";
@@ -61,7 +61,7 @@ $lang['failed_to_save']="Échec de l'enregistrement de vos modifications";
 $lang['select_file']="Sélectionner un fichier";
 $lang['invalid_file_failed_to_read']="Fichier invalide, échec de lecture du fichier !";
 
-$lang['form_update_success']="Your changes have been saved";
+$lang['form_update_success']="Vos changements ont été enregistrés";
 
 $lang['template']="Modèle";
 $lang['templates']="Modèles";
@@ -79,3 +79,5 @@ $lang['recent']=" Récent ↑";
 $lang['oldest']=" Le plus ancien ↓";
 $lang['title_az']="Titre (A-Z)";
 $lang['title_za']="Titre (Z-A)";
+
+$lang['site_administration']="Administration du site";
