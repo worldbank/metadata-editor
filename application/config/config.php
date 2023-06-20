@@ -81,7 +81,26 @@ $config['url_suffix'] = '';
 $config['language']	= "english";
 
 //List of supported languages. type language name in lower case
-$config['supported_languages']=array();//array("english","french","arabic","russian","spanish","mongolian");
+$config['supported_languages']=array("english","french");//array("english","french","arabic","russian","spanish","mongolian");
+
+$config['language_codes']=[
+    'english'=>
+        [
+            'name'=>'English',
+            'language_file'=>'english',
+            'display'=>'English',
+            'code'=>'en',
+            'direction'=>'ltr'
+        ],
+    'french'=>
+        [
+            'name'=>'French',
+            'language_file'=>'french',
+            'display'=>'Français',
+            'code'=>'fr',
+            'direction'=>'ltr'
+        ],
+];
 
 /*
 |--------------------------------------------------------------------------
@@ -231,7 +250,7 @@ $config['directory_trigger'] = 'd';
 | your log files will fill up very fast.
 |
 */
-$config['log_threshold'] = 0;
+$config['log_threshold'] = 1;
 
 /*
 |--------------------------------------------------------------------------
