@@ -14,6 +14,7 @@ class Editor extends MY_Controller {
 		$this->load->model('Editor_model');
 		$this->load->model('Editor_template_model');
 		$this->load->library("Editor_acl");
+		$this->lang->load("users");
 		$this->lang->load("general");
 		$this->lang->load("template_manager");		
 	}
