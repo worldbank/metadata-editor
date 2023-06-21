@@ -213,6 +213,17 @@ class Editor_template_model extends ci_model {
 		return $this->db->get('editor_templates')->row_array();
 	}
 
+	function check_uid_exists($uid)
+	{
+		$this->db->select('uid');
+		$this->db->where('uid',$uid);
+		$result=$this->db->get('editor_templates')->row_array();
+
+		if (isset($result['uid'])){
+			return true;
+		}
+		return false;
+	}
 
     function delete($uid)
 	{		
@@ -273,10 +284,18 @@ class Editor_template_model extends ci_model {
 			throw new Exception("Template::Data type is not set");
 		}
 
-		if (isset($template_options['uid'])){
+		if (!isset($template_options['uid'])){
 			$template_options["uid"]=md5($template_options['data_type'].'-'.mt_rand());
 		}
-		
+		else{
+			$exists=$this->check_uid_exists($template_options['uid']);
+
+			if ($exists==true){
+				throw new Exception("Template with UID already exists");
+			}
+		}
+
+
 		if (isset($template_options['template'])){
 			$template_options['template']=json_encode($template_options['template']);
 		}
