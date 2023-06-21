@@ -81,3 +81,5 @@ $lang['title_az']="Titre (A-Z)";
 $lang['title_za']="Titre (Z-A)";
 
 $lang['site_administration']="Administration du site";
+$lang['imported_successfully']="Importé avec succès !";
+$lang['failed']="Échec";

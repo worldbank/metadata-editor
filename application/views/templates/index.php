@@ -62,7 +62,7 @@
                 <div class=" mb-5">
                   <h2>{{$t('template_manager')}}</h2>
                   <div class="pull-right float-right">
-                    <button type="button" @click="dialog_import_template=true" class="btn btn-sm btn-outline-primary">{{$t('import_template')}}</button>
+                    <button type="button" @click="showImportTemplateDialog" class="btn btn-sm btn-outline-primary">{{$t('import_template')}}</button>
                   </div>
                 </div>
 
@@ -244,6 +244,7 @@
           "script": "fa fa-file-code"
         },
         dialog_import_template: false,
+        template_import_errors:[],
         dialog_import: {},
         templateFile: '',
         importJSON: ''
@@ -398,22 +399,32 @@
           projectIcon = this.project_types_icons[type];
           return projectIcon;
         },
+        showImportTemplateDialog: function(){
+          this.dialog_import_template=true;
+          this.template_import_errors=[];
+        },
         importTemplate: function() {
           let formData = this.importJSON;
 
           vm = this;
-          this.errors = '';
+          this.template_import_errors = [];
           let url = CI.base_url + '/api/templates/create'
 
           axios.post(url,
               formData, {}
             ).then(function(response) {
               vm.loadTemplates();
-              alert("Template imported successfully!");
+              alert(vm.$t("imported_successfully"));
               vm.dialog_import_template = false;
             })
             .catch(function(response) {
-              vm.errors = response;
+              console.log("failed",response);
+              let error_message=vm.$t('failed');
+              if (response.response.data.message){
+                error_message+=" - " + response.response.data.message
+              }
+              alert(error_message);
+              vm.template_import_errors = response;
             });
         },
         handleTemplateUpload(event) {
