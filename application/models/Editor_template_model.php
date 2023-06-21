@@ -255,10 +255,18 @@ class Editor_template_model extends ci_model {
 
 		$template_options=array();
 
+		if (isset($options['result']['template'])){
+			$options=$options['result'];
+		}
+
 		foreach($options as $key=>$value){
 			if (in_array($key,$this->fields)){
 				$template_options[$key]=$value;
 			}
+		}
+
+		if (isset($template_options['id'])){
+			unset($template_options["id"]);
 		}
 
 		if (!isset($template_options['data_type'])){
