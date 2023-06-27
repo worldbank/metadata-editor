@@ -24,6 +24,10 @@ Vue.component('editor-date-field', {
     },
     computed:{
       Value(){
+        if (!this.value){
+          return null;
+        }
+
         return this.momentDate(this.value);
       }
     },
