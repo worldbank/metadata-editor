@@ -197,6 +197,7 @@ class Data extends MY_REST_Controller
 				'status'=>'success',
 				'params'=>$dict_params,
 				'file'=>realpath($datafile_path),
+				'request'=> isset($api_response['request']) ? $api_response['request'] :''
 				//'job_id'=>$api_response['job_id']
 			);
 			$output=array_merge($output,$api_response['response']);

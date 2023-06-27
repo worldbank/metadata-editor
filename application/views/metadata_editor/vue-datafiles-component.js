@@ -119,6 +119,7 @@ Vue.component('datafiles', {
             }
             
             let vm=this;
+            
             this.selected_files.forEach(function(file_id){
                 let file_idx=vm.data_files.findIndex(function(item){return item.file_id==file_id});
                 vm.deleteFile(file_idx,true);
@@ -204,9 +205,6 @@ Vue.component('datafiles', {
 
             axios.post(url, 
                 form_data
-                /*headers: {
-                    "name" : "value"
-                }*/
             )
             .then(function (response) {
                 vm.data_files.splice(file_idx, 1);
@@ -214,11 +212,9 @@ Vue.component('datafiles', {
             .catch(function (error) {
                 console.log(error);
                 alert("Failed to delete: "+ error.message);
-            })
-            .then(function () {
-                console.log("request completed");
             });
-
+            
+            vm.data_files.splice(file_idx, 1);
         },
         exitEditMode: function()
         {

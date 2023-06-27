@@ -185,6 +185,7 @@ class DataUtils
 		$response=json_decode($api_response->getBody()->getContents(),true);
 		return [
 			'response'=>$response,
+			'request'=>$request_body,
 			'status_code'=>$api_response->getStatusCode() //e.g. 200
 		];
 	}

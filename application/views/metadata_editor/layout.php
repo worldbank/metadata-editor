@@ -57,7 +57,7 @@
                     <i class="fas fa-random"></i> <?php echo t("metadata");?>
                 </a>
 
-                <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
                     <a class="dropdown-item" href="#/import"><i class="fas fa-file-invoice"></i> <?php echo t("import_project_metadata");?></a>
                     <a class="dropdown-item" href="#/external-resources/import"><i class="fas fa-clone"></i> <?php echo t("import_external_resources");?></a>
                     <div class="dropdown-divider"></div>

@@ -5,11 +5,13 @@ class Editor_DDI_Writer
     private $data;
     private $writer;
     private $ci;
+    private $sid;
 
     public function __construct()
     {
         $this->ci =& get_instance();
         $this->ci->load->model('Editor_datafile_model');
+        $this->ci->load->model("Editor_variable_model");
     }
 
 
@@ -114,6 +116,7 @@ class Editor_DDI_Writer
         //$this->ci->load->model("Variable_group_model");        
 
         $dataset=$this->ci->Editor_model->get_row($id);
+        $this->sid=$id;
 
         if (!$dataset['type']=='survey'){
             throw new Exception('Project type is not `survey`:: '. $id . ' - ' . $dataset['type']);
@@ -299,6 +302,37 @@ class Editor_DDI_Writer
         return ($result->saveXML($result->documentElement));
     }
 
+    //is weight variable?
+    function get_is_var_wgt($var){
+
+        if (isset($var['var_wgt']) && (int)$var['var_wgt']==1){
+            return 'wgt';
+        }
+        return '';
+    }
+
+    //has weight applied
+    function get_var_wgt($var){
+
+        if (!isset($var['var_wgt_id']) ){
+            return '';
+        }
+        
+        if (strtolower(substr($var['var_wgt_id'],0,1))=='v'){
+            return $var['var_wgt_id'];
+        }else{
+            $result=$this->ci->Editor_variable_model->vid_by_uid($this->sid,$var['var_wgt_id']);
+
+            if ($result){
+                return $result;
+            }
+        }
+
+        return '';
+    }
+
+    
+
     function get_var_desc_xml($data)
     {
         $var = new \Adbar\Dot($data);
@@ -312,6 +346,9 @@ class Editor_DDI_Writer
                 'files'=>$var['file_id'],
                 'dcml'=>$var['var_dcml'],
                 'intrvl'=>$var['var_intrvl'],
+                'wgt'=> $this->get_is_var_wgt($var),
+                'wgt-var'=>$this->get_var_wgt($var),
+
             ],
 
             'varFormat'=>[
@@ -367,10 +404,12 @@ class Editor_DDI_Writer
 
         //catgry
         $categories=new \Adbar\Dot($var->get('var_catgry'));
+        $categories_value_labels=$this->get_var_categories_value_labels_indexed($var->get('var_catgry_labels'));
+
         foreach($categories->all() as $idx=>$cat){
             $output->set([
                 'catgry.'.$idx.'.catValu'=> $categories["{$idx}.value"],
-                'catgry.'.$idx.'.labl'=> $categories["{$idx}.labl"],
+                'catgry.'.$idx.'.labl'=> isset($categories_value_labels->{$categories["{$idx}.value"]}) ? $categories_value_labels->{$categories["{$idx}.value"]} : '',
                 'catgry.'.$idx.'.catStat'=>[                    
                     '_attributes'=>[
                         'type'=>$sumstats["{$idx}.type"],
@@ -388,4 +427,12 @@ class Editor_DDI_Writer
         return ($result->saveXML($result->documentElement));
     }
 
+    function get_var_categories_value_labels_indexed($var_catgry_labels)
+    {
+        $result=new stdClass();
+        foreach($var_catgry_labels as $label){
+            $result->{$label['value']}=isset($label['labl']) ? $label['labl'] : '';
+        }        
+        return $result;        
+    }
 }

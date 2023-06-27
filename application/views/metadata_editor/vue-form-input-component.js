@@ -177,7 +177,8 @@ Vue.component('form-input', {
                         <small :id="'field-toggle-' + normalizeClassID(field.key)" class="collapse help-text form-text text-muted mb-2">{{field.help_text}}</small>
                         <table-grid-component 
                             v-model="local" 
-                            :columns="field.props" 
+                            :columns="field.props"
+                            :enums="field.enum" 
                             class="border elevation-1"
                             >
                         </table-grid-component>

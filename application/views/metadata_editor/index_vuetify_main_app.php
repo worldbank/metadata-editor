@@ -196,6 +196,7 @@
             echo $this->load->view("metadata_editor/vue-dialog-weight-variable-selection-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-dialog-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-dialog-datafile-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-dialog-enum-selection-component.js",null,true);
         ?>
 
         <?php if (empty($metadata)):?>

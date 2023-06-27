@@ -1,13 +1,14 @@
 //vue table-grid component
 Vue.component('table-grid-component', {
-    props:['value','columns', 'field'],
+    props:['value','columns', 'field','enums'],
     data: function () {    
         return {
             sort_field:'',
             sort_asc:true,
             undo_paste:'',
             snackbar:false,
-            snackbar_message:''
+            snackbar_message:'',
+            dialog_enum_selection:false,
         }
     },
     watch: {
@@ -45,6 +46,15 @@ Vue.component('table-grid-component', {
         showToast: function(message){
             this.snackbar=true;
             this.snackbar_message=message;
+        },
+        addEnum: function(){
+            this.dialog_enum_selection=true;
+        },
+        onEnumSelection: function(selection){            
+            for(i=0;i<selection.length;i++){
+                this.local.push(JSON.parse(JSON.stringify(selection[i])));
+            }
+            this.$emit('input', JSON.parse(JSON.stringify(this.local))); 
         },
         update: function (index, key, value)
         {
@@ -281,7 +291,18 @@ Vue.component('table-grid-component', {
                             <i v-if="sort_field==column.key && sort_asc==true" class="fas fa-caret-up"></i>
                         </span>
                     </th>
-                    <th scope="col">               
+                    <th scope="col">
+                    <span class="float-right" v-show="enums">
+                    <v-btn
+                            light
+                            icon
+                            x-small                            
+                            @click="addEnum"
+                            
+                        >
+                            <v-icon>mdi-form-dropdown</v-icon>
+                        </v-btn>
+                        </span>
                     </th>
                 </tr>
                 </thead>
@@ -349,6 +370,14 @@ Vue.component('table-grid-component', {
                     <v-icon @click="snackbar = false">mdi-close-circle-outline</v-icon>                    
                 </div>
             </v-snackbar>
+
+            <vue-dialog-enum-selection-component
+                v-model="dialog_enum_selection"
+                :columns="columns"
+                @selection="onEnumSelection($event)"
+                :enums="enums"
+            >
+            </vue-dialog-enum-selection-component>
 
             </div>  `    
 })

@@ -296,6 +296,13 @@ class DDI_Writer
         return ($result->saveXML($result->documentElement));
     }
 
+    function get_var_wgt($var){
+        if (isset($var['var_wgt']) && (int)$var['var_wgt']==1){
+            return 'wgt';
+        }
+        return '';
+    }
+
     function get_var_desc_xml($data)
     {
         $var = new \Adbar\Dot($data);
@@ -309,6 +316,7 @@ class DDI_Writer
                 'files'=>$var['file_id'],
                 'dcml'=>$var['var_dcml'],
                 'intrvl'=>$var['var_intrvl'],
+                'wgt'=> $this->get_var_wgt($var)
             ],
 
             'varFormat'=>[

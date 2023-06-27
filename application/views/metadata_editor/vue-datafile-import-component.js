@@ -12,6 +12,8 @@ Vue.component('datafile-import', {
             errors:'',
             upload_report:[],
             file_type:'',
+            sleep_time:500,
+            sleep_counter:0,
             file_types:{
                 "DTA": "Stata (DTA)",
                 "SAV": "SPSS (SAV)",
@@ -179,7 +181,7 @@ Vue.component('datafile-import', {
             
         },
         importSummaryStatisticsQueueStatusCheck: async function(file_id,job_id){
-            await this.sleep(5000);
+            await this.sleep(this.sleep_time);
             let result=await this.$store.dispatch('importDataFileSummaryStatisticsQueueStatusCheck',{file_id:file_id, job_id:job_id});
             console.log("job updated",result);
                                 
@@ -204,7 +206,7 @@ Vue.component('datafile-import', {
             return status;
         },         
         generateCsvQueueStatusCheck: async function(file_id,job_id){
-            await this.sleep(5000);
+            await this.sleep(this.sleep_time);
             let result=await this.$store.dispatch('generateCsvQueueStatusCheck',{file_id:file_id, job_id:job_id});
             console.log("csv updated",result);
 
