@@ -82,12 +82,11 @@ Note that unlike the metadata on the document, information on external resources
 
 You have now completed the documentation of the book. The "Projects" page will show this new entry. You may at any time go back to it to edit or complete the metadata.
 
-![image](https://user-images.githubusercontent.com/35276300/231568157-ca5555e4-acba-441d-8c9f-c6f931697233.png)
+![image](https://github.com/ihsn/editor/assets/35276300/b3a72952-73e0-491e-aa03-483a1875ac82)
 
-If you have a NADA catalog and the credentials to publish content in it, you can now upload your metadata in the NADA catalog using the "Publish to NADA" command in the "Project" main menu. See the chapter "Publishing a project".
+If you have a NADA catalog and the credentials to publish content in it, you can now upload your metadata in the NADA catalog using the "Publish to NADA" command in the "Project" main menu. See the section "Publishing a project" of this User Guide.
 
 ![image](https://user-images.githubusercontent.com/35276300/231568894-e364c4f4-49a3-4168-8cda-eba631152a5f.png)
-
 
 The book will now be listed and discoverable in your NADA catalog.
 ![image](https://user-images.githubusercontent.com/35276300/231571821-ffd10899-5dd9-4318-ac84-2fd13986eb24.png)
@@ -110,7 +109,7 @@ The dataset we will be documenting, and publishing in a NADA catalog, is a synth
 ![image](https://user-images.githubusercontent.com/35276300/233700458-8e1526d5-8e02-433d-af6a-086b6219cc65.png)
  
 
-To begin documenting the dataset, open the Metadata Editor and log in. Then, on the Project page, click "Create new project" and select "Microdata". A new project homepage will open, and the navigation bar shown on the left will reflect the content of the default metadata template for "Microdata" (default templates can be changed in the Template Manager).
+To begin documenting the dataset, open the Metadata Editor and log in. Then, on the **My projects** page, click "Create new project" and select "Microdata". A new project homepage will open, and the navigation bar shown on the left will reflect the content of the default metadata template for "Microdata" (default templates can be changed in the Template Manager).
 
 ![image](https://github.com/ihsn/editor/assets/35276300/c9beb3aa-fad8-4228-aa2e-d43fd74e316b)
 
@@ -159,13 +158,14 @@ The page will display a list of variables for the selected file, along with mult
 
 - Edit the variables labels.
 - Edit the value labels (for discrete/categorical variables only).
-- If necessary, rename, re-order, and delete variables.
-- Change the variable type if it was not correctly identified when the file was imported.
+- If necessary, delete variables.
 - Identify a variable as being a sample weight.
 - Add metadata related to the variable (literal question, interviewer instructions, derivation and imputation, and more) in the "DOCUMENTATION" tab.
 - Identify values to be considered as "missing." The system missing values in Stata or SPSS will be automatically identified as "missing." However, in some cases, one (or multiple) values may be used to represent missing values (e.g., "99" representing missing or unknown for a variable such as age).
 - Set the weighting coefficient (if relevant) to be applied to generate summary statistics.
 - Select the summary statistics to be included in the metadata (in tab "STATISTICS").
+
+Note that you cannot rename variables in the Metadata Editor. This considered as a change of data. If you need to change your data (renaming variables, creating new ones, deleting observations, or editing the data themselves), you will have to do that outside the Metadata Editor and re-import the modified data files.  
 
 ![image](https://user-images.githubusercontent.com/35276300/233704709-a211367a-53e2-42fe-b472-b07fff4e6d99.png)
 
@@ -178,7 +178,6 @@ Now, add metadata specific to each variable. Most of the metadata at the variabl
 
 - Universe of the variable
 - Pre-question, literal question, and post-question (for collected variables, not for derived variables)
-- Skip instructions, if any
 - Derivation or imputation methods (for derived variables)
 
 ![image](https://user-images.githubusercontent.com/35276300/233705597-9b6a4e8b-c65b-4f65-8994-1d029cc60900.png)
@@ -198,7 +197,7 @@ First, select the variables to which you want to apply a weighting coefficient. 
 
 ![image](https://user-images.githubusercontent.com/35276300/233706693-b4193d98-8cc6-41aa-af6f-39448a3f7272.png)
 
-Next, repeat the process for the three quintile variables, but use the "popweight" variable.
+Next, repeat the process for the three quintile variables, but use the "popweight" variable as weight.
 
 ![image](https://user-images.githubusercontent.com/35276300/233706968-8f314f5f-8c8a-4fa1-bb2c-d9ea4b5da48a.png)
 
