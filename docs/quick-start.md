@@ -6,19 +6,17 @@ We will be using the following two resources in this quick start:
 
 - A book, available in both online and PDF format.
 - A synthetic micro-dataset consisting of two data files provided in Stata 15 format. The dataset, along with some related materials, can be found in the "demo" folder of the Metadata Editor installation package or online in the Metadata Editor GitHub repository.
-- 
-We will demonstrate how to document and publish these resources in an online NADA catalog. NADA is an open-source cataloging application compatible with all metadata standards supported by the Metadata Editor.
+- We will demonstrate how to document and publish these resources in an online NADA catalog. NADA is an open-source cataloging application compatible with all metadata standards supported by the Metadata Editor.
 
 We assume that you have successfully installed the Metadata Editor. If you want to pilot the publishing of a project in an online catalog, we also assume that you have administrator access to a NADA catalog.
 
-
-To begin, log in with your username and password, and navigate to the "Projects" page of the Metadata Editor. This page displays all the projects you have created and those that have been shared with you by others. 
+To begin, log in with your username and password, and navigate to the "My projects" page of the Metadata Editor. This page displays all the projects you have created and those that have been shared with you by others. 
 
 ![image](https://user-images.githubusercontent.com/35276300/231554433-0e14708b-8208-4881-bd36-c0d8fe065d41.png)
 
 If you are using the application for the first time, the project list will be empty.
 
-![image](https://user-images.githubusercontent.com/35276300/231555203-fb3184c0-d93d-4417-8411-4d21afe655a1.png)
+![image](https://github.com/ihsn/editor/assets/35276300/2ff6b678-6e5f-4aee-87d2-a73dd75c9fc9)
 
 
 ## Example 1: Documenting and cataloguing a book
@@ -27,8 +25,7 @@ The book we will be documenting is titled "The Analysis of Household Surveys: A 
 
 To get started, click on "Create project" and select "Document" when prompted.
 
-![image](https://user-images.githubusercontent.com/35276300/231555537-3b7d3770-45a5-404b-be5c-0996eb44bfac.png)
-  
+![image](https://github.com/ihsn/editor/assets/35276300/f52bcdc3-c677-4a72-90f4-a3d1da3b65ac)
   
 A new project page will open in a new tab.
 
@@ -115,12 +112,11 @@ The dataset we will be documenting, and publishing in a NADA catalog, is a synth
 
 To begin documenting the dataset, open the Metadata Editor and log in. Then, on the Project page, click "Create new project" and select "Microdata". A new project homepage will open, and the navigation bar shown on the left will reflect the content of the default metadata template for "Microdata" (default templates can be changed in the Template Manager).
 
-![image](https://user-images.githubusercontent.com/35276300/231760101-17cceff8-fdc4-4364-ad21-ba189435f3b3.png)
-
+![image](https://github.com/ihsn/editor/assets/35276300/c9beb3aa-fad8-4228-aa2e-d43fd74e316b)
 
 We can change the image that will be used as a thumbnail for the project (this is optional). Click on "Change image" and select the file "survey_logo.JPG".
 
-![image](https://user-images.githubusercontent.com/35276300/215513036-95c7d60a-d5b0-44fe-8f76-5a5623185f08.png)
+![image](https://github.com/ihsn/editor/assets/35276300/4d2fe874-c569-4515-a36a-44bdd23efc5a)
 
 We will use the default metadata template to document the dataset, so there is no need to "Switch template". You are now ready to start documenting the dataset.
 
