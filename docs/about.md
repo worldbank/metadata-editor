@@ -6,14 +6,7 @@ The Metadata Editor is a multi-platform application developed for the production
 
 The application works as a stand-alone application or as a server application. Operating the application on a server allows curation teams to collaborate on the documentation of datasets in the context of a data archive or data library. 
 
-The software makes use of the following technologies:
-- APIs
-- For the user interface: Bootstrap version ...
-- For the back-end: PHP 8
-- For the storage of metadata: JSON (with option to export metadata in XML)
-- For the import and export of microdata and production of summary statistics: Python and the underlying .... C library.  
+The Metadata Editor is built on APIs. It makes use of Python (Pandas) for importing microdata from different formats and to generate summary statistics. 
 
-The application was in part inspired by the Nesstar Publisher software application (by the Norwegian Social Science Data ARchive). The Nesstar Publisher, designed for the production of DDI-compliant metadata for microdata, is not maintained anymore. But the Metadata Editor interface is largely inspired from Nesstar. A large community of data curators have relied on Nesstar, and will be familiar with the interface. We express our gratitude to the Nesstar developers for our past collaboration and for allowing us to replicate much of their user interface. Note that there are major differences in the way we store and manage metadata. Nesstar was built on a specific format to store data and metadata. Our application is web-based and operates differently. We package data and related documentation in ZIP files, with metadata in JSON, and store the metadata in a database.
-
-Note to Nesstar users: You can convert your Nesstar files by ... (only Windows).
+The Metadata Editor was developed in part to replace the Nesstar Publisher application, created in 2000 by the former Norwegian Social Science Data Services. The Nesstar Publisher ceased to be maintained in 2022. Although the Metadata Editor presents similarities with the Nesstar Publisher, there are major differences between the two applications. First, the Metadata Editor is multi-standard (while the Nesstar Publisher was designed to be a DDI 1.n editor). Second, the Nesstar Publisher was a strictly stand-alone application that made use of its own specific format to store the data and metadata, while the Metadata Editor is a web-based application that relies on a database, converts data into CSV for internal storage, and packages the data, metadata, and related resources in ZIP files with metadata stored in JSON format.
 
