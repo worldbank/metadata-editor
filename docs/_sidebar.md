@@ -17,8 +17,8 @@
 
    * [Managing projects](managing_projects.md)
    * [Managing files](managing_files.md)
-   * [Managing permissions](managing_permissions.md)
    * [Packaging projects](packaging_projects.md)
+   * [Managing permissions](managing_permissions.md)
 
 * Documenting data
 
@@ -54,7 +54,3 @@
 * Providing feedback
 
     * [Feedback and contacts](feedback.md)
-
-* References and links
-
-    * [References and links](references.md)
