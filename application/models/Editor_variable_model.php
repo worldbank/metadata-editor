@@ -358,6 +358,22 @@ class Editor_variable_model extends ci_model {
         return false;
     }
 
+    //return a list of variable VID/UIDs
+    function vid_uid_list($sid)
+    {
+        $this->db->select("vid,uid");
+        $this->db->where("sid",$sid);
+        $result=$this->db->get("editor_variables")->result_array();
+
+        $output=array();
+        foreach($result as $row)
+        {
+            $output[$row['vid']]=$row['uid'];
+        }
+
+        return $output;
+    }
+
 
 	/**
 	 * 

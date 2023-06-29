@@ -38,6 +38,7 @@ class Variables extends MY_REST_Controller
 			$user_id=$this->get_api_user_id();        			
 			$variable_detailed=(int)$this->input->get("detailed");
 			$survey_variables=$this->Editor_variable_model->select_all($sid,$file_id,$variable_detailed);
+			$this->update_variable_weight_info($sid,$survey_variables);
 			
 			$response=array(
 				'variables'=>$survey_variables
@@ -331,5 +332,24 @@ class Variables extends MY_REST_Controller
 			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
+
+
+	//fix variable-weight from VID to UID
+	private function update_variable_weight_info($sid,&$variables)
+    {
+        $variable_vid_uids=$this->Editor_variable_model->vid_uid_list($sid);
+
+        foreach($variables as $idx=>$variable)
+        {
+            //if variable var_wgt_id is set
+            if (isset($variable['var_wgt_id']))
+            {
+                if (isset($variable_vid_uids[$variable['var_wgt_id']])){
+                    $variables[$idx]['var_wgt_id']=$variable_vid_uids[$variable['var_wgt_id']];
+                }
+            }
+        }
+    }
+
 	
 }
