@@ -13,11 +13,12 @@
 
    * [Template manager](managing_templates.md)
 
-* Managing projects and files
+* Managing projects and users 
 
    * [Managing projects](managing_projects.md)
-   * [Managing files](managing_files.md)
    * [Packaging projects](packaging_projects.md)
+   * [Managing the database](managing_database.md)
+   * [Managing users](managing_permissions.md)
 
 * Documenting data
 
@@ -53,7 +54,3 @@
 * Providing feedback
 
     * [Feedback and contacts](feedback.md)
-
-* References and links
-
-    * [References and links](references.md)

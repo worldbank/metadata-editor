@@ -1,26 +1,15 @@
 # Installation
 
-
-## Requirements
-
-
 ## Installation as a standalone application
 
+Requirements
+Instructions
 
 ## Installation as a server application
 
+Requirements
+Instructions
 
-## Database installation
+## Upgrading the schemas and core templates
 
-
-## R installation
-
-Needed only for microdata.
-Also useful for automating tasks using the API. (Python is another option)
-
-
-## PHP installation
-
-
-## Docker image
-
+Instructions

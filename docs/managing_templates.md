@@ -23,7 +23,7 @@ The full list of available elements in the standard or schema is provided as a c
 
 Custom templates are created by duplicating and modifying an existing template, either a core or custom template. The custom templates created can be exported, and users can import custom templates created by others. Multiple custom templates can be created for the same data type. Additionally, a template can be easily translated into any language. Users can duplicate the English template and translate each element label and description.
 
-![image](https://user-images.githubusercontent.com/35276300/214394808-d752cb8e-b007-4642-9e16-e2cb26b16e91.png)
+![image](https://github.com/ihsn/editor/assets/35276300/131e90c9-f748-4708-bba7-26ad2114cb7f)
 
 The Metadata Editor provides pre-designed custom templates, known as the IHSN templates, covering all data types. Users can make use of these templates without generating their own custom templates. 
 
@@ -42,12 +42,14 @@ Here are a few important points to note:
 ## Creating or editing a custom template
 
 To build a custom template, you will need to duplicate and edit the content of a core template or an existing custom template.
-![image](https://user-images.githubusercontent.com/35276300/214386279-82d6df69-4cf2-4694-bdfc-a8291a5c519a.png)
+
+![image](https://github.com/ihsn/editor/assets/35276300/f8e69561-cf7f-4843-90d1-b4e8ccc7d847)
+
 
 First, select the template that you want to use as a starting point and click on “Duplicate”. This will display the "Template description" page for the new template.
 
-![image](https://user-images.githubusercontent.com/35276300/214677926-79ad0824-3678-4f23-999f-390ed63e248a.png)
- 
+![image](https://github.com/ihsn/editor/assets/35276300/014c40d8-e020-46fb-98b1-d191d3304792)
+
 Next, change the name of the template. By default, the name will be the name of the template you duplicated followed by "- copy". Give a clear and unique name to your new template. Although the Metadata Editor does not require templates to have a unique name, it is good practice to create a name that includes the data type, the organization that developed the template, and the version of the custom template. Other fields in the "Template description" page can be filled out as appropriate. Although not required, no field should be left empty. Once you have filled out the page, remember to click "SAVE" (changes are not saved automatically). You can now start customizing the content of this new template.
 
 All standards and schemas begin with a first section named either **Metadata information** or **Document description**. This section contains the metadata elements used to document the metadata itself (not the data). This information will be useful in keeping track of who documented the dataset and when. This first section is followed by a few "hard-coded" sections ("section containers") specific to each standard and schema, within which metadata elements will be listed and grouped. Hard-coded main groups are displayed with the icon:
@@ -72,14 +74,13 @@ This section describes the types of metadata elements found in the standards and
     ![image](https://user-images.githubusercontent.com/35276300/224108908-16a31b84-420a-493e-b72b-cef7573c2e64.png)
    - Array
      ![image](https://user-images.githubusercontent.com/35276300/224109056-54de49b2-ba4a-44b1-a2ff-047d9e87410a.png)
-   - Simple array
-   
-   - Nested array
+   - Simple array or nested array
      ![image](https://user-images.githubusercontent.com/35276300/224109195-f62d1e58-2533-49d9-8dff-daecb0a97a5c.png)
 
 - Nested elements
 
 - A metadata element has a default *label*, which can be changed in custom templates.
+  
 ![image](https://user-images.githubusercontent.com/35276300/214671331-30aefe93-0053-4710-a88b-de101810170b.png)
 
 - A metadata element has a *name* in the standard/schema. This corresponds to the names shown in *ReDoc*. When the metadata are exported, this is the name that will be used, no matter what custom label you give to the elements. This guarantees that the standard is "standard" and can be validated.
@@ -94,8 +95,9 @@ This section describes the types of metadata elements found in the standards and
 
  ![image](https://user-images.githubusercontent.com/35276300/214671469-ce5a006c-5cca-4ff8-b816-eab44c948439.png)
 
-- The way each element will be displayed in the Metadata Editor entry pages is controlled in the Template Manager. The "DISPLAY" parameter provides the main customization options. For a specific case described below, the "Type" will also be used.
-![image](https://user-images.githubusercontent.com/35276300/217053424-45e59e6b-c476-46af-b6c7-678360d3ab61.png)
+- The way each element will be displayed in the Metadata Editor entry pages is controlled in the Template Manager. The "DISPLAY" parameter provides the main customization options.
+  
+![image](https://github.com/ihsn/editor/assets/35276300/b2904802-fc8f-404e-aa66-a9a0842e6430)
 
 An single element (or sub-element) can have the following types, controlled by selecting an option in the *Display* drop-down :
   - **Text**: the element will be displayed as a single, on-line text box. The box can accept entries with up to N characters. For example, in the metadata entry page: 
@@ -124,11 +126,20 @@ An single element (or sub-element) can have the following types, controlled by s
  
      ![image](https://user-images.githubusercontent.com/35276300/217055225-9c4dee87-c80d-4b27-9aa4-9092e0732c0d.png)
 
+- Controlled vocabularies
+
+Enter your controlled vocabularies in the tab "CONTROLLLED VOCABULARY". Each element in a controlled vocabulary has a code (which should be used consistently across templates, including templates in different languages), and a label for the item (or multiple labels for multi-field elements). When an element has a controlled vocabulary, a drop-down menu or a list of options will be displayed for the element in the metadata entry form. You may define in the template whether the user will be forced to make a selection from the vocabulary  (Display = "dropdown"), or have the option to enter a value that is not in the vocabulary (Display = "dropdown-custom"). 
+
+![image](https://github.com/ihsn/editor/assets/35276300/d0ac8d9d-22bb-4df9-9067-efaea0364201)
+
+In the Metadata Entry form:
+![image](https://github.com/ihsn/editor/assets/35276300/b01f9ef7-5e7f-49b3-a8fc-57bd9da2965e)
+
+![image](https://github.com/ihsn/editor/assets/35276300/92e49795-7ab9-4fe8-ae9b-b05a6b229bb0)
+
 - An element may have a default value. A tool is provided in the Metadata Editor to "Load default values". When you document a dataset, this option will provide you with a way to automatically fill out the fields for which a default value is available.
 
 ![image](https://user-images.githubusercontent.com/35276300/214395605-c5ec98d9-23db-48d5-badf-a37014273e9d.png)
-
-- Controlled vocabularies
 
 - Validation rules. One or multiploe validation rule(s) can be set for each element or sub-element. Multiple options are provided, including the option to enter a regular expression. When content is entered in a metadata field, the compliance with the validation rules will automatically be checked and a warning message will be displayed in teh element and in the project home page. When more than one validation rule is set for a same element, the entry must comply with all of them to be valid.
   
@@ -183,22 +194,25 @@ For complex elements, you also control the sub-elements that you include, and th
 
 At least one template for each data type must be declared as being the "default" one. When a new project is created, this is the template that will be used. You can change the default using the radio button.
 
-Remember (see NOTES)
-
 ## Sharing custom templates
 
-Exporting templates:
+You can export your templates by clicking on "Export". This will generate a JSON file that contathat you can save and share.
 
-Importing templates:
--	From a saved template
--	From the IHSN website
--	From a project
+![image](https://github.com/ihsn/editor/assets/35276300/789443ec-4f24-42f5-9e8b-68cb4b89d74d)
 
-Note: saved as JSON files. Stored in ...
+Note that the web plugin may add two lines to the JSON file, which are not part of the template itself. Using a text editor, delete these two lines. The JSON file will also contain the "id" and "uid" of the template, which are specific to your instance of the Metadata Editor. We suggest you also delete these two lines if you share your template. When the template is imported by another user of the Metadata Editor, a new id and uid will be automatically generated, which will be specific to the instance of the user. Note also that if you export a template to edit it manually, you must delete the id and uid lines if you want to be able to re-import it in your Metadata Edotor (otherwise, the Metadata Editor will consider it as an existing template and will refuse to overwrite it).
+
+![image](https://github.com/ihsn/editor/assets/35276300/faba3bac-5fdb-44d3-8ad3-4059d81a1579)
+
+Templates in JSON format can be imported in the Metadata Editor using the "Import template" button in the Template Manager page.
+
+![image](https://github.com/ihsn/editor/assets/35276300/140db1a8-39aa-4725-9977-1a5886bcd07f)
+
 
 ## Deleting templates
 
-Click "delete".
+You can delete a template by clicking on "delete" in the Template list.
 
+![image](https://github.com/ihsn/editor/assets/35276300/f0d31c7a-6411-435f-a5e3-874c7f0ae357)
 
 
