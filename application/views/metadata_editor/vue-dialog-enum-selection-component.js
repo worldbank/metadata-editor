@@ -14,7 +14,7 @@ Vue.component('vue-dialog-enum-selection-component', {
         }
     }, 
     mounted: function () {
-        this.initColumnHeaders();
+        this.initColumnHeaders();        
     },      
     methods: {
         initColumnHeaders() {
@@ -25,8 +25,9 @@ Vue.component('vue-dialog-enum-selection-component', {
             }
         },
         addSelection: function(){
-            this.$emit('selection', this.selected);
+            this.$emit('selection', JSON.parse(JSON.stringify(this.selected)));
             this.dialog=false;
+            this.selected=[];
         }
     },
     computed: {

@@ -348,7 +348,6 @@ class Editor_DDI_Writer
                 'intrvl'=>$var['var_intrvl'],
                 'wgt'=> $this->get_is_var_wgt($var),
                 'wgt-var'=>$this->get_var_wgt($var),
-
             ],
 
             'varFormat'=>[
@@ -408,12 +407,17 @@ class Editor_DDI_Writer
 
         foreach($categories->all() as $idx=>$cat){
             $output->set([
+                'catgry.'.$idx=>[                    
+                    '_attributes'=>[
+                        'missing'=> isset($categories["{$idx}.is_missing"]) && intval($categories["{$idx}.is_missing"])==1 ? 'Y' : ''
+                    ]
+                ],
                 'catgry.'.$idx.'.catValu'=> $categories["{$idx}.value"],
                 'catgry.'.$idx.'.labl'=> isset($categories_value_labels->{$categories["{$idx}.value"]}) ? $categories_value_labels->{$categories["{$idx}.value"]} : '',
                 'catgry.'.$idx.'.catStat'=>[                    
                     '_attributes'=>[
                         'type'=>$sumstats["{$idx}.type"],
-                        'wgtd'=>$sumstats["{$idx}.wgtd"]
+                        'wgtd'=>$sumstats["{$idx}.wgtd"],
                     ],
                     '_value'=> (string)$categories["{$idx}.stats.value"]
                 ]

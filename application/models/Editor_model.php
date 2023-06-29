@@ -1470,6 +1470,7 @@ class Editor_model extends CI_Model {
 		$sid=(int)$variable['sid'];
 		unset($variable['metadata']['uid']);
 		unset($variable['metadata']['sid']);
+
 		//process summary statistics
 		$sum_stats_options = isset($variable['metadata']['sum_stats_options']) ? $variable['metadata']['sum_stats_options'] : [];
 		$sum_stats_enabled_list=[];
@@ -1485,6 +1486,8 @@ class Editor_model extends CI_Model {
 					unset($variable['metadata']['var_sumstat'][$idx]);
 				}
 			}
+			//fix to get a JSON array instead of Object
+			$variable['metadata']['var_sumstat']=array_values((array)$variable['metadata']['var_sumstat']);
 		}
 
 		//value ranges [counts, min, max] - remove min and max if not enabled
@@ -1522,7 +1525,7 @@ class Editor_model extends CI_Model {
 			$variable['metadata']['var_wgt_id']=$this->Editor_variable_model->vid_by_uid($sid,$variable['metadata']['var_wgt_id']);
 		}
 
-
+		array_remove_empty($variable);
 		return $variable;
 	}
 
