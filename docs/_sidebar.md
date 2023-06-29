@@ -13,12 +13,13 @@
 
    * [Template manager](managing_templates.md)
 
-* Managing projects, files, and users 
+* Managing projects and users 
 
    * [Managing projects](managing_projects.md)
    * [Managing files](managing_files.md)
+   * [Managing the database](managing_database.md)
    * [Packaging projects](packaging_projects.md)
-   * [Managing permissions](managing_permissions.md)
+   * [Managing users](managing_permissions.md)
 
 * Documenting data
 
