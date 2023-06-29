@@ -10,3 +10,6 @@ Instructions
 Requirements
 Instructions
 
+## Upgrading the schemas and core templates
+
+Instructions
