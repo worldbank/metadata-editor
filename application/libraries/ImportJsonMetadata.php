@@ -167,7 +167,9 @@ class ImportJsonMetadata
 
             //check if variable exists
             $variable_info=$this->ci->Editor_variable_model->variable_by_name($sid,$fid, $variable['name']);
-            $variable['var_catgry_labels']=$this->get_variable_category_value_labels($variable);
+            if (!isset($variable['var_catgry_labels'])){
+                $variable['var_catgry_labels']=$this->get_variable_category_value_labels($variable);
+            }
 
             //remove fields
             $exclude=array("uid","sid");
@@ -208,7 +210,6 @@ class ImportJsonMetadata
 
         return $labels;
     }
-    
 
 }
 
