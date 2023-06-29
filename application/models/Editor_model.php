@@ -1466,10 +1466,12 @@ class Editor_model extends CI_Model {
 	}
 
 	function transform_variable($variable)
-	{
+	{		
 		$sid=(int)$variable['sid'];
 		unset($variable['metadata']['uid']);
 		unset($variable['metadata']['sid']);
+
+		$var_catgry_labels=$this->get_indexed_variable_category_labels($variable['metadata']["var_catgry_labels"]);
 
 		//process summary statistics
 		$sum_stats_options = isset($variable['metadata']['sum_stats_options']) ? $variable['metadata']['sum_stats_options'] : [];
@@ -1509,6 +1511,7 @@ class Editor_model extends CI_Model {
 			if (isset($variable['metadata']['var_catgry']) && is_array($variable['metadata']['var_catgry']) ){
 				foreach($variable['metadata']['var_catgry'] as $idx=>$cat){
 
+					//remove freq if not enabled
 					if (isset($cat['stats']) && is_array($cat['stats']) ){
 						foreach($cat['stats'] as $stat_idx=>$stat){
 							if ($stat['type']=='freq'){
@@ -1520,6 +1523,16 @@ class Editor_model extends CI_Model {
 			}
 		}
 
+		//add var_catgry labels
+		if (isset($variable['metadata']['var_catgry']) && is_array($variable['metadata']['var_catgry']) ){
+			foreach($variable['metadata']['var_catgry'] as $idx=>$cat){
+				if (isset($var_catgry_labels[$cat['value']])){
+					$variable['metadata']['var_catgry'][$idx]['labl']=$var_catgry_labels[$cat['value']];
+				}
+			}
+		}
+
+
 		//var_wgt_id field - replace UID with VID
 		if (isset($variable['metadata']['var_wgt_id']) && $variable['metadata']['var_wgt_id']!==''){
 			$variable['metadata']['var_wgt_id']=$this->Editor_variable_model->vid_by_uid($sid,$variable['metadata']['var_wgt_id']);
@@ -1527,6 +1540,18 @@ class Editor_model extends CI_Model {
 
 		array_remove_empty($variable);
 		return $variable;
+	}
+
+
+	function get_indexed_variable_category_labels($cat_labels)
+	{
+		$output=array();
+		foreach($cat_labels as $cat)
+		{
+			$output[$cat['value']]=$cat['labl'];
+		}
+
+		return $output;
 	}
 
 	
