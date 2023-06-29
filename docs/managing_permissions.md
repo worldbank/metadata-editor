@@ -1,4 +1,4 @@
-# Managing permissions
+# Managing users
 
 Different roles:
 - ME administrator (super admin)
