@@ -1592,6 +1592,18 @@ class Editor_model extends CI_Model {
 		return $this->db->insert_id();
 	}
 
+
+	function catalog_connection_delete($catalog_id, $user_id)
+	{
+		$data_options=[
+			'user_id'=>$user_id,
+			'id'=>$catalog_id
+		];
+
+		$this->db->where("id",$catalog_id);
+		return $this->db->delete("editor_catalogs",$data_options);		
+	}
+
 	function delete_project($sid)
 	{
 		$project_folder=$this->get_project_folder($sid);

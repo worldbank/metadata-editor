@@ -30,7 +30,12 @@ Vue.component('configure-catalog', {
             });
         },
         CreateCatalogConnection: function()
-        {
+        {            
+            //remove trailing slash
+            if (this.catalog.url.slice(-1) == "/"){
+                this.catalog.url = this.catalog.url.slice(0, -1);
+            }
+
             let formData = this.catalog;//new FormData();
             //formData.append('user_id', this.LoggedInUserID);
             //formData.user_id=this.LoggedInUserID;
@@ -57,6 +62,34 @@ Vue.component('configure-catalog', {
                 console.log("failed to create catalog connection",response);
             }); 
         },
+        DeleteCatalogConnection: function(catalog_id)
+        {
+            if (!confirm("Are you sure you want to delete this catalog connection?")){
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append('catalog_id', catalog_id);
+
+            vm=this;
+            let url=CI.base_url + '/api/editor/catalog_connections_delete';
+
+            axios.post( url,
+                formData,
+                {
+                    /*headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }*/
+                }
+            ).then(function(response){
+                vm.catalog={};
+                vm.loadCatalogConnections();
+            })
+            .catch(function(response){
+                alert("failed");
+                console.log("failed to delete catalog connection",response);
+            }); 
+        },
     },
     
     computed: {
@@ -69,12 +102,12 @@ Vue.component('configure-catalog', {
     template: `
             <div class="configure-catalog-component">
                 
-                <div class="container">
+                <div class="container-fluid p-5">
 
                     <div class="row">                        
                         <div class="col-6">
                             <h5>Catalogs</h5>
-                            <table class="table table-striped">
+                            <table class="table table-sm table-bordered table-striped">
                                 <tr>
                                     <th>Title</th>
                                     <th>Catalog URL</th>
@@ -82,6 +115,9 @@ Vue.component('configure-catalog', {
                                 <tr v-for="connection in catalog_connections">
                                     <td>{{connection.title}}</td>
                                     <td>{{connection.url}}</td>
+                                    <td><button type="button" class="btn btn-sm" @click="DeleteCatalogConnection(connection.id)">
+                                    <v-icon color="red">mdi-close-circle-outline</v-icon>
+                                    </button></td>
                                 </tr>
                             </table>
                         </div>
@@ -96,7 +132,7 @@ Vue.component('configure-catalog', {
 
                             <div class="form-group form-field">
                                 <label for="url">Catalog URL</label> 
-                                <span><input type="text" id="url" class="form-control" v-model="catalog.url"/></span> 
+                                <span><input type="text" id="url" class="form-control" v-model="catalog.url"/></span>                                 
                             </div>
 
                             <div class="form-group form-field">

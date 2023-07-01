@@ -13,7 +13,7 @@ Vue.component('publish-options', {
             publish_resources:true,
             catalog_connections:[],
             panels: [0, 1,2],
-            catalog:'',
+            catalog:false,
             publish_options:{
                 "overwrite": {
                     "title":"Overwrite if already exists?",
@@ -34,10 +34,11 @@ Vue.component('publish-options', {
                         "1": "Publish"
                     }
                 },
-                "data_access":{
+                "access_policy":{
                     "title":"Data access",
                     "value":6,
                     "type":"text",
+                    "custom":true,
                     "enum":{
                         "1": "Direct access",
                         "2": "Publich use files",
@@ -48,7 +49,7 @@ Vue.component('publish-options', {
                         "7": "Open access"
                     }
                 },
-                "da_link":{
+                "data_remote_url":{
                     "custom":true,
                     "title":"Data access link",
                     "value":'',
@@ -69,6 +70,7 @@ Vue.component('publish-options', {
             is_publishing_completed:false,
             project_export_status:'',
             collections:[],
+            data_access_list:[],
             publish_responses:{}//all publish responses                        
         }
     },
@@ -105,7 +107,12 @@ Vue.component('publish-options', {
             }
         },
         publishToCatalog: async function()
-        {
+        {            
+            if (this.catalog===false){
+                alert("Select a catalog for publishing");
+                return false;
+            }
+
             this.dialog_process=true;
             let formData=this.PublishOptions;
             vm=this;
@@ -148,11 +155,19 @@ Vue.component('publish-options', {
             this.is_publishing_completed=true;
             //await this.publishExternalResourcesFiles();
         },
-        publishProjectMetadata: async function(){
+        publishProjectMetadata: async function()
+        {
             let formData=this.PublishOptions;
             vm=this;
 
-            let url=CI.base_url + '/api/publish/' +this.ProjectID +'/' + this.catalog;
+            let nada_catalog=this.catalog_connections[this.catalog];            
+
+            if(!nada_catalog){
+                alert("Catalog was not found");
+                return false;
+            }
+
+            let url=CI.base_url + '/api/publish/' +this.ProjectID +'/' + nada_catalog.id;
             this.publish_responses.metadata.messages.push("starting metadata publishing to: " + url);
         
             return axios.post(url,
@@ -198,15 +213,23 @@ Vue.component('publish-options', {
         },
         publishSingleResource: async function(resource)
         {
+
+            let nada_catalog=this.catalog_connections[this.catalog];            
+
+            if(!nada_catalog){
+                alert("Catalog was not found");
+                return false;
+            }
+
             let formData={
                 "overwrite": this.resources_overwrite,
                 "resource_id": resource.id,
                 "sid": this.ProjectID,
-                "catalog_id": this.catalog
+                "catalog_id": nada_catalog.id
             }
 
             vm=this;            
-            let url=CI.base_url + '/api/publish/external_resource/'+this.ProjectID +'/' + this.catalog;
+            let url=CI.base_url + '/api/publish/external_resource/'+this.ProjectID +'/' + nada_catalog.id;
 
             return axios.post(url,
                 formData,
@@ -218,8 +241,15 @@ Vue.component('publish-options', {
             let formData={
             }
 
+            let nada_catalog=this.catalog_connections[this.catalog];            
+
+            if(!nada_catalog){
+                alert("Catalog was not found");
+                return false;
+            }
+
             vm=this;            
-            let url=CI.base_url + '/api/publish/thumbnail/'+this.ProjectID +'/' + this.catalog;
+            let url=CI.base_url + '/api/publish/thumbnail/'+this.ProjectID +'/' + nada_catalog.id;
 
             return axios.post(url,
                 formData,
@@ -332,11 +362,15 @@ Vue.component('publish-options', {
                 console.log("request completed");
             });
         },
+        onCatalogSelection: function(){
+            this.getCollections();
+            this.getDataAccessList();
+        },
         getCollections: function() {
             vm=this;
             this.collections=[];
 
-            if (!this.catalog){
+            if (this.catalog<0){
                 return;
             }
 
@@ -347,14 +381,43 @@ Vue.component('publish-options', {
             }
 
             let url=collection.url + '/index.php/api/catalog/collections';
+
             axios.get(url)
             .then(function (response) {
+                console.log("collections",response);
                 if(response.data.collections){
                     vm.collections=response.data.collections;
                 }
             })
             .catch(function (error) {
-                console.log(error);
+                console.log("failed loading collections", error);
+            });
+        },
+        getDataAccessList: function() {
+            vm=this;
+            this.data_access_list=[];
+
+            if (this.catalog<0){
+                return;
+            }
+
+            let nada_catalog=this.catalog_connections[this.catalog];            
+
+            if(!nada_catalog){
+                return;
+            }
+
+            let url=nada_catalog.url + '/index.php/api/catalog/data_access_codes';
+
+            axios.get(url)
+            .then(function (response) {
+                console.log("data_access",response);
+                if(response.data.codes){
+                    vm.data_access_list=response.data.codes;
+                }
+            })
+            .catch(function (error) {
+                console.log("failed loading data access codes", error);
             });
         },
         getCollectionByID:function(id)
@@ -411,13 +474,14 @@ Vue.component('publish-options', {
                 >
                         <div class="form-group" elevation="10">
                             <label for="catalog_id">{{$t("catalog")}} <router-link class="btn btn-sm btn-link" to="/configure-catalog">{{$t("configure_catalog")}}</router-link></label>
-                            <select class="form-control" id="catalog_id" v-model="catalog" @change="getCollections">
-                                <option value="">-Select-</option>
-                                <option v-for="option in catalog_connections" v-bind:value="option.id">
+                            <select class="form-control" id="catalog_id" v-model="catalog" @change="onCatalogSelection">
+                                <option :value="false">-Select-</option>
+                                <option v-for="(option,index) in catalog_connections" v-bind:value="index">
                                     {{ option.title }} - {{option.url}}
                                 </option>                            
                             </select>
-                            <div v-if="catalog!=''" class="text-muted">{{getCollectionByID(catalog).url}}</div>                            
+                            
+                            <div v-if="catalog" class="text-muted">{{catalog_connections[catalog]}}</div>                            
                         </div>
 
                 </v-card>
@@ -439,10 +503,7 @@ Vue.component('publish-options', {
                                 <template v-for="(kv,kv_key) in publish_options">                                            
                                 <tr v-if="!kv.custom">
                                     <td>
-                                        {{kv.title}}
-                                        <span v-if="kv_key=='repositoryid'">
-                                        <v-icon @click="getCollections">mdi-reload</v-icon>
-                                        </span>
+                                        {{kv.title}}                                        
                                     </td>
                                     <td>
                                         <input v-if="!kv.enum" type="text" class="form-control" v-model="kv.value"/>
@@ -455,14 +516,32 @@ Vue.component('publish-options', {
                                 </tr>                                            
                                 </template>
                                 <tr>
-                                    <td>{{$t("collection")}}</td>
+                                    <td>{{$t("data_access")}} <v-icon @click="onCatalogSelection">mdi-reload</v-icon></td>
+                                    <td>
+                                        <select v-if="data_access_list" class="form-control" v-model="publish_options.access_policy.value">
+                                            <option value="">N/A</option>
+                                            <option v-for="(data_access,da_index) in data_access_list" v-bind:value="data_access.type">
+                                                {{ data_access.title }} - [{{ data_access.type }}]
+                                            </option>
+                                        </select>
+
+                                        <div v-if="publish_options.access_policy.value=='remote'" class="p-2">
+                                            <label>Link to remote repository</label>
+                                            <input class="form-control" type="text" v-model="publish_options.data_remote_url.value">
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td>{{$t("collection")}} <v-icon @click="onCatalogSelection">mdi-reload</v-icon></td>
                                     <td>
                                         <select v-if="collections" class="form-control" v-model="publish_options.repositoryid.value">
                                             <option value="">N/A</option>
                                             <option v-for="(collection,collection_index) in collections" v-bind:value="collection.repositoryid">
-                                                [{{ collection.repositoryid }}] {{ collection.title }}
+                                                {{ collection.title }} - [{{ collection.repositoryid }}]
                                             </option>
-                                        </select>
+                                        </select>                                    
                                     </td>
 
                                 </tr>
@@ -545,7 +624,7 @@ Vue.component('publish-options', {
                            
                     </div>
 
-                    <button :disabled="!catalog || is_publishing==true" type="button" class="btn btn-primary" @click="publishToCatalog()">{{$t("publish")}}</button>
+                    <button :disabled="is_publishing==true" type="button" class="btn btn-primary" @click="publishToCatalog()">{{$t("publish")}}</button>
                 </div>
 
                 

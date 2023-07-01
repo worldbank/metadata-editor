@@ -902,6 +902,42 @@ class Editor extends MY_REST_Controller
 		}
 	}
 
+
+	//remove catalog connection
+	function catalog_connections_delete_post()
+	{
+		try{
+			//$this->has_dataset_access('view');
+			
+			$user_id=$this->get_api_user_id();
+
+			if (!$user_id){
+				throw new Exception("User-login-required");
+			}
+			
+			$catalog_id=$this->input->post('catalog_id');
+
+			if (!isset($catalog_id)){
+				throw new Exception("Catalog ID is required");
+			}
+
+			$result=$this->Editor_model->catalog_connection_delete($catalog_id, $user_id);
+			
+			$response=array(
+				'status'=>$result
+			);
+
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
 	function publish_to_catalog_post($sid=null,$catalog_connection_id=null)
 	{
 		try{
