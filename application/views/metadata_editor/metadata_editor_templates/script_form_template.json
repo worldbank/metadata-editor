@@ -115,7 +115,7 @@
                             "display_type": "text"
                         },
                         {
-                            "key": "project_desc.identifiers",
+                            "key": "project_desc.title_statement.identifiers",
                             "title": "Other identifiers",
                             "type": "array",
                             "help_text": "This repeatable element is used to enter identifiers (IDs) other than the \"Primary ID\" (IDNO). It can for example be a Digital Object Identifier (DOI). The \"Primary ID\" can be repeated here (the \"Primary ID\" does not provide a \"Type\" parameter, so if a DOI or other standard ID type is used as main identifier, it is recommended to repeat it here with the identification of the type). ",
@@ -180,6 +180,31 @@
                         }
                     ]
                 },
+                {
+                    "type": "section",
+                    "key": "project_desc_reproducibility_status",
+                    "title": "Reproducibility status",
+                    "class": "recommended",
+                    "items": [
+                        {
+                            "key": "project_desc.reproducibility_status.type",
+                            "title": "Status",
+                            "help_text": "Information on the reproducibility status of the project, using a controlled vocabulary",
+                            "type": "string",
+                            "is_required": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "project_desc.reproducibility_status.note",
+                            "title": "Reproducibility note",
+                            "help_text": "Note",
+                            "type": "string",
+                            "is_required": false,
+                            "display_type": "text"
+                        }
+                    ]
+
+                    },
                 {
                     "key": "project_desc_container1674844564813",
                     "title": "Authors and contributors",
