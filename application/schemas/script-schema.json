@@ -144,6 +144,23 @@
             "title"
           ]
         },
+        "reproducibility_status": {
+          "type": "object",
+          "title": "Reproducibility status",
+          "description": "Information on the reproducibility status of the project, using a controlled vocabulary",
+          "properties": {
+            "status": {
+              "type": "string",
+              "title": "status",
+              "description": "Status"
+            },
+            "note": {
+              "type": "string",
+              "title": "Note",
+              "description": "Note"
+            }
+          }
+        },
         "abstract": {
           "type": "string",
           "title": "Abstract"
