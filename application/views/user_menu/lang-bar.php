@@ -10,11 +10,22 @@ if (!$languages)
 {
     return;
 }
+
+$lang=$this->session->userdata('language');
+
+$lang=!empty($lang) ? $lang : $this->config->item('language');
+
+if (isset($language_codes[$lang])){
+    $lang_title=$language_codes[$lang]['display'];
+}
+else{
+    $lang_title=$lang;
+}
 ?>
 <li class="nav-item dropdown">
         <div class="dropdown ml-auto">
             <a class="nav-link dropdown-toggle capitalize" href="#" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="mdi mdi-translate"></i> 
+                <i class="mdi mdi-translate"></i> <?php echo $lang_title; ?>
             </a>
 
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">                

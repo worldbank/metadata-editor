@@ -1,0 +1,2719 @@
+{
+    "type": "template",
+    "title": "Timeseries project",
+    "items": [
+        {
+            "type": "section_container",
+            "key": "metadata_information",
+            "title": "Informations sur les métadonnées",
+            "class": "recommended",
+            "items": [
+                {
+                    "key": "metadata_information1674224341900",
+                    "title": "Informations sur les métadonnées",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "metadata_information.title",
+                            "title": "Titre du document",
+                            "type": "string",
+                            "help_text": "Le titre du document de métadonnées (qui peut être le même que l'élément \"Nom\" dans la section \"Description de l'indicateur / Instruction du titre\"). Le document de métadonnées est le fichier de métadonnées (fichier XML ou JSON) qui est généré.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "metadata_information.idno",
+                            "title": "ID du document",
+                            "type": "string",
+                            "help_text": "Un identifiant unique pour le document de métadonnées de l'indicateur/de la série. Cet identifiant doit être unique dans le catalogue où les métadonnées sont destinées à être publiées. Idéalement, l'identifiant devrait également être unique au niveau mondial. Ceci est différent de l'\"Identifiant principal\" dans la section Description de la base de données / Instruction du titre, bien qu'il soit recommandé de générer des identifiants qui établissent une connexion claire entre ces deux identifiants. L'ID de document peut également inclure l'identifiant de version du document de métadonnées. Par exemple, si l'\"Identifiant principal\" de l'indicateur \"Décaissements de la dette extérieure par les créanciers privés en dollars américains courants\" est \"DT.DIS.PRVT.CD\", l'ID du document pourrait être \"WB_DT.DIS.PRVT. CD_v1.0\" si les métadonnées sont produites par l'IHSN et s'il s'agit de la version 1.0 des métadonnées. Chaque organisation doit établir des règles systématiques pour générer de tels identifiants. Une règle de validation peut être définie (à l'aide d'une expression régulière) dans les modèles utilisateur pour faire respecter un format d'identifiant spécifique. L'identifiant ne doit pas contenir d'espaces vides.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "metadata_information.producers",
+                            "title": "Producteurs des métadonnées",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "rules_": "required",
+                                    "prop_key": "metadata_information.producers.name",
+                                    "help_text": "Le nom de la personne ou de l'organisation qui a produit les métadonnées ou contribué à leur production.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbr",
+                                    "title": "Abbréviation",
+                                    "type": "string",
+                                    "prop_key": "metadata_information.producers.abbr",
+                                    "help_text": "L'abréviation (ou l'acronyme) de l'organisation référencée dans \"Nom\"..",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "string",
+                                    "prop_key": "metadata_information.producers.affiliation",
+                                    "help_text": "L'affiliation de la personne ou de l'organisation mentionnée dans \"Nom\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Rôle",
+                                    "type": "string",
+                                    "prop_key": "metadata_information.producers.role",
+                                    "help_text": "Le rôle spécifique de la personne ou de l'organisation mentionnée dans \"Nom\" dans la production des métadonnées.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "Le producteur de métadonnées est la personne ou l'organisation ayant la responsabilité financière et/ou administrative des processus par lesquels le document de métadonnées a été créé. Il s'agit d'un élément \"Recommandé\". Pour l'administration du catalogue, les informations sur le producteur et sur la date de production des métadonnées sont utiles.",
+                            "is_recommended": true
+                        },
+                        {
+                            "key": "metadata_information.prod_date",
+                            "title": "Date de production",
+                            "type": "string",
+                            "help_text": "La date à laquelle les métadonnées de cet indicateur ont été produites (non diffusées ou archivées), de préférence saisies au format ISO 8601 (AAAA-MM-JJ ou AAAA-MM). Une règle de validation peut être définie dans les modèles utilisateur pour appliquer un format de date. Il s'agit d'un élément \"Recommandé\", car les informations sur le producteur et sur la date de production des métadonnées sont utiles à des fins d'administration du catalogue.",
+                            "is_recommended": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "metadata_information.version",
+                            "title": "Version",
+                            "type": "string",
+                            "help_text": "La version du document de métadonnées (et non la version de l'indicateur/de la série temporelle elle-même).",
+                            "display_type": "text"
+                        }
+                    ],
+                    "help_text": ""
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "key": "series_description_container",
+            "title": "Description de l'indicateur",
+            "class": "mandatory recommended",
+            "expanded": true,
+            "items": [
+                {
+                    "key": "series_description_container1673533435878",
+                    "title": "Titre",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "series_description.idno",
+                            "title": "ID principal",
+                            "type": "string",
+                            "class": "required",
+                            "required": true,
+                            "rules_": "required|alpha_dash|min:5|max:80",
+                            "help_text": "Un identifiant unique de l'indicateur/de la série. L'\"ID principal\" (également appelé IDNO) est un numéro d'identification unique utilisé pour identifier la base de données. Un identifiant unique est requis à des fins de catalogage, cet élément est donc déclaré comme Obligatoire. L'identifiant permettra aux utilisateurs de citer correctement l'indicateur/la série. L'identifiant doit être unique dans le catalogue. Idéalement, il devrait également être unique au monde ; l'option recommandée consiste à obtenir un identificateur d'objet numérique (DOI) pour l'étude. Alternativement, l'\"ID principal\" peut être créé par une organisation à l'aide d'un schéma cohérent. Par exemple, le nom de la série dans la série des Indicateurs du développement dans le monde de la Banque mondiale est composé des quatre éléments suivants, séparés par un point : Code de sujet (2 chiffres) ; Code de sujet général (3 chiffres); Code de sujet spécifique (4 chiffres); Extensions (2 chiffres chacune). Notez que le schéma vous permet de fournir plus d'un identifiant pour une même étude (dans l'élément \"Autres identifiants\"); un identifiant spécifique au catalogue n'est donc pas incompatible avec un identifiant global unique comme un DOI. Une règle de validation peut être définie (à l'aide d'une expression régulière) dans les modèles utilisateur pour appliquer un format d'ID spécifique. Une règle de validation peut être définie (à l'aide d'une expression régulière) dans les modèles utilisateur pour appliquer un format d'ID spécifique. L'identifiant ne doit pas contenir d'espaces vides.",
+                            "is_required": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "series_description.alternate_identifiers",
+                            "title": "Autres identifiants",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Type",
+                                    "type": "string",
+                                    "prop_key": "series_description.alternate_identifiers.name",
+                                    "help_text": "Le type d'identifiant. Par exemple: \"DOI\" ou \"ISBN\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "identifier",
+                                    "title": "Identifiant",
+                                    "type": "string",
+                                    "prop_key": "series_description.alternate_identifiers.identifier",
+                                    "help_text": "L'identifiant lui-même.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "database",
+                                    "title": "Base de données",
+                                    "type": "string",
+                                    "prop_key": "series_description.alternate_identifiers.database",
+                                    "help_text": "Le nom de la base de données (ou du catalogue) où cet identifiant alternatif est utilisé, par ex. « FMI, Statistiques financières internationales (IFS) ».",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "series_description.alternate_identifiers.uri",
+                                    "help_text": "Un lien (URL) vers la base de données mentionnée dans la base de données.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "notes",
+                                    "title": "Notes",
+                                    "type": "string",
+                                    "prop_key": "series_description.alternate_identifiers.notes",
+                                    "help_text": "Informations complémentaires sur l'autre identifiant.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "Cet élément répétable est utilisé pour saisir des identifiants (ID) autres que l'\"ID principal\" (IDNO). L'élément \"Primary ID\" est l'identifiant de référence du catalogue dans lequel les métadonnées sont destinées à être publiées. Mais le même indicateur/métadonnées peut être publié dans d'autres catalogues. Par exemple, un catalogue de données peut publier des métadonnées pour des séries extraites de la base de données des Indicateurs du développement dans le monde (WDI) de la Banque mondiale. Et le WDI lui-même contient des séries générées et publiées par d'autres organisations, telles que l'Organisation mondiale de la santé ou l'UNICEF. Les administrateurs de catalogue peuvent souhaiter attribuer un identifiant unique spécifique à leur catalogue (l'élément \"ID principal\"), mais conserver une trace de l'identifiant de la série ou de l'indicateur dans le catalogue ou les bases de données d'origine. Les \"Autres identifiants\" peuvent également inclure un identifiant d'objet numérique (DOI). L'\"ID principal\" peut être répété ici (l'\"ID principal\" ne fournit pas de paramètre \"Type\", donc si un DOI ou un autre type d'ID standard est utilisé comme identifiant principal, il est recommandé de répéter ici avec l'identification du type)."
+                        },
+                        {
+                            "key": "series_description.name",
+                            "type": "string",
+                            "class": "name",
+                            "title": "Nom",
+                            "help_text": "Le nom (étiquette) de l'indicateur/de la série. Assurez-vous d'utiliser un nom unique pour chaque indicateur/série distinct. Notez qu'un alias de champ est fourni (voir ci-dessous) pour saisir des noms alternatifs pour l'indicateur/la série. Faites attention à l'utilisation cohérente des majuscules dans le nom des indicateurs/séries.",
+                            "is_required": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "series_description.aliases",
+                            "title": "Aliases",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "alias",
+                                    "title": "Alias",
+                                    "type": "string",
+                                    "prop_key": "series_description.aliases.alias",
+                                    "help_text": "Un autre nom pour l'indicateur ou la série documentée.",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Une série ou un indicateur peuvent être référencés en utilisant des noms différents. Par exemple, l'indicateur \"Taux de mortalité infantile\" pourrait également être appelé \"Taux de mortalité des moins de cinq ans\". L'élément alias est fourni pour saisir les noms alternatifs de la série ou de l'indicateur documenté. Faites attention à l'utilisation cohérente des majuscules dans les alias."
+                        },
+                        {
+                            "key": "series_description.database_id",
+                            "type": "string",
+                            "class": "database_id",
+                            "title": "ID de la base de données",
+                            "help_text": "L'identifiant unique de la base de données à laquelle appartient l'indicateur/la série. Ce champ doit correspondre à l'élément \"Database description / Title statement / Primary ID\" des métadonnées de la base de données. C'est le seul champ nécessaire pour établir le lien entre les métadonnées de l'indicateur et les informations de la base de données à laquelle il appartient.",
+                            "display_type": "text"
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "series_description_container1673533506085",
+                    "title": "Sources, concepts et méthodes",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "series_description.definition_short",
+                            "type": "string",
+                            "class": "definition_short",
+                            "title": "Définition courte",
+                            "help_text": "Une brève définition de la série. La définition courte capture l'essence de la série.",
+                            "is_recommended": true,
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "series_description.definition_long",
+                            "type": "string",
+                            "class": "definition_long",
+                            "title": "Définition longue",
+                            "help_text": "Une version (plus) longue de la définition de la série. Si une seule définition est disponible (pas une version courte/longue), il est recommandé de la saisir dans l'élément \"Définition courte\". Alternativement, la même définition peut être stockée à la fois dans \"Définition courte\" et \"Définition longue\".",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "series_description.definition_references",
+                            "title": "Références de la définition",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "source",
+                                    "title": "Source",
+                                    "type": "string",
+                                    "prop_key": "series_description.definition_references.source",
+                                    "help_text": "The source of the definition (title, or label).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "rules_": "required",
+                                    "prop_key": "series_description.definition_references.uri",
+                                    "help_text": "Un lien (URL) vers la source de la définition.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "note",
+                                    "title": "Note",
+                                    "type": "string",
+                                    "prop_key": "series_description.definition_references.note",
+                                    "help_text": "Cet élément permet d'annoter ou d'expliquer la raison pour laquelle la référence a été incluse dans les métadonnées.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "Cet élément est fourni pour établir un lien vers une ressource externe à partir de laquelle la définition a été extraite."
+                        },
+                        {
+                            "key": "series_description.relevance",
+                            "type": "string",
+                            "title": "Relevance",
+                            "help_text": "Ce champ documente la pertinence d'un indicateur ou d'une série par rapport à un impératif social ou à un objectif politique.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "series_description.methodology",
+                            "type": "string",
+                            "class": "methodology",
+                            "title": "Méthodologie",
+                            "help_text": "Précisions méthodologiques sur la production de la série ou de l'indicateur.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "series_description.derivation",
+                            "type": "string",
+                            "title": "Dérivation",
+                            "help_text": "Description de la méthode de dérivation (hors imputations, qui doivent être décrites dans l'élément \"Imputation\").",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "series_description.imputation",
+                            "type": "string",
+                            "class": "imputation",
+                            "title": "Imputation",
+                            "help_text": "Les données peuvent avoir été imputées pour tenir compte des lacunes dans les données ou pour d'autres raisons (harmonisation/normalisation, et autres). Si des imputations ont été faites, cet élément fournit l'espace pour leur description.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "series_description.statistical_concept",
+                            "type": "string",
+                            "class": "statistical_concept",
+                            "title": "Concept statistique",
+                            "help_text": "Une référence de la série avec un contenu à caractère statistique. Cela peut inclure des concepts ou des normes de codage qui sont appliqués pour rendre les données statistiquement pertinentes.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "series_description.concepts",
+                            "title": "Notions connexes",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "rules_": "required",
+                                    "prop_key": "series_description.concepts.name",
+                                    "help_text": "Un nom concis et standardisé (étiquette) pour le concept.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "definition",
+                                    "title": "Définition",
+                                    "type": "string",
+                                    "prop_key": "series_description.concepts.definition",
+                                    "help_text": "La définition du concept.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "series_description.concepts.uri",
+                                    "help_text": "Un lien (URL) vers une ressource fournissant des informations plus détaillées sur le concept.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Cet élément répétable peut être utilisé pour documenter des concepts liés aux indicateurs ou aux séries chronologiques (autres que le concept statistique principal qui peut avoir été saisi dans \"Concept statistique\"). Par exemple, le concept de malnutrition pourrait être documenté par rapport aux indicateurs « Prévalence du retard de croissance » et « Prévalence de l'émaciation »."
+                        },
+                        {
+                            "key": "series_description.aggregation_method",
+                            "type": "string",
+                            "title": "Méthode d'agrégation",
+                            "help_text": "L'élément \"Méthode d'agrégation\" décrit comment les valeurs peuvent être agrégées d'un niveau géographique (par exemple, un pays) à une zone géographique de niveau supérieur (par exemple, un groupe de pays défini en fonction de critères géographiques (région, monde ) ou un autre critère (pays à revenu faible/moyen/élevé, pays insulaires, pays de l'OCDE, etc.) La méthode d'agrégation peut être simple (type « somme » ou « moyenne pondérée par la population ») ou plus complexe, impliquant la pondération des valeurs.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "series_description.sources",
+                            "title": "Sources de données",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "string",
+                                    "prop_key": "series_description.sources.id",
+                                    "help_text": "Cet élément enregistre l'ID principal (identifiant unique) d'une source de données. Si la source n'a pas d'identifiant unique spécifique, un numéro séquentiel peut être utilisé. Si la source est un ensemble de données ou une base de données qui a son propre identifiant unique (éventuellement un DOI), cet identifiant doit être utilisé.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "name",
+                                    "title": "Titre",
+                                    "type": "string",
+                                    "rules_": "required",
+                                    "prop_key": "series_description.sources.name",
+                                    "help_text": "Le titre (nom ou étiquette) de la source.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "organization",
+                                    "title": "Organisation",
+                                    "type": "string",
+                                    "prop_key": "series_description.sources.organization",
+                                    "help_text": "Organisation responsable des données sources.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "type",
+                                    "title": "Type de données",
+                                    "type": "string",
+                                    "prop_key": "series_description.sources.type",
+                                    "help_text": "Le type de source, par ex. « enquête auprès des ménages », « données administratives » ou « base de données externe ».",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "note",
+                                    "title": "Notes",
+                                    "type": "string",
+                                    "prop_key": "series_description.sources.note",
+                                    "help_text": "Cet élément peut être utilisé pour fournir des informations supplémentaires concernant les données source.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "Cet élément fournit des informations sur la ou les sources de données qui ont été utilisées pour générer l'indicateur. Une source peut faire référence à une organisation (par exemple, « Source : Organisation mondiale de la santé ») ou à un ensemble de données (par exemple, pour un indicateur national de pauvreté, les sources seront probablement une liste d'enquêtes auprès des ménages). Dans les sources, nous nous intéressons principalement à ces dernières. Lorsqu'une série d'une base de données est une série extraite d'une autre base de données (par exemple, lorsque les Indicateurs du développement dans le monde de la Banque mondiale incluent une série de l'Organisation mondiale de la santé dans sa base de données), l'organisation source doit être mentionnée dans l'\"entité auteur\" élément du schéma. L'élément sources est un élément répétable. Dans les bases de données internationales où les séries couvrent de nombreux pays, une série peut avoir un grand nombre de sources (par exemple, les données sur l'incidence de la pauvreté de la Banque mondiale sont extraites de centaines d'enquêtes nationales auprès des ménages différentes). Le contenu de cet élément peut donc être assez important. Ces informations sont cependant utiles, car elles contribuent à établir la traçabilité et la crédibilité des données."
+                        },
+                        {
+                            "key": "series_description.sources_note",
+                            "type": "string",
+                            "title": "Notes sur la source des données",
+                            "help_text": "Informations supplémentaires sur la ou les sources de données utilisées pour générer la série ou l'indicateur.",
+                            "display_type": "textarea"
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "series_description_container1673533684214",
+                    "title": "Standards et cadres",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "series_description.compliance",
+                            "title": "Standards",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "standard",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "prop_key": "series_description.compliance.standard",
+                                    "help_text": "Le nom du standard (norme) auquel la série est conforme. Ce nom comportera idéalement un label et une version ou une date. Par exemple : « Classification internationale type de toutes les activités économiques (CITI) Révision 4, publiée en 2007 »",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbreviation",
+                                    "title": "Abbréviation",
+                                    "type": "string",
+                                    "prop_key": "series_description.compliance.abbreviation",
+                                    "help_text": "L'acronyme du standard auquel la série est conforme. Par exemple, \"ICD10\" pour la version 10 de la Classification internationale des maladies.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "custodian",
+                                    "title": "Gardien",
+                                    "type": "string",
+                                    "prop_key": "series_description.compliance.custodian",
+                                    "help_text": "L'organisation qui maintient le standard utilisé pour la conformité. Par exemple : « Division de statistique des Nations Unies ».",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "series_description.compliance.uri",
+                                    "help_text": "Un lien vers un site Web public où des informations sur le standard de conformité peuvent être obtenues.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Pour certains indicateurs, des standards internationaux ont été établis. C'est par exemple le cas d'indicateurs comme le chômage ou le taux de chômage, pour lesquels la Conférence internationale des statisticiens du travail définit les concepts et méthodes normatifs. L'élément de conformité est utilisé pour documenter la conformité d'une série à un ou plusieurs standards nationaux et/ou internationaux."
+                        },
+                        {
+                            "key": "series_description.framework",
+                            "title": "Cadres",
+                            "type": "nested_array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "prop_key": "series_description.framework.name",
+                                    "help_text": "Le nom du cadre. Par exemple, \"Objectifs de développement durable\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbreviation",
+                                    "title": "Abbréviation",
+                                    "type": "string",
+                                    "prop_key": "series_description.framework.abbreviation",
+                                    "help_text": "L'acronyme ou l'abréviation du cadre, par exemple \"ODD\" pour les objectifs de développement durable.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "custodian",
+                                    "title": "Gardien",
+                                    "type": "string",
+                                    "prop_key": "series_description.framework.custodian",
+                                    "help_text": "Le nom de l'organisation qui est le gardien officiel du cadre.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "string",
+                                    "prop_key": "series_description.framework.description",
+                                    "help_text": "Une brève description du cadre.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "goal_id",
+                                    "title": "ID de l'objectif",
+                                    "type": "string",
+                                    "prop_key": "series_description.framework.goal_id",
+                                    "help_text": "L'identifiant de l'objectif auquel l'indicateur ou la série est associé.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "goal_name",
+                                    "title": "Nom de l'objectif",
+                                    "type": "string",
+                                    "prop_key": "series_description.framework.goal_name",
+                                    "help_text": "Le nom (label) de l'objectif auquel l'indicateur ou la série est associé.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "goal_description",
+                                    "title": "Description de l'objectif",
+                                    "type": "string",
+                                    "prop_key": "series_description.framework.goal_description",
+                                    "help_text": "Une brève description de l'objectif auquel l'indicateur ou la série est associé(e).",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "target_id",
+                                    "title": "ID de la cible",
+                                    "type": "string",
+                                    "prop_key": "series_description.framework.target_id",
+                                    "help_text": "L'identifiant de la cible à laquelle l'indicateur ou la série est associé.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "target_name",
+                                    "title": "Nom de la cible",
+                                    "type": "string",
+                                    "prop_key": "series_description.framework.target_name",
+                                    "help_text": "Le nom (label) de la cible à laquelle l'indicateur ou la série est associé.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "target_description",
+                                    "title": "Description de la cible",
+                                    "type": "string",
+                                    "prop_key": "series_description.framework.target_description",
+                                    "help_text": "Une brève description de la cible à laquelle l'indicateur ou la série est associé(e).",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "indicator_id",
+                                    "title": "ID de l'indicateur",
+                                    "type": "string",
+                                    "prop_key": "series_description.framework.indicator_id",
+                                    "help_text": "L'identifiant de l'indicateur, tel que fourni dans le cadre.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "indicator_name",
+                                    "title": "Nom de l'indicateur",
+                                    "type": "string",
+                                    "prop_key": "series_description.framework.indicator_name",
+                                    "help_text": "Le nom de l'indicateur, tel qu'il est fourni dans le cadre (qui peut être différent du nom fourni dans \"Nom\").",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "indicator_description",
+                                    "title": "Description de l'indicateur",
+                                    "type": "string",
+                                    "prop_key": "series_description.framework.indicator_description",
+                                    "help_text": "Une brève description de l'indicateur, telle qu'elle est fournie dans le cadre.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "series_description.framework.uri",
+                                    "help_text": "Un lien vers un site Web fournissant des informations détaillées sur le cadre, ses objectifs, ses cibles et ses indicateurs.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "notes",
+                                    "title": "Notes",
+                                    "type": "string",
+                                    "prop_key": "series_description.framework.notes",
+                                    "help_text": "Toute information supplémentaire sur la relation entre l'indicateur/la série et le cadre.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "Certaines agences nationales, régionales et internationales élaborent des cadres de suivi, avec des objectifs, des cibles et des indicateurs. Quelques exemples bien connus sont les objectifs du Millénaire pour le développement et les objectifs de développement durable qui établissent des objectifs internationaux pour le développement humain, ou le Sommet mondial pour les enfants (1990) qui fixe des objectifs internationaux dans les domaines de la survie, du développement et de la protection des enfants, soutenant les objectifs sectoriels tels que la santé et l'éducation des femmes, la nutrition, la santé des enfants, l'eau et l'assainissement, l'éducation de base et les enfants en situation difficile. L'élément de cadre est utilisé pour lier un indicateur ou une série au cadre, à l'objectif et à la cible qui lui sont associés."
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "series_description_container1673533307656",
+                    "title": "Qualité",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "series_description.limitation",
+                            "type": "string",
+                            "title": "Limitations",
+                            "help_text": "Cet élément est utilisé pour communiquer à l'utilisateur toute limitation ou exception dans l'utilisation des données. Les limitations peuvent résulter de la méthodologie, de problèmes de qualité ou de cohérence dans la source de données, ou autre.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "series_description.quality_checks",
+                            "type": "string",
+                            "title": "Contrôles de qualité",
+                            "help_text": "Les données peuvent avoir subi des contrôles de qualité des données pour s'assurer que les valeurs sont raisonnables et cohérentes, ce qui peut être décrit dans cet élément. Ces contrôles de qualité peuvent inclure la vérification des valeurs aberrantes ou autres. Une brève description de ces procédures de contrôle de la qualité contribuera à renforcer la crédibilité des données diffusées.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "series_description.quality_note",
+                            "type": "string",
+                            "title": "Note sur la qualité",
+                            "help_text": "Informations supplémentaires ou déclaration générale sur la qualité des données. Celles-ci pourraient par exemple couvrir des notes de qualité non standard et/ou des informations sur des examens indépendants de la qualité des données.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "series_description.sources_discrepancies",
+                            "type": "string",
+                            "title": "Écarts",
+                            "help_text": "Cet élément est utilisé pour décrire et expliquer pourquoi les données de la série peuvent être différentes des données de la même série publiées dans d'autres sources. Les organisations internationales, par exemple, peuvent appliquer différentes techniques pour rendre les données obtenues à partir de sources nationales comparables entre les pays, auquel cas les données publiées dans les bases de données internationales peuvent différer des données publiées dans les bases de données nationales officielles.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "series_description.missing",
+                            "type": "string",
+                            "class": "missing",
+                            "title": "Valeurs manquantes",
+                            "help_text": "Informations sur les valeurs manquantes dans la série ou l'indicateur. Ces informations peuvent être liées au traitement des valeurs manquantes, à la ou aux causes des valeurs manquantes, etc.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "series_description.errata",
+                            "type": "array",
+                            "title": "Errata",
+                            "props": [
+                                {
+                                    "key": "type",
+                                    "title": "Date",
+                                    "type": "string",
+                                    "prop_key": "series_description.errata.type",
+                                    "help_text": "La date à laquelle l'erratum a été publié, de préférence au format ISO (AAAA-MM-JJ).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "string",
+                                    "prop_key": "series_description.errata.description",
+                                    "help_text": "Une brève description de l'erreur et de la solution.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "Une liste d'errata pour l'indicateur."
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "series_description_container1674230835280",
+                    "title": "Couverture géographique et temporelle",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "series_description.time_periods",
+                            "title": "Couverture temporelle",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "start",
+                                    "title": "Début",
+                                    "type": "string",
+                                    "rules_": "required",
+                                    "prop_key": "series_description.time_periods.start",
+                                    "help_text": "La date initiale de la série dans l'ensemble de données. La date de début doit être saisie au format ISO 8601 (AAAA-MM-JJ ou AAAA-MM ou AAAA). Une règle de validation peut être définie pour imposer l'utilisation d'un format de date spécifique.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "end",
+                                    "title": "Fin",
+                                    "type": "string",
+                                    "prop_key": "series_description.time_periods.end",
+                                    "help_text": "La date de fin est la dernière date pour laquelle une estimation de l'indicateur est disponible. La date de fin doit être saisie au format ISO 8601 (AAAA-MM-JJ ou AAAA-MM ou AAAA). Une règle de validation peut être définie pour imposer l'utilisation d'un format de date spécifique.",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "La période couvre l'ensemble des données disponibles pour la série. La période a un début et une fin et est rapportée selon la périodicité fournie dans un élément précédent."
+                        },
+                        {
+                            "key": "series_description.ref_country",
+                            "title": "Pays",
+                            "help_text": "Liste des pays pour lesquels des données sont disponibles dans la série. Cet élément peut être redondant avec l'élément \"Zones géographiques\" qui peut également contenir une liste de pays, bien que l'information n'ait pas à être répétée. Les noms de pays doivent être saisis dans \"Pays\" et éventuellement dans \"Zones géographiques\". L'élément \"Zones géographiques\" peut alors être utilisé pour fournir des informations supplémentaires, telles que le nom des zones sous-nationales ou supranationales (par exemple, \"Afrique subsaharienne\", ou \"Bangkok\". Notez que si un indicateur est lié à une zone sous-nationale d'un pays, le nom de ce pays doit être saisi dans \"Pays\".",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "prop_key": "series_description.ref_country.name",
+                                    "help_text": "Le nom du pays. Veillez à utiliser des noms de pays cohérents pour tous les indicateurs documentés. Évitez d'utiliser des noms ou des orthographes de noms différents pour un même pays.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "code",
+                                    "title": "Code",
+                                    "type": "string",
+                                    "prop_key": "series_description.ref_country.code",
+                                    "help_text": "Le code du pays. L'utilisation des codes ISO 3166-1 alpha-3 est recommandée.",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "is_recommended": true,
+                            "enum": [
+                                {
+                                    "code": "AFG",
+                                    "name": "Afghanistan"
+                                },
+                                {
+                                    "code": "AFE",
+                                    "name": "Afrique de l'Est et du Sud"
+                                },
+                                {
+                                    "code": "AFW",
+                                    "name": "Afrique de l'Ouest et centrale"
+                                },
+                                {
+                                    "code": "NAF",
+                                    "name": "Afrique du Nord"
+                                },
+                                {
+                                    "code": "ZAF",
+                                    "name": "Afrique du Sud"
+                                },
+                                {
+                                    "code": "AFR",
+                                    "name": "Afrique subsaharienne"
+                                },
+                                {
+                                    "code": "SSF",
+                                    "name": "Afrique subsaharienne"
+                                },
+                                {
+                                    "code": "CAA",
+                                    "name": "Afrique subsaharienne (classification IFC)"
+                                },
+                                {
+                                    "code": "DSS",
+                                    "name": "Afrique subsaharienne (pays éligibles IDA)"
+                                },
+                                {
+                                    "code": "BSS",
+                                    "name": "Afrique subsaharienne (pays IBRD uniquement)"
+                                },
+                                {
+                                    "code": "TSS",
+                                    "name": "Afrique subsaharienne (pays IDA & IBRD)"
+                                },
+                                {
+                                    "code": "SXZ",
+                                    "name": "Afrique subsaharienne (sauf Afrique du Sud)"
+                                },
+                                {
+                                    "code": "SSA",
+                                    "name": "Afrique subsaharienne (sauf revenu élevé)"
+                                },
+                                {
+                                    "code": "XZN",
+                                    "name": "Afrique subsaharienne sauf Afrique du Sud et Nigéria"
+                                },
+                                {
+                                    "code": "ALB",
+                                    "name": "Albanie"
+                                },
+                                {
+                                    "code": "DZA",
+                                    "name": "Algérie"
+                                },
+                                {
+                                    "code": "DEU",
+                                    "name": "Allemagne"
+                                },
+                                {
+                                    "code": "ASM",
+                                    "name": "American Samoa"
+                                },
+                                {
+                                    "code": "NAC",
+                                    "name": "Amérique du Nord"
+                                },
+                                {
+                                    "code": "LCN",
+                                    "name": "Amérique latine & Caraïbes "
+                                },
+                                {
+                                    "code": "BLA",
+                                    "name": "Amerique latine & Caraïbes (pays IBRD uniquement)"
+                                },
+                                {
+                                    "code": "LAC",
+                                    "name": "Amérique latine & Caraïbes (sauf revenus élevés)"
+                                },
+                                {
+                                    "code": "CLA",
+                                    "name": "Amérique latine et Caraïbes (classification IFC )"
+                                },
+                                {
+                                    "code": "DLA",
+                                    "name": "Amérique latine et Caraïbes (pays éligibles IDA)"
+                                },
+                                {
+                                    "code": "TLA",
+                                    "name": "Amérique latine et Caraïbes (pays IDA & IBRD)"
+                                },
+                                {
+                                    "code": "AND",
+                                    "name": "Andorre"
+                                },
+                                {
+                                    "code": "AGO",
+                                    "name": "Angola"
+                                },
+                                {
+                                    "code": "ATG",
+                                    "name": "Antigua and Barbuda"
+                                },
+                                {
+                                    "code": "SAU",
+                                    "name": "Arabie saoudite"
+                                },
+                                {
+                                    "code": "ARG",
+                                    "name": "Argentine"
+                                },
+                                {
+                                    "code": "ARM",
+                                    "name": "Arménie"
+                                },
+                                {
+                                    "code": "ABW",
+                                    "name": "Aruba"
+                                },
+                                {
+                                    "code": "EAS",
+                                    "name": "Asie de l'Est & Pacifique"
+                                },
+                                {
+                                    "code": "DEA",
+                                    "name": "Asie de l'Est & Pacifique (pays éligibles IDA)"
+                                },
+                                {
+                                    "code": "BEA",
+                                    "name": "Asie de l'Est & Pacifique (pays IBRD uniquement)"
+                                },
+                                {
+                                    "code": "TEA",
+                                    "name": "Asie de l'Est & Pacifique (pays IDA & IBRD)"
+                                },
+                                {
+                                    "code": "EAP",
+                                    "name": "Asie de l'Est & Pacifique (sauf haut revenu)"
+                                },
+                                {
+                                    "code": "CEA",
+                                    "name": "Asie de l'Est et Pacifique (classification IFC )"
+                                },
+                                {
+                                    "code": "SAS",
+                                    "name": "Asie du Sud"
+                                },
+                                {
+                                    "code": "CSA",
+                                    "name": "Asie du Sud (classification IFC) "
+                                },
+                                {
+                                    "code": "TSA",
+                                    "name": "Asie du Sud (IDA & IBRD)"
+                                },
+                                {
+                                    "code": "DSA",
+                                    "name": "Asie du Sud (pays éligibles IDA)"
+                                },
+                                {
+                                    "code": "AUS",
+                                    "name": "Australie"
+                                },
+                                {
+                                    "code": "OSS",
+                                    "name": "Autres petits états"
+                                },
+                                {
+                                    "code": "AUT",
+                                    "name": "Autriche"
+                                },
+                                {
+                                    "code": "AZE",
+                                    "name": "Azerbaijan"
+                                },
+                                {
+                                    "code": "BHS",
+                                    "name": "Bahamas"
+                                },
+                                {
+                                    "code": "BHR",
+                                    "name": "Bahrein"
+                                },
+                                {
+                                    "code": "BGD",
+                                    "name": "Bangladesh"
+                                },
+                                {
+                                    "code": "BRB",
+                                    "name": "Barbade"
+                                },
+                                {
+                                    "code": "BLR",
+                                    "name": "Bélarus"
+                                },
+                                {
+                                    "code": "BEL",
+                                    "name": "Belgique"
+                                },
+                                {
+                                    "code": "BLZ",
+                                    "name": "Belize"
+                                },
+                                {
+                                    "code": "BEN",
+                                    "name": "Bénin"
+                                },
+                                {
+                                    "code": "BMU",
+                                    "name": "Bermudes"
+                                },
+                                {
+                                    "code": "BTN",
+                                    "name": "Bhoutan"
+                                },
+                                {
+                                    "code": "BOL",
+                                    "name": "Bolivie"
+                                },
+                                {
+                                    "code": "BIH",
+                                    "name": "Bosnie-Herzégovine"
+                                },
+                                {
+                                    "code": "BWA",
+                                    "name": "Botswana"
+                                },
+                                {
+                                    "code": "BRA",
+                                    "name": "Brésil"
+                                },
+                                {
+                                    "code": "BRN",
+                                    "name": "Brunéi Darussalam"
+                                },
+                                {
+                                    "code": "BGR",
+                                    "name": "Bulgarie"
+                                },
+                                {
+                                    "code": "BFA",
+                                    "name": "Burkina Faso"
+                                },
+                                {
+                                    "code": "BDI",
+                                    "name": "Burundi"
+                                },
+                                {
+                                    "code": "CPV",
+                                    "name": "Cabo Verde"
+                                },
+                                {
+                                    "code": "KHM",
+                                    "name": "Cambodge"
+                                },
+                                {
+                                    "code": "CMR",
+                                    "name": "Cameroun"
+                                },
+                                {
+                                    "code": "CAN",
+                                    "name": "Canada"
+                                },
+                                {
+                                    "code": "CHL",
+                                    "name": "Chili"
+                                },
+                                {
+                                    "code": "CHN",
+                                    "name": "Chine"
+                                },
+                                {
+                                    "code": "HKG",
+                                    "name": "Chine, RAS de Hong Kong"
+                                },
+                                {
+                                    "code": "CYP",
+                                    "name": "Chypre"
+                                },
+                                {
+                                    "code": "COL",
+                                    "name": "Colombie"
+                                },
+                                {
+                                    "code": "COM",
+                                    "name": "Comores"
+                                },
+                                {
+                                    "code": "COG",
+                                    "name": "Congo, République"
+                                },
+                                {
+                                    "code": "COD",
+                                    "name": "Congo, République démocratique"
+                                },
+                                {
+                                    "code": "KOR",
+                                    "name": "Corée, République de"
+                                },
+                                {
+                                    "code": "PRK",
+                                    "name": "Corée, République démocratique de"
+                                },
+                                {
+                                    "code": "CRI",
+                                    "name": "Costa Rica"
+                                },
+                                {
+                                    "code": "CIV",
+                                    "name": "Côte d'Ivoire"
+                                },
+                                {
+                                    "code": "HRV",
+                                    "name": "Croatie"
+                                },
+                                {
+                                    "code": "CUB",
+                                    "name": "Cuba"
+                                },
+                                {
+                                    "code": "CUW",
+                                    "name": "Curaçao"
+                                },
+                                {
+                                    "code": "DNK",
+                                    "name": "Danemark"
+                                },
+                                {
+                                    "code": "LTE",
+                                    "name": "Dividende démographique tardif"
+                                },
+                                {
+                                    "code": "DJI",
+                                    "name": "Djibouti"
+                                },
+                                {
+                                    "code": "DMA",
+                                    "name": "Dominique"
+                                },
+                                {
+                                    "code": "EGY",
+                                    "name": "Egypte, République arabe d'"
+                                },
+                                {
+                                    "code": "SLV",
+                                    "name": "El Salvador"
+                                },
+                                {
+                                    "code": "ARE",
+                                    "name": "Emirats arabes unis"
+                                },
+                                {
+                                    "code": "ECU",
+                                    "name": "Equateur"
+                                },
+                                {
+                                    "code": "ERI",
+                                    "name": "Erythrée"
+                                },
+                                {
+                                    "code": "ESP",
+                                    "name": "Espagne"
+                                },
+                                {
+                                    "code": "EST",
+                                    "name": "Estonie"
+                                },
+                                {
+                                    "code": "SWZ",
+                                    "name": "Eswatini"
+                                },
+                                {
+                                    "code": "USA",
+                                    "name": "Etats-Unis"
+                                },
+                                {
+                                    "code": "ETH",
+                                    "name": "Ethiopie"
+                                },
+                                {
+                                    "code": "ECS",
+                                    "name": "Europe & Asie centrale"
+                                },
+                                {
+                                    "code": "DEC",
+                                    "name": "Europe & Asie centrale (pays éligibles IDA)"
+                                },
+                                {
+                                    "code": "BEC",
+                                    "name": "Europe & Asie centrale (pays IBRD uniquement)"
+                                },
+                                {
+                                    "code": "TEC",
+                                    "name": "Europe & Asie centrale (pays IDA & IBRD)"
+                                },
+                                {
+                                    "code": "ECA",
+                                    "name": "Europe & Asie centrale (sauf haut revenu)"
+                                },
+                                {
+                                    "code": "CEB",
+                                    "name": "Europe centrale et pays baltes"
+                                },
+                                {
+                                    "code": "CEU",
+                                    "name": "Europe et Asie centrale (classification IFC )"
+                                },
+                                {
+                                    "code": "LIC",
+                                    "name": "Faible revenu"
+                                },
+                                {
+                                    "code": "RUS",
+                                    "name": "Fédération de Russie"
+                                },
+                                {
+                                    "code": "FJI",
+                                    "name": "Fiji"
+                                },
+                                {
+                                    "code": "FIN",
+                                    "name": "Finlande"
+                                },
+                                {
+                                    "code": "FRA",
+                                    "name": "France"
+                                },
+                                {
+                                    "code": "GAB",
+                                    "name": "Gabon"
+                                },
+                                {
+                                    "code": "GMB",
+                                    "name": "Gambie"
+                                },
+                                {
+                                    "code": "GEO",
+                                    "name": "Georgie"
+                                },
+                                {
+                                    "code": "GHA",
+                                    "name": "Ghana"
+                                },
+                                {
+                                    "code": "GIB",
+                                    "name": "Gibraltar"
+                                },
+                                {
+                                    "code": "GRC",
+                                    "name": "Grèce"
+                                },
+                                {
+                                    "code": "GRD",
+                                    "name": "Grenade"
+                                },
+                                {
+                                    "code": "GRL",
+                                    "name": "Groenland"
+                                },
+                                {
+                                    "code": "GUM",
+                                    "name": "Guam"
+                                },
+                                {
+                                    "code": "GTM",
+                                    "name": "Guatemala"
+                                },
+                                {
+                                    "code": "GIN",
+                                    "name": "Guinée"
+                                },
+                                {
+                                    "code": "GNQ",
+                                    "name": "Guinée équatoriale"
+                                },
+                                {
+                                    "code": "GNB",
+                                    "name": "Guinée-Bissau"
+                                },
+                                {
+                                    "code": "GUY",
+                                    "name": "Guyane"
+                                },
+                                {
+                                    "code": "HTI",
+                                    "name": "Haïti"
+                                },
+                                {
+                                    "code": "HND",
+                                    "name": "Honduras"
+                                },
+                                {
+                                    "code": "HUN",
+                                    "name": "Hongrie"
+                                },
+                                {
+                                    "code": "IBD",
+                                    "name": "IBRD uniquement"
+                                },
+                                {
+                                    "code": "IBB",
+                                    "name": "IBRD, y compris mélange"
+                                },
+                                {
+                                    "code": "IDB",
+                                    "name": "IDA "
+                                },
+                                {
+                                    "code": "IBT",
+                                    "name": "IDA & IBRD total"
+                                },
+                                {
+                                    "code": "IDA",
+                                    "name": "IDA total"
+                                },
+                                {
+                                    "code": "IDX",
+                                    "name": "IDA uniquement"
+                                },
+                                {
+                                    "code": "IMN",
+                                    "name": "Ile de Man"
+                                },
+                                {
+                                    "code": "CHI",
+                                    "name": "Iles anglo-normandes"
+                                },
+                                {
+                                    "code": "CYM",
+                                    "name": "Iles Cayman "
+                                },
+                                {
+                                    "code": "FRO",
+                                    "name": "Iles Féroé "
+                                },
+                                {
+                                    "code": "MHL",
+                                    "name": "Iles Marshall "
+                                },
+                                {
+                                    "code": "SLB",
+                                    "name": "Iles Salomon "
+                                },
+                                {
+                                    "code": "TCA",
+                                    "name": "Iles Turks et Caicos "
+                                },
+                                {
+                                    "code": "VIR",
+                                    "name": "Iles Vierges (U.S.)"
+                                },
+                                {
+                                    "code": "VGB",
+                                    "name": "Iles Vierges britanniques"
+                                },
+                                {
+                                    "code": "IND",
+                                    "name": "Inde"
+                                },
+                                {
+                                    "code": "IDN",
+                                    "name": "Indonésie"
+                                },
+                                {
+                                    "code": "IRN",
+                                    "name": "Iran, République islamique d'"
+                                },
+                                {
+                                    "code": "IRQ",
+                                    "name": "Iraq"
+                                },
+                                {
+                                    "code": "IRL",
+                                    "name": "Irlande"
+                                },
+                                {
+                                    "code": "ISL",
+                                    "name": "Islande"
+                                },
+                                {
+                                    "code": "ISR",
+                                    "name": "Israël"
+                                },
+                                {
+                                    "code": "ITA",
+                                    "name": "Italie"
+                                },
+                                {
+                                    "code": "JAM",
+                                    "name": "Jamaique"
+                                },
+                                {
+                                    "code": "JPN",
+                                    "name": "Japon"
+                                },
+                                {
+                                    "code": "JOR",
+                                    "name": "Jordanie"
+                                },
+                                {
+                                    "code": "KAZ",
+                                    "name": "Kazakhstan"
+                                },
+                                {
+                                    "code": "KEN",
+                                    "name": "Kenya"
+                                },
+                                {
+                                    "code": "KIR",
+                                    "name": "Kiribati"
+                                },
+                                {
+                                    "code": "XKX",
+                                    "name": "Kosovo"
+                                },
+                                {
+                                    "code": "KWT",
+                                    "name": "Koweït"
+                                },
+                                {
+                                    "code": "LVA",
+                                    "name": "Latvie"
+                                },
+                                {
+                                    "code": "LSO",
+                                    "name": "Lesotho"
+                                },
+                                {
+                                    "code": "LBN",
+                                    "name": "Liban"
+                                },
+                                {
+                                    "code": "LBR",
+                                    "name": "Libéria"
+                                },
+                                {
+                                    "code": "LBY",
+                                    "name": "Libye"
+                                },
+                                {
+                                    "code": "LIE",
+                                    "name": "Liechtenstein"
+                                },
+                                {
+                                    "code": "LTU",
+                                    "name": "Lituanie"
+                                },
+                                {
+                                    "code": "LUX",
+                                    "name": "Luxembourg"
+                                },
+                                {
+                                    "code": "MKD",
+                                    "name": "Macédoine du Nord"
+                                },
+                                {
+                                    "code": "MDG",
+                                    "name": "Madagascar"
+                                },
+                                {
+                                    "code": "MYS",
+                                    "name": "Malaisie"
+                                },
+                                {
+                                    "code": "MWI",
+                                    "name": "Malawi"
+                                },
+                                {
+                                    "code": "MDV",
+                                    "name": "Maldives"
+                                },
+                                {
+                                    "code": "MLI",
+                                    "name": "Mali"
+                                },
+                                {
+                                    "code": "MLT",
+                                    "name": "Malte"
+                                },
+                                {
+                                    "code": "MNP",
+                                    "name": "Mariannes"
+                                },
+                                {
+                                    "code": "MAR",
+                                    "name": "Maroc"
+                                },
+                                {
+                                    "code": "MUS",
+                                    "name": "Maurice"
+                                },
+                                {
+                                    "code": "MRT",
+                                    "name": "Mauritanie"
+                                },
+                                {
+                                    "code": "OED",
+                                    "name": "Membres OECD "
+                                },
+                                {
+                                    "code": "MEX",
+                                    "name": "Mexique"
+                                },
+                                {
+                                    "code": "FSM",
+                                    "name": "Micronésie, Etats fédérés de"
+                                },
+                                {
+                                    "code": "MDA",
+                                    "name": "Moldavie"
+                                },
+                                {
+                                    "code": "MCO",
+                                    "name": "Monaco"
+                                },
+                                {
+                                    "code": "WLD",
+                                    "name": "Monde"
+                                },
+                                {
+                                    "code": "ARB",
+                                    "name": "Monde arabe"
+                                },
+                                {
+                                    "code": "MNG",
+                                    "name": "Mongolie"
+                                },
+                                {
+                                    "code": "MNE",
+                                    "name": "Monténégro"
+                                },
+                                {
+                                    "code": "MDE",
+                                    "name": "Moyen Orient (en développement)"
+                                },
+                                {
+                                    "code": "DMN",
+                                    "name": "Moyen orient & Afrique du Nord (pays éligibles IDA)"
+                                },
+                                {
+                                    "code": "BMN",
+                                    "name": "Moyen Orient & Afrique du Nord (pays IBRD uniquement)"
+                                },
+                                {
+                                    "code": "MEA",
+                                    "name": "Moyen Orient et Afrique du Nord"
+                                },
+                                {
+                                    "code": "CME",
+                                    "name": "Moyen Orient et Afrique du Nord (classification IFC )"
+                                },
+                                {
+                                    "code": "TMN",
+                                    "name": "Moyen Orient et Afrique du Nord (pays IDA & IBRD)"
+                                },
+                                {
+                                    "code": "MNA",
+                                    "name": "Moyen Orient et Afrique du Nord (sauf revenu élevé)"
+                                },
+                                {
+                                    "code": "MOZ",
+                                    "name": "Mozambique"
+                                },
+                                {
+                                    "code": "MMR",
+                                    "name": "Myanmar"
+                                },
+                                {
+                                    "code": "NAM",
+                                    "name": "Namibie"
+                                },
+                                {
+                                    "code": "NRU",
+                                    "name": "Nauru"
+                                },
+                                {
+                                    "code": "NPL",
+                                    "name": "Népal"
+                                },
+                                {
+                                    "code": "NIC",
+                                    "name": "Nicaragua"
+                                },
+                                {
+                                    "code": "NER",
+                                    "name": "Niger"
+                                },
+                                {
+                                    "code": "NGA",
+                                    "name": "Nigéria"
+                                },
+                                {
+                                    "code": "INX",
+                                    "name": "Non classifié"
+                                },
+                                {
+                                    "code": "NOR",
+                                    "name": "Norvège"
+                                },
+                                {
+                                    "code": "NCL",
+                                    "name": "Nouvelle Calédonie"
+                                },
+                                {
+                                    "code": "NZL",
+                                    "name": "Nouvelle Zélande"
+                                },
+                                {
+                                    "code": "OMN",
+                                    "name": "Oman"
+                                },
+                                {
+                                    "code": "UZB",
+                                    "name": "Ouzbékistan"
+                                },
+                                {
+                                    "code": "PAK",
+                                    "name": "Pakistan"
+                                },
+                                {
+                                    "code": "PLW",
+                                    "name": "Palau"
+                                },
+                                {
+                                    "code": "PAN",
+                                    "name": "Panama"
+                                },
+                                {
+                                    "code": "PNG",
+                                    "name": "Papouasie Nouvelle Guinée"
+                                },
+                                {
+                                    "code": "PRY",
+                                    "name": "Paraguay"
+                                },
+                                {
+                                    "code": "SST",
+                                    "name": "Patits états"
+                                },
+                                {
+                                    "code": "NRS",
+                                    "name": "Pays d'Afrique subsaharienne pauvres en resources"
+                                },
+                                {
+                                    "code": "RRS",
+                                    "name": "Pays d'Afrique subsaharienne riches en resources"
+                                },
+                                {
+                                    "code": "EAR",
+                                    "name": "Pays de dividende démographique précoce "
+                                },
+                                {
+                                    "code": "FCS",
+                                    "name": "Pays en situation fragile ou de conflit"
+                                },
+                                {
+                                    "code": "BHI",
+                                    "name": "Pays IBRD à haut revenu"
+                                },
+                                {
+                                    "code": "FXS",
+                                    "name": "Pays IDA classifiés comme étant en situation fragiles, hors Afrique subsaharienne"
+                                },
+                                {
+                                    "code": "DSF",
+                                    "name": "Pays IDA d'Afrique subsaharienne classifiés en situation fragile"
+                                },
+                                {
+                                    "code": "DNS",
+                                    "name": "Pays IDA d'Afrique subsaharienne non classifiés en situation fragile"
+                                },
+                                {
+                                    "code": "DFS",
+                                    "name": "Pays IDA en situation fragile"
+                                },
+                                {
+                                    "code": "DNF",
+                                    "name": "Pays IDA non classifiés en situation fragile"
+                                },
+                                {
+                                    "code": "NXS",
+                                    "name": "Pays IDA non-classifiés comme fragiles, sauf Afrique subsaharienne"
+                                },
+                                {
+                                    "code": "LDC",
+                                    "name": "Pays les moins développés: classification NU"
+                                },
+                                {
+                                    "code": "HPC",
+                                    "name": "Pays très endettés (HIPC)"
+                                },
+                                {
+                                    "code": "NLD",
+                                    "name": "Pays-Bas"
+                                },
+                                {
+                                    "code": "PER",
+                                    "name": "Pérou"
+                                },
+                                {
+                                    "code": "CSS",
+                                    "name": "Petits états des Caraïbes"
+                                },
+                                {
+                                    "code": "PSS",
+                                    "name": "Petits états insulaires du Pacifique"
+                                },
+                                {
+                                    "code": "PHL",
+                                    "name": "Philippines"
+                                },
+                                {
+                                    "code": "POL",
+                                    "name": "Pologne"
+                                },
+                                {
+                                    "code": "PYF",
+                                    "name": "Polynésie française"
+                                },
+                                {
+                                    "code": "PRI",
+                                    "name": "Porto Rico"
+                                },
+                                {
+                                    "code": "PRT",
+                                    "name": "Portugal"
+                                },
+                                {
+                                    "code": "PST",
+                                    "name": "Post-dividende démographique "
+                                },
+                                {
+                                    "code": "PRE",
+                                    "name": "Pré-dividende démographique "
+                                },
+                                {
+                                    "code": "QAT",
+                                    "name": "Qatar"
+                                },
+                                {
+                                    "code": "MAC",
+                                    "name": "Région adminisrative spéciale de Macao, Chine"
+                                },
+                                {
+                                    "code": "SYR",
+                                    "name": "République arabe syrienne"
+                                },
+                                {
+                                    "code": "CAF",
+                                    "name": "République centrafricaine"
+                                },
+                                {
+                                    "code": "LAO",
+                                    "name": "République démocratique populaire lao"
+                                },
+                                {
+                                    "code": "DOM",
+                                    "name": "République dominicaine"
+                                },
+                                {
+                                    "code": "KGZ",
+                                    "name": "République kirgize"
+                                },
+                                {
+                                    "code": "SVK",
+                                    "name": "République slovaque"
+                                },
+                                {
+                                    "code": "CZE",
+                                    "name": "République tchèque"
+                                },
+                                {
+                                    "code": "HIC",
+                                    "name": "Revenu élevé"
+                                },
+                                {
+                                    "code": "LMY",
+                                    "name": "Revenu faible et intermédiaire"
+                                },
+                                {
+                                    "code": "MIC",
+                                    "name": "Revenu intermédiaire"
+                                },
+                                {
+                                    "code": "LMC",
+                                    "name": "Revenu intermédiaire, tranche inférieure"
+                                },
+                                {
+                                    "code": "UMC",
+                                    "name": "Revenu intermédiaire, tranche supérieure"
+                                },
+                                {
+                                    "code": "ROU",
+                                    "name": "Roumanie"
+                                },
+                                {
+                                    "code": "GBR",
+                                    "name": "Royaume Uni"
+                                },
+                                {
+                                    "code": "RWA",
+                                    "name": "Rwanda"
+                                },
+                                {
+                                    "code": "SMR",
+                                    "name": "Saint-Marin"
+                                },
+                                {
+                                    "code": "WSM",
+                                    "name": "Samoa"
+                                },
+                                {
+                                    "code": "STP",
+                                    "name": "Sao Tomé et Principe"
+                                },
+                                {
+                                    "code": "SEN",
+                                    "name": "Sénégal"
+                                },
+                                {
+                                    "code": "SRB",
+                                    "name": "Serbie"
+                                },
+                                {
+                                    "code": "SYC",
+                                    "name": "Seychelles"
+                                },
+                                {
+                                    "code": "SLE",
+                                    "name": "Sierra Leone"
+                                },
+                                {
+                                    "code": "SGP",
+                                    "name": "Singapour"
+                                },
+                                {
+                                    "code": "SXM",
+                                    "name": "Sint Maarten (Dutch part)"
+                                },
+                                {
+                                    "code": "SVN",
+                                    "name": "Slovénie"
+                                },
+                                {
+                                    "code": "SOM",
+                                    "name": "Somalie"
+                                },
+                                {
+                                    "code": "SDN",
+                                    "name": "Soudan"
+                                },
+                                {
+                                    "code": "SSD",
+                                    "name": "Soudan du Sud"
+                                },
+                                {
+                                    "code": "LKA",
+                                    "name": "Sri Lanka"
+                                },
+                                {
+                                    "code": "KNA",
+                                    "name": "St. Kitts et Nevis"
+                                },
+                                {
+                                    "code": "LCA",
+                                    "name": "St. Lucie"
+                                },
+                                {
+                                    "code": "MAF",
+                                    "name": "St. Martin (partie française)"
+                                },
+                                {
+                                    "code": "VCT",
+                                    "name": "St. Vincent et Grenadines"
+                                },
+                                {
+                                    "code": "SWE",
+                                    "name": "Suède"
+                                },
+                                {
+                                    "code": "CHE",
+                                    "name": "Suisse"
+                                },
+                                {
+                                    "code": "SUR",
+                                    "name": "Surinam"
+                                },
+                                {
+                                    "code": "TWN",
+                                    "name": "Taiwan, Chine"
+                                },
+                                {
+                                    "code": "TJK",
+                                    "name": "Tajikistan"
+                                },
+                                {
+                                    "code": "TZA",
+                                    "name": "Tanzanie"
+                                },
+                                {
+                                    "code": "TCD",
+                                    "name": "Tchad"
+                                },
+                                {
+                                    "code": "THA",
+                                    "name": "Thailande"
+                                },
+                                {
+                                    "code": "TLS",
+                                    "name": "Timor-Leste"
+                                },
+                                {
+                                    "code": "TGO",
+                                    "name": "Togo"
+                                },
+                                {
+                                    "code": "TON",
+                                    "name": "Tonga"
+                                },
+                                {
+                                    "code": "TTO",
+                                    "name": "Trinidad et Tobago"
+                                },
+                                {
+                                    "code": "TUN",
+                                    "name": "Tunisie"
+                                },
+                                {
+                                    "code": "TKM",
+                                    "name": "Turkménistan"
+                                },
+                                {
+                                    "code": "TUR",
+                                    "name": "Turquie"
+                                },
+                                {
+                                    "code": "TUV",
+                                    "name": "Tuvalu"
+                                },
+                                {
+                                    "code": "UGA",
+                                    "name": "Uganda"
+                                },
+                                {
+                                    "code": "UKR",
+                                    "name": "Ukraine"
+                                },
+                                {
+                                    "code": "EUU",
+                                    "name": "Union Européenne"
+                                },
+                                {
+                                    "code": "URY",
+                                    "name": "Uruguay"
+                                },
+                                {
+                                    "code": "VUT",
+                                    "name": "Vanuatu"
+                                },
+                                {
+                                    "code": "VEN",
+                                    "name": "Vénézuela, RB"
+                                },
+                                {
+                                    "code": "VNM",
+                                    "name": "Viet Nam"
+                                },
+                                {
+                                    "code": "PSE",
+                                    "name": "West Bank et Gaza"
+                                },
+                                {
+                                    "code": "YEM",
+                                    "name": "Yémen, Rép. du"
+                                },
+                                {
+                                    "code": "ZMB",
+                                    "name": "Zambie"
+                                },
+                                {
+                                    "code": "ZWE",
+                                    "name": "Zimbabwe"
+                                },
+                                {
+                                    "code": "EMU",
+                                    "name": "Zone Euro "
+                                }
+                            ]
+                        },
+                        {
+                            "key": "series_description.geographic_units",
+                            "title": "Zones géographiques",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "name": "Geographic unit name",
+                                    "rules_": "required",
+                                    "prop_key": "series_description.geographic_units.name",
+                                    "help_text": "Nom de l'unité géographique, par ex. \"Monde\", \"Afrique\", \"Pays de l'OCDE\", \"Bangkok\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "code",
+                                    "title": "Code",
+                                    "type": "string",
+                                    "prop_key": "series_description.geographic_units.code",
+                                    "help_text": "Code de l'unité géographique. Le code ISO 3166-1 alpha-3 est préféré lorsque l'unité est un pays.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "type",
+                                    "title": "Type",
+                                    "type": "string",
+                                    "prop_key": "series_description.geographic_units.type",
+                                    "help_text": "Type d'unité géographique, par ex. \"pays\", \"état\", \"région\", \"province\", \"ville\", etc.",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Liste des unités géographiques (régions, pays, états, provinces, etc.) pour lesquelles des données sont disponibles pour la série. Notez que les noms de pays doivent être entrés dans \"Pays\" (bien qu'ils puissent également être inclus dans cet élément)."
+                        },
+                        {
+                            "key": "series_description.bbox",
+                            "title": "Encadré géographique (bounding box)",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "west",
+                                    "title": "Ouest",
+                                    "type": "string",
+                                    "prop_key": "series_description.bbox.west",
+                                    "help_text": "Longitude ouest de l'encadré géographique.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "east",
+                                    "title": "Est",
+                                    "type": "string",
+                                    "prop_key": "series_description.bbox.east",
+                                    "help_text": "Longitude est de l'encadré géographique.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "Sud",
+                                    "title": "South",
+                                    "type": "string",
+                                    "prop_key": "series_description.bbox.south",
+                                    "help_text": "Latitude sud de l'encadré géographique.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "north",
+                                    "title": "Nord",
+                                    "type": "string",
+                                    "prop_key": "series_description.bbox.north",
+                                    "help_text": "Latitude nord de l'encadré géographique.",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Cet élément est utilisé pour définir un ou plusieurs encadrés géographiques, qui sont la description géométrique fondamentale rectangulaire de la couverture géographique des données. Un encadré géographique est défini par les longitudes ouest et est et les latitudes nord et sud, et comprend la plus grande étendue géographique de la couverture géographique de l'ensemble de données. L'encadré géographique fournit les coordonnées géographiques des coins supérieur gauche (nord/ouest) et inférieur droit (sud/est) d'une zone rectangulaire. Cet élément peut être utilisé dans les catalogues comme premier passage d'une recherche basée sur les coordonnées. La plage de latitude valide en degrés est de -90 et +90 pour l'hémisphère sud et nord, respectivement. La longitude est comprise entre -180 et +180 spécifiant les coordonnées à l'ouest et à l'est du premier méridien, respectivement."
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "type": "section",
+                    "key": "series_description",
+                    "title": "Description",
+                    "class": "mandatory recommended",
+                    "expanded": true,
+                    "items": [
+                        {
+                            "key": "series_description.authoring_entity",
+                            "title": "Auteur",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "prop_key": "series_description.authoring_entity.name",
+                                    "help_text": "Le nom de la personne ou de l'organisation responsable de la production de l'indicateur ou de la série.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "string",
+                                    "prop_key": "series_description.authoring_entity.affiliation",
+                                    "help_text": "L'affiliation de la personne ou de l'organisation mentionnée dans \"Nom\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbreviation",
+                                    "title": "Abbréviation",
+                                    "type": "string",
+                                    "prop_key": "series_description.authoring_entity.abbreviation",
+                                    "help_text": "Nom abrégé (acronyme) de l'organisation mentionnée dans \"Nom\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "email",
+                                    "title": "E-mail",
+                                    "type": "string",
+                                    "prop_key": "series_description.authoring_entity.email",
+                                    "help_text": "Adresse e-mail publique de la personne ou des organisations mentionnées dans \"Nom\". Il est recommandé de fournir une adresse e-mail de compte de service, et non une adresse personnelle.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "series_description.authoring_entity.uri",
+                                    "help_text": "Un lien (URL) vers le site Web de l'entité mentionnée dans \"Nom\".",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Cet ensemble reproductible d'éléments est utilisé pour identifier la ou les organisation(s) ou personne(s) qui sont les principaux producteurs/conservateurs de l'indicateur. Notez qu'un élément similaire est fourni au niveau de la base de données. L'\"Entité auteur\" de l'indicateur peut être différente de l'\"Entité auteur\" de la base de données. Par exemple, la Banque mondiale est l'entité auteur de la base de données des Indicateurs du développement dans le monde, mais la base de données contient des indicateurs obtenus du Fonds monétaire international, de l'Organisation mondiale de la santé et d'autres organisations qui sont donc les entités auteur de leurs indicateurs respectifs.",
+                            "is_recommended": true
+                        },
+                        {
+                            "key": "series_description.measurement_unit",
+                            "type": "string",
+                            "class": "measurement_unit",
+                            "title": "Unité de mesure",
+                            "help_text": "L'unité de mesure. Notez que dans de nombreuses bases de données, l'unité de mesure sera incluse dans le nom/l'étiquette de la série. Dans les Indicateurs du développement dans le monde de la Banque mondiale, par exemple, les séries sont nommées comme suit :\n- Émissions de CO2 (kg par 2010 US$ de PIB)\n- PIB par habitant (USD courants)\n- PIB par habitant (LCU actuelles )\n- Densité de population (personnes par km² de superficie)\nDans ce cas, le nom de la série ne doit pas être modifié, mais l'unité de mesure peut en être extraite et stockée dans l'élément \"Unité de mesure\" .",
+                            "is_recommended": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "series_description.dimensions",
+                            "title": "Dimensions",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "prop_key": "series_description.dimensions.name",
+                                    "help_text": "Identifiant de la dimension",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "label",
+                                    "title": "Label",
+                                    "type": "string",
+                                    "prop_key": "series_description.dimensions.label",
+                                    "help_text": "Le label du niveau de désagrégation, par exemple « sexe » ou « urbain/rural ».",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "string",
+                                    "prop_key": "series_description.dimensions.description",
+                                    "help_text": "Une description du niveau de désagrégation (par exemple, si l'étiquette était \"groupe d'âge\", la description peut fournir des informations détaillées sur les groupes d'âge, par exemple \"Les groupes d'âge dans la base de données sont 0-14, 15-49, 50-64 , et 65 ans et plus ».)",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "Un indicateur ou une série chronologique peut être mis à disposition à différents niveaux de désagrégation. Par exemple, un indicateur contenant des estimations de la « population » d'un pays par année peut être disponible par sexe. Dans ce cas, les conservateurs de données auront deux options : (i) créer et documenter trois indicateurs distincts, à savoir « Population, Total », « Population, Female » et « Population, Male » ; soit créer un seul indicateur « Population » et y attacher une dimension « sexe », avec les valeurs « Total », « Féminin » et « Masculin ». Les dimensions sont des caractéristiques (ou « variables ») qui définissent les différents niveaux de désagrégation au sein d'un indicateur/d'une série. Les dimensions de l'élément sont utilisées pour fournir une liste détaillée des désagrégations qui correspondent exactement aux données publiées. Notez que lorsqu'un indicateur est disponible à deux niveaux de désagrégation « sans chevauchement », il doit être divisé en deux indicateurs. Par exemple, si l'indicateur \"Population\" est disponible par homme/femme et par urbain/rural, mais pas par homme/urbain/homme/rural/femme urbain/femme rural, il doit être traité comme deux indicateurs distincts (\" Population par sexe » avec la dimension sexe = « masculin/féminin » et « Population par zone de résidence » avec la dimension zone = « urbain / rural ».) Notez également qu'un autre élément du schéma, la désagrégation, est également fourni, dans lequel un une description narrative de la désagrégation réelle ou recommandée peut être documentée."
+                        },
+                        {
+                            "key": "series_description.periodicity",
+                            "type": "string",
+                            "class": "periodicity",
+                            "title": "Périodicité",
+                            "help_text": "La périodicité de la série. Il est recommandé d'utiliser un vocabulaire contrôlé avec des valeurs telles que annuelle, trimestrielle, mensuelle, quotidienne, etc.",
+                            "is_recommended": true,
+                            "display_type": "dropdown-custom",
+                            "enum": [
+                                {
+                                    "code": "ann",
+                                    "label": "Annuel"
+                                },
+                                {
+                                    "label": "sem",
+                                    "code": "Semi-annuel / semestriel"
+                                },
+                                {
+                                    "code": "qua",
+                                    "label": "Trimestriel"
+                                },
+                                {
+                                    "code": "bim",
+                                    "label": "Bi-mensuel"
+                                },
+                                {
+                                    "code": "mon",
+                                    "label": "Mensuel"
+                                },
+                                {
+                                    "code": "biw",
+                                    "label": "Bi-hebdomadaire"
+                                },
+                                {
+                                    "label": "wee",
+                                    "code": "Hebdomadaire"
+                                },
+                                {
+                                    "code": "day",
+                                    "label": "Quotidien"
+                                },
+                                {
+                                    "label": "hou",
+                                    "code": "Heure"
+                                },
+                                {
+                                    "label": "irr",
+                                    "code": "Irrégulier/adhoc"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "series_description.base_period",
+                            "type": "string",
+                            "class": "base_period",
+                            "title": "Période de base",
+                            "help_text": "La période de base de la série. Ce champ ne s'appliquera qu'aux séries qui nécessitent une année de base (ou une autre période de référence) utilisée comme référence, comme un indice des prix à la consommation (IPC) qui aura une valeur de 100 pour une année de base de référence.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "series_description.series_break",
+                            "type": "string",
+                            "title": "Rupture de série",
+                            "help_text": "Les ruptures dans les séries statistiques se produisent lorsqu'il y a un changement dans les normes, les sources de données ou l'année de référence utilisée dans la compilation d'une série. Les ruptures de série doivent être bien documentées. La documentation doit inclure la ou les raisons de la rupture, l'heure à laquelle elle s'est produite et des informations sur l'impact sur la comparabilité des données au fil du temps.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "series_description.keywords",
+                            "title": "Mots clés",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Mot clé",
+                                    "type": "string",
+                                    "rules_": "required",
+                                    "prop_key": "series_description.keywords.name",
+                                    "help_text": "Le mot-clé (ou la phrase) lui-même.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulaire",
+                                    "type": "string",
+                                    "prop_key": "series_description.keywords.vocabulary",
+                                    "help_text": "Le vocabulaire contrôlé (y compris le numéro de version ou la date) à partir duquel le mot-clé est extrait, le cas échéant.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "series_description.keywords.uri",
+                                    "help_text": "L'URL du vocabulaire contrôlé à partir duquel le mot-clé est extrait, le cas échéant.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Les mots-clés sont des mots ou des phrases qui décrivent des aspects saillants de ce que l'indicateur mesure. L'ajout de mots-clés peut améliorer considérablement la découvrabilité des données et est donc recommandé. Les mots clés peuvent résumer et améliorer la description du contenu ou du sujet d'une ressource. Les mots-clés peuvent être sélectionnés à partir d'un thésaurus standard, de préférence un thésaurus international multilingue. Ou ils peuvent être suggérés par des modèles d'apprentissage automatique. Un vocabulaire contrôlé peut être utilisé dans les modèles utilisateur.",
+                            "is_recommended": true
+                        },
+                        {
+                            "key": "series_description.topics",
+                            "title": "Sujets",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "string",
+                                    "rules_": "required",
+                                    "prop_key": "series_description.topics.id",
+                                    "help_text": "L'identifiant unique du sujet. Il peut s'agir d'un numéro séquentiel ou de l'ID du sujet dans un vocabulaire contrôlé.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "name",
+                                    "title": "Label",
+                                    "type": "string",
+                                    "rules_": "required",
+                                    "prop_key": "series_description.topics.name",
+                                    "help_text": "Le titre (label) du sujet.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "title": "ID parent",
+                                    "type": "string",
+                                    "help_text": "Lorsqu'un vocabulaire contrôlé hiérarchique (imbriqué) est utilisé, le champ \"ID parent\" peut être utilisé pour indiquer un sujet de niveau supérieur auquel appartient ce sujet.",
+                                    "prop_key": "series_description.topics.parent_id",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulaire",
+                                    "type": "string",
+                                    "prop_key": "series_description.topics.vocabulary",
+                                    "help_text": "La spécification (nom incluant la version et la date) du vocabulaire contrôlé dont le sujet est tiré.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "series_description.topics.uri",
+                                    "help_text": "Un lien (URL) vers le site de vocabulaire contrôlé.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "\"Sujets\" indique le(s) sujet(s) de fond général(s) couvert(s) par l'indicateur/la série. Une classification thématique facilite le référencement et les recherches dans les catalogues électroniques d'enquêtes; les sujets doivent donc être sélectionnés à partir d'un vocabulaire contrôlé standard, par exemple la classification CESSDA Topics (une typologie de sujets disponible en 11 langues), ou le système de classification du Journal of Economic Literature (JEL). Notez que vous pouvez combiner des sujets de plus d'un vocabulaire contrôlé."
+                        },
+                        {
+                            "key": "series_description.themes",
+                            "title": "Thèmes",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "string",
+                                    "rules_": "required",
+                                    "prop_key": "series_description.themes.id",
+                                    "help_text": "L'identifiant unique du thème. Il peut s'agir d'un numéro séquentiel ou de l'identifiant du thème dans un vocabulaire contrôlé.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "rules_": "required",
+                                    "prop_key": "series_description.themes.name",
+                                    "help_text": "Libellé du thème associé aux données.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "title": "ID parent",
+                                    "type": "string",
+                                    "help_text": "Lorsqu'un vocabulaire contrôlé hiérarchique (imbriqué) est utilisé, le champ \"ID parent\" peut être utilisé pour indiquer un thème de niveau supérieur auquel ce thème appartient.",
+                                    "prop_key": "series_description.themes.parent_id",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulaire",
+                                    "type": "string",
+                                    "prop_key": "series_description.themes.vocabulary",
+                                    "help_text": "Le nom du vocabulaire contrôlé utilisé, le cas échéant.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "series_description.themes.uri",
+                                    "help_text": "Un lien vers le vocabulaire contrôlé mentionné dans le champ \"Vocabulaire\".",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Les thèmes donnent une idée générale de la recherche qui pourrait guider la création et/ou la demande de la série. Un thème est large et est probablement également soumis à une définition ou à une liste basée sur la communauté. Un vocabulaire contrôlé doit être utilisé. Cet élément sera rarement utilisé (les sujets d'éléments décrits ci-dessous seront utilisés plus souvent)."
+                        },
+                        {
+                            "key": "series_description.disciplines",
+                            "title": "Disciplines",
+                            "type": "array",
+                            "help_text": "Informations sur les disciplines académiques liées au contenu du document. On utilisera de préférence un vocabulaire contrôlé, par exemple celui fourni par la liste des domaines académiques de Wikipédia.",
+                            "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "string",
+                                    "rules_": "required",
+                                    "prop_key": "series_description.disciplines.id",
+                                    "help_text": "L'identifiant de la discipline, de préférence issu d'un vocabulaire contrôlé.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "rules_": "required",
+                                    "prop_key": "series_description.disciplines.name",
+                                    "help_text": "Le nom (label) de la discipline, de préférence issu d'un vocabulaire contrôlé.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "title": "ID parent",
+                                    "type": "string",
+                                    "help_text": "L'ID parent de la discipline (ID de l'élément d'un niveau supérieur dans la hiérarchie), si un vocabulaire contrôlé hiérarchique est utilisé.",
+                                    "prop_key": "series_description.disciplines.parent_id",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulaire",
+                                    "type": "string",
+                                    "prop_key": "series_description.disciplines.vocabulary",
+                                    "help_text": "Le nom (y compris le numéro de version) du vocabulaire contrôlé utilisé, le cas échéant.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "series_description.disciplines.uri",
+                                    "help_text": "L'URL du vocabulaire contrôlé utilisé, le cas échéant.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "series_description.disaggregation",
+                            "type": "string",
+                            "title": "Disagrégation",
+                            "help_text": "Cet élément est destiné à informer les utilisateurs qu'un indicateur ou une série est disponible à différents niveaux de désagrégation. Les séries associées doivent être listées (par nom et/ou identifiant). Pour l'indicateur « Population, totale » par exemple, on peut informer l'utilisateur que l'indicateur est également disponible (dans d'autres séries) par sexe, urbain/rural, et groupe d'âge (dans les séries « Population, masculin » et « Population, féminine » , etc.).",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "series_description.languages",
+                            "title": "Langue",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "prop_key": "series_description.languages.name",
+                                    "help_text": "Le nom de la langue.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "code",
+                                    "title": "Code",
+                                    "type": "string",
+                                    "prop_key": "series_description.languages.code",
+                                    "help_text": "Le code de la langue.",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "La langue des métadonnées de l'indicateur/de la série. Pour les codes et noms de langues, l'utilisation de la norme ISO 639-2 est recommandée."
+                        },
+                        {
+                            "key": "series_description.acronyms",
+                            "title": "Acronymes",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "acronym",
+                                    "title": "Acronyme",
+                                    "type": "string",
+                                    "rules_": "required",
+                                    "prop_key": "series_description.acronyms.acronym",
+                                    "help_text": "Un acronyme référencé dans les métadonnées de la série (par exemple « GDP »).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "expansion",
+                                    "title": "Expansion",
+                                    "type": "string",
+                                    "rules_": "required",
+                                    "prop_key": "series_description.acronyms.expansion",
+                                    "help_text": "L'expansion de l'acronyme, c'est-à-dire le nom complet ou le titre qu'il représente (par exemple, \"Produit intérieur brut\" pour le PIB).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "occurence",
+                                    "title": "Occurence",
+                                    "type": "integer",
+                                    "prop_key": "series_description.acronyms.occurence",
+                                    "help_text": "Cet élément numérique peut être utilisé pour indiquer le nombre de fois que l'acronyme est mentionné dans les métadonnées. L'élément sera rarement utilisé.",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "L'élément acronymes est utilisé pour documenter la signification de tous les acronymes utilisés dans les métadonnées d'une série. Si certains acronymes sont connus (comme « PIB », ou « FMI » par exemple), d'autres peuvent être moins évidents ou pourraient être incertains (est-ce que « PPP » signifie « partenariat public-privé », ou « parité de pouvoir d'achat » ?) . Dans tous les cas, fournir une liste d'acronymes avec leur signification aidera les utilisateurs et rendra vos métadonnées plus visibles. Notez que les acronymes ne doivent pas inclure les codes de pays utilisés dans la documentation de la couverture géographique des données."
+                        },
+                        {
+                            "key": "series_description.related_indicators",
+                            "title": "Indicateurs associés",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "code",
+                                    "title": "Code",
+                                    "type": "string",
+                                    "prop_key": "series_description.related_indicators.code",
+                                    "help_text": "Code de l'indicateur référencé dans le document. Il s'agira probablement d'un ID utilisé par cet indicateur.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "series_description.related_indicators.uri",
+                                    "help_text": "Un lien vers l'indicateur associé.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "label",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "prop_key": "series_description.related_indicators.label",
+                                    "help_text": "Le nom ou label de l'indicateur associé à l'indicateur documenté.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "relationship",
+                                    "title": "Relation",
+                                    "type": "string",
+                                    "prop_key": "series_description.related_indicators.relationship",
+                                    "help_text": "Relation",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "type",
+                                    "title": "Type",
+                                    "type": "string",
+                                    "prop_key": "series_description.related_indicators.type",
+                                    "help_text": "Type",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Cet élément permet de référencer des indicateurs souvent associés à l'indicateur documenté."
+                        },
+                        {
+                            "key": "series_description.series_groups",
+                            "title": "Groupes d'indicateurs",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nom du groupe",
+                                    "type": "string",
+                                    "rules_": "required",
+                                    "prop_key": "series_description.series_groups.name",
+                                    "help_text": "Le nom du groupe d'indicateurs/séries.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "string",
+                                    "rules_": "required",
+                                    "prop_key": "series_description.series_groups.description",
+                                    "help_text": "Une brève description du groupe d'indicateurs/séries.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "version",
+                                    "title": "Version",
+                                    "type": "string",
+                                    "prop_key": "series_description.series_groups.version",
+                                    "help_text": "La version du groupe.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "series_description.series_groups.uri",
+                                    "help_text": "Une URL vers un site décrivant le regroupement.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Cet élément permet d'organiser les indicateurs et les séries par groupes thématiques ou autres. Ces groupes sont « virtuels » et n'affectent pas les données. Un indicateur/série peut appartenir à plusieurs groupes."
+                        },
+                        {
+                            "key": "series_description.notes",
+                            "title": "Notes",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "note",
+                                    "title": "Note",
+                                    "type": "string",
+                                    "prop_key": "series_description.notes.note",
+                                    "help_text": "La note elle-même.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "type",
+                                    "title": "Type",
+                                    "type": "string",
+                                    "prop_key": "series_description.notes.type",
+                                    "help_text": "Le type de note. Cet élément doit utiliser un vocabulaire contrôlé pour organiser les notes en catégories.",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Cet élément est ouvert et réservé aux notes explicatives jugées utiles aux utilisateurs des données. Les notes doivent tenir compte des informations supplémentaires qui pourraient aider à : répliquer la série ; accéder au domaine des données et de la recherche, ou à la découvrabilité en général."
+                        }
+                    ]
+                },
+                {
+                    "key": "series_description_container1674231510403",
+                    "title": "Accès et conditions d'utilisation",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "series_description.license",
+                            "title": "License",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "prop_key": "series_description.license.name",
+                                    "help_text": "Le nom de la licence, par exemple « Creative Commons Attribution 4.0 International license (CC-BY 4.0) ».",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "series_description.license.uri",
+                                    "help_text": "Une URL où des informations détaillées sur la licence / les conditions d'utilisation peuvent être trouvées.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "note",
+                                    "title": "Note",
+                                    "type": "string",
+                                    "prop_key": "series_description.license.note",
+                                    "help_text": "Informations complémentaires sur la licence.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "Cet ensemble d'éléments est utilisé pour décrire la ou les licences d'accès attachées à l'indicateur/la série."
+                        },
+                        {
+                            "key": "series_description.confidentiality",
+                            "type": "string",
+                            "title": "Déclaration de confidentialité",
+                            "help_text": "Une déclaration de confidentialité pour l'indicateur / la série.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "series_description.confidentiality_status",
+                            "type": "string",
+                            "title": "Statut de confidentialité",
+                            "help_text": "Ceci indique un statut de confidentialité pour la série. Un vocabulaire contrôlé doit être utilisé avec les options possibles \"public\", \"usage officiel uniquement\", \"confidentiel\", \"strictement confidentiel\", \"inconnu\". Lorsque toutes les séries sont rendues publiques et appartiennent à une base de données qui a une politique d'accès ouvert ou public, cet élément peut être ignoré.",
+                            "enum": [
+                                {
+                                    "code": "pub",
+                                    "label": "Public"
+                                },
+                                {
+                                    "code": "off",
+                                    "label": "Utilisation officielle uniquement"
+                                },
+                                {
+                                    "label": "res",
+                                    "code": "Restreint"
+                                },
+                                {
+                                    "code": "con",
+                                    "label": "Confidentiel"
+                                },
+                                {
+                                    "code": "sco",
+                                    "label": "Strictement confidentiel"
+                                },
+                                {
+                                    "code": "unk",
+                                    "label": "Non déterminé"
+                                }
+                            ],
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "series_description.confidentiality_note",
+                            "type": "string",
+                            "title": "Note sur la confidentialité",
+                            "enum": [],
+                            "help_text": "Cet élément est réservé à des notes complémentaires concernant la confidentialité des données. Cela pourrait impliquer des références à des lois et circonstances spécifiques concernant l'utilisation des données.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "series_description.links",
+                            "title": "Links",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "type",
+                                    "title": "Type",
+                                    "type": "string",
+                                    "prop_key": "series_description.links.type",
+                                    "help_text": "Cet élément permet de classer le type de lien qui est fourni.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "string",
+                                    "prop_key": "series_description.links.description",
+                                    "help_text": "Une description du lien fourni.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "rules_": "required",
+                                    "prop_key": "series_description.links.uri",
+                                    "help_text": "Le lien (URL) vers la ressource décrite.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Cet élément fournit des liens vers des ressources en ligne de tout type qui pourraient être utiles aux utilisateurs de données. Il peut s'agir de liens vers la description de méthodes et de documents de référence, d'outils d'analyse, de visualisations, de sources de données ou autres."
+                        },
+                        {
+                            "key": "series_description.api_documentation",
+                            "title": "Documentation de l'API",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "string",
+                                    "prop_key": "series_description.api_documentation.description",
+                                    "help_text": "Cet élément ne contiendra pas la documentation de l'API elle-même, mais des informations sur la documentation disponible.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "rules_": "required",
+                                    "prop_key": "series_description.api_documentation.uri",
+                                    "help_text": "L'URL de la documentation de l'API.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "De plus en plus, les données sont rendues accessibles via des interfaces de programmation d'applications (API). L'API associée à une série doit être documentée. La documentation ne sera généralement pas spécifique à une série, mais s'appliquera à toutes les séries d'une même base de données."
+                        }
+                    ],
+                    "help_text": ""
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "id": "tags",
+            "key": "tags_container",
+            "title": "Tags",
+            "items": [
+                {
+                    "key": "tags",
+                    "title": "Tags",
+                    "type": "array",
+                    "props": [
+                        {
+                            "key": "tag",
+                            "title": "Tag",
+                            "type": "string",
+                            "prop_key": "tags.tag",
+                            "help_text": "Un tag défini par l'utilisateur.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "tag_group",
+                            "title": "Groupe de tags",
+                            "type": "string",
+                            "prop_key": "tags.tag_group",
+                            "help_text": "Un groupe défini par l'utilisateur (facultatif) auquel appartient le tag. Le regroupement des tags permet la mise en œuvre de facettes contrôlées dans les catalogues de données.",
+                            "display_type": "text"
+                        }
+                    ],
+                    "help_text": "Les tags, en particulier lorsqu'ils sont organisés en groupes, offrent une solution puissante et flexible pour activer les facettes personnalisées (filtres) dans les catalogues de données."
+                }
+            ]
+        }
+    ]
+}

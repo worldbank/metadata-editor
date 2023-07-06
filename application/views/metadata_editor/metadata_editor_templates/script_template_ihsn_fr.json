@@ -1,0 +1,3120 @@
+{
+    "type": "template",
+    "title": "Script Schema",
+    "items": [
+        {
+            "type": "section_container",
+            "key": "doc_desc_container",
+            "title": "Informations sur les métadonnées",
+            "expanded": true,
+            "items": [
+                {
+                    "type": "section",
+                    "key": "doc_desc_section",
+                    "title": "Informations sur les métadonnées",
+                    "expanded": true,
+                    "items": [
+                        {
+                            "key": "doc_desc.title",
+                            "type": "string",
+                            "class": "required",
+                            "title": "Titre du document",
+                            "help_text": "Le titre du document de métadonnées (qui sera généralement le même que l'élément \"Title\" dans la section \"Project description \/ Title statement\"). Le document de métadonnées est le fichier de métadonnées (fichier XML ou JSON) qui est généré.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "doc_desc.idno",
+                            "type": "string",
+                            "class": "required",
+                            "title": "ID du document",
+                            "help_text": "Un identifiant unique pour le document de métadonnées du projet. Cet identifiant doit être unique dans le catalogue où les métadonnées sont destinées à être publiées. Idéalement, l'identifiant devrait également être unique au niveau mondial. Ceci est différent de l'\"ID principal\" dans la section Description du projet \/ Instruction du titre, bien qu'il soit recommandé de générer des identifiants qui établissent une connexion claire entre ces deux identifiants. L'ID de document peut également inclure l'identifiant de version du document de métadonnées. Par exemple, si l'\"ID principal\" du projet de recherche reproductible \"Madagascar Poverty Mapping 2022\" est \"RR_MDG_POVMAP_2022\", l'ID du document pourrait être \"IHSN_RR_MDG_POVMAP_2022_v1.0\" si les métadonnées sont produites par l'IHSN et si cela est version 1.0 des métadonnées. Chaque organisation doit établir des règles systématiques pour générer ces identifiants. Une règle de validation peut être définie (à l'aide d'une expression régulière) dans les modèles utilisateur pour appliquer un format d'identifiant spécifique. L'identifiant ne peut pas contenir d'espaces vides.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "doc_desc.producers",
+                            "class": "required",
+                            "title": "Producteurs des métadonnées",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "help_text": "Le nom de la personne ou de l'organisation qui a produit les métadonnées ou contribué à leur production.",
+                                    "class": "required",
+                                    "prop_key": "doc_desc.producers.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbr",
+                                    "title": "Abbréviation",
+                                    "type": "string",
+                                    "prop_key": "doc_desc.producers.abbr",
+                                    "help_text": "L'abréviation (ou l'acronyme) de l'organisation référencée dans \"Nom\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "type": "string",
+                                    "title": "Affiliation",
+                                    "prop_key": "doc_desc.producers.affiliation",
+                                    "help_text": "L'affiliation de la personne ou de l'organisation mentionnée dans \"Nom\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Rôle",
+                                    "type": "string",
+                                    "prop_key": "doc_desc.producers.role",
+                                    "help_text": "Le rôle spécifique de la personne ou de l'organisation mentionnée dans \"Nom\" dans la production des métadonnées.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "Le producteur de métadonnées est la personne ou l'organisation ayant la responsabilité financière et\/ou administrative des processus par lesquels le document de métadonnées a été créé. Il s'agit d'un élément \"Recommandé\". Pour l'administration du catalogue, les informations sur le producteur et sur la date de production des métadonnées sont utiles.",
+                            "is_recommended": true
+                        },
+                        {
+                            "key": "doc_desc.prod_date",
+                            "type": "string",
+                            "class": "required",
+                            "title": "Date de production",
+                            "help_text": "La date à laquelle les métadonnées de ce projet ont été produites (non diffusées ou archivées), de préférence saisies au format ISO 8601 (AAAA-MM-JJ ou AAAA-MM). Une règle de validation peut être définie dans les modèles utilisateur pour appliquer un format de date. Il s'agit d'un élément \"Recommandé\", car les informations sur le producteur et sur la date de production des métadonnées sont utiles à des fins d'administration du catalogue.",
+                            "is_recommended": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "doc_desc.version",
+                            "type": "string",
+                            "class": "",
+                            "title": "Version",
+                            "help_text": "La version du document de métadonnées (pas la version du projet lui-même).",
+                            "display_type": "text"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "key": "project_desc_container",
+            "title": "Description du projet",
+            "class": "recommended",
+            "items": [
+                {
+                    "type": "section",
+                    "key": "project_desc_title_statement",
+                    "title": "Titre",
+                    "class": "recommended",
+                    "items": [
+                        {
+                            "key": "project_desc.title_statement.idno",
+                            "title": "ID principal",
+                            "help_text": "Un identifiant unique du projet. L'\"ID principal\" (également appelé IDNO) est un numéro d'identification unique utilisé pour identifier la base de données. Un identifiant unique est requis à des fins de catalogage, cet élément est donc déclaré comme \"Obligatoire\". L'identifiant permettra aux utilisateurs de citer correctement l'indicateur\/la série. L'identifiant doit être unique dans le catalogue. Idéalement, il devrait également être unique au monde ; l'option recommandée consiste à obtenir un identificateur d'objet numérique (DOI) pour l'étude. Alternativement, l'\"ID principal\" peut être créé par une organisation à l'aide d'un schéma cohérent. Notez que le schéma vous permet de fournir plus d'un identifiant pour une même étude (dans l'élément \"Autres identifiants\"); un identifiant spécifique au catalogue n'est donc pas incompatible avec un identifiant global unique comme un DOI. Une règle de validation peut être définie (à l'aide d'une expression régulière) dans les modèles utilisateur pour appliquer un format d'ID spécifique. Une règle de validation peut être définie (à l'aide d'une expression régulière) dans les modèles utilisateur pour appliquer un format d'ID spécifique. L'identifiant ne doit pas contenir d'espaces vides.",
+                            "type": "string",
+                            "is_required": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "project_desc.title_statement.identifiers",
+                            "title": "Autres identifiants",
+                            "type": "array",
+                            "help_text": "Cet élément répétable permet de saisir des identifiants (ID) autres que l'« ID principal » (IDNO). Il peut s'agir par exemple d'un Digital Object Identifier (DOI). Le \"Primary ID\" peut être répété ici (le \"Primary ID\" ne fournit pas de paramètre \"Type\", donc si un DOI ou un autre type d'ID standard est utilisé comme identifiant principal, il est recommandé de le répéter ici avec l'identification du type).",
+                            "props": [
+                                {
+                                    "key": "type",
+                                    "title": "Type",
+                                    "type": "string",
+                                    "help_text": "The type of identifier. For example: “DOI”, or \"ISBN\". ",
+                                    "prop_key": "project_desc.title_statement.identifiers.type",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "identifier",
+                                    "title": "Identifier",
+                                    "type": "string",
+                                    "prop_key": "project_desc.title_statement.identifiers.identifier",
+                                    "help_text": "The identifier itself.",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "project_desc.title_statement.title",
+                            "title": "Titre",
+                            "type": "string",
+                            "help_text": "Le titre est le nom officiel du projet tel qu'il peut être indiqué dans des rapports, des articles ou d'autres documents. Assurez-vous d'utiliser un nom unique pour chaque projet distinct. Le titre peut correspondre au titre d'un article académique, d'une évaluation d'impact de projet, etc. Faites attention à l'utilisation cohérente des majuscules dans le titre.",
+                            "is_required": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "project_desc.title_statement.sub_title",
+                            "title": "Sous-titre",
+                            "type": "string",
+                            "help_text": "Le sous-titre projet\/script peut être utilisé lorsqu'il est nécessaire de distinguer les caractéristiques d'un projet. Cet élément sera rarement utilisé. Faites attention à l'utilisation cohérente des majuscules dans le sous-titre.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "project_desc.title_statement.alternate_title",
+                            "title": "Titre alternatif",
+                            "type": "string",
+                            "help_text": "Un autre titre du projet. Ce serait n'importe quel autre titre qui aiderait à découvrir le projet de recherche. Il pourrait par exemple s'agir d'un acronyme par lequel le projet est souvent désigné.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "project_desc.title_statement.translated_title",
+                            "title": "Titre traduit",
+                            "type": "string",
+                            "help_text": "Une version traduite du titre (elle sera utilisée par exemple lorsqu'un catalogue documente toutes les entrées en anglais, mais souhaite conserver le titre d'un projet dans sa langue d'origine lorsque la langue d'origine n'est pas l'anglais). Les caractères spéciaux doivent être correctement affichés, tels que les accents et autres marques d'accentuation ou différents alphabets.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "project_desc.project_website",
+                            "title": "Site Web du projet",
+                            "help_text": "URL du site Web du projet.",
+                            "type": "string",
+                            "enum": [],
+                            "rules": {
+                                "is_uri": true
+                            },
+                            "display_type": "text"
+                        }
+                    ]
+                },
+                {
+                    "key": "project_desc_container1674844564813",
+                    "title": "Auteurs et contributeurs",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "project_desc.authoring_entity",
+                            "title": "Auteurs",
+                            "help_text": "Cette section identifiera la ou les personne(s) et\/ou organisation(s) responsable(s) du contenu intellectuel du projet de recherche et précisera leur rôle respectif.",
+                            "type": "nested_array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "help_text": "Nom de la personne ou de l'organisme responsable du projet de recherche.",
+                                    "prop_key": "project_desc.authoring_entity.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Rôle",
+                                    "type": "string",
+                                    "help_text": "Rôle spécifique de la personne ou de l'organisation mentionnée dans \"Nom\".",
+                                    "prop_key": "project_desc.authoring_entity.role",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "string",
+                                    "prop_key": "project_desc.authoring_entity.affiliation",
+                                    "help_text": "Affiliation de l'agence ou de l'organisation de l'auteur\/chercheur principal mentionné dans \"Nom\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbreviation",
+                                    "title": "Abbréviation",
+                                    "help_text": "Abréviation utilisée pour identifier l'agence mentionnée sous \"Affiliation\".",
+                                    "type": "string",
+                                    "prop_key": "project_desc.authoring_entity.abbreviation",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "email",
+                                    "type": "string",
+                                    "title": "E-mail",
+                                    "help_text": "Selon les politiques de l'agence, un chercheur peut fournir un e-mail personnel ou un e-mail de l'agence pour les demandes de terrain liées au projet.",
+                                    "prop_key": "project_desc.authoring_entity.email",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "author_id",
+                                    "type": "array",
+                                    "title": "ID de l'auteur",
+                                    "help_text": "Identifiant unique d'un auteur, qui peut être fourni par des services comme ORCID ou d'autres.",
+                                    "props": [
+                                        {
+                                            "key": "type",
+                                            "type": "string",
+                                            "title": "Type",
+                                            "prop_key": "project_desc.authoring_entity.author_id.type",
+                                            "help_text": "Le type d'identifiant, par exemple \"ORCID\".",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "id",
+                                            "type": "string",
+                                            "title": "ID",
+                                            "prop_key": "project_desc.authoring_entity.author_id.id",
+                                            "help_text": "Un numéro\/code d'identification unique pour l'auteur.",
+                                            "display_type": "text"
+                                        }
+                                    ],
+                                    "prop_key": "project_desc.authoring_entity.author_id"
+                                }
+                            ],
+                            "is_recommended": true
+                        },
+                        {
+                            "key": "project_desc.contributors",
+                            "title": "Contributeurs",
+                            "help_text": "Cette section est fournie pour enregistrer les autres contributeurs au projet de recherche et reconnaître les rôles qu'ils ont joués.",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "help_text": "Nom de la personne, de la collectivité ou de l'agence qui contribue au contenu intellectuel du projet (autre que l'entité auteur\/chercheur principal). Lorsque vous entrez le nom d'une personne, inversez le nom et le prénom et utilisez des virgules.",
+                                    "prop_key": "project_desc.contributors.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Rôle",
+                                    "type": "string",
+                                    "help_text": "Titre de la personne (le cas échéant) responsable du contenu substantiel et intellectuel de l'œuvre.",
+                                    "prop_key": "project_desc.contributors.role",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "string",
+                                    "prop_key": "project_desc.contributors.affiliation",
+                                    "help_text": "Affiliation à une agence ou à une organisation du contributeur.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbreviation",
+                                    "title": "Abbréviation",
+                                    "help_text": "Abréviation utilisée pour identifier l'agence mentionnée sous \"Affiliation\".",
+                                    "type": "string",
+                                    "prop_key": "project_desc.contributors.abbreviation",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "email",
+                                    "type": "string",
+                                    "title": "E-mail",
+                                    "help_text": "Selon les politiques de l'agence, un chercheur peut fournir un e-mail personnel ou un e-mail de l'agence pour les demandes de terrain liées au projet.",
+                                    "prop_key": "project_desc.contributors.email",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "url",
+                                    "type": "string",
+                                    "title": "URL",
+                                    "prop_key": "project_desc.contributors.url",
+                                    "help_text": "L'URL qui fournit des informations sur le contributeur ou son affilié.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "project_desc.sponsors",
+                            "title": "Sponsors",
+                            "help_text": "La ou les sources de financement pour la production de l'œuvre. Si différentes agences de financement ont parrainé différentes étapes du processus de production, utilisez l'attribut \"rôle\" pour les distinguer.",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "prop_key": "project_desc.sponsors.name",
+                                    "help_text": "Nom de l'organisme de financement\/sponsor",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbr",
+                                    "title": "Abbréviation",
+                                    "type": "string",
+                                    "prop_key": "project_desc.sponsors.abbr",
+                                    "help_text": "Abréviation de l'organisme de financement\/sponsor.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Rôle",
+                                    "type": "string",
+                                    "prop_key": "project_desc.sponsors.role",
+                                    "help_text": "Rôle spécifique de l'agence de financement\/sponsor.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "grant_no",
+                                    "title": "Numéro du don",
+                                    "type": "string",
+                                    "prop_key": "project_desc.sponsors.grant_no",
+                                    "help_text": "Numéro du don \/ de la subvention",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "project_desc.curators",
+                            "title": "Curateurs",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "help_text": "Le nom de la personne ou de l'organisation en charge de la curation.",
+                                    "prop_key": "project_desc.curators.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Rôle",
+                                    "type": "string",
+                                    "help_text": "Le rôle spécifique de la personne ou de l'organisation dans la conservation des ressources du projet.",
+                                    "prop_key": "project_desc.curators.role",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "string",
+                                    "prop_key": "project_desc.curators.affiliation",
+                                    "help_text": "L'affiliation de la personne ou de l'organisation.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbreviation",
+                                    "title": "Abbréviation",
+                                    "help_text": "Un acronyme de l'organisation, si une organisation a été saisie dans \"Nom\".",
+                                    "type": "string",
+                                    "prop_key": "project_desc.curators.abbreviation",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "email",
+                                    "type": "string",
+                                    "title": "E-mail",
+                                    "help_text": "L'adresse e-mail de la personne ou de l'organisation mentionnée dans \"Nom\". L'utilisation d'adresses e-mail personnelles doit être évitée.",
+                                    "prop_key": "project_desc.curators.email",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "url",
+                                    "type": "string",
+                                    "title": "URL",
+                                    "prop_key": "project_desc.curators.url",
+                                    "help_text": "Un lien vers le site Web de la personne ou de l'organisation mentionnée dans \"Nom\".",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Une liste des personnes et\/ou organisations en charge de la conservation des ressources associées au projet."
+                        },
+                        {
+                            "key": "project_desc.acknowledgments",
+                            "title": "Remerciements",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "prop_key": "project_desc.acknowledgments.name",
+                                    "help_text": "Le nom de la personne ou de l'agence reconnue pour avoir soutenu le projet.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "string",
+                                    "prop_key": "project_desc.acknowledgments.affiliation",
+                                    "help_text": "L'affiliation de la personne ou de l'agence reconnue.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Rôle",
+                                    "type": "string",
+                                    "prop_key": "project_desc.acknowledgments.role",
+                                    "help_text": "Une brève description du rôle de la personne ou de l'agence reconnue ou reconnue pour avoir soutenu le projet.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "Ce bloc répétable d'éléments est utilisé pour fournir une liste détaillée des personnes et des organisations dont la contribution au projet doit être reconnue. Notez que des éléments de métadonnées spécifiques sont disponibles pour répertorier les sponsors financiers et les principaux contributeurs à l'étude. Une alternative à ce champ est le champ \"Déclaration de remerciement\" (voir ci-dessous) qui peut être utilisé pour fournir l'accusé de réception sous la forme d'un texte non structuré."
+                        },
+                        {
+                            "key": "project_desc.acknowledgment_statement",
+                            "title": "Déclaration de remerciement",
+                            "type": "string",
+                            "help_text": "Ce champ est utilisé pour fournir des accusés de réception sous la forme d'un texte non structuré. C'est une alternative à l'élément \"Acknowledgements\" qui apporte une solution pour détailler les accusés de réception.",
+                            "display_type": "textarea"
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "project_desc_container1688585445261",
+                    "title": "Statut de reproducibilité",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "project_desc.reproducibility_status.type",
+                            "title": "Statut",
+                            "help_text": "Statut de reproducibilité du projet; un vocabulaire contrôlé devrait être utilisé.",
+                            "type": "string",
+                            "is_required": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "project_desc.reproducibility_status.note",
+                            "title": "Note sur la reproducibilité",
+                            "help_text": "Toute autre information sur le statut de reproducibilité.",
+                            "type": "string",
+                            "is_required": false,
+                            "display_type": "textarea"
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "project_desc_container1674844693452",
+                    "title": "Version",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "project_desc.production_date",
+                            "title": "Date d'achèvement du projet",
+                            "help_text": "La date, de préférence saisie au format ISO 8601 (AAAA-MM-JJ), à laquelle le projet a été achevé (il s'agit de la version qui est documentée et diffusée.)",
+                            "type": "string",
+                            "display_type": "text",
+                            "is_recommended": true
+                        },
+                        {
+                            "key": "project_desc.version_statement.version",
+                            "title": "Version",
+                            "type": "string",
+                            "help_text": "Un label décrivant la version. Par exemple, \"Version 1.2\".",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "project_desc.version_statement.version_date",
+                            "title": "Date de la version",
+                            "type": "string",
+                            "help_text": "La date, de préférence saisie au format ISO 8601 (AAAA-MM-JJ), à laquelle la version a été publiée.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "project_desc.version_statement.version_resp",
+                            "title": "Responsabilité",
+                            "help_text": "Personne(s) ou organisation(s) responsable(s) de cette version.",
+                            "type": "string",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "project_desc.version_statement.version_notes",
+                            "title": "Note sur la version",
+                            "type": "string",
+                            "help_text": "Informations complémentaires sur la version le cas échéant ; il est recommandé de décrire ce qui distingue cette version de la ou des précédentes.",
+                            "display_type": "textarea"
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "project_desc_container1674844638082",
+                    "title": "Portée et couverture",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "project_desc.abstract",
+                            "title": "Résumé",
+                            "type": "string",
+                            "help_text": "Le résumé doit fournir un résumé clair des buts, des objectifs et du contenu du projet. Un résumé peut faire référence aux différents résultats associés au projet de recherche.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "project_desc.geographic_units",
+                            "title": "Zones géographiques",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "prop_key": "project_desc.geographic_units.name",
+                                    "help_text": "Le nom de la zone géographique.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "code",
+                                    "title": "Code",
+                                    "type": "string",
+                                    "prop_key": "project_desc.geographic_units.code",
+                                    "help_text": "Le code de la zone géographique. Pour les pays, il est recommandé d'utiliser les codes et noms de pays ISO 3166.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "type",
+                                    "title": "Type",
+                                    "type": "string",
+                                    "prop_key": "project_desc.geographic_units.type",
+                                    "help_text": "Le type de zone géographique. Par exemple : \"pays\", \"province\", \"camp de réfugiés\", etc.",
+                                    "display_type": "text",
+                                    "enum": [
+                                        {
+                                            "code": "cty",
+                                            "label": "Country"
+                                        },
+                                        {
+                                            "code": "reg",
+                                            "label": "Geographic region"
+                                        }
+                                    ]
+                                }
+                            ],
+                            "help_text": "Les zones géographiques couvertes par le projet. Lorsque le projet concerne un ou plusieurs pays, ou une partie d'un ou plusieurs pays, il est important de fournir le nom du pays. Cela signifie que pour un projet lié à une province ou une ville spécifique d'un pays, le nom du pays sera saisi en plus de la province ou de la ville (sous forme d'entrées distinctes dans ce bloc d'éléments répétable). Notez que la zone ne doit pas nécessairement être une zone administrative ; il peut s'agir par exemple d'un océan).",
+                            "is_recommended": true,
+                            "enum": [
+                                {
+                                    "code": "AFG",
+                                    "name": "Afghanistan",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "AFE",
+                                    "name": "Afrique de l'Est et du Sud",
+                                    "type": "reg"
+                                },
+                                {
+                                    "code": "AFW",
+                                    "name": "Afrique de l'Ouest et centrale",
+                                    "type": "reg"
+                                },
+                                {
+                                    "code": "NAF",
+                                    "name": "Afrique du Nord",
+                                    "type": "reg"
+                                },
+                                {
+                                    "code": "ZAF",
+                                    "name": "Afrique du Sud",
+                                    "type": "reg"
+                                },
+                                {
+                                    "code": "AFR",
+                                    "name": "Afrique subsaharienne",
+                                    "type": "reg"
+                                },
+                                {
+                                    "code": "SSF",
+                                    "name": "Afrique subsaharienne",
+                                    "type": "reg"
+                                },
+                                {
+                                    "code": "CAA",
+                                    "name": "Afrique subsaharienne (classification IFC)",
+                                    "type": "reg"
+                                },
+                                {
+                                    "code": "DSS",
+                                    "name": "Afrique subsaharienne (pays éligibles IDA)",
+                                    "type": "rig"
+                                },
+                                {
+                                    "code": "BSS",
+                                    "name": "Afrique subsaharienne (pays IBRD uniquement)",
+                                    "type": "rig"
+                                },
+                                {
+                                    "code": "TSS",
+                                    "name": "Afrique subsaharienne (pays IDA & IBRD)",
+                                    "type": "rig"
+                                },
+                                {
+                                    "code": "SXZ",
+                                    "name": "Afrique subsaharienne (sauf Afrique du Sud)",
+                                    "type": "reg"
+                                },
+                                {
+                                    "code": "SSA",
+                                    "name": "Afrique subsaharienne (sauf revenu élevé)",
+                                    "type": "rig"
+                                },
+                                {
+                                    "code": "XZN",
+                                    "name": "Afrique subsaharienne sauf Afrique du Sud et Nigéria",
+                                    "type": "reg"
+                                },
+                                {
+                                    "code": "ALB",
+                                    "name": "Albanie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "DZA",
+                                    "name": "Algérie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "DEU",
+                                    "name": "Allemagne",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "ASM",
+                                    "name": "American Samoa",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "NAC",
+                                    "name": "Amérique du Nord",
+                                    "type": "reg"
+                                },
+                                {
+                                    "code": "LCN",
+                                    "name": "Amérique latine & Caraïbes",
+                                    "type": "reg"
+                                },
+                                {
+                                    "code": "BLA",
+                                    "name": "Amerique latine & Caraïbes (pays IBRD uniquement)",
+                                    "type": "rig"
+                                },
+                                {
+                                    "code": "LAC",
+                                    "name": "Amérique latine & Caraïbes (sauf revenus élevés)",
+                                    "type": "rig"
+                                },
+                                {
+                                    "code": "CLA",
+                                    "name": "Amérique latine et Caraïbes (classification IFC)",
+                                    "type": "reg"
+                                },
+                                {
+                                    "code": "DLA",
+                                    "name": "Amérique latine et Caraïbes (pays éligibles IDA)",
+                                    "type": "rig"
+                                },
+                                {
+                                    "code": "TLA",
+                                    "name": "Amérique latine et Caraïbes (pays IDA & IBRD)",
+                                    "type": "rig"
+                                },
+                                {
+                                    "code": "AND",
+                                    "name": "Andorre",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "AGO",
+                                    "name": "Angola",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "ATG",
+                                    "name": "Antigua and Barbuda",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "SAU",
+                                    "name": "Arabie saoudite",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "ARG",
+                                    "name": "Argentine",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "ARM",
+                                    "name": "Arménie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "ABW",
+                                    "name": "Aruba",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "EAS",
+                                    "name": "Asie de l'Est & Pacifique",
+                                    "type": "reg"
+                                },
+                                {
+                                    "code": "DEA",
+                                    "name": "Asie de l'Est & Pacifique (pays éligibles IDA)",
+                                    "type": "rig"
+                                },
+                                {
+                                    "code": "BEA",
+                                    "name": "Asie de l'Est & Pacifique (pays IBRD uniquement)",
+                                    "type": "rig"
+                                },
+                                {
+                                    "code": "TEA",
+                                    "name": "Asie de l'Est & Pacifique (pays IDA & IBRD)",
+                                    "type": "rig"
+                                },
+                                {
+                                    "code": "EAP",
+                                    "name": "Asie de l'Est & Pacifique (sauf haut revenu)",
+                                    "type": "rig"
+                                },
+                                {
+                                    "code": "CEA",
+                                    "name": "Asie de l'Est et Pacifique (classification IFC)",
+                                    "type": "reg"
+                                },
+                                {
+                                    "code": "SAS",
+                                    "name": "Asie du Sud",
+                                    "type": "reg"
+                                },
+                                {
+                                    "code": "CSA",
+                                    "name": "Asie du Sud (classification IFC)",
+                                    "type": "reg"
+                                },
+                                {
+                                    "code": "TSA",
+                                    "name": "Asie du Sud (IDA & IBRD)",
+                                    "type": "rig"
+                                },
+                                {
+                                    "code": "DSA",
+                                    "name": "Asie du Sud (pays éligibles IDA)",
+                                    "type": "rig"
+                                },
+                                {
+                                    "code": "AUS",
+                                    "name": "Australie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "OSS",
+                                    "name": "Autres petits états",
+                                    "type": "siz"
+                                },
+                                {
+                                    "code": "AUT",
+                                    "name": "Autriche",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "AZE",
+                                    "name": "Azerbaijan",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "BHS",
+                                    "name": "Bahamas",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "BHR",
+                                    "name": "Bahrein",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "BGD",
+                                    "name": "Bangladesh",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "BRB",
+                                    "name": "Barbade",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "BLR",
+                                    "name": "Bélarus",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "BEL",
+                                    "name": "Belgique",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "BLZ",
+                                    "name": "Belize",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "BEN",
+                                    "name": "Bénin",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "BMU",
+                                    "name": "Bermudes",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "BTN",
+                                    "name": "Bhoutan",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "BOL",
+                                    "name": "Bolivie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "BIH",
+                                    "name": "Bosnie-Herzégovine",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "BWA",
+                                    "name": "Botswana",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "BRA",
+                                    "name": "Brésil",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "BRN",
+                                    "name": "Brunéi Darussalam",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "BGR",
+                                    "name": "Bulgarie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "BFA",
+                                    "name": "Burkina Faso",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "BDI",
+                                    "name": "Burundi",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "CPV",
+                                    "name": "Cabo Verde",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "KHM",
+                                    "name": "Cambodge",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "CMR",
+                                    "name": "Cameroun",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "CAN",
+                                    "name": "Canada",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "CHL",
+                                    "name": "Chili",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "CHN",
+                                    "name": "Chine",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "HKG",
+                                    "name": "Chine, RAS de Hong Kong",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "CYP",
+                                    "name": "Chypre",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "COL",
+                                    "name": "Colombie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "COM",
+                                    "name": "Comores",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "COG",
+                                    "name": "Congo, République",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "COD",
+                                    "name": "Congo, République démocratique",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "KOR",
+                                    "name": "Corée, République de",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "PRK",
+                                    "name": "Corée, République démocratique de",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "CRI",
+                                    "name": "Costa Rica",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "CIV",
+                                    "name": "Côte d'Ivoire",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "HRV",
+                                    "name": "Croatie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "CUB",
+                                    "name": "Cuba",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "CUW",
+                                    "name": "Curaçao",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "DNK",
+                                    "name": "Danemark",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "LTE",
+                                    "name": "Dividende démographique tardif",
+                                    "type": "dmg"
+                                },
+                                {
+                                    "code": "DJI",
+                                    "name": "Djibouti",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "DMA",
+                                    "name": "Dominique",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "EGY",
+                                    "name": "Egypte, République arabe d'",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "SLV",
+                                    "name": "El Salvador",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "ARE",
+                                    "name": "Emirats arabes unis",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "ECU",
+                                    "name": "Equateur",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "ERI",
+                                    "name": "Erythrée",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "ESP",
+                                    "name": "Espagne",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "EST",
+                                    "name": "Estonie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "SWZ",
+                                    "name": "Eswatini",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "USA",
+                                    "name": "Etats-Unis",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "ETH",
+                                    "name": "Ethiopie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "ECS",
+                                    "name": "Europe & Asie centrale",
+                                    "type": "reg"
+                                },
+                                {
+                                    "code": "DEC",
+                                    "name": "Europe & Asie centrale (pays éligibles IDA)",
+                                    "type": "rig"
+                                },
+                                {
+                                    "code": "BEC",
+                                    "name": "Europe & Asie centrale (pays IBRD uniquement)",
+                                    "type": "rig"
+                                },
+                                {
+                                    "code": "TEC",
+                                    "name": "Europe & Asie centrale (pays IDA & IBRD)",
+                                    "type": "rig"
+                                },
+                                {
+                                    "code": "ECA",
+                                    "name": "Europe & Asie centrale (sauf haut revenu)",
+                                    "type": "rig"
+                                },
+                                {
+                                    "code": "CEB",
+                                    "name": "Europe centrale et pays baltes",
+                                    "type": "reg"
+                                },
+                                {
+                                    "code": "CEU",
+                                    "name": "Europe et Asie centrale (classification IFC)",
+                                    "type": "reg"
+                                },
+                                {
+                                    "code": "LIC",
+                                    "name": "Faible revenu",
+                                    "type": "inc"
+                                },
+                                {
+                                    "code": "RUS",
+                                    "name": "Fédération de Russie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "FJI",
+                                    "name": "Fiji",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "FIN",
+                                    "name": "Finlande",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "FRA",
+                                    "name": "France",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "GAB",
+                                    "name": "Gabon",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "GMB",
+                                    "name": "Gambie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "GEO",
+                                    "name": "Georgie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "GHA",
+                                    "name": "Ghana",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "GIB",
+                                    "name": "Gibraltar",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "GRC",
+                                    "name": "Grèce",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "GRD",
+                                    "name": "Grenade",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "GRL",
+                                    "name": "Groenland",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "GUM",
+                                    "name": "Guam",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "GTM",
+                                    "name": "Guatemala",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "GIN",
+                                    "name": "Guinée",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "GNQ",
+                                    "name": "Guinée équatoriale",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "GNB",
+                                    "name": "Guinée-Bissau",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "GUY",
+                                    "name": "Guyane",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "HTI",
+                                    "name": "Haïti",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "HND",
+                                    "name": "Honduras",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "HUN",
+                                    "name": "Hongrie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "IBD",
+                                    "name": "IBRD uniquement",
+                                    "type": "inc"
+                                },
+                                {
+                                    "code": "IBB",
+                                    "name": "IBRD, y compris mélange",
+                                    "type": "inc"
+                                },
+                                {
+                                    "code": "IDB",
+                                    "name": "IDA ",
+                                    "type": "inc"
+                                },
+                                {
+                                    "code": "IBT",
+                                    "name": "IDA & IBRD total",
+                                    "type": "inc"
+                                },
+                                {
+                                    "code": "IDA",
+                                    "name": "IDA total",
+                                    "type": "inc"
+                                },
+                                {
+                                    "code": "IDX",
+                                    "name": "IDA uniquement",
+                                    "type": "inc"
+                                },
+                                {
+                                    "code": "IMN",
+                                    "name": "Ile de Man",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "CHI",
+                                    "name": "Iles anglo-normandes",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "CYM",
+                                    "name": "Iles Cayman",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "FRO",
+                                    "name": "Iles Féroé",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "MHL",
+                                    "name": "Iles Marshall",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "SLB",
+                                    "name": "Iles Salomon",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "TCA",
+                                    "name": "Iles Turks et Caicos",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "VIR",
+                                    "name": "Iles Vierges (U.S.)",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "VGB",
+                                    "name": "Iles Vierges britanniques",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "IND",
+                                    "name": "Inde",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "IDN",
+                                    "name": "Indonésie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "IRN",
+                                    "name": "Iran, République islamique d'",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "IRQ",
+                                    "name": "Iraq",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "IRL",
+                                    "name": "Irlande",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "ISL",
+                                    "name": "Islande",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "ISR",
+                                    "name": "Israël",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "ITA",
+                                    "name": "Italie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "JAM",
+                                    "name": "Jamaique",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "JPN",
+                                    "name": "Japon",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "JOR",
+                                    "name": "Jordanie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "KAZ",
+                                    "name": "Kazakhstan",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "KEN",
+                                    "name": "Kenya",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "KIR",
+                                    "name": "Kiribati",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "XKX",
+                                    "name": "Kosovo",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "KWT",
+                                    "name": "Koweït",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "LVA",
+                                    "name": "Lettonie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "LSO",
+                                    "name": "Lesotho",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "LBN",
+                                    "name": "Liban",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "LBR",
+                                    "name": "Libéria",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "LBY",
+                                    "name": "Libye",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "LIE",
+                                    "name": "Liechtenstein",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "LTU",
+                                    "name": "Lituanie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "LUX",
+                                    "name": "Luxembourg",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "MKD",
+                                    "name": "Macédoine du Nord",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "MDG",
+                                    "name": "Madagascar",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "MYS",
+                                    "name": "Malaisie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "MWI",
+                                    "name": "Malawi",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "MDV",
+                                    "name": "Maldives",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "MLI",
+                                    "name": "Mali",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "MLT",
+                                    "name": "Malte",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "MNP",
+                                    "name": "Mariannes",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "MAR",
+                                    "name": "Maroc",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "MUS",
+                                    "name": "Maurice",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "MRT",
+                                    "name": "Mauritanie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "OED",
+                                    "name": "Membres OECD",
+                                    "type": "mmb"
+                                },
+                                {
+                                    "code": "MEX",
+                                    "name": "Mexique",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "FSM",
+                                    "name": "Micronésie, Etats fédérés de",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "MDA",
+                                    "name": "Moldavie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "MCO",
+                                    "name": "Monaco",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "WLD",
+                                    "name": "Monde",
+                                    "type": "reg"
+                                },
+                                {
+                                    "code": "ARB",
+                                    "name": "Monde arabe",
+                                    "type": "reg"
+                                },
+                                {
+                                    "code": "MNG",
+                                    "name": "Mongolie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "MNE",
+                                    "name": "Monténégro",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "MDE",
+                                    "name": "Moyen Orient (en développement)",
+                                    "type": "reg"
+                                },
+                                {
+                                    "code": "DMN",
+                                    "name": "Moyen orient & Afrique du Nord (pays éligibles IDA)",
+                                    "type": "rig"
+                                },
+                                {
+                                    "code": "BMN",
+                                    "name": "Moyen Orient & Afrique du Nord (pays IBRD uniquement)",
+                                    "type": "rig"
+                                },
+                                {
+                                    "code": "MEA",
+                                    "name": "Moyen Orient et Afrique du Nord",
+                                    "type": "reg"
+                                },
+                                {
+                                    "code": "CME",
+                                    "name": "Moyen Orient et Afrique du Nord (classification IFC)",
+                                    "type": "reg"
+                                },
+                                {
+                                    "code": "TMN",
+                                    "name": "Moyen Orient et Afrique du Nord (pays IDA & IBRD)",
+                                    "type": "rig"
+                                },
+                                {
+                                    "code": "MNA",
+                                    "name": "Moyen Orient et Afrique du Nord (sauf revenu élevé)",
+                                    "type": "rig"
+                                },
+                                {
+                                    "code": "MOZ",
+                                    "name": "Mozambique",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "MMR",
+                                    "name": "Myanmar",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "NAM",
+                                    "name": "Namibie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "NRU",
+                                    "name": "Nauru",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "NPL",
+                                    "name": "Népal",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "NIC",
+                                    "name": "Nicaragua",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "NER",
+                                    "name": "Niger",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "NGA",
+                                    "name": "Nigéria",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "INX",
+                                    "name": "Non classifié",
+                                    "type": "ncl"
+                                },
+                                {
+                                    "code": "NOR",
+                                    "name": "Norvège",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "NCL",
+                                    "name": "Nouvelle Calédonie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "NZL",
+                                    "name": "Nouvelle Zélande",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "OMN",
+                                    "name": "Oman",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "UZB",
+                                    "name": "Ouzbékistan",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "PAK",
+                                    "name": "Pakistan",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "PLW",
+                                    "name": "Palau",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "PAN",
+                                    "name": "Panama",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "PNG",
+                                    "name": "Papouasie Nouvelle Guinée",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "PRY",
+                                    "name": "Paraguay",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "SST",
+                                    "name": "Petits états",
+                                    "type": "siz"
+                                },
+                                {
+                                    "code": "NRS",
+                                    "name": "Pays d'Afrique subsaharienne pauvres en resources",
+                                    "type": "rig"
+                                },
+                                {
+                                    "code": "RRS",
+                                    "name": "Pays d'Afrique subsaharienne riches en resources",
+                                    "type": "rig"
+                                },
+                                {
+                                    "code": "EAR",
+                                    "name": "Pays de dividende démographique précoce",
+                                    "type": "dmg"
+                                },
+                                {
+                                    "code": "FCS",
+                                    "name": "Pays en situation fragile ou de conflit",
+                                    "type": "frg"
+                                },
+                                {
+                                    "code": "BHI",
+                                    "name": "Pays IBRD à haut revenu",
+                                    "type": "inc"
+                                },
+                                {
+                                    "code": "FXS",
+                                    "name": "Pays IDA classifiés comme étant en situation fragiles, hors Afrique subsaharienne",
+                                    "type": "frg"
+                                },
+                                {
+                                    "code": "DSF",
+                                    "name": "Pays IDA d'Afrique subsaharienne classifiés en situation fragile",
+                                    "type": "frg"
+                                },
+                                {
+                                    "code": "DNS",
+                                    "name": "Pays IDA d'Afrique subsaharienne non classifiés en situation fragile",
+                                    "type": "frg"
+                                },
+                                {
+                                    "code": "DFS",
+                                    "name": "Pays IDA en situation fragile",
+                                    "type": "frg"
+                                },
+                                {
+                                    "code": "DNF",
+                                    "name": "Pays IDA non classifiés en situation fragile",
+                                    "type": "frg"
+                                },
+                                {
+                                    "code": "NXS",
+                                    "name": "Pays IDA non-classifiés comme fragiles, sauf Afrique subsaharienne",
+                                    "type": "rig"
+                                },
+                                {
+                                    "code": "LDC",
+                                    "name": "Pays les moins développés: classification NU",
+                                    "type": "inc"
+                                },
+                                {
+                                    "code": "HPC",
+                                    "name": "Pays très endettés (HIPC)",
+                                    "type": "eco"
+                                },
+                                {
+                                    "code": "NLD",
+                                    "name": "Pays-Bas",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "PER",
+                                    "name": "Pérou",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "CSS",
+                                    "name": "Petits états des Caraïbes",
+                                    "type": "siz"
+                                },
+                                {
+                                    "code": "PSS",
+                                    "name": "Petits états insulaires du Pacifique",
+                                    "type": "siz"
+                                },
+                                {
+                                    "code": "PHL",
+                                    "name": "Philippines",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "POL",
+                                    "name": "Pologne",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "PYF",
+                                    "name": "Polynésie française",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "PRI",
+                                    "name": "Porto Rico",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "PRT",
+                                    "name": "Portugal",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "PST",
+                                    "name": "Post-dividende démographique",
+                                    "type": "dmg"
+                                },
+                                {
+                                    "code": "PRE",
+                                    "name": "Pré-dividende démographique",
+                                    "type": "dmg"
+                                },
+                                {
+                                    "code": "QAT",
+                                    "name": "Qatar",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "MAC",
+                                    "name": "Région adminisrative spéciale de Macao, Chine",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "SYR",
+                                    "name": "République arabe syrienne",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "CAF",
+                                    "name": "République centrafricaine",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "LAO",
+                                    "name": "République démocratique populaire lao",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "DOM",
+                                    "name": "République dominicaine",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "KGZ",
+                                    "name": "République kirgize",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "SVK",
+                                    "name": "République slovaque",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "CZE",
+                                    "name": "République tchèque",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "HIC",
+                                    "name": "Revenu élevé",
+                                    "type": "inc"
+                                },
+                                {
+                                    "code": "LMY",
+                                    "name": "Revenu faible et intermédiaire",
+                                    "type": "inc"
+                                },
+                                {
+                                    "code": "MIC",
+                                    "name": "Revenu intermédiaire",
+                                    "type": "inc"
+                                },
+                                {
+                                    "code": "LMC",
+                                    "name": "Revenu intermédiaire, tranche inférieure",
+                                    "type": "inc"
+                                },
+                                {
+                                    "code": "UMC",
+                                    "name": "Revenu intermédiaire, tranche supérieure",
+                                    "type": "inc"
+                                },
+                                {
+                                    "code": "ROU",
+                                    "name": "Roumanie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "GBR",
+                                    "name": "Royaume Uni",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "RWA",
+                                    "name": "Rwanda",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "SMR",
+                                    "name": "Saint-Marin",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "WSM",
+                                    "name": "Samoa",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "STP",
+                                    "name": "Sao Tomé et Principe",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "SEN",
+                                    "name": "Sénégal",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "SRB",
+                                    "name": "Serbie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "SYC",
+                                    "name": "Seychelles",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "SLE",
+                                    "name": "Sierra Leone",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "SGP",
+                                    "name": "Singapour",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "SXM",
+                                    "name": "Sint Maarten (Dutch part)",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "SVN",
+                                    "name": "Slovénie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "SOM",
+                                    "name": "Somalie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "SDN",
+                                    "name": "Soudan",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "SSD",
+                                    "name": "Soudan du Sud",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "LKA",
+                                    "name": "Sri Lanka",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "KNA",
+                                    "name": "St. Kitts et Nevis",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "LCA",
+                                    "name": "St. Lucie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "MAF",
+                                    "name": "St. Martin (partie française)",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "VCT",
+                                    "name": "St. Vincent et Grenadines",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "SWE",
+                                    "name": "Suède",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "CHE",
+                                    "name": "Suisse",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "SUR",
+                                    "name": "Surinam",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "TWN",
+                                    "name": "Taiwan, Chine",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "TJK",
+                                    "name": "Tajikistan",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "TZA",
+                                    "name": "Tanzanie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "TCD",
+                                    "name": "Tchad",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "THA",
+                                    "name": "Thailande",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "TLS",
+                                    "name": "Timor-Leste",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "TGO",
+                                    "name": "Togo",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "TON",
+                                    "name": "Tonga",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "TTO",
+                                    "name": "Trinidad et Tobago",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "TUN",
+                                    "name": "Tunisie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "TKM",
+                                    "name": "Turkménistan",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "TUR",
+                                    "name": "Turquie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "TUV",
+                                    "name": "Tuvalu",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "UGA",
+                                    "name": "Uganda",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "UKR",
+                                    "name": "Ukraine",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "EUU",
+                                    "name": "Union Européenne",
+                                    "type": "mmb"
+                                },
+                                {
+                                    "code": "URY",
+                                    "name": "Uruguay",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "VUT",
+                                    "name": "Vanuatu",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "VEN",
+                                    "name": "Vénézuela, RB",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "VNM",
+                                    "name": "Viet Nam",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "PSE",
+                                    "name": "West Bank et Gaza",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "YEM",
+                                    "name": "Yémen, Rép. du",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "ZMB",
+                                    "name": "Zambie",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "ZWE",
+                                    "name": "Zimbabwe",
+                                    "type": "cty"
+                                },
+                                {
+                                    "code": "EMU",
+                                    "name": "Zone Euro",
+                                    "type": "cur"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "project_desc.keywords",
+                            "type": "array",
+                            "title": "Mots clés",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Mot clé",
+                                    "type": "string",
+                                    "prop_key": "project_desc.keywords.name",
+                                    "help_text": "Le mot-clé lui-même (un mot ou une phrase).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulaire",
+                                    "type": "string",
+                                    "prop_key": "project_desc.keywords.vocabulary",
+                                    "help_text": "Le vocabulaire contrôlé (y compris le numéro de version ou la date) à partir duquel le mot-clé est extrait, le cas échéant.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "project_desc.keywords.uri",
+                                    "help_text": "L'URL du vocabulaire contrôlé à partir duquel le mot-clé est extrait, le cas échéant.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Une liste de mots-clés qui fournissent des informations sur la portée et les objectifs principaux du projet de recherche. Les mots-clés offrent une solution pratique pour améliorer la découvrabilité de la recherche, car ils permettent d'indexer des termes et des phrases qui ne se trouvent pas ailleurs dans les métadonnées et de rendre un projet détectable par les moteurs de recherche textuels. Un vocabulaire contrôlé sera de préférence utilisé (bien que non obligatoire), tel que le Thésaurus de l'UNESCO. La liste fournie ici peut combiner des mots-clés de plusieurs vocabulaires contrôlés et des mots-clés définis par l'utilisateur.",
+                            "is_recommended": true
+                        },
+                        {
+                            "key": "project_desc.themes",
+                            "type": "array",
+                            "title": "Thèmes",
+                            "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "string",
+                                    "prop_key": "project_desc.themes.id",
+                                    "help_text": "L'identifiant du thème, tiré d'un vocabulaire contrôlé.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "prop_key": "project_desc.themes.name",
+                                    "help_text": "Le nom (label) du thème, de préférence tiré d'un vocabulaire contrôlé.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "title": "ID parent",
+                                    "help_text": "L'ID parent du thème (ID de l'élément d'un niveau supérieur dans la hiérarchie), si un vocabulaire contrôlé hiérarchique est utilisé.",
+                                    "type": "string",
+                                    "prop_key": "project_desc.themes.parent_id",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulaire",
+                                    "type": "string",
+                                    "prop_key": "project_desc.themes.vocabulary",
+                                    "help_text": "Le nom (y compris le numéro de version) du vocabulaire contrôlé utilisé, le cas échéant.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "project_desc.themes.uri",
+                                    "help_text": "L'URL du vocabulaire contrôlé utilisé, le cas échéant.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Une liste des thèmes couverts par le projet de recherche. Un vocabulaire contrôlé sera de préférence utilisé. Notez que les thèmes seront rarement utilisés car les éléments sujets et disciplines sont plus appropriés pour la plupart des utilisations."
+                        },
+                        {
+                            "key": "project_desc.topics",
+                            "type": "array",
+                            "title": "Sujets",
+                            "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "string",
+                                    "prop_key": "project_desc.topics.id",
+                                    "help_text": "L'identifiant du sujet, tiré d'un vocabulaire contrôlé.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "prop_key": "project_desc.topics.name",
+                                    "help_text": "Le nom (étiquette) du sujet, de préférence tiré d'un vocabulaire contrôlé.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "title": "ID parent",
+                                    "help_text": "L'identifiant parent du thème (identifiant de l'élément d'un niveau supérieur dans la hiérarchie), si un vocabulaire contrôlé hiérarchique est utilisé.",
+                                    "type": "string",
+                                    "prop_key": "project_desc.topics.parent_id",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulaire",
+                                    "type": "string",
+                                    "prop_key": "project_desc.topics.vocabulary",
+                                    "help_text": "Le nom (y compris le numéro de version) du vocabulaire contrôlé utilisé, le cas échéant.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "project_desc.topics.uri",
+                                    "help_text": "L'URL du vocabulaire contrôlé utilisé, le cas échéant.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Informations sur les sujets abordés dans le projet de recherche. On utilisera de préférence un vocabulaire contrôlé, par exemple la classification CESSDA Topics, une typologie de thèmes disponible en 11 langues ; ou le système de classification du Journal of Economic Literature (JEL), ou la classification des sujets de la Banque mondiale. Notez que vous pouvez utiliser plus d'un vocabulaire contrôlé."
+                        },
+                        {
+                            "key": "project_desc.disciplines",
+                            "type": "array",
+                            "title": "Disciplines",
+                            "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "string",
+                                    "prop_key": "project_desc.disciplines.id",
+                                    "help_text": "L'identifiant de la discipline, issu d'un vocabulaire contrôlé.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "prop_key": "project_desc.disciplines.name",
+                                    "help_text": "Le nom (label) de la discipline, de préférence issu d'un vocabulaire contrôlé.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "title": "ID parent",
+                                    "help_text": "L'identifiant parent de la discipline (identifiant de l'élément d'un niveau supérieur dans la hiérarchie), si un vocabulaire contrôlé hiérarchique est utilisé.",
+                                    "type": "string",
+                                    "prop_key": "project_desc.disciplines.parent_id",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulaire",
+                                    "type": "string",
+                                    "prop_key": "project_desc.disciplines.vocabulary",
+                                    "help_text": "Le nom (y compris le numéro de version) du vocabulaire contrôlé utilisé, le cas échéant.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "project_desc.disciplines.uri",
+                                    "help_text": "L'URL du vocabulaire contrôlé utilisé, le cas échéant.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Informations sur les disciplines académiques liées au contenu du projet de recherche. On utilisera de préférence un vocabulaire contrôlé, par exemple celui fourni par la liste des domaines académiques de Wikipédia."
+                        },
+                        {
+                            "key": "project_desc.related_projects",
+                            "title": "Projets liés",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "prop_key": "project_desc.related_projects.name",
+                                    "help_text": "Le nom (titre) du projet associé.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "project_desc.related_projects.uri",
+                                    "help_text": "Un lien (URL) vers la page Web du projet associé.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "note",
+                                    "title": "Note",
+                                    "type": "string",
+                                    "prop_key": "project_desc.related_projects.note",
+                                    "help_text": "Une brève description ou toute autre information pertinente sur le projet associé.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "L'objectif de ce bloc est de fournir des liens (URL) vers d'autres projets connexes qui peuvent être documentés et diffusés dans le même catalogue ou à tout autre emplacement sur Internet."
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "project_desc_container1674844845378",
+                    "title": "Processus et résultats",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "project_desc.process",
+                            "title": "Processus",
+                            "help_text": "Cet élément est utilisé pour documenter le cycle de vie du projet de recherche, depuis sa conception et son lancement jusqu'à sa conclusion. Cela peut inclure des phases de collecte de fonds, l'approbation par un comité d'examen, l'examen de la note conceptuelle, l'acquisition de données, l'analyse, la publication d'un document de travail, l'examen par les pairs, l'examen du code et l'évaluation de la reproductibilité, la publication dans une revue, la présentation à des conférences, la publication, l'évaluation, rapports aux commanditaires, etc. Il est recommandé de fournir ces étapes dans un ordre chronologique.",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "prop_key": "project_desc.process.name",
+                                    "help_text": "Il s'agit d'un en-tête pour la phase du processus.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "date_start",
+                                    "title": "Date de début",
+                                    "type": "string",
+                                    "prop_key": "project_desc.process.date_start",
+                                    "help_text": "Date de début de la phase, de préférence saisie au format ISO 8601 (AAAA-MM-JJ).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "date_end",
+                                    "title": "Date de fin",
+                                    "type": "string",
+                                    "prop_key": "project_desc.process.date_end",
+                                    "help_text": "Date de fin de la phase, de préférence saisie au format ISO 8601 (AAAA-MM-JJ).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "string",
+                                    "prop_key": "project_desc.process.description",
+                                    "help_text": "Une brève description de la phase.",
+                                    "display_type": "textarea"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "project_desc.review_board",
+                            "title": "Comité d'examen institutionnel",
+                            "help_text": "Des informations indiquant si et quand le projet a été soumis, examiné et approuvé par un comité d'examen institutionnel (ou un comité d'éthique indépendant, un comité d'examen éthique (ERB), un comité d'éthique de la recherche ou l'équivalent).",
+                            "type": "string",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "project_desc.approval_process",
+                            "title": "Processus d'approbation",
+                            "help_text": "Le \"Processus d'approbation\" est un groupe de six éléments utilisés pour décrire le ou les processus d'approbation formels (le cas échéant) que le projet a dû suivre. Cela peut par exemple inclure une approbation par un comité d'éthique pour collecter de nouvelles données, suivie d'un processus d'examen interne pour approuver les résultats.",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "approval_phase",
+                                    "title": "Nom de la phase",
+                                    "type": "string",
+                                    "prop_key": "project_desc.approval_process.approval_phase",
+                                    "help_text": "Un label qui décrit la phase d'approbation.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "approval_authority",
+                                    "title": "Autorité",
+                                    "type": "string",
+                                    "prop_key": "project_desc.approval_process.approval_authority",
+                                    "help_text": "Identification de la (des) personne(s) ou organisation(s) dont l'approbation était requise ou demandée.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "submission_date",
+                                    "title": "Date de soumission",
+                                    "type": "string",
+                                    "prop_key": "project_desc.approval_process.submission_date",
+                                    "help_text": "La date, de préférence saisie au format ISO 8601 (AAAA-MM-JJ), à laquelle le projet (ou une composante de celui-ci) a été soumis pour approbation.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "reviewer",
+                                    "title": "Critique",
+                                    "type": "string",
+                                    "help_text": "Identification du ou des examinateurs.",
+                                    "prop_key": "project_desc.approval_process.reviewer",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "review_status",
+                                    "title": "État de l'examen",
+                                    "type": "string",
+                                    "prop_key": "project_desc.approval_process.review_status",
+                                    "help_text": "Statut d'approbation.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "approval_date",
+                                    "title": "Date d'approbation",
+                                    "type": "string",
+                                    "prop_key": "project_desc.approval_process.approval_date",
+                                    "help_text": "Date de réception officielle de l'approbation, de préférence saisie au format ISO 8601 (AAAA-MM-JJ).",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "project_desc.reviews_comments",
+                            "title": "Avis et commentaires",
+                            "type": "nested_array",
+                            "props": [
+                                {
+                                    "key": "comment_date",
+                                    "title": "Date",
+                                    "type": "string",
+                                    "prop_key": "project_desc.reviews_comments.comment_date",
+                                    "help_text": "La date à laquelle le commentaire a été fourni, de préférence au format ISO 8601 (AAAA-MM-JJ ou AAAA-MM).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "comment_by",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "prop_key": "project_desc.reviews_comments.comment_by",
+                                    "help_text": "Le nom de la personne ou de l'organisation qui a fourni le commentaire.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "comment_description",
+                                    "title": "Commentaire",
+                                    "type": "string",
+                                    "prop_key": "project_desc.reviews_comments.comment_description",
+                                    "help_text": "Le texte du commentaire lui-même, dans sa formulation originale ou dans une version résumée.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "comment_response",
+                                    "title": "Réponse",
+                                    "type": "string",
+                                    "prop_key": "project_desc.reviews_comments.comment_response",
+                                    "help_text": "La réponse apportée par l'équipe\/la personne de recherche au commentaire, dans sa formulation originale ou dans une version résumée.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "De nombreux projets de recherche seront soumis à un processus d'examen, qui peut se produire à différentes étapes de la mise en œuvre du projet (de la conception à l'examen du résultat final). Ce bloc est destiné à documenter les commentaires reçus par les réviseurs au cours de ce processus. Il s'agit d'un bloc reproductible d'éléments de métadonnées, qui peut être utilisé pour documenter des commentaires avec une granularité fine."
+                        },
+                        {
+                            "key": "project_desc.output",
+                            "title": "Résultat",
+                            "help_text": "Cet élément décrira et référencera tous les produits substantiels\/prévus du projet de recherche, qui peuvent inclure des publications, des rapports, des sites Web, des ensembles de données, des applications interactives, des présentations, des visualisations et autres. Un extrant peut également être appelé « livrable ».",
+                            "type": "nested_array",
+                            "props": [
+                                {
+                                    "key": "type",
+                                    "title": "Type",
+                                    "type": "string",
+                                    "help_text": "Type de résultat. Le type de résultat se rapporte au média qui est utilisé pour transmettre ou communiquer les résultats, constatations ou conclusions prévus du projet de recherche. Ce champ peut être contrôlé par un vocabulaire contrôlé. Le type de résultat pourrait être \"Papier de travail\", \"Base de données\", etc.",
+                                    "prop_key": "project_desc.output.type",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "title",
+                                    "title": "Titre",
+                                    "type": "string",
+                                    "prop_key": "project_desc.output.title",
+                                    "help_text": "Titre officiel du résultat. Selon le type de résultat, le titre variera en termes de formalité.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "authors",
+                                    "title": "Auteurs",
+                                    "type": "string",
+                                    "prop_key": "project_desc.output.authors",
+                                    "help_text": "Auteurs du résultat; s'ils sont plusieurs, ils seront répertoriés dans un même champ de texte.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "string",
+                                    "prop_key": "project_desc.output.description",
+                                    "help_text": "Une brève description du résultat (mais pas un résumé, qui serait saisi dans \"Résumé\")",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "abstract",
+                                    "type": "string",
+                                    "title": "Résumé",
+                                    "prop_key": "project_desc.output.abstract",
+                                    "help_text": "Si la sortie consiste en un document, le résumé sera saisi ici.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "uri",
+                                    "type": "string",
+                                    "title": "URL",
+                                    "prop_key": "project_desc.output.uri",
+                                    "help_text": "Un lien (URL) où la sortie ou des informations sur la sortie peuvent être trouvées.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "doi",
+                                    "type": "string",
+                                    "title": "DOI",
+                                    "prop_key": "project_desc.output.doi",
+                                    "help_text": "L'identificateur d'objet numérique (DOI) de la sortie, s'il est disponible.",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "project_desc.language",
+                            "title": "Langue",
+                            "help_text": "Un bloc de deux éléments décrivant le(s) langage(s) du projet. Au moins un des deux éléments doit être fourni pour chaque langue répertoriée.",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "prop_key": "project_desc.language.name",
+                                    "help_text": "Le nom de la langue.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "code",
+                                    "title": "Code",
+                                    "type": "string",
+                                    "prop_key": "project_desc.language.code",
+                                    "help_text": "Le code de la langue. Les codes numériques doivent être saisis sous forme de chaînes. L'utilisation de l'ISO 639-2 (le code alpha-3 dans Codes pour la représentation des noms de langues) est recommandée.",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "project_desc.errata",
+                            "title": "Errata",
+                            "help_text": "Ce champ est utilisé pour lister et décrire les errata.",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "date",
+                                    "title": "Date",
+                                    "type": "string",
+                                    "prop_key": "project_desc.errata.date",
+                                    "help_text": "La date, de préférence saisie au format ISO 8601 (AAAA-MM-JJ), à laquelle l'erratum a été publié.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "string",
+                                    "prop_key": "project_desc.errata.description",
+                                    "help_text": "Description de la ou des erreurs et mesures prises pour y remédier.",
+                                    "display_type": "textarea"
+                                }
+                            ]
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "project_desc_container1674845183788",
+                    "title": "Données",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "project_desc.data_statement",
+                            "title": "Déclaration sur les données",
+                            "help_text": "Une déclaration générale sur les données utilisées dans le projet. Un champ distinct est fourni pour répertorier et documenter l'origine et les principales caractéristiques des ensembles de données. La déclaration doit inclure des informations sur la confiance de l'auteur dans la qualité des données et\/ou des informations sur les limites connues des ensembles de données.",
+                            "type": "string",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "project_desc.datasets",
+                            "title": "Datasets",
+                            "help_text": "Ce champ est utilisé pour fournir une liste détaillée des ensembles de données utilisés dans le projet. Les données ne sont pas documentées ici (des métadonnées spécifiques sont disponibles pour documenter des données de différents types, comme la DDI pour les microdonnées, l'ISO 19139 pour les jeux de données géographiques, etc.)",
+                            "type": "nested_array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "prop_key": "project_desc.datasets.name",
+                                    "help_text": "Le nom du dataset (titre).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "idno",
+                                    "title": "ID du dataset",
+                                    "type": "string",
+                                    "prop_key": "project_desc.datasets.idno",
+                                    "help_text": "L'identifiant unique du dataset. Si l'ensemble de données a plusieurs identifiants, y compris un DOI, le DOI devrait être utilisé ici.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "note",
+                                    "title": "Note",
+                                    "type": "string",
+                                    "prop_key": "project_desc.datasets.note",
+                                    "help_text": "Une brève description du dataset.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "access_type",
+                                    "title": "Politique d'accès",
+                                    "type": "string",
+                                    "prop_key": "project_desc.datasets.access_type",
+                                    "help_text": "La politique d'accès appliquée au dataset.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "license",
+                                    "title": "License",
+                                    "type": "string",
+                                    "prop_key": "project_desc.datasets.license",
+                                    "help_text": "La licence d'accès ou d'utilisation des données qui s'applique au dataset.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "license_uri",
+                                    "title": "URL de la license",
+                                    "type": "string",
+                                    "prop_key": "project_desc.datasets.license_uri",
+                                    "help_text": "L'URL d'une page Web où plus d'informations sur la licence peuvent être obtenues.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "type": "string",
+                                    "title": "URL du dataset",
+                                    "prop_key": "project_desc.datasets.uri",
+                                    "help_text": "L'URL où l'ensemble de données (ou une description détaillée de celui-ci) peut être obtenu. Il peut s'agir d'un lien vers un catalogue de données.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ]
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "project_desc_container1674845066822",
+                    "title": "Méthodes, logiciels et scripts",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "project_desc.methods",
+                            "title": "Méthodes",
+                            "help_text": "Une liste des méthodes analytiques, statistiques, économétriques et d'apprentissage automatique utilisées dans le projet. L'objectif est de permettre aux utilisateurs de trouver des projets sur la base d'une recherche sur les méthodes appliquées, par ex. répondre à une requête comme \"prédiction de la pauvreté à l'aide de random forests\".",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "prop_key": "project_desc.methods.name",
+                                    "help_text": "Nom abrégé de la méthode décrite.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "note",
+                                    "title": "Note",
+                                    "type": "string",
+                                    "prop_key": "project_desc.methods.note",
+                                    "help_text": "Toute information complémentaire sur la méthode.",
+                                    "display_type": "textarea"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "project_desc.software",
+                            "title": "Logiciel",
+                            "help_text": "Ce champ permet de lister les logiciels et les packages spécialisés et bibliothèques\/packages qui ont été utilisés pour mettre en œuvre le projet et qui sont nécessaires pour reproduire les scripts. Les bibliothèques chargées par les scripts (par exemple, par la commande R \"require\" ou \"library\") sont incluses (pas toutes leurs propres dépendances, qui seront supposées être installées automatiquement).",
+                            "type": "nested_array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "prop_key": "project_desc.software.name",
+                                    "help_text": "Le nom du logiciel. Par exemple : \"Python\", ou \"R\". Il est recommandé d'utiliser un vocabulaire contrôlé.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "version",
+                                    "title": "Version",
+                                    "type": "string",
+                                    "prop_key": "project_desc.software.version",
+                                    "help_text": "La version du logiciel.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "library",
+                                    "title": "Libraries",
+                                    "help_text": "Une liste des librariries\/packages requis pour exécuter les scripts. Notez que la version spécifique de chaque package n'est pas documentée ici ; on s'attend à ce qu'il se trouve dans le script ou dans les instructions de reproduction.",
+                                    "type": "string",
+                                    "prop_key": "project_desc.software.library",
+                                    "enum": [],
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "project_desc.scripts",
+                            "title": "Scripts",
+                            "help_text": "Ce champ est utilisé pour décrire les scripts écrits par les auteurs du projet. Tous les scripts doivent avoir été écrits à l'aide des logiciels répertoriés dans le champs \"logiciel\".",
+                            "type": "nested_array",
+                            "props": [
+                                {
+                                    "key": "file_name",
+                                    "title": "Nom de fichier",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.file_name",
+                                    "help_text": "Nom du fichier de script (pour les utilisateurs de R, cela inclura généralement les fichiers avec l'extension [.R], pour les utilisateurs de Stata ce seront les fichiers avec l'extension [.do], pour les utilisateurs de Python …). Mais cela peut également inclure d'autres fichiers liés et nécessaires à l'exécution des scripts (par exemple, les fichiers CSV de recherche, etc.). Cela n'inclut pas les fichiers de données, qui sont décrits dans un champ spécifique.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "zip_package",
+                                    "title": "Zip package",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.zip_package",
+                                    "help_text": "Si les fichiers du script ont été enregistrés sous ou dans un fichier compressé (zip, rar, ou équivalent), nous fournissons ici le nom du fichier zip contenant le script.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "title",
+                                    "title": "Titre",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.title",
+                                    "help_text": "Un titre (label) donné au fichier de script.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "authors",
+                                    "type": "array",
+                                    "title": "Auteurs",
+                                    "props": [
+                                        {
+                                            "key": "name",
+                                            "title": "Name",
+                                            "type": "string",
+                                            "prop_key": "project_desc.scripts.authors.name",
+                                            "help_text": "Nom de l'auteur (personne ou organisation) du script.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "abbr",
+                                            "title": "Abbréviation",
+                                            "type": "string",
+                                            "prop_key": "project_desc.scripts.authors.abbr",
+                                            "help_text": "L'acronyme de l'organisation qui a écrit le script.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "role",
+                                            "title": "Rôle",
+                                            "type": "string",
+                                            "prop_key": "project_desc.scripts.authors.role",
+                                            "help_text": "Rôle spécifique de la personne ou de l'organisation dans la production du scénario.",
+                                            "display_type": "textarea"
+                                        }
+                                    ],
+                                    "prop_key": "project_desc.scripts.authors",
+                                    "help_text": "Il s'agit d'un bloc répétable qui permet de saisir une liste d'auteurs et de co-auteurs d'un script."
+                                },
+                                {
+                                    "key": "date",
+                                    "title": "Date",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.date",
+                                    "help_text": "Date de production du script, de préférence saisie au format ISO 8601 (AAAA-MM-JJ).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "format",
+                                    "title": "Format",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.format",
+                                    "help_text": "Format de fichier",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "software",
+                                    "title": "Logiciel",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.software",
+                                    "help_text": "Logiciel utilisé pour exécuter le script",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.description",
+                                    "help_text": "Brève description du script",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "methods",
+                                    "title": "Méthodes",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.methods",
+                                    "help_text": "Méthodes statistiques\/analytiques incluses dans le script",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "dependencies",
+                                    "title": "Dépendances",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.dependencies",
+                                    "help_text": "Toutes les dépendances (packages\/bibliothèques) sur lesquelles le script s'appuie. Ce champ n'est pas nécessaire si les dépendances ont été décrites dans l'élément de bibliothèque.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "instructions",
+                                    "title": "Instructions",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.instructions",
+                                    "help_text": "Instructions pour exécuter le script. Les informations sur l'ordre dans lequel les scripts doivent être exécutés sont essentielles.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "source_code_repo",
+                                    "title": "Dépôt",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.source_code_repo",
+                                    "help_text": "Dépôt (par exemple GitHub repo) où le script a été publié.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "notes",
+                                    "title": "Notes",
+                                    "type": "string",
+                                    "prop_key": "project_desc.scripts.notes",
+                                    "help_text": "Toute information supplémentaire sur le script.",
+                                    "enum": [],
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "license",
+                                    "title": "License",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "name",
+                                            "title": "Nom",
+                                            "type": "string",
+                                            "prop_key": "project_desc.scripts.license.name",
+                                            "help_text": "Nom (label) de la licence",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "uri",
+                                            "title": "URL",
+                                            "type": "string",
+                                            "prop_key": "project_desc.scripts.license.uri",
+                                            "help_text": "URL de la licence",
+                                            "rules": {
+                                                "is_uri": true
+                                            },
+                                            "display_type": "text"
+                                        }
+                                    ],
+                                    "prop_key": "project_desc.scripts.license",
+                                    "help_text": "Licence, le cas échéant, sous laquelle le script est publié."
+                                }
+                            ]
+                        },
+                        {
+                            "key": "project_desc.repository_uri",
+                            "title": "Dépôt",
+                            "help_text": "Dans le processus de production des résultats du projet de recherche, un chercheur peut vouloir partager son code source pour plus de transparence et de réplicabilité. Ce référentiel fournit des informations pour trouver le référentiel dans lequel le code source est conservé.",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "help_text": "Le nom du dépôt où le code est hébergé.",
+                                    "type": "string",
+                                    "prop_key": "project_desc.repository_uri.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "type",
+                                    "title": "Type",
+                                    "type": "string",
+                                    "help_text": "Type de dépôt, par ex. \"GitHub\", \"Bitbucket\", etc.",
+                                    "prop_key": "project_desc.repository_uri.type",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "type": "string",
+                                    "title": "URL",
+                                    "prop_key": "project_desc.repository_uri.uri",
+                                    "help_text": "Un lien vers le dépôt de code source\/script du projet.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "project_desc_container16748450668221674845089408",
+                            "title": "Reproductibilité",
+                            "type": "section",
+                            "items": [
+                                {
+                                    "key": "project_desc.technology_environment",
+                                    "title": "Environnement technologique",
+                                    "help_text": "Ce champ est utilisé pour fournir une description (aussi détaillée que possible) de l'environnement de calcul dans lequel les scripts ont été mis en œuvre et sont censés être reproductibles. Un défi important dans la reproduction des analyses consiste à installer et à configurer le réseau de dépendances de versions spécifiques de divers outils analytiques. Les machines virtuelles (un ordinateur à l'intérieur d'un ordinateur) vous permettent de partager efficacement l'ensemble de votre environnement de calcul avec toutes les dépendances intactes. (https:\/\/ropensci.github.io\/reproductibility-guide\/sections\/introduction\/)",
+                                    "type": "string",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "project_desc.technology_requirements",
+                                    "title": "Exigences technologiques",
+                                    "help_text": "Exigences logicielles\/matérielles ou autres technologies nécessaires pour exécuter les scripts et répliquer les résultats.",
+                                    "type": "string",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "project_desc.reproduction_instructions",
+                                    "title": "Instructions de reproduction",
+                                    "type": "string",
+                                    "help_text": "Instructions pour la réplication ou la reproduction du travail.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": ""
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "project_desc_container1674844764972",
+                    "title": "Accès et droits",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "project_desc.disclaimer",
+                            "type": "string",
+                            "title": "Clause de non-responsabilité",
+                            "help_text": "Une clause de non-responsabilité limite la responsabilité ou l'obligation de l'organisme éditeur ou des chercheurs associés au projet de recherche. Une clause de non-responsabilité garantit que toute recherche dans le domaine public produite par une organisation a des répercussions limitées sur l'organisation éditrice. Une clause de non-responsabilité a pour but d'éviter la responsabilité de tout effet survenant à la suite d'actes ou d'omissions dans la recherche.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "project_desc.confidentiality",
+                            "type": "string",
+                            "title": "Confidentialité",
+                            "help_text": "Une déclaration de confidentialité engage l'éditeur à des considérations éthiques concernant les sujets de la recherche. Dans la plupart des cas, l'identité individuelle d'un individu faisant l'objet d'une recherche ne peut être divulguée et des efforts particuliers sont nécessaires pour assurer la préservation de la vie privée.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "project_desc.citation_requirement",
+                            "type": "string",
+                            "title": "Exigence de citation",
+                            "help_text": "L'exigence de citation est spécifique au résultat et est un moyen de faire référence à la publication ou au produit publié.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "project_desc.license",
+                            "title": "License",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "prop_key": "project_desc.license.name",
+                                    "help_text": "Le nom de la licence, par exemple « Creative Commons Attribution 4.0 International license (CC-BY 4.0) ».",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "project_desc.license.uri",
+                                    "help_text": "Une URL vers une description de la licence, par exemple https:\/\/creativecommons.org\/licenses\/by\/4.0\/.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Informations sur la ou les licences attachées aux ressources du projet de recherche, qui définissent leurs conditions d'utilisation."
+                        },
+                        {
+                            "key": "project_desc.copyright",
+                            "title": "Droits d'auteur",
+                            "type": "string",
+                            "help_text": "Informations sur le droit d'auteur, le cas échéant, qui s'applique aux métadonnées du projet de recherche.",
+                            "display_type": "text"
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "type": "section",
+                    "key": "project_desc_others",
+                    "title": "Contacts",
+                    "class": "recommended",
+                    "items": [
+                        {
+                            "key": "project_desc.contacts",
+                            "title": "Contacts",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "prop_key": "project_desc.contacts.name",
+                                    "help_text": "Le nom de la personne de contact à contacter en fonction du rôle défini ci-dessous.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Rôle",
+                                    "type": "string",
+                                    "prop_key": "project_desc.contacts.role",
+                                    "help_text": "Rôle de la personne de contact. Un projet de recherche peut avoir des personnes de contact en fonction des résultats ou de certains apports techniques. Certains projets complexes peuvent avoir divers processus de collecte de données qui ont des canaux de traitement et des contacts différents. Cette section doit prévoir une interface publique principale qui peut renvoyer l'enquête publique ou fournir un ensemble de points d'entrée.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "string",
+                                    "prop_key": "project_desc.contacts.affiliation",
+                                    "help_text": "L'organisation ou l'affiliation de la personne de contact. Il s'agit généralement de l'organisation que représente la personne-ressource.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "email",
+                                    "title": "E-Mail",
+                                    "type": "string",
+                                    "prop_key": "project_desc.contacts.email",
+                                    "help_text": "Adresse e-mail de la personne, de l'institution ou de la division responsable du projet ou du résultat de recherche.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "telephone",
+                                    "title": "Téléphone",
+                                    "type": "string",
+                                    "prop_key": "project_desc.contacts.telephone",
+                                    "help_text": "Numéro de téléphone de la personne, de l'institution ou de la division responsable du projet ou du résultat de recherche.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "project_desc.contacts.uri",
+                                    "help_text": "URL de l'agence ou de l'organisation de l'organisation de contact. Il peut s'agir de la même que la page Web du projet ou d'un nom de contact permanent au niveau institutionnel et non lié au projet. Finalement, un site Web de projet peut être supprimé, mais il peut toujours être nécessaire d'avoir un contact. Dans ce cas, il est recommandé d'avoir un contact permanent.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "L'élément contacts fournit l'interface publique pour les questions associées au projet de recherche. Il pourrait y avoir divers contacts fournis en fonction de l'organisation. Il est important de s'assurer que les contacts appropriés sont fournis pour canaliser l'enquête publique."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "id": "tags",
+            "key": "tags_container",
+            "title": "Tags",
+            "items": [
+                {
+                    "key": "tags",
+                    "title": "Tags",
+                    "type": "array",
+                    "props": [
+                        {
+                            "key": "tag",
+                            "title": "Tag",
+                            "type": "string",
+                            "prop_key": "tags.tag",
+                            "help_text": "Un tag défini par l'utilisateur.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "tag_group",
+                            "title": "Groupe de tags",
+                            "type": "string",
+                            "prop_key": "tags.tag_group",
+                            "display_type": "text",
+                            "help_text": "Le nom d'un groupe de tags."
+                        }
+                    ],
+                    "help_text": "Les tags, en particulier lorsqu'ils sont organisés en groupes, offrent une solution puissante et flexible pour activer les facettes personnalisées (filtres) dans les catalogues de données."
+                }
+            ]
+        }
+    ]
+}

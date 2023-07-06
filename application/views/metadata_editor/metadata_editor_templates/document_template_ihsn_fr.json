@@ -1,0 +1,2749 @@
+{
+
+            "type": "template",
+            "title": "Document project",
+            "items": [
+                {
+                    "type": "section_container",
+                    "key": "metadata_information",
+                    "title": "Information sur les métadonnées",
+                    "class": "mandatory recommended",
+                    "expanded": true,
+                    "items": [
+                        {
+                            "key": "metadata_information1674165212128",
+                            "title": "Information sur les métadonnées",
+                            "type": "section",
+                            "items": [
+                                {
+                                    "key": "metadata_information.title",
+                                    "type": "string",
+                                    "title": "Titre",
+                                    "help_text": "Le titre du document de métadonnées (qui sera généralement le même que l'élément \"Title\" dans la section \"Document description \/ Title statement\"). Le document de métadonnées est le fichier de métadonnées (fichier XML ou JSON) qui est généré.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "metadata_information.idno",
+                                    "type": "string",
+                                    "class": "idno",
+                                    "title": "Identifiant",
+                                    "help_text": "Un identifiant unique pour le document de métadonnées. Cet identifiant doit être unique dans le catalogue où les métadonnées sont destinées à être publiées. Idéalement, l'identifiant devrait également être unique au niveau mondial. Ceci est différent de l'\"ID principal\" dans la section \"Description du document \/ Instruction du titre\", bien qu'il soit recommandé de générer des identifiants qui établissent une connexion claire entre ces deux identifiants. L'ID de document peut également inclure l'identifiant de version du document de métadonnées. Par exemple, si l'\"ID principal\" de la publication est \"978-1-4648-1342-9\", l'ID du document peut être \"IHSN_978-1-4648-1342-9_v1.0\" si les métadonnées sont produites par l'IHSN et s'il s'agit de la version 1.0 des métadonnées. Chaque organisation devrait établir des règles systématiques pour générer de tels identifiants. Une règle de validation peut être définie (à l'aide d'une expression régulière) dans les modèles utilisateur pour appliquer un format d'ID spécifique. L'identifiant ne doit pas contenir d'espaces vides.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "metadata_information.producers",
+                                    "class": "required",
+                                    "title": "Producteur des métadonnées",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "name",
+                                            "title": "Nom",
+                                            "type": "string",
+                                            "help_text": "Le nom de la personne ou de l'organisation qui a produit les métadonnées ou contribué à leur production.",
+                                            "class": "required",
+                                            "prop_key": "metadata_information.producers.name",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "abbr",
+                                            "title": "Abbréviation",
+                                            "type": "string",
+                                            "prop_key": "metadata_information.producers.abbr",
+                                            "help_text": "L'abréviation (ou l'acronyme) de l'organisation référencée dans \"Nom\".",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "affiliation",
+                                            "type": "string",
+                                            "title": "Affiliation",
+                                            "prop_key": "metadata_information.producers.affiliation",
+                                            "help_text": "L'affiliation de la personne ou de l'organisation mentionnée dans \"Nom\".",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "role",
+                                            "title": "Role",
+                                            "type": "string",
+                                            "prop_key": "metadata_information.producers.role",
+                                            "help_text": "Le rôle spécifique de la personne ou de l'organisation mentionnée dans \"Nom\" dans la production des métadonnées.",
+                                            "display_type": "textarea"
+                                        }
+                                    ],
+                                    "help_text": "Le producteur de métadonnées est la personne ou l'organisation ayant la responsabilité financière et\/ou administrative des processus par lesquels le document de métadonnées a été créé. Il s'agit d'un élément \"Recommandé\". Pour l'administration du catalogue, les informations sur le producteur et sur la date de production des métadonnées sont utiles.",
+                                    "is_recommended": true
+                                },
+                                {
+                                    "key": "metadata_information.production_date",
+                                    "type": "string",
+                                    "class": "required",
+                                    "title": "Date de production",
+                                    "help_text": "La date à laquelle les métadonnées de ce document ont été produites (non diffusées ou archivées), de préférence saisies au format ISO 8601 (AAAA-MM-JJ ou AAAA-MM). Une règle de validation peut être définie dans les modèles utilisateur pour appliquer un format de date. Il s'agit d'un élément \"Recommandé\", car les informations sur le producteur et sur la date de production des métadonnées sont utiles à des fins d'administration du catalogue.",
+                                    "is_recommended": true,
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "metadata_information.version",
+                                    "type": "string",
+                                    "class": "required",
+                                    "title": "Version",
+                                    "help_text": "La version du document de métadonnées (et non la version de la publication, du rapport ou de toute autre ressource documentée).",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": ""
+                        }
+                    ]
+                },
+                {
+                    "type": "section_container",
+                    "key": "document",
+                    "title": "Description du document",
+                    "class": "mandatory recommended",
+                    "expanded": true,
+                    "items": [
+                        {
+                            "type": "section",
+                            "key": "title_statement",
+                            "title": "Identifiants et titre",
+                            "class": "recommended",
+                            "items": [
+                                {
+                                    "key": "document_description.title_statement.idno",
+                                    "title": "Identifiant principal",
+                                    "help_text": "Un identifiant unique du document. L'\"ID principal\" (également appelé IDNO) est un numéro d'identification unique utilisé pour identifier la base de données. Un identifiant unique est requis à des fins de catalogage, cet élément est donc déclaré comme \"Obligatoire\". L'identifiant permettra aux utilisateurs de citer correctement l'indicateur\/la série. L'identifiant doit être unique dans le catalogue. Idéalement, il devrait également être unique au monde ; l'option recommandée consiste à obtenir un identificateur d'objet numérique (DOI) pour l'étude. Alternativement, l'\"ID principal\" peut être créé par une organisation à l'aide d'un schéma cohérent. Notez que le schéma vous permet de fournir plus d'un identifiant pour une même étude (dans l'élément \"Autres identifiants\"); un identifiant spécifique au catalogue n'est donc pas incompatible avec un identifiant global unique comme un DOI. Une règle de validation peut être définie (à l'aide d'une expression régulière) dans les modèles utilisateur pour appliquer un format d'ID spécifique. L'identifiant ne doit pas contenir d'espaces vides.",
+                                    "type": "string",
+                                    "class": "required",
+                                    "_rules": "required|idno|alpha_dash|min:5|max:80",
+                                    "required": true,
+                                    "is_required": true,
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "document_description.identifiers",
+                                    "title": "Autres identifiants",
+                                    "type": "array",
+                                    "help_text": "Cet élément est utilisé pour saisir des identifiants de document (ID) autres que l'ID de catalogue saisi dans l'\"ID principal\" (IDNO). Il peut s'agir par exemple d'un identificateur d'objet numérique (DOI), d'un numéro international normalisé du livre (ISBN) ou d'un numéro international normalisé de série (ISSN). L'\"ID principal\" peut être répété ici (l'\"ID principal\" ne fournit pas de paramètre \"Type\" ; si un DOI, un ISBN, un ISSN ou un autre ID de référence standard est utilisé comme ID principal, il est recommandé de le répéter ici avec l'identification de son type).",
+                                    "props": [
+                                        {
+                                            "key": "type",
+                                            "title": "Type",
+                                            "type": "string",
+                                            "help_text": "Le type d'identifiant, par exemple \"DOI\", \"ISBN\" ou \"ISSN\".",
+                                            "prop_key": "document_description.identifiers.type",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "identifier",
+                                            "title": "Identifiant",
+                                            "type": "string",
+                                            "prop_key": "document_description.identifiers.identifier",
+                                            "help_text": "L'identifiant lui-même.",
+                                            "display_type": "text"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "document_description.title_statement.title",
+                                    "title": "Titre",
+                                    "type": "string",
+                                    "class": "required",
+                                    "required": true,
+                                    "_rules": "required|max:300",
+                                    "name": "title",
+                                    "is_required": true,
+                                    "help_text": "Le titre du livre, du rapport, de l'article ou de tout autre document. Faites attention à l'utilisation des majuscules dans le titre, pour assurer la cohérence entre les documents répertoriés dans votre catalogue. Faites attention à l'utilisation cohérente des majuscules dans le titre. Il est recommandé d'utiliser la capitalisation des phrases.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "document_description.title_statement.sub_title",
+                                    "title": "Sous-titre",
+                                    "type": "string",
+                                    "_rules": "max:300",
+                                    "help_text": "Le sous-titre du document peut être utilisé lorsqu'il est nécessaire de distinguer les caractéristiques d'un document. Faites attention à l'utilisation cohérente des majuscules dans le sous-titre.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "document_description.title_statement.alternate_title",
+                                    "title": "Titre alternatif",
+                                    "type": "string",
+                                    "help_text": "Une version alternative du titre, éventuellement une version abrégée. Par exemple, le Rapport sur le développement dans le monde de la Banque mondiale est souvent appelé RDM ; le titre alternatif du « Rapport sur le développement dans le monde 2021 » pourrait alors être « WDR 2021 ».",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "document_description.title_statement.translated_title",
+                                    "title": "Titre traduit",
+                                    "help_text": "Une traduction du titre du document. Les caractères spéciaux doivent être correctement affichés, tels que les accents et autres marques d'accentuation ou différents alphabets.",
+                                    "type": "string",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "section",
+                            "key": "date_info",
+                            "title": "Dates ",
+                            "class": "recommended",
+                            "items": [
+                                {
+                                    "key": "document_description.date_created",
+                                    "title": "Date de création",
+                                    "type": "string",
+                                    "class": "recommended",
+                                    "help_text": "La date, de préférence saisie au format ISO 8601 (AAAA-MM-JJ ou AAAA-MM ou AAAA), à laquelle le document a été produit. Cela peut être différent de la date à laquelle le document a été publié, mis à disposition et de la couverture temporelle.",
+                                    "is_recommended": false,
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "document_description.date_published",
+                                    "title": "Date de publication",
+                                    "type": "string",
+                                    "class": "recommended",
+                                    "help_text": "La date, de préférence saisie au format ISO 8601 (AAAA-MM-JJ ou AAAA-MM ou AAAA), à laquelle le document a été publié.",
+                                    "is_recommended": true,
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "document_description.date_modified",
+                                    "title": "Date de la dernière modification",
+                                    "type": "string",
+                                    "class": "recommended",
+                                    "help_text": "La date, de préférence saisie au format ISO 8601 (AAAA-MM-JJ ou AAAA-MM ou AAAA) de la dernière modification du document.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "document_description.date_available",
+                                    "title": "Date de disponibilité",
+                                    "type": "string",
+                                    "class": "recommended",
+                                    "help_text": "La date, de préférence saisie au format ISO 8601 (AAAA-MM-JJ ou AAAA-MM ou AAAA), à laquelle le document a été mis à disposition. Ceci est différent de la date de publication. Cet élément ne sera pas utilisé fréquemment.",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "section",
+                            "key": "authors",
+                            "title": "Auteurs et contributeurs",
+                            "class": "recommended",
+                            "items": [
+                                {
+                                    "key": "document_description.authors",
+                                    "title": "Auteurs",
+                                    "help_text": "Les auteurs doivent être listés dans le même ordre qu'ils apparaissent dans la source elle-même, qui n'est pas nécessairement alphabétique.",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "first_name",
+                                            "title": "Prénom",
+                                            "type": "string",
+                                            "help_text": "Le prénom de l'auteur.",
+                                            "prop_key": "document_description.authors.first_name",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "initial",
+                                            "title": "Initiales",
+                                            "type": "string",
+                                            "help_text": "Les initiales de l'auteur.",
+                                            "prop_key": "document_description.authors.initial",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "last_name",
+                                            "title": "Nom de famille",
+                                            "type": "string",
+                                            "help_text": "Le nom de famille de l'auteur.",
+                                            "prop_key": "document_description.authors.last_name",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "full_name",
+                                            "title": "Nom complet",
+                                            "type": "string",
+                                            "prop_key": "document_description.authors.full_name",
+                                            "help_text": "Le nom complet de l'auteur. Utilisez cet élément lorsque le nom ne peut pas être décomposé en prénom et nom.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "affiliation",
+                                            "title": "Affiliation",
+                                            "type": "string",
+                                            "prop_key": "document_description.authors.affiliation",
+                                            "help_text": "L'affiliation de l'auteur.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "author_id",
+                                            "type": "array",
+                                            "title": "ID de l'auteur",
+                                            "help_text": "Identifiant unique d'un auteur, qui peut être fourni par des services comme ORCID ou d'autres.",
+                                            "props": [
+                                                {
+                                                    "key": "type",
+                                                    "type": "string",
+                                                    "title": "Type",
+                                                    "prop_key": "document_description.authors.author_id.type",
+                                                    "help_text": "Le type d'identifiant, c'est-à-dire l'identification du registre qui a attribué l'identifiant de l'auteur, par exemple \"ORCID\".",
+                                                    "display_type": "text"
+                                                },
+                                                {
+                                                    "key": "id",
+                                                    "type": "string",
+                                                    "title": "ID",
+                                                    "prop_key": "document_description.authors.author_id.id",
+                                                    "help_text": "L'identifiant de l'auteur dans le registre mentionné dans `type`.",
+                                                    "display_type": "text"
+                                                }
+                                            ],
+                                            "prop_key": "document_description.authors.author_id"
+                                        }
+                                    ],
+                                    "is_recommended": true
+                                },
+                                {
+                                    "key": "document_description.editors",
+                                    "title": "Editeurs",
+                                    "help_text": "Si la source est un texte dans un volume édité, elle doit être répertoriée sous le nom de l'auteur du texte utilisé, et non sous le nom de l'éditeur. Le nom de l'éditeur doit cependant être indiqué dans la citation bibliographique, conformément à un style de référence. L'élément comporte quatre sous-éléments: prénom de l'éditeur, initiales de l'éditeur, nom de famille de l'éditeur et affiliation de l'éditeur.",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "first_name",
+                                            "title": "Prénom",
+                                            "type": "string",
+                                            "help_text": "Le prénom de l'éditeur.",
+                                            "prop_key": "document_description.editors.first_name",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "initial",
+                                            "title": "Initiales",
+                                            "type": "string",
+                                            "help_text": "Les initiales de l'éditeur.",
+                                            "prop_key": "document_description.editors.initial",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "last_name",
+                                            "title": "Nom de famille",
+                                            "type": "string",
+                                            "help_text": "Le nom de famille de l'éditeur.",
+                                            "prop_key": "document_description.editors.last_name",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "affiliation",
+                                            "title": "Affiliation",
+                                            "type": "string",
+                                            "prop_key": "document_description.editors.affiliation",
+                                            "help_text": "L'affiliation de l'éditeur.",
+                                            "display_type": "text"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "document_description.translators",
+                                    "title": "Traducteurs",
+                                    "help_text": "Informations sur les traducteurs, pour les publications qui sont des traductions de publications créées à l'origine dans une autre langue.",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "first_name",
+                                            "title": "Prénom",
+                                            "type": "string",
+                                            "help_text": "Le prénom du traducteur.",
+                                            "prop_key": "document_description.translators.first_name",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "initial",
+                                            "title": "Initiales",
+                                            "type": "string",
+                                            "help_text": "Les initiales du traducteur.",
+                                            "prop_key": "document_description.translators.initial",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "last_name",
+                                            "title": "Nom de famille",
+                                            "type": "string",
+                                            "help_text": "Le nom de famille du traducteur.",
+                                            "prop_key": "document_description.translators.last_name",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "affiliation",
+                                            "title": "Affiliation",
+                                            "type": "string",
+                                            "prop_key": "document_description.translators.affiliation",
+                                            "help_text": "L'affiliation du traducteur.",
+                                            "display_type": "text"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "document_description.contributors",
+                                    "title": "Autres contributeurs",
+                                    "help_text": "Ces éléments sont utilisés pour reconnaître les contributions à la production du document, autres que celles pour lesquelles des éléments de métadonnées spécifiques sont fournis (comme les auteurs ou les traducteurs).",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "first_name",
+                                            "title": "Prénom",
+                                            "type": "string",
+                                            "help_text": "Le prénom du contributeur.",
+                                            "prop_key": "document_description.contributors.first_name",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "initial",
+                                            "title": "Initiales",
+                                            "type": "string",
+                                            "help_text": "Les initiales du contributeur.",
+                                            "prop_key": "document_description.contributors.initial",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "last_name",
+                                            "title": "Nom de famille",
+                                            "type": "string",
+                                            "help_text": "Le nom de famille du contributeur. Si le contributeur est une organisation, entrez le nom de l'organisation ici.",
+                                            "prop_key": "document_description.contributors.last_name",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "affiliation",
+                                            "title": "Affiliation",
+                                            "type": "string",
+                                            "prop_key": "document_description.contributors.affiliation",
+                                            "help_text": "L'affiliation du contributeur.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "contribution",
+                                            "title": "Contribution",
+                                            "type": "string",
+                                            "prop_key": "document_description.contributors.contribution",
+                                            "help_text": "Une brève description de la contribution spécifique de la personne au document, par ex. « Conception de la page de garde », ou « Relecture ».",
+                                            "display_type": "textarea"
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "key": "document1673376374410",
+                            "title": "Information bibliographique",
+                            "type": "section",
+                            "items": [
+                                {
+                                    "key": "document_description.bibliographic_citation",
+                                    "title": "Citation bibliographique",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "style",
+                                            "title": "Style",
+                                            "type": "string",
+                                            "help_text": "Le style de citation, par ex. « MLA », « APA » ou « Chicago ».",
+                                            "prop_key": "document_description.bibliographic_citation.style",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "citation",
+                                            "title": "Citation",
+                                            "type": "string",
+                                            "prop_key": "document_description.bibliographic_citation.citation",
+                                            "help_text": "La citation saisie dans le style mentionné dans \"Style\". Par exemple (avec Style = MLA) : Davidson, Russell et Jean-Yves Duclos. \"Inférence statistique pour la dominance stochastique et pour la mesure de la pauvreté et des inégalités.\" Econometrica, vol. 68, non. 6, [Wiley, Econometric Society], 2000, pp. 1435–64, http:\/\/www.jstor.org\/stable\/3003995.",
+                                            "display_type": "textarea"
+                                        }
+                                    ],
+                                    "help_text": "La citation bibliographique fournit des informations pertinentes sur l'auteur et la publication. Lors de l'utilisation de l'élément \"Citation bibliographique\", la citation est fournie en tant qu'élément unique. Il doit être fourni dans un style standard : Modern Language Association (MLA), American Psychological Association (APA) ou Chicago. \nRemarque : Les modèles BibTex (disponibles sur https:\/\/www.bibtex.com\/format\/) fournissent une liste utile des champs obligatoires et facultatifs par type de document."
+                                },
+                                {
+                                    "key": "document_description.booktitle",
+                                    "title": "Titre du livre",
+                                    "type": "string",
+                                    "help_text": "Titre d'un livre dont une partie est citée. Si vous documentez le livre lui-même, cet élément ne sera pas utilisé ; il n'est utilisé que lorsqu'une partie d'un livre est documentée.\nRemarque : les modèles BibTex (disponibles sur https:\/\/www.bibtex.com\/format\/) fournissent une liste utile de champs obligatoires et facultatifs par type de document.",
+                                    "enum": [],
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "document_description.chapter",
+                                    "title": "Chapitre",
+                                    "type": "string",
+                                    "help_text": "Un numéro de chapitre (ou de section). Cet élément n'est utilisé que pour documenter une ressource qui a été extraite d'un livre.\nRemarque : les modèles BibTex (disponibles sur https:\/\/www.bibtex.com\/format\/) fournissent une liste utile des champs obligatoires et facultatifs par type de document.",
+                                    "enum": [],
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "document_description.edition",
+                                    "title": "Edition",
+                                    "type": "string",
+                                    "help_text": "L'édition d'un livre - par exemple \"Deuxième\". Lorsqu'un livre n'a pas de numéro\/nom d'édition, on peut supposer qu'il s'agit d'une première édition. Si l'édition est différente de la première, les informations sur l'édition du livre documenté doivent être mentionnées dans la citation. L'édition peut être identifiée par un numéro, une étiquette (telle que « Édition révisée » ou « Édition abrégée ») et\/ou une année. La première lettre du libellé doit être en majuscule.\nRemarque : les modèles BibTex (disponibles sur https:\/\/www.bibtex.com\/format\/) fournissent une liste utile des champs obligatoires et facultatifs par type de document.",
+                                    "enum": [],
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "document_description.institution",
+                                    "title": "Nom de l'institution",
+                                    "type": "string",
+                                    "help_text": "L'institution commanditaire d'un rapport technique. Pour les citations de maîtrise et de doctorat. thèse, ce sera le nom de l'école.\nRemarque : Les modèles BibTex (disponibles sur https:\/\/www.bibtex.com\/format\/) fournissent une liste utile des champs obligatoires et facultatifs par type de document.",
+                                    "enum": [],
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "document_description.journal",
+                                    "title": "Nom du journal",
+                                    "type": "string",
+                                    "help_text": "Un nom de journal. Des abréviations sont fournies pour de nombreuses revues.\nRemarque : les modèles BibTex (disponibles sur https:\/\/www.bibtex.com\/format\/) fournissent une liste utile de champs obligatoires et facultatifs par type de document.",
+                                    "enum": [],
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "document_description.volume",
+                                    "title": "Volume",
+                                    "type": "string",
+                                    "help_text": "Le volume d'un journal ou d'un livre en plusieurs volumes. Les publications périodiques, telles que les revues savantes, sont publiées régulièrement par tranches appelées numéros. Un volume se compose généralement des numéros publiés au cours d'une année.\nRemarque : les modèles BibTex (disponibles sur https:\/\/www.bibtex.com\/format\/) fournissent une liste utile de champs obligatoires et facultatifs par type de document.",
+                                    "enum": [],
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "document_description.number",
+                                    "title": "Numéro",
+                                    "type": "string",
+                                    "help_text": "Numéro d'une revue, d'un magazine, d'un rapport technique ou d'un ouvrage dans une série. Un numéro d'une revue ou d'un magazine est généralement identifié par son volume (voir élément précédent) et son numéro; l'organisme qui publie un rapport technique lui attribue généralement un numéro ; et parfois les livres reçoivent des numéros dans une série nommée.\nRemarque : les modèles BibTex (disponibles sur https:\/\/www.bibtex.com\/format\/) fournissent une liste utile de champs obligatoires et facultatifs par type de document.",
+                                    "enum": [],
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "document_description.pages",
+                                    "title": "Pages",
+                                    "type": "string",
+                                    "help_text": "Un ou plusieurs numéros de page ou plage de numéros, tels que 42-111 ou 7,41,73-97 ou 43+ (le `+' indique les pages suivantes qui ne forment pas une plage simple).\nRemarque : Les modèles BibTex (disponible sur https:\/\/www.bibtex.com\/format\/) fournissent une liste utile des champs obligatoires et facultatifs par type de document.",
+                                    "enum": [],
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "document_description.publisher",
+                                    "title": "Nom de l'éditeur",
+                                    "type": "string",
+                                    "help_text": "Entité responsable de la mise à disposition de la ressource. Pour les grandes maisons d'édition, l'information peut être omise. Pour les petits éditeurs, il est recommandé de fournir l'adresse complète. Si l'entreprise est une presse universitaire, l'abréviation UP (pour University Press) peut être utilisée. L'éditeur n'est pas indiqué pour les articles de revues, les documents de travail et les types de documents similaires.\nRemarque : les modèles BibTex (disponibles sur https:\/\/www.bibtex.com\/format\/) fournissent une liste utile des champs obligatoires et facultatifs par type de document.",
+                                    "enum": [],
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "document_description.publisher_address",
+                                    "title": "Adresse de l'éditeur",
+                                    "type": "string",
+                                    "help_text": "L'adresse de l'éditeur. Pour les grandes maisons d'édition, seule la ville est indiquée. Pour les petits éditeurs, l'adresse complète peut être fournie.\nRemarque : Les modèles BibTex (disponibles sur https:\/\/www.bibtex.com\/format\/) fournissent une liste utile de champs obligatoires et facultatifs par type de document.",
+                                    "enum": [],
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "document_description.series",
+                                    "title": "Nom de la série",
+                                    "type": "string",
+                                    "class": "recommended",
+                                    "help_text": "Le nom d'une série ou d'un ensemble de livres. Lorsque vous citez un livre entier, le champ de titre donne son titre et un champ de série facultatif donne le nom d'une série ou d'un ensemble de plusieurs volumes dans lequel le livre est publié.\nRemarque : Les modèles BibTex (disponibles sur https:\/\/www. bibtex.com\/format\/) fournit une liste utile des champs obligatoires et facultatifs par type de document.",
+                                    "enum": [],
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "document_description.crossref",
+                                    "title": "Références croisées",
+                                    "type": "string",
+                                    "help_text": "L'identifiant de catalogue (\"clé de base de données\") d'une autre entrée de catalogue faisant l'objet d'une référence croisée. Cet élément peut être utilisé lorsque plusieurs entrées font référence à une même publication, afin d'éviter les doublons.\nRemarque : les modèles BibTex (disponibles sur https:\/\/www.bibtex.com\/format\/) fournissent une liste utile de champs obligatoires et facultatifs par type de document.",
+                                    "enum": [],
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "document_description.key",
+                                    "title": "Clé",
+                                    "type": "string",
+                                    "help_text": "Une clé est un champ utilisé pour classer par ordre alphabétique, faire des références croisées et créer une étiquette lorsque les informations sur l'auteur sont manquantes.\nRemarque : les modèles BibTex (disponibles sur https:\/\/www.bibtex.com\/format\/) fournissent un outil utile liste des champs obligatoires et facultatifs par type de document.",
+                                    "enum": [],
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "document_description.organization",
+                                    "title": "Organisation",
+                                    "type": "string",
+                                    "help_text": "L'organisation qui parraine une conférence ou qui publie un manuel.\nRemarque : les modèles BibTex (disponibles sur https:\/\/www.bibtex.com\/format\/) fournissent une liste utile de champs obligatoires et facultatifs par type de document.",
+                                    "enum": [],
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "document_description.annote",
+                                    "title": "Annotation",
+                                    "type": "string",
+                                    "help_text": "Une annotation. Cet élément ne sera pas utilisé par les styles de bibliographie standard tels que MLA, APA ou Chicago, mais peut être utilisé par d'autres qui produisent une bibliographie annotée.\nRemarque : Les modèles BibTex (disponibles sur https:\/\/www.bibtex.com\/format \/) fournissent une liste utile des champs obligatoires et facultatifs par type de document.",
+                                    "enum": [],
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "document_description.howpublished",
+                                    "title": "Comment publié",
+                                    "type": "string",
+                                    "help_text": "L'élément \"Comment publié\" est utilisé pour stocker l'avis pour les publications inhabituelles. Le premier mot doit être en majuscule. Par exemple, \"Page Web\" ou \"Distribué à l'office de tourisme local\".\nRemarque : les modèles BibTex (disponibles sur https:\/\/www.bibtex.com\/format\/) fournissent une liste utile des champs obligatoires et facultatifs par type de document.",
+                                    "enum": [],
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "document_description.url",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "help_text": "L'URL du document, de préférence une URL permanente.\nRemarque : Les modèles BibTex (disponibles sur https:\/\/www.bibtex.com\/format\/) fournissent une liste utile de champs obligatoires et facultatifs par type de document.",
+                                    "enum": [],
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": ""
+                        },
+                        {
+                            "type": "section",
+                            "key": "document_description",
+                            "title": "Description du contenu",
+                            "class": "recommended",
+                            "items": [
+                                {
+                                    "key": "document_description.type",
+                                    "title": "Type de document",
+                                    "type": "string",
+                                    "enum": [
+                                        {
+                                            "code": "article",
+                                            "label": "Article"
+                                        },
+                                        {
+                                            "code": "book",
+                                            "label": "Livre"
+                                        },
+                                        {
+                                            "code": "booklet",
+                                            "label": "Booklet"
+                                        },
+                                        {
+                                            "code": "collection",
+                                            "label": "Collection"
+                                        },
+                                        {
+                                            "code": "conference proceedings",
+                                            "label": "Actes de conférence"
+                                        },
+                                        {
+                                            "code": "manual",
+                                            "label": "Manuel"
+                                        },
+                                        {
+                                            "code": "master thesis",
+                                            "label": "Mémoire de maitrise"
+                                        },
+                                        {
+                                            "code": "methodology document",
+                                            "label": "Document de méthodologie"
+                                        },
+                                        {
+                                            "code": "patent",
+                                            "label": "Brevet"
+                                        },
+                                        {
+                                            "code": "PhD thesis",
+                                            "label": "Thèse de doctorat"
+                                        },
+                                        {
+                                            "code": "press release",
+                                            "label": "Communiqué de presse"
+                                        },
+                                        {
+                                            "code": "proceedings",
+                                            "label": "Procédure"
+                                        },
+                                        {
+                                            "code": "protocol",
+                                            "label": "Protocole"
+                                        },
+                                        {
+                                            "code": "technical report",
+                                            "label": "Rapport technique"
+                                        },
+                                        {
+                                            "code": "working paper",
+                                            "label": "Working paper"
+                                        },
+                                        {
+                                            "code": "website",
+                                            "label": "Site web"
+                                        },
+                                        {
+                                            "code": "yearbook",
+                                            "label": "Annuaire"
+                                        },
+                                        {
+                                            "code": "other",
+                                            "label": "Autre"
+                                        }
+                                    ],
+                                    "help_text": "Ceci décrit la nature de la ressource. Il est recommandé de sélectionner une valeur dans un vocabulaire contrôlé, qui pourrait par exemple inclure les options suivantes : \"article\", \"livre\", \"livret\", \"collection\", \"actes de conférence \", \"manuel\", \"thèse de master\", \"brevet\", \"thèse de doctorat\", \"actes\", \"rapport technique\", \"document de travail\", \"site Web\", \"autre\". Les agences spécialisées peuvent vouloir créer leurs propres vocabulaires contrôlés ; par exemple, une agence statistique nationale peut avoir besoin d'options telles que \"communiqué de presse\", \"document méthodologique\", \"protocole\" ou \"annuaire\".",
+                                    "is_recommended": true,
+                                    "display_type": "dropdown-custom"
+                                },
+                                {
+                                    "key": "document_description.publication_frequency",
+                                    "title": "Fréquence de publication",
+                                    "type": "string",
+                                    "help_text": "Certains documents sont publiés régulièrement. La fréquence des publications peut être documentée à l'aide de cet élément. Un vocabulaire contrôlé peut être fourni dans les modèles utilisateur, par exemple le vocabulaire de fréquence de publication PRISM qui identifie les fréquences de publication standard pour une publication en série ou périodique avec les options suivantes :\n- annuel (publié une fois par an)\n- semestriel (publié deux fois par an)\n- trimestriel (publié tous les 3 mois ou une fois par trimestre)\n- bimestriel (publié deux fois par mois)\n- mensuel (publié une fois par mois)\n- bihebdomadaire (publié deux fois par semaine)\n - hebdomadaire (publié une fois par semaine)\n- quotidien (publié tous les jours)\n- en continu (publié en continu à mesure que de nouveaux contenus sont ajoutés ; typique des sites Web et des blogs, généralement plusieurs fois par jour)\n- irrégulièrement (publié sur un horaire irrégulier, comme tous les mois sauf juillet et août)\n- autre (publié sur un autre horaire non énuméré dans ce vocabulaire contrôlé).",
+                                    "enum": [
+                                        {
+                                            "code": "ann",
+                                            "label": "Annuel"
+                                        },
+                                        {
+                                            "code": "sem",
+                                            "label": "Semestriel"
+                                        },
+                                        {
+                                            "code": "qua",
+                                            "label": "Trimestriel"
+                                        },
+                                        {
+                                            "code": "bim",
+                                            "label": "Bimensuel"
+                                        },
+                                        {
+                                            "code": "mon",
+                                            "label": "Mensuel"
+                                        },
+                                        {
+                                            "code": "biw",
+                                            "label": "Bihebdomadaire"
+                                        },
+                                        {
+                                            "code": "wee",
+                                            "label": "Hebdomadaire"
+                                        },
+                                        {
+                                            "code": "day",
+                                            "label": "Quotidien"
+                                        },
+                                        {
+                                            "code": "con",
+                                            "label": "Continuel"
+                                        },
+                                        {
+                                            "code": "irr",
+                                            "label": "Irrégulier"
+                                        },
+                                        {
+                                            "code": "oth",
+                                            "label": "Autre"
+                                        }
+                                    ],
+                                    "display_type": "dropdown-custom"
+                                },
+                                {
+                                    "key": "document_description.languages",
+                                    "title": "Langue",
+                                    "help_text": "La ou les langues dans lesquelles le document est rédigé. Pour les codes et noms de langues, l'utilisation de la norme ISO 639-2 est recommandée.",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "name",
+                                            "title": "Nom",
+                                            "type": "string",
+                                            "help_text": "Le nom de la langue.",
+                                            "prop_key": "document_description.languages.name",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "code",
+                                            "title": "Code",
+                                            "type": "string",
+                                            "help_text": "Le code de la langue. L'utilisation de l'ISO 639-2 (le code alpha-3 dans Codes pour la représentation des noms de langues) est recommandée.",
+                                            "prop_key": "document_description.languages.code",
+                                            "display_type": "text"
+                                        }
+                                    ],
+                                    "is_recommended": true
+                                },
+                                {
+                                    "key": "document_description.description",
+                                    "title": "Description",
+                                    "type": "string",
+                                    "class": "recommended",
+                                    "help_text": "Cet élément est utilisé pour fournir une brève description du document (pas un résumé, qui serait fourni dans le champ \"résumé\"). Il ne doit pas être utilisé pour fournir du contenu contenu dans d'autres éléments plus spécifiques. Le champ \"Description\" est une source potentiellement riche de termes indexables ; il faut donc veiller à fournir ces informations lorsque cela est possible. La meilleure pratique recommandée pour cet élément est d'utiliser des phrases complètes, car la description est souvent utilisée pour présenter des informations aux utilisateurs afin de les aider à sélectionner les ressources appropriées à partir d'un ensemble de résultats de recherche.",
+                                    "enum": [],
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "document_description.abstract",
+                                    "title": "Résumé",
+                                    "type": "string",
+                                    "help_text": "Le résumé est un résumé du document, généralement d'environ un ou deux paragraphe(s) (environ 150 à 300 mots).",
+                                    "is_recommended": true,
+                                    "enum": [],
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "document_description.scope",
+                                    "title": "Sujets traités",
+                                    "help_text": "Une description textuelle des sujets traités dans le document, qui complète (mais ne duplique pas) les éléments \"Description\" et \"Sujets\" disponibles dans le modèle.",
+                                    "type": "string",
+                                    "enum": [],
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "document_description.keywords",
+                                    "type": "array",
+                                    "title": "Mots clés",
+                                    "props": [
+                                        {
+                                            "key": "name",
+                                            "title": "Keyword",
+                                            "type": "string",
+                                            "prop_key": "document_description.keywords.name",
+                                            "help_text": "Le mot-clé (ou la phrase) lui-même.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "vocabulary",
+                                            "title": "Vocabulaire",
+                                            "type": "string",
+                                            "prop_key": "document_description.keywords.vocabulary",
+                                            "help_text": "Le vocabulaire contrôlé (y compris le numéro de version ou la date) à partir duquel le mot-clé est extrait, le cas échéant.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "uri",
+                                            "title": "URL",
+                                            "type": "string",
+                                            "prop_key": "document_description.keywords.uri",
+                                            "help_text": "L'URL du vocabulaire contrôlé à partir duquel le mot-clé est extrait, le cas échéant.",
+                                            "rules": {
+                                                "is_uri": true
+                                            },
+                                            "display_type": "text"
+                                        }
+                                    ],
+                                    "help_text": "Une liste de mots-clés qui fournissent des informations sur le contenu du document. Les mots-clés offrent une solution pratique pour améliorer la découvrabilité du document, car ils permettent d'indexer des termes et des phrases qui ne se trouvent pas dans le document lui-même et de rendre un document détectable par les moteurs de recherche textuels. Un vocabulaire contrôlé peut être utilisé (mais pas obligatoire), comme le Thésaurus de l'UNESCO (voir http:\/\/vocabularies.unesco.org\/browser\/thesaurus\/en\/). La liste fournie ici peut combiner des mots-clés de plusieurs vocabulaires contrôlés et des mots-clés définis par l'utilisateur."
+                                },
+                                {
+                                    "key": "document_description.topics",
+                                    "type": "array",
+                                    "title": "Sujets",
+                                    "props": [
+                                        {
+                                            "key": "id",
+                                            "title": "ID",
+                                            "type": "string",
+                                            "prop_key": "document_description.topics.id",
+                                            "help_text": "L'identifiant unique de la rubrique. Il peut s'agir d'un numéro séquentiel ou de l'ID du sujet dans un vocabulaire contrôlé.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "name",
+                                            "title": "Sujet",
+                                            "type": "string",
+                                            "prop_key": "document_description.topics.name",
+                                            "help_text": "Le libellé du sujet.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "parent_id",
+                                            "title": "ID parent",
+                                            "help_text": "Lorsqu'un vocabulaire contrôlé hiérarchique (imbriqué) est utilisé, le champ \"ID parent\" peut être utilisé pour indiquer un sujet de niveau supérieur auquel appartient ce sujet.",
+                                            "type": "string",
+                                            "prop_key": "document_description.topics.parent_id",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "vocabulary",
+                                            "title": "Vocabulaire",
+                                            "type": "string",
+                                            "prop_key": "document_description.topics.vocabulary",
+                                            "help_text": "La spécification (nom incluant la version et la date) du vocabulaire contrôlé dont le sujet est tiré.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "uri",
+                                            "title": "URL",
+                                            "type": "string",
+                                            "prop_key": "document_description.topics.uri",
+                                            "help_text": "Un lien (URL) vers le site de vocabulaire contrôlé.",
+                                            "rules": {
+                                                "is_uri": true
+                                            },
+                                            "display_type": "text"
+                                        }
+                                    ],
+                                    "help_text": "\"Sujets\" indique le(s) sujet(s) de fond général(s) couvert(s) par le document. Une classification thématique facilite le référencement et les recherches dans les catalogues électroniques d'enquêtes ; les sujets doivent ainsi être sélectionnés dans un vocabulaire contrôlé standard, par exemple la classification CESSDA Topics (typologie des sujets disponible en 11 langues ; voir https:\/\/vocabularies.cessda.eu\/vocabulary\/TopicClassification), ou le Journal of Economic Literature ( JEL) Système de classification (voir https:\/\/en.wikipedia.org\/wiki\/JEL_classification_codes). La liste fournie ici peut combiner des sujets de plusieurs vocabulaires contrôlés et des sujets définis par l'utilisateur."
+                                },
+                                {
+                                    "key": "document_description.themes",
+                                    "type": "array",
+                                    "title": "Thèmes",
+                                    "props": [
+                                        {
+                                            "key": "id",
+                                            "title": "ID",
+                                            "type": "string",
+                                            "prop_key": "document_description.themes.id",
+                                            "help_text": "L'identifiant du thème, tiré d'un vocabulaire contrôlé.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "name",
+                                            "title": "Thème",
+                                            "type": "string",
+                                            "prop_key": "document_description.themes.name",
+                                            "help_text": "Le nom (libellé) du thème, de préférence tiré d'un vocabulaire contrôlé.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "parent_id",
+                                            "title": "ID parent",
+                                            "type": "string",
+                                            "prop_key": "document_description.themes.parent_id",
+                                            "help_text": "L'ID parent du thème (ID de l'élément d'un niveau supérieur dans la hiérarchie), si un vocabulaire contrôlé hiérarchique est utilisé.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "vocabulary",
+                                            "title": "Vocabulaire",
+                                            "type": "string",
+                                            "prop_key": "document_description.themes.vocabulary",
+                                            "help_text": "Le nom (y compris le numéro de version) du vocabulaire contrôlé utilisé, le cas échéant.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "uri",
+                                            "title": "URL",
+                                            "type": "string",
+                                            "prop_key": "document_description.themes.uri",
+                                            "help_text": "L'URL du vocabulaire contrôlé utilisé, le cas échéant.",
+                                            "rules": {
+                                                "is_uri": true
+                                            },
+                                            "display_type": "text"
+                                        }
+                                    ],
+                                    "help_text": "Une liste des thèmes couverts par le document. Un vocabulaire contrôlé sera de préférence utilisé. La liste fournie ici peut combiner des thèmes de plusieurs vocabulaires contrôlés et des thèmes définis par l'utilisateur. Notez que les thèmes seront rarement utilisés car les éléments sujets et disciplines sont plus appropriés pour la plupart des utilisations."
+                                },
+                                {
+                                    "key": "document_description.disciplines",
+                                    "type": "array",
+                                    "title": "Disciplines",
+                                    "props": [
+                                        {
+                                            "key": "id",
+                                            "title": "ID",
+                                            "type": "string",
+                                            "prop_key": "document_description.disciplines.id",
+                                            "help_text": "L'identifiant de la discipline, issu d'un vocabulaire contrôlé.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "name",
+                                            "title": "Discipline",
+                                            "type": "string",
+                                            "prop_key": "document_description.disciplines.name",
+                                            "help_text": "Le nom (libellé) de la discipline, de préférence issu d'un vocabulaire contrôlé.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "parent_id",
+                                            "title": "ID parent",
+                                            "type": "string",
+                                            "prop_key": "document_description.disciplines.parent_id",
+                                            "help_text": "L'ID parent de la discipline (ID de l'élément d'un niveau supérieur dans la hiérarchie), si un vocabulaire contrôlé hiérarchique est utilisé.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "vocabulary",
+                                            "title": "Vocabulaire",
+                                            "type": "string",
+                                            "prop_key": "document_description.disciplines.vocabulary",
+                                            "help_text": "Le nom (y compris le numéro de version) du vocabulaire contrôlé utilisé, le cas échéant.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "uri",
+                                            "title": "URL",
+                                            "type": "string",
+                                            "prop_key": "document_description.disciplines.uri",
+                                            "help_text": "L'URL du vocabulaire contrôlé utilisé, le cas échéant.",
+                                            "rules": {
+                                                "is_uri": true
+                                            },
+                                            "display_type": "text"
+                                        }
+                                    ],
+                                    "help_text": "Informations sur les disciplines académiques liées au contenu du document. Un vocabulaire contrôlé sera de préférence utilisé, par exemple celui fourni par la liste des domaines académiques de Wikipédia (voir https:\/\/en.wikipedia.org\/wiki\/List_of_academic_fields). La liste fournie ici peut combiner des disciplines de plusieurs vocabulaires contrôlés et des disciplines définies par l'utilisateur"
+                                },
+                                {
+                                    "key": "document_description.toc",
+                                    "title": "able des matières",
+                                    "type": "string",
+                                    "help_text": "La table des matières du document, fournie sous la forme d'un élément de chaîne unique, c'est-à-dire sans structure (une alternative structurée est fournie avec le champ \"Table des matières (structurée)\". Cet élément est également une riche source de termes indexables qui peut contribuer à la découvrabilité du document ; cet élément (ou son alternative \"Table des matières (structurée)\" doit donc être rempli lorsque cela est possible.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "document_description.toc_structured",
+                                    "title": "Table des matières (structurée)",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "id",
+                                            "title": "ID",
+                                            "type": "string",
+                                            "prop_key": "document_description.toc_structured.id",
+                                            "help_text": "Un identifiant unique pour l'élément de la table des matières. Par exemple, l'ID du chapitre 1 pourrait être \"1\" tandis que l'ID de la section 1 du chapitre 1 serait \"11\".",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "parent_id",
+                                            "title": "ID parent",
+                                            "type": "string",
+                                            "prop_key": "document_description.toc_structured.parent_id",
+                                            "help_text": "L'ID de la section parent (par exemple, si la table des matières est divisée en chapitres, eux-mêmes divisés en sections, l'ID parent d'une section sera l'ID du chapitre auquel elle appartient).",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "name",
+                                            "title": "Name",
+                                            "type": "string",
+                                            "prop_key": "document_description.toc_structured.name",
+                                            "help_text": "Le libellé de cet élément de la table des matières (par exemple, le titre du chapitre ou de la section).",
+                                            "display_type": "text"
+                                        }
+                                    ],
+                                    "help_text": "Cet élément est utilisé comme alternative à la \"Table des matières\" pour fournir une table des matières structurée. L'élément contient un bloc répétable de sous-éléments qui offre la possibilité de définir une structure hiérarchique."
+                                }
+                            ]
+                        },
+                        {
+                            "key": "document1673376827580",
+                            "title": "Couverture spatiale et temporelle",
+                            "type": "section",
+                            "items": [
+                                {
+                                    "key": "document_description.ref_country",
+                                    "title": "Pays et régions",
+                                    "help_text": "La liste des pays (ou régions) couverts par le document, le cas échéant. Ces informations sont très pertinentes et seront souvent utilisées comme filtre (facette) dans les catalogues de données. C'est donc un champ \"Recommandé\". Essayez d'extraire (éventuellement à l'aide d'un script qui analyse le document) des informations sur les pays mentionnés dans le document. \n\nLorsqu'un document est lié à une région (et non à des pays spécifiques), ou lorsqu'il est lié à un sujet mais pas à une zone géographique spécifique, l'élément \"Pays\" peut toujours être applicable. Lorsqu'un document n'est lié qu'à une partie d'un pays, nous voulons toujours capturer cette information dans les métadonnées. « Monde » (code WLD) peut être saisi si le document est lié mais non spécifique à des pays (par exemple, un document sur « l'atténuation du changement climatique »). Si un document n'est spécifique à aucun pays, l'élément \"Pays\" peut être ignoré (par exemple, le guide d'utilisation d'un logiciel). Notez que de nombreuses organisations ont leurs propres politiques sur la dénomination et l'orthographe des pays\/régions\/économies\/territoires, auxquelles les conservateurs de données devront se conformer.",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "name",
+                                            "title": "Nom",
+                                            "type": "string",
+                                            "help_text": "Le nom du pays\/de la région. Notez que de nombreuses organisations ont leurs propres politiques sur la dénomination des pays\/régions\/économies\/territoires, auxquelles les conservateurs de données devront se conformer.",
+                                            "_rules": "required",
+                                            "prop_key": "document_description.ref_country.name",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "code",
+                                            "title": "Code",
+                                            "type": "string",
+                                            "help_text": "Le code pays\/région. Il est recommandé d'utiliser une liste standard de codes de pays, telle que l'ISO 3166.",
+                                            "prop_key": "document_description.ref_country.code",
+                                            "display_type": "text"
+                                        }
+                                    ],
+                                    "is_recommended": true,
+                                    "enum": [
+                                        {
+                                            "code": "AFG",
+                                            "name": "Afghanistan"
+                                        },
+                                        {
+                                            "code": "AFE",
+                                            "name": "Afrique de l'Est et du Sud"
+                                        },
+                                        {
+                                            "code": "AFW",
+                                            "name": "Afrique de l'Ouest et centrale"
+                                        },
+                                        {
+                                            "code": "NAF",
+                                            "name": "Afrique du Nord"
+                                        },
+                                        {
+                                            "code": "ZAF",
+                                            "name": "Afrique du Sud"
+                                        },
+                                        {
+                                            "code": "AFR",
+                                            "name": "Afrique subsaharienne"
+                                        },
+                                        {
+                                            "code": "SSF",
+                                            "name": "Afrique subsaharienne"
+                                        },
+                                        {
+                                            "code": "CAA",
+                                            "name": "Afrique subsaharienne (classification IFC)"
+                                        },
+                                        {
+                                            "code": "DSS",
+                                            "name": "Afrique subsaharienne (pays éligibles IDA)"
+                                        },
+                                        {
+                                            "code": "BSS",
+                                            "name": "Afrique subsaharienne (pays IBRD uniquement)"
+                                        },
+                                        {
+                                            "code": "TSS",
+                                            "name": "Afrique subsaharienne (pays IDA & IBRD)"
+                                        },
+                                        {
+                                            "code": "SXZ",
+                                            "name": "Afrique subsaharienne (sauf Afrique du Sud)"
+                                        },
+                                        {
+                                            "code": "SSA",
+                                            "name": "Afrique subsaharienne (sauf revenu élevé)"
+                                        },
+                                        {
+                                            "code": "XZN",
+                                            "name": "Afrique subsaharienne sauf Afrique du Sud et Nigéria"
+                                        },
+                                        {
+                                            "code": "ALB",
+                                            "name": "Albanie"
+                                        },
+                                        {
+                                            "code": "DZA",
+                                            "name": "Algérie"
+                                        },
+                                        {
+                                            "code": "DEU",
+                                            "name": "Allemagne"
+                                        },
+                                        {
+                                            "code": "ASM",
+                                            "name": "American Samoa"
+                                        },
+                                        {
+                                            "code": "NAC",
+                                            "name": "Amérique du Nord"
+                                        },
+                                        {
+                                            "code": "LCN",
+                                            "name": "Amérique latine & Caraïbes "
+                                        },
+                                        {
+                                            "code": "BLA",
+                                            "name": "Amerique latine & Caraïbes (pays IBRD uniquement)"
+                                        },
+                                        {
+                                            "code": "LAC",
+                                            "name": "Amérique latine & Caraïbes (sauf revenus élevés)"
+                                        },
+                                        {
+                                            "code": "CLA",
+                                            "name": "Amérique latine et Caraïbes (classification IFC )"
+                                        },
+                                        {
+                                            "code": "DLA",
+                                            "name": "Amérique latine et Caraïbes (pays éligibles IDA)"
+                                        },
+                                        {
+                                            "code": "TLA",
+                                            "name": "Amérique latine et Caraïbes (pays IDA & IBRD)"
+                                        },
+                                        {
+                                            "code": "AND",
+                                            "name": "Andorre"
+                                        },
+                                        {
+                                            "code": "AGO",
+                                            "name": "Angola"
+                                        },
+                                        {
+                                            "code": "ATG",
+                                            "name": "Antigua and Barbuda"
+                                        },
+                                        {
+                                            "code": "SAU",
+                                            "name": "Arabie saoudite"
+                                        },
+                                        {
+                                            "code": "ARG",
+                                            "name": "Argentine"
+                                        },
+                                        {
+                                            "code": "ARM",
+                                            "name": "Arménie"
+                                        },
+                                        {
+                                            "code": "ABW",
+                                            "name": "Aruba"
+                                        },
+                                        {
+                                            "code": "EAS",
+                                            "name": "Asie de l'Est & Pacifique"
+                                        },
+                                        {
+                                            "code": "DEA",
+                                            "name": "Asie de l'Est & Pacifique (pays éligibles IDA)"
+                                        },
+                                        {
+                                            "code": "BEA",
+                                            "name": "Asie de l'Est & Pacifique (pays IBRD uniquement)"
+                                        },
+                                        {
+                                            "code": "TEA",
+                                            "name": "Asie de l'Est & Pacifique (pays IDA & IBRD)"
+                                        },
+                                        {
+                                            "code": "EAP",
+                                            "name": "Asie de l'Est & Pacifique (sauf haut revenu)"
+                                        },
+                                        {
+                                            "code": "CEA",
+                                            "name": "Asie de l'Est et Pacifique (classification IFC )"
+                                        },
+                                        {
+                                            "code": "SAS",
+                                            "name": "Asie du Sud"
+                                        },
+                                        {
+                                            "code": "CSA",
+                                            "name": "Asie du Sud (classification IFC) "
+                                        },
+                                        {
+                                            "code": "TSA",
+                                            "name": "Asie du Sud (IDA & IBRD)"
+                                        },
+                                        {
+                                            "code": "DSA",
+                                            "name": "Asie du Sud (pays éligibles IDA)"
+                                        },
+                                        {
+                                            "code": "AUS",
+                                            "name": "Australie"
+                                        },
+                                        {
+                                            "code": "OSS",
+                                            "name": "Autres petits états"
+                                        },
+                                        {
+                                            "code": "AUT",
+                                            "name": "Autriche"
+                                        },
+                                        {
+                                            "code": "AZE",
+                                            "name": "Azerbaijan"
+                                        },
+                                        {
+                                            "code": "BHS",
+                                            "name": "Bahamas"
+                                        },
+                                        {
+                                            "code": "BHR",
+                                            "name": "Bahrein"
+                                        },
+                                        {
+                                            "code": "BGD",
+                                            "name": "Bangladesh"
+                                        },
+                                        {
+                                            "code": "BRB",
+                                            "name": "Barbade"
+                                        },
+                                        {
+                                            "code": "BLR",
+                                            "name": "Bélarus"
+                                        },
+                                        {
+                                            "code": "BEL",
+                                            "name": "Belgique"
+                                        },
+                                        {
+                                            "code": "BLZ",
+                                            "name": "Belize"
+                                        },
+                                        {
+                                            "code": "BEN",
+                                            "name": "Bénin"
+                                        },
+                                        {
+                                            "code": "BMU",
+                                            "name": "Bermudes"
+                                        },
+                                        {
+                                            "code": "BTN",
+                                            "name": "Bhoutan"
+                                        },
+                                        {
+                                            "code": "BOL",
+                                            "name": "Bolivie"
+                                        },
+                                        {
+                                            "code": "BIH",
+                                            "name": "Bosnie-Herzégovine"
+                                        },
+                                        {
+                                            "code": "BWA",
+                                            "name": "Botswana"
+                                        },
+                                        {
+                                            "code": "BRA",
+                                            "name": "Brésil"
+                                        },
+                                        {
+                                            "code": "BRN",
+                                            "name": "Brunéi Darussalam"
+                                        },
+                                        {
+                                            "code": "BGR",
+                                            "name": "Bulgarie"
+                                        },
+                                        {
+                                            "code": "BFA",
+                                            "name": "Burkina Faso"
+                                        },
+                                        {
+                                            "code": "BDI",
+                                            "name": "Burundi"
+                                        },
+                                        {
+                                            "code": "CPV",
+                                            "name": "Cabo Verde"
+                                        },
+                                        {
+                                            "code": "KHM",
+                                            "name": "Cambodge"
+                                        },
+                                        {
+                                            "code": "CMR",
+                                            "name": "Cameroun"
+                                        },
+                                        {
+                                            "code": "CAN",
+                                            "name": "Canada"
+                                        },
+                                        {
+                                            "code": "CHL",
+                                            "name": "Chili"
+                                        },
+                                        {
+                                            "code": "CHN",
+                                            "name": "Chine"
+                                        },
+                                        {
+                                            "code": "HKG",
+                                            "name": "Chine, RAS de Hong Kong"
+                                        },
+                                        {
+                                            "code": "CYP",
+                                            "name": "Chypre"
+                                        },
+                                        {
+                                            "code": "COL",
+                                            "name": "Colombie"
+                                        },
+                                        {
+                                            "code": "COM",
+                                            "name": "Comores"
+                                        },
+                                        {
+                                            "code": "COG",
+                                            "name": "Congo, République"
+                                        },
+                                        {
+                                            "code": "COD",
+                                            "name": "Congo, République démocratique"
+                                        },
+                                        {
+                                            "code": "KOR",
+                                            "name": "Corée, République de"
+                                        },
+                                        {
+                                            "code": "PRK",
+                                            "name": "Corée, République démocratique de"
+                                        },
+                                        {
+                                            "code": "CRI",
+                                            "name": "Costa Rica"
+                                        },
+                                        {
+                                            "code": "CIV",
+                                            "name": "Côte d'Ivoire"
+                                        },
+                                        {
+                                            "code": "HRV",
+                                            "name": "Croatie"
+                                        },
+                                        {
+                                            "code": "CUB",
+                                            "name": "Cuba"
+                                        },
+                                        {
+                                            "code": "CUW",
+                                            "name": "Curaçao"
+                                        },
+                                        {
+                                            "code": "DNK",
+                                            "name": "Danemark"
+                                        },
+                                        {
+                                            "code": "LTE",
+                                            "name": "Dividende démographique tardif"
+                                        },
+                                        {
+                                            "code": "DJI",
+                                            "name": "Djibouti"
+                                        },
+                                        {
+                                            "code": "DMA",
+                                            "name": "Dominique"
+                                        },
+                                        {
+                                            "code": "EGY",
+                                            "name": "Egypte, République arabe d'"
+                                        },
+                                        {
+                                            "code": "SLV",
+                                            "name": "El Salvador"
+                                        },
+                                        {
+                                            "code": "ARE",
+                                            "name": "Emirats arabes unis"
+                                        },
+                                        {
+                                            "code": "ECU",
+                                            "name": "Equateur"
+                                        },
+                                        {
+                                            "code": "ERI",
+                                            "name": "Erythrée"
+                                        },
+                                        {
+                                            "code": "ESP",
+                                            "name": "Espagne"
+                                        },
+                                        {
+                                            "code": "EST",
+                                            "name": "Estonie"
+                                        },
+                                        {
+                                            "code": "SWZ",
+                                            "name": "Eswatini"
+                                        },
+                                        {
+                                            "code": "USA",
+                                            "name": "Etats-Unis"
+                                        },
+                                        {
+                                            "code": "ETH",
+                                            "name": "Ethiopie"
+                                        },
+                                        {
+                                            "code": "ECS",
+                                            "name": "Europe & Asie centrale"
+                                        },
+                                        {
+                                            "code": "DEC",
+                                            "name": "Europe & Asie centrale (pays éligibles IDA)"
+                                        },
+                                        {
+                                            "code": "BEC",
+                                            "name": "Europe & Asie centrale (pays IBRD uniquement)"
+                                        },
+                                        {
+                                            "code": "TEC",
+                                            "name": "Europe & Asie centrale (pays IDA & IBRD)"
+                                        },
+                                        {
+                                            "code": "ECA",
+                                            "name": "Europe & Asie centrale (sauf haut revenu)"
+                                        },
+                                        {
+                                            "code": "CEB",
+                                            "name": "Europe centrale et pays baltes"
+                                        },
+                                        {
+                                            "code": "CEU",
+                                            "name": "Europe et Asie centrale (classification IFC )"
+                                        },
+                                        {
+                                            "code": "LIC",
+                                            "name": "Faible revenu"
+                                        },
+                                        {
+                                            "code": "RUS",
+                                            "name": "Fédération de Russie"
+                                        },
+                                        {
+                                            "code": "FJI",
+                                            "name": "Fiji"
+                                        },
+                                        {
+                                            "code": "FIN",
+                                            "name": "Finlande"
+                                        },
+                                        {
+                                            "code": "FRA",
+                                            "name": "France"
+                                        },
+                                        {
+                                            "code": "GAB",
+                                            "name": "Gabon"
+                                        },
+                                        {
+                                            "code": "GMB",
+                                            "name": "Gambie"
+                                        },
+                                        {
+                                            "code": "GEO",
+                                            "name": "Georgie"
+                                        },
+                                        {
+                                            "code": "GHA",
+                                            "name": "Ghana"
+                                        },
+                                        {
+                                            "code": "GIB",
+                                            "name": "Gibraltar"
+                                        },
+                                        {
+                                            "code": "GRC",
+                                            "name": "Grèce"
+                                        },
+                                        {
+                                            "code": "GRD",
+                                            "name": "Grenade"
+                                        },
+                                        {
+                                            "code": "GRL",
+                                            "name": "Groenland"
+                                        },
+                                        {
+                                            "code": "GUM",
+                                            "name": "Guam"
+                                        },
+                                        {
+                                            "code": "GTM",
+                                            "name": "Guatemala"
+                                        },
+                                        {
+                                            "code": "GIN",
+                                            "name": "Guinée"
+                                        },
+                                        {
+                                            "code": "GNQ",
+                                            "name": "Guinée équatoriale"
+                                        },
+                                        {
+                                            "code": "GNB",
+                                            "name": "Guinée-Bissau"
+                                        },
+                                        {
+                                            "code": "GUY",
+                                            "name": "Guyane"
+                                        },
+                                        {
+                                            "code": "HTI",
+                                            "name": "Haïti"
+                                        },
+                                        {
+                                            "code": "HND",
+                                            "name": "Honduras"
+                                        },
+                                        {
+                                            "code": "HUN",
+                                            "name": "Hongrie"
+                                        },
+                                        {
+                                            "code": "IBD",
+                                            "name": "IBRD uniquement"
+                                        },
+                                        {
+                                            "code": "IBB",
+                                            "name": "IBRD, y compris mélange"
+                                        },
+                                        {
+                                            "code": "IDB",
+                                            "name": "IDA "
+                                        },
+                                        {
+                                            "code": "IBT",
+                                            "name": "IDA & IBRD total"
+                                        },
+                                        {
+                                            "code": "IDA",
+                                            "name": "IDA total"
+                                        },
+                                        {
+                                            "code": "IDX",
+                                            "name": "IDA uniquement"
+                                        },
+                                        {
+                                            "code": "IMN",
+                                            "name": "Ile de Man"
+                                        },
+                                        {
+                                            "code": "CHI",
+                                            "name": "Iles anglo-normandes"
+                                        },
+                                        {
+                                            "code": "CYM",
+                                            "name": "Iles Cayman"
+                                        },
+                                        {
+                                            "code": "FRO",
+                                            "name": "Iles Féroé"
+                                        },
+                                        {
+                                            "code": "MHL",
+                                            "name": "Iles Marshall"
+                                        },
+                                        {
+                                            "code": "SLB",
+                                            "name": "Iles Salomon"
+                                        },
+                                        {
+                                            "code": "TCA",
+                                            "name": "Iles Turks et Caicos"
+                                        },
+                                        {
+                                            "code": "VIR",
+                                            "name": "Iles Vierges (U.S.)"
+                                        },
+                                        {
+                                            "code": "VGB",
+                                            "name": "Iles Vierges britanniques"
+                                        },
+                                        {
+                                            "code": "IND",
+                                            "name": "Inde"
+                                        },
+                                        {
+                                            "code": "IDN",
+                                            "name": "Indonésie"
+                                        },
+                                        {
+                                            "code": "IRN",
+                                            "name": "Iran, République islamique d'"
+                                        },
+                                        {
+                                            "code": "IRQ",
+                                            "name": "Iraq"
+                                        },
+                                        {
+                                            "code": "IRL",
+                                            "name": "Irlande"
+                                        },
+                                        {
+                                            "code": "ISL",
+                                            "name": "Islande"
+                                        },
+                                        {
+                                            "code": "ISR",
+                                            "name": "Israël"
+                                        },
+                                        {
+                                            "code": "ITA",
+                                            "name": "Italie"
+                                        },
+                                        {
+                                            "code": "JAM",
+                                            "name": "Jamaique"
+                                        },
+                                        {
+                                            "code": "JPN",
+                                            "name": "Japon"
+                                        },
+                                        {
+                                            "code": "JOR",
+                                            "name": "Jordanie"
+                                        },
+                                        {
+                                            "code": "KAZ",
+                                            "name": "Kazakhstan"
+                                        },
+                                        {
+                                            "code": "KEN",
+                                            "name": "Kenya"
+                                        },
+                                        {
+                                            "code": "KIR",
+                                            "name": "Kiribati"
+                                        },
+                                        {
+                                            "code": "XKX",
+                                            "name": "Kosovo"
+                                        },
+                                        {
+                                            "code": "KWT",
+                                            "name": "Koweït"
+                                        },
+                                        {
+                                            "code": "LSO",
+                                            "name": "Lesotho"
+                                        },
+                                        {
+                                            "code": "LVA",
+                                            "name": "Lettonie"
+                                        },
+                                        {
+                                            "code": "LBN",
+                                            "name": "Liban"
+                                        },
+                                        {
+                                            "code": "LBR",
+                                            "name": "Libéria"
+                                        },
+                                        {
+                                            "code": "LBY",
+                                            "name": "Libye"
+                                        },
+                                        {
+                                            "code": "LIE",
+                                            "name": "Liechtenstein"
+                                        },
+                                        {
+                                            "code": "LTU",
+                                            "name": "Lituanie"
+                                        },
+                                        {
+                                            "code": "LUX",
+                                            "name": "Luxembourg"
+                                        },
+                                        {
+                                            "code": "MKD",
+                                            "name": "Macédoine du Nord"
+                                        },
+                                        {
+                                            "code": "MDG",
+                                            "name": "Madagascar"
+                                        },
+                                        {
+                                            "code": "MYS",
+                                            "name": "Malaisie"
+                                        },
+                                        {
+                                            "code": "MWI",
+                                            "name": "Malawi"
+                                        },
+                                        {
+                                            "code": "MDV",
+                                            "name": "Maldives"
+                                        },
+                                        {
+                                            "code": "MLI",
+                                            "name": "Mali"
+                                        },
+                                        {
+                                            "code": "MLT",
+                                            "name": "Malte"
+                                        },
+                                        {
+                                            "code": "MNP",
+                                            "name": "Mariannes"
+                                        },
+                                        {
+                                            "code": "MAR",
+                                            "name": "Maroc"
+                                        },
+                                        {
+                                            "code": "MUS",
+                                            "name": "Maurice"
+                                        },
+                                        {
+                                            "code": "MRT",
+                                            "name": "Mauritanie"
+                                        },
+                                        {
+                                            "code": "OED",
+                                            "name": "Membres OECD "
+                                        },
+                                        {
+                                            "code": "MEX",
+                                            "name": "Mexique"
+                                        },
+                                        {
+                                            "code": "FSM",
+                                            "name": "Micronésie, Etats fédérés de"
+                                        },
+                                        {
+                                            "code": "MDA",
+                                            "name": "Moldavie"
+                                        },
+                                        {
+                                            "code": "MCO",
+                                            "name": "Monaco"
+                                        },
+                                        {
+                                            "code": "WLD",
+                                            "name": "Monde"
+                                        },
+                                        {
+                                            "code": "ARB",
+                                            "name": "Monde arabe"
+                                        },
+                                        {
+                                            "code": "MNG",
+                                            "name": "Mongolie"
+                                        },
+                                        {
+                                            "code": "MNE",
+                                            "name": "Monténégro"
+                                        },
+                                        {
+                                            "code": "MDE",
+                                            "name": "Moyen Orient (en développement)"
+                                        },
+                                        {
+                                            "code": "DMN",
+                                            "name": "Moyen orient & Afrique du Nord (pays éligibles IDA)"
+                                        },
+                                        {
+                                            "code": "BMN",
+                                            "name": "Moyen Orient & Afrique du Nord (pays IBRD uniquement)"
+                                        },
+                                        {
+                                            "code": "MEA",
+                                            "name": "Moyen Orient et Afrique du Nord"
+                                        },
+                                        {
+                                            "code": "CME",
+                                            "name": "Moyen Orient et Afrique du Nord (classification IFC )"
+                                        },
+                                        {
+                                            "code": "TMN",
+                                            "name": "Moyen Orient et Afrique du Nord (pays IDA & IBRD)"
+                                        },
+                                        {
+                                            "code": "MNA",
+                                            "name": "Moyen Orient et Afrique du Nord (sauf revenu élevé)"
+                                        },
+                                        {
+                                            "code": "MOZ",
+                                            "name": "Mozambique"
+                                        },
+                                        {
+                                            "code": "MMR",
+                                            "name": "Myanmar"
+                                        },
+                                        {
+                                            "code": "NAM",
+                                            "name": "Namibie"
+                                        },
+                                        {
+                                            "code": "NRU",
+                                            "name": "Nauru"
+                                        },
+                                        {
+                                            "code": "NPL",
+                                            "name": "Népal"
+                                        },
+                                        {
+                                            "code": "NIC",
+                                            "name": "Nicaragua"
+                                        },
+                                        {
+                                            "code": "NER",
+                                            "name": "Niger"
+                                        },
+                                        {
+                                            "code": "NGA",
+                                            "name": "Nigéria"
+                                        },
+                                        {
+                                            "code": "INX",
+                                            "name": "Non classifié"
+                                        },
+                                        {
+                                            "code": "NOR",
+                                            "name": "Norvège"
+                                        },
+                                        {
+                                            "code": "NCL",
+                                            "name": "Nouvelle Calédonie"
+                                        },
+                                        {
+                                            "code": "NZL",
+                                            "name": "Nouvelle Zélande"
+                                        },
+                                        {
+                                            "code": "OMN",
+                                            "name": "Oman"
+                                        },
+                                        {
+                                            "code": "UZB",
+                                            "name": "Ouzbékistan"
+                                        },
+                                        {
+                                            "code": "PAK",
+                                            "name": "Pakistan"
+                                        },
+                                        {
+                                            "code": "PLW",
+                                            "name": "Palau"
+                                        },
+                                        {
+                                            "code": "PAN",
+                                            "name": "Panama"
+                                        },
+                                        {
+                                            "code": "PNG",
+                                            "name": "Papouasie Nouvelle Guinée"
+                                        },
+                                        {
+                                            "code": "PRY",
+                                            "name": "Paraguay"
+                                        },
+                                        {
+                                            "code": "NRS",
+                                            "name": "Pays d'Afrique subsaharienne pauvres en resources"
+                                        },
+                                        {
+                                            "code": "RRS",
+                                            "name": "Pays d'Afrique subsaharienne riches en resources"
+                                        },
+                                        {
+                                            "code": "EAR",
+                                            "name": "Pays de dividende démographique précoce "
+                                        },
+                                        {
+                                            "code": "FCS",
+                                            "name": "Pays en situation fragile ou de conflit"
+                                        },
+                                        {
+                                            "code": "BHI",
+                                            "name": "Pays IBRD à haut revenu"
+                                        },
+                                        {
+                                            "code": "FXS",
+                                            "name": "Pays IDA classifiés comme étant en situation fragiles, hors Afrique subsaharienne"
+                                        },
+                                        {
+                                            "code": "DSF",
+                                            "name": "Pays IDA d'Afrique subsaharienne classifiés en situation fragile"
+                                        },
+                                        {
+                                            "code": "DNS",
+                                            "name": "Pays IDA d'Afrique subsaharienne non classifiés en situation fragile"
+                                        },
+                                        {
+                                            "code": "DFS",
+                                            "name": "Pays IDA en situation fragile"
+                                        },
+                                        {
+                                            "code": "DNF",
+                                            "name": "Pays IDA non classifiés en situation fragile"
+                                        },
+                                        {
+                                            "code": "NXS",
+                                            "name": "Pays IDA non-classifiés comme fragiles, sauf Afrique subsaharienne"
+                                        },
+                                        {
+                                            "code": "LDC",
+                                            "name": "Pays les moins développés: classification NU"
+                                        },
+                                        {
+                                            "code": "HPC",
+                                            "name": "Pays très endettés (HIPC)"
+                                        },
+                                        {
+                                            "code": "NLD",
+                                            "name": "Pays-Bas"
+                                        },
+                                        {
+                                            "code": "PER",
+                                            "name": "Pérou"
+                                        },
+                                        {
+                                            "code": "SST",
+                                            "name": "Petits états"
+                                        },
+                                        {
+                                            "code": "CSS",
+                                            "name": "Petits états des Caraïbes"
+                                        },
+                                        {
+                                            "code": "PSS",
+                                            "name": "Petits états insulaires du Pacifique"
+                                        },
+                                        {
+                                            "code": "PHL",
+                                            "name": "Philippines"
+                                        },
+                                        {
+                                            "code": "POL",
+                                            "name": "Pologne"
+                                        },
+                                        {
+                                            "code": "PYF",
+                                            "name": "Polynésie française"
+                                        },
+                                        {
+                                            "code": "PRI",
+                                            "name": "Porto Rico"
+                                        },
+                                        {
+                                            "code": "PRT",
+                                            "name": "Portugal"
+                                        },
+                                        {
+                                            "code": "PST",
+                                            "name": "Post-dividende démographique "
+                                        },
+                                        {
+                                            "code": "PRE",
+                                            "name": "Pré-dividende démographique "
+                                        },
+                                        {
+                                            "code": "QAT",
+                                            "name": "Qatar"
+                                        },
+                                        {
+                                            "code": "MAC",
+                                            "name": "Région adminisrative spéciale de Macao, Chine"
+                                        },
+                                        {
+                                            "code": "SYR",
+                                            "name": "République arabe syrienne"
+                                        },
+                                        {
+                                            "code": "CAF",
+                                            "name": "République centrafricaine"
+                                        },
+                                        {
+                                            "code": "LAO",
+                                            "name": "République démocratique populaire lao"
+                                        },
+                                        {
+                                            "code": "DOM",
+                                            "name": "République dominicaine"
+                                        },
+                                        {
+                                            "code": "KGZ",
+                                            "name": "République kirgize"
+                                        },
+                                        {
+                                            "code": "SVK",
+                                            "name": "République slovaque"
+                                        },
+                                        {
+                                            "code": "CZE",
+                                            "name": "République tchèque"
+                                        },
+                                        {
+                                            "code": "HIC",
+                                            "name": "Revenu élevé"
+                                        },
+                                        {
+                                            "code": "LMY",
+                                            "name": "Revenu faible et intermédiaire"
+                                        },
+                                        {
+                                            "code": "MIC",
+                                            "name": "Revenu intermédiaire"
+                                        },
+                                        {
+                                            "code": "LMC",
+                                            "name": "Revenu intermédiaire, tranche inférieure"
+                                        },
+                                        {
+                                            "code": "UMC",
+                                            "name": "Revenu intermédiaire, tranche supérieure"
+                                        },
+                                        {
+                                            "code": "ROU",
+                                            "name": "Roumanie"
+                                        },
+                                        {
+                                            "code": "GBR",
+                                            "name": "Royaume Uni"
+                                        },
+                                        {
+                                            "code": "RWA",
+                                            "name": "Rwanda"
+                                        },
+                                        {
+                                            "code": "SMR",
+                                            "name": "Saint-Marin"
+                                        },
+                                        {
+                                            "code": "WSM",
+                                            "name": "Samoa"
+                                        },
+                                        {
+                                            "code": "STP",
+                                            "name": "Sao Tomé et Principe"
+                                        },
+                                        {
+                                            "code": "SEN",
+                                            "name": "Sénégal"
+                                        },
+                                        {
+                                            "code": "SRB",
+                                            "name": "Serbie"
+                                        },
+                                        {
+                                            "code": "SYC",
+                                            "name": "Seychelles"
+                                        },
+                                        {
+                                            "code": "SLE",
+                                            "name": "Sierra Leone"
+                                        },
+                                        {
+                                            "code": "SGP",
+                                            "name": "Singapour"
+                                        },
+                                        {
+                                            "code": "SXM",
+                                            "name": "Sint Maarten (Dutch part)"
+                                        },
+                                        {
+                                            "code": "SVN",
+                                            "name": "Slovénie"
+                                        },
+                                        {
+                                            "code": "SOM",
+                                            "name": "Somalie"
+                                        },
+                                        {
+                                            "code": "SDN",
+                                            "name": "Soudan"
+                                        },
+                                        {
+                                            "code": "SSD",
+                                            "name": "Soudan du Sud"
+                                        },
+                                        {
+                                            "code": "LKA",
+                                            "name": "Sri Lanka"
+                                        },
+                                        {
+                                            "code": "KNA",
+                                            "name": "St. Kitts et Nevis"
+                                        },
+                                        {
+                                            "code": "LCA",
+                                            "name": "St. Lucie"
+                                        },
+                                        {
+                                            "code": "MAF",
+                                            "name": "St. Martin (partie française)"
+                                        },
+                                        {
+                                            "code": "VCT",
+                                            "name": "St. Vincent et Grenadines"
+                                        },
+                                        {
+                                            "code": "SWE",
+                                            "name": "Suède"
+                                        },
+                                        {
+                                            "code": "CHE",
+                                            "name": "Suisse"
+                                        },
+                                        {
+                                            "code": "SUR",
+                                            "name": "Surinam"
+                                        },
+                                        {
+                                            "code": "TWN",
+                                            "name": "Taiwan, Chine"
+                                        },
+                                        {
+                                            "code": "TJK",
+                                            "name": "Tajikistan"
+                                        },
+                                        {
+                                            "code": "TZA",
+                                            "name": "Tanzanie"
+                                        },
+                                        {
+                                            "code": "TCD",
+                                            "name": "Tchad"
+                                        },
+                                        {
+                                            "code": "THA",
+                                            "name": "Thailande"
+                                        },
+                                        {
+                                            "code": "TLS",
+                                            "name": "Timor-Leste"
+                                        },
+                                        {
+                                            "code": "TGO",
+                                            "name": "Togo"
+                                        },
+                                        {
+                                            "code": "TON",
+                                            "name": "Tonga"
+                                        },
+                                        {
+                                            "code": "TTO",
+                                            "name": "Trinidad et Tobago"
+                                        },
+                                        {
+                                            "code": "TUN",
+                                            "name": "Tunisie"
+                                        },
+                                        {
+                                            "code": "TKM",
+                                            "name": "Turkménistan"
+                                        },
+                                        {
+                                            "code": "TUR",
+                                            "name": "Turquie"
+                                        },
+                                        {
+                                            "code": "TUV",
+                                            "name": "Tuvalu"
+                                        },
+                                        {
+                                            "code": "UGA",
+                                            "name": "Uganda"
+                                        },
+                                        {
+                                            "code": "UKR",
+                                            "name": "Ukraine"
+                                        },
+                                        {
+                                            "code": "EUU",
+                                            "name": "Union Européenne"
+                                        },
+                                        {
+                                            "code": "URY",
+                                            "name": "Uruguay"
+                                        },
+                                        {
+                                            "code": "VUT",
+                                            "name": "Vanuatu"
+                                        },
+                                        {
+                                            "code": "VEN",
+                                            "name": "Vénézuela, RB"
+                                        },
+                                        {
+                                            "code": "VNM",
+                                            "name": "Viet Nam"
+                                        },
+                                        {
+                                            "code": "PSE",
+                                            "name": "West Bank et Gaza"
+                                        },
+                                        {
+                                            "code": "YEM",
+                                            "name": "Yémen, Rép. du"
+                                        },
+                                        {
+                                            "code": "ZMB",
+                                            "name": "Zambie"
+                                        },
+                                        {
+                                            "code": "ZWE",
+                                            "name": "Zimbabwe"
+                                        },
+                                        {
+                                            "code": "EMU",
+                                            "name": "Zone Euro"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "document_description.geographic_units",
+                                    "title": "Unités géographiques",
+                                    "help_text": "Une liste des unités géographiques couvertes dans le document, autres que les pays répertoriés dans \"Pays\".",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "name",
+                                            "title": "Nom",
+                                            "type": "string",
+                                            "help_text": "Le nom de l'unité géographique.",
+                                            "__rules": "required",
+                                            "prop_key": "document_description.geographic_units.name",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "code",
+                                            "title": "Code",
+                                            "type": "string",
+                                            "help_text": "Le code de l'unité géographique.",
+                                            "prop_key": "document_description.geographic_units.code",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "type",
+                                            "title": "Type",
+                                            "type": "string",
+                                            "help_text": "Le type de l'unité géographique (par exemple, \"province\", \"état\", \"district\" ou \"ville\").",
+                                            "prop_key": "document_description.geographic_units.type",
+                                            "display_type": "text"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "document_description.bbox",
+                                    "title": "Bounding box (encadré géographique)",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "west",
+                                            "title": "Ouest",
+                                            "type": "string",
+                                            "prop_key": "document_description.bbox.west",
+                                            "help_text": "Longitude Ouest de l'encadré géographique",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "east",
+                                            "title": "Est",
+                                            "type": "string",
+                                            "prop_key": "document_description.bbox.east",
+                                            "help_text": "Longitude Est de l'encadré géographique",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "south",
+                                            "title": "Sud",
+                                            "type": "string",
+                                            "prop_key": "document_description.bbox.south",
+                                            "help_text": "Latitude Sud de l'encadré géographique",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "north",
+                                            "title": "Nord",
+                                            "type": "string",
+                                            "prop_key": "document_description.bbox.north",
+                                            "help_text": "Latitude Nord de l'encadré géographique",
+                                            "display_type": "text"
+                                        }
+                                    ],
+                                    "help_text": "Cet élément est utilisé pour définir un ou plusieurs encadrés de délimitation géographique, qui sont la description géométrique fondamentale rectangulaire de la couverture géographique des données. Un encadré géographique est défini par les longitudes ouest et est et les latitudes nord et sud, et comprend la plus grande étendue géographique de la couverture géographique de l'ensemble de données. L'encadré géographique fournit les coordonnées géographiques des coins supérieur gauche (nord\/ouest) et inférieur droit (sud\/est) d'une zone rectangulaire. Cet élément peut être utilisé dans les catalogues comme premier passage d'une recherche basée sur les coordonnées. La plage de latitude valide en degrés est de -90 et +90 pour l'hémisphère sud et nord, respectivement. La longitude est comprise entre -180 et +180 spécifiant les coordonnées à l'ouest et à l'est du premier méridien, respectivement. Cet élément sera rarement utilisé pour documenter des publications. Les encadrés géographiques sont un élément facultatif, mais lorsqu'un encadré géographique est défini, les quatre coordonnées sont requises."
+                                },
+                                {
+                                    "key": "document_description.spatial_coverage",
+                                    "title": "Couverture spatiale",
+                                    "type": "string",
+                                    "help_text": "Cet élément fournit un autre champ pour capturer des informations sur la couverture spatiale d'un document, qui complète les éléments \"Pays\", \"Zones géographiques\" et \"Boîte de délimitation\". Il peut être utilisé pour qualifier la couverture géographique du document, sous la forme d'un texte libre. Par exemple, un rapport sur les camps de réfugiés dans le district de Cox's Bazar au Bangladesh aurait le Bangladesh comme pays de référence, \"Cox's Bazar\" comme \"Zone géographique\", et \"Camps de réfugiés de Rohingyas\" comme \"Couverture spatiale \".",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "document_description.temporal_coverage",
+                                    "title": "Couverture temporelle",
+                                    "type": "string",
+                                    "help_text": "Tous les documents n'ont pas une couverture temporelle spécifique. Quand c'est le cas, cela peut être spécifié dans cet élément.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": ""
+                        },
+                        {
+                            "key": "document1673376592167",
+                            "title": "Accès et droits",
+                            "type": "section",
+                            "items": [
+                                {
+                                    "key": "document_description.status",
+                                    "title": "Statut",
+                                    "type": "string",
+                                    "class": "recommended",
+                                    "help_text": "Le statut du document. Le statut du document doit (mais n'est pas obligatoire) être fourni à l'aide d'un vocabulaire contrôlé, par exemple avec les options suivantes : \"premier projet\", \"projet\", \"projet révisé\", \"final brouillon\", \"final\". La plupart des documents publiés dans un catalogue seront probablement \"définitifs\".",
+                                    "enum": [
+                                        {
+                                            "value": "first draft",
+                                            "code": "first draft",
+                                            "label": "Premier projet (brouillon)"
+                                        },
+                                        {
+                                            "value": "draft",
+                                            "code": "draft",
+                                            "label": "Projet (brouillon)"
+                                        },
+                                        {
+                                            "value": "draft released for comment",
+                                            "code": "reviewed draft",
+                                            "label": "Projet  (brouillon)révisé"
+                                        },
+                                        {
+                                            "value": "reviewed draft",
+                                            "code": "final draft",
+                                            "label": "Projet  (brouillon)final"
+                                        },
+                                        {
+                                            "value": "final draft",
+                                            "code": "final",
+                                            "label": "Final"
+                                        }
+                                    ],
+                                    "display_type": "dropdown-custom"
+                                },
+                                {
+                                    "key": "document_description.rights",
+                                    "title": "Droits",
+                                    "type": "string",
+                                    "help_text": "Une déclaration sur les droits associés au document (autres que le copyright, qui doit être décrit dans l'élément \"Copyright\").",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "document_description.copyright",
+                                    "title": "Droits d'auteur",
+                                    "type": "string",
+                                    "help_text": "Une déclaration et un identifiant indiquant la propriété légale et les droits concernant l'utilisation et la réutilisation de tout ou partie de la ressource. Si le document est protégé par un droit d'auteur, entrez les informations sur la personne ou l'organisation qui détient les droits.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "document_description.license",
+                                    "title": "License",
+                                    "help_text": "Informations sur la ou les licences jointes au document, qui définissent les conditions d'utilisation.",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "name",
+                                            "title": "Nom",
+                                            "type": "string",
+                                            "help_text": "Le nom de la licence (par exemple, CC-BY 4.0).",
+                                            "prop_key": "document_description.license.name",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "uri",
+                                            "title": "URL",
+                                            "type": "string",
+                                            "help_text": "L'URL de la licence, où des informations détaillées sur la licence peuvent être obtenues.",
+                                            "prop_key": "document_description.license.uri",
+                                            "rules": {
+                                                "is_uri": true
+                                            },
+                                            "display_type": "text"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "document_description.usage_terms",
+                                    "title": "Conditions d'utilisation",
+                                    "type": "string",
+                                    "help_text": "Cet élément est utilisé pour fournir une description des termes juridiques ou autres conditions qu'une personne ou une organisation qui souhaite utiliser ou reproduire le document doit respecter.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "document_description.disclaimer",
+                                    "title": "Clause de non-responsabilité",
+                                    "type": "string",
+                                    "help_text": "Une clause de non-responsabilité limite la responsabilité du ou des auteurs et\/ou éditeurs du document. Une mention légale standard doit être utilisée pour tous les documents d'une même agence. Par exemple (tiré des Documents de travail de recherche sur les politiques de la Banque mondiale) : \"Ce travail est un produit du personnel de la Banque mondiale avec des contributions externes. Les constatations, interprétations et conclusions exprimées dans ce travail ne reflètent pas nécessairement les vues de la Banque mondiale. Banque mondiale, son conseil d'administration ou les gouvernements qu'ils représentent. La Banque mondiale ne garantit pas l'exactitude des données incluses dans cet ouvrage. Les limites, les couleurs, les dénominations et les autres informations figurant sur les cartes de cet ouvrage ne n'implique aucun jugement de la part de la Banque mondiale concernant le statut juridique d'un territoire ou l'approbation ou l'acceptation de telles frontières.\"",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "document_description.security_classification",
+                                    "title": "Classification de sécurité",
+                                    "type": "string",
+                                    "help_text": "Informations sur la classification de sécurité jointes au document. Les différents niveaux de classification indiquent le degré de sensibilité du contenu du document. L'utilisation du vocabulaire contrôlé est recommandée (le vocabulaire contrôlé doit être spécifique à l'organisation qui conserve ou diffuse le document), par exemple avec les modalités \"public\", \"interne uniquement\", \"restreint\", \"confidentiel\", \"strictement confidentiel\".",
+                                    "enum": [
+                                        {
+                                            "value": "public",
+                                            "code": "public",
+                                            "label": "Public"
+                                        },
+                                        {
+                                            "value": "internal-only",
+                                            "code": "internal only",
+                                            "label": "Interne uniquement"
+                                        },
+                                        {
+                                            "value": "restricted",
+                                            "code": "restricted",
+                                            "label": "Restreint"
+                                        },
+                                        {
+                                            "value": "confidential",
+                                            "code": "confidential",
+                                            "label": "Confidentiel"
+                                        },
+                                        {
+                                            "code": "strictly confidential",
+                                            "label": "Strictement confidentiel"
+                                        }
+                                    ],
+                                    "display_type": "dropdown-custom"
+                                },
+                                {
+                                    "key": "document_description.access_restrictions",
+                                    "title": "Restrictions d'accès",
+                                    "type": "string",
+                                    "help_text": "Une description textuelle des restrictions d'accès qui s'appliquent au document.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "document_description.pricing",
+                                    "title": "Pricing",
+                                    "type": "string",
+                                    "help_text": "Le prix actuel du document dans n'importe quelle devise définie. Comme ces informations sont sujettes à des changements réguliers, elles ne seront souvent pas incluses dans les métadonnées du document.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": ""
+                        },
+                        {
+                            "key": "document1673377443704",
+                            "title": "Autre information",
+                            "type": "section",
+                            "items": [
+                                {
+                                    "key": "document_description.contacts",
+                                    "title": "Contacts",
+                                    "help_text": "Coordonnées d'une personne ou d'une organisation qui peut être contactée pour les demandes liées au document.",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "name",
+                                            "title": "Nom",
+                                            "type": "string",
+                                            "help_text": "Nom de la personne ou organisation.",
+                                            "prop_key": "document_description.contacts.name",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "role",
+                                            "title": "Rôle",
+                                            "type": "string",
+                                            "help_text": "Rôle de la personne ou organisation.",
+                                            "prop_key": "document_description.contacts.role",
+                                            "display_type": "textarea"
+                                        },
+                                        {
+                                            "key": "affiliation",
+                                            "title": "Affiliation",
+                                            "type": "string",
+                                            "help_text": "Affiliation de la personne ou organisation.",
+                                            "prop_key": "document_description.contacts.affiliation",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "email",
+                                            "title": "Email",
+                                            "type": "string",
+                                            "help_text": "E-mail",
+                                            "prop_key": "document_description.contacts.email",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "telephone",
+                                            "title": "Téléphone",
+                                            "type": "string",
+                                            "help_text": "Numéro de téléphone",
+                                            "prop_key": "document_description.contacts.telephone",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "uri",
+                                            "title": "URL",
+                                            "type": "string",
+                                            "help_text": "Addresse du site web",
+                                            "prop_key": "document_description.contacts.uri",
+                                            "rules": {
+                                                "is_uri": true
+                                            },
+                                            "display_type": "text"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "document_description.sources",
+                                    "type": "array",
+                                    "title": "Sources",
+                                    "props": [
+                                        {
+                                            "key": "source_origin",
+                                            "title": "Origine",
+                                            "type": "string",
+                                            "prop_key": "document_description.sources.source_origin",
+                                            "help_text": "Pour les documents historiques, des informations sur l'origine ou les origines des sources et les règles suivies pour établir les sources doivent être précisées.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "source_char",
+                                            "title": "Caractéristiques",
+                                            "type": "string",
+                                            "prop_key": "document_description.sources.source_char",
+                                            "help_text": "Caractéristiques de la source. Évaluation des caractéristiques et de la qualité du matériel source.",
+                                            "display_type": "textarea"
+                                        },
+                                        {
+                                            "key": "source_doc",
+                                            "title": "Documentation",
+                                            "type": "string",
+                                            "prop_key": "document_description.sources.source_doc",
+                                            "help_text": "Documentation et accès à la source.",
+                                            "display_type": "textarea"
+                                        }
+                                    ],
+                                    "help_text": "Cet élément est utilisé pour décrire les sources de différents types (à l'exception des sources de données, qui doivent être répertoriées dans l'élément \"Sources de données\") qui ont été utilisées dans la production du document."
+                                },
+                                {
+                                    "key": "document_description.data_sources",
+                                    "type": "array",
+                                    "title": "Sources de données",
+                                    "props": [
+                                        {
+                                            "key": "name",
+                                            "title": "Dataset",
+                                            "type": "string",
+                                            "prop_key": "document_description.data_sources.name",
+                                            "help_text": "Nom (titre) du jeu de données utilisé comme source. Par exemple : \"Bangladesh Demographic and Health Survey 2017-18\"",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "uri",
+                                            "title": "URL",
+                                            "type": "string",
+                                            "prop_key": "document_description.data_sources.uri",
+                                            "help_text": "Lien (URL) vers le jeu de données ou vers une page Web décrivant le jeu de données. Par exemple : \"https:\/\/www.dhsprogram.com\/methodology\/survey\/survey-display-536.cfm\"",
+                                            "rules": {
+                                                "is_uri": true
+                                            },
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "note",
+                                            "title": "Note",
+                                            "type": "string",
+                                            "prop_key": "document_description.data_sources.note",
+                                            "help_text": "Informations supplémentaires sur la source de données. Par exemple : \"Enquête auprès des ménages menée par l'Institut national de recherche et de formation sur la population, la Division de l'éducation médicale et du bien-être familial et le ministère de la Santé et du Bien-être familial. Données et documentation disponibles sur https:\/\/dhsprogram.com\/)\"",
+                                            "display_type": "textarea"
+                                        }
+                                    ],
+                                    "help_text": "Utilisé pour répertorier le ou les fichiers de données lisibles par machine -le cas échéant- qui ont servi de source(s) de données."
+                                },
+                                {
+                                    "key": "document_description.reproducibility.statement",
+                                    "title": "Déclaration de reproductibilité",
+                                    "type": "string",
+                                    "help_text": "La \"Déclaration de reproductibilité\" est une déclaration générale sur la reproductibilité et la réplicabilité de l'analyse (y compris le traitement des données, la tabulation, la production de visualisations, la modélisation, etc.) présentée dans le document.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "document_description.reproducibility.links",
+                                    "type": "array",
+                                    "title": "Liens de reproductibilité",
+                                    "props": [
+                                        {
+                                            "key": "uri",
+                                            "title": "URL",
+                                            "type": "string",
+                                            "prop_key": "document_description.reproducibility.links.uri",
+                                            "help_text": "Le lien vers une page Web.",
+                                            "rules": {
+                                                "is_uri": true
+                                            },
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "description",
+                                            "title": "Description",
+                                            "type": "string",
+                                            "prop_key": "document_description.reproducibility.links.description",
+                                            "help_text": "Une brève description du contenu de la page Web.",
+                                            "display_type": "textarea"
+                                        }
+                                    ],
+                                    "help_text": "Les \"Liens de reproductibilité\" fournissent des liens vers des pages Web où les documents reproductibles et les informations connexes peuvent être trouvés."
+                                },
+                                {
+                                    "key": "document_description.audience",
+                                    "title": "Public visé",
+                                    "type": "string",
+                                    "help_text": "Informations sur le public visé par le document, c'est-à-dire la ou les catégories d'utilisateurs auxquels la ressource est destinée en termes d'intérêt, de compétences, de statut ou autres.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "document_description.mandate",
+                                    "title": "Mandat",
+                                    "type": "string",
+                                    "help_text": "Le mandat législatif ou autre en vertu duquel la ressource a été produite.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "document_description.relations",
+                                    "title": "Ressources associées",
+                                    "help_text": "Références à des ressources associées avec une spécification du type de relation.",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "name",
+                                            "title": "Nom",
+                                            "type": "string",
+                                            "prop_key": "document_description.relations.name",
+                                            "help_text": "Le titre ou le nom de la ressource associée. La pratique recommandée consiste à identifier la ressource associée au moyen d'une URL. Si cela n'est pas possible ou faisable, une chaîne conforme à un système d'identification formel peut être fournie.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "type",
+                                            "title": "Type",
+                                            "type": "string",
+                                            "enum": [],
+                                            "prop_key": "document_description.relations.type",
+                                            "help_text": "Le type de relation. L'utilisation d'un vocabulaire contrôlé est recommandée. Le Dublin Core propose le vocabulaire suivant : \"isPartOf\", \"hasPart\", \"isVersionOf\", \"isFormatOf\", \"hasFormat\", \"references\", \"isReferencedBy\", \"isBasedOn\", \"isBasisFor\", \"replaces\", \"isReplacedBy\", \"requires\", \"isRequiredBy\".",
+                                            "display_type": "text"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "key": "document_description.notes",
+                                    "title": "Notes",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "note",
+                                            "title": "Note",
+                                            "type": "string",
+                                            "prop_key": "document_description.notes.note",
+                                            "help_text": "Une note, saisie sous forme de texte libre.",
+                                            "display_type": "textarea"
+                                        }
+                                    ],
+                                    "help_text": "Ce champ peut être utilisé pour fournir des informations sur le document qui n'appartiennent pas aux autres éléments de métadonnées plus spécifiques fournis dans le schéma."
+                                }
+                            ],
+                            "help_text": ""
+                        },
+                        {
+                            "type": "section",
+                            "key": "document_tags",
+                            "title": "Tags",
+                            "class": "recommended",
+                            "items": [
+                                {
+                                    "key": "tags",
+                                    "title": "Tags",
+                                    "type": "array",
+                                    "props": [
+                                        {
+                                            "key": "tag",
+                                            "title": "Tag",
+                                            "type": "string",
+                                            "prop_key": "tags.tag",
+                                            "help_text": "Un tag défini par l'utilisateur.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "tag_group",
+                                            "title": "Tag group",
+                                            "type": "string",
+                                            "prop_key": "tags.tag_group",
+                                            "help_text": "Le nom d'un groupe de tags",
+                                            "display_type": "text"
+                                        }
+                                    ],
+                                    "help_text": "Les tags, en particulier lorsqu'ils sont organisées en groupes de tags, offrent une solution puissante et flexible pour activer les facettes personnalisées (filtres) dans les catalogues de données."
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }

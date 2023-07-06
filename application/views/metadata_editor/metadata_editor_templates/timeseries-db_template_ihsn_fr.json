@@ -1,0 +1,2253 @@
+{
+    "type": "template",
+    "title": "Base de données d'indicateurs",
+    "items": [
+        {
+            "type": "section_container",
+            "key": "metadata_information",
+            "title": "Informations sur les métadonnées",
+            "class": "recommended",
+            "items": [
+                {
+                    "type": "section",
+                    "key": "metadata_information_section",
+                    "title": "Informations sur les métadonnées",
+                    "class": "recommended",
+                    "items": [
+                        {
+                            "key": "metadata_information.title",
+                            "title": "Titre du document",
+                            "type": "string",
+                            "help_text": "Le titre du document de métadonnées (qui peut être le titre de la base de données elle-même). Le \"document de métadonnées\" est le fichier de métadonnées (fichier XML ou JSON) qui est généré.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "metadata_information.idno",
+                            "title": "ID du document",
+                            "type": "string",
+                            "help_text": "Identifiant unique du document de métadonnées de la base de données. Cet identifiant doit être unique dans le catalogue où les métadonnées sont destinées à être publiées. Idéalement, l'identifiant devrait également être unique au niveau mondial. Ceci est différent de l'\"ID principal\" dans la section Description de la base de données \/ Instruction du titre, bien qu'il soit recommandé de générer des identifiants qui établissent une connexion claire entre ces deux identifiants. L'ID de document peut également inclure l'identifiant de version du document de métadonnées. Par exemple, si l'\"ID principal\" de la base de données des Indicateurs du développement dans le monde (WDI) - avril 2022 est \"WDI_2022-04, l'\"ID de document\" dans les informations de métadonnées pourrait être \"WB_WDI_2022-04\" si le les métadonnées sont produites par la Banque mondiale. Chaque organisation doit établir des règles systématiques pour générer de tels identifiants. Une règle de validation peut être définie (à l'aide d'une expression régulière) dans les modèles utilisateur pour appliquer un format d'identifiant spécifique. L'identifiant ne peut pas contenir d'espaces vides.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "metadata_information.producers",
+                            "title": "Producteurs de métadonnées",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "rules_": "required",
+                                    "prop_key": "metadata_information.producers.name",
+                                    "help_text": "Le nom de la personne ou de l'organisation qui a produit les métadonnées ou contribué à leur production.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbr",
+                                    "title": "Abbréviation",
+                                    "type": "string",
+                                    "prop_key": "metadata_information.producers.abbr",
+                                    "help_text": "L'abréviation (ou l'acronyme) de l'organisation référencée dans \"Nom\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "string",
+                                    "prop_key": "metadata_information.producers.affiliation",
+                                    "help_text": "L'affiliation de la personne ou de l'organisation mentionnée dans \"Nom\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Rôle",
+                                    "type": "string",
+                                    "prop_key": "metadata_information.producers.role",
+                                    "help_text": "Le rôle spécifique de la personne ou de l'organisation mentionnée dans \"Nom\" dans la production des métadonnées.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "is_recommended": true,
+                            "help_text": "Le producteur de métadonnées est la personne ou l'organisation ayant la responsabilité financière et\/ou administrative des processus par lesquels le document de métadonnées a été créé. Il s'agit d'un élément \"Recommandé\". Pour l'administration du catalogue, les informations sur le producteur et sur la date de production des métadonnées sont utiles."
+                        },
+                        {
+                            "key": "metadata_information.prod_date",
+                            "title": "Date de production",
+                            "type": "string",
+                            "is_recommended": true,
+                            "help_text": "La date à laquelle les métadonnées de cette base de données ont été produites (non diffusées ou archivées), de préférence saisie au format ISO 8601 (AAAA-MM-JJ ou AAAA-MM). Une règle de validation peut être définie dans les modèles utilisateur pour appliquer un format de date. Il s'agit d'un élément \"Recommandé\", car les informations sur le producteur et sur la date de production des métadonnées sont utiles à des fins d'administration du catalogue.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "metadata_information.version",
+                            "title": "Version",
+                            "type": "string",
+                            "help_text": "La version du document de métadonnées (pas la version de la base de données elle-même).",
+                            "display_type": "text"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "key": "database_description",
+            "title": "Description de la base de données",
+            "items": [
+                {
+                    "type": "section",
+                    "key": "database_description_titlestatement",
+                    "title": "Titre",
+                    "items": [
+                        {
+                            "key": "database_description.title_statement.idno",
+                            "title": "ID principal",
+                            "type": "string",
+                            "class": "required",
+                            "required": true,
+                            "rules": [],
+                            "is_required": true,
+                            "help_text": "Un identifiant unique de la base de données. Par exemple, la base de données des Indicateurs du développement dans le monde de la Banque mondiale publiée en avril 2020 pourrait avoir l'identifiant principal = \"WB_WDI_APR_2020\".\nL'\"ID principal\" (également appelé IDNO) est un numéro d'identification unique utilisé pour identifier la base de données. Un identifiant unique est requis à des fins de catalogage, cet élément est donc déclaré comme \"Obligatoire\". L'identifiant permettra aux utilisateurs de citer correctement la base de données. L'identifiant doit être unique dans le catalogue. Idéalement, il devrait également être unique au monde ; l'option recommandée consiste à obtenir un identificateur d'objet numérique (DOI) pour l'étude. Alternativement, l'\"ID principal\" peut être créé par une organisation à l'aide d'un schéma cohérent. Notez que le schéma vous permet de fournir plus d'un identifiant pour une même étude (dans l'élément \"Autres identifiants\"); un identifiant spécifique au catalogue n'est donc pas incompatible avec un identifiant global unique comme un DOI. Une règle de validation peut être définie (à l'aide d'une expression régulière) dans les modèles utilisateur pour appliquer un format d'ID spécifique. L'identifiant ne doit pas contenir d'espaces vides.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "database_description.identifiers",
+                            "title": "Autres identifiants",
+                            "type": "array",
+                            "help_text": "Cet élément répétable est utilisé pour saisir des identifiants (ID) autres que l'\"ID principal\" (IDNO). Il peut s'agir par exemple d'un Digital Object Identifier (DOI). L'\"ID principal\" peut être répété ici (l'\"ID principal\" ne fournit pas de paramètre \"Type\", donc si un DOI ou un autre type d'ID standard est utilisé comme identifiant principal, il est recommandé de répéter ici avec l'identification du type).",
+                            "props": [
+                                {
+                                    "key": "type",
+                                    "title": "Type",
+                                    "type": "string",
+                                    "help_text": "Le type d'identifiant. Par exemple : \"DOI\" ou \"ISBN\".",
+                                    "prop_key": "database_description.identifiers.type",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "identifier",
+                                    "title": "Identifiant",
+                                    "type": "string",
+                                    "prop_key": "database_description.identifiers.identifier",
+                                    "help_text": "L'identifiant lui-même.",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "database_description.title_statement.title",
+                            "type": "string",
+                            "title": "Titre",
+                            "is_required": true,
+                            "help_text": "Le titre est le nom sous lequel la base de données est officiellement connue. Assurez-vous d'utiliser un titre unique pour chaque base de données distincte (ou version de). Il est recommandé d'inclure l'année de production dans le titre (et éventuellement le mois, ou le trimestre, si une nouvelle version de la base de données est publiée plus d'une fois par an). Par exemple, « Indicateurs du développement dans le monde, avril 2020 ». Faites attention à l'utilisation cohérente des majuscules dans le titre.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "database_description.title_statement.sub_title",
+                            "type": "string",
+                            "title": "Sous-titre",
+                            "help_text": "Le sous-titre de la base de données peut être utilisé lorsqu'il est nécessaire de distinguer les caractéristiques d'une base de données. Cet élément sera rarement utilisé. Faites attention à l'utilisation cohérente des majuscules dans le sous-titre.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "database_description.title_statement.alternate_title",
+                            "type": "string",
+                            "title": "Titre alternatif",
+                            "help_text": "Il peut s'agir d'un acronyme ou d'un autre nom de la base de données. Par exemple, \"WDI avril 2020\".",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "database_description.title_statement.translated_title",
+                            "type": "string",
+                            "title": "Titre traduit",
+                            "help_text": "Le titre de la base de données dans une langue secondaire (si plus d'une autre langue, elles peuvent être saisies comme une seule chaîne, car cet élément n'est pas répétable). Les caractères spéciaux doivent être correctement affichés, tels que les accents et autres marques d'accentuation ou différents alphabets.",
+                            "display_type": "text"
+                        }
+                    ]
+                },
+                {
+                    "type": "section",
+                    "key": "database_description_overview",
+                    "title": "Description",
+                    "items": [
+                        {
+                            "key": "database_description.authoring_entity",
+                            "title": "Auteur\/producteur",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "prop_key": "database_description.authoring_entity.name",
+                                    "help_text": "Le nom de la personne ou de l'organisation qui gère le contenu de la base de données (back-end). Écrivez le nom au complet (utilisez l'élément \"Abréviation\" pour saisir l'acronyme de l'organisation, le cas échéant).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "string",
+                                    "prop_key": "database_description.authoring_entity.affiliation",
+                                    "help_text": "L'affiliation de la personne ou de l'organisation mentionnée dans \"Nom\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbreviation",
+                                    "title": "Abbréviation",
+                                    "type": "string",
+                                    "prop_key": "database_description.authoring_entity.abbreviation",
+                                    "help_text": "Nom abrégé (acronyme) de l'organisation mentionnée dans \"Nom\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "email",
+                                    "title": "E-mail",
+                                    "type": "string",
+                                    "prop_key": "database_description.authoring_entity.email",
+                                    "help_text": "Le contact e-mail public de la personne ou des organisations mentionnées dans le nom. Il est recommandé de fournir une adresse e-mail de compte de service, et non une adresse personnelle.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "database_description.authoring_entity.uri",
+                                    "help_text": "Un lien (URL) vers le site Web de l'entité mentionnée dans le nom.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "is_recommended": true,
+                            "is_required": false,
+                            "help_text": "Cet ensemble de cinq éléments est utilisé pour identifier la ou les organisations ou personnes qui sont les principaux producteurs\/conservateurs de la base de données. Notez qu'un élément similaire est disponible au niveau de l'indicateur\/de la série."
+                        },
+                        {
+                            "key": "database_description.abstract",
+                            "type": "string",
+                            "title": "Résumé",
+                            "help_text": "Le résumé est une brève description de la base de données. Il peut par exemple inclure une brève déclaration sur la portée et la couverture de la base de données (pas en détail, car d'autres champs sont disponibles à cette fin), les objectifs, l'historique et le public attendu.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "database_description.type",
+                            "type": "string",
+                            "title": "Type de base de données",
+                            "help_text": "Le type de base de données.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "database_description.date_created",
+                            "type": "string",
+                            "title": "Date de création",
+                            "help_text": "Il s'agit de la date à laquelle la base de données a été créée. La date doit être saisie au format ISO 8601 (AAAA-MM-JJ, ou AAAA-MM, ou AAAA).",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "database_description.date_published",
+                            "type": "string",
+                            "title": "Date de publication",
+                            "help_text": "Il s'agit de la date à laquelle la base de données a été rendue publique. La date doit être saisie au format ISO 8601 (AAAA-MM-JJ, ou AAAA-MM, ou AAAA).",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "database_description.version",
+                            "title": "Version",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "version",
+                                    "title": "Version",
+                                    "type": "string",
+                                    "prop_key": "database_description.version.version",
+                                    "help_text": "Un label pour la version. La spécification de la version sera déterminée par un conservateur ou un gestionnaire de données selon des conventions déterminées par l'auteur\/producteur.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "date",
+                                    "title": "Date de la version",
+                                    "type": "string",
+                                    "prop_key": "database_description.version.date",
+                                    "help_text": "La date de sortie de la version. La date doit être saisie au format ISO 8601 (AAAA-MM-JJ, ou AAAA-MM, ou AAAA).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "responsibility",
+                                    "title": "Responsabilité",
+                                    "type": "string",
+                                    "prop_key": "database_description.version.responsibility",
+                                    "help_text": "L'organisation ou la personne en charge de cette version de la base de données.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "notes",
+                                    "title": "Notes",
+                                    "type": "string",
+                                    "prop_key": "database_description.version.notes",
+                                    "help_text": "Informations complémentaires sur cette version de la base de données. Les notes peuvent par exemple être utilisées pour documenter en quoi cette version diffère des précédentes.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "Une base de données reste rarement statique; il sera régulièrement mis à jour et mis à jour. L'élément version est un élément composé et contient des informations importantes concernant la mise à jour de la base de données. Cela inclut toute extension de la base de données (ajout de nouvelles données de série), ajout de données existantes, correction de données existantes, etc."
+                        },
+                        {
+                            "key": "database_description.update_frequency",
+                            "type": "string",
+                            "title": "Fréquence de mise à jour",
+                            "help_text": "Indique à quelle fréquence la base de données est mise à jour (par exemple, « annuelle » ou « trimestrielle »). L'utilisation d'un vocabulaire contrôlé est recommandée. Si une base de données contient de nombreux indicateurs, la fréquence de mise à jour peut varier selon l'indicateur (par exemple, certains peuvent être mis à jour sur une base mensuelle ou trimestrielle tandis que d'autres ne sont mis à jour qu'une fois par an). Les informations fournies dans \"Fréquence de mise à jour\" correspondront à la fréquence de mise à jour des indicateurs les plus fréquemment mis à jour.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "database_description.update_schedule",
+                            "title": "Calendrier de mise à jour",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "update",
+                                    "title": "Mise à jour",
+                                    "type": "string",
+                                    "prop_key": "database_description.update_schedule.update",
+                                    "help_text": "Une description du calendrier des mises à jour ou une date saisie au format ISO 8601.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "Le calendrier de mise à jour est destiné à fournir aux utilisateurs des informations sur les mises à jour programmées. Il s'agit d'un champ répétable qui permet de saisir des dates précises, mais ces informations devront ensuite être régulièrement mises à jour. Souvent, une seule description sera utilisée, ce qui éviterait d'avoir à mettre à jour régulièrement les métadonnées. Par exemple, \"La base de données est mise à jour en janvier, avril, juillet, octobre de chaque année.\""
+                        },
+                        {
+                            "key": "database_description.languages",
+                            "type": "array",
+                            "title": "Langues",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "prop_key": "database_description.languages.name",
+                                    "help_text": "Le nom officiel de la langue prise en charge ; il est recommandé d'utiliser un nom de la liste des noms de langue ISO 639-1.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "code",
+                                    "title": "Code",
+                                    "type": "string",
+                                    "prop_key": "database_description.languages.code",
+                                    "help_text": "Le code de la langue mentionnée dans \"Nom\", de préférence le code ISO 639-1 à trois lettres.",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Cet ensemble d'éléments est fourni pour répertorier les langues prises en charge dans la base de données."
+                        },
+                        {
+                            "key": "database_description.themes",
+                            "type": "array",
+                            "title": "Thèmes",
+                            "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "string",
+                                    "prop_key": "database_description.themes.id",
+                                    "help_text": "L'identifiant unique du thème. Il peut s'agir d'un numéro séquentiel, ou de l'identifiant du thème dans un vocabulaire contrôlé.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "name",
+                                    "title": "Thème",
+                                    "type": "string",
+                                    "prop_key": "database_description.themes.name",
+                                    "help_text": "Libellé du thème associé aux données.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "title": "ID parent",
+                                    "type": "string",
+                                    "prop_key": "database_description.themes.parent_id",
+                                    "help_text": "Lorsqu'un vocabulaire contrôlé hiérarchique (imbriqué) est utilisé, le champ \"ID parent\" peut être utilisé pour indiquer un thème de niveau supérieur auquel ce thème appartient.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulaire",
+                                    "type": "string",
+                                    "prop_key": "database_description.themes.vocabulary",
+                                    "help_text": "Le nom du vocabulaire contrôlé utilisé, le cas échéant.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "database_description.themes.uri",
+                                    "help_text": "Un lien vers le vocabulaire contrôlé mentionné dans le champ \"vocabulaire\".",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Les thèmes donnent une idée générale de la recherche qui pourrait guider la création et\/ou la demande de la série. Un thème est large et est probablement également soumis à une définition ou à une liste basée sur la communauté. Un vocabulaire contrôlé doit être utilisé. Cet élément sera rarement utilisé (l'élément \"Sujets\" sera utilisé plus souvent)."
+                        },
+                        {
+                            "key": "database_description.topics",
+                            "type": "array",
+                            "title": "Sujets",
+                            "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "string",
+                                    "prop_key": "database_description.topics.id",
+                                    "help_text": "L'identifiant unique de la rubrique. Il peut s'agir d'un numéro séquentiel ou de l'identifiant du sujet dans un vocabulaire contrôlé.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "name",
+                                    "title": "Sujet",
+                                    "type": "string",
+                                    "prop_key": "database_description.topics.name",
+                                    "help_text": "Libellé de la rubrique associée aux données.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "title": "ID parent",
+                                    "help_text": "Lorsqu'un vocabulaire contrôlé hiérarchique (imbriqué) est utilisé, le champ \"ID parent\" peut être utilisé pour indiquer un sujet de niveau supérieur auquel appartient ce sujet.",
+                                    "type": "string",
+                                    "prop_key": "database_description.topics.parent_id",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulaire",
+                                    "type": "string",
+                                    "prop_key": "database_description.topics.vocabulary",
+                                    "help_text": "Le nom du vocabulaire contrôlé utilisé, le cas échéant.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "database_description.topics.uri",
+                                    "help_text": "Un lien vers le vocabulaire contrôlé mentionné dans le champ \"vocabulaire\".",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Le champ des sujets indique le ou les grands sujets de fond couverts par l'indicateur\/la série. Une classification thématique facilite le référencement et les recherches dans les catalogues électroniques d'enquêtes. Les sujets doivent être sélectionnés à partir d'un vocabulaire contrôlé standard tel que la classification des sujets du Conseil européen des archives de données en sciences sociales (CESSDA)."
+                        },
+                        {
+                            "key": "database_description.keywords",
+                            "type": "array",
+                            "title": "Mots clés",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Mot clé",
+                                    "type": "string",
+                                    "prop_key": "database_description.keywords.name",
+                                    "help_text": "Un mot-clé (ou une expression).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulaire",
+                                    "type": "string",
+                                    "prop_key": "database_description.keywords.vocabulary",
+                                    "help_text": "Le nom du vocabulaire contrôlé dont le mot-clé a été extrait, le cas échéant.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "database_description.keywords.uri",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "help_text": "L'URL du vocabulaire contrôlé utilisé, le cas échéant.",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Mots ou expressions qui décrivent les aspects saillants du contenu d'une collection de données. Cela peut être utilisé pour créer des index de mots-clés et à des fins de classification et de récupération. Les mots-clés peuvent être sélectionnés à partir d'un thésaurus standard, de préférence un thésaurus international multilingue. La liste de mots-clés peut comprendre des mots-clés extraits d'un ou plusieurs vocabulaires contrôlés et des mots-clés définis par l'utilisateur.",
+                            "is_recommended": true
+                        },
+                        {
+                            "key": "database_description.dimensions",
+                            "title": "Dimensions",
+                            "help_text": "Les dimensions disponibles pour la série incluse dans la base de données. Par exemple, \"pays, année\".",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "help_text": "Le nom de la dimension.",
+                                    "prop_key": "database_description.dimensions.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "label",
+                                    "title": "Label",
+                                    "type": "string",
+                                    "prop_key": "database_description.dimensions.label",
+                                    "display_type": "text",
+                                    "help_text": "Un label pour la dimension."
+                                }
+                            ]
+                        },
+                        {
+                            "key": "database_description.sponsors",
+                            "title": "Sponsors",
+                            "help_text": "La ou les sources de financement pour la production et la maintenance de la base de données. Si différentes agences de financement ont parrainé différentes étapes du développement de la base de données, utilisez l'attribut de rôle pour distinguer leurs contributions respectives.",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "help_text": "Nom de l'organisme de financement\/sponsor.",
+                                    "prop_key": "database_description.sponsors.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbreviation",
+                                    "title": "Abbréviation",
+                                    "type": "string",
+                                    "prop_key": "database_description.sponsors.abbreviation",
+                                    "help_text": "Abréviation de l'agence de financement\/sponsor mentionnée dans \"Nom\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Rôle",
+                                    "type": "string",
+                                    "help_text": "Le rôle de l'agence de financement\/sponsor mentionné dans \"Nom\".",
+                                    "prop_key": "database_description.sponsors.role",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "grant",
+                                    "title": "Don",
+                                    "type": "string",
+                                    "prop_key": "database_description.sponsors.grant",
+                                    "help_text": "Numéro de subvention ou de don. Si une agence a fourni plus d'une subvention, énumérez toutes les subventions séparées par un « ; ».",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "database_description.sponsors.uri",
+                                    "help_text": "URL de l'agence sponsor mentionnée dans \"Nom\".",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "database_description.acknowledgments",
+                            "title": "Remerciements",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "help_text": "Le nom de la personne ou de l'agence reconnue pour avoir soutenu la base de données.",
+                                    "prop_key": "database_description.acknowledgments.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "string",
+                                    "prop_key": "database_description.acknowledgments.affiliation",
+                                    "help_text": "Affiliation de la personne ou de l'agence reconnue ou reconnue pour soutenir la base de données.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Rôle",
+                                    "type": "string",
+                                    "help_text": "Rôle de la personne ou de l'agence reconnue ou reconnue pour avoir soutenu la base de données.",
+                                    "prop_key": "database_description.acknowledgments.role",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "database_description.acknowledgments.uri",
+                                    "help_text": "URL du site Web ou e-mail de la personne ou de l'organisation reconnue ou reconnue pour son soutien à la base de données.",
+                                    "display_type": "text",
+                                    "rules": {
+                                        "is_uri": true
+                                    }
+                                }
+                            ],
+                            "help_text": "Une liste détaillée des personnes et\/ou organisations autres que les sponsors et contributeurs déjà mentionnés dans les éléments de métadonnées contributeurs et sponsors dont la contribution à la base de données doit être reconnue. REMARQUE : Un autre élément (\"Déclaration de remerciements\") est disponible comme alternative à cette liste détaillée d'accusés de réception."
+                        },
+                        {
+                            "key": "database_description.acknowledgment_statement",
+                            "type": "string",
+                            "title": "Déclaration de remerciements",
+                            "help_text": "Une déclaration globale de reconnaissance, qui peut être utilisée comme alternative (ou complément) à la liste détaillée fournie dans \"Remerciements\".",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "database_description.contacts",
+                            "title": "Contacts",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "prop_key": "database_description.contacts.name",
+                                    "help_text": "Le nom de la personne de contact à contacter. Au lieu du nom d'un individu (qui serait sujet à changement et nécessiterait une mise à jour fréquente des métadonnées), un titre peut être fourni ici (par exemple, \"data helpdesk\").",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Rôle",
+                                    "type": "string",
+                                    "prop_key": "database_description.contacts.role",
+                                    "help_text": "Le rôle spécifique de la personne de contact mentionnée dans \"Nom\". Ceci sera utilisé lorsque plusieurs contacts sont répertoriés et est destiné à aider les utilisateurs à adresser leurs questions et demandes à la bonne personne de contact.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "string",
+                                    "prop_key": "database_description.contacts.affiliation",
+                                    "help_text": "L'organisation ou l'affiliation de la personne de contact mentionnée dans \"Nom\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "email",
+                                    "title": "E-mail",
+                                    "type": "string",
+                                    "prop_key": "database_description.contacts.email",
+                                    "help_text": "L'adresse e-mail de la personne ou de l'organisation mentionnée dans \"Nom\". Évitez d'utiliser des comptes de messagerie personnels ; l'utilisation d'un e-mail anonyme est recommandée (par exemple, \"helpdesk@….org\")",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "telephone",
+                                    "title": "Téléphone",
+                                    "type": "string",
+                                    "prop_key": "database_description.contacts.telephone",
+                                    "help_text": "Le numéro de téléphone de la personne ou de l'organisation mentionnée dans \"Nom\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "database_description.contacts.uri",
+                                    "help_text": "L'URL de l'agence (généralement, une URL vers une page Web \"contactez-nous\")",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "L'élément contacts fournit l'interface publique pour les questions associées au développement et à la maintenance de la base de données. Il pourrait y avoir divers contacts fournis en fonction de l'organisation."
+                        },
+                        {
+                            "key": "database_description.errata",
+                            "type": "array",
+                            "title": "Errata",
+                            "props": [
+                                {
+                                    "key": "type",
+                                    "title": "Date",
+                                    "type": "string",
+                                    "prop_key": "database_description.errata.type",
+                                    "help_text": "La date à laquelle l'erratum a été publié.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "string",
+                                    "prop_key": "database_description.errata.description",
+                                    "help_text": "Une description de l'erreur et des mesures prises pour y remédier.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "Une liste d'errata au niveau de la base de données. Notez qu'un élément \"errata\" est également disponible dans le schéma utilisé pour la description des indicateurs\/séries."
+                        },
+                        {
+                            "key": "database_description.notes",
+                            "title": "Notes",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "note",
+                                    "title": "Note",
+                                    "type": "string",
+                                    "prop_key": "database_description.notes.note",
+                                    "help_text": "Une note en texte libre.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "Cet élément est fourni pour ajouter des notes pertinentes pour décrire la base de données, qui ne peuvent pas être fournies dans d'autres éléments de métadonnées."
+                        }
+                    ]
+                },
+                {
+                    "key": "database_description1674836265628",
+                    "title": "Couverture géographique",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "database_description.ref_country",
+                            "type": "array",
+                            "title": "Pays",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "prop_key": "database_description.ref_country.name",
+                                    "help_text": "Le nom du pays.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "code",
+                                    "title": "Code",
+                                    "type": "string",
+                                    "prop_key": "database_description.ref_country.code",
+                                    "help_text": "Le code du pays. L'utilisation des codes ISO 3166-1 alpha-3 est recommandée.",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Une liste des pays pour lesquels des données sont disponibles dans la base de données. Cet élément est quelque peu redondant avec l'élément \"Zones géographiques\". La liste des pays doit être saisie dans \"Pays\".",
+                            "is_recommended": true,
+                            "enum": [
+                                {
+                                    "code": "AFG",
+                                    "name": "Afghanistan"
+                                },
+                                {
+                                    "code": "AFE",
+                                    "name": "Afrique de l'Est et du Sud"
+                                },
+                                {
+                                    "code": "AFW",
+                                    "name": "Afrique de l'Ouest et centrale"
+                                },
+                                {
+                                    "code": "NAF",
+                                    "name": "Afrique du Nord"
+                                },
+                                {
+                                    "code": "ZAF",
+                                    "name": "Afrique du Sud"
+                                },
+                                {
+                                    "code": "AFR",
+                                    "name": "Afrique subsaharienne"
+                                },
+                                {
+                                    "code": "SSF",
+                                    "name": "Afrique subsaharienne"
+                                },
+                                {
+                                    "code": "CAA",
+                                    "name": "Afrique subsaharienne (classification IFC)"
+                                },
+                                {
+                                    "code": "DSS",
+                                    "name": "Afrique subsaharienne (pays éligibles IDA)"
+                                },
+                                {
+                                    "code": "BSS",
+                                    "name": "Afrique subsaharienne (pays IBRD uniquement)"
+                                },
+                                {
+                                    "code": "TSS",
+                                    "name": "Afrique subsaharienne (pays IDA & IBRD)"
+                                },
+                                {
+                                    "code": "SXZ",
+                                    "name": "Afrique subsaharienne (sauf Afrique du Sud)"
+                                },
+                                {
+                                    "code": "SSA",
+                                    "name": "Afrique subsaharienne (sauf revenu élevé)"
+                                },
+                                {
+                                    "code": "XZN",
+                                    "name": "Afrique subsaharienne sauf Afrique du Sud et Nigéria"
+                                },
+                                {
+                                    "code": "ALB",
+                                    "name": "Albanie"
+                                },
+                                {
+                                    "code": "DZA",
+                                    "name": "Algérie"
+                                },
+                                {
+                                    "code": "DEU",
+                                    "name": "Allemagne"
+                                },
+                                {
+                                    "code": "ASM",
+                                    "name": "American Samoa"
+                                },
+                                {
+                                    "code": "NAC",
+                                    "name": "Amérique du Nord"
+                                },
+                                {
+                                    "code": "LCN",
+                                    "name": "Amérique latine & Caraïbes "
+                                },
+                                {
+                                    "code": "BLA",
+                                    "name": "Amerique latine & Caraïbes (pays IBRD uniquement)"
+                                },
+                                {
+                                    "code": "LAC",
+                                    "name": "Amérique latine & Caraïbes (sauf revenus élevés)"
+                                },
+                                {
+                                    "code": "CLA",
+                                    "name": "Amérique latine et Caraïbes (classification IFC )"
+                                },
+                                {
+                                    "code": "DLA",
+                                    "name": "Amérique latine et Caraïbes (pays éligibles IDA)"
+                                },
+                                {
+                                    "code": "TLA",
+                                    "name": "Amérique latine et Caraïbes (pays IDA & IBRD)"
+                                },
+                                {
+                                    "code": "AND",
+                                    "name": "Andorre"
+                                },
+                                {
+                                    "code": "AGO",
+                                    "name": "Angola"
+                                },
+                                {
+                                    "code": "ATG",
+                                    "name": "Antigua and Barbuda"
+                                },
+                                {
+                                    "code": "SAU",
+                                    "name": "Arabie saoudite"
+                                },
+                                {
+                                    "code": "ARG",
+                                    "name": "Argentine"
+                                },
+                                {
+                                    "code": "ARM",
+                                    "name": "Arménie"
+                                },
+                                {
+                                    "code": "ABW",
+                                    "name": "Aruba"
+                                },
+                                {
+                                    "code": "EAS",
+                                    "name": "Asie de l'Est & Pacifique"
+                                },
+                                {
+                                    "code": "DEA",
+                                    "name": "Asie de l'Est & Pacifique (pays éligibles IDA)"
+                                },
+                                {
+                                    "code": "BEA",
+                                    "name": "Asie de l'Est & Pacifique (pays IBRD uniquement)"
+                                },
+                                {
+                                    "code": "TEA",
+                                    "name": "Asie de l'Est & Pacifique (pays IDA & IBRD)"
+                                },
+                                {
+                                    "code": "EAP",
+                                    "name": "Asie de l'Est & Pacifique (sauf haut revenu)"
+                                },
+                                {
+                                    "code": "CEA",
+                                    "name": "Asie de l'Est et Pacifique (classification IFC )"
+                                },
+                                {
+                                    "code": "SAS",
+                                    "name": "Asie du Sud"
+                                },
+                                {
+                                    "code": "CSA",
+                                    "name": "Asie du Sud (classification IFC) "
+                                },
+                                {
+                                    "code": "TSA",
+                                    "name": "Asie du Sud (IDA & IBRD)"
+                                },
+                                {
+                                    "code": "DSA",
+                                    "name": "Asie du Sud (pays éligibles IDA)"
+                                },
+                                {
+                                    "code": "AUS",
+                                    "name": "Australie"
+                                },
+                                {
+                                    "code": "OSS",
+                                    "name": "Autres petits états"
+                                },
+                                {
+                                    "code": "AUT",
+                                    "name": "Autriche"
+                                },
+                                {
+                                    "code": "AZE",
+                                    "name": "Azerbaijan"
+                                },
+                                {
+                                    "code": "BHS",
+                                    "name": "Bahamas"
+                                },
+                                {
+                                    "code": "BHR",
+                                    "name": "Bahrein"
+                                },
+                                {
+                                    "code": "BGD",
+                                    "name": "Bangladesh"
+                                },
+                                {
+                                    "code": "BRB",
+                                    "name": "Barbade"
+                                },
+                                {
+                                    "code": "BLR",
+                                    "name": "Bélarus"
+                                },
+                                {
+                                    "code": "BEL",
+                                    "name": "Belgique"
+                                },
+                                {
+                                    "code": "BLZ",
+                                    "name": "Belize"
+                                },
+                                {
+                                    "code": "BEN",
+                                    "name": "Bénin"
+                                },
+                                {
+                                    "code": "BMU",
+                                    "name": "Bermudes"
+                                },
+                                {
+                                    "code": "BTN",
+                                    "name": "Bhoutan"
+                                },
+                                {
+                                    "code": "BOL",
+                                    "name": "Bolivie"
+                                },
+                                {
+                                    "code": "BIH",
+                                    "name": "Bosnie-Herzégovine"
+                                },
+                                {
+                                    "code": "BWA",
+                                    "name": "Botswana"
+                                },
+                                {
+                                    "code": "BRA",
+                                    "name": "Brésil"
+                                },
+                                {
+                                    "code": "BRN",
+                                    "name": "Brunéi Darussalam"
+                                },
+                                {
+                                    "code": "BGR",
+                                    "name": "Bulgarie"
+                                },
+                                {
+                                    "code": "BFA",
+                                    "name": "Burkina Faso"
+                                },
+                                {
+                                    "code": "BDI",
+                                    "name": "Burundi"
+                                },
+                                {
+                                    "code": "CPV",
+                                    "name": "Cabo Verde"
+                                },
+                                {
+                                    "code": "KHM",
+                                    "name": "Cambodge"
+                                },
+                                {
+                                    "code": "CMR",
+                                    "name": "Cameroun"
+                                },
+                                {
+                                    "code": "CAN",
+                                    "name": "Canada"
+                                },
+                                {
+                                    "code": "CHL",
+                                    "name": "Chili"
+                                },
+                                {
+                                    "code": "CHN",
+                                    "name": "Chine"
+                                },
+                                {
+                                    "code": "HKG",
+                                    "name": "Chine, RAS de Hong Kong"
+                                },
+                                {
+                                    "code": "CYP",
+                                    "name": "Chypre"
+                                },
+                                {
+                                    "code": "COL",
+                                    "name": "Colombie"
+                                },
+                                {
+                                    "code": "COM",
+                                    "name": "Comores"
+                                },
+                                {
+                                    "code": "COG",
+                                    "name": "Congo, République"
+                                },
+                                {
+                                    "code": "COD",
+                                    "name": "Congo, République démocratique"
+                                },
+                                {
+                                    "code": "KOR",
+                                    "name": "Corée, République de"
+                                },
+                                {
+                                    "code": "PRK",
+                                    "name": "Corée, République démocratique de"
+                                },
+                                {
+                                    "code": "CRI",
+                                    "name": "Costa Rica"
+                                },
+                                {
+                                    "code": "CIV",
+                                    "name": "Côte d'Ivoire"
+                                },
+                                {
+                                    "code": "HRV",
+                                    "name": "Croatie"
+                                },
+                                {
+                                    "code": "CUB",
+                                    "name": "Cuba"
+                                },
+                                {
+                                    "code": "CUW",
+                                    "name": "Curaçao"
+                                },
+                                {
+                                    "code": "DNK",
+                                    "name": "Danemark"
+                                },
+                                {
+                                    "code": "LTE",
+                                    "name": "Dividende démographique tardif"
+                                },
+                                {
+                                    "code": "DJI",
+                                    "name": "Djibouti"
+                                },
+                                {
+                                    "code": "DMA",
+                                    "name": "Dominique"
+                                },
+                                {
+                                    "code": "EGY",
+                                    "name": "Egypte, République arabe d'"
+                                },
+                                {
+                                    "code": "SLV",
+                                    "name": "El Salvador"
+                                },
+                                {
+                                    "code": "ARE",
+                                    "name": "Emirats arabes unis"
+                                },
+                                {
+                                    "code": "ECU",
+                                    "name": "Equateur"
+                                },
+                                {
+                                    "code": "ERI",
+                                    "name": "Erythrée"
+                                },
+                                {
+                                    "code": "ESP",
+                                    "name": "Espagne"
+                                },
+                                {
+                                    "code": "EST",
+                                    "name": "Estonie"
+                                },
+                                {
+                                    "code": "SWZ",
+                                    "name": "Eswatini"
+                                },
+                                {
+                                    "code": "USA",
+                                    "name": "Etats-Unis"
+                                },
+                                {
+                                    "code": "ETH",
+                                    "name": "Ethiopie"
+                                },
+                                {
+                                    "code": "ECS",
+                                    "name": "Europe & Asie centrale"
+                                },
+                                {
+                                    "code": "DEC",
+                                    "name": "Europe & Asie centrale (pays éligibles IDA)"
+                                },
+                                {
+                                    "code": "BEC",
+                                    "name": "Europe & Asie centrale (pays IBRD uniquement)"
+                                },
+                                {
+                                    "code": "TEC",
+                                    "name": "Europe & Asie centrale (pays IDA & IBRD)"
+                                },
+                                {
+                                    "code": "ECA",
+                                    "name": "Europe & Asie centrale (sauf haut revenu)"
+                                },
+                                {
+                                    "code": "CEB",
+                                    "name": "Europe centrale et pays baltes"
+                                },
+                                {
+                                    "code": "CEU",
+                                    "name": "Europe et Asie centrale (classification IFC )"
+                                },
+                                {
+                                    "code": "LIC",
+                                    "name": "Faible revenu"
+                                },
+                                {
+                                    "code": "RUS",
+                                    "name": "Fédération de Russie"
+                                },
+                                {
+                                    "code": "FJI",
+                                    "name": "Fiji"
+                                },
+                                {
+                                    "code": "FIN",
+                                    "name": "Finlande"
+                                },
+                                {
+                                    "code": "FRA",
+                                    "name": "France"
+                                },
+                                {
+                                    "code": "GAB",
+                                    "name": "Gabon"
+                                },
+                                {
+                                    "code": "GMB",
+                                    "name": "Gambie"
+                                },
+                                {
+                                    "code": "GEO",
+                                    "name": "Georgie"
+                                },
+                                {
+                                    "code": "GHA",
+                                    "name": "Ghana"
+                                },
+                                {
+                                    "code": "GIB",
+                                    "name": "Gibraltar"
+                                },
+                                {
+                                    "code": "GRC",
+                                    "name": "Grèce"
+                                },
+                                {
+                                    "code": "GRD",
+                                    "name": "Grenade"
+                                },
+                                {
+                                    "code": "GRL",
+                                    "name": "Groenland"
+                                },
+                                {
+                                    "code": "GUM",
+                                    "name": "Guam"
+                                },
+                                {
+                                    "code": "GTM",
+                                    "name": "Guatemala"
+                                },
+                                {
+                                    "code": "GIN",
+                                    "name": "Guinée"
+                                },
+                                {
+                                    "code": "GNQ",
+                                    "name": "Guinée équatoriale"
+                                },
+                                {
+                                    "code": "GNB",
+                                    "name": "Guinée-Bissau"
+                                },
+                                {
+                                    "code": "GUY",
+                                    "name": "Guyane"
+                                },
+                                {
+                                    "code": "HTI",
+                                    "name": "Haïti"
+                                },
+                                {
+                                    "code": "HND",
+                                    "name": "Honduras"
+                                },
+                                {
+                                    "code": "HUN",
+                                    "name": "Hongrie"
+                                },
+                                {
+                                    "code": "IBD",
+                                    "name": "IBRD uniquement"
+                                },
+                                {
+                                    "code": "IBB",
+                                    "name": "IBRD, y compris mélange"
+                                },
+                                {
+                                    "code": "IDB",
+                                    "name": "IDA "
+                                },
+                                {
+                                    "code": "IBT",
+                                    "name": "IDA & IBRD total"
+                                },
+                                {
+                                    "code": "IDA",
+                                    "name": "IDA total"
+                                },
+                                {
+                                    "code": "IDX",
+                                    "name": "IDA uniquement"
+                                },
+                                {
+                                    "code": "IMN",
+                                    "name": "Ile de Man"
+                                },
+                                {
+                                    "code": "CHI",
+                                    "name": "Iles anglo-normandes"
+                                },
+                                {
+                                    "code": "CYM",
+                                    "name": "Iles Cayman "
+                                },
+                                {
+                                    "code": "FRO",
+                                    "name": "Iles Féroé "
+                                },
+                                {
+                                    "code": "MHL",
+                                    "name": "Iles Marshall "
+                                },
+                                {
+                                    "code": "SLB",
+                                    "name": "Iles Salomon "
+                                },
+                                {
+                                    "code": "TCA",
+                                    "name": "Iles Turks et Caicos "
+                                },
+                                {
+                                    "code": "VIR",
+                                    "name": "Iles Vierges (U.S.)"
+                                },
+                                {
+                                    "code": "VGB",
+                                    "name": "Iles Vierges britanniques"
+                                },
+                                {
+                                    "code": "IND",
+                                    "name": "Inde"
+                                },
+                                {
+                                    "code": "IDN",
+                                    "name": "Indonésie"
+                                },
+                                {
+                                    "code": "IRN",
+                                    "name": "Iran, République islamique d'"
+                                },
+                                {
+                                    "code": "IRQ",
+                                    "name": "Iraq"
+                                },
+                                {
+                                    "code": "IRL",
+                                    "name": "Irlande"
+                                },
+                                {
+                                    "code": "ISL",
+                                    "name": "Islande"
+                                },
+                                {
+                                    "code": "ISR",
+                                    "name": "Israël"
+                                },
+                                {
+                                    "code": "ITA",
+                                    "name": "Italie"
+                                },
+                                {
+                                    "code": "JAM",
+                                    "name": "Jamaique"
+                                },
+                                {
+                                    "code": "JPN",
+                                    "name": "Japon"
+                                },
+                                {
+                                    "code": "JOR",
+                                    "name": "Jordanie"
+                                },
+                                {
+                                    "code": "KAZ",
+                                    "name": "Kazakhstan"
+                                },
+                                {
+                                    "code": "KEN",
+                                    "name": "Kenya"
+                                },
+                                {
+                                    "code": "KIR",
+                                    "name": "Kiribati"
+                                },
+                                {
+                                    "code": "XKX",
+                                    "name": "Kosovo"
+                                },
+                                {
+                                    "code": "KWT",
+                                    "name": "Koweït"
+                                },
+                                {
+                                    "code": "LVA",
+                                    "name": "Latvie"
+                                },
+                                {
+                                    "code": "LSO",
+                                    "name": "Lesotho"
+                                },
+                                {
+                                    "code": "LBN",
+                                    "name": "Liban"
+                                },
+                                {
+                                    "code": "LBR",
+                                    "name": "Libéria"
+                                },
+                                {
+                                    "code": "LBY",
+                                    "name": "Libye"
+                                },
+                                {
+                                    "code": "LIE",
+                                    "name": "Liechtenstein"
+                                },
+                                {
+                                    "code": "LTU",
+                                    "name": "Lituanie"
+                                },
+                                {
+                                    "code": "LUX",
+                                    "name": "Luxembourg"
+                                },
+                                {
+                                    "code": "MKD",
+                                    "name": "Macédoine du Nord"
+                                },
+                                {
+                                    "code": "MDG",
+                                    "name": "Madagascar"
+                                },
+                                {
+                                    "code": "MYS",
+                                    "name": "Malaisie"
+                                },
+                                {
+                                    "code": "MWI",
+                                    "name": "Malawi"
+                                },
+                                {
+                                    "code": "MDV",
+                                    "name": "Maldives"
+                                },
+                                {
+                                    "code": "MLI",
+                                    "name": "Mali"
+                                },
+                                {
+                                    "code": "MLT",
+                                    "name": "Malte"
+                                },
+                                {
+                                    "code": "MNP",
+                                    "name": "Mariannes"
+                                },
+                                {
+                                    "code": "MAR",
+                                    "name": "Maroc"
+                                },
+                                {
+                                    "code": "MUS",
+                                    "name": "Maurice"
+                                },
+                                {
+                                    "code": "MRT",
+                                    "name": "Mauritanie"
+                                },
+                                {
+                                    "code": "OED",
+                                    "name": "Membres OECD "
+                                },
+                                {
+                                    "code": "MEX",
+                                    "name": "Mexique"
+                                },
+                                {
+                                    "code": "FSM",
+                                    "name": "Micronésie, Etats fédérés de"
+                                },
+                                {
+                                    "code": "MDA",
+                                    "name": "Moldavie"
+                                },
+                                {
+                                    "code": "MCO",
+                                    "name": "Monaco"
+                                },
+                                {
+                                    "code": "WLD",
+                                    "name": "Monde"
+                                },
+                                {
+                                    "code": "ARB",
+                                    "name": "Monde arabe"
+                                },
+                                {
+                                    "code": "MNG",
+                                    "name": "Mongolie"
+                                },
+                                {
+                                    "code": "MNE",
+                                    "name": "Monténégro"
+                                },
+                                {
+                                    "code": "MDE",
+                                    "name": "Moyen Orient (en développement)"
+                                },
+                                {
+                                    "code": "DMN",
+                                    "name": "Moyen orient & Afrique du Nord (pays éligibles IDA)"
+                                },
+                                {
+                                    "code": "BMN",
+                                    "name": "Moyen Orient & Afrique du Nord (pays IBRD uniquement)"
+                                },
+                                {
+                                    "code": "MEA",
+                                    "name": "Moyen Orient et Afrique du Nord"
+                                },
+                                {
+                                    "code": "CME",
+                                    "name": "Moyen Orient et Afrique du Nord (classification IFC )"
+                                },
+                                {
+                                    "code": "TMN",
+                                    "name": "Moyen Orient et Afrique du Nord (pays IDA & IBRD)"
+                                },
+                                {
+                                    "code": "MNA",
+                                    "name": "Moyen Orient et Afrique du Nord (sauf revenu élevé)"
+                                },
+                                {
+                                    "code": "MOZ",
+                                    "name": "Mozambique"
+                                },
+                                {
+                                    "code": "MMR",
+                                    "name": "Myanmar"
+                                },
+                                {
+                                    "code": "NAM",
+                                    "name": "Namibie"
+                                },
+                                {
+                                    "code": "NRU",
+                                    "name": "Nauru"
+                                },
+                                {
+                                    "code": "NPL",
+                                    "name": "Népal"
+                                },
+                                {
+                                    "code": "NIC",
+                                    "name": "Nicaragua"
+                                },
+                                {
+                                    "code": "NER",
+                                    "name": "Niger"
+                                },
+                                {
+                                    "code": "NGA",
+                                    "name": "Nigéria"
+                                },
+                                {
+                                    "code": "INX",
+                                    "name": "Non classifié"
+                                },
+                                {
+                                    "code": "NOR",
+                                    "name": "Norvège"
+                                },
+                                {
+                                    "code": "NCL",
+                                    "name": "Nouvelle Calédonie"
+                                },
+                                {
+                                    "code": "NZL",
+                                    "name": "Nouvelle Zélande"
+                                },
+                                {
+                                    "code": "OMN",
+                                    "name": "Oman"
+                                },
+                                {
+                                    "code": "UZB",
+                                    "name": "Ouzbékistan"
+                                },
+                                {
+                                    "code": "PAK",
+                                    "name": "Pakistan"
+                                },
+                                {
+                                    "code": "PLW",
+                                    "name": "Palau"
+                                },
+                                {
+                                    "code": "PAN",
+                                    "name": "Panama"
+                                },
+                                {
+                                    "code": "PNG",
+                                    "name": "Papouasie Nouvelle Guinée"
+                                },
+                                {
+                                    "code": "PRY",
+                                    "name": "Paraguay"
+                                },
+                                {
+                                    "code": "SST",
+                                    "name": "Patits états"
+                                },
+                                {
+                                    "code": "NRS",
+                                    "name": "Pays d'Afrique subsaharienne pauvres en resources"
+                                },
+                                {
+                                    "code": "RRS",
+                                    "name": "Pays d'Afrique subsaharienne riches en resources"
+                                },
+                                {
+                                    "code": "EAR",
+                                    "name": "Pays de dividende démographique précoce "
+                                },
+                                {
+                                    "code": "FCS",
+                                    "name": "Pays en situation fragile ou de conflit"
+                                },
+                                {
+                                    "code": "BHI",
+                                    "name": "Pays IBRD à haut revenu"
+                                },
+                                {
+                                    "code": "FXS",
+                                    "name": "Pays IDA classifiés comme étant en situation fragiles, hors Afrique subsaharienne"
+                                },
+                                {
+                                    "code": "DSF",
+                                    "name": "Pays IDA d'Afrique subsaharienne classifiés en situation fragile"
+                                },
+                                {
+                                    "code": "DNS",
+                                    "name": "Pays IDA d'Afrique subsaharienne non classifiés en situation fragile"
+                                },
+                                {
+                                    "code": "DFS",
+                                    "name": "Pays IDA en situation fragile"
+                                },
+                                {
+                                    "code": "DNF",
+                                    "name": "Pays IDA non classifiés en situation fragile"
+                                },
+                                {
+                                    "code": "NXS",
+                                    "name": "Pays IDA non-classifiés comme fragiles, sauf Afrique subsaharienne"
+                                },
+                                {
+                                    "code": "LDC",
+                                    "name": "Pays les moins développés: classification NU"
+                                },
+                                {
+                                    "code": "HPC",
+                                    "name": "Pays très endettés (HIPC)"
+                                },
+                                {
+                                    "code": "NLD",
+                                    "name": "Pays-Bas"
+                                },
+                                {
+                                    "code": "PER",
+                                    "name": "Pérou"
+                                },
+                                {
+                                    "code": "CSS",
+                                    "name": "Petits états des Caraïbes"
+                                },
+                                {
+                                    "code": "PSS",
+                                    "name": "Petits états insulaires du Pacifique"
+                                },
+                                {
+                                    "code": "PHL",
+                                    "name": "Philippines"
+                                },
+                                {
+                                    "code": "POL",
+                                    "name": "Pologne"
+                                },
+                                {
+                                    "code": "PYF",
+                                    "name": "Polynésie française"
+                                },
+                                {
+                                    "code": "PRI",
+                                    "name": "Porto Rico"
+                                },
+                                {
+                                    "code": "PRT",
+                                    "name": "Portugal"
+                                },
+                                {
+                                    "code": "PST",
+                                    "name": "Post-dividende démographique "
+                                },
+                                {
+                                    "code": "PRE",
+                                    "name": "Pré-dividende démographique "
+                                },
+                                {
+                                    "code": "QAT",
+                                    "name": "Qatar"
+                                },
+                                {
+                                    "code": "MAC",
+                                    "name": "Région adminisrative spéciale de Macao, Chine"
+                                },
+                                {
+                                    "code": "SYR",
+                                    "name": "République arabe syrienne"
+                                },
+                                {
+                                    "code": "CAF",
+                                    "name": "République centrafricaine"
+                                },
+                                {
+                                    "code": "LAO",
+                                    "name": "République démocratique populaire lao"
+                                },
+                                {
+                                    "code": "DOM",
+                                    "name": "République dominicaine"
+                                },
+                                {
+                                    "code": "KGZ",
+                                    "name": "République kirgize"
+                                },
+                                {
+                                    "code": "SVK",
+                                    "name": "République slovaque"
+                                },
+                                {
+                                    "code": "CZE",
+                                    "name": "République tchèque"
+                                },
+                                {
+                                    "code": "HIC",
+                                    "name": "Revenu élevé"
+                                },
+                                {
+                                    "code": "LMY",
+                                    "name": "Revenu faible et intermédiaire"
+                                },
+                                {
+                                    "code": "MIC",
+                                    "name": "Revenu intermédiaire"
+                                },
+                                {
+                                    "code": "LMC",
+                                    "name": "Revenu intermédiaire, tranche inférieure"
+                                },
+                                {
+                                    "code": "UMC",
+                                    "name": "Revenu intermédiaire, tranche supérieure"
+                                },
+                                {
+                                    "code": "ROU",
+                                    "name": "Roumanie"
+                                },
+                                {
+                                    "code": "GBR",
+                                    "name": "Royaume Uni"
+                                },
+                                {
+                                    "code": "RWA",
+                                    "name": "Rwanda"
+                                },
+                                {
+                                    "code": "SMR",
+                                    "name": "Saint-Marin"
+                                },
+                                {
+                                    "code": "WSM",
+                                    "name": "Samoa"
+                                },
+                                {
+                                    "code": "STP",
+                                    "name": "Sao Tomé et Principe"
+                                },
+                                {
+                                    "code": "SEN",
+                                    "name": "Sénégal"
+                                },
+                                {
+                                    "code": "SRB",
+                                    "name": "Serbie"
+                                },
+                                {
+                                    "code": "SYC",
+                                    "name": "Seychelles"
+                                },
+                                {
+                                    "code": "SLE",
+                                    "name": "Sierra Leone"
+                                },
+                                {
+                                    "code": "SGP",
+                                    "name": "Singapour"
+                                },
+                                {
+                                    "code": "SXM",
+                                    "name": "Sint Maarten (Dutch part)"
+                                },
+                                {
+                                    "code": "SVN",
+                                    "name": "Slovénie"
+                                },
+                                {
+                                    "code": "SOM",
+                                    "name": "Somalie"
+                                },
+                                {
+                                    "code": "SDN",
+                                    "name": "Soudan"
+                                },
+                                {
+                                    "code": "SSD",
+                                    "name": "Soudan du Sud"
+                                },
+                                {
+                                    "code": "LKA",
+                                    "name": "Sri Lanka"
+                                },
+                                {
+                                    "code": "KNA",
+                                    "name": "St. Kitts et Nevis"
+                                },
+                                {
+                                    "code": "LCA",
+                                    "name": "St. Lucie"
+                                },
+                                {
+                                    "code": "MAF",
+                                    "name": "St. Martin (partie française)"
+                                },
+                                {
+                                    "code": "VCT",
+                                    "name": "St. Vincent et Grenadines"
+                                },
+                                {
+                                    "code": "SWE",
+                                    "name": "Suède"
+                                },
+                                {
+                                    "code": "CHE",
+                                    "name": "Suisse"
+                                },
+                                {
+                                    "code": "SUR",
+                                    "name": "Surinam"
+                                },
+                                {
+                                    "code": "TWN",
+                                    "name": "Taiwan, Chine"
+                                },
+                                {
+                                    "code": "TJK",
+                                    "name": "Tajikistan"
+                                },
+                                {
+                                    "code": "TZA",
+                                    "name": "Tanzanie"
+                                },
+                                {
+                                    "code": "TCD",
+                                    "name": "Tchad"
+                                },
+                                {
+                                    "code": "THA",
+                                    "name": "Thailande"
+                                },
+                                {
+                                    "code": "TLS",
+                                    "name": "Timor-Leste"
+                                },
+                                {
+                                    "code": "TGO",
+                                    "name": "Togo"
+                                },
+                                {
+                                    "code": "TON",
+                                    "name": "Tonga"
+                                },
+                                {
+                                    "code": "TTO",
+                                    "name": "Trinidad et Tobago"
+                                },
+                                {
+                                    "code": "TUN",
+                                    "name": "Tunisie"
+                                },
+                                {
+                                    "code": "TKM",
+                                    "name": "Turkménistan"
+                                },
+                                {
+                                    "code": "TUR",
+                                    "name": "Turquie"
+                                },
+                                {
+                                    "code": "TUV",
+                                    "name": "Tuvalu"
+                                },
+                                {
+                                    "code": "UGA",
+                                    "name": "Uganda"
+                                },
+                                {
+                                    "code": "UKR",
+                                    "name": "Ukraine"
+                                },
+                                {
+                                    "code": "EUU",
+                                    "name": "Union Européenne"
+                                },
+                                {
+                                    "code": "URY",
+                                    "name": "Uruguay"
+                                },
+                                {
+                                    "code": "VUT",
+                                    "name": "Vanuatu"
+                                },
+                                {
+                                    "code": "VEN",
+                                    "name": "Vénézuela, RB"
+                                },
+                                {
+                                    "code": "VNM",
+                                    "name": "Viet Nam"
+                                },
+                                {
+                                    "code": "PSE",
+                                    "name": "West Bank et Gaza"
+                                },
+                                {
+                                    "code": "YEM",
+                                    "name": "Yémen, Rép. du"
+                                },
+                                {
+                                    "code": "ZMB",
+                                    "name": "Zambie"
+                                },
+                                {
+                                    "code": "ZWE",
+                                    "name": "Zimbabwe"
+                                },
+                                {
+                                    "code": "EMU",
+                                    "name": "Zone Euro "
+                                }
+                            ]
+                        },
+                        {
+                            "key": "database_description.geographic_units",
+                            "type": "array",
+                            "title": "Zones géographiques",
+                            "help_text": "Une liste de zones géographiques (régions, états, provinces, etc.) pour lesquelles des données sont disponibles dans la base de données. Il peut contenir des zones infranationales, des régions supranationales ou des noms de zones non administratives. L'élément type est utilisé pour indiquer le type de zone géographique. Les pays doivent être indiqués dans l'élément \"Pays\".",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "help_text": "Le nom de la zone géographique, par exemple, \"Monde\", \"Afrique subsaharienne\", \"Pays à faible revenu\".",
+                                    "type": "string",
+                                    "prop_key": "database_description.geographic_units.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "code",
+                                    "title": "Code",
+                                    "help_text": "Le code de l'unité géographique.",
+                                    "type": "string",
+                                    "prop_key": "database_description.geographic_units.code",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "type",
+                                    "title": "Type",
+                                    "help_text": "Le type de zone géographique, par ex. \"état\", \"région\" ou \"province\".",
+                                    "type": "string",
+                                    "prop_key": "database_description.geographic_units.type",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "database_description.geographic_coverage_note",
+                            "type": "string",
+                            "title": "Remarque sur la couverture géographique",
+                            "help_text": "La note peut être utilisée pour saisir des informations supplémentaires sur la couverture géographique de la base de données.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "database_description.bbox",
+                            "title": "Encadrés géographiques (nbunding boxes)",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "west",
+                                    "title": "Ouest",
+                                    "type": "string",
+                                    "prop_key": "database_description.bbox.west",
+                                    "help_text": "Longitude ouest de l'encadré géographique.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "east",
+                                    "title": "Est",
+                                    "type": "string",
+                                    "prop_key": "database_description.bbox.east",
+                                    "help_text": "Longitude est de l'encadré géographique.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "south",
+                                    "title": "Sud",
+                                    "type": "string",
+                                    "prop_key": "database_description.bbox.south",
+                                    "help_text": "Latitude sud de l'encadré géographique.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "north",
+                                    "title": "Nord",
+                                    "type": "string",
+                                    "prop_key": "database_description.bbox.north",
+                                    "help_text": "Latitude nord de l'encadré géographique.",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Cet élément est utilisé pour définir une ou plusieurs boîtes de délimitation géographique, qui sont la description géométrique fondamentale rectangulaire de la couverture géographique des données. Une boîte englobante est définie par les longitudes ouest et est et les latitudes nord et sud, et comprend la plus grande étendue géographique de la couverture géographique de l'ensemble de données. La boîte englobante fournit les coordonnées géographiques des coins supérieur gauche (nord\/ouest) et inférieur droit (sud\/est) d'une zone rectangulaire. Cet élément peut être utilisé dans les catalogues comme premier passage d'une recherche basée sur les coordonnées. La plage de latitude valide en degrés est de -90 et +90 pour l'hémisphère sud et nord, respectivement. La longitude est comprise entre -180 et +180 spécifiant les coordonnées à l'ouest et à l'est du premier méridien, respectivement."
+                        },
+                        {
+                            "key": "database_description.geographic_granularity",
+                            "type": "string",
+                            "title": "Granularité géographique",
+                            "help_text": "Alors que l'élément \"Zones géographiques\" répertorie les différents niveaux géographiques pour lesquels il existe des données dans la base de données, l'élément \"Granularité géographique\" fournira des informations sur les niveaux géographiques pour lesquels des informations sont disponibles dans la base de données. Par exemple : « La base de données contient des données aux niveaux national, provincial (admin 1) et du district (admin 2) ».",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "database_description.geographic_area_count",
+                            "type": "string",
+                            "title": "Nombre de zones géographiques",
+                            "help_text": "Le nombre de zones géographiques pour lesquelles des données sont fournies dans la base de données. Les Indicateurs du développement dans le monde de la Banque mondiale, par exemple, fournissent des données pour 262 domaines différents (qui incluent des pays et des territoires, des régions géographiques et d'autres groupements de pays).",
+                            "rules": [],
+                            "display_type": "textarea"
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "database_description1674836355879",
+                    "title": "Couverture temporelle et périodicité",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "database_description.time_coverage",
+                            "title": "Couverture temporelle",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "start",
+                                    "title": "Début",
+                                    "type": "string",
+                                    "prop_key": "database_description.time_coverage.start",
+                                    "help_text": "Indique la date de début de la période couverte par les données (toutes séries confondues) dans la base de données. La date doit être fournie au format ISO 8601 (AAAA-MM-JJ, ou AAAA-MM, ou AAAA).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "end",
+                                    "title": "Fin",
+                                    "type": "string",
+                                    "prop_key": "database_description.time_coverage.end",
+                                    "help_text": "Indique la date de fin de la période couverte par les données (toutes séries confondues) dans la base de données. La date doit être fournie au format ISO 8601 (AAAA-MM-JJ, ou AAAA-MM, ou AAAA).",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "La couverture temporelle est la durée de toutes les données contenues dans la base de données dans toutes les séries."
+                        },
+                        {
+                            "key": "database_description.time_coverage_note",
+                            "type": "string",
+                            "title": "Remarque sur la couverture temporelle",
+                            "help_text": "L'élément est utilisé pour annoter et\/ou décrire des informations auxiliaires liées à la couverture temporelle décrite dans \"Couverture temporelle\".",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "database_description.periodicity",
+                            "title": "Périodicité",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "period",
+                                    "title": "Période",
+                                    "type": "string",
+                                    "prop_key": "database_description.periodicity.period",
+                                    "help_text": "La périodicité des séries chronologiques incluses dans la base de données, par exemple, « annuelle », « trimestrielle » ou « mensuelle ».",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "La périodicité des données décrit la périodicité des indicateurs contenus dans la base de données. Une base de données peut contenir des séries couvrant différentes périodes, auquel cas les informations seront répétées pour chaque type de périodicité. Un vocabulaire contrôlé doit être utilisé."
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "database_description1674836432597",
+                    "title": "Accès, licence et droits",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "database_description.access_options",
+                            "type": "array",
+                            "title": "Modes d'accès",
+                            "props": [
+                                {
+                                    "key": "type",
+                                    "title": "Type",
+                                    "type": "string",
+                                    "prop_key": "database_description.access_options.type",
+                                    "help_text": "Le type d'accès, par ex. \"Application Programming Interface (API)\", \"Téléchargement au format CSV\", \"Interface de requête en ligne\", etc.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "database_description.access_options.uri",
+                                    "help_text": "L'URL correspondant au mode d'accès mentionné en type.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "note",
+                                    "title": "Note",
+                                    "type": "string",
+                                    "prop_key": "database_description.access_options.note",
+                                    "help_text": "Cet élément permet d'annoter toute information spécifique associée au mode d'accès mentionné en type.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "Cet ensemble reproductible d'éléments décrit les différents modes et formats dans lesquels la base de données est rendue accessible. Lorsque plus d'un mode d'accès est fourni, décrivez-les séparément."
+                        },
+                        {
+                            "key": "database_description.url",
+                            "type": "string",
+                            "title": "URL de la base de données",
+                            "help_text": "Le lien vers l'interface publique de la base de données (page d'accueil).",
+                            "rules": {
+                                "is_uri": true
+                            },
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "database_description.links",
+                            "title": "Autres liens",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "database_description.links.uri",
+                                    "help_text": "L'URL du lien associé.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "string",
+                                    "prop_key": "database_description.links.description",
+                                    "help_text": "Une brève description du lien, en relation avec la base de données.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "Ce champ permet d'associer des liens auxiliaires renvoyant à la base de données."
+                        },
+                        {
+                            "key": "database_description.copyright",
+                            "type": "string",
+                            "title": "Droits d'auteur",
+                            "help_text": "Le droit d'auteur attaché à la base de données, le cas échéant.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "database_description.license",
+                            "title": "License",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "prop_key": "database_description.license.name",
+                                    "help_text": "Le nom de la licence, par exemple « Creative Commons Attribution 4.0 International license (CC-BY 4.0) ».",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "database_description.license.uri",
+                                    "help_text": "Une URL vers une description de la licence, par exemple https:\/\/creativecommons.org\/licenses\/by\/4.0\/.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "note",
+                                    "title": "Note",
+                                    "type": "string",
+                                    "prop_key": "database_description.license.note",
+                                    "help_text": "Toute information supplémentaire pour qualifier les exigences de licence.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "Cet ensemble d'éléments est utilisé pour décrire la ou les licences d'accès attachées à la base de données."
+                        },
+                        {
+                            "key": "database_description.disclaimer",
+                            "type": "string",
+                            "title": "Clause de non-responsabilité",
+                            "help_text": "Si l'agence responsable de la gestion de la base de données a déterminé qu'il peut y avoir une responsabilité à la suite des données, l'élément peut être utilisé pour fournir une déclaration de non-responsabilité.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "database_description.citation",
+                            "type": "string",
+                            "title": "Exigence de citation",
+                            "help_text": "L'exigence de citation pour la base de données (c'est-à-dire comment les utilisateurs doivent citer la base de données dans les publications et les rapports).",
+                            "display_type": "textarea"
+                        }
+                    ],
+                    "help_text": ""
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "id": "tags",
+            "key": "tags_container",
+            "title": "Tags",
+            "items": [
+                {
+                    "key": "tags",
+                    "title": "Tags",
+                    "type": "array",
+                    "props": [
+                        {
+                            "key": "tag",
+                            "title": "Tag",
+                            "type": "string",
+                            "prop_key": "tags.tag",
+                            "help_text": "Un tag défini par l'utilisateur.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "tag_group",
+                            "title": "Groupe de tags",
+                            "type": "string",
+                            "prop_key": "tags.tag_group",
+                            "help_text": "Un groupe défini par l'utilisateur (facultatif) auquel appartient le tag. Le regroupement des tags permet la mise en œuvre de facettes contrôlées dans les catalogues de données.",
+                            "display_type": "text"
+                        }
+                    ],
+                    "help_text": "Les tags, en particulier lorsqu'ils sont organisés en groupes, offrent une solution puissante et flexible pour activer les facettes personnalisées (filtres) dans les catalogues de données."
+                }
+            ]
+        }
+    ]
+}
