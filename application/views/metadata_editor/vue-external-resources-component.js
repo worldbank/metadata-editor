@@ -42,7 +42,11 @@ Vue.component('external-resources', {
             router.push('/external-resources/import');
         },
         deleteResource:function(id)
-        {            
+        {
+            if (!confirm(this.$t("confirm_delete"))){
+                return;
+            }
+
             vm=this;
             let url=CI.base_url + '/api/resources/delete/'+ this.ProjectID + '/'+id;
 
