@@ -321,7 +321,7 @@ class Editor_resource_model extends ci_model {
 			'added'=>0,
 			'skipped'=>0
 		);
-			
+
 		//success
 		foreach($rdf_array as $rdf_rec)
 		{
@@ -339,9 +339,9 @@ class Editor_resource_model extends ci_model {
 			$insert_data['filename']=$this->normalize_filename($insert_data['filename']);
 
             if(isset($insert_data['type'])){
-                $options['dctype']=$insert_data['type'];
+                $insert_data['dctype']=$insert_data['type'];
             }
-			
+
             //insert into db
             $this->insert($insert_data);
             $output['added']++;
