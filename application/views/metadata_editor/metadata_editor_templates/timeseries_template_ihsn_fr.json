@@ -393,6 +393,52 @@
                             "title": "Notes sur la source des données",
                             "help_text": "Informations supplémentaires sur la ou les sources de données utilisées pour générer la série ou l'indicateur.",
                             "display_type": "textarea"
+                        },
+                        {
+                            "key": "series_description_container16735335060851694031482673",
+                            "title": "Collecte des données",
+                            "type": "section",
+                            "items": [
+                                {
+                                    "key": "series_description.data_collection.data_source",
+                                    "type": "string",
+                                    "title": "Source",
+                                    "help_text": "Source des données (typiquement: identification d'une enquête ou d'un recensement, source de données administratives, ou autre source de données)",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "series_description.data_collection.method",
+                                    "type": "string",
+                                    "title": "Méthode de collecte",
+                                    "help_text": "Method",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "series_description.data_collection.period",
+                                    "type": "string",
+                                    "title": "Période de la collecte",
+                                    "help_text": "Period",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "series_description.data_collection.note",
+                                    "type": "string",
+                                    "title": "Note sur la collecte",
+                                    "help_text": "Note",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "series_description.data_collection.uri",
+                                    "type": "string",
+                                    "title": "URL",
+                                    "help_text": "Data collection URL",
+                                    "display_type": "text",
+                                    "rules": {
+                                        "is_uri": true
+                                    }
+                                }
+                            ],
+                            "help_text": ""
                         }
                     ],
                     "help_text": ""
@@ -606,10 +652,24 @@
                             "display_type": "textarea"
                         },
                         {
+                            "key": "series_description.validation_rules",
+                            "type": "simple_array",
+                            "title": "Règles de validation",
+                            "help_text": "Une ou plusieurs instructions utilisées pour la validation des valeurs de l'indicateur, par exempl vérification de la portée des valeurs. ",
+                            "display_type": "text"
+                        },
+                        {
                             "key": "series_description.sources_discrepancies",
                             "type": "string",
                             "title": "Écarts",
                             "help_text": "Cet élément est utilisé pour décrire et expliquer pourquoi les données de la série peuvent être différentes des données de la même série publiées dans d'autres sources. Les organisations internationales, par exemple, peuvent appliquer différentes techniques pour rendre les données obtenues à partir de sources nationales comparables entre les pays, auquel cas les données publiées dans les bases de données internationales peuvent différer des données publiées dans les bases de données nationales officielles.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "series_description.adjustments",
+                            "type": "simple_array",
+                            "title": "Ajustements",
+                            "help_text": "Description de tout ajustement concernant l'utilisation de classifications standard ou l'harmonisation d'autres dimensions, ou ajustements apportés pour se conformer à des définitions internationales ou nationales spécifiques.",
                             "display_type": "textarea"
                         },
                         {
@@ -2037,6 +2097,20 @@
                             "is_recommended": true
                         },
                         {
+                            "key": "series_description.mandate.mandate",
+                            "type": "string",
+                            "title": "Mandat",
+                            "display_type": "text",
+                            "help_text": "Description du mandat institutionnel ou de de l'ensemble de règles ou autre ensemble formel d'instructions attribuant la responsabilité ainsi que l'autorité à une organisation pour la collecte, le traitement et la diffusion de statistiques pour cet indicateur."
+                        },
+                        {
+                            "key": "series_description.mandate.uri",
+                            "type": "string",
+                            "title": "Mandat URL",
+                            "help_text": "Une URL vers une description du mandat institutionnel.",
+                            "display_type": "text"
+                        },
+                        {
                             "key": "series_description.measurement_unit",
                             "type": "string",
                             "class": "measurement_unit",
@@ -2076,6 +2150,13 @@
                                 }
                             ],
                             "help_text": "Un indicateur ou une série chronologique peut être mis à disposition à différents niveaux de désagrégation. Par exemple, un indicateur contenant des estimations de la « population » d'un pays par année peut être disponible par sexe. Dans ce cas, les conservateurs de données auront deux options : (i) créer et documenter trois indicateurs distincts, à savoir « Population, Total », « Population, Female » et « Population, Male » ; soit créer un seul indicateur « Population » et y attacher une dimension « sexe », avec les valeurs « Total », « Féminin » et « Masculin ». Les dimensions sont des caractéristiques (ou « variables ») qui définissent les différents niveaux de désagrégation au sein d'un indicateur/d'une série. Les dimensions de l'élément sont utilisées pour fournir une liste détaillée des désagrégations qui correspondent exactement aux données publiées. Notez que lorsqu'un indicateur est disponible à deux niveaux de désagrégation « sans chevauchement », il doit être divisé en deux indicateurs. Par exemple, si l'indicateur \"Population\" est disponible par homme/femme et par urbain/rural, mais pas par homme/urbain/homme/rural/femme urbain/femme rural, il doit être traité comme deux indicateurs distincts (\" Population par sexe » avec la dimension sexe = « masculin/féminin » et « Population par zone de résidence » avec la dimension zone = « urbain / rural ».) Notez également qu'un autre élément du schéma, la désagrégation, est également fourni, dans lequel un une description narrative de la désagrégation réelle ou recommandée peut être documentée."
+                        },
+                        {
+                            "key": "series_description.release_calendar",
+                            "title": "Calendrier de mise à jour",
+                            "type": "string",
+                            "help_text": "Information sur les dates attendues de mise à jour des valeurs de l'indicateur, par exemple \"Chaque premier lundi du mois\".",
+                            "display_type": "textarea"
                         },
                         {
                             "key": "series_description.periodicity",
@@ -2677,6 +2758,73 @@
                                 }
                             ],
                             "help_text": "De plus en plus, les données sont rendues accessibles via des interfaces de programmation d'applications (API). L'API associée à une série doit être documentée. La documentation ne sera généralement pas spécifique à une série, mais s'appliquera à toutes les séries d'une même base de données."
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "series_description_container1694031195641",
+                    "title": "Contacts",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "series_description.contacts",
+                            "title": "Contacts",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Nom",
+                                    "type": "string",
+                                    "prop_key": "series_description.contacts.name",
+                                    "help_text": "Le nom de la personne à contacter. Au lieu du nom d'une personne (qui serait susceptible de changer et nécessiterait une mise à jour fréquente des métadonnées), un titre peut être fourni ici (par exemple \"service d'assistance aux utilisateurs des données\").",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Rôle",
+                                    "type": "string",
+                                    "prop_key": "series_description.contacts.role",
+                                    "help_text": "Le rôle spécifique de la personne de contact mentionnée dans \"Nom\". Ceci sera utilisé lorsque plusieurs contacts sont répertoriés et vise à aider les utilisateurs à diriger leurs questions et demandes vers la bonne personne de contact.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "string",
+                                    "prop_key": "series_description.contacts.affiliation",
+                                    "help_text": "L'organisation ou l'affiliation de la personne de contact mentionnée dans \"Nom\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "email",
+                                    "title": "Email",
+                                    "type": "string",
+                                    "prop_key": "series_description.contacts.email",
+                                    "help_text": "L'adresse e-mail de la personne ou de l'organisation mentionnée dans \"Nom\". Évitez d'utiliser des comptes de messagerie personnels ; l'utilisation d'un e-mail anonyme est recommandée (par exemple, \"helpdesk@….org\")",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "telephone",
+                                    "title": "Téléphone",
+                                    "type": "string",
+                                    "prop_key": "series_description.contacts.telephone",
+                                    "help_text": "Le numéro de téléphone de la personne ou de l'organisation mentionnée dans 'Nom\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "series_description.contacts.uri",
+                                    "help_text": "L'URL de l'agence (généralement, une URL vers une page Web \"contactez-nous\")",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Contacts"
                         }
                     ],
                     "help_text": ""
