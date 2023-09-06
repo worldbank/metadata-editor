@@ -268,6 +268,72 @@
                             "display_type": "textarea"
                         },
                         {
+                            "key": "series_description_mandate",
+                            "title": "Mandate",
+                            "help_text":"Mandate",
+                            "type": "section",
+                            "items": [
+                                {
+                                    "key": "series_description.mandate.mandate",
+                                    "type": "string",                                    
+                                    "title": "Mandate",
+                                    "display_type": "text"
+                                },                                
+                                {
+                                    "key": "series_description.mandate.uri",
+                                    "type": "string",                                    
+                                    "title": "Mandate URL",
+                                    "help_text": "Mandate URL",
+                                    "display_type": "text"
+                                }
+
+                            ]
+                        },
+                        {
+                            "key": "series_description_data_collection",
+                            "title": "Data collection",
+                            "help_text":"This description should include, when applicable, the sample frame used, the questions used to collect the data, the type of interview, the dates/duration of fieldwork, the sample size and the response rate. Some additional information on questionnaire design and testing, interviewer training, methods used to monitor non-response etc.",
+                            "type": "section",
+                            "items": [
+                                {
+                                    "key": "series_description.data_collection.data_source",
+                                    "type": "string",                                    
+                                    "title": "Data source",
+                                    "help_text": "Data source",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "series_description.data_collection.method",
+                                    "type": "string",                                    
+                                    "title": "Data collection method",
+                                    "help_text": "Method",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "series_description.data_collection.period",
+                                    "type": "string",                                    
+                                    "title": "Data collection period",
+                                    "help_text": "Period",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "series_description.data_collection.note",
+                                    "type": "string",                                    
+                                    "title": "Data collection note",
+                                    "help_text": "Note",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "series_description.data_collection.uri",
+                                    "type": "string",                                    
+                                    "title": "Data collection URL",
+                                    "help_text": "Data collection URL",
+                                    "display_type": "text"
+                                }
+
+                            ]
+                        },
+                        {
                             "key": "series_description.methodology",
                             "type": "string",
                             "class": "methodology",
@@ -598,6 +664,13 @@
                             "display_type": "textarea"
                         },
                         {
+                            "key": "series_description.validation_rules",
+                            "type": "simple_array",
+                            "title": "Validation rules",
+                            "help_text": "Set of rules to validate values for indicators, e.g. range checks",
+                            "display_type": "text"
+                        },
+                        {
                             "key": "series_description.quality_checks",
                             "type": "string",
                             "title": "Quality checks",
@@ -616,6 +689,13 @@
                             "type": "string",
                             "title": "Discrepancies",
                             "help_text": "This element is used to describe and explain why the data in the series may be different from the data for the same series published in other sources. International organizations, for example, may apply different techniques to make data obtained from national sources comparable across countries, in which cases the data published in international databases may differ from the data published in national, official databases.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "series_description.adjustments",
+                            "type": "simple_array",
+                            "title": "Adjustments",
+                            "help_text": "Description of any adjustments with respect to use of standard classifications and harmonization of breakdowns for age group and other dimensions, or adjustments made for compliance with specific international or national definitions.",
                             "display_type": "textarea"
                         },
                         {
@@ -885,6 +965,13 @@
                                 }
                             ],
                             "help_text": "An indicator or time series can be made available at different levels of disaggregation. For example, an indicator containing estimates of the “Population” of a country by year can be available by sex. The data curators in such case will have two options: (i) create and document three separate indicators, namely “Population, Total”, “Population, Female”, and “Population, Male”; or create a single indicator “Population” and attach a dimension “sex” to it, with values “Total”, “Female”, and “Male”. The dimensions are features (or “variables”) that define the different levels of disaggregation within an indicator/series. The element dimensions is used to provide an itemized list of disaggregations that correspond exactly to the published data. Note that when an indicator is available at two “non-overlapping” levels of disaggregation, it should be split into two indicators. For example, if the \"Population\" indicator is available by male/female and by urban/rural, but not by male/urban/male/rural/female urban/female rural, it should be treated as two separate indicators (“Population by sex” with dimension sex = “male / female” and “Population by area of residence” with dimension area = “urban / rural”.) Note also that another element in the schema, disaggregation, is also provided, in which a narrative description of the actual or recommended disaggregation can be documented.\n"
+                        },
+                        {
+                            "key": "series_description.release_calendar",
+                            "title": "Release calendar",
+                            "type": "string",                            
+                            "help_text": "Release calendar",
+                            "display_type": "textarea"
                         },
                         {
                             "key": "series_description.periodicity",
@@ -1456,6 +1543,65 @@
                                 }
                             ],
                             "help_text": "This element provides links to online resources of any type that could be useful to the data users. This can be links to description of methods and reference documents, analytics tools, visualizations, data sources, or other."
+                        },
+                        {
+                            "key": "series_description.contacts",
+                            "title": "Contacts",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "prop_key": "series_description.contacts.name",
+                                    "help_text": "The name of the contact person that should be contacted. Instead of the name of an individual (which would be subject to change and require frequent update of the metadata), a title can be provided here (e.g. “data helpdesk”).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Role",
+                                    "type": "string",
+                                    "prop_key": "series_description.contacts.role",
+                                    "help_text": "The specific role of the contact person mentioned in \"Name\". This will be used when multiple contacts are listed, and is intended to help users direct their questions and requests to the right contact person.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "string",
+                                    "prop_key": "series_description.contacts.affiliation",
+                                    "help_text": "The organization or affiliation of the contact person mentioned in \"Name\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "email",
+                                    "title": "Email",
+                                    "type": "string",
+                                    "prop_key": "database_description.contacts.email",
+                                    "help_text": "The email address of the person or organization mentioned in \"Name\". Avoid using personal email accounts; the use of an anonymous email is recommended (e.g., “helpdesk@….org”)",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "telephone",
+                                    "title": "Phone",
+                                    "type": "string",
+                                    "prop_key": "series_description.contacts.telephone",
+                                    "help_text": "The phone number of the person or organization mentioned in \"Name\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "series_description.contacts.uri",
+                                    "help_text": "The URL of the agency (typically, a URL to a “contact us” web page)",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Contacts"
                         },
                         {
                             "key": "series_description.api_documentation",
