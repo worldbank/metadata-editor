@@ -220,6 +220,11 @@
 						]
 					}
 				},
+				"release_calendar": {
+					"title": "Release calendar",
+					"description": "Release calendar",
+					"type": "string"
+				},
 				"periodicity": {
 					"type": "string",
 					"title": "Periodicity of data"
@@ -294,6 +299,33 @@
 						]
 					}
 				},
+				"data_collection": {
+					"title": "Data collection",
+					"description": " This description should include, when applicable, the sample frame used, the questions used to collect the data, the type of interview, the dates/duration of fieldwork, the sample size and the response rate. Some additional information on questionnaire design and testing, interviewer training, methods used to monitor non-response etc.",
+					"type": "object",
+					"properties": {												
+						"data_source": {
+							"title": "Data source",
+							"type": "string"
+						},
+						"method": {
+							"title": "Data collection method",
+							"type": "string"
+						},
+						"period": {
+							"title": "Data collection period",
+							"type": "string"
+						},
+						"note": {
+							"title": "Data collection note",
+							"type": "string"
+						},
+						"uri": {
+							"title": "Data collection URL",
+							"type": "string"
+						}
+					}
+				},
 				"methodology": {
 					"type": "string",
 					"title": "Methodology"
@@ -306,10 +338,27 @@
 					"type": "string",
 					"title": "Imputations"
 				},
+				"adjustments": {
+					"title": "Adjustments",
+					"description": " Description of any adjustments with respect to use of standard classifications and harmonization of breakdowns for age group and other dimensions, or adjustments made for compliance with specific international or national definitions.",
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
 				"missing": {
 					"type": "string",
 					"title": "Treatment of missing values"
 				},
+				"validation_rules": {
+					"title": "Validation rules",
+					"description": "Set of rules to validate values for indicators, e.g. range checks",
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				
 				"quality_checks": {
 					"type": "string",
 					"title": "Quality control methods"
@@ -439,6 +488,20 @@
 					"type": "string",
 					"title": "Relavance"
 				},
+				"mandate": {
+					"title": "Mandate",
+					"description": "Mandate",
+					"type": "object",
+					"properties": {												
+						"mandate": {
+							"title": "Mandate",
+							"type": "string"
+						},
+						"uri": {
+							"title": "URL",
+							"type": "string"
+						}					}
+				},				
 				"time_periods": {
 					"type": "array",
 					"title": "Series dates",
@@ -577,6 +640,7 @@
 					"type": "string",
 					"title": "Confidentiality note"
 				},
+				
 				"links": {
 					"type": "array",
 					"title": "Series links",
@@ -928,6 +992,43 @@
 							"uri": {
 								"type": "string",
 								"title": "URI"
+							}
+						}
+					},
+					"required": [
+						"name"
+					]
+				},
+				"contacts": {
+					"type": "array",
+					"title": "Contacts",
+					"description": "Contacts",
+					"items": {
+						"type": "object",
+						"properties": {
+							"name": {
+								"title": "Name",
+								"type": "string"
+							},
+							"role": {
+								"title": "Role",
+								"type": "string"
+							},
+							"affiliation": {
+								"title": "Affiliation",
+								"type": "string"
+							},
+							"email": {
+								"title": "Email",
+								"type": "string"
+							},
+							"telephone": {
+								"title": "Telephone",
+								"type": "string"
+							},
+							"uri": {
+								"title": "URI",
+								"type": "string"
 							}
 						}
 					},
