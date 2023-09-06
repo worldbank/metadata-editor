@@ -2107,13 +2107,14 @@
                             "key": "series_description.mandate.mandate",
                             "type": "string",
                             "title": "Mandate",
-                            "display_type": "text"
+                            "display_type": "text",
+                            "help_text": "Description of the institutional mandate or of a set of rules or other formal set of instructions assigning responsibility as well as the authority to an organization for the collection, processing, and dissemination of statistics for this indicator."
                         },
                         {
                             "key": "series_description.mandate.uri",
                             "type": "string",
                             "title": "Mandate URL",
-                            "help_text": "Mandate URL",
+                            "help_text": "A URL to a description of the institutional mandate.",
                             "display_type": "text",
                             "rules": {
                                 "is_uri": true
@@ -2164,7 +2165,7 @@
                             "key": "series_description.release_calendar",
                             "title": "Release calendar",
                             "type": "string",
-                            "help_text": "Release calendar",
+                            "help_text": "Information on the expected dates of updates for the indicator. For example: \"Every first Monday of the month\".",
                             "display_type": "textarea"
                         },
                         {
