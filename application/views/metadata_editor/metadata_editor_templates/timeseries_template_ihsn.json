@@ -17,14 +17,14 @@
                             "key": "metadata_information.title",
                             "title": "Document title",
                             "type": "string",
-                            "help_text": "The title of the metadata document (which may be the same as the element \"Name\" in the \"Indicator description \/ Title statement\" section). The metadata document is the metadata file (XML or JSON file) that is being generated. ",
+                            "help_text": "The title of the metadata document (which may be the same as the element \"Name\" in the \"Indicator description / Title statement\" section). The metadata document is the metadata file (XML or JSON file) that is being generated. ",
                             "display_type": "text"
                         },
                         {
                             "key": "metadata_information.idno",
                             "title": "Document ID",
                             "type": "string",
-                            "help_text": "A unique identifier for the indicator\/series metadata document. This identifier must be unique in the catalog where the metadata are intended to be published. Ideally, the identifier should also be unique globally. This is different from the \"Primary identifier\" in section Database description \/ Title statement, although it is good practice to generate identifiers that establish a clear connection between these two identifiers. The Document ID could also include the metadata document version identifier. For example, if the \"Primary identifier\" of the indicator “External debt disbursements by private creditors in current US dollars” is \"DT.DIS.PRVT.CD”, the Document ID could be “WB_DT.DIS.PRVT.CD_v1.0” if the metadata are produced by the IHSN and if this is version 1.0 of the metadata. Each organization should establish systematic rules to generate such IDs. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. The identifier may not contain blank spaces.",
+                            "help_text": "A unique identifier for the indicator/series metadata document. This identifier must be unique in the catalog where the metadata are intended to be published. Ideally, the identifier should also be unique globally. This is different from the \"Primary identifier\" in section Database description / Title statement, although it is good practice to generate identifiers that establish a clear connection between these two identifiers. The Document ID could also include the metadata document version identifier. For example, if the \"Primary identifier\" of the indicator “External debt disbursements by private creditors in current US dollars” is \"DT.DIS.PRVT.CD”, the Document ID could be “WB_DT.DIS.PRVT.CD_v1.0” if the metadata are produced by the IHSN and if this is version 1.0 of the metadata. Each organization should establish systematic rules to generate such IDs. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. The identifier may not contain blank spaces.",
                             "display_type": "text"
                         },
                         {
@@ -66,7 +66,7 @@
                                     "display_type": "textarea"
                                 }
                             ],
-                            "help_text": "The metadata producer is the person or organization with the financial and\/or administrative responsibility for the processes whereby the metadata document was created. This is a \"Recommended\" element. For catalog administration purposes, information on the producer and on the date of metadata production is useful.",
+                            "help_text": "The metadata producer is the person or organization with the financial and/or administrative responsibility for the processes whereby the metadata document was created. This is a \"Recommended\" element. For catalog administration purposes, information on the producer and on the date of metadata production is useful.",
                             "is_recommended": true
                         },
                         {
@@ -81,7 +81,7 @@
                             "key": "metadata_information.version",
                             "title": "Version",
                             "type": "string",
-                            "help_text": "The version of the metadata document (not the version of the indicator\/time series itself).",
+                            "help_text": "The version of the metadata document (not the version of the indicator/time series itself).",
                             "display_type": "text"
                         }
                     ],
@@ -108,7 +108,7 @@
                             "class": "required",
                             "required": true,
                             "rules_": "required|alpha_dash|min:5|max:80",
-                            "help_text": "A unique identifier of the indicator\/series. The \"Primary ID\" (also referred to as IDNO) is a unique identification number used to identify the database. A unique identifier is required for cataloguing purpose, so this element is declared as \"Required\". The identifier will allow users to cite the indicator\/series properly. The identifier must be unique within the catalog. Ideally, it should also be globally unique; the recommended option is to obtain a Digital Object Identifier (DOI) for the study. Alternatively, the \"Primary ID\" can be constructed by an organization using a consistent scheme. For example, the name of the series in the World Bank’s World Development Indicators series are composed of the following four elements, separated by a dot: Topic code (2 digits); General subject code (3 digits); Specific subject code (4 digits); Extensions (2 digits each). Note that the schema allows you to provide more than one identifier for a same study (in element \"Other identifiers\"); a catalog-specific identifier is thus not incompatible with a globally unique identifier like a DOI. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. The identifier may not contain blank spaces.",
+                            "help_text": "A unique identifier of the indicator/series. The \"Primary ID\" (also referred to as IDNO) is a unique identification number used to identify the database. A unique identifier is required for cataloguing purpose, so this element is declared as \"Required\". The identifier will allow users to cite the indicator/series properly. The identifier must be unique within the catalog. Ideally, it should also be globally unique; the recommended option is to obtain a Digital Object Identifier (DOI) for the study. Alternatively, the \"Primary ID\" can be constructed by an organization using a consistent scheme. For example, the name of the series in the World Bank’s World Development Indicators series are composed of the following four elements, separated by a dot: Topic code (2 digits); General subject code (3 digits); Specific subject code (4 digits); Extensions (2 digits each). Note that the schema allows you to provide more than one identifier for a same study (in element \"Other identifiers\"); a catalog-specific identifier is thus not incompatible with a globally unique identifier like a DOI. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. The identifier may not contain blank spaces.",
                             "is_required": true,
                             "display_type": "text"
                         },
@@ -163,14 +163,14 @@
                                     "display_type": "textarea"
                                 }
                             ],
-                            "help_text": "This repeatable element is used to enter identifiers (IDs) other than the \"Primary ID\" (IDNO). The element \"Primary ID\" is the reference identifier for the catalog in which the metadata is intended to be published. But the same indicator\/metadata may be published in other catalogs. For example, a data catalog may publish metadata for series extracted from the World Bank World Development Indicators (WDI) database. And the WDI itself contains series generated and published by other organizations, such as the World Health Organization or UNICEF. Catalog administrators may want to assign a unique identifier specific to their catalog (the \"Primary ID\" element) but keep track of the identifier of the series or indicator in the originating catalog or databases. The \"Other identifiers\" can also include a Digital Object Identifier (DOI). The \"Primary ID\" can be repeated here (the \"Primary ID\" does not provide a \"Type\" parameter, so if a DOI or other standard ID type is used as main identifier, it is recommended to repeat it here with the identification of the type).\n\n "
+                            "help_text": "This repeatable element is used to enter identifiers (IDs) other than the \"Primary ID\" (IDNO). The element \"Primary ID\" is the reference identifier for the catalog in which the metadata is intended to be published. But the same indicator/metadata may be published in other catalogs. For example, a data catalog may publish metadata for series extracted from the World Bank World Development Indicators (WDI) database. And the WDI itself contains series generated and published by other organizations, such as the World Health Organization or UNICEF. Catalog administrators may want to assign a unique identifier specific to their catalog (the \"Primary ID\" element) but keep track of the identifier of the series or indicator in the originating catalog or databases. The \"Other identifiers\" can also include a Digital Object Identifier (DOI). The \"Primary ID\" can be repeated here (the \"Primary ID\" does not provide a \"Type\" parameter, so if a DOI or other standard ID type is used as main identifier, it is recommended to repeat it here with the identification of the type).\n\n "
                         },
                         {
                             "key": "series_description.name",
                             "type": "string",
                             "class": "name",
                             "title": "Name",
-                            "help_text": "The name (label) of the indicator\/series. Make sure to use a unique name for each distinct indicator\/series. Note that a field alias is provided (see below) to capture alternative names for the indicator\/series. Pay attention to the consistent use of capitalization in the name of indicators\/series.",
+                            "help_text": "The name (label) of the indicator/series. Make sure to use a unique name for each distinct indicator/series. Note that a field alias is provided (see below) to capture alternative names for the indicator/series. Pay attention to the consistent use of capitalization in the name of indicators/series.",
                             "is_required": true,
                             "display_type": "text"
                         },
@@ -195,7 +195,7 @@
                             "type": "string",
                             "class": "database_id",
                             "title": "Database ID",
-                            "help_text": "The unique identifier of the database the indicator\/series belongs to. This field must correspond to the element \"Database description \/ Title statement \/ Primary ID\" of the database metadata. This is the only field that is needed to establish the link between the indicator metadata and the information on the database it belongs to.",
+                            "help_text": "The unique identifier of the database the indicator/series belongs to. This field must correspond to the element \"Database description / Title statement / Primary ID\" of the database metadata. This is the only field that is needed to establish the link between the indicator metadata and the information on the database it belongs to.",
                             "display_type": "text"
                         }
                     ],
@@ -220,7 +220,7 @@
                             "type": "string",
                             "class": "definition_long",
                             "title": "Definition long",
-                            "help_text": "A long(er) version of the definition of the series. If only one definition is available (not a short\/long version), it is recommended to capture it in the \"Definition short\" element. Alternatively, the same definition can be stored in both \"Definition short\" and \"Definition long\".",
+                            "help_text": "A long(er) version of the definition of the series. If only one definition is available (not a short/long version), it is recommended to capture it in the \"Definition short\" element. Alternatively, the same definition can be stored in both \"Definition short\" and \"Definition long\".",
                             "display_type": "textarea"
                         },
                         {
@@ -287,7 +287,7 @@
                             "type": "string",
                             "class": "imputation",
                             "title": "Imputation",
-                            "help_text": "Data may have been imputed to account for data gaps or for other reasons (harmonization\/standardization, and others). If imputations have been made, this element provides the space for their description.",
+                            "help_text": "Data may have been imputed to account for data gaps or for other reasons (harmonization/standardization, and others). If imputations have been made, this element provides the space for their description.",
                             "display_type": "textarea"
                         },
                         {
@@ -339,7 +339,7 @@
                             "key": "series_description.aggregation_method",
                             "type": "string",
                             "title": "Aggregation method",
-                            "help_text": "The \"Aggregation method\" element describes how values can be aggregated from one geographic level (for example, a country) to a higher-level geographic area (for example, a group of country defined based on a geographic criteria (region, world) or another criteria (low\/medium\/high-income countries, island countries, OECD countries, etc.). The aggregation method can be simple (like “sum” or “population-weighted average”) or more complex, involving weighting of values.",
+                            "help_text": "The \"Aggregation method\" element describes how values can be aggregated from one geographic level (for example, a country) to a higher-level geographic area (for example, a group of country defined based on a geographic criteria (region, world) or another criteria (low/medium/high-income countries, island countries, OECD countries, etc.). The aggregation method can be simple (like “sum” or “population-weighted average”) or more complex, involving weighting of values.",
                             "display_type": "textarea"
                         },
                         {
@@ -399,6 +399,52 @@
                             "title": "Notes on data source",
                             "help_text": "Additional information on the source(s) of data used to generate the series or indicator.",
                             "display_type": "textarea"
+                        },
+                        {
+                            "key": "series_description.data_collection.data_source",
+                            "type": "string",
+                            "title": "Data source",
+                            "help_text": "Data source",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "series_description_container16735335060851694030746673",
+                            "title": "Data collection",
+                            "type": "section",
+                            "items": [
+                                {
+                                    "key": "series_description.data_collection.method",
+                                    "type": "string",
+                                    "title": "Data collection method",
+                                    "help_text": "Method",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "series_description.data_collection.period",
+                                    "type": "string",
+                                    "title": "Data collection period",
+                                    "help_text": "Period",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "series_description.data_collection.note",
+                                    "type": "string",
+                                    "title": "Data collection note",
+                                    "help_text": "Note",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "series_description.data_collection.uri",
+                                    "type": "string",
+                                    "title": "Data collection URL",
+                                    "help_text": "Data collection URL",
+                                    "display_type": "text",
+                                    "rules": {
+                                        "is_uri": true
+                                    }
+                                }
+                            ],
+                            "help_text": ""
                         }
                     ],
                     "help_text": ""
@@ -576,7 +622,7 @@
                                     "title": "Notes",
                                     "type": "string",
                                     "prop_key": "series_description.framework.notes",
-                                    "help_text": "Any additional information on the relationship between the indicator\/series and the framework.",
+                                    "help_text": "Any additional information on the relationship between the indicator/series and the framework.",
                                     "display_type": "textarea"
                                 }
                             ],
@@ -608,14 +654,28 @@
                             "key": "series_description.quality_note",
                             "type": "string",
                             "title": "Quality note",
-                            "help_text": "Additional information or an overall statement on data quality. These could for example cover non-standard quality notes and\/or information on independent reviews on the data quality.",
+                            "help_text": "Additional information or an overall statement on data quality. These could for example cover non-standard quality notes and/or information on independent reviews on the data quality.",
                             "display_type": "textarea"
+                        },
+                        {
+                            "key": "series_description.validation_rules",
+                            "type": "simple_array",
+                            "title": "Validation rules",
+                            "help_text": "Set of rules to validate values for indicators, e.g. range checks",
+                            "display_type": "text"
                         },
                         {
                             "key": "series_description.sources_discrepancies",
                             "type": "string",
                             "title": "Discrepancies",
                             "help_text": "This element is used to describe and explain why the data in the series may be different from the data for the same series published in other sources. International organizations, for example, may apply different techniques to make data obtained from national sources comparable across countries, in which cases the data published in international databases may differ from the data published in national, official databases.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "series_description.adjustments",
+                            "type": "simple_array",
+                            "title": "Adjustments",
+                            "help_text": "Description of any adjustments with respect to use of standard classifications and harmonization of breakdowns for age group and other dimensions, or adjustments made for compliance with specific international or national definitions.",
                             "display_type": "textarea"
                         },
                         {
@@ -1979,7 +2039,7 @@
                                     "display_type": "text"
                                 }
                             ],
-                            "help_text": "This element is used to define one or multiple geographic bounding box(es), which are the rectangular fundamental geometric description of the geographic coverage of the data. A bounding box is defined by west and east longitudes and north and south latitudes, and includes the largest geographic extent of the dataset’s geographic coverage. The bounding box provides the geographic coordinates of the top left (north\/west) and bottom-right (south\/east) corners of a rectangular area. This element can be used in catalogs as the first pass of a coordinate-based search. The valid range of latitude in degrees is -90 and +90 for the southern and northern hemisphere, respectively. Longitude is in the range -180 and +180 specifying coordinates west and east of the Prime Meridian, respectively."
+                            "help_text": "This element is used to define one or multiple geographic bounding box(es), which are the rectangular fundamental geometric description of the geographic coverage of the data. A bounding box is defined by west and east longitudes and north and south latitudes, and includes the largest geographic extent of the dataset’s geographic coverage. The bounding box provides the geographic coordinates of the top left (north/west) and bottom-right (south/east) corners of a rectangular area. This element can be used in catalogs as the first pass of a coordinate-based search. The valid range of latitude in degrees is -90 and +90 for the southern and northern hemisphere, respectively. Longitude is in the range -180 and +180 specifying coordinates west and east of the Prime Meridian, respectively."
                         }
                     ],
                     "help_text": ""
@@ -2040,15 +2100,31 @@
                                     "display_type": "text"
                                 }
                             ],
-                            "help_text": "This repeatable set of elements is used to identify the organization(s) or person(s) who are the main producers\/curators of the indicator. Note that a similar element is provided at the database level. The \"Authoring entity\" for the indicator can be different from the \"Authoring entity\" of the database. For example, the World Bank is the authoring entity for the World Development Indicators database, but the database contains indicators obtained from the International Monetary Fund, the World Health Organization, and other organizations that are thus the authoring entities for their respective indicators.",
+                            "help_text": "This repeatable set of elements is used to identify the organization(s) or person(s) who are the main producers/curators of the indicator. Note that a similar element is provided at the database level. The \"Authoring entity\" for the indicator can be different from the \"Authoring entity\" of the database. For example, the World Bank is the authoring entity for the World Development Indicators database, but the database contains indicators obtained from the International Monetary Fund, the World Health Organization, and other organizations that are thus the authoring entities for their respective indicators.",
                             "is_recommended": true
+                        },
+                        {
+                            "key": "series_description.mandate.mandate",
+                            "type": "string",
+                            "title": "Mandate",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "series_description.mandate.uri",
+                            "type": "string",
+                            "title": "Mandate URL",
+                            "help_text": "Mandate URL",
+                            "display_type": "text",
+                            "rules": {
+                                "is_uri": true
+                            }
                         },
                         {
                             "key": "series_description.measurement_unit",
                             "type": "string",
                             "class": "measurement_unit",
                             "title": "Measurement unit",
-                            "help_text": "The unit of measurement. Note that in many databases the measurement unit will be included in the series name\/label. In the World Bank’s World Development Indicators for example, series are named as follows:\n- CO2 emissions (kg per 2010 US$ of GDP)\n- GDP per capita (current US$)\n- GDP per capita (current LCU)\n- Population density (people per sq. km of land area)\nIn such case, the name of the series should not be changed, but the measurement unit may be extracted from it and stored in element \"Measurement unit\".",
+                            "help_text": "The unit of measurement. Note that in many databases the measurement unit will be included in the series name/label. In the World Bank’s World Development Indicators for example, series are named as follows:\n- CO2 emissions (kg per 2010 US$ of GDP)\n- GDP per capita (current US$)\n- GDP per capita (current LCU)\n- Population density (people per sq. km of land area)\nIn such case, the name of the series should not be changed, but the measurement unit may be extracted from it and stored in element \"Measurement unit\".",
                             "is_recommended": true,
                             "display_type": "text"
                         },
@@ -2070,7 +2146,7 @@
                                     "title": "Label",
                                     "type": "string",
                                     "prop_key": "series_description.dimensions.label",
-                                    "help_text": "The label of the disaggregation level, for example “sex”, or “urban\/rural”.",
+                                    "help_text": "The label of the disaggregation level, for example “sex”, or “urban/rural”.",
                                     "display_type": "text"
                                 },
                                 {
@@ -2082,7 +2158,14 @@
                                     "display_type": "textarea"
                                 }
                             ],
-                            "help_text": "An indicator or time series can be made available at different levels of disaggregation. For example, an indicator containing estimates of the “Population” of a country by year can be available by sex. The data curators in such case will have two options: (i) create and document three separate indicators, namely “Population, Total”, “Population, Female”, and “Population, Male”; or create a single indicator “Population” and attach a dimension “sex” to it, with values “Total”, “Female”, and “Male”. The dimensions are features (or “variables”) that define the different levels of disaggregation within an indicator\/series. The element dimensions is used to provide an itemized list of disaggregations that correspond exactly to the published data. Note that when an indicator is available at two “non-overlapping” levels of disaggregation, it should be split into two indicators. For example, if the \"Population\" indicator is available by male\/female and by urban\/rural, but not by male\/urban\/male\/rural\/female urban\/female rural, it should be treated as two separate indicators (“Population by sex” with dimension sex = “male \/ female” and “Population by area of residence” with dimension area = “urban \/ rural”.) Note also that another element in the schema, disaggregation, is also provided, in which a narrative description of the actual or recommended disaggregation can be documented.\n"
+                            "help_text": "An indicator or time series can be made available at different levels of disaggregation. For example, an indicator containing estimates of the “Population” of a country by year can be available by sex. The data curators in such case will have two options: (i) create and document three separate indicators, namely “Population, Total”, “Population, Female”, and “Population, Male”; or create a single indicator “Population” and attach a dimension “sex” to it, with values “Total”, “Female”, and “Male”. The dimensions are features (or “variables”) that define the different levels of disaggregation within an indicator/series. The element dimensions is used to provide an itemized list of disaggregations that correspond exactly to the published data. Note that when an indicator is available at two “non-overlapping” levels of disaggregation, it should be split into two indicators. For example, if the \"Population\" indicator is available by male/female and by urban/rural, but not by male/urban/male/rural/female urban/female rural, it should be treated as two separate indicators (“Population by sex” with dimension sex = “male / female” and “Population by area of residence” with dimension area = “urban / rural”.) Note also that another element in the schema, disaggregation, is also provided, in which a narrative description of the actual or recommended disaggregation can be documented.\n"
+                        },
+                        {
+                            "key": "series_description.release_calendar",
+                            "title": "Release calendar",
+                            "type": "string",
+                            "help_text": "Release calendar",
+                            "display_type": "textarea"
                         },
                         {
                             "key": "series_description.periodicity",
@@ -2240,7 +2323,7 @@
                                     "display_type": "text"
                                 }
                             ],
-                            "help_text": "\"Topics\" indicate the broad substantive topic(s) that the indicator\/series covers. A topic classification facilitates referencing and searches in electronic survey catalogs; topics should thus be selected from a standard controlled vocabulary, for example the CESSDA Topics classification (a typology of topics available in 11 languages), or the Journal of Economic Literature (JEL) Classification System. Note that you may combine topics from more than one controlled vocabulary. "
+                            "help_text": "\"Topics\" indicate the broad substantive topic(s) that the indicator/series covers. A topic classification facilitates referencing and searches in electronic survey catalogs; topics should thus be selected from a standard controlled vocabulary, for example the CESSDA Topics classification (a typology of topics available in 11 languages), or the Journal of Economic Literature (JEL) Classification System. Note that you may combine topics from more than one controlled vocabulary. "
                         },
                         {
                             "key": "series_description.themes",
@@ -2294,7 +2377,7 @@
                                     "display_type": "text"
                                 }
                             ],
-                            "help_text": "Themes provide a general idea of the research that might guide the creation and\/or demand for the series. A theme is broad and is likely also subject to a community based definition or list. A controlled vocabulary should be used. This element will rarely be used (the element topics described below will be used more often)."
+                            "help_text": "Themes provide a general idea of the research that might guide the creation and/or demand for the series. A theme is broad and is likely also subject to a community based definition or list. A controlled vocabulary should be used. This element will rarely be used (the element topics described below will be used more often)."
                         },
                         {
                             "key": "series_description.disciplines",
@@ -2354,7 +2437,7 @@
                             "key": "series_description.disaggregation",
                             "type": "string",
                             "title": "Disaggregation",
-                            "help_text": "This element is intended to inform users that an indicator or series is available at various levels of disaggregation. The related series should be listed (by name and\/or identifier). For indicator “Population, total” for example, one may inform the user that the indicator is also available (in other series) by sex, urban\/rural, and age group (in series “Population, male” and “Population, female”, etc.).",
+                            "help_text": "This element is intended to inform users that an indicator or series is available at various levels of disaggregation. The related series should be listed (by name and/or identifier). For indicator “Population, total” for example, one may inform the user that the indicator is also available (in other series) by sex, urban/rural, and age group (in series “Population, male” and “Population, female”, etc.).",
                             "display_type": "textarea"
                         },
                         {
@@ -2379,7 +2462,7 @@
                                     "display_type": "text"
                                 }
                             ],
-                            "help_text": "The language of the indicator\/series metadata. For the language codes and names, the use of the ISO 639-2 standard is recommended."
+                            "help_text": "The language of the indicator/series metadata. For the language codes and names, the use of the ISO 639-2 standard is recommended."
                         },
                         {
                             "key": "series_description.acronyms",
@@ -2478,7 +2561,7 @@
                                     "type": "string",
                                     "rules_": "required",
                                     "prop_key": "series_description.series_groups.name",
-                                    "help_text": "The name of the indicator\/series group.",
+                                    "help_text": "The name of the indicator/series group.",
                                     "display_type": "text"
                                 },
                                 {
@@ -2487,7 +2570,7 @@
                                     "type": "string",
                                     "rules_": "required",
                                     "prop_key": "series_description.series_groups.description",
-                                    "help_text": "A brief description of the indicator\/series group.",
+                                    "help_text": "A brief description of the indicator/series group.",
                                     "display_type": "textarea"
                                 },
                                 {
@@ -2510,7 +2593,7 @@
                                     "display_type": "text"
                                 }
                             ],
-                            "help_text": "This element allows organizing indicators and series by thematic or other groups. These groups are “virtual” and do not affect the data. One indicator\/series can belong to more than one group."
+                            "help_text": "This element allows organizing indicators and series by thematic or other groups. These groups are “virtual” and do not affect the data. One indicator/series can belong to more than one group."
                         },
                         {
                             "key": "series_description.notes",
@@ -2561,7 +2644,7 @@
                                     "title": "URL",
                                     "type": "string",
                                     "prop_key": "series_description.license.uri",
-                                    "help_text": "A URL where detailed information on the license \/ terms of use can be found.",
+                                    "help_text": "A URL where detailed information on the license / terms of use can be found.",
                                     "rules": {
                                         "is_uri": true
                                     },
@@ -2576,7 +2659,7 @@
                                     "display_type": "textarea"
                                 }
                             ],
-                            "help_text": "This set of elements is used to describe the access license(s) attached to the indicator\/series."
+                            "help_text": "This set of elements is used to describe the access license(s) attached to the indicator/series."
                         },
                         {
                             "key": "series_description.confidentiality",
@@ -2690,6 +2773,73 @@
                                 }
                             ],
                             "help_text": "Increasingly, data are made accessible via Application Programming Interfaces (APIs). The API associated with a series must be documented. The documentation will usually not be specific to a series, but apply to all series in a same database."
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "series_description_container1694030886312",
+                    "title": "Contacts",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "series_description.contacts",
+                            "title": "Contacts",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "prop_key": "series_description.contacts.name",
+                                    "help_text": "The name of the contact person that should be contacted. Instead of the name of an individual (which would be subject to change and require frequent update of the metadata), a title can be provided here (e.g. “data helpdesk”).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Role",
+                                    "type": "string",
+                                    "prop_key": "series_description.contacts.role",
+                                    "help_text": "The specific role of the contact person mentioned in \"Name\". This will be used when multiple contacts are listed, and is intended to help users direct their questions and requests to the right contact person.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "string",
+                                    "prop_key": "series_description.contacts.affiliation",
+                                    "help_text": "The organization or affiliation of the contact person mentioned in \"Name\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "email",
+                                    "title": "Email",
+                                    "type": "string",
+                                    "prop_key": "series_description.contacts.email",
+                                    "help_text": "The email address of the person or organization mentioned in \"Name\". Avoid using personal email accounts; the use of an anonymous email is recommended (e.g., “helpdesk@….org”)",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "telephone",
+                                    "title": "Phone",
+                                    "type": "string",
+                                    "prop_key": "series_description.contacts.telephone",
+                                    "help_text": "The phone number of the person or organization mentioned in \"Name\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "series_description.contacts.uri",
+                                    "help_text": "The URL of the agency (typically, a URL to a “contact us” web page)",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Contacts"
                         }
                     ],
                     "help_text": ""
