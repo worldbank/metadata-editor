@@ -355,7 +355,11 @@
             })
             .catch(function(error) {
               console.log("error", error);
-              alert("Failed", error);
+              if (error.response.data.error){
+                alert ("Failed: " + error.response.data.error);
+              }else{
+                alert("Failed", error);
+              }
             })
             .then(function() {
               console.log("request completed");
@@ -385,7 +389,11 @@
             })
             .catch(function(error) {
               console.log("error", error);
-              alert("Failed", error);
+              if (error.response.data.error){
+                alert ("Failed: " + error.response.data.error);
+              }else{
+                alert("Failed", error);
+              }
             })
             .then(function() {
               // always executed

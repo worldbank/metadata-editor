@@ -38,7 +38,7 @@ Vue.component('import-options', {
                 }
             }
         },
-        importDDI: function(){
+        importDDI: function(){            
             let formData = new FormData();
             formData.append('file', this.file);
             formData.append('options', this.import_options_selected.join(','));
@@ -46,8 +46,7 @@ Vue.component('import-options', {
             vm=this;
             this.errors='';
             let url=CI.base_url + '/api/import_metadata/'+ this.ProjectID;
-
-            alert(url);
+            this.is_processing=true;
 
             axios.post( url,
                 formData,
@@ -57,14 +56,15 @@ Vue.component('import-options', {
                     }
                 }
             ).then(function(response){
-                alert("done");
-                return;
+                vm.is_processing=false;
                 vm.$store.dispatch('loadProject',{dataset_id:vm.ProjectID});
                 vm.$store.dispatch('initData',{dataset_id:vm.ProjectID});
                 router.push('/study/study_desc');
             })
             .catch(function(response){
+                vm.is_processing=false;
                 vm.errors=response;
+                console.log("failed, response:",response)
             }); 
         },
         onCancel: function(){
@@ -114,13 +114,15 @@ Vue.component('import-options', {
                             </div>
                         
                         </div>
-
-                        <button type="button" class="btn btn-sm btn-primary" @click="importDDI">Import file</button>
-                        <button type="button" class="btn btn-sm btn-danger" @click="onCancel">Cancel</button>
+                        
+                        <div v-if="!is_processing" class="mt-5" >
+                        <button type="button" :disabled="!file" class="btn btn-sm btn-primary" @click="importDDI">Import file</button>
+                        <button type="button" :disabled="!file" class="btn btn-sm btn-danger" @click="onCancel">Cancel</button>
+                        </div>
 
                     </div>
 
-                    <div v-if="errors" class="p-3" style="color:red">
+                    <div v-if="errors" class="p-3 mt-3 border" style="color:red">
                         <div><strong>Errors</strong></div>
                         {{errors}}
                         <div v-if="errors.response">{{errors.response.data.message}}</div>
@@ -134,29 +136,16 @@ Vue.component('import-options', {
                     </v-row>
             
 
-                    <div v-if="update_status!='completed' && errors=='' ">                    
-                        <v-row v-if="is_processing"
-                        class="fill-height"
-                        align-content="center"
-                        justify="center"
-                        >
-                        <v-col
-                            class="text-subtitle-1 text-center"
-                            cols="12"
-                        >
-                        {{update_status}}
-                        </v-col>
-                        <v-col cols="12">
-                            <v-app>
-                            <v-progress-linear 
-                            color="deep-purple accent-4"
+                    <div class="mt-5" v-if="is_processing">
+                    
+                        <v-progress-circular
                             indeterminate
-                            rounded
-                            height="6"
-                            ></v-progress-linear>
-                            </v-app>
-                        </v-col>
-                        </v-row>
+                            width="4"
+                            :size="20"
+                            color="primary"
+                            ></v-progress-circular>
+                            Processing, please wait... 
+
                     </div>
 
 

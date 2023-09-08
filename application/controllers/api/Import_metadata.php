@@ -67,18 +67,7 @@ class Import_metadata extends MY_REST_Controller
 				}
 			}else{
 				$this->load->library('ImportJsonMetadata');
-
 				$result=$this->importjsonmetadata->import($sid,$uploaded_filepath);
-
-				/*
-				$json_data=json_decode(file_get_contents($uploaded_filepath),true);
-				
-				if (!$json_data){
-					throw new Exception("Failed to read/decode JSON file");
-				}
-
-				$result=$this->Editor_model->importJSON($sid,$type=$project['type'],$json_data,$validate=true);
-				*/
 			}
 
 			$output=array(
@@ -96,7 +85,11 @@ class Import_metadata extends MY_REST_Controller
 			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}
 		catch(Exception $e){
-			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
+			$output=array(
+				'status'=>'error',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($output, REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
 

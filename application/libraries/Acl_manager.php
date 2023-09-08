@@ -7,6 +7,7 @@ use Laminas\Permissions\Acl\Resource\GenericResource as Resource;
 class Acl_manager
 {
 	var $debug=false;
+	private $acl_permissions;
 
 	/**
 	 * Constructor
@@ -23,6 +24,7 @@ class Acl_manager
 		}
 
 		$this->ci->load->config('acl_permissions');
+		$this->acl_permissions=$this->ci->config->item("acl_permissions");
 	}
 
 
@@ -352,13 +354,15 @@ class Acl_manager
 
 		//check roles has access to resource
 		foreach($permissions as $perm){
-			$acl->addResource(new Resource($perm['resource']));
-			$acl->allow($perm['role_id'],$perm['resource'], $perm['permissions']);
+			if ($perm['resource']==$resource){
+				$acl->addResource(new Resource($perm['resource']));
+				$acl->allow($perm['role_id'],$perm['resource'], $this->get_resource_sub_priveleges($perm['resource'],$perm['permissions']));
+			}
 		}
 
 		//resources by repository
 		if(!empty($repositoryid)){
-			foreach($permissions as $perm){			
+			foreach($permissions as $perm){
 				$acl->addResource(new Resource($repositoryid.'-'.$perm['resource']));
 				$acl->allow($perm['role_id'],$repositoryid.'-'.$perm['resource'], $perm['permissions']);
 			}
@@ -395,6 +399,32 @@ class Acl_manager
 		}else{
 			throw new AclAccessDeniedException('Access denied for resource:: '.$resource);
 		}
+	}
+
+
+
+	/**
+	 * 
+	 * get sub_priveleges associated to a resource's privilege
+	 * 
+	 * A higher privilege gets all child privileges e.g admin can view, edit, delete
+	 * 
+	 * 
+	 * */
+	function get_resource_sub_priveleges($resource,$privileges)
+	{
+		$resource_sub_perms=$privileges;
+		if (isset($this->acl_permissions[$resource]['permissions'])){
+			foreach($privileges as $privilege){
+				foreach($this->acl_permissions[$resource]['permissions'] as $permission){				
+					if ($permission['permission']==$privilege && isset($permission['sub_permissions']) ){					
+						$resource_sub_perms=array_merge($resource_sub_perms,$permission['sub_permissions']);
+					}
+				}
+			}
+		}
+		
+		return $resource_sub_perms;
 	}
 	
 }

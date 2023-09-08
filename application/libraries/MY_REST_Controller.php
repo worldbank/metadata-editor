@@ -183,7 +183,16 @@ abstract class MY_REST_Controller extends REST_Controller {
             return $this->acl_manager->has_access($resource, $privilege,$user,$repositoryid);
         }
         catch(Exception $e){
-            throw new AclAccessDeniedException('ACCESS-DENIED',$e->getMessage());
+            //throw new AclAccessDeniedException('ACCESS-DENIED',$e->getMessage());            
+				$this->output
+					->set_status_header(403)
+        			->set_content_type('application/json');
+				die (json_encode(
+                    array(
+                        'status'=>'failed',
+                        'error'=>$e->getMessage()
+                    )
+                ));
         }        
     }
 

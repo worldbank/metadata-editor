@@ -50,7 +50,7 @@ class Editor_acl
 		}
 
 		//check if user is project collaborator
-		if ($this->user_has_shared_project_access($project_id,$user)){
+		if ($this->user_has_shared_project_access($project_id,$user,$permission)){
 			return true;
 		}
 
@@ -95,26 +95,91 @@ class Editor_acl
 	 * check if user has shared access to the project
 	 * 
 	 */
-	function user_has_shared_project_access($project_id,$user=null)
+	function user_has_shared_project_access($project_id,$user=null,$permission='view')
 	{
 		if (!$user){
 			$user=(object)$this->current_user();
 		}
 
+		if (!$user)
+		{
+			throw new Exception("User not set");
+		}
+
 		//check if project is shared with user
-		$this->ci->db->select("user_id");
+		$this->ci->db->select("user_id,permissions");
 		$this->ci->db->where("sid",$project_id);
-		$project_owners=$this->ci->db->get("editor_project_owners")->row_array();
+		$this->ci->db->where("user_id",$user->id);
+		$project_owners=$this->ci->db->get("editor_project_owners")->result_array();
 
 		if (!$project_owners){
 			return false;
 		}
 
+		$user_permissions=[];
+		foreach($project_owners as $row)
+		{
+			$user_permissions[]=$row['permissions'];
+		}
+
+		//test access
+		$has_access=$this->user_has_shared_project_access_acl($user_permissions, $permission);
+
+		if (!$has_access){
+			throw new Exception("You don't have access: " . $permission);
+		}
+		
 		if ($project_owners['user_id']==$user->id){
 			return true;
 		}
 
 		return false;
+	}
+
+	/**
+	 * 
+	 * Check if user has access to the project
+	 * 
+	 * @privilege - array - view, edit, admin
+	 * @permission - permission - view, edit, admin
+	 * 
+	 */
+	private function user_has_shared_project_access_acl($privileges,$permission)
+	{
+
+		$acl = new Acl();
+
+		//base role/user
+		$acl->addRole(new Role('user'));
+
+		$permissions_list=array('view','edit','admin');
+
+		//for each permission add a role
+		$acl->addRole(new Role('user-view'), 'user');
+		$acl->addRole(new Role('user-edit'), 'user-view');
+		$acl->addRole(new Role('user-admin'), 'user-edit');
+
+		//add resources
+		$acl->addResource(new Resource('project'));
+
+		//allow access
+		$acl->allow('user-view','project',array('view'));
+		$acl->allow('user-edit','project',array('edit'));
+		$acl->allow('user-admin','project',array('admin'));
+		
+		//add access
+		foreach($privileges as $priv)
+		{
+			$role='user-'.$priv;
+			$acl->allow($role,'project',$privileges);
+		}
+
+
+		if ($acl->isAllowed($role,'project',$permission) ){
+			return true;
+		}
+
+		return false;	
 	}
 
 
@@ -611,6 +676,7 @@ echo '<pre>';
 
 		//get role resources and permissions list
 		$permissions=$this->get_roles_permissions(array_keys($user_roles));
+
 
 		//load into zend acl
 		$acl = new Acl();
