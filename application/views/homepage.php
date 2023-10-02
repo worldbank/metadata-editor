@@ -15,8 +15,8 @@
     <div class="col-md-4 ">
         <div class="border shadow m-3 p-3  text-center">
             <div class="text-center"><i style="font-size:50px;padding:15px;color:#28a745;" class="fas fa-book"></i> </div>
-            <div class="text-center font-weight-bold"><a href="docs" target="_blank">Documentation</a></div>
-            <div><a href="docs" target="_blank" class="text-muted">Learn about the Metadata Editor features</a></div>
+            <div class="text-center font-weight-bold"><a href="<?php echo base_url();?>" target="_blank">Documentation</a></div>
+            <div><a href="<?php echo base_url();?>docs" target="_blank" class="text-muted">Learn about the Metadata Editor features</a></div>
         </div>
     </div>
 
@@ -38,31 +38,6 @@
     </div>
 
 </div>
-
-<div class="border-top mt-3 mb-3"></div>
-
-
-<div class="mt-5"><h5>Getting started</h5></div>
-<div class="row">
-        <div class="col-md-3">
-            <ul>
-                <li><a href="docs/#/editing/microdata">Microdata</a></li>
-                <li><a href="docs/#/editing/microdata">Document</a></li>
-                <li>Table</li>
-                <li>Image</li>
-            </ul>
-        </div>
-
-        <div class="col-md-4">
-            <ul>
-                <li>Video</li>
-                <li>Timeseries, Timeseries database</li>
-                <li>Script</li>
-            </ul>
-        </div>
-</div>
-
-
 
 
 <div style="height:300px;"></div>

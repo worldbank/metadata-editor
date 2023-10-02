@@ -8,8 +8,7 @@ class Share extends MY_REST_Controller
 	{
 		parent::__construct();
 		$this->load->model("editor_owners_model");
-		
-		//$this->load->library("Dataset_manager");
+		$this->load->library("Editor_acl");
 		$this->is_authenticated_or_die();
 	}
 
@@ -159,7 +158,7 @@ class Share extends MY_REST_Controller
 	function index_post($sid=null, $userId=null)
 	{
 		try{
-			//$this->has_dataset_access('edit',$sid);
+			$this->editor_acl->user_has_project_access($sid,$permission='admin');
 
 			if(!$sid){
 				throw new Exception("Missing parameter `sid`");
@@ -203,7 +202,7 @@ class Share extends MY_REST_Controller
 	function index_delete($sid=null, $userId=null)
 	{
 		try{
-			//$this->has_dataset_access('edit',$sid);
+			$this->editor_acl->user_has_project_access($sid,$permission='admin');
 
 			if(!$sid){
 				throw new Exception("Missing parameter `sid`");

@@ -56,7 +56,7 @@ class Editor_owners_model extends ci_model {
 
     function user_by_id($user_id)
     {
-        $this->db->select('id,username,email');
+        $this->db->select('id,id as user_id,username,email');
         $this->db->where("id",$user_id);
 		$this->db->order_by('username','ASC');
 		return $this->db->get('users')->row_array();
@@ -93,7 +93,6 @@ class Editor_owners_model extends ci_model {
 
     function add($sid,$user_id, $permissions=null)
     {
-
         //check if user is the owner
         $owner=$this->get_project_owner($sid);
 

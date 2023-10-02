@@ -84,7 +84,8 @@ class Editor extends MY_REST_Controller
 				'offset'=>$offset,
 				'limit'=>$limit,
 				'projects'=>$result['result'],
-				'filters'=>$result['filters']
+				'filters'=>$result['filters'],
+				'db_query_'=>$result['db_query']
 			);
 						
 			$this->set_response($response, REST_Controller::HTTP_OK);
@@ -1077,5 +1078,61 @@ class Editor extends MY_REST_Controller
 
 		return true;
 	}
+
+
+	/**
+	 * 
+	 * Get info on all users/collections that have access to a project
+	 * 
+	 */
+	function access_permissions_get($sid=null)
+	{
+		try{
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
+
+			$result=$this->editor_acl->get_project_access_permissions($sid);
+			
+			$response=array(
+				'status'=>'success',
+				'access'=>$result
+			);			
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	/**
+	 * 
+	 * Check if user has admin access on a project
+	 * 
+	 */
+	function has_admin_access_get($sid=null)
+	{
+		try{
+			$this->editor_acl->user_has_project_access($sid,$permission='admin');
+
+			$response=array(
+				'status'=>'success',
+				'access'=>'admin'
+			);
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+
+	}
+
 	
 }

@@ -10,8 +10,10 @@ class Templates extends MY_REST_Controller
 		$this->load->helper("date");
 		$this->load->model("Editor_template_model");
 		
-		//$this->load->library("Dataset_manager");
-		$this->is_admin_or_die();
+		$this->load->library("Form_validation");
+		//$this->is_admin_or_die();
+		$this->load->library("Editor_acl");
+		$this->is_authenticated_or_die();
 	}
 
 	//override authentication to support both session authentication + api keys
@@ -37,7 +39,8 @@ class Templates extends MY_REST_Controller
 				return $this->template_get($uid);
 			}
 
-			//$this->has_dataset_access('view');
+			$this->has_access($resource_='template_manager',$privilege='view');
+			
 			$result=$this->Editor_template_model->select_all();
 			array_walk($result, 'unix_date_to_gmt',array('created','changed'));
 			
@@ -63,7 +66,7 @@ class Templates extends MY_REST_Controller
 	function core_template_get($data_type=null)
 	{
 		try{
-			//$this->has_dataset_access('view',$sid);
+			$this->has_access($resource_='template_manager',$privilege='view');
 
 			if(!$data_type){
 				throw new Exception("Missing parameter for `data_type`");
@@ -97,7 +100,7 @@ class Templates extends MY_REST_Controller
 	function template_get($uid=null)
 	{
 		try{
-			//$this->has_dataset_access('view',$sid);
+			$this->has_access($resource_='template_manager',$privilege='view');
 
 			if(!$uid){
 				throw new Exception("Missing parameter for `UID`");
@@ -128,7 +131,7 @@ class Templates extends MY_REST_Controller
 	function list_get($type=null)
 	{
 		try{
-			//$this->has_dataset_access('view',$sid);
+			$this->has_access($resource_='template_manager',$privilege='view');
 
 			$result=$this->Editor_template_model->get_templates_by_type($type);
 				
@@ -155,7 +158,7 @@ class Templates extends MY_REST_Controller
 	function template_parts_get($uid=null)
 	{
 		try{
-			//$this->has_dataset_access('view',$sid);
+			$this->has_access($resource_='template_manager',$privilege='view');
 
 			if(!$uid){
 				throw new Exception("Missing parameter for `UID`");
@@ -191,7 +194,9 @@ class Templates extends MY_REST_Controller
 	 **/ 
 	function duplicate_post($uid=null)
 	{		
-		try{			
+		try{
+			$this->has_access($resource_='template_manager',$privilege='duplicate');
+
 			$result=$this->Editor_template_model->duplicate_template($uid);
 
 			$output=array(
@@ -210,6 +215,9 @@ class Templates extends MY_REST_Controller
 	function create_post()
 	{		
 		try{
+
+			$this->has_access($resource_='template_manager',$privilege='edit');
+
 			$options=$this->raw_json_input();
 			$result=$this->Editor_template_model->create_template($options);
 
@@ -233,6 +241,8 @@ class Templates extends MY_REST_Controller
 	function update_post($uid=null)
 	{		
 		try{
+			$this->has_access($resource_='template_manager',$privilege='edit');
+
 			if (!$uid){
 				throw new Exception("Missing parameter: UID");
 			}
@@ -256,6 +266,9 @@ class Templates extends MY_REST_Controller
 	function delete_post($uid=null)
 	{		
 		try{
+			
+			$this->has_access($resource_='template_manager',$privilege='delete');
+
 			if (!$uid){
 				throw new Exception("Missing parameter: UID");
 			}
@@ -283,6 +296,8 @@ class Templates extends MY_REST_Controller
 	function default_post($type=null,$uid=null)
 	{		
 		try{			
+			$this->has_access($resource_='template_manager',$privilege='admin');
+
 			$result=$this->Editor_template_model->set_default_template($type,$uid);
 
 			$output=array(
@@ -301,7 +316,7 @@ class Templates extends MY_REST_Controller
 	function default_get($type=null)
 	{
 		try{
-			//$this->has_dataset_access('view',$sid);
+			$this->has_access($resource_='template_manager',$privilege='view');
 
 			$result=$this->Editor_template_model->get_default_template($type);
 				
@@ -323,7 +338,7 @@ class Templates extends MY_REST_Controller
 	function defaults_get($type=null)
 	{
 		try{
-			//$this->has_dataset_access('view',$sid);
+			$this->has_access($resource_='template_manager',$privilege='view');
 
 			$result=$this->Editor_template_model->get_all_default_templates();
 				

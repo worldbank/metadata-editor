@@ -65,13 +65,18 @@ $config['acl_permissions'] = [
                 "permission" => "view"
             ],
             [
-                "permission" => "edit"
+                "permission" => "edit",
+                "sub_permissions"=>["view"]
             ],
             [
                 "permission" => "delete"
             ],
             [
-                "permission" => "admin"
+                "permission" => "admin",
+                "sub_permissions"=>["view","edit","delete", "duplicate"]
+            ],            
+            [
+                "permission" => "duplicate"
             ]
         ]
     ],
@@ -81,7 +86,7 @@ $config['acl_permissions'] = [
         "permissions"=>[
             [
                 "permission" => "view"
-            ],
+            ],            
             [
                 "permission" => "create"
             ],
@@ -90,6 +95,27 @@ $config['acl_permissions'] = [
             ],
             [
                 "permission" => "delete"
+            ]
+        ]
+    ],
+
+    "collection"=>[ 
+        "title" => "Collections",
+        "permissions"=>[
+            [
+                "permission" => "view"
+            ],            
+            [
+                "permission" => "edit",
+                "sub_permissions"=>["view"]
+            ],
+            [
+                "permission" => "delete",
+                "sub_permissions"=>["view"]
+            ],
+            [
+                "permission" => "admin",
+                "sub_permissions"=>["view","edit","delete"]
             ]
         ]
     ],

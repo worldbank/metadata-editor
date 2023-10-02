@@ -21,28 +21,11 @@ class Editor_acl
 
 
 
-	/**
-	 * 
-	 * Return a list of all permissions
-	 * 
-	 * 
-	 */
-	function get_user_permissions_by_project($project_id,$user=null)
-	{
-		if (!$user){
-			$user=$this->current_user();
-		}
-
-		
-	}
-
-
 	function user_has_project_access($project_id,$permission=null,$user=null)
 	{
 		if (!$user){
 			$user=(object)$this->current_user();
 		}
-
 
 		//check if user is project owner
 		if ($this->is_user_project_owner($project_id,$user)){
@@ -58,7 +41,7 @@ class Editor_acl
 		if ($this->user_has_collection_access($permission,$project_id,$user)){
 			return true;
 		}
-
+ 
 		throw new Exception("You don't have permissions to access this project");
 	}
 
@@ -106,6 +89,7 @@ class Editor_acl
 			throw new Exception("User not set");
 		}
 
+
 		//check if project is shared with user
 		$this->ci->db->select("user_id,permissions");
 		$this->ci->db->where("sid",$project_id);
@@ -126,14 +110,11 @@ class Editor_acl
 		$has_access=$this->user_has_shared_project_access_acl($user_permissions, $permission);
 
 		if (!$has_access){
-			throw new Exception("You don't have access: " . $permission);
-		}
-		
-		if ($project_owners['user_id']==$user->id){
-			return true;
+			//throw new AclAccessDeniedException("Access denied, you don't have permissions");
+			throw new Exception("Access denied, you don't have permissions");
 		}
 
-		return false;
+		return true;
 	}
 
 	/**
@@ -271,128 +252,6 @@ class Editor_acl
 		return false;		
 	}
 
-
-
-	//--- tobe removed
-	function role_has_access_test($permission)
-	{
-		$acl = new Acl();
-
-		//add roles
-		$acl->addRole(new Role('user-x'));
-		$acl->addRole(new Role('user-y'));
-
-		//view access
-		$acl->addRole( new Role('user-viewer'));
-
-		//edit access
-		$acl->addRole(new Role('user-editor'), 'user-viewer');
-
-		//admin access
-		$acl->addRole(new Role('user-admin'), 'user-editor');
-
-		//add resources
-		$acl->addResource(new Resource('project-y'));
-		
-echo '<pre>';
-
-		$acl->allow('user-viewer','project-y',array('view'));
-		$acl->allow('user-editor','project-y',array('edit'));
-		$acl->allow('user-admin','project-y',array('admin'));
-
-		echo $acl->isAllowed('user-viewer','project-y',$permission) ? 'user-viewer has '.$permission.' access to project-y yes' : 'viewer has no '.$permission.' access';
-		echo '<hr>';
-
-		echo $acl->isAllowed('user-editor','project-y',$permission) ? 'user-editor has '.$permission.' access to project-y yes' : 'editor has no '.$permission.' access';
-		echo '<hr>';
-
-		echo $acl->isAllowed('user-editor','project-y',$permission) ? 'user-editor has EDIT access to project-y yes' : 'no edit access';
-		echo '<hr>';
-
-		echo $acl->isAllowed('user-admin','project-y',$permission) ? 'user-admin has VIEW access to project-y yes' : 'no view access';
-		echo '<hr>';
-
-		echo $acl->isAllowed('user-admin','project-y',$permission) ? 'user-admin has EDIT access to project-y yes' : 'no edit access';
-		echo '<hr>';
-
-		echo $acl->isAllowed('user-admin','project-y',$permission) ? 'user-admin has ADMIN access to project-y yes' : 'no admin access';
-		echo '<hr>';
-
-		die();
-
-
-		//allow access
-		$acl->allow('user-x','project-y',array('view'));
-		$acl->allow('user-y','project-y',array('view','edit','admin'));
-
-		//check if user has access to the project
-		echo $acl->isAllowed('user-x','project-y','view') ? 'user-x has VIEW access to project-y yes' : 'no view access';
-		echo '<hr>';
-
-		//check if user has access to the project
-		echo $acl->isAllowed('user-x','project-y','edit') ? 'user-x has EDIT access to project-y yes' : 'no edit access';
-		echo '<hr>';
-
-		//check if user has access to the project
-		echo $acl->isAllowed('user-x','project-y','admin') ? 'user-x has ADMIN access to project-y yes' : 'no admin access';
-		echo '<hr>';
-
-		//check if user has access to the project
-		echo $acl->isAllowed('user-x','project-y','delete') ? 'user-x has DELETE access to project-y yes' : 'no delete access';
-		echo '<hr>';
-
-		//check if user has access to the project
-		echo $acl->isAllowed('user-x','project-y',$permission) ? 'user-x has '.$permission.' access to project-y yes' : 'no '.$permission.' access';
-		echo '<hr>';
-
-			
-
-		return;
-
-		$acl->addRole(new Role('user'))    
-			->addRole(new Role('admin'))
-			->addRole(new Role('study_manager'))
-			->addRole(new Role('lsms_collection_manager'))
-			->addRole(new Role('lsms_collection_editor'))
-			->addRole(new Role('lsms_collection_reviewer'))
-			->addRole(new Role('findex_collection_manager'))
-			->addRole(new Role('citation_manager'))
-			->addRole(new Role('licensed_request_manager'));
-
-		/*
-		$acl->addResource(new Resource('lsms_collection'));
-		$acl->addResource(new Resource('findex_collection'));
-		$acl->addResource(new Resource('study'));
-		*/
-
-
-		$acl->addResource(new Resource('study'));
-
-		//afr and lsms inherit from study
-		$acl->addResource(new Resource('afr'), 'study');
-		//$acl->addResource(new Resource('lsms'), 'study');
-
-		$acl->addResource(new Resource('lsms'));
-
-
-		//allow full control for admin
-		$acl->allow('admin',null, null);
-
-		//can edit, import, but not publish, delete
-		$acl->allow('lsms_collection_editor', 'lsms', array('view','edit','import','resources.admin', 'uploads.admin'));
-
-		//can only publish, delete nothing else
-		$acl->allow('lsms_collection_reviewer', 'lsms', array('unpublish','publish','view'));
-
-		//everything
-		$acl->allow('lsms_collection_manager', 'lsms');
-
-
-		//isAllowed(user_role, resource, rules, permissions)
-		echo $acl->isAllowed('admin', 'afr','publish') ? 'user is allowed afr '."<BR/>" : 'user is denied';
-	}
-
-	
 
 	/**
 	 * 
@@ -732,6 +591,70 @@ echo '<pre>';
 			throw new AclAccessDeniedException('Access denied for resource:: '.$resource);
 		}
 	}
-	
+
+
+	/**
+	 * 
+	 * Return a list of all permissions
+	 * 
+	 * 
+	 */
+	function get_user_permissions_by_project($project_id,$user=null)
+	{
+		if (!$user){
+			$user=(object)$this->current_user();
+		}
+
+		//TODO
+	}
+
+	/**
+	 * 
+	 * Return project owner, collaborators, and collection permissions
+	 * 
+	 * 
+	 * 
+	 */
+	function get_project_access_permissions($project_id)
+	{
+		$output=array();
+
+		$this->ci->load->model("Editor_owners_model");
+
+		$output['owner']=$this->ci->Editor_owners_model->get_project_owner($project_id);
+		$output['collaborators']=$this->ci->Editor_owners_model->select_all($project_id);
+		$output['collections']=$this->get_project_access_permissions_by_collections($project_id);
+
+		return $output;
+	}
+
+
+	/**
+     * Get users with access to the project via collections
+     * 
+     */
+    function get_project_access_permissions_by_collections($sid)
+    {
+
+	/*		SELECT editor_collections.id as collection_id,editor_collections.title, ca.user_id, ca.permissions, p.sid,
+				users.username, users.email
+				FROM editor_collections
+				inner join editor_collection_access ca on ca.collection_id=editor_collections.id
+				inner join editor_collection_projects p on p.collection_id= ca.collection_id 
+				inner join users on users.id=ca.user_id
+				LIMIT 0,100
+	*/
+
+		$this->ci->db->select("editor_collections.id as collection_id,editor_collections.title, ca.user_id, ca.permissions, p.sid,users.username, users.email");
+		$this->ci->db->join("editor_collection_access ca","ca.collection_id=editor_collections.id");
+		$this->ci->db->join("editor_collection_projects p","p.collection_id= ca.collection_id");
+		$this->ci->db->join("users","users.id=ca.user_id");
+		$this->ci->db->where("p.sid",$sid);
+		$result=$this->ci->db->get("editor_collections")->result_array();
+
+		return $result;
+    }
+
+
 }
 

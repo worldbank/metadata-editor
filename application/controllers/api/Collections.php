@@ -10,6 +10,7 @@ class Collections extends MY_REST_Controller
 		$this->load->helper("date");
 		$this->load->model("Collection_model");
 		$this->load->model("Collection_access_model");
+		$this->load->library("Form_validation");
 		
 		$this->is_authenticated_or_die();
 	}
@@ -36,7 +37,7 @@ class Collections extends MY_REST_Controller
 				return $this->single_get($uid);
 			}
 
-			//$this->has_dataset_access('view');
+			$this->has_access($resource_='collection',$privilege='view');
 			$result=$this->Collection_model->select_all();
 			array_walk($result, 'unix_date_to_gmt',array('created','changed'));
 			
@@ -61,6 +62,7 @@ class Collections extends MY_REST_Controller
 	function single_get($id=null)
 	{
 		try{
+			$this->has_access($resource_='collection',$privilege='view');
 			$result=$this->Collection_model->select_single($id);
 
 			if(!$result){
@@ -94,6 +96,7 @@ class Collections extends MY_REST_Controller
 	function index_post()
 	{		
 		try{
+			$this->has_access($resource_='collection',$privilege='edit');
 			$options=$this->raw_json_input();
 			$options['created_by']=$this->session->userdata('user_id');
 			$options['changed_by']=$this->session->userdata('user_id');
@@ -121,6 +124,7 @@ class Collections extends MY_REST_Controller
 				throw new Exception("Missing parameter: ID");
 			}
 
+			$this->has_access($resource_='collection',$privilege='edit');
 			$options=$this->raw_json_input();			
 			$options['changed_by']=$this->session->userdata('user_id');
 			$options['changed']=time();
@@ -145,7 +149,8 @@ class Collections extends MY_REST_Controller
 			if (!$id){
 				throw new Exception("Missing parameter: ID");
 			}
-
+			
+			$this->has_access($resource_='collection',$privilege='delete');
 			$result=$this->Collection_model->delete($id);
 
 			$output=array(
@@ -162,6 +167,7 @@ class Collections extends MY_REST_Controller
 	function add_projects_post()
 	{		
 		try{
+			$this->has_access($resource_='collection',$privilege='edit');
 			$options=$this->raw_json_input();			
 
 			if (!isset($options['collection_id'])){
@@ -171,7 +177,7 @@ class Collections extends MY_REST_Controller
 			if (!isset($options['projects'])){
 				throw new Exception("Missing parameter: projects");
 			}
-
+			
 			$result=$this->Collection_model->add_projects($options['collection_id'], $options['projects']);
 
 			$output=array(
@@ -188,6 +194,8 @@ class Collections extends MY_REST_Controller
 	function remove_project_post($collection_id=null,$project_id=null)
 	{		
 		try{
+			$this->has_access($resource_='collection',$privilege='edit');
+
 			if (!$collection_id){
 				throw new Exception("Missing parameter: collection_id");
 			}
@@ -219,6 +227,8 @@ class Collections extends MY_REST_Controller
 	function user_access_get($collection_id=null)
 	{
 		try{
+			$this->has_access($resource_='collection',$privilege='view');
+
 			if (!$collection_id){
 				throw new Exception("Missing parameter: collection ID");
 			}
@@ -247,7 +257,8 @@ class Collections extends MY_REST_Controller
 	function user_access_post()
 	{
 		try{
-			$options=$this->raw_json_input();			
+			$options=$this->raw_json_input();
+			$this->has_access($resource_='collection',$privilege='edit');
 
 			if (!isset($options['collection_id'])){
 				throw new Exception("Missing parameter: collection_id");
@@ -282,6 +293,8 @@ class Collections extends MY_REST_Controller
 	function remove_user_access_post()
 	{
 		try{
+			$this->has_access($resource_='collection',$privilege='edit');
+
 			$options=$this->raw_json_input();
 
 			if (!isset($options['collection_id'])){

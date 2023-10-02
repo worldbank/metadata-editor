@@ -197,18 +197,24 @@
                       </div>
                     </div>
 
-                    <table class="table table-sm border-bottom"  v-if="ProjectsCount>0">
+                    <table class="table table-sm table-striped table-hover border-bottom"  v-if="ProjectsCount>0">
                       <thead>
                         <tr style="font-size:small;">
-                          <th><input type="checkbox" v-model="select_all_projects" @change="toggleProjectSelection" /></th>
-                          <th></th>
+                          <th style="width:20px;"><span class="mdi mdi-chevron-down"></span></th>
+                          <th style="width:20px;"><input type="checkbox" v-model="select_all_projects" @change="toggleProjectSelection" /></th>
+                          <th style="width:30px;"></th>
                           <th>Title</th>
                           <th>Updated by</th>
-                          <th>Updated on</th>
-                          <th></th>
+                          <th style="width:100px;">Updated on</th>
+                          <th style="width:100px"></th>
                         </tr>
-                        <tr v-for="(project,index) in Projects" class="project-row" :key="index">
+                      </thead>
 
+                        <template v-for="(project,index) in Projects" >
+                        <tr class="project-row" :key="index">
+                          <td><v-btn x-small icon @click="toggleProjectDetails(project.id)">
+                              <v-icon>mdi-chevron-down</v-icon></v-btn>                            
+                            </td>
                           <td><input type="checkbox" v-model="selected_projects" :value="project.id" /></td>
                           <td style="vertical-align:top"><i :title="project.type" :class="project_types_icons[project.type]"></i></td>
                           <td>
@@ -218,39 +224,100 @@
                                 <span v-if="project.title.length>1">{{project.title}}</span>
                                 <span v-else>Untitled</span>
                               </a>
-                            </div>
-                            <div class="text-secondary text-small">
-                              {{project.idno}}
-                            </div>
-
-                            <div v-if="project.collections.length>0" class="mt-2">
-                              <span class="text-secondary">Collections: </span>
-                              <template v-for="collection in project.collections">
-                                <span @click="removeCollection(project.id,collection.id)" class="cursor-pointer badge font-weight-normal text-secondary border border-warning rounded mr-1">
-                                  {{collection.title}}
-                                  <span aria-hidden="true">&times;</span>
-                                </span>
-                              </template>
-                            </div>
+                            </div>                                                    
                           </td>
 
                           <td class="text-xs"><span class="wb-value capitalize text-truncate">{{project.username}}</span></td>
-                          <td class="text-secondary text-small text-xs">{{momentAgo(project.changed)}} <br /> <span class="text-xs">{{momentDate(project.changed)}}</span></td>
-                          <td>
+                          <td class="text-secondary text-small text-xs">{{momentAgo(project.changed)}} </td>
+                          <td >
 
-                            <span>                              
-                              <a  title="Edit project" @click.prevent.stop="EditProject(project.id)" :href="projectEditUrl(project.id)"><span class="mdi mdi-pencil-box-outline"></span></a>                              
-                              <a title="Share project" v-if="project.is_shared>0"  @click="ShareProject(project.id)" href="#">
-                                <span class="mdi mdi-share"></span>
-                              </a>
-                              <a v-else  @click="ShareProject(project.id)" href="#">
-                                <span class="mdi mdi-share"></span>
-                              </a>
-                              <a  title="Delete" @click="DeleteProject(project.id)" href="#"><span class="text-danger mdi mdi-close-circle-outline"></span></a>                              
-                            </span>
+                            <v-btn x-small icon @click="EditProject(project.id)">
+                              <v-icon>mdi-pencil-box-outline</v-icon>
+                            </v-btn>  
+
+                            <v-btn x-small icon @click="toggleProjectDetails(project.id)">
+                              <v-icon>mdi-dots-vertical</v-icon>
+                            </v-btn>  
 
                           </td>
                         </tr>
+                        <tr style="font-size:small;">
+                          <td colspan="7" v-if="isProjectDetailsOpen(project.id)">
+                              <v-row class="m-1 pl-3 bg-light">
+                                
+                                <v-col cols="2">
+                                  <div class="text-secondary text-small mb-3">
+                                    <div class="wb-label"><strong>Last modified</strong></div>
+                                    <div class="wb-value">{{momentDate(project.changed)}}</div>
+                                  </div>
+                                  <div class="text-secondary text-small mb-3">
+                                    <div class="wb-label"><strong>Created on</strong></div>
+                                    <div class="wb-value">{{momentDate(project.created)}}</div>
+                                  </div>
+
+                                </v-col>
+
+                                <v-col cols="2">                                  
+
+                                  <div class="text-secondary text-small mb-3">
+                                    <div class="wb-label"><strong>Last modified by</strong></div>
+                                    <div class="wb-value">{{project.username}}</div>
+                                  </div>
+
+                                  <div class="text-secondary text-small mb-3">
+                                    <div class="wb-label"><strong>Project owner</strong></div>
+                                    <div class="wb-value">{{project.username_cr}}</div>
+                                  </div>
+
+                                </v-col>
+
+                                <v-col cols="3"  >
+                                  
+                                <div class="text-secondary text-small mb-3">
+                                  <div><strong>IDNO</strong></div>
+                                  {{project.idno}}
+                                </div>
+                                
+                                <div v-if="project.collections.length>0" >
+                                  <div class="text-secondary"><strong>Collections</strong></div>
+                                  <template v-for="collection in project.collections">
+                                    <span @click="removeCollection(project.id,collection.id)" class="cursor-pointer badge font-weight-normal text-secondary border border-warning rounded mr-1">
+                                      {{collection.title}}
+                                      <span aria-hidden="true">&times;</span>
+                                    </span>
+                                  </template>
+                                </div>
+                                </v-col>
+
+                                <v-col>
+
+                                  <div class="float-right">
+                                
+                                  <div class="mb-1">
+                                    <a href="#" @click="viewAccessPermissions(project.id)" class="btn btn-sm btn-outline-primary"><span class="mdi mdi-information-outline"> View access</span></a>                              
+                                  </div>
+                              
+                                  <div class="mb-1">
+                                  <a class="btn btn-sm btn-outline-primary" title="Share project"  @click="ShareProject(project.id)" href="#">
+                                    <span class="mdi mdi-share"> Share</span>
+                                  </a>
+                                </div>
+
+                                  <div class="mb-1">
+                                  <a  class="btn btn-sm btn-outline-danger" title="Delete" @click="DeleteProject(project.id)" href="#"><span class="mdi mdi-close-circle-outline"> Delete</span></a>                              
+                                  </div>
+                                </span>
+
+                                </div>
+
+                                </v-col>
+
+                                
+                              </v-row>
+                          
+                          </td>                          
+                        </tr>
+                        </template>
                   </template>
 
                 </div>
@@ -262,6 +329,10 @@
       </div>
 
     </div>
+
+    
+    <vue-project-access-dialog v-model="dialog_access_project" v-bind="dialog_access_options">
+    </vue-project-access-dialog>
 
     <vue-project-share v-model="dialog_share_project" v-bind="dialog_share_options" v-on:share-project="ShareProjectWithUser" v-on:remove-access="UnshareProjectWithUser">
     </vue-project-share>
@@ -432,6 +503,7 @@
     <?php
     echo $this->load->view("project/vue-project-share-component.js", null, true);
     echo $this->load->view("project/vue-collection-share-component.js", null, true);
+    echo $this->load->view("project/vue-project-access-component.js", null, true);
     ?>
 
     const translation_messages = {
@@ -503,12 +575,15 @@
         import_file_errors:null,
         dialog_share_project: false,
         dialog_share_options: [],
+        dialog_access_project:false,
+        dialog_access_options:[],
         dialog_share_collection: false,
         dialog_share_collection_options: [],
         users_list: null,
         projects_shared: [],
         search_keywords: '',
         search_filters: {},
+        collapsible_list: [], //show/hide project details
         data_types: {
           "survey": "Microdata",
           "document": "Document",
@@ -827,8 +902,23 @@
             window_.focus();
           }
         },
-        ShareProject: async function(id) {
+        viewAccessPermissions: async function (id)
+        {
+          let ProjectAccessPermissions= await this.getProjectAccessPermissions(id);
+          this.dialog_access_options = {
+              'project_access':ProjectAccessPermissions,
+            };
+            this.dialog_access_project = true;
+        },
+        ShareProject: async function(id) { 
           try {
+            let hasPermissionsToShare = await this.hasProjectAdminAccess(id);
+
+            if (!hasPermissionsToShare){
+              alert("You don't have permissions to share this project");
+              return false;
+            }
+
             let users = await this.getUsersList();
             let SharedUsers = await this.getProjectSharedUsers(id);
 
@@ -896,6 +986,34 @@
 
           throw new Error(response);
         },
+        hasProjectAdminAccess: async function(project_id) {
+          let vm = this;
+          let url = CI.base_url + '/api/editor/has_admin_access/' + project_id;
+
+          try{
+            let response = await axios.get(url);
+
+            if (response.status == 200) {
+              if (response.data.access=='admin'){
+                return true;
+              }
+            }
+        } catch (e) {}
+          return false;
+
+        },
+        getProjectAccessPermissions: async function(project_id) {
+          let vm = this;
+          let url = CI.base_url + '/api/editor/access_permissions/' + project_id;
+
+          let response = await axios.get(url);
+
+          if (response.status == 200) {
+            return response.data.access;
+          }
+
+          throw new Error(response);
+        },
         ShareProjectWithUser: async function(obj) {
           try {
             let vm = this;
@@ -928,32 +1046,43 @@
           let form_data = {};
           let url = CI.base_url + '/api/share/delete/' + project_id + '/' + user_id;
 
+          try{
           let response = await axios.post(url,
             form_data
           );
-
           return response;
+        } catch (e) {
+            alert("Error:" +  e.response.data.message);            
+        }
+        return false;          
         },
         UnshareProjectWithUser: async function(obj) {
-          try {
             let vm = this;
-            console.log("unshare project", obj);
             let result = this._unshareProject(obj.project_id, obj.user_id);
             this.loadProjects();
-
-          } catch (e) {
-            console.log("UnshareProject error", e);
-            alert("Failed", JSON.stringify(e));
-          }
         },
         toggleProjectSelection: function() {
           this.selected_projects = [];
           if (this.select_all_projects == true) {
-            console.log("is true/false", this.select_all_projects);
             for (i = 0; i < this.Projects.length; i++) {
               this.selected_projects.push(this.Projects[i].id);
             }
           }
+        },
+        toggleProjectDetails: function(project_id) {
+          let idx = this.collapsible_list.indexOf(project_id);
+          if (idx == -1) {
+            this.collapsible_list.push(project_id);
+          } else {
+            this.collapsible_list.splice(idx, 1);
+          }
+        },
+        isProjectDetailsOpen: function(project_id) {
+          let idx = this.collapsible_list.indexOf(project_id);
+          if (idx == -1) {
+            return false;
+          }
+          return true;
         },
         addProjectsToCollection: async function() {
           try {

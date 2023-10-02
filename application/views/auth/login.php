@@ -23,7 +23,7 @@
     display:block;
 }
 </style>
-<div class="login-form">
+<div class="login-form mt-5">
 
 
 <?php $reason=$this->session->flashdata('reason');?>

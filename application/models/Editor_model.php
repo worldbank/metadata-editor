@@ -190,11 +190,8 @@ class Editor_model extends CI_Model {
 			$this->db->limit($limit, $offset);
 		}
 
-		$search_filters=$this->apply_search_filters($search_options);
-		
+		$search_filters=$this->apply_search_filters($search_options);		
 		$result= $this->db->get("editor_projects");
-
-		//echo $this->db->last_query();
 		
 		if ($result){
 			$result=$result->result_array();			
@@ -207,12 +204,13 @@ class Editor_model extends CI_Model {
 			$result=$this->decode_encoded_fields_rows($result);
 		}
 
+		//var_dump($this->db->last_query());
+
 		return array(
 			'result'=>$result,
+			'db_query'=>$this->db->last_query(),
 			'filters'=>$search_filters
 		);
-
-		return false;
 	}
 
 	//returns the total 
@@ -260,11 +258,30 @@ class Editor_model extends CI_Model {
 	private function apply_search_filters($search_options)
 	{
 		$applied_filters=array();
+		$ownership_types=array(
+			"self",
+			"shared"
+		);
+
+		/*
+		if (isset($search_options['ownership']) && in_array($search_options['ownership'],$ownership_types)) {
+			switch($search_options['ownership']){
+				case 'self':
+					$this->db->where('editor_projects.created_by',(int)$project_owners[0]);
+					break;
+				case 'shared':
+					$this->db->where('editor_projects.created_by !=',(int)$project_owners[0]);
+					break;
+			}		
+			
+			$applied_filters['ownerships']=$search_options['ownership'];
+		}
+		*/
 
 		//filter by ownership
 		$project_owners=$this->parse_filter_values_as_int($this->get_search_filter($search_options,'user_id'));
 
-		if ($project_owners){		
+		if ($project_owners){
 			
 			//projects user owns by direct sharing
 			$subquery='select sid from editor_project_owners where user_id='.(int)$project_owners[0];
@@ -276,8 +293,33 @@ class Editor_model extends CI_Model {
 			
 			$query='(editor_projects.created_by='.(int)$project_owners[0]
 				 .' OR editor_projects.id in( '. $subquery.') OR editor_projects.id in ('.$collection_query.')) ';
-			$this->db->where($query,null, false);
-			$applied_filters['user_id']=$project_owners;
+			
+			//ownership
+			if (isset($search_options['ownership']) && in_array($search_options['ownership'],$ownership_types)) {
+				switch($search_options['ownership']){
+					case 'self':
+						$this->db->where('editor_projects.created_by',(int)$project_owners[0]);
+						break;
+					case 'shared':
+
+						//direct shared
+						$direct_shared='editor_projects.id in (select sid from editor_project_owners where user_id='.(int)$project_owners[0].')';
+						$this->db->or_where($direct_shared);
+
+						//collections
+						$query_shared_only='(editor_projects.created_by!='.(int)$project_owners[0]
+							.' OR editor_projects.id in ('.$collection_query.') )';
+						$this->db->where($query_shared_only);
+						break;
+				}		
+				$applied_filters['user_id']=$project_owners;
+				$applied_filters['ownerships']=$search_options['ownership'];
+			}
+			else{
+				//show all shared and owned projects
+				$this->db->where($query,null, false);
+				$applied_filters['user_id']=$project_owners;
+			}
 		}
 
 		//filter by collection
@@ -311,8 +353,27 @@ class Editor_model extends CI_Model {
 			$applied_filters['keywords']=$search_options['keywords'];
 		}
 
-		//tags
+		/*
+		//ownership
+		$ownership_types=array(
+			"self",
+			"shared"
+		);
 
+		if (isset($search_options['ownership']) && in_array($search_options['ownership'],$ownership_types)) {
+			switch($search_options['ownership']){
+				case 'self':
+					$this->db->where('editor_projects.created_by',(int)$project_owners[0]);
+					break;
+				case 'shared':
+					$this->db->where('editor_projects.created_by !=',(int)$project_owners[0]);
+					break;
+			}		
+			
+			$applied_filters['ownerships']=$search_options['ownership'];
+		}
+		*/
+		
 		return $applied_filters;		
 	}
 
@@ -1648,7 +1709,11 @@ class Editor_model extends CI_Model {
 		//collections
 		$facets['collection']=$this->Collection_model->collections_list();
 
-		//tags
+		//ownership type
+		$facets['ownership']=array(
+			array("id"=>"shared","title"=>"Shared"),
+			array("id"=>"self","title"=>"My projects"),
+		);
 		
 		return $facets;
 	}
