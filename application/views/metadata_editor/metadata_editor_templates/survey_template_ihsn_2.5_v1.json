@@ -393,7 +393,7 @@
                 },
                 {
                     "type": "section",
-                    "key": "study_description.version",
+                    "key": "study_desc.version",
                     "title": "Version",
                     "class": "recommended",
                     "items": [
@@ -2058,7 +2058,7 @@
                 },
                 {
                     "type": "section",
-                    "key": "study_description.study_authorization",
+                    "key": "study_desc.study_authorization",
                     "help_text": "Provides structured information on the agency that authorized the study, the date of authorization, and an authorization statement",
                     "title": "Study authorization",
                     "items": [
@@ -3311,7 +3311,7 @@
                     "type": "section",
                     "items": [
                         {
-                            "key": "study_description.study_notes",
+                            "key": "study_desc.study_notes",
                             "title": "Notes on the study",
                             "help_text": "This element can be used to provide additional information on the study which cannot be accommodated in the specific metadata elements of the schema, in the form of a free text field.",
                             "type": "string",

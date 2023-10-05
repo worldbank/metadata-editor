@@ -405,7 +405,7 @@
                 },
                 {
                     "type": "section",
-                    "key": "study_description.version",
+                    "key": "study_desc.version",
                     "title": "Version",
                     "class": "recommended",
                     "items": [
@@ -2091,7 +2091,7 @@
                 },
                 {
                     "type": "section",
-                    "key": "study_description.study_authorization",
+                    "key": "study_desc.study_authorization",
                     "help_text": "Provides structured information on the agency that authorized the study, the date of authorization, and an authorization statement",
                     "title": "Autorisation de l'étude",
                     "items": [
@@ -3343,7 +3343,7 @@
                     "type": "section",
                     "items": [
                         {
-                            "key": "study_description.study_notes",
+                            "key": "study_desc.study_notes",
                             "title": "Note sur l'étude",
                             "help_text": "Cet élément peut être utilisé pour fournir des informations supplémentaires sur l'étude qui ne peuvent pas être prises en compte dans les éléments de métadonnées spécifiques du schéma, sous la forme d'un champ de texte libre.",
                             "type": "string",

@@ -205,7 +205,7 @@
                 },
                 {
                     "type": "section",
-                    "key": "study_description.version",
+                    "key": "study_desc.version",
                     "title": "Version",
                     "class": "recommended",
                     "items": [
@@ -414,7 +414,7 @@
                 },
                 {
                     "type": "section",
-                    "key": "study_description.study_authorization",
+                    "key": "study_desc.study_authorization",
                     "help_text": "Provides structured information on the agency that authorized the study, the date of authorization, and an authorization statement",
                     "title": "Study authorization",
                     "items": [
@@ -468,7 +468,7 @@
                 },
                 {
                     "type": "section",
-                    "key": "study_description.series_statement",
+                    "key": "study_desc.series_statement",
                     "title": "Series",
                     "class": "recommended",
                     "items": [
@@ -1913,14 +1913,14 @@
                 },
                 {
                     "type": "section",
-                    "key": "study_description.bib_citation_section",
+                    "key": "study_desc.bib_citation_section",
                     "title": "Bibliographic citation",
                     "help_text": "Complete bibliographic reference containing all of the standard elements of a citation that can be used to cite the work. The `'bib_citation_format'` field is provided to enable specification of the particular citation style used, e.g., APA, MLA, Chicago, etc.",
                     "class": "recommended",
                     "items": [
                         {
                             "type": "string",
-                            "key": "study_description.bib_citation",
+                            "key": "study_desc.bib_citation",
                             "title": "Bibliographic citation",
                             "help_text": "Complete bibliographic reference containing all of the standard elements of a citation that can be used to cite the study. A \"Citation format\" element is also provided to enable specification of the particular citation style used, for example APA, MLA, or Chicago.",
                             "display_type": "textarea"
@@ -1936,12 +1936,12 @@
                 },
                 {
                     "type": "section",
-                    "key": "study_description.holdings_section",
+                    "key": "study_desc.holdings_section",
                     "title": "Holdings information",
                     "help_text": "Information concerning either the physical or electronic holdings of the cited work. Attributes include: location--The physical location where a copy is held; callno--The call number for a work at the location specified; and URI--A URN or URL for accessing the electronic copy of the cited work.",
                     "items": [
                         {
-                            "key": "study_description.holdings",
+                            "key": "study_desc.holdings",
                             "title": "Holdings information",
                             "help_text": "Information concerning either the physical or electronic holdings of the study being described. Note that this information should only be provided when the dataset is stored in a location that is unlikely to change. If a dataset is stored in multiple and/or changing locations, this information can be left empty as it would in many cases be inaccurate.\n",
                             "type": "array",
@@ -1950,7 +1950,7 @@
                                     "key": "name",
                                     "title": "Name",
                                     "type": "string",
-                                    "prop_key": "study_description.holdings.name",
+                                    "prop_key": "study_desc.holdings.name",
                                     "help_text": "Name of the physical or electronic holdings of the cited study.",
                                     "display_type": "text"
                                 },
@@ -1958,7 +1958,7 @@
                                     "key": "location",
                                     "title": "Location",
                                     "type": "string",
-                                    "prop_key": "study_description.holdings.location",
+                                    "prop_key": "study_desc.holdings.location",
                                     "help_text": "The physical location where a copy of the study is held.",
                                     "display_type": "textarea"
                                 },
@@ -1966,7 +1966,7 @@
                                     "key": "callno",
                                     "title": "Call number",
                                     "type": "string",
-                                    "prop_key": "study_description.holdings.callno",
+                                    "prop_key": "study_desc.holdings.callno",
                                     "help_text": "The call number at the location specified in \"Location\".",
                                     "display_type": "text"
                                 },
@@ -1974,7 +1974,7 @@
                                     "key": "uri",
                                     "title": "URL",
                                     "type": "string",
-                                    "prop_key": "study_description.holdings.uri",
+                                    "prop_key": "study_desc.holdings.uri",
                                     "help_text": "A URL for accessing the electronic copy of the cited study from the location mentioned in \"Name\".",
                                     "rules": {
                                         "is_uri": true
@@ -2141,7 +2141,7 @@
                 },
                 {
                     "type": "section",
-                    "key": "study_description.study_info",
+                    "key": "study_desc.study_info",
                     "help_text": "This section contains information about the data collection's scope across several dimensions, including substantive content, geography, and time.",
                     "title": "Other information",
                     "items": [
@@ -2161,7 +2161,7 @@
                             "display_type": "text"
                         },
                         {
-                            "key": "study_description.study_notes",
+                            "key": "study_desc.study_notes",
                             "title": "Notes on the study",
                             "help_text": "This element can be used to provide additional information on the study which cannot be accommodated in the specific metadata elements of the schema, in the form of a free text field.",
                             "type": "string",
