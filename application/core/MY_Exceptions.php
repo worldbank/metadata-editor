@@ -17,7 +17,7 @@
  * @link - http://codeigniter.com/forums/viewthread/69407/
  * @Author Beren - http://codeigniter.com/forums/member/58252/
  */
-define('DEBUG_BACKTRACE', true);
+define('DEBUG_BACKTRACE', ENVIRONMENT=='development');
 class MY_Exceptions extends CI_Exceptions {
 
   /**
