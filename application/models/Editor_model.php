@@ -1252,6 +1252,11 @@ class Editor_model extends CI_Model {
 			if($parseOnly){
 				$output['variables'][]=$var_obj->get_metadata_array();
 			}else{
+				
+				if (!$var_obj){
+					continue;
+				}
+
 				$variable=$var_obj->get_metadata_array();
 				$variable['fid']=$variable['file_id'];
 				$variable['var_catgry_labels']=$this->get_variable_category_value_labels($variable);

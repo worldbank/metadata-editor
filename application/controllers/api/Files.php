@@ -108,4 +108,41 @@ class Files extends MY_REST_Controller
 		}
 	}
 
+
+	/**
+	 * 
+	 * 
+	 * Return files and folders for a project with file size information
+	 * 
+	 */
+	function size_get($sid=null,$details=0)
+	{
+		try{
+			$sid=$this->get_sid($sid);
+			$exists=$this->Editor_model->check_id_exists($sid);
+
+			if(!$exists){
+				throw new Exception("Project not found");
+			}
+
+			if ($details==1){
+				$details=true;
+			}else{
+				$details=false;
+			}
+
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
+			$result=$this->Editor_resource_model->files_with_sizes($sid,$details);
+
+			$output=array(
+				'result'=>$result
+			);
+
+			$this->set_response($output, REST_Controller::HTTP_OK);			
+		}
+		catch(Exception $e){
+			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
 }

@@ -36,17 +36,17 @@ Vue.component('publish-options', {
                 },
                 "access_policy":{
                     "title":"Data access",
-                    "value":6,
+                    "value":"data_na",
                     "type":"text",
                     "custom":true,
                     "enum":{
-                        "1": "Direct access",
-                        "2": "Publich use files",
-                        "3": "Licensed data files",
-                        "4": "Data accessible only in data enclave",
-                        "5": "Data available from external repository",
-                        "6": "Data not available",
-                        "7": "Open access"
+                        "direct": "Direct access",
+                        "public": "Publich use files",
+                        "licensed": "Licensed data files",
+                        "remote": "Data accessible only in data enclave",
+                        "enclave": "Data available from external repository",
+                        "": "Data not available",
+                        "open": "Open access"
                     }
                 },
                 "data_remote_url":{

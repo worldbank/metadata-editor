@@ -35,6 +35,14 @@ class Page extends MY_Controller {
 			
 			if ($this->input->get("destination")){
 				$destination=$this->input->get("destination");
+
+				$valid_redirects=array('admin','editor','collections');
+
+				$destination_parts=explode("/",$destination);
+
+				if (!in_array($destination_parts[0],$valid_redirects)){
+					$destination=site_home();
+				}
 			}
 			
 			redirect($destination);

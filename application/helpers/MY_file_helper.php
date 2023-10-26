@@ -316,7 +316,92 @@ if ( ! function_exists('get_catalog_root'))
 
 		return $catalog_root;
 	}
-}	
+}
+
+
+if ( ! function_exists('get_dir_size'))
+{
+	function get_dir_size($folder_path,$details=FALSE)
+	{	
+		$size = 0;
+		$files=array();
+		foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($folder_path,RecursiveDirectoryIterator::SKIP_DOTS)) as $file){
+			$size_=$file->getSize();
+			$files[$file->getFileName()]=$size_;
+			$size+=$file->getSize();
+		}
+
+		$output= [
+			'size'=>$size,
+			'size_mb'=>get_size_to_mb($size),
+			'size_formatted'=>format_bytes($size),			
+			'path'=>$folder_path
+		];
+
+		if($details){
+			$output['files']=$files;
+		}
+
+		return $output;
+	}
+}
+
+
+
+if ( ! function_exists('get_size_to_mb'))
+{
+	function get_size_to_mb($size){
+		//size in mb
+		return round($size/1024/1024,2);
+	}
+}
+
+
+if ( ! function_exists('get_zip_archive_list'))
+{
+	/**
+	 * 
+	 * 
+	 * Return an array of files and folders of a zip archive
+	 * 
+	 * @ignore - file or folder names or ignore
+	 * 
+	 */
+	function get_zip_archive_list($zipfile_path,$ignore=array())
+	{
+		$zip = new ZipArchive();
+		$zip->open($zipfile_path);
+
+		if (count($ignore)==0){
+			$ignore = array( 'MACOSX/', 'MACOSX/._','.DS_Store' );
+		}
+
+		$output=array();
+
+		for( $i = 0; $i < $zip->numFiles; $i++ ){
+			if (in_array(basename($zip->getNameIndex($i)), $ignore)) {
+				continue;
+			} else
+
+			if(substr($zip->getNameIndex($i), 0, 9) === "__MACOSX/") {
+				continue;
+			} else {
+				$stat = $zip->statIndex($i);
+			}
+		
+			print_r($stat);
+			echo "<HR>";
+			print_r(( $stat['name'] ) . PHP_EOL );
+			
+			$output[$stat['name']]=$stat;
+		}
+
+		return $output;		
+	}
+}
+
+
+
 // ------------------------------------------------------------------------
 /* End of file MY_file_helper.php */
 /* Location: ./system/helpers/MY_file_helper.php */

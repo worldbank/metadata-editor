@@ -284,7 +284,7 @@
                                     "display_type": "text"
                                 },
                                 {
-                                    "key": "abbreviation",
+                                    "key": "abbr",
                                     "title": "Abbreviation",
                                     "type": "string",
                                     "prop_key": "study_desc.production_statement.producers.abbreviation",
@@ -1599,14 +1599,14 @@
                                     "display_type": "textarea"
                                 },
                                 {
-                                    "key": "study_desc.method.data_collection.analysis_info.sampling_error_estimates",
+                                    "key": "study_desc.method.analysis_info.sampling_error_estimates",
                                     "title": "Sampling errors",
                                     "type": "string",
                                     "help_text": "Sampling errors are intended to measure how precisely one can estimate a population value from a given sample. For sampling surveys, it is good practice to calculate and publish sampling error. This field is used to provide information on these calculations (not to provide the sampling errors themselves, which should be made available in publications or reports). Information can be provided on which ratios/indicators have been subjected to the calculation of sampling errors, and on the software used for computing the sampling error. Reference to a report or other document where the results can be found can also be provided.",
                                     "display_type": "textarea"
                                 },
                                 {
-                                    "key": "study_desc.method.data_collection.analysis_info.data_appraisal",
+                                    "key": "study_desc.method.analysis_info.data_appraisal",
                                     "title": "Other data appraisal",
                                     "type": "string",
                                     "help_text": "This section is used to report any other action taken to assess the reliability of the data, or any observations regarding data quality. Describe here issues such as response variance, interviewer and response bias, question bias, etc. For a population census, this can include information on the main results of a post enumeration survey (a report should be provided in external resources and mentioned here); it can also include relevant comparisons with data from other sources that can be used as benchmarks.",

@@ -12,12 +12,12 @@ $user=$this->session->userdata('username');
 <li class="nav-item dropdown">
     <?php if ($user!=''): ?>
         <div class="dropdown ml-auto">
-            <a class="nav-link dropdown-toggle capitalize" href="#" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <i class="fas fa-user-circle fa-lg"></i> 
+            <a class="nav-link dropdown-toggle" href="#" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-user-circle fa-lg"></i>  <span class="text-capitalize"><?php echo $user; ?></span>
             </a>
 
             <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">                
-                <span class="dropdown-item capitalize"><?php echo $user; ?></span>
+                <?php /* <span class="dropdown-item capitalize"><?php echo $user; ?></span> */ ?>
                 <a class="dropdown-item" href="<?php echo site_url('auth/profile'); ?>"><?php echo t('profile');?> </a>
                 <a class="dropdown-item" href="<?php echo site_url('auth/change_password'); ?>"><?php echo t('password');?></a>
                 <div class="dropdown-divider"></div>

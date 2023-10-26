@@ -6,7 +6,7 @@ $ddi=$this->editor_ddi_writer;
       <titlStmt>
         <titl><?php $ddi->el('study_desc/title_statement/title');?></titl>       
         <subTitl><?php $ddi->el('study_desc/title_statement/sub_title');?></subTitl>
-        <altTitl><?php $ddi->el('study_desc/title_statement/alt_title');?></altTitl>
+        <altTitl><?php $ddi->el('study_desc/title_statement/alternate_title');?></altTitl>
         <parTitl><?php $ddi->el('study_desc/title_statement/translated_title');?></parTitl>
         <IDNo><?php $ddi->el('study_desc/title_statement/idno');?></IDNo>
       </titlStmt>      
@@ -28,25 +28,29 @@ $ddi=$this->editor_ddi_writer;
         <?php //producers ?>
         <?php $producers=(array)$ddi->get_el('study_desc/production_statement/producers');?>  
         <?php foreach($producers as $producer):?>    
-        <producer abbr="<?php echo $ddi->attr_val($producer,'abbreviation');?>" affiliation="<?php echo $ddi->attr_val($producer,'affiliation');?>" role="<?php echo $ddi->attr_val($producer,'role');?>"><?php echo $ddi->el_val($producer,'name');?></producer>
+        <producer abbr="<?php echo $ddi->attr_val($producer,'abbr');?>" affiliation="<?php echo $ddi->attr_val($producer,'affiliation');?>" role="<?php echo $ddi->attr_val($producer,'role');?>"><?php echo $ddi->el_val($producer,'name');?></producer>
         <?php endforeach;?>
         
         <copyright><?php $ddi->el('study_desc/production_statement/copyright');?></copyright>
-        <software version="5.0" date="<?php echo date("Y-m-d");?>">NADA</software>
+        <software version="beta" date="<?php echo date("Y-m-d");?>">MetadataEditor</software>
+        <prodDate><?php $ddi->el('study_desc/production_statement/prod_date');?></prodDate>
+        <prodPlac><?php $ddi->el('study_desc/production_statement/prod_place');?></prodPlac>
 
         <?php //funding agencies ?>
         <?php $fundags=(array)$ddi->get_el('study_desc/production_statement/funding_agencies');?>  
         <?php foreach($fundags as $fundag):?>   
-					<fundAg abbr="<?php echo $ddi->attr_val($fundag,'abbreviation');?>" role="<?php echo $ddi->attr_val($fundag,'role');?>"><?php echo $ddi->el_val($fundag,'name');?></fundAg>
+					<fundAg abbr="<?php echo $ddi->attr_val($fundag,'abbr');?>" role="<?php echo $ddi->attr_val($fundag,'role');?>"><?php echo $ddi->el_val($fundag,'name');?></fundAg>
         <?php endforeach;?>
-        <grantNo><?php $ddi->el('study_desc/production_statement/grant_no');?></grantNo>
+        <?php foreach($fundags as $fundag):?>
+          <grantNo><?php echo $ddi->el_val($fundag,'grant');?></grantNo>
+        <?php endforeach;?>
       </prodStmt>
 
       <distStmt>
         <?php //distributor ?>
         <?php $distributors=(array)$ddi->get_el('study_desc/distribution_statement/distributors');?>
         <?php foreach($distributors as $distributor):?>   
-          <distrbtr abbr="<?php echo $ddi->attr_val($distributor,'abbreviation');?>" affiliation="<?php echo $ddi->attr_val($distributor,'affiliation');?>" URI="<?php echo $ddi->attr_val($distributor,'uri');?>"><?php echo $ddi->el_val($distributor,'name');?></distrbtr>
+          <distrbtr abbr="<?php echo $ddi->attr_val($distributor,'abbr');?>" affiliation="<?php echo $ddi->attr_val($distributor,'affiliation');?>" URI="<?php echo $ddi->attr_val($distributor,'uri');?>"><?php echo $ddi->el_val($distributor,'name');?></distrbtr>
         <?php endforeach;?>
 
         <?php //contacts ?>
@@ -58,7 +62,7 @@ $ddi=$this->editor_ddi_writer;
         <?php //depositor ?>
         <?php $depositors=(array)$ddi->get_el('study_desc/distribution_statement/depositor');?>
         <?php foreach($depositors as $contact):?>   
-          <depositr abbr="<?php echo $ddi->attr_val($contact,'abbreviation');?>"  affiliation="<?php echo $ddi->attr_val($contact,'affiliation');?>"><?php echo $ddi->el_val($contact,'name');?></depositr>
+          <depositr abbr="<?php echo $ddi->attr_val($contact,'abbr');?>"  affiliation="<?php echo $ddi->attr_val($contact,'affiliation');?>" URI="<?php echo $ddi->attr_val($contact,'uri');?>"><?php echo $ddi->el_val($contact,'name');?></depositr>
         <?php endforeach;?>
         
         <depDate date="<?php $ddi->el('study_desc/distribution_statement/deposit_date');?>" />
@@ -96,6 +100,15 @@ $ddi=$this->editor_ddi_writer;
     <authorizationStatement>Statement of authorization issued bu OUHS on 2010-11-04</authorizationStatement>
   </studyAuthorization>
   */ ?>
+
+  <studyAuthorization date="<?php $ddi->el('study_desc/study_authorization/date');?>"> 
+      <?php $authorization_agencies=(array)$ddi->get_el('study_desc/study_authorization/agency');?>
+      <?php foreach($authorization_agencies as $agency):?>  
+         <authorizingAgency affiliation="<?php echo $ddi->attr_val($agency,'affiliation');?>" abbr="<?php echo $ddi->attr_val($agency,'abbr');?>"><?php echo $ddi->el_val($agency,'name');?></authorizingAgency> 
+      <?php endforeach;?>
+    <authorizationStatement><![CDATA[<?php $ddi->el('study_desc/study_authorization/authorization_statement');?>]]></authorizationStatement>
+  </studyAuthorization>
+
   <stdyInfo>
     <?php /*
      <!-- studyBudget - ddi2.5 
@@ -142,6 +155,9 @@ $ddi=$this->editor_ddi_writer;
         <?php endforeach;?>
 
         <geogCover><?php $ddi->el('study_desc/study_info/geog_coverage');?></geogCover>
+
+        <?php //geogCoverNote - not a ddi field ?>
+        <geogCoverNote><?php $ddi->el('study_desc/study_info/geog_coverage_notes');?></geogCoverNote>        
         <geogUnit><?php $ddi->el('study_desc/study_info/geog_unit');?></geogUnit>
 
         <?php //bounding box?>  
@@ -190,11 +206,14 @@ $ddi=$this->editor_ddi_writer;
      */?>
      <qualityStatement>
         <standardsCompliance>
+          <?php $standards = (array)$ddi->get_el('study_desc/study_info/quality_statement/standards');?>
+          <?php foreach($standards as $standard):?>            
           <standard> 
-            <standardName><?php $ddi->el('study_desc/study_info/quality_statement/standard_name');?></standardName>
-            <producer><?php $ddi->el('study_desc/study_info/quality_statement/standard_producer');?></producer>
+            <standardName><?php echo $ddi->el_val($standard,'name');?></standardName>
+            <producer><?php echo $ddi->el_val($standard,'producer');?></producer>
           </standard> 
-          <complianceDescription><?php $ddi->el('study_desc/study_info/quality_statement/standard_compliance_desc');?></complianceDescription> 
+          <?php endforeach;?>
+          <complianceDescription><?php $ddi->el('study_desc/study_info/quality_statement/compliance_description');?></complianceDescription> 
         </standardsCompliance>
         <otherQualityStatement><?php $ddi->el('study_desc/study_info/quality_statement/other_quality_statement');?></otherQualityStatement>
      </qualityStatement> 
@@ -250,13 +269,35 @@ $ddi=$this->editor_ddi_writer;
   </studyDevelopment>
 */?>
 
+  <?php $activities=(array)$ddi->get_el('study_desc/study_development/development_activity');?>
+  <?php foreach($activities as $activity):?>
+  <studyDevelopment>
+      <developmentActivity type="<?php echo $ddi->attr_val($activity,'activity_type');?>"> 
+        <description><?php echo $ddi->el_val($activity,'activity_description');?></description>
+        <?php $participants=(array)$ddi->array_get_by_key($activity,'participants');?>
+        <?php foreach($participants as $participant):?>
+          <participant affiliation="<?php echo $ddi->attr_val($participant,'affiliation');?>" role="<?php echo $ddi->attr_val($participant,'role');?>"><?php echo $ddi->el_val($participant,'name');?></participant> 
+        <?php endforeach;?>
+        
+        <?php $resources=(array)$ddi->array_get_by_key($activity,'resources');?>
+        <?php foreach($resources as $resource):?>
+          <resource>
+            <dataSrc><?php echo $ddi->el_val($resource,'name');?></dataSrc> 
+            <srcOrig><?php echo $ddi->el_val($resource,'origin');?></srcOrig> 
+            <srcChar><?php echo $ddi->el_val($resource,'characteristics');?></srcChar> 
+          </resource>
+        <?php endforeach;?>
+        <outcome><?php echo $ddi->el_val($activity,'outcome');?></outcome> 
+      </developmentActivity>
+  </studyDevelopment>
+  <?php endforeach;?>
   <method>
      <dataColl>
         <timeMeth><?php $ddi->el('study_desc/method/data_collection/time_method');?></timeMeth>
         
         <?php $collectors=(array)$ddi->get_el('study_desc/method/data_collection/data_collectors');?>
         <?php foreach($collectors as $collector):?>
-          <dataCollector abbr="<?php echo $ddi->attr_val($collector,'abbreviation');?>" affiliation="<?php echo $ddi->attr_val($collector,'affiliation');?>"><?php echo $ddi->el_val($collector,'name');?></dataCollector>
+          <dataCollector abbr="<?php echo $ddi->attr_val($collector,'abbr');?>" role="<?php echo $ddi->attr_val($collector,'role');?>" affiliation="<?php echo $ddi->attr_val($collector,'affiliation');?>"><?php echo $ddi->el_val($collector,'name');?></dataCollector>
         <?php endforeach;?> 
         
         <?php /*
@@ -289,7 +330,7 @@ $ddi=$this->editor_ddi_writer;
           <custodian><?php $ddi->el('study_desc/method/data_collection/sample_frame/custodian');?></custodian>
           <universe><?php $ddi->el('study_desc/method/data_collection/sample_frame/universe');?></universe>
           <frameUnit isPrimary="<?php $ddi->el('study_desc/method/data_collection/sample_frame/frame_unit/is_primary');?>">
-            <unitType numberOfUnits="<?php $ddi->el('study_desc/method/data_collection/sample_frame/num_of_units');?>"><?php $ddi->el('study_desc/method/data_collection/sample_frame/unit_type');?></unitType>
+            <unitType numberOfUnits="<?php $ddi->el('study_desc/method/data_collection/sample_frame/frame_unit/num_of_units');?>"><?php $ddi->el('study_desc/method/data_collection/sample_frame/frame_unit/unit_type');?></unitType>
           </frameUnit>
           
           <?php $ref_periods=(array)$ddi->get_el('study_desc/method/data_collection/sample_frame/reference_period');?>
@@ -317,7 +358,7 @@ $ddi=$this->editor_ddi_writer;
         <?php /*
         <!-- sources - DD2.5 - complex type 
         
-        NOTE: WON'T be supported by IHSN schemas
+        Simplified version of sources [nested sources not supported instead we use repeatable sources]
         -->
         <sources>
             <dataSrc>data sources [repeatabled]- NOT used by IHSN**  Used to list the book(s), article(s), serial(s), and/or machine-readable data file(s)--if any--that served as the source(s) of the data collection.</dataSrc>
@@ -329,6 +370,16 @@ $ddi=$this->editor_ddi_writer;
             <srcDocu>!NESSTAR** - Documentation and Access to Sources</srcDocu>
         </sources>
         */?>
+
+        <?php $sources=(array)$ddi->get_el('study_desc/method/data_collection/sources');?>
+        <?php foreach($sources as $source):?>
+          <sources>
+            <dataSrc><?php echo $ddi->el_val($source,'name');?></dataSrc>
+            <srcOrig><?php echo $ddi->el_val($source,'origin');?></srcOrig>
+            <srcChar><?php echo $ddi->el_val($source,'characteristics');?></srcChar>
+            <?php /* <srcDocu><?php echo $ddi->el_val($source,'documentation');?></srcDocu> */ ?>
+          </sources>
+        <?php endforeach;?>
 
         <collSitu><![CDATA[<?php $ddi->el('study_desc/method/data_collection/coll_situation');?>]]></collSitu>
         <actMin><![CDATA[<?php $ddi->el('study_desc/method/data_collection/act_min');?>]]></actMin>
@@ -349,10 +400,14 @@ $ddi=$this->editor_ddi_writer;
         <dataProcessing type="<?php echo $ddi->attr_val($dp,'type');?>"><?php echo $ddi->el_val($dp,'description');?></dataProcessing>
       <?php endforeach;?>
 
-     <codingInstructions relatedProcesses="<?php $ddi->el('study_desc/method/coding_instructions/related_processes');?>" type="<?php $ddi->el('study_desc/method/coding_instructions/type');?>"> 
-        <txt><?php $ddi->el('study_desc/method/coding_instructions/txt');?></txt> 
-        <command formalLanguage="<?php $ddi->el('study_desc/method/coding_instructions/command_language');?>"><?php $ddi->el('study_desc/method/coding_instructions/command');?></command> 
-     </codingInstructions>
+      <?php $coding_ins=(array)$ddi->get_el('study_desc/method/coding_instructions');?>
+      <?php foreach($coding_ins as $ins):?>
+        <codingInstructions relatedProcesses="<?php echo $ddi->attr_val($ins,'related_processes');?>" type="<?php echo $ddi->attr_val($ins,'type');?>"> 
+          <txt><?php echo $ddi->el_val($ins,'txt');?></txt> 
+          <command formalLanguage="<?php echo $ddi->attr_val($ins,'formal_language');?>"><?php echo $ddi->el_val($ins,'command');?></command> 
+        </codingInstructions>
+      <?php endforeach;?>
+
   </method>
 
 
@@ -364,7 +419,7 @@ $ddi=$this->editor_ddi_writer;
         <accsPlac URI="URI">data collectino location 2 name</accsPlac>
         */?>
 
-        <accsPlac URI="<?php $ddi->el('study_desc/data_access/dataset_availability/access_place_uri');?>"><?php $ddi->el('study_desc/data_access/dataset_availability/access_place');?></accsPlac>        
+        <accsPlac URI="<?php $ddi->el('study_desc/data_access/dataset_availability/access_place_url');?>"><?php $ddi->el('study_desc/data_access/dataset_availability/access_place');?></accsPlac>        
         <origArch><?php $ddi->el('study_desc/data_access/dataset_availability/original_archive');?></origArch>
         <avlStatus><?php $ddi->el('study_desc/data_access/dataset_availability/status');?></avlStatus>
         <collSize><?php $ddi->el('study_desc/data_access/dataset_availability/coll_size');?></collSize>
@@ -379,12 +434,12 @@ $ddi=$this->editor_ddi_writer;
         <?php //confdec -- TODO - schema is missing the attributes ?>  
         <?php $confdec_arr=(array)$ddi->get_el('study_desc/data_access/dataset_use/conf_dec');?>
         <?php foreach($confdec_arr as $conf):?>
-        <confDec required="<?php echo $ddi->attr_val($conf,'required');?>" formNo="<?php echo $ddi->attr_val($conf,'form_no');?>" URI="<?php echo $ddi->attr_val($conf,'uri');?>"><?php echo $ddi->el_val($conf,'txt');?></confDec>
+        <confDec required="<?php echo $ddi->attr_val($conf,'required');?>" formNo="<?php echo $ddi->attr_val($conf,'form_id');?>" URI="<?php echo $ddi->attr_val($conf,'form_url');?>"><?php echo $ddi->el_val($conf,'txt');?></confDec>
         <?php endforeach;?>
 
         <?php $spec_perms=(array)$ddi->get_el('study_desc/data_access/dataset_use/spec_perm');?>
         <?php foreach($spec_perms as $perm):?>
-        <specPerm required="<?php echo $ddi->attr_val($perm,'required');?>" formNo="<?php echo $ddi->attr_val($perm,'form_no');?>" URI="<?php echo $ddi->attr_val($perm,'uri');?>"><?php echo $ddi->el_val($perm,'txt');?></specPerm>
+        <specPerm required="<?php echo $ddi->attr_val($perm,'required');?>" formNo="<?php echo $ddi->attr_val($perm,'form_id');?>" URI="<?php echo $ddi->attr_val($perm,'form_url');?>"><?php echo $ddi->el_val($perm,'txt');?></specPerm>
         <?php endforeach;?>
         
         <restrctn><?php $ddi->el('study_desc/data_access/dataset_use/restrictions');?></restrctn>

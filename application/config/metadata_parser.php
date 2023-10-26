@@ -27,7 +27,7 @@ $config['survey']=array(
             'transform_callback'=>'none'    
     ),
     'study_desc/title_statement/sub_title'=>array('xpath'=>'codeBook/stdyDscr/citation/titlStmt/subTitl', 'transform_callback'=>'none'),
-    'study_desc/title_statement/alt_title'=>array('xpath'=>'codeBook/stdyDscr/citation/titlStmt/altTitl', 'transform_callback'=>'none'),
+    'study_desc/title_statement/alternate_title'=>array('xpath'=>'codeBook/stdyDscr/citation/titlStmt/altTitl', 'transform_callback'=>'none'),
     'study_desc/title_statement/translated_title'=>array('xpath'=>'codeBook/stdyDscr/citation/titlStmt/parTitl', 'transform_callback'=>'none'),    
 
     'study_desc/authoring_entity'=>array(
@@ -49,7 +49,7 @@ $config['survey']=array(
     ),
     'study_desc/production_statement/copyright'=>array('xpath'=>'codeBook/stdyDscr/citation/prodStmt/copyright', 'transform_callback'=>'none'),
     'study_desc/production_statement/prod_date'=>array('xpath'=>'codeBook/stdyDscr/citation/prodStmt/prodDate', 'transform_callback'=>'none'),
-    'study_desc/production_statement/prod_place'=>array('xpath'=>'codeBook/stdyDscr/citation/prodStmt/prodPlac', 'transform_callback'=>'none'),
+    'study_desc/production_statement/prod_place'=>array('xpath'=>'codeBook/stdyDscr/citation/prodStmt/prodPlace', 'transform_callback'=>'none'),
 
 
     #'study_desc/software'=>array('xpath'=>'codeBook/stdyDscr/citation/prodStmt/software', 'transform_callback'=>'none'),
@@ -62,8 +62,8 @@ $config['survey']=array(
     'study_desc/distribution_statement/distributors'=>array('xpath'=>'codeBook/stdyDscr/citation/distStmt/distrbtr', 'transform_callback'=>'none','type'=>'array'),
     'study_desc/distribution_statement/contact'=>array('xpath'=>'codeBook/stdyDscr/citation/distStmt/contact', 'transform_callback'=>'none','type'=>'array'),
     'study_desc/distribution_statement/depositor'=>array('xpath'=>'codeBook/stdyDscr/citation/distStmt/depositr', 'transform_callback'=>'none','type'=>'array'),
-    'study_desc/distribution_statement/deposit_date'=>array('xpath'=>'codeBook/stdyDscr/citation/distStmt/depDate', 'transform_callback'=>'none'),
-    'study_desc/distribution_statement/distribution_date'=>array('xpath'=>'codeBook/stdyDscr/citation/distStmt/distDate', 'transform_callback'=>'none'),
+    'study_desc/distribution_statement/deposit_date'=>array('xpath'=>'codeBook/stdyDscr/citation/distStmt/depDate/@date', 'transform_callback'=>'none'),
+    'study_desc/distribution_statement/distribution_date'=>array('xpath'=>'codeBook/stdyDscr/citation/distStmt/distDate/@date', 'transform_callback'=>'none'),
 
     #series statement    
     'study_desc/series_statement/series_name'=>array('xpath'=>'codeBook/stdyDscr/citation/serStmt/serName', 'transform_callback'=>'none'),
@@ -87,7 +87,7 @@ $config['survey']=array(
     ##TODO - need transforms
     'study_desc/study_authorization/date'=>array('xpath'=>'codeBook/stdyDscr/studyAuthorization/@date', 'transform_callback'=>'none'),
     'study_desc/study_authorization/agency'=>array('xpath'=>'codeBook/stdyDscr/studyAuthorization/authorizingAgency', 'transform_callback'=>'none','type'=>'array'),
-    'study_desc/study_authorization/authorization_statement'=>array('xpath'=>'codeBook/stdyDscr/authorizationStatement', 'transform_callback'=>'none'),
+    'study_desc/study_authorization/authorization_statement'=>array('xpath'=>'codeBook/stdyDscr/studyAuthorization/authorizationStatement', 'transform_callback'=>'none'),
 
     #study info
     'study_desc/study_info/study_budget'=>array(
@@ -126,13 +126,13 @@ $config['survey']=array(
     ),
     'study_desc/study_info/bound_poly'=>array(
         'xpath'=>'codeBook/stdyDscr/stdyInfo/sumDscr/boundPoly', 
-        'transform_callback'=>'transform_ddi_nation','type'=>'array'
+        'transform_callback'=>'none','type'=>'array'
     ),
 
     'study_desc/study_info/geog_coverage'=>array('xpath'=>'codeBook/stdyDscr/stdyInfo/sumDscr/geogCover', 'transform_callback'=>'none'),
     
-    #TODO - not sure this is correct - need to check with DDI-Alliance
-    'study_desc/study_info/geog_coverage_notes'=>array('xpath'=>'codeBook/stdyDscr/stdyInfo/sumDscr/geogCover/txt', 'transform_callback'=>'none'),        
+    #TODO - not part of the DDI spec
+    'study_desc/study_info/geog_coverage_notes'=>array('xpath'=>'codeBook/stdyDscr/stdyInfo/sumDscr/geogCoverNote', 'transform_callback'=>'none'),
     'study_desc/study_info/geog_unit'=>array('xpath'=>'codeBook/stdyDscr/stdyInfo/sumDscr/geogUnit', 'transform_callback'=>'none'),
 
     'study_desc/study_info/analysis_unit'=>array('xpath'=>'codeBook/stdyDscr/stdyInfo/sumDscr/anlyUnit', 'transform_callback'=>'none'),
@@ -141,9 +141,10 @@ $config['survey']=array(
     'study_desc/study_info/notes'=>array('xpath'=>'codeBook/stdyDscr/stdyInfo/notes', 'transform_callback'=>'none'),
 
     #quality statement
-    'study_desc/study_info/quality_statement/standard_name'=>array('xpath'=>'codeBook/stdyDscr/stdyInfo/qualityStatement/standardsCompliance/standard/standardName', 'transform_callback'=>'none'),
-    'study_desc/study_info/quality_statement/standard_producer'=>array('xpath'=>'codeBook/stdyDscr/stdyInfo/qualityStatement/standardsCompliance/standard/producer', 'transform_callback'=>'none'),
-    'study_desc/study_info/quality_statement/standard_compliance_desc'=>array('xpath'=>'codeBook/stdyDscr/stdyInfo/qualityStatement/standardsCompliance/complianceDescription', 'transform_callback'=>'none'),
+    //'study_desc/study_info/quality_statement/standard_name'=>array('xpath'=>'codeBook/stdyDscr/stdyInfo/qualityStatement/standardsCompliance/standard/standardName', 'transform_callback'=>'none'),
+    //'study_desc/study_info/quality_statement/standard_producer'=>array('xpath'=>'codeBook/stdyDscr/stdyInfo/qualityStatement/standardsCompliance/standard/producer', 'transform_callback'=>'none'),
+    'study_desc/study_info/quality_statement/standards'=>array('xpath'=>'codeBook/stdyDscr/stdyInfo/qualityStatement/standardsCompliance/standard', 'transform_callback'=>'none','type'=>'array'),
+    'study_desc/study_info/quality_statement/compliance_description'=>array('xpath'=>'codeBook/stdyDscr/stdyInfo/qualityStatement/standardsCompliance/complianceDescription', 'transform_callback'=>'none'),
     'study_desc/study_info/quality_statement/other_quality_statement'=>array('xpath'=>'codeBook/stdyDscr/stdyInfo/qualityStatement/otherQualityStatement', 'transform_callback'=>'none'),
 
     #ex-post-evaluation
@@ -155,9 +156,10 @@ $config['survey']=array(
     'study_desc/study_info/ex_post_evaluation/outcomes'=>array('xpath'=>'codeBook/stdyDscr/stdyInfo/exPostEvaluation/outcomes', 'transform_callback'=>'none'),
 
     #study development
-    'study_desc/study_development/activity_type'=>array('xpath'=>'codeBook/stdyDscr/studyDevelopment/developmentActivity/@type', 'transform_callback'=>'none'),
-    'study_desc/study_development/activity_description'=>array('xpath'=>'codeBook/stdyDscr/studyDevelopment/developmentActivity/description', 'transform_callback'=>'none'),
-    'study_desc/study_development/participants'=>array('xpath'=>'codeBook/stdyDscr/studyDevelopment/developmentActivity/participant', 'transform_callback'=>'none','type'=>'array'),
+    //'study_desc/study_development/activity_type'=>array('xpath'=>'codeBook/stdyDscr/studyDevelopment/developmentActivity/@type', 'transform_callback'=>'none'),
+    //'study_desc/study_development/activity_description'=>array('xpath'=>'codeBook/stdyDscr/studyDevelopment/developmentActivity/description', 'transform_callback'=>'none'),
+    //'study_desc/study_development/participants'=>array('xpath'=>'codeBook/stdyDscr/studyDevelopment/developmentActivity/participant', 'transform_callback'=>'none','type'=>'array'),
+    'study_desc/study_development/development_activity'=>array('xpath'=>'codeBook/stdyDscr/studyDevelopment/developmentActivity', 'transform_callback'=>'none', 'type'=>'array'),
 
     #study development > resource
     'study_desc/study_development/resource/data_source'=>array('xpath'=>'codeBook/stdyDscr/studyDevelopment/developmentActivity/resource/dataSrc', 'transform_callback'=>'transform_ddi_datasource','type'=>'array'),
@@ -219,14 +221,14 @@ $config['survey']=array(
     'study_desc/method/data_collection/instru_development_type'=>array('xpath'=>'codeBook/stdyDscr/method/dataColl/instrumentDevelopment/@type', 'transform_callback'=>'none'),
     
     //sources - todo - not all fields are mapped for sources
-    'study_desc/method/data_collection/sources/data_source'=>array('xpath'=>'codeBook/stdyDscr/method/dataColl/sources/dataSrc', 'transform_callback'=>'none','type'=>'array'),
+    'study_desc/method/data_collection/sources'=>array('xpath'=>'codeBook/stdyDscr/method/dataColl/sources', 'transform_callback'=>'none','type'=>'array'),
     
     'study_desc/method/data_collection/coll_situation'=>array('xpath'=>'codeBook/stdyDscr/method/dataColl/collSitu', 'transform_callback'=>'none'),
     'study_desc/method/data_collection/act_min'=>array('xpath'=>'codeBook/stdyDscr/method/dataColl/actMin', 'transform_callback'=>'none'),
     'study_desc/method/data_collection/control_operations'=>array('xpath'=>'codeBook/stdyDscr/method/dataColl/ConOps', 'transform_callback'=>'none'),
     'study_desc/method/data_collection/weight'=>array('xpath'=>'codeBook/stdyDscr/method/dataColl/weight', 'transform_callback'=>'none'),
     'study_desc/method/data_collection/cleaning_operations'=>array('xpath'=>'codeBook/stdyDscr/method/dataColl/cleanOps', 'transform_callback'=>'none'),
-    'study_desc/method/data_collection/method_notes'=>array('xpath'=>'codeBook/stdyDscr/method/notes', 'transform_callback'=>'none'),
+    'study_desc/method/method_notes'=>array('xpath'=>'codeBook/stdyDscr/method/notes', 'transform_callback'=>'none'),
     
     #method > analysis info
     'study_desc/method/analysis_info/response_rate'=>array('xpath'=>'codeBook/stdyDscr/method/anlyInfo/respRate', 'transform_callback'=>'none'),
@@ -234,15 +236,18 @@ $config['survey']=array(
     'study_desc/method/analysis_info/data_appraisal'=>array('xpath'=>'codeBook/stdyDscr/method/anlyInfo/dataAppr', 'transform_callback'=>'none'),
 
     'study_desc/method/study_class'=>array('xpath'=>'codeBook/stdyDscr/method/stdyClas', 'transform_callback'=>'none'),
-    'study_desc/method/data_processing'=>array('xpath'=>'codeBook/stdyDscr/method/dataProcessing', 'transform_callback'=>'none'),
-    'study_desc/method/data_processing_type'=>array('xpath'=>'codeBook/stdyDscr/method/dataProcessing/@type', 'transform_callback'=>'none'),
+    'study_desc/method/data_processing'=>array('xpath'=>'codeBook/stdyDscr/method/dataProcessing', 'transform_callback'=>'none', 'type'=>'array'),
+    //'study_desc/method/data_processing_type'=>array('xpath'=>'codeBook/stdyDscr/method/dataProcessing/@type', 'transform_callback'=>'none'),
 
     #coding instructions
+    'study_desc/method/coding_instructions'=>array('xpath'=>'codeBook/stdyDscr/method/codingInstructions', 'transform_callback'=>'none', 'type'=>'array'),
+    /*
     'study_desc/method/coding_instructions/related_processes'=>array('xpath'=>'codeBook/stdyDscr/method/codingInstructions/@relatedProcesses', 'transform_callback'=>'none'),
     'study_desc/method/coding_instructions/type'=>array('xpath'=>'codeBook/stdyDscr/method/codingInstructions/@type', 'transform_callback'=>'none'),
     'study_desc/method/coding_instructions/txt'=>array('xpath'=>'codeBook/stdyDscr/method/codingInstructions/@txt', 'transform_callback'=>'none'),
     'study_desc/method/coding_instructions/command'=>array('xpath'=>'codeBook/stdyDscr/method/codingInstructions/command', 'transform_callback'=>'none'),
     'study_desc/method/coding_instructions/command_language'=>array('xpath'=>'codeBook/stdyDscr/method/codingInstructions/command/@formalLanguage', 'transform_callback'=>'none'),
+    */
 
     #data access > data availability
     'study_desc/data_access/dataset_availability/access_place'=>array(
@@ -251,11 +256,7 @@ $config['survey']=array(
         'type'=>'array'
     ),
     //not a ddi field - created by the transform to convert the access_place repeated element to a non-repeatable fields
-    'study_desc/data_access/dataset_availability/access_place_uri'=>array(
-        'xpath'=>'codeBook/stdyDscr/dataAccs/setAvail/accsPlac_uri', 
-        'transform_callback'=>'none',
-        'type'=>'array'
-    ),
+    'study_desc/data_access/dataset_availability/access_place_url'=>array('xpath'=>'codeBook/stdyDscr/dataAccs/setAvail/accsPlac_url', 'transform_callback'=>'none'),
 
     'study_desc/data_access/dataset_availability/original_archive'=>array('xpath'=>'codeBook/stdyDscr/dataAccs/setAvail/origArch', 'transform_callback'=>'none'),
     'study_desc/data_access/dataset_availability/status'=>array('xpath'=>'codeBook/stdyDscr/dataAccs/setAvail/avlStatus', 'transform_callback'=>'none'),

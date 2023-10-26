@@ -153,15 +153,6 @@ class DefaultAuth implements AuthInterface
 		$this->ci->template->set_template('blank');
         $this->data['title'] = t("login");
 
-		if($this->ci->input->get('destination'))
-		{
-			$destination=$this->ci->input->get('destination');
-			$this->ci->session->unset_userdata('destination');
-		}
-		else {
-        	$destination=$this->ci->session->userdata("destination");
-		}
-
         //validate form input
     	$this->ci->form_validation->set_rules('email', t('email'), 'trim|required|valid_email|max_length[100]');
 	    $this->ci->form_validation->set_rules('password', t('password'), 'required|max_length[100]');
@@ -197,10 +188,13 @@ class DefaultAuth implements AuthInterface
         	if ($this->ci->ion_auth->login($this->ci->input->post('email'), $this->ci->input->post('password'), $remember)) //if the login is successful
 			{
 				//log
-				//$this->ci->db_logger->write_log('login',$this->ci->input->post('email'));
+				$this->ci->db_logger->write_log('login',$this->ci->input->post('email'));
+
+				$destination=$this->ci->session->userdata("destination");
 
 				if ($destination!="")
 				{
+					$this->ci->session->unset_userdata('destination');
 					redirect($destination, 'refresh');
 				}
 				else

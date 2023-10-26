@@ -40,14 +40,19 @@ Vue.component('datafile-data-explorer', {
         PageOffset(){
             return this.variable_data.offset;
         },
-        CurrentPage(){
-            currentPage = Math.ceil(this.variable_data.offset / this.rows_limit);
+        CurrentPage:{
+                get: function () {
+                    currentPage_ = Math.ceil(this.variable_data.offset / this.rows_limit);
 
-            if (currentPage<=0){
-                return 1;
-            }
-
-            return currentPage+1;
+                    if (currentPage_<=0){
+                        return 1;
+                    }
+        
+                    return currentPage_+1;
+                },
+                set: function (newValue) {
+                    
+                }
         },
         
         PaginationTotalRecords()
@@ -94,7 +99,7 @@ Vue.component('datafile-data-explorer', {
         loadData: function(offset=0,limit=50) {
             this.data_loading_dialog=true;
             vm=this;
-            let url=CI.base_url + '/api/R/read_csv/'+this.ProjectID+'/'+this.fid+'?offset='+offset+'&limit='+limit;            
+            let url=CI.base_url + '/api/data/read_csv/'+this.ProjectID+'/'+this.fid+'?offset='+offset+'&limit='+limit;            
             axios.get(url)
             .then(function (response) {
                 if(response.data){                    
@@ -117,7 +122,7 @@ Vue.component('datafile-data-explorer', {
         }
     },  
     template: `
-            <div class="datafile-component m-3" v-if="activeDataFile">
+            <div class="datafile-component mt-5 pt-3 m-3" v-if="activeDataFile">
 
             <div class="float-right"">
                 <button type="button" class="btn btn-sm btn-outline-primary" @click="show_dialog=true">Import Data</button>
@@ -125,6 +130,18 @@ Vue.component('datafile-data-explorer', {
             </div>
 
             <h2>Data</h2>
+
+            <template>
+                <div v-if="data_loading_dialog==true">
+                    <div class="pt-4 ">    
+                        <div>Loading, please wait ...</div>
+                        <v-progress-linear
+                            indeterminate
+                            color="teal"
+                        ></v-progress-linear>
+                    </div>
+                </div>                
+            </template>
 
             <template v-if="variable_data.records" >
 
@@ -169,9 +186,11 @@ Vue.component('datafile-data-explorer', {
                 </table>
             </div>
             </template>
-            <template v-else>
-                No data is available
-            </template>
+            
+
+            <div v-if="!data_loading_dialog && !variable_data" class="row mt-2" >
+                No data is avaiable
+            </div>
 
 
 

@@ -126,6 +126,10 @@ class Editor_partial_import
 
 		foreach($variable_iterator as $var_obj)
         {
+			if (!$var_obj){
+				continue;
+			}
+
             $variable=$var_obj->get_metadata_array();
             $variable['fid']=$variable['file_id'];
 

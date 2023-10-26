@@ -5,10 +5,10 @@
   <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
 
   <script src="https://adminlte.io/themes/v3/plugins/jquery/jquery.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment-with-locales.min.js"></script>
   <script src="https://unpkg.com/vue-i18n@8"></script>
 
@@ -41,6 +41,7 @@
   </script>
 
   <div id="app" data-app>
+    <v-app>
 
     <div class="wrapper">
 
@@ -110,7 +111,12 @@
                     </template>
                   </div>
 
-                  <div class="mt-5 p-3 border text-center text-danger" v-if="!Projects || projects.found<1"> No projects found!</div>
+                  <div class="mt-5 p-3 border  text-danger" v-if="errors && errors.length>0"> 
+                    <div><strong>Error:</strong> <a href="<?php echo site_url('editor');?>">Refresh page</a></div>
+                    <div v-for="error in errors">{{error}}</div>
+                  </div>
+
+                  <div class="mt-5 p-3 border text-center text-danger" v-if="!errors && !Projects || projects.found<1"> No projects found!</div>
 
                   <div v-if="!Projects || projects.found>0" class="row mb-2 border-bottom  mt-3">
                     <div class="col-md-5">
@@ -169,9 +175,10 @@
                   </template>
                   <template v-else class="bg-light">
 
-                    <div class="row">
-                      <div class="col-md-6">
+                    <div class="row mb-1">
+                      <div class="col-md-6">                        
                         <div class=" p-1" v-if="ProjectsCount>0">
+                          <span style="padding-left:20px;padding-right:30px;" > <input type="checkbox" v-model="select_all_projects" @change="toggleProjectSelection" /></span>
                           <button @click="addProjectsToCollection" :disabled="selected_projects.length==0"  class="btn btn-xs btn-outline-primary"><span class="mdi mdi-folder-plus"></span> {{$t("add_to_collection")}}</button>
                         </div>
                       </div>
@@ -197,127 +204,151 @@
                       </div>
                     </div>
 
-                    <table class="table table-sm table-striped table-hover border-bottom"  v-if="ProjectsCount>0">
-                      <thead>
-                        <tr style="font-size:small;">
-                          <th style="width:20px;"><span class="mdi mdi-chevron-down"></span></th>
-                          <th style="width:20px;"><input type="checkbox" v-model="select_all_projects" @change="toggleProjectSelection" /></th>
-                          <th style="width:30px;"></th>
-                          <th>Title</th>
-                          <th>Updated by</th>
-                          <th style="width:100px;">Updated on</th>
-                          <th style="width:100px"></th>
-                        </tr>
-                      </thead>
+                    <v-expansion-panels focusable :multiple="false">
+                      <v-expansion-panel
+                        @click="onProjectPanelClick(index)"
+                        v-for="(project,index) in Projects"
+                        :key="project.id"
+                      >
+                        <v-expansion-panel-header>
+                          <div style="text-align:left;font-weight:normal;">
+                          <v-row>
+                            <v-col cols="auto">
+                              <input type="checkbox" v-model="selected_projects" :value="project.id" @click="checkboxOnClick" />
+                            </v-col>
+                            <v-col>
+                              <div style="font-size:16px;" >
+                              <i :title="project.type" :class="project_types_icons[project.type]"></i>
+                              <span v-if="project.title.length>1">{{project.title}}</span>
+                              <span v-else>Untitled</span>
+                              </div>
+                              
+                              <div v-if="project.collections.length>0" class="mt-2">
+                                  <template v-for="collection in project.collections">
+                                    <v-chip x-small outlined color="primary" class="mr-1">
+                                      {{collection.title}}
+                                    </v-chip>                                    
+                                  </template>
+                                </div>
+                            </v-col>
+                            <v-col cols="4">
+                              <div class="d-flex">
+                                <div class="text--disabled mr-4" style="color:gray;" >{{momentShortDate(project.changed)}}</div>
+                                <span class="wb-value capitalize text--disabled text-truncate mr-2">{{project.username}}</span>                                
+                                <v-btn class="ml-auto mr-3" outlined small @click.native.stop="EditProject(project.id)" >Edit</v-btn>
+                              </div>
+                            </v-col>
+                          </v-row>
+                          </div>
+                        </v-expansion-panel-header>
+                        <v-expansion-panel-content>
+                            <div class="m-3 ml-5 pl-5 ">
 
-                        <template v-for="(project,index) in Projects" >
-                        <tr class="project-row" :key="index">
-                          <td><v-btn x-small icon @click="toggleProjectDetails(project.id)">
-                              <v-icon>mdi-chevron-down</v-icon></v-btn>                            
-                            </td>
-                          <td><input type="checkbox" v-model="selected_projects" :value="project.id" /></td>
-                          <td style="vertical-align:top"><i :title="project.type" :class="project_types_icons[project.type]"></i></td>
-                          <td>
-                            <div class="wb-card-title title">
-                              <a href="#" :title="project.title" class="d-flex" @click="EditProject(project.id)">
+                            <v-row class="m-1 pl-3">
+                              <v-col>
+                                <div v-if="project.collections.length>0" >
+                                  <div class="mt-2 text-secondary"><strong>Collections</strong></div>
+                                  <template v-for="collection in project.collections">
+                                    <v-chip @click:close="removeCollection(project.id,collection.id)" small color="primary" close class="mr-1">
+                                      {{collection.title}}                                      
+                                    </v-chip>
+                                  </template>
+                                </div>
+                                </v-col>
+                            </v-row>
+                            <v-row class="m-1 pl-3 ">
 
-                                <span v-if="project.title.length>1">{{project.title}}</span>
-                                <span v-else>Untitled</span>
-                              </a>
-                            </div>                                                    
-                          </td>
+                              <v-col cols="3">
+                                  
+                                  <div class="text-secondary  mb-3">
+                                    <div class="wb-label"><strong>Project owner</strong> <span class="mdi mdi-star"></span></div>
+                                    <div class="wb-value capitalize"> {{project.username_cr}}</div>
+                                  </div>
 
-                          <td class="text-xs"><span class="wb-value capitalize text-truncate">{{project.username}}</span></td>
-                          <td class="text-secondary text-small text-xs">{{momentAgo(project.changed)}} </td>
-                          <td >
+                                  <div class="text-secondary  mb-3">
+                                    <div class="wb-label"><strong>Last modified by</strong></div>
+                                    <div class="wb-value capitalize">{{project.username}}</div>
+                                  </div>
+                                </v-col>
 
-                            <v-btn x-small icon @click="EditProject(project.id)">
-                              <v-icon>mdi-pencil-box-outline</v-icon>
-                            </v-btn>  
-
-                            <v-btn x-small icon @click="toggleProjectDetails(project.id)">
-                              <v-icon>mdi-dots-vertical</v-icon>
-                            </v-btn>  
-
-                          </td>
-                        </tr>
-                        <tr style="font-size:small;">
-                          <td colspan="7" v-if="isProjectDetailsOpen(project.id)">
-                              <v-row class="m-1 pl-3 bg-light">
                                 
                                 <v-col cols="2">
-                                  <div class="text-secondary text-small mb-3">
+                                  <div class="text-secondary mb-3">
                                     <div class="wb-label"><strong>Last modified</strong></div>
                                     <div class="wb-value">{{momentDate(project.changed)}}</div>
                                   </div>
-                                  <div class="text-secondary text-small mb-3">
+                                  <div class="text-secondary  mb-3">
                                     <div class="wb-label"><strong>Created on</strong></div>
                                     <div class="wb-value">{{momentDate(project.created)}}</div>
                                   </div>
 
                                 </v-col>
 
-                                <v-col cols="2">                                  
 
-                                  <div class="text-secondary text-small mb-3">
-                                    <div class="wb-label"><strong>Last modified by</strong></div>
-                                    <div class="wb-value">{{project.username}}</div>
-                                  </div>
-
-                                  <div class="text-secondary text-small mb-3">
-                                    <div class="wb-label"><strong>Project owner</strong></div>
-                                    <div class="wb-value">{{project.username_cr}}</div>
-                                  </div>
-
-                                </v-col>
-
-                                <v-col cols="3"  >
+                                <v-col cols="auto"  >
                                   
-                                <div class="text-secondary text-small mb-3">
-                                  <div><strong>IDNO</strong></div>
-                                  {{project.idno}}
-                                </div>
-                                
-                                <div v-if="project.collections.length>0" >
-                                  <div class="text-secondary"><strong>Collections</strong></div>
-                                  <template v-for="collection in project.collections">
-                                    <span @click="removeCollection(project.id,collection.id)" class="cursor-pointer badge font-weight-normal text-secondary border border-warning rounded mr-1">
-                                      {{collection.title}}
-                                      <span aria-hidden="true">&times;</span>
-                                    </span>
-                                  </template>
-                                </div>
-                                </v-col>
-
-                                <v-col>
-
-                                  <div class="float-right">
-                                
-                                  <div class="mb-1">
-                                    <a href="#" @click="viewAccessPermissions(project.id)" class="btn btn-sm btn-outline-primary"><span class="mdi mdi-information-outline"> View access</span></a>                              
+                                  <div class="text-secondary  mb-3">
+                                    <div><strong>IDNO</strong></div>
+                                    {{project.idno}}
                                   </div>
+
+                                  <div class="text-secondary  mb-3">
+                                    <div><strong>Disk usage</strong></div>
+                                    <div v-if="project.size">{{project.size.size_formatted}}</div>
+                                    <div v-else>-</div>
+                                  </div>
+                                  
+                                </v-col>
+                            </v-row>
+                                                    
+                            </div>
+
+                            <v-card-actions>
+                              <v-spacer></v-spacer>
+                              <v-btn
+                                text
+                                outlined
+                                small
+                                color="primary"
+                                @click="viewAccessPermissions(project.id)"
+                              >
+                                View access
+                              </v-btn>
+                              <v-btn
+                                text
+                                small
+                                outlined
+                                class="ml-2"
+                                color="primary"
+                                @click="ShareProject(project.id)"
+                              >
+                              Share
+                              </v-btn>
+
+                              <v-btn
+                                text
+                                outlined
+                                small
+                                color="error"
+                                @click="DeleteProject(project.id)"
+                                class="ml-2"
+                              >
+                                Delete
+                              </v-btn>
                               
-                                  <div class="mb-1">
-                                  <a class="btn btn-sm btn-outline-primary" title="Share project"  @click="ShareProject(project.id)" href="#">
-                                    <span class="mdi mdi-share"> Share</span>
-                                  </a>
-                                </div>
+                            </v-card-actions>
 
-                                  <div class="mb-1">
-                                  <a  class="btn btn-sm btn-outline-danger" title="Delete" @click="DeleteProject(project.id)" href="#"><span class="mdi mdi-close-circle-outline"> Delete</span></a>                              
-                                  </div>
-                                </span>
+                        </v-expansion-panel-content>
+                      </v-expansion-panel>
+                    </v-expansion-panels>
 
-                                </div>
 
-                                </v-col>
+                    <template>
+                        <div class="mb-5 mt-2" v-if="PaginationTotalPages">
+                          <v-pagination v-model="pagination_page" :length="PaginationTotalPages" :total-visible="6" @input="PaginatePage"></v-pagination>
+                        </div>
+                      </template>
 
-                                
-                              </v-row>
-                          
-                          </td>                          
-                        </tr>
-                        </template>
                   </template>
 
                 </div>
@@ -469,7 +500,7 @@
       </div>
     </template>
 
-
+    </v-app>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
@@ -557,6 +588,7 @@
       data: {
         page_layout: 'list',
         projects: [],
+        project_size_info:[],
         selected_projects: [],
         select_all_projects: false,
         is_loading: false,
@@ -580,6 +612,7 @@
         dialog_share_collection: false,
         dialog_share_collection_options: [],
         users_list: null,
+        errors:[],
         projects_shared: [],
         search_keywords: '',
         search_filters: {},
@@ -705,6 +738,17 @@
         }
       },
       methods: {
+        onProjectPanelClick: function (projectIndex)
+        {
+          console.log(this.Projects[projectIndex]);
+          if (!this.Projects[projectIndex].size){
+            this.getProjectSize(this.Projects[projectIndex].id, projectIndex);
+          }
+        },
+
+        checkboxOnClick: function(e) {
+          e.cancelBubble = true;
+        },
         initDataTypes: function()
         {
           this.data_types={
@@ -785,6 +829,17 @@
           let utc_date = moment(date, "YYYY-MM-DD HH:mm:ss").toDate();
           return moment.utc(utc_date).format("YYYY-MM-DD")
         },
+        momentShortDate(date) {
+          let utc_date = moment(date, "YYYY-MM-DD HH:mm:ss").toDate();
+          let year=moment.utc(utc_date).format("YYYY");
+          let current_year=moment.utc().format("YYYY");
+
+          if (year==current_year){
+            return moment.utc(utc_date).format("MMM DD");
+          }else{
+            return moment.utc(utc_date).format("MMM DD, YYYY");
+          }
+        },
         momentAgo(date) {
           //moment.locale('fr');
           let utc_date = moment(date, "YYYY-MM-DD HH:mm:ss").toDate();
@@ -834,6 +889,20 @@
               console.log("error", error);
             });
         },
+        getProjectSize: function(projectId,projectIndex) {
+          vm = this;
+          let url = CI.base_url + '/api/files/size/' + projectId;
+          return axios
+            .get(url)
+            .then(function(response) {
+              Vue.set(vm.projects.projects[projectIndex], 'size', response.data.result);
+              console.log("project size",response.data.result);
+              
+            })
+            .catch(function(error) {
+              console.log("error", error);
+            });
+        },
         loadProjects: function() {
           vm = this;
 
@@ -852,10 +921,17 @@
             '&' + urlParams.toString();
 
           this.loading_status = "Loading projects...";
+          this.errors = [];
 
           return axios
             .get(url)
             .then(function(response) {
+              
+              if (!response.data.projects){
+                vm.errors.push(response.data);
+                throw new Error(response.data);
+              }
+
               console.log("success", response);
               vm.projects = response.data;
               vm.pagination_page = vm.PaginationCurrentPage;
@@ -896,7 +972,8 @@
               console.log("request completed");
             });
         },
-        EditProject: function(id) {
+        EditProject: function(id) 
+        {
           let window_ = window.open(CI.base_url + '/editor/edit/' + id, 'project-' + id);
           if (window_){
             window_.focus();

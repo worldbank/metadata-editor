@@ -12,10 +12,7 @@ class DataUtils
 {
 
 	//Data API base url
-	private $DataApiUrl; //'http://localhost:2121';
-
-	//temporary storage for creating files via data api
-	private $DataStoragePath;	
+	private $DataApiUrl; //'http://localhost:8000';
 
 	/**
 	 * Constructor
@@ -26,11 +23,8 @@ class DataUtils
 		require_once 'modules/guzzle/vendor/autoload.php';
 		$this->ci =& get_instance();
 		$this->ci->load->model("Editor_model");
-
 		$this->ci->load->config("editor");
-
 		$this->DataApiUrl = $this->ci->config->item('data_api_url', 'editor');
-		$this->DataStoragePath=$this->ci->config->item('data_storage_path', 'editor');
 	}
 
 
@@ -185,7 +179,7 @@ class DataUtils
 		$response=json_decode($api_response->getBody()->getContents(),true);
 		return [
 			'response'=>$response,
-			'request'=>$request_body,
+			//'request'=>$request_body,
 			'status_code'=>$api_response->getStatusCode() //e.g. 200
 		];
 	}
@@ -465,6 +459,74 @@ class DataUtils
 
 		return $max;
 	}
+
+
+	 /**
+     * 
+     *  Create params for data dictionary generation
+     * 
+     */
+    function prepare_data_dictionary_params($sid, $fid,$datafile_path=null)
+    {
+		$this->ci->load->model("Editor_datafile_model");
+		$this->ci->load->model("Editor_variable_model");
+
+        if (!$datafile_path){
+            $datafile_path=$this->ci->Editor_datafile_model->get_file_path($sid,$fid);
+        }
+
+        if (!$datafile_path){
+            throw new Exception("Data file not found");
+        }
+		
+		//get variables data types, missing, weights info
+        $this->ci->db->select("name,field_dtype,user_missings,is_weight,var_wgt_id");
+        $this->ci->db->where("sid",$sid);
+        $this->ci->db->where("fid",$fid);        
+        $variables=$this->ci->db->get("editor_variables")->result_array();
+
+        $params=array(
+            'datafile'=> realpath($datafile_path)
+        );
+
+        $dtype_map=array(
+            //'numeric'=>'float',
+            'string'=>'object',
+            'character'=>'object'
+        );
+
+        foreach($variables as $variable){
+            if (isset($variable['var_wgt_id']) && $variable['var_wgt_id']>0 ){
+                $params['weights'][]=array(
+                    'field'=>$variable['name'],
+                    'weight_field'=>$this->ci->Editor_variable_model->get_name_by_var_wgt_id($sid,$variable['var_wgt_id'])
+                );
+            }
+            /*if ($variable['user_missings']!=''){
+                $params['missings'][]=array(
+                    "field"=>$variable['name'],
+                    "missings"=> explode(",",$variable['user_missings'])
+                );
+            }*/
+
+            if ($variable['user_missings']!=''){
+				$missings=explode(",",$variable['user_missings']);
+				foreach($missings as $idx=>$missing){
+					if (is_numeric($missing)){												
+						$params['missings'][trim($variable['name'])][]=intval($missing);
+					}
+				}
+            }
+
+            if ($variable['field_dtype']!=''){
+                if (isset($dtype_map[$variable['field_dtype']])){
+                    $params['dtypes'][$variable['name']]= $dtype_map[$variable['field_dtype']];
+                }
+            }
+        }
+
+        return $params;
+    }
 
 }
 

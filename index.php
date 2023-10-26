@@ -1,4 +1,5 @@
 <?php
+
 /**
  * CodeIgniter
  *
@@ -44,7 +45,7 @@
  *
  *
  */
-	define('APP_VERSION', '5.2');
+	define('APP_VERSION', '1.0');
 
 /*
  *---------------------------------------------------------------
@@ -63,7 +64,7 @@
  *
  * NOTE: If you change these, also change the error_reporting() code below
  */
-	define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'production');
+	define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'development');
 
 /*
  *---------------------------------------------------------------
@@ -77,6 +78,7 @@ switch (ENVIRONMENT)
 {
 	case 'development':
 		error_reporting(-1);
+		error_reporting(E_ERROR ^  (~E_DEPRECATED & ~E_STRICT & ~E_USER_DEPRECATED));
 		ini_set('display_errors', 1);
 	break;
 

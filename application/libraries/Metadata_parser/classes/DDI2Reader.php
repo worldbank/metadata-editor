@@ -83,7 +83,7 @@ class DDI2Reader
             'type' => 'table',
             'cols' => array(
                 '.' => 'name',
-                '@abbr' => 'abbreviation',
+                '@abbr' => 'abbr',
                 '@affiliation' => 'affiliation',
                 '@role' => 'role',
             )
@@ -94,8 +94,9 @@ class DDI2Reader
             'type' => 'table',
             'cols' => array(
                 '.' => 'name',
-                '@abbr' => 'abbreviation',
-                '@affiliation' => 'affiliation'
+                '@abbr' => 'abbr',
+                '@affiliation' => 'affiliation',
+                '@URI' => 'uri'
             )
         );
 
@@ -104,7 +105,7 @@ class DDI2Reader
             'type' => 'table',
             'cols' => array(
                 '.' => 'name',
-                '@abbr' => 'abbreviation',
+                '@abbr' => 'abbr',
                 '@affiliation' => 'affiliation',
                 '@URI' => 'uri'
             )
@@ -114,7 +115,7 @@ class DDI2Reader
             'label' => 'Holdings',
             'type' => 'table',
             'cols' => array(
-                '.' => 'text',
+                '.' => 'name',
                 '@location' => 'location',
                 '@callno' => 'callno',
                 '@URI'=>'uri'
@@ -126,7 +127,7 @@ class DDI2Reader
             'type' => 'table',
             'cols' => array(
                 '.' => 'name',
-                '@abbr' => 'abbreviation',
+                '@abbr' => 'abbr',
                 '@affiliation' => 'affiliation'
             )
         );
@@ -156,19 +157,62 @@ class DDI2Reader
             'type' => 'table',
             'cols' => array(
                 '.' => 'name',
-                '@abbr' => 'abbreviation',
+                '@abbr' => 'abbr',
                 '@affiliation' => 'affiliation',
                 '@role' => 'role'
             )
         );
 
-        $xpath_group["codeBook/stdyDscr/studyDevelopment/developmentActivity/participant"] = array(
+        /*$xpath_group["codeBook/stdyDscr/studyDevelopment/developmentActivity/participant"] = array(
             'label' => 'participant',
             'type' => 'table',
             'cols' => array(
                 '.' => 'name',
                 '@affiliation' => 'affiliation',
                 '@role' => 'role'
+            )
+        );*/
+
+        $xpath_group["codeBook/stdyDscr/studyDevelopment/developmentActivity"] = array(
+            'label' => 'Study development activity',
+            'type' => 'table',
+            'is_nested'=>true,
+            'cols' => array(
+                '@type'=>'activity_type',
+                'description' => 'activity_description',
+                'participant' => 'participants',
+                'resource' => 'resources',
+                'outcome'=> 'outcome'
+            )
+        );
+
+        $xpath_group["codeBook/stdyDscr/stdyInfo/qualityStatement/standardsCompliance/standard"] = array(
+            'label' => 'Standard',
+            'type' => 'table',
+            'cols' => array(
+                'standardName'=>'name',
+                'producer' => 'producer'
+            )
+        );
+        
+
+        $xpath_group["codeBook/stdyDscr/studyDevelopment/developmentActivity/resource"] = array(
+            'label' => 'Resource',
+            'type' => 'table',            
+            'cols' => array(
+                'dataSrc'=>'name',
+                'srcOrig' => 'origin',
+                'srcChar' => 'characteristics',
+            )
+        );
+
+        $xpath_group["codeBook/stdyDscr/studyDevelopment/developmentActivity/participant"] = array(
+            'label' => 'Participant',
+            'type' => 'table',            
+            'cols' => array(
+                '.'=>'name',
+                'affiliation' => 'affiliation',
+                'role' => 'role',
             )
         );
 
@@ -179,7 +223,7 @@ class DDI2Reader
                 '.' => 'txt',
                 '@required' => 'required',
                 '@formNo' => 'form_no',
-                '@URI' => 'uri'
+                '@URI' => 'form_uri'
             )
         );
 
@@ -200,20 +244,20 @@ class DDI2Reader
                 '.' => 'txt',
                 '@required' => 'required',
                 '@formNo' => 'form_no',
-                '@URI' => 'uri'
+                '@URI' => 'form_uri'
             )
         );
 
         $xpath_group["codeBook/stdyDscr/method/codingInstructions"] = array(
             'label' => 'Data access confidentiality',
-            'type' => 'table',
-            'repeatable' => false,
+            'type' => 'table',            
             'cols' => array(
-                '.' => 'txt',
+                //'.' => 'txt',
                 '@relatedProcesses' => 'related_processes',
                 '@type' => 'type',
                 'txt' => 'txt',
                 'command' => 'command',
+                'command/@formalLanguage' => 'formal_language',
             )
         );
 
@@ -248,7 +292,7 @@ class DDI2Reader
             'type' => 'table',
             'cols' => array(
                 '.' => 'name',
-                '@abbr' => 'abbreviation',
+                '@abbr' => 'abbr',
                 '@role' => 'role',
             )
         );
@@ -261,6 +305,16 @@ class DDI2Reader
                 '@date' => 'date',
                 '@event' => 'event',
                 '@cycle' => 'cycle',
+            )
+        );
+
+        
+        $xpath_group['codeBook/stdyDscr/method/dataProcessing'] = array(
+            'label' => 'Data processing',
+            'type' => 'table',
+            'cols' => array(
+                '.' => 'description',
+                '@type' => 'type',
             )
         );
 
@@ -282,10 +336,6 @@ class DDI2Reader
             )
         );
 
-        
-
-        
-
         $xpath_group['codeBook/stdyDscr/stdyInfo/sumDscr/nation'] = array(
             'label' => 'Countries',
             'type' => 'table',
@@ -296,12 +346,25 @@ class DDI2Reader
         );
 
 
+        $xpath_group['codeBook/stdyDscr/method/dataColl/sources'] = array(
+            'label' => 'Sources',
+            'type' => 'table',
+            'cols' => array(
+                'dataSrc' => 'name',
+                'srcOrig' => 'origin',
+                'srcChar' => 'characteristics',
+            )
+        );
+
+
+
         $xpath_group['codeBook/stdyDscr/method/dataColl/dataCollector'] = array(
             'label' => 'Data Collectors',
             'type' => 'table',
             'cols' => array(
                 '.' => 'name',
-                '@abbr' => 'abbreviation',
+                '@abbr' => 'abbr',
+                '@role' =>'role',
                 '@affiliation' => 'affiliation',
             )
         );
@@ -344,13 +407,14 @@ class DDI2Reader
             'type' => 'table',
             'cols' => array(
                 '.' => 'name',
+                '@abbr'=>'abbr',
                 '@affiliation' => 'affiliation',
                 '@role' => 'role',
             )
         );
 
 
-        $xpath_group['codeBook/stdyDscr/citation/distStmt/contact'] = array(
+        $xpath_group['codeBook/stdyDscr/citation/distStmt/contact'] = array( 
             'label' => 'Data Collectors',
             'type' => 'table',
             'cols' => array(
@@ -576,18 +640,20 @@ class DDI2Reader
                 $key_values[$date_field] = $this->transform_collection_dates($key_values[$date_field]);
             }
         }
-
+        
+        /*
         //data source element transform
 		$data_source_items=array(
 			'codeBook/stdyDscr/studyDevelopment/developmentActivity/resource/dataSrc',
 			'codeBook/stdyDscr/method/dataColl/sources/dataSrc'
 		);
-		
+
 		foreach($data_source_items as $source) {
 			if (array_key_exists($source, $key_values)) {
 				$key_values[$source] = $this->transform_data_source($key_values[$source]);
 			}
-		}
+		}        
+        */
 
 		//convert access_place - JSON schema supports only a single value
 		$access_place_key='codeBook/stdyDscr/dataAccs/setAvail/accsPlac';
@@ -595,7 +661,7 @@ class DDI2Reader
 			$access_place=$key_values[$access_place_key];
 			if(is_array($access_place)){
 				$key_values[$access_place_key]=@$access_place[0]['name'];
-				$key_values[$access_place_key.'_uri']=@$access_place[0]['uri'];
+				$key_values[$access_place_key.'_url']=@$access_place[0]['uri'];
 			}else{
 				$key_values[$access_place_key]='';
 			}
@@ -849,6 +915,7 @@ class DDI2Reader
     }
 
 
+
     /*
     *
     * return an array of all child elements with values
@@ -857,6 +924,16 @@ class DDI2Reader
     public function get_child_elements_array(&$xml_obj, $parent_path = "/", &$elements_array)
     {
         if (array_key_exists($parent_path, $this->table_elements)) {
+
+            if (isset($this->table_elements[$parent_path]['is_nested']) && $this->table_elements[$parent_path]['is_nested']==true)
+            {
+                //custom mapping for developmentActivity element
+                if ($parent_path=='codeBook/stdyDscr/studyDevelopment/developmentActivity'){
+                    $elements_array[$parent_path][]=$this->get_development_activity($xml_obj);
+                }
+                return $elements_array;
+            }
+
             $result = $this->get_element_flattened($xml_obj, $element_parent_path = NULL, $result);
             $cols = $this->table_elements[$parent_path]['cols'];
 
@@ -958,6 +1035,7 @@ class DDI2Reader
         }
         return $output;
     }
+    
 
     private function transform_data_source($data)
 	{
@@ -967,6 +1045,66 @@ class DDI2Reader
 		}
 		return $output;
 	}
+
+
+
+    /**
+     * 
+     * 
+     * @xml_obj = codeBook/stdyDscr/studyDevelopment/developmentActivity
+     * 
+     */
+    function get_development_activity($node)
+    {        
+        $activity_item=array(
+            'activity_type'=>$this->get_attribute_value($node, 'type'),
+            'activity_description'=>strval($node->description),
+            'participants'=>$this->get_development_activity_participants($node),
+            'resources'=>$this->get_development_activity_resources($node),
+            'outcome'=>strval($node->outcome),
+        );
+
+        return $activity_item;
+    }
+
+    function get_development_activity_resources($node){
+
+        $resource = $node->resource;
+
+        $resource_output=array();
+        foreach ($resource as $resource) {
+            $resource_output[]=array(
+                'name'=>strval($resource->dataSrc),
+                'origin'=>strval($resource->srcOrig),
+                'characteristics'=>strval($resource->srcChar),
+            );
+        }
+        return $resource_output;
+    }
+    
+    function get_development_activity_participants($node)
+    {
+        $participants = $node->participant;
+        $participants_output=array();
+        foreach ($participants as $participant) {
+            $participants_output[]=array(
+                'affiliation'=>$this->get_attribute_value($participant, 'affiliation'),
+                'role'=>$this->get_attribute_value($participant, 'role'),
+                'name'=>strval($participant),
+            );
+        }
+        return $participants_output;
+    }
+    
+    function get_attribute_value($node, $attribute_name)
+    {
+        foreach ($node->attributes() as $att_name=>$att_value) {
+            if ($att_name == $attribute_name) {
+                return strval($att_value);
+            }
+        }
+        return null;
+    }
 }
 
 

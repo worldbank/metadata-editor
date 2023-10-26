@@ -52,17 +52,7 @@ class ImportProject extends MY_REST_Controller
 			$options['changed']=date("U");
 			$options['title']='untitled';
 			$options['type']=$type;
-			$options['idno']=$idno;
-
-			//validate & create dataset
-			$sid=$this->Editor_model->create_project($type,$options);
-
-			if(!$sid){
-				throw new Exception("FAILED_TO_CREATE_PROJECT");
-			}
-
-			$this->Editor_model->create_project_folder($sid);
-			
+			$options['idno']=$idno;					
 		
 			//upload file and import metadata
 			$allowed_file_types="json|xml|zip";
@@ -77,34 +67,51 @@ class ImportProject extends MY_REST_Controller
 
 			$result=$file_info;
 
-			if ($file_ext=='xml'){
-				if ($options['type']=='survey'){
-					$result=$this->Editor_model->importDDI($sid, $parseOnly=false,$options);
+
+			//validate & create dataset
+			$sid=$this->Editor_model->create_project($type,$options);
+
+			if(!$sid){
+				throw new Exception("FAILED_TO_CREATE_PROJECT");
+			}
+
+			$this->Editor_model->create_project_folder($sid);
+			
+
+			try{
+				if ($file_ext=='xml'){
+					if ($options['type']=='survey'){
+						$result=$this->Editor_model->importDDI($sid, $parseOnly=false,$options);
+					}
+				}else if ($file_ext=='json'){
+					$this->load->library('ImportJsonMetadata');
+					$result=$this->importjsonmetadata->import($sid,$uploaded_filepath,$validate=true,$options);
 				}
-			}else if ($file_ext=='json'){
-				$this->load->library('ImportJsonMetadata');
-				$result=$this->importjsonmetadata->import($sid,$uploaded_filepath,$validate=true,$options);
+				else if ($file_ext=='zip')
+				{
+					$result=$this->import_zip_package($sid,$zip_path=$uploaded_filepath);
+				}			
+
+				$this->Editor_model->set_project_options($sid,$options=array(
+					'created_by'=>$user_id,
+					'changed_by'=>$user_id,
+					'created'=>date("U"),
+					'changed'=>date("U"),
+				));
+
+				$output=array(
+					'status'=>'success',
+					'file_info'=>$file_info,
+					'sid'=>$sid,
+					'idno'=>$idno
+				);
+
+				$this->set_response($output, REST_Controller::HTTP_OK);			
 			}
-			else if ($file_ext=='zip')
-			{
-				$result=$this->import_zip_package($sid,$zip_path=$uploaded_filepath);
+			catch(Exception $e){
+				$this->Editor_model->delete_project($sid);
+				throw $e;
 			}
-
-			$this->Editor_model->set_project_options($sid,$options=array(
-				'created_by'=>$user_id,
-				'changed_by'=>$user_id,
-				'created'=>date("U"),
-				'changed'=>date("U"),
-			));
-
-			$output=array(
-				'status'=>'success',
-				'file_info'=>$file_info,
-				'sid'=>$sid,
-				'idno'=>$idno
-			);
-
-			$this->set_response($output, REST_Controller::HTTP_OK);			
 		}
 		catch(ValidationException $e){
 			$error_output=array(

@@ -687,13 +687,30 @@ class Editor_resource_model extends ci_model {
 	 * Return all files for the project
 	 * 
 	 */
-    function files($sid)
+    function files($sid) 
     {
         $this->load->helper("file");
         $project_folder=$this->Editor_model->get_project_folder($sid);
         $result=get_dir_recursive($project_folder,$make_relative_to=$project_folder);
         return $result['files'];        
     }
+
+	/**
+	 * 
+	 * 
+	 * Return all files with sizes
+	 * 
+	 * @details - true/false - return file details
+	 * 
+	 * 
+	 */
+	function files_with_sizes($sid,$details=false)
+	{
+		$this->load->helper("file");
+		$project_folder=$this->Editor_model->get_project_folder($sid);
+		$result=get_dir_size($project_folder,$details);
+		return $result;        
+	}
 
 
 	function get_resource_file_by_name($sid,$filename)

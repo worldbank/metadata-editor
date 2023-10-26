@@ -187,13 +187,19 @@ class Editor_DDI_Writer
         //document description
         $doc_desc->set([
             'citation.titlStmt.IDNo'=>$dataset_metadata['doc_desc.idno'],
+            'citation.titlStmt.titl'=>$dataset_metadata['doc_desc.title'],
             'citation.prodStmt.producer'=>'',
             'citation.prodStmt.prodDate._value'=>$dataset_metadata['doc_desc.prod_date'],
             'citation.prodStmt.prodDate._attributes'=>['date' => $dataset_metadata['doc_desc.prod_date']],
-            'citation.prodStmt.software._attributes'=>['version'=>'v5'],
-            'citation.prodStmt.software._value'=>'NADA',
+            'citation.prodStmt.software._attributes'=>['version'=>'beta'],
+            'citation.prodStmt.software._value'=>'MetadataEditor',
             //version
-            'citation.verStmt.version'=> $dataset_metadata['doc_desc.version_statement.version']
+            'citation.verStmt.version._value'=> $dataset_metadata['doc_desc.version_statement.version'],
+            'citation.verStmt.version._attributes'=>[
+                'date'=>$dataset_metadata['doc_desc.version_statement.version_date']                
+            ],
+            'citation.verStmt.notes'=>$dataset_metadata['doc_desc.version_statement.version_notes'],
+            'citation.verStmt.verResp'=>$dataset_metadata['doc_desc.version_statement.version_resp']
         ]);
 
         //doc_desc/producers
@@ -202,7 +208,7 @@ class Editor_DDI_Writer
             $doc_desc->set([
                 'citation.prodStmt.producer.'.$idx.'._value'=>$producers["{$idx}.name"],
                 'citation.prodStmt.producer.'.$idx.'._attributes'=>[
-                    'abbr'=>$producers["{$idx}.abbreviation"],
+                    'abbr'=>$producers["{$idx}.abbr"],
                     'affiliation'=>$producers["{$idx}.affiliation"],
                     'role'=>$producers["{$idx}.role"],
                 ],

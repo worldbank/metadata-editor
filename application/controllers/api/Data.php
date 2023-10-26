@@ -12,10 +12,7 @@ class Data extends MY_REST_Controller
 {
 
 	//Data API base url
-	private $DataApiUrl; //'http://localhost:2121';
-
-	//temporary storage for creating files via data api
-	private $DataStoragePath;	
+	private $DataApiUrl; //'http://localhost:8000';
 
 	public function __construct()
 	{
@@ -33,9 +30,7 @@ class Data extends MY_REST_Controller
 		$this->is_authenticated_or_die();
 
 		$this->load->config("editor");
-
 		$this->DataApiUrl = $this->config->item('data_api_url', 'editor');
-		$this->DataStoragePath=$this->config->item('data_storage_path', 'editor');
 	}
 
 	
@@ -174,9 +169,7 @@ class Data extends MY_REST_Controller
 			}
 
 			$this->editor_acl->user_has_project_access($sid,$permission='edit',$this->api_user());
-
-			$dict_params=$this->Editor_variable_model->prepare_data_dictionary_params($sid,$file_id);
-
+		
 			$data_file_var_count=$this->Editor_datafile_model->get_file_varcount($sid,$file_id);//if not 0 then use CSV
 
 			if ($data_file_var_count==0){
@@ -188,6 +181,8 @@ class Data extends MY_REST_Controller
 			if (!$datafile_path){
 				throw new Exception("Data file not found");
 			}
+
+			$dict_params=$this->datautils->prepare_data_dictionary_params($sid,$file_id,$datafile_path);
 
 			//queue job
 			$api_response=$this->datautils->generate_summary_stats_queue($datafile_path,$dict_params);
@@ -255,7 +250,7 @@ class Data extends MY_REST_Controller
 				'status'=>'success',
 				//'result'=>realpath($datafile_path),
 				'variables_imported'=>count($variable_import_result),
-				'api_response'=>$api_response,
+				//'api_response'=>$api_response,
 				'job_status'=>$job_status				
 				#'variables'=>$response['variables']
 			);
@@ -569,6 +564,96 @@ class Data extends MY_REST_Controller
 			);
 			$this->set_response($response, REST_Controller::HTTP_BAD_REQUEST);
 		}
+	}
+
+
+	/**
+	 * 
+	 * 
+	 * Read CSV
+	 * 
+	 */
+	public function read_csv_get($sid=null,$fileid=null)
+	{
+		sleep(1);
+		try{
+			$exists=$this->Editor_model->check_id_exists($sid);
+
+			if(!$exists){
+				throw new Exception("Project not found");
+			}
+
+			$project_folder=$this->Editor_model->get_project_folder($sid);			
+		
+			if (!file_exists($project_folder)){
+				throw new Exception('PROJECT_FOLDER_NOT_FOUND');
+			}
+
+			$project_folder=realpath($project_folder);
+
+			//get filename by FID
+			$datafile=$this->Editor_model->data_file_by_id($sid,$fileid);
+			
+			if (!$datafile){
+				throw new Exception("DATAFILE_NOT_FOUND");
+			}
+
+			$filename=$datafile['file_name'];
+			$csv_file_path=$project_folder.'/data/'.$filename.'.csv';
+
+			/*if (!file_exists($data_file_path)){
+				throw new Exception("DATA_FILE_NOT_FOUND: ".$data_file_path);
+			}*/
+
+			if (!file_exists($csv_file_path)){
+				throw new Exception("CSV_FILE_NOT_FOUND: ".$csv_file_path);
+			}
+
+			$csv = Reader::createFromPath($csv_file_path, 'r');
+			$csv->setHeaderOffset(0); //set the CSV header offset
+			$offset=(int)$this->input->get("offset");
+			$limit=(int)$this->input->get("limit");
+
+			if ($limit <1 || $limit>100){
+				$limit=100;
+			}
+
+			$stmt = Statement::create()
+				->offset($offset)
+				->limit($limit)
+			;
+
+			$records = $stmt->process($csv);
+			/*foreach ($records as $record) {
+				//do something here
+			}*/
+
+			$response=array(
+				'csv'=>basename($csv_file_path),
+				'total'=>$this->getCsvLinesCount($csv_file_path),
+				//'total'=>'?',
+				'offset'=>$offset,
+				'limit'=>$limit,
+				'records'=>$records
+			);
+
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}	
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}	
+	}
+
+	private function getCsvLinesCount($file_path)
+	{
+		$file = new \SplFileObject($file_path, 'r');
+		$file->seek(PHP_INT_MAX);
+
+		return $file->key();
 	}
 
 }
