@@ -9,3 +9,9 @@ Options -Indexes
     #always connect via https
     Header set Strict-Transport-Security "max-age=31536000; includeSubDomains"
 </IfModule>
+
+
+<FilesMatch "composer.json|composer.lock">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
