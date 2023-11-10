@@ -16,6 +16,51 @@ Vue.component('form-input', {
                 this.$emit('input', newValue);               
             }
        },
+       fieldEnumByCodeMultiple:{
+        get: function() {
+            //loop this.local and find the code in the enum
+            let list = [];
+            _.forEach(this.local, (code) => {
+                let enumCode = this.findEnumByCode(this.getEnumCodeFromLabel(code));
+                if (enumCode){
+                    list.push(enumCode);
+                }else{
+                    list.push(code);
+                }
+            });
+            return list;
+        },
+        set: function(value) {
+            let list = [];
+            _.forEach(value, (code) => {
+                let enumCode = this.findEnumByCode(code);
+                if (enumCode){
+                    list.push(enumCode.label + ' [' + enumCode.code + ']');
+                }else{
+                    list.push(code);
+                }
+            });
+            this.local = list;
+            }
+         },
+       fieldEnumByCode: {
+        get: function() {
+          const code = this.field.enum.find(
+            code => code.code === this.getEnumCodeFromLabel(this.local)
+          );
+
+          return code || this.local;
+        },
+        set: function(value) {
+          let code=this.findEnumByCode(value);  
+
+          if (code){
+            this.local = code.label + ' [' + code.code + ']';
+          }else{
+            this.local = value;
+          }
+        }
+      },
         formTextFieldStyle(){            
             return this.$store.state.formTextFieldStyle;
         }
@@ -51,7 +96,7 @@ Vue.component('form-input', {
                     </div>
                     <div v-else-if="fieldDisplayType(field)=='dropdown' || fieldDisplayType(field)=='dropdown-custom'">
                         <v-combobox
-                            v-model="local"
+                            v-model="fieldEnumByCodeMultiple"
                             :items="field.enum"
                             item-text="label"
                             item-value="code"
@@ -62,6 +107,7 @@ Vue.component('form-input', {
                             v-bind="formTextFieldStyle"
                             background-color="#FFFFFF"                    
                         ></v-combobox>
+                        
                     </div>
                                     
                 </div>
@@ -128,7 +174,7 @@ Vue.component('form-input', {
                         <label :for="'field-' + normalizeClassID(field.key)">{{field.title}}</label>                
                         <span class="small" v-if="field.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(field.key)" ><i class="far fa-question-circle"></i></span>
                         <v-combobox
-                            v-model="local"
+                            v-model="fieldEnumByCode"
                             :items="field.enum"
                             item-text="label"
                             item-value="code"
@@ -186,7 +232,18 @@ Vue.component('form-input', {
                 </div>
 
             </div>  `,
-    methods:{        
+    methods:{
+        findEnumByCode: function(code){
+            return _.find(this.field.enum, {code: code});
+        },
+        getEnumCodeFromLabel: function(label){
+            //code is enclosed in [] e.g. label [code]
+            let code = label.match(/\[(.*?)\]/);
+            if (code && code.length>1){
+                return code[1];
+            }
+            return label;
+        },
         update: function (value)
         {
             this.$emit('input', value);
