@@ -345,6 +345,53 @@ paths:
               $ref: "#/definitions/Collection"
         security:
           - ApiKeyAuth: []
+      post:
+        tags:
+          - Collections
+        summary: Create collection
+        description: Create a new collection
+        operationId: createCollection
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/Collection"
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: "#/definitions/Collection"
+        security:
+          - ApiKeyAuth: []
+  /collections/update/{collectionId}:      
+      post:
+        tags:
+          - Collections
+        summary: Update collection
+        description: Update a collection
+        operationId: updateCollection
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/Collection"
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: "#/definitions/Collection"
+        security:
+          - ApiKeyAuth: []
   /collections/{id}:
       get:
         tags:
@@ -367,10 +414,32 @@ paths:
           '200':
             description: successful operation
             schema:
-              $ref: "#/definitions/Collection"
+              $ref: "#/definitions/CollectionList"
         security:
           - ApiKeyAuth: []
-          
+      delete:
+        tags:
+          - Collections
+        summary: Delete collection
+        description: Delete a collection
+        operationId: deleteCollectionById
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - name: id
+            in: path
+            title: Collection ID
+            description: Collection ID
+            type: string
+            required: true
+        responses:
+          '200':
+            description: successful operation
+        security:
+          - ApiKeyAuth: []
+
   /collections/add_projects:
       post:
         tags:
@@ -394,10 +463,111 @@ paths:
             schema:
               $ref: "#/definitions/AddProjectsToCollection"
         security:
-          - ApiKeyAuth: []        
+          - ApiKeyAuth: []
+  /collections/remove_project/{collectionId}/{projectId}}:
+      post:
+        tags:
+          - Collections
+        summary: Remove project from collection
+        description: Remove project from collection
+        operationId: removeProjectFromCollection
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "collectionId"
+            required: true
+            type: integer            
+          - in: "path"
+            name: "projectId"
+            required: true
+            type: integer            
+        responses:
+          '200':
+            description: successful operation
+        security:
+          - ApiKeyAuth: []
+
+  /collections/user_access/{collectionId}:
+      get:
+        tags:
+          - Collections
+        summary: List users by collection
+        description: List of users who have access to a collection
+        operationId: UsersByCollection
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "collectionId"
+            required: true
+            type: integer            
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+  /collections/user_access:
+      post:
+        tags:
+          - Collections
+        summary: Add users to collection
+        description: Grant user access to a collection
+        operationId: AddUsersToCollection
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/UserCollectionAccess"
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+  /collections/remove_user_access:
+      post:
+        tags:
+          - Collections
+        summary: Remove user from collection
+        description: Remove user access from a collection
+        operationId: RemoveUserFromCollection
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/RemoveUserCollectionAccess"
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
 ###############################################################
 definitions:
   Collection:
+    type: object
+    properties:
+      title:
+        type: string
+        required: true
+      description:
+        type: string
+    xml:
+      name: collection
+  CollectionList:
     type: object
     properties:
       id:
@@ -421,7 +591,7 @@ definitions:
       username:
         type: string
     xml:
-      name: AddProjectsToCollection
+      name: CollectionList
   AddProjectsToCollection:
     type: object
     properties:
@@ -435,6 +605,35 @@ definitions:
           format: int64   
     xml:
       name: AddProjectsToCollection
+  UserCollectionAccess:
+    type: object
+    properties:
+      collection_id:
+        type: integer
+        required: true
+      user_id:        
+        type: integer
+        format: int64   
+        required: true
+      permissions:
+        type: array
+        items:
+          type: string
+          enum:
+            - view
+            - edit
+            - admin
+  RemoveUserCollectionAccess:
+    type: object
+    properties:
+      collection_id:
+        type: integer
+        required: true
+      user_id:        
+        type: integer
+        format: int64   
+        required: true
+
   AuthenticationResponse:
     type: object
     properties:

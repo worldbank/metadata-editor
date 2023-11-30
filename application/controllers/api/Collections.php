@@ -143,6 +143,11 @@ class Collections extends MY_REST_Controller
 	}
 
 
+	function index_delete($id=null)
+	{
+		return $this->delete_post($id);
+	}
+
 	function delete_post($id=null)
 	{		
 		try{
