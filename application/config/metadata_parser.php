@@ -49,7 +49,7 @@ $config['survey']=array(
     ),
     'study_desc/production_statement/copyright'=>array('xpath'=>'codeBook/stdyDscr/citation/prodStmt/copyright', 'transform_callback'=>'none'),
     'study_desc/production_statement/prod_date'=>array('xpath'=>'codeBook/stdyDscr/citation/prodStmt/prodDate', 'transform_callback'=>'none'),
-    'study_desc/production_statement/prod_place'=>array('xpath'=>'codeBook/stdyDscr/citation/prodStmt/prodPlace', 'transform_callback'=>'none'),
+    'study_desc/production_statement/prod_place'=>array('xpath'=>'codeBook/stdyDscr/citation/prodStmt/prodPlac', 'transform_callback'=>'none'),
 
 
     #'study_desc/software'=>array('xpath'=>'codeBook/stdyDscr/citation/prodStmt/software', 'transform_callback'=>'none'),
