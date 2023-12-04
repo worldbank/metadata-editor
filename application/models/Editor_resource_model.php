@@ -7,6 +7,12 @@
  * 
  */
 class Editor_resource_model extends ci_model {
+
+	private $documentation_types=array(
+		'documentation'=>'documentation',
+		'data' => 'data',
+		'thumbnail' => ''
+	);
  
     public function __construct()
     {
@@ -45,6 +51,8 @@ class Editor_resource_model extends ci_model {
 
     function delete($sid,$resource_id)
 	{
+		$this->delete_file_by_resource($sid,$resource_id);
+
 		$this->db->where('sid',$sid);
         $this->db->where('id',$resource_id);
 		return $this->db->delete('editor_resources');
@@ -780,7 +788,7 @@ class Editor_resource_model extends ci_model {
 		//data files
 		$data_files=$this->Editor_datafile_model->select_all($sid);
 
-		$data_files_by_name=array();
+		$data_files_by_name=array(); 
 		if (is_array($data_files)){
 			foreach($data_files as $key=>$file){
 				$data_files_by_name[$file['file_name']]=$file;
@@ -921,4 +929,54 @@ class Editor_resource_model extends ci_model {
 		
 		return $rdf;
 	}
+
+
+	/**
+	 * 
+	 * Check if a file exists
+	 * 
+	 */
+	function check_file_exists($sid,$documentation_type,$filename)
+	{
+		$project_folder=$this->Editor_model->get_project_folder($sid);
+		$resource_file=$project_folder.'/'.$documentation_type.'/'.$this->normalize_filename($filename);
+
+		if (file_exists($resource_file)){
+			return true;
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * 
+	 * Delete a file
+	 * 
+	 */
+	function delete_file($sid,$documentation_type,$filename)
+	{
+		$project_folder=$this->Editor_model->get_project_folder($sid);
+		$resource_file=$project_folder.'/'.$documentation_type.'/'. $this->normalize_filename($filename);
+
+		if (file_exists($resource_file)){
+			unlink($resource_file);
+		}
+	}
+
+
+	/**
+	 * 
+	 * Delete file by resource id
+	 * 
+	 */
+	function delete_file_by_resource($sid,$resource_id)
+	{
+		$resource=$this->select_single($sid,$resource_id);
+
+		if ($resource){
+			$this->delete_file($sid,'documentation',$resource['filename']);
+		}
+	}
+
 }    

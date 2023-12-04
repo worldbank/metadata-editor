@@ -8,6 +8,7 @@ Vue.component('external-resources-edit', {
             attachment_type:'',
             attachment_url:'',
             resource_template:'',
+            file_exists:false,
             dc_types:{                
                 "doc/adm":"Document, Administrative [doc/adm]",
                 "doc/anl":"Document, Analytical [doc/anl]",
@@ -29,9 +30,7 @@ Vue.component('external-resources-edit', {
         }
     }, 
     created () {
-        //this.loadDataFiles();
-        //this.loadResourceTemplate();
-    },   
+    },
     methods: {        
         getResourceByID: function(){
             this.ExternalResources.forEach((resource, index) => {                
@@ -57,7 +56,6 @@ Vue.component('external-resources-edit', {
         saveResource: function()
         {
             let formData = new FormData();
-            //formData.append('file', this.file);            
 
             if (this.attachment_type=='url'){
                 this.Resource.filename=this.attachment_url;
@@ -95,7 +93,7 @@ Vue.component('external-resources-edit', {
         },
         uploadFile: function ()
         {
-            if (this.attachment_type!='file'){
+            if (this.attachment_type!='file' || !this.file){
                 this.saveResource();
                 return;
             }
@@ -125,8 +123,9 @@ Vue.component('external-resources-edit', {
             });            
         }, 
         handleFileUpload( event ){
-            this.file = event.target.files[0];
+            this.file = event;
             this.errors='';
+            this.resourceFileExists();            
         },
         isValidUrl: function(string) {
             let url;
@@ -138,7 +137,60 @@ Vue.component('external-resources-edit', {
             }
           
             return url.protocol === "http:" || url.protocol === "https:";
-          }
+        },
+        resourceFileExists: function()
+        {
+            if (!this.file){
+                return false;
+            }
+
+            formData= new FormData();
+            formData.append('file_name', this.file.name);
+            formData.append('doc_type', 'documentation');
+
+            vm=this;
+            let url=CI.base_url + '/api/files/exists/'+ this.ProjectID;
+
+            axios.post( url,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
+            ).then(function(response){
+                if (response.data.exists){
+                    vm.file_exists=response.data.exists;
+                }
+            })
+            .catch(function(response){
+                console.log("resourceFileExists",response);
+            });    
+        },
+        resourceDeleteFile: function()
+        {
+            if (!confirm("Are you sure you want to delete this file?")){
+                return false;
+            }
+
+            vm=this;
+            let formData= new FormData();
+            let url=CI.base_url + '/api/files/delete_resource_file/'+ this.ProjectID + '/' + this.Resource['id'];
+
+            axios.post( url,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
+            ).then(function(response){
+                vm.Resource.filename='';
+            })
+            .catch(function(response){
+                console.log("resourceFileDeleted",response);
+            });    
+        }
     },
     computed: {
         ExternalResources()
@@ -175,6 +227,9 @@ Vue.component('external-resources-edit', {
         },
         ProjectID(){
             return this.$store.state.project_id;
+        },
+        ResourceFileExists(){
+            return this.resourceFileExists();
         }
 
     },
@@ -275,6 +330,11 @@ Vue.component('external-resources-edit', {
                     <span v-if="ResourceAttachmentType=='file'">File:</span>
                     <span v-if="ResourceAttachmentType=='url'">Link:</span>
                     {{Resource.filename}}
+                    <span v-if="Resource.filename!=''">
+                        <button type="button" class="btn btn-link btn-sm" @click="resourceDeleteFile">Remove</button>
+                    </span>
+
+                    <div v-if="file_exists && file" class="border bg-danger text-light p-2 m-2"><strong>{{file.name}}</strong> File already exists, use a different file!</div>
                 </div>
 
                 <div class="form-check mt-2" >
@@ -285,9 +345,20 @@ Vue.component('external-resources-edit', {
                 </div>
 
                 <div class="file-group form-field m-1 p-3 border-bottom">
-                    <label class="l" for="customFile">Upload file</label>
-                    <div class="bg-white border p-1">
-                        <input type="file" class="form-control-file" id="customFile" @click="attachment_type='file'" @change="handleFileUpload( $event )">                    
+                    <div class="bg-white">
+                    
+                        <v-file-input                            
+                            label=""
+                            outlined
+                            truncate-length="50"
+                            dense
+                            prepend-icon=""
+                            prepend-inner-icon="mdi-paperclip"
+                            @change="handleFileUpload( $event )"
+                            @click="attachment_type='file'"
+                            ref="fileUpload"
+                         ></v-file-input>
+                        
                     </div>     
                 </div>
 
@@ -299,14 +370,13 @@ Vue.component('external-resources-edit', {
                 </div>
 
                 <div class="form-group form-field  m-1 p-3 ">
-                    <label for="url">URL</label> 
                     <span><input type="text" id="url" class="form-control" v-model="attachment_url" @click="attachment_type='url'"/></span> 
                 </div>
 
             </div>
 
 
-            <button type="button" class="btn btn-primary" @click="uploadFile">Save</button>
+            <button type="button" class="btn btn-primary" @click="uploadFile" :disabled="file_exists==true">Save</button>
             <button type="button" class="btn btn-secondary" @click="cancelSave">Cancel</button>
 
             

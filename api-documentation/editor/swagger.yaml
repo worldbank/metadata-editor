@@ -1,11 +1,11 @@
 swagger: '2.0'
 info:
   description: >-
-    The NADA REST API allows searching, browsing and viewing the catalog. Use the metadata endpoints to extract detailed study metadata as JSON. 
+    Metadata Editor API
     
 
-    Find out more about NADA at
-    [http://nada.ihsn.org](http://nada.ihsn.org).  
+    Find out more about Editor at
+    [http://editor.ihsn.org](http://editor.ihsn.org).  
 
     
   version: 1.0.0
@@ -19,7 +19,7 @@ tags:
   - name: Editor
     description: Create, update projects
 
-  - name: Resources
+  - name: External resources
     description: Manage external resources and files for projects
 
   - name: Collections
@@ -38,7 +38,7 @@ x-tagGroups:
       - Editor
       - Microdata
       - Timeseries
-      - Resources
+      - External resources
       - Datafile
       - Variable
 
@@ -550,6 +550,305 @@ paths:
             required: true
             schema:
               $ref: "#/definitions/RemoveUserCollectionAccess"
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+  /resources/{projectId}:
+      get:
+        tags:
+          - External resources
+        summary: List resources
+        description: List documentation (Reports, Questionnaires, Tables, etc.) for a project
+        operationId: ListResources
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "projectId"
+            type: integer
+            required: true            
+        responses:
+          '200':
+            description: successful operation            
+            schema:
+              $ref: "resource-schema.json"
+        security:
+          - ApiKeyAuth: []
+
+      post:
+        tags:
+          - External resources
+        summary: Create resource
+        description: Create a new resource for a project
+        operationId: CreateResource
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "projectId"
+            type: integer
+            required: true
+          - in: "formData"
+            name: "dctype"
+            type: string
+            required: true
+            description: "Resource type"
+          - in: "formData"
+            name: "title"
+            type: string
+            required: true
+            description: "Resource title"            
+          - in: "formData"
+            name: "author"
+            type: string
+            required: false
+          - in: "formData"
+            name: "dcdate"
+            type: string
+            required: false
+          - in: "formData"
+            name: "country"
+            type: string
+            required: false  
+          - in: "formData"
+            name: "language"
+            type: string
+            required: false
+          - in: "formData"
+            name: "contributor"
+            type: string
+            required: false
+          - in: "formData"
+            name: "publisher"
+            type: string
+            required: false
+          - in: "formData"
+            name: "rights"
+            type: string
+            required: false
+          - in: "formData"
+            name: "description"
+            type: string
+            required: false
+          - in: "formData"
+            name: "abstract"
+            type: string
+            required: false
+          - in: "formData"
+            name: "toc"
+            type: string
+            required: false
+          - in: "formData"
+            name: "filename"
+            type: file
+            description: "Upload file"
+            required: false
+        responses:
+          '200':
+            description: successful operation            
+            schema:
+              $ref: "resource-schema.json"
+        security:
+          - ApiKeyAuth: []
+  /resources/{projectId}/{resourceId}:
+      post:
+        tags:
+          - External resources
+        summary: Update resource
+        description: Update external resource for a project
+        operationId: UpdateResource
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "projectId"
+            type: integer
+            required: true
+          - in: "path"
+            name: "resourceId"
+            type: integer
+            required: true
+          - in: "formData"
+            name: "dctype"
+            type: string
+            required: true
+            description: "Resource type"
+          - in: "formData"
+            name: "title"
+            type: string
+            required: true
+            description: "Resource title"            
+          - in: "formData"
+            name: "author"
+            type: string
+            required: false
+          - in: "formData"
+            name: "dcdate"
+            type: string
+            required: false
+          - in: "formData"
+            name: "country"
+            type: string
+            required: false  
+          - in: "formData"
+            name: "language"
+            type: string
+            required: false
+          - in: "formData"
+            name: "contributor"
+            type: string
+            required: false
+          - in: "formData"
+            name: "publisher"
+            type: string
+            required: false
+          - in: "formData"
+            name: "rights"
+            type: string
+            required: false
+          - in: "formData"
+            name: "description"
+            type: string
+            required: false
+          - in: "formData"
+            name: "abstract"
+            type: string
+            required: false
+          - in: "formData"
+            name: "toc"
+            type: string
+            required: false
+          - in: "formData"
+            name: "filename"
+            type: file
+            description: "Upload file"
+            required: false
+        responses:
+          '200':
+            description: successful operation            
+            schema:
+              $ref: "resource-schema.json"
+        security:
+          - ApiKeyAuth: [] 
+  /resources/write_json{projectId}:
+      get:
+        tags:
+          - External resources
+        summary: Generate JSON
+        description: Generate JSON for external resources
+        operationId: ResourcesWriteJSON
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            type: integer
+            name: "projectId"
+            required: true
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+  /resources/write_rdf{projectId}:
+      get:
+        tags:
+          - External resources
+        summary: Generate RDF
+        description: Generate RDF for external resources
+        operationId: ResourcesRdfJSON
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "projectId"
+            type: integer
+            required: true
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+  /resources/rdf{projectId}:
+      get:
+        tags:
+          - External resources
+        summary: Download RDF
+        description: Download RDF for external resources
+        operationId: DownloadResourcesRdf
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "projectId"
+            type: integer
+            required: true
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+  /resources/import/{projectId}:
+      post:
+        tags:
+          - External resources
+        summary: Import RDF or JSON
+        description: Import external resources using RDF or JSON
+        operationId: importResources
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "projectId"
+            type: integer
+            required: true
+          - in: "formData"
+            name: "file"
+            type: file
+            description: "Upload RDF or JSON file"
+            required: true
+        responses:
+          '200':
+            description: successful operation            
+            schema:
+              $ref: "resource-schema.json"
+        security:
+          - ApiKeyAuth: []
+  /resources/delete/{projectId}/{resourceId}}:
+      post:
+        tags:
+          - External resources
+        summary: Delete resource
+        description: Delete external resource for a project
+        operationId: deleteResource
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "projectId"
+            type: integer
+            required: true
+          - in: "path"
+            name: "resourceId"
+            type: integer
+            required: true          
         responses:
           '200':
             description: successful operation            

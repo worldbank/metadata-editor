@@ -47,7 +47,7 @@
 | Examples:	my-controller/index	-> my_controller/index
 |		my-controller/my-method	-> my_controller/my_method
 */
-$route['default_controller'] = 'page';
+$route['default_controller'] = 'editor';
 $route['404_override'] = 'page';
 $route['translate_uri_dashes'] = FALSE;
 

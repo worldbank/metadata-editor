@@ -327,8 +327,12 @@ if ( ! function_exists('get_dir_size'))
 		$files=array();
 		foreach(new RecursiveIteratorIterator(new RecursiveDirectoryIterator($folder_path,RecursiveDirectoryIterator::SKIP_DOTS)) as $file){
 			$size_=$file->getSize();
-			$files[$file->getFileName()]=$size_;
-			$size+=$file->getSize();
+			$files[]=array(
+				'name'=>$file->getFileName(),
+				'size'=>$size_,
+				'path'=>str_replace($folder_path,'',$file->getPath()),
+			);
+			$size+=$size_;
 		}
 
 		$output= [

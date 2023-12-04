@@ -245,6 +245,11 @@ class Resources extends MY_REST_Controller
 					if (!$resource){
 						throw new Exception("Resource not found");
 					}
+
+					if($resource['filename'] && $options['filename']){
+						//delete old file
+						$this->Editor_resource_model->delete_file_by_resource($sid,$resource_id);
+					}
 					
 					$resource_id=$this->Editor_resource_model->update($resource_id,$options);
 				}				

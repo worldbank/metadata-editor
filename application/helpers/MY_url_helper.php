@@ -434,5 +434,42 @@ if ( ! function_exists('_parse_attributes'))
 			return $output;
 		}
 	}
+
+
+
+
+	if ( ! function_exists('username_initials'))
+	{
+		function username_initials($username) {
+			$initials = '';
+			$words = explode(' ', $username);
+			foreach ($words as $word) {
+				$initials .= $word[0];
+			}
+			if (strlen($initials) > 2) {
+				$initials= substr($initials, 0, 2);
+			}
+
+			return strtoupper($initials);
+		}
+	}
+
+	
+	{
+		function nada_site_url()
+		{
+			$CI =& get_instance();
+			$nada_site_url=$CI->config->slash_item('nada_site_url');
+			
+			if ($nada_site_url!==FALSE && $nada_site_url!='')
+			{
+				return $nada_site_url;
+			}
+			
+			return base_url();
+		}
+	}
+
+
 /* End of file MY_url_helper.php */
 /* Location: ./application/helpers/MY_url_helper.php */

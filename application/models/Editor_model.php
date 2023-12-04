@@ -655,6 +655,15 @@ class Editor_model extends CI_Model {
 
 	function get_project_metadata_field($type,$field,$data)
 	{
+		//set image core title field - DCMI or IPTC
+		if ($type=='image'){
+			if (isset($data['image_description']['dcmi']['title'])){
+				$image_title_field='image_description.dcmi.title';
+			}else{
+				$image_title_field='image_description.iptc.photoVideoMetadataIPTC.title';
+			}
+		}
+
 		$core_fields=array(
 			'survey'=>array(
 				'idno'=>'study_desc.title_statement.idno',
@@ -687,9 +696,13 @@ class Editor_model extends CI_Model {
 			'geospatial'=>array(
 				'idno'=>'description.idno',
 				'title'=>'description.identificationInfo.citation.title'
-			)			
-
+			),
+			'image'=>array(
+				'idno'=>'image_description.idno',
+				'title'=>$image_title_field
+			),
 		);
+
 
 		if(!array_key_exists($type,$core_fields)){
 			return false;

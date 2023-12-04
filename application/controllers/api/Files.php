@@ -145,4 +145,99 @@ class Files extends MY_REST_Controller
 		}
 	}
 
+	/**
+	 * 
+	 * 
+	 * Check if documentation file exists
+	 * 
+	 * @sid
+	 * @filename
+	 * @doc_type data | documentation | thumbnail
+	 * 
+	 */
+	function exists_post($sid=null)
+	{
+		try{
+			$sid=$this->get_sid($sid);
+			$filename=basename($this->post('file_name'));
+			$doc_type=$this->post('doc_type');
+			$user=$this->api_user();
+
+			if (!$sid){
+				throw new Exception("Missing parameter: sid");
+			}
+
+			if (!$filename){
+				throw new Exception("Missing parameter: file_name");
+			}
+
+			if (!$doc_type){
+				throw new Exception("Missing parameter: doc_type");
+			}
+			
+			$this->editor_acl->user_has_project_access($sid,$permission='view',$user);
+
+			$exists=$this->Editor_model->check_id_exists($sid);
+
+			if(!$exists){
+				throw new Exception("Project not found");
+			}
+
+			$result=$this->Editor_resource_model->check_file_exists($sid,$doc_type,$filename);
+
+			$output=array(
+				'exists'=>$result
+			);
+
+			$this->set_response($output, REST_Controller::HTTP_OK);			
+		}
+		catch(Exception $e){
+			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	/**
+	 * 
+	 * 
+	 * Delete resource file
+	 * 
+	 */
+	function delete_resource_file_post($sid=null,$resource_id=null)
+	{
+
+		try{
+			$sid=$this->get_sid($sid);
+			$user=$this->api_user();
+
+			if (!$sid){
+				throw new Exception("Missing parameter: sid");
+			}
+
+			if (!$resource_id){
+				throw new Exception("Missing parameter: resource_id");
+			}
+			
+			$this->editor_acl->user_has_project_access($sid,$permission='edit',$user);
+			$exists=$this->Editor_model->check_id_exists($sid);
+
+			if(!$exists){
+				throw new Exception("Project not found");
+			}
+
+			$result=$this->Editor_resource_model->delete_file_by_resource($sid,$resource_id);
+
+			$output=array(
+				'status'=>'success'
+			);
+
+			$this->set_response($output, REST_Controller::HTTP_OK);			
+		}
+		catch(Exception $e){
+			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
+		}
+
+
+	}
+
 }
