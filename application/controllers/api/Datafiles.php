@@ -217,7 +217,9 @@ class Datafiles extends MY_REST_Controller
 		try{
 			$sid=$this->get_sid($sid);
 			$this->editor_acl->user_has_project_access($sid,$permission='edit');
-			$this->Editor_model->data_file_delete($sid,$file_id);
+			$this->Editor_datafile_model->cleanup($sid,$file_id);
+			$this->Editor_datafile_model->delete_physical_file($sid,$file_id);
+			$this->Editor_datafile_model->delete($sid,$file_id);
 				
 			$response=array(
 				'status'=>'success'					
@@ -372,6 +374,40 @@ class Datafiles extends MY_REST_Controller
 
 			$response=array(
 				'file_id'=>$file_id
+			);
+
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+
+	/**
+	 * 
+	 * Clean up temporary data files
+	 * 
+	 *  - removes original data files [keep only the csv version]
+	 * 
+	 */
+	function cleanup_post($sid=null, $file_id=null)
+	{
+		try{
+			$sid=$this->get_sid($sid);
+			$user_id=$this->get_api_user_id();
+
+			$this->editor_acl->user_has_project_access($sid,$permission='edit');			
+			$result=$this->Editor_datafile_model->cleanup($sid, $file_id);
+
+			$response=array(
+				'status'=>'success',
+				'files_removed'=>$result
 			);
 
 			$this->set_response($response, REST_Controller::HTTP_OK);
