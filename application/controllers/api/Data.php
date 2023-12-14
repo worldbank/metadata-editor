@@ -547,7 +547,6 @@ class Data extends MY_REST_Controller
 				throw new Exception("File upload failed");
 			}
 
-
 			$result=$this->datafile_update->update($sid, $file_id,$result['uploaded_path']);
 			
 			$output=array(
@@ -575,7 +574,6 @@ class Data extends MY_REST_Controller
 	 */
 	public function read_csv_get($sid=null,$fileid=null)
 	{
-		sleep(1);
 		try{
 			$exists=$this->Editor_model->check_id_exists($sid);
 
