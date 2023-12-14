@@ -1,71 +1,72 @@
 //form input component
-Vue.component('form-input', {
-    props:['value','field','title'],
-    data: function () {    
-        return {
-        }
+Vue.component("form-input", {
+  props: ["value", "field", "title"],
+  data: function () {
+    return {};
+  },
+  mounted: function () {},
+  computed: {
+    local: {
+      get: function () {
+        return this.value;
+      },
+      set: function (newValue) {
+        this.$emit("input", newValue);
+      },
     },
-    mounted: function () {
-    },
-    computed: {
-        local: {
-            get: function () {
-                return this.value;
-            },
-            set: function (newValue) {
-                this.$emit('input', newValue);               
-            }
-       },
-       fieldEnumByCodeMultiple:{
-        get: function() {
-            //loop this.local and find the code in the enum
-            let list = [];
-            _.forEach(this.local, (code) => {
-                let enumCode = this.findEnumByCode(this.getEnumCodeFromLabel(code));
-                if (enumCode){
-                    list.push(enumCode);
-                }else{
-                    list.push(code);
-                }
-            });
-            return list;
-        },
-        set: function(value) {
-            let list = [];
-            _.forEach(value, (code) => {
-                let enumCode = this.findEnumByCode(code);
-                if (enumCode){
-                    list.push(enumCode.label + ' [' + enumCode.code + ']');
-                }else{
-                    list.push(code);
-                }
-            });
-            this.local = list;
-            }
-         },
-       fieldEnumByCode: {
-        get: function() {
-          const code = this.field.enum.find(
-            code => code.code === this.getEnumCodeFromLabel(this.local)
-          );
-
-          return code || this.local;
-        },
-        set: function(value) {
-          let code=this.findEnumByCode(value);  
-
-          if (code){
-            this.local = code.label + ' [' + code.code + ']';
-          }else{
-            this.local = value;
+    fieldEnumByCodeMultiple: {
+      get: function () {
+        //loop this.local and find the code in the enum
+        let list = [];
+        _.forEach(this.local, (code) => {
+          let enumCode = this.findEnumByCode(this.getEnumCodeFromLabel(code));
+          if (enumCode) {
+            list.push(enumCode);
+          } else {
+            list.push(code);
           }
+        });
+        return list;
+      },
+      set: function (value) {
+        let list = [];
+        _.forEach(value, (code) => {
+          let enumCode = this.findEnumByCode(code);
+          if (enumCode) {
+            list.push(enumCode.label + " [" + enumCode.code + "]");
+          } else {
+            list.push(code);
+          }
+        });
+        this.local = list;
+      },
+    },
+    fieldEnumByCode: {
+      get: function () {
+        const code = this.field.enum.find(
+          (code) => code.code === this.getEnumCodeFromLabel(this.local)
+        );
+
+        return code || this.local;
+      },
+      set: function (value) {
+        let code = this.findEnumByCode(value);
+
+        if (code) {
+          this.local = code.label + " [" + code.code + "]";
+        } else {
+          this.local = value;
         }
       },
-        formTextFieldStyle(){            
-            return this.$store.state.formTextFieldStyle;
-        }
-    },  
-    template: `
+    },
+    formTextFieldStyle() {
+      return this.$store.state.formTextFieldStyle;
+    },
+    ProjectType() {
+      return this.$store.state.project_type;
+    },
+  },
+  template: `
             <div class="form-input-field mt-3" :class="'form-input-' + field.type"  >
 
                 <div v-if="field.type=='nested_array'">
@@ -125,7 +126,7 @@ Vue.component('form-input', {
                             v-slot="{ errors }"                            
                             :name="field.title"
                             >            
-                        
+
                             <v-text-field
                                 v-model="local"
                                 v-bind="formTextFieldStyle"
@@ -232,33 +233,40 @@ Vue.component('form-input', {
                 </div>
 
             </div>  `,
-    methods:{
-        findEnumByCode: function(code){
-            return _.find(this.field.enum, {code: code});
-        },
-        getEnumCodeFromLabel: function(label){
-            //code is enclosed in [] e.g. label [code]
-            let code = label.match(/\[(.*?)\]/);
-            if (code && code.length>1){
-                return code[1];
-            }
-            return label;
-        },
-        update: function (value)
-        {
-            this.$emit('input', value);
-        },
-        fieldDisplayType(field)
-        {
-            if (field.display_type){
-                return field.display_type;
-            }
+  methods: {
+    findEnumByCode: function (code) {
+      return _.find(this.field.enum, { code: code });
+    },
+    getEnumCodeFromLabel: function (label) {
+      //code is enclosed in [] e.g. label [code]
+      if (!label) {
+        return "";
+      }
 
-            if (_.includes(['text','string','integer','boolean','number'],field.display_type)){
-                return 'text';
-            }            
-            
-            return field.type;
-        }
-    }
-})
+      let code = label.match(/\[(.*?)\]/);
+      if (code && code.length > 1) {
+        return code[1];
+      }
+      return label;
+    },
+    update: function (value) {
+      this.$emit("input", value);
+    },
+    fieldDisplayType(field) {
+      if (field.display_type) {
+        return field.display_type;
+      }
+
+      if (
+        _.includes(
+          ["text", "string", "integer", "boolean", "number"],
+          field.display_type
+        )
+      ) {
+        return "text";
+      }
+
+      return field.type;
+    },
+  },
+});
