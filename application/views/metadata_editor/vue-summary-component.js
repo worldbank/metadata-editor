@@ -5,11 +5,15 @@ Vue.component('summary-component', {
           validation_errors: "",
           dialog_template:false,
           template_idx:-1,
-          template_updating:false
+          template_updating:false,
+          project_edit_stats:{},
+          project_disk_usage:{}
         }
       },
     created: function(){      
         this.validateProject();
+        this.getProjectEditStats();
+        this.getProjectDiskUsage();
     },
     
     computed: {
@@ -32,6 +36,39 @@ Vue.component('summary-component', {
         },
     },
     methods:{
+        momentDate(date) {
+            //gmt to utc
+            let utc_date = moment(date, "YYYY-MM-DD HH:mm:ss").toDate();
+            return moment.utc(utc_date).format("YYYY-MM-DD")
+          },
+        getProjectEditStats: function() {
+            let vm=this;
+            let url=CI.base_url + '/api/editor/edit_stats/'+this.ProjectID;
+
+            axios.get(url)
+            .then(function (response) {
+                if (response.data && response.data.info){
+                    vm.project_edit_stats=response.data.info;
+                }
+            })
+            .catch(function (error) {
+                console.log("edit_stats_failed",error);
+            });
+        },
+        getProjectDiskUsage: function() {
+            let vm=this;
+            let url=CI.base_url + '/api/files/size/'+this.ProjectID;
+
+            axios.get(url)
+            .then(function (response) {
+                if (response.data && response.data.result){
+                    vm.project_disk_usage=response.data.result;
+                }
+            })
+            .catch(function (error) {
+                console.log("disk_usage_stats_failed",error);
+            });
+        },
         validateProject: function() {
             let vm=this;
             let url=CI.base_url + '/api/editor/validate/'+this.ProjectID;
@@ -79,21 +116,120 @@ Vue.component('summary-component', {
     template: `
             <div class="summary-component mt-3 container-fluid">
 
+                <div class="row">
+                    <div class="col-6">
+                        <v-card>
+                            <v-card-text>
+                            <div class="row">
+                            <div class="col-4" >
+                                <div class="thumbnail-container">
+                                    <project-thumbnail/>
+                                </div>
+                            </div>
+                            <div class="col-8 border-left" >
+                            
+                            <!-- project info -->
+
+                            <div class="project-info-container row">
+                                <div class="col-6">
+
+                                    <div class="mb-3">
+                                        <strong>{{$t("project_owner")}}:</strong> 
+                                        <div class="text-capitalize">{{project_edit_stats.username}}</div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <strong>{{$t("last_changed_by")}}:</strong>
+                                        <div class="text-capitalize">{{project_edit_stats.username_cr}}</div>
+                                    </div>                                    
+
+                                </div>
+                                <div class="col-6">
+                                
+                                    <div class="mb-3">
+                                        <strong>{{$t("created_on")}}:</strong>
+                                        <div>{{momentDate(project_edit_stats.created)}}</div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <strong>{{$t("changed_on")}}:</strong>
+                                        <div>{{momentDate(project_edit_stats.changed)}}</div>
+                                    </div>
+                                
+                                </div>
+
+                                <div class="col-12">
+
+                                    
+                                    <div>
+                                        <div><v-icon style="font-size:25px;">mdi-alpha-t-box</v-icon> {{$t("template")}}</div>
+                                        <div class="border-top mt-1">
+                                            <div class="btn btn-link text-left" style="font-size:12px;" @click="dialog_template=true">
+                                                {{ProjectTemplate.name}} <v-icon>mdi-square-edit-outline</v-icon>                                                
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    </div>
+
+                            </div>
+
+                            <!-- end -->
+                            
+
+                            </div>
+                            </div>
+                                
+                            </v-card-text>                     
+                        </v-card>
+
+
+
+                        <v-card class="project-validation-container  mt-3">
+                            <v-card-text>
+                            <h5>{{$t("project_validation")}}</h5>                            
+
+                            <div class="validation-errors mt-2 border" v-if="validation_errors!=''" style="color:red;font-size:small;" >
+                                <div class="border-bottom p-2 mb-2"><strong>{{$t("validation_errors")}}</strong></div>
+                                <ul v-for="error in validation_errors.errors" class="mb-2 ml-3">
+                                    <li><strong>{{error.message}}</strong><br/>
+                                    Property: {{error.property}}
+                                    </li>                                    
+                                </ul>
+                            </div>
+                            <div class="mt-3 p-2 border" style="color:green" v-else>{{$t("no_validation_errors")}}</div>
+                            </v-card-text>
+                        </v-card>
+
+
+                    </div>
+
+                    <div class="col-6" >
+
+                        <v-card class="mb-2">
+                            <v-card-text>
+                                <h6>{{$t("disk_usage")}}</h6>
+                                <div v-if="project_disk_usage.size_formatted">{{project_disk_usage.size_formatted}}</div>
+                                <div v-else>-</div>
+                            </v-card-text>
+                        </v-card>
+
+                        <v-card>
+                        <v-card-text>
+                            <h6>{{$t("project_information")}}</h6>
+                            <div class="files-container " v-if="ProjectType!=='timeseries-db'" style="max-height:400px;overflow:auto;">
+                             <summary-files></summary-files>
+                            </div>
+                        </v-card-text>
+                    </v-card>
+
+                    </div>
+
+
+                </div>
+
                 <div class="row" >
                     <div class="col-6" >
-                        <div class="thumbnail-container border bg-white mb-3">
-                            <project-thumbnail/>
-                        </div>
-
-                        <div class="template-selection-container border mb-3 p-3 bg-white">
-                            <h5><v-icon style="font-size:25px;">mdi-alpha-t-box</v-icon> {{$t("template")}}</h5>
-                            <div class="border-top p-1">
-                                <span class="btn btn-link" @click="dialog_template=true">
-                                    <strong>{{ProjectTemplate.name}}</strong> [{{$t("switch_template")}}]
-                                </span>
-                            </div>
-                        </div>
-
                         <!-- template dialog -->
                         <template class="project-template">
                             <div class="text-center">
@@ -194,27 +330,11 @@ Vue.component('summary-component', {
                         <!-- end template dialog -->
 
 
-                        <div class="project-validation-container border mt-3 p-3 bg-white">
-                            <h5>{{$t("project_validation")}}</h5>                            
-
-                            <div class="validation-errors mt-2 border" v-if="validation_errors!=''" style="color:red;font-size:small;" >
-                                <div class="border-bottom p-2 mb-2"><strong>{{$t("validation_errors")}}</strong></div>
-                                <ul v-for="error in validation_errors.errors" class="mb-2 ml-3">
-                                    <li><strong>{{error.message}}</strong><br/>
-                                    Property: {{error.property}}
-                                    </li>                                    
-                                </ul>
-                            </div>
-                            <div class="mt-3 p-2 border" style="color:green" v-else>{{$t("no_validation_errors")}}</div>
-                        </div>
+                        
 
 
                     </div>
-                    <div class="col-6">
-                        <div class="files-container border bg-white p-3" v-if="ProjectType!=='timeseries-db'">
-                            <summary-files></summary-files>
-                        </div>
-                    </div>
+                   
                 </div>
 
             </div>          

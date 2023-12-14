@@ -26,7 +26,7 @@ Vue.component('datafile-edit', {
             
                 <div class="form-group form-field">
                     <label for="filename">File name</label> 
-                    <span><input type="text" id="filename" class="form-control" v-model="form_local.file_name"/></span> 
+                    <span><input readonly type="text" id="filename" class="form-control" v-model="form_local.file_name"/></span> 
                 </div>
 
                 <div class="form-group form-field">
@@ -80,7 +80,7 @@ Vue.component('datafile-edit', {
                         </div>
                         <div class="mt-2" v-if="form_local.file_info">
                             <label>{{$t("file_size")}}:</label>
-                            <div>{{form_local.file_info.original.file_size}}</div>                        
+                            <div v-if="form_local && form_local.file_info && form_local.file_info.original ">{{form_local.file_info.original.file_size}}</div>                        
                         </div>
                     </div> 
                 </div>

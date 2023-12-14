@@ -289,6 +289,8 @@ Vue.component('datafiles', {
                 if (result.data.job_status!=='done'){
                     this.importSummaryStatisticsQueueStatusCheck(file_id,job_id);
                 }else if (result.data.job_status==='done'){
+                    await this.reloadDataFileVariables(file_id);
+                    await this.reloadDataFiles();
                     this.dialog.is_loading=false;
                     this.dialog.message_success=this.$t("sum_stats_imported_success");
                 }
@@ -298,6 +300,12 @@ Vue.component('datafiles', {
                 this.dialog.is_loading=false;
                 this.dialog.message_error="Failed to import summary statistics: "+e.response.data.message;
             }
+        },
+        reloadDataFileVariables: async function(file_id){
+            return await this.$store.dispatch('loadVariables',{dataset_id:this.dataset_id, fid:file_id});
+        },
+        reloadDataFiles: async function(){
+            await store.dispatch('loadDataFiles',{dataset_id:this.dataset_id});
         },
         sleep: function(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
@@ -364,6 +372,10 @@ Vue.component('datafiles', {
               this.selected_files.push(this.data_files[i].file_id);
             }
           }
+        },
+        onDatafileReplaced: function(event){
+            this.dialog_datafile_import=false;            
+            this.importSummaryStatistics(this.dialog_datafile_import_fid);
         }
     },
     computed: {
@@ -523,7 +535,11 @@ Vue.component('datafiles', {
                 </v-dialog>
             <!-- end dialog -->
 
-            <dialog-datafile-import v-model="dialog_datafile_import" :file_id="dialog_datafile_import_fid"></dialog-datafile-import>            
+            <dialog-datafile-replace 
+                v-model="dialog_datafile_import" 
+                :file_id="dialog_datafile_import_fid"
+                v-on:file-replaced="onDatafileReplaced"
+            ></dialog-datafile-replace>            
         
         </div>
     `

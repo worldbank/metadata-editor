@@ -7,13 +7,15 @@ Vue.component('spread-metadata', {
             //dialog:this.value,
             dialogm1: '',
             variable_matches:[],
-            options:['documentation','question','categories'],
+            chk_select_all:false,
+            options:['info','documentation','question','categories'],
             options_fields:{
                 'info':[
                     'labl'
                 ],
                 'documentation':[
                     'var_txt',
+                    'var_notes',
                     'var_universe',
                     'var_resp_unit',
                     'var_imputation',
@@ -86,7 +88,7 @@ Vue.component('spread-metadata', {
         {
             console.log("variable saved in db", data);
             vm=this;
-            let url=CI.base_url + '/api/datasets/variables/'+vm.IDNO;
+            let url=CI.base_url + '/api/variables/'+vm.ProjectID;
             axios.post(url, 
                 data
                 /*headers: {
@@ -146,12 +148,28 @@ Vue.component('spread-metadata', {
                 });
            
             });
+        },
+        toggleSelection: function(){
+            //Select all if chk_select_all is true else deselect all
+            if(this.chk_select_all){
+                this.variable_matches.forEach((match, index) => {
+                    match.selected=true;
+                });
+            }
+            else{
+                this.variable_matches.forEach((match, index) => {
+                    match.selected=false;
+                });
+            }
         }
     },
     
     computed: {
         IDNO(){
             return this.$store.getters["getIDNO"];
+        },
+        ProjectID(){
+            return this.$store.getters["getProjectID"];            
         },
         dataFiles(){
             return this.$store.getters.getDataFiles;
@@ -174,7 +192,7 @@ Vue.component('spread-metadata', {
                     <v-dialog
                     v-model="value" persistent 
                     scrollable                    
-                    max-width="650px"
+                    max-width="850px"
                     >
                     
                     <v-card>
@@ -192,7 +210,7 @@ Vue.component('spread-metadata', {
                         <table class="table table-sm table-bordered" v-if="variable_matches.length>0" style="font-size:12px;">
                             <thead>
                             <tr>
-                                <td></td>
+                                <td><input type="checkbox" v-model="chk_select_all" @change="toggleSelection"/></td>
                                 <td>FID</td>
                                 <td>Dataset</td>
                                 <td>Variable</td>
@@ -212,18 +230,18 @@ Vue.component('spread-metadata', {
 
                         </div>
 
-                        <div>
-                            <div class="border-bottom"><strong>Spread metadata</strong></div>
+                        <div class="pt-1">
+                            <div class="border-bottom mb-1"><strong>Spread metadata</strong></div>
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" value="info" id="info" v-model="options">
                                 <label class="form-check-label" for="info">
-                                    Variable information
+                                    Variable information - Labels
                                 </label>
                             </div>
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" value="documentation" id="documentation" v-model="options">
                                 <label class="form-check-label" for="documentation">
-                                    Variable documentation
+                                    Variable documentation - Texts, notes, universe, etc.
                                 </label>
                             </div>
                             <div class="form-check">
@@ -235,7 +253,7 @@ Vue.component('spread-metadata', {
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" value="question" id="question" v-model="options">
                                 <label class="form-check-label" for="question">
-                                    Question texts
+                                    Question texts - Pre, post, literal, etc.
                                 </label>
                             </div>
                             <div class="form-check">

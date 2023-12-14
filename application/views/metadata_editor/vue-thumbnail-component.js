@@ -52,12 +52,12 @@ Vue.component('project-thumbnail', {
         }
     },  
     template: `
-            <div class="thumbnail-component p-3">
-                <h5>{{$t("thumbnail")}}</h5>
+            <div class="thumbnail-component">
                 <div class="row">
                     <div class="col-4" @click="show_dialog=true">
                         <div v-if="image_error==true">
-                            <i class="far fa-image" style="font-size:125px;"></i>                            
+                            <!--<i class="far fa-image" style="font-size:125px;"></i>-->
+                            <v-icon style="font-size:125px;">mdi-image-edit-outline</v-icon>
                         </div>
                         <div v-if="image_error==false"><img class="img-fluid" style="max-width:150px;max-height:150px;" :src="thumbnail" @error="imageLoadError"/></div>
                         <button type="button"  @click="show_dialog=true" class="btn btn-link">{{$t("change_thumbnail")}}</button>

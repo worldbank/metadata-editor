@@ -1134,5 +1134,33 @@ class Editor extends MY_REST_Controller
 
 	}
 
+
+	/**
+	 * 
+	 * Return info on users who created, changed the project
+	 * 
+	 */
+	function edit_stats_get($sid=null)
+	{
+		try{
+			$this->editor_acl->user_has_project_access($sid,$permission='view');			
+			$info=$this->Editor_model->get_edits_info($sid);
+			array_walk($info, 'unix_date_to_gmt_row',array('created','changed'));
+			
+			$response=array(
+				'info'=>$info
+			);
+
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}		
+	}
+
 	
 }

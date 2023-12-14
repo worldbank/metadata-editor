@@ -195,7 +195,7 @@
             echo $this->load->view("metadata_editor/vue-dialog-variable-selection-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-dialog-weight-variable-selection-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-dialog-component.js",null,true);
-            echo $this->load->view("metadata_editor/vue-dialog-datafile-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-dialog-datafile-replace-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-dialog-enum-selection-component.js",null,true);
         ?>
 
@@ -312,6 +312,14 @@
                                     "class": "required",
                                     "required": false,
                                     "help_text": "Definition help text",
+                                    "rules":"max:1000",
+                                    "enabled":true
+                                },
+                                {
+                                    "key": "var_notes",
+                                    "title": "Notes",
+                                    "type": "textarea",                                    
+                                    "help_text": "Notes",
                                     "rules":"max:1000",
                                     "enabled":true
                                 },

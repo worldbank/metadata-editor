@@ -422,6 +422,75 @@ class Editor_datafile_model extends CI_Model {
 	}
 
 
+	/**
+	 * 
+	 * Clean up original data files - except CSV version
+	 * 
+	 */
+	function cleanup($sid, $file_id=null)
+	{
+		//get all data files for this project
+		$files=$this->select_all($sid);
+
+		if (!$files){
+			return false;
+		}
+
+		//get project folder
+		$project_folder=$this->Editor_model->get_project_folder($sid);
+
+		$deleted=array();
+
+		//remove original data files except csv
+		foreach($files as $file){
+
+			if ($file_id && $file['file_id']!=$file_id){
+				continue;
+			}
+
+			$file_info=pathinfo($file['file_physical_name']);
+			
+			if (isset($file_info['extension']) && $file_info['extension']=='csv'){
+				continue; //skip csv
+			}
+
+			$filename_csv=$file_info['filename'].'.csv';
+
+			//check if csv exists?
+			if (file_exists($project_folder.'/data/'.$filename_csv)){
+				//delete original if exists
+				$path_=$project_folder.'/data/'.$file['file_physical_name'];
+
+				if (file_exists($path_)){
+					$deleted[]=basename($path_);
+					unlink($path_);
+				}
+			}
+			else{
+				throw new Exception("CSV file not found: ".$project_folder.'/data/'.$filename_csv);
+			}
+		}
+		
+		return $deleted;
+	}
+
+
+	/**
+	 * 
+	 * Delete data file
+	 * 
+	 */
+	function delete_physical_file($sid,$file_id)
+	{
+		try{
+			$file_path=$this->get_file_path($sid,$file_id);
+			unlink($file_path);
+		}
+		catch(Exception $e){
+			return false;
+		}
+	}
+
 	function delete($sid,$file_id)
     {        
         $this->db->where("sid",$sid);

@@ -779,22 +779,7 @@ class Editor_model extends CI_Model {
 
 		return 'F'.($max +1);
 	}
-
-
-	function data_file_delete($sid,$file_id)
-    {        
-        $this->db->where("sid",$sid);
-        $this->db->where("file_id",$file_id);
-        $this->db->delete("editor_data_files");
-		$this->data_file_delete_variables($sid,$file_id);
-	}
-
-	function data_file_delete_variables($sid,$file_id)
-	{
-		$this->db->where("sid",$sid);
-        $this->db->where("fid",$file_id);
-        return $this->db->delete("editor_variables");
-	}
+	
 
 
 	/**
@@ -1249,8 +1234,8 @@ class Editor_model extends CI_Model {
 			$data_files[]=$data_file;
 
 			if(!$parseOnly){
-				$this->data_file_delete($sid,$data_file['file_id']);
-				$this->data_file_insert($sid,$data_file);
+				$this->Editor_datafile_model->delete($sid,$data_file['file_id']);
+				$this->Editor_datafile_model->insert($sid,$data_file);
 			}
         }
         unset($files);
@@ -1766,7 +1751,8 @@ class Editor_model extends CI_Model {
 		}
 	}
 
-	function validate_idno($idno){
+	function validate_idno($idno)
+	{
 		if (is_numeric($idno)){
 			throw new Exception("IDNO cannot be numeric");
 		}
@@ -1788,6 +1774,21 @@ class Editor_model extends CI_Model {
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * 
+	 * Get project last modified and created info
+	 * 
+	 */
+	function get_edits_info($sid)
+	{
+		$this->db->select("users.username, users_cr.username as username_cr, editor_projects.created, editor_projects.changed");
+		$this->db->join("users", "users.id=editor_projects.changed_by");
+		$this->db->join("users as users_cr", "users_cr.id=editor_projects.created_by","left");		
+		$this->db->where("editor_projects.id",$sid);
+		$result=$this->db->get("editor_projects")->row_array();
+		return $result;
 	}
 
 
