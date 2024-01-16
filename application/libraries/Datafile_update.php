@@ -49,6 +49,11 @@ class Datafile_update
 
 		$target_filepath=$this->ci->Editor_model->get_project_folder($sid).'/data/'.$datafile['file_name'].'.'.$file_ext;
 
+		//create folder if not already exists
+		if (!file_exists($this->ci->Editor_model->get_project_folder($sid).'/data/')){
+			mkdir($this->ci->Editor_model->get_project_folder($sid).'/data/',0777,true);
+		}
+
 		//replace original data file
 		rename($datafile_path,$target_filepath);
 
