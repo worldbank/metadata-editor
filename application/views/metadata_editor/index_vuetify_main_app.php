@@ -136,7 +136,7 @@
         })
         
         <?php 
-            
+            echo $this->load->view("metadata_editor/vue-toast-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-login-component.js",null,true);
             echo $this->load->view("metadata_editor/fields/vue-field-date.js",null,true);
 
@@ -262,8 +262,8 @@
         router.beforeEach((to, from, next)=>{
             route_path=to.path.replace('/study/','');
             
-            if (!store.state.treeActiveNode){            
-                if (store.state.formTemplateParts[route_path] !== undefined){
+            if (!store.state.treeActiveNode){
+                if (store.getters.getTemplateItemByKey(route_path)){
                     store.commit('tree_active_node_path',route_path);
                 }
             }
@@ -441,6 +441,9 @@
                 getProjectType(state){
                     return state.project_type;
                 },
+                getProjectTemplate(state){
+                    return state.formTemplate;
+                },
                 getDataFiles(state) {
                     return state.data_files;
                 },
@@ -502,6 +505,37 @@
                 },
                 getTreeItems(state){
                     return state.treeItems;
+                },
+                //find template item by key                
+                getTemplateItemByKey: (state) => (key) => {
+                    
+                    let findTemplateByItemKey= function (items,key){
+                        let item=null;
+                        let found=false;
+                        let i=0;
+
+                        while(!found && i<items.length){
+                            if (items[i].key==key){
+                                item=items[i];
+                                found=true;
+                            }else{
+                                if (items[i].items){
+                                    item=findTemplateByItemKey(items[i].items,key);
+                                    if (item){
+                                        found=true;
+                                    }
+                                }
+                            }
+                            i++;                        
+                        }
+                        return item;
+                    }
+
+                    //search nested formTemplate
+                    let items=store.state.formTemplate.template.items;
+                    let item=findTemplateByItemKey(items,route_path);
+
+                    return item;
                 },
             },
             actions: {               
@@ -679,7 +713,7 @@
                     //state.treeActiveNode=state.formTemplateParts[node];
                 },
                 tree_active_node_path(state,node_key){
-                    state.treeActiveNode=state.formTemplateParts[node_key];
+                    state.treeActiveNode=store.getters.getTemplateItemByKey(node_key);
                 },
                 tree_active_node_data(state,node){
                     state.treeActiveNode=node;

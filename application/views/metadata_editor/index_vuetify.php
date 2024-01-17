@@ -26,7 +26,7 @@
   $template_parts=array();
   
   //update template_parts
-  get_template_part($metadata_template_arr['items'],$template_parts);
+  //get_template_part($metadata_template_arr['items'],$template_parts);
 
   function get_template_part($items,&$output)
   {
@@ -37,8 +37,23 @@
       if (isset($item['key'])){
         $output[$item['key']]=$item;
       }
+    }
+  } 
+  
+  
+  get_template_keys($metadata_template_arr['items'],$template_keys);
+  function get_template_keys($items,&$output)
+  {
+    foreach($items as $item){
+      if (isset($item['items'])){
+        get_template_keys($item['items'],$output);
+      }
+      if (isset($item['key']) && $item['type']!='section' ){
+        $output[]=$item['key'];
+      }
     }        
-  }  
+  }
+  
 ?>
 
 <style>
@@ -51,7 +66,7 @@
         let sid='<?php echo $sid;?>';
         let form_template=<?php echo $metadata_template;?>;
         let form_template_parts= <?php echo json_encode($template_parts,JSON_PRETTY_PRINT); ?>;
-        let metadata_schema=<?php echo $metadata_schema;?>;        
+        //let metadata_schema=<?php //echo $metadata_schema;?>;        
     </script>
 
   <div id="app" data-app>
@@ -150,7 +165,7 @@
           dataset_idno:project_idno,
           dataset_type:project_type,
           form_template: form_template,
-          metadata_schema: metadata_schema,
+          //metadata_schema: metadata_schema,
           is_loading:false,
           vuex_is_loaded:false,
           loading_status:null,

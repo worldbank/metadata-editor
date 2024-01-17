@@ -22,12 +22,13 @@
 
 
         <ul class="navbar-nav ml-auto">
-          <li class="nav-item">
-              <?php echo $this->load->view('user_menu/user-menu',null,true);?>
-          </li>
-          <li class="nav-item">
+            <li class="nav-item">
               <?php echo $this->load->view('user_menu/lang-bar',null,true);?>
-          </li>
+            </li>
+          
+            <li class="nav-item">
+              <?php echo $this->load->view('user_menu/user-menu',null,true);?>
+            </li>          
         </ul>
 
         

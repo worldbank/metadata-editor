@@ -1,93 +1,31 @@
 <v-app style="position:relative;height: 100vh">
+
+    
+
+
     <!--header-->
 
-    <nav class="main-header sticky-top navbar navbar-expand navbar-white navbar-light bg-light border-bottom" style="margin-left:0px;">
-
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <a href="<?php echo site_url();?>" title="<?php echo t("home");?>" role="button" class="nav-link"><i class="mdi mdi-home-outline"></i> 
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="<?php echo site_url('editor');?>" class="nav-link"><i class="mdi mdi-folder-multiple-outline"></i> <?php echo t("my_projects");?>
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a href="<?php echo site_url('editor/templates');?>"  role="button" class="nav-link btn btn-link"><i class="mdi mdi-alpha-t-box-outline"></i> <?php echo t("templates");?></a>
-            </li>
-        </ul>
-
-        <div class="pl-2 border-left ml-5">
-            <div class="d-flex flex-row">
-
-            
-
-                <div>
-                    <i style="font-size:x-large;" :class="project_types_icons[dataset_type]"></i>
-                </div>
-                <div>
-                    <div style="font-size:20px;">&nbsp; <strong>{{Title}}</strong></div>                    
-                </div>
-            </div>
-        </div>
-
-        <div>{{this.loading_status}}</div>
-
-        <ul class="navbar-nav ml-5 ml-auto">
-
-            <div class="dropdown">
-                <a class="btn btn-link dropdown-toggle" href="#" role="button" id="dropdownProjectMenu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="far fa-folder-open"></i> <?php echo t("project");?>
-                </a>
-
-                <div class="dropdown-menu" aria-labelledby="dropdownProjectMenu">
-                    <a class="dropdown-item" href="#/project-package">
-                        <span style="font-size:20px;" class="mdi mdi-package-down"></span> <?php echo t("export_package_zip");?></a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#/publish">
-                        <span style="font-size:20px;" class="mdi mdi-arrow-top-right-thick"></span> <?php echo t("publish_to_nada");?></a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#/generate-pdf"><span style="font-size:20px;" class="mdi mdi-file-pdf-box"></span> <?php echo t("pdf_documentation");?></a>
-                </div>
-            </div>
-
-            <div class="dropdown">
-                <a class="btn btn-link dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="fas fa-random"></i> <?php echo t("metadata");?>
-                </a>
-
-                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLink">
-                    <a class="dropdown-item" href="#/import"><i class="fas fa-file-invoice"></i> <?php echo t("import_project_metadata");?></a>
-                    <a class="dropdown-item" href="#/external-resources/import"><i class="fas fa-clone"></i> <?php echo t("import_external_resources");?></a>
-                    <div class="dropdown-divider"></div>
-                    <a v-if="dataset_type=='survey'" class="dropdown-item" :href="'<?php echo site_url('api/editor/ddi/'); ?>' + dataset_id" target="_blank"><i class="far fa-file-alt"></i> <?php echo t("export_ddi");?></a>
-                    <a class="dropdown-item" :href="'<?php echo site_url('api/editor/json/'); ?>' + dataset_id" target="_blank"><i class="far fa-file-code"></i> <?php echo t("export_json");?></a>
-                    <a class="dropdown-item" :href="'<?php echo site_url('api/resources/rdf/'); ?>' + dataset_id" target="_blank"><i class="far fa-file-alt"></i> <?php echo t("export_external_resources");?> (RDF/XML)</a>
-                    <a class="dropdown-item" :href="'<?php echo site_url('api/resources/'); ?>' + dataset_id" target="_blank"><i class="far fa-file-alt"></i> <?php echo t("export_external_resources");?> (JSON)</a>
-                </div>
-            </div>
-
-            <li class="nav-item">
-                <?php echo $this->load->view('user_menu/user-menu', null, true); ?>
-            </li>
-
-        </ul>
-
-        
-
-    </nav>
+    <?php //echo $this->load->view('metadata_editor/header', array(), true); ?>
 
     <!--end-header-->
 
-    <splitpanes class="default-theme splitpanes splitpanes--vertical" style="min-height: 100px">
+    <?php /* <div class="row no-gutters">
+        <div class="col-md-3 col-xl-2 col-xs-4 "> */?>
+    <splitpanes class="default-theme splitpanes splitpanes--vertical editor-split-panes" style="min-height: 100px"> 
         <pane min-size="15" max-size="35" size="20" class="editor-sidebar">
             <!--left -->
 
-            <div class="container-fluid bg-secondary-light pt-2 pb-3 editor-sidebar-container">
+            <div class="container-fluid-x  pt-2 pb-3 editor-sidebar editor-sidebar-container" >
+
+                <div class="p-1 mb-3 pl-2 sticky-top" style="border-bottom:1px solid #343a40; color:#343a40">
+                    <a href="<?php echo site_url('projects');?>" class="navbar-brand">
+                        <i class="fas fa-compass" ></i> 
+                        <span class="brand-text font-weight-light color-white">Metadata Editor</span>
+                    </a>
+                </div>
 
                 <!-- icons -->
-                <div class="pb-2 sidebar-menu-bar d-flex justify-content-center">
+                <div class="pb-2 mb-3 sidebar-menu-bar d-flex justify-content-center" style="border-bottom:1px solid #343a40; color:#343a40">
 
                 
 
@@ -130,7 +68,7 @@
 
 
 
-                <div class="mb-5">
+                <div class="mb-5" >
                     <v-treeview color="warning" v-model="tree" :active.sync="tree_active_items" @update:open="treeOnUpdate" :open.sync="initiallyOpen" :items="items" activatable dense item-key="key" item-text="title" expand-icon="mdi-chevron-down" indeterminate-icon="mdi-bookmark-minus" on-icon="mdi-bookmark" off-icon="mdi-bookmark-outline" item-children="items">
 
                         <template #label="{ item }">
@@ -180,10 +118,16 @@
                 </div>
             </div>
             <!--end left-->
-        </pane>
+        
+            </pane>
+        <?php /* 
+        </div>*/ ?>
+        <?php /* <div class="col col-md-9 col-xl-10" style="height:100vh;overflow-y:scroll;">*/?>
         <pane size="80" class="pane-main-content">
             <!-- right -->
 
+            
+            <?php echo $this->load->view('metadata_editor/header', array(), true); ?>
 
             <div class="content-wrapper" style="margin-left:0px;">
 
@@ -240,4 +184,8 @@
             <!--end right-->
         </pane>
     </splitpanes>
+    <?php /*</div>
+    </div>*/?>
+
+<v-toast></v-toast>
 </v-app>
