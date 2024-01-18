@@ -83,9 +83,8 @@ $lang['title_za']="Title (Z-A)";
 $lang['site_administration']="Site administration";
 $lang['imported_successfully']="Imported successfully!";
 $lang['failed']="Failed";
-$lang['']="";
-$lang['']="";
-$lang['']="";
-$lang['']="";
+$lang['confirm_delete']="Delete";
+$lang['confirm_delete_records']="Are you sure you want to delete the following records?";
+
 /* End of file general_lang.php */
 /* Location: ./application/language/base/general_lang.php */
