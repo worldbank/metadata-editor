@@ -55,6 +55,34 @@ Vue.component('variable-categories', {
             }
 
             Vue.set(this.variable, 'var_catgry_labels', labels);
+        },
+        GetFieldTitle: function (code, default_title='') {
+            let template_field=this.FindTemplateByItemKey(this.VariableTemplate.items,code);
+            if (template_field){
+                return template_field.title;
+            }
+            return default_title;
+        },
+        FindTemplateByItemKey: function (items,key){            
+            let item=null;
+            let found=false;
+            let i=0;
+
+            while(!found && i<items.length){
+                if (items[i].key==key){
+                    item=items[i];
+                    found=true;
+                }else{
+                    if (items[i].items){
+                        item=this.FindTemplateByItemKey(items[i].items,key);
+                        if (item){
+                            found=true;
+                        }
+                    }
+                }
+                i++;                        
+            }
+            return item;        
         }
     },
     computed: {        
@@ -76,6 +104,12 @@ Vue.component('variable-categories', {
                 this.variable.var_catgry=[];
             }
             return this.variable
+        },
+        VariableTemplate: function()
+        {
+            let items=this.$store.state.formTemplate.template.items;
+            let item=this.FindTemplateByItemKey(items,'variable');
+            return item;        
         }
     },
     /*methods: {
@@ -91,7 +125,7 @@ Vue.component('variable-categories', {
                 <div class="section-title section-list-header p-1 bg-variable">
                     <div class="row">
                         <div class="col">
-                        <strong>{{$t("categories")}}</strong> <span v-if="variable.var_catgry && variable.var_catgry.length>0"><span class="badge badge-light">{{variable.var_catgry.length}}</span></span>
+                        <strong>{{GetFieldTitle('variable.var_catgry',$t("xcategories"))}}</strong> <span v-if="variable.var_catgry && variable.var_catgry.length>0"><span class="badge badge-light">{{variable.var_catgry.length}}</span></span>
 
                         <div class="float-right">                           
                             <span title="Create categories" @click="refreshCategories"><v-icon aria-hidden="false" class="var-icon">mdi-update</v-icon></span>

@@ -154,6 +154,7 @@
             echo $this->load->view("metadata_editor/vue-datafile-import-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-datafile-data-explorer-component.js",null,true);
 
+            echo $this->load->view("metadata_editor/vue-variable-edit-documentation-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-variables-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-variable-edit-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-variable-weights-component.js",null,true);
@@ -294,133 +295,41 @@
                 },
                 variables_loaded:false,
                 variables_isloading:false,
-                variables_active_tab:"documentation",
-                variable_documentation_template:{
-                    "title":"Variable",
-                    "key":"variable",
-                    "items":[
-                        {
-                            "type": "section",
-                            "key": "variable_description",
-                            "title": "Description",
-                            "expanded": true,
-                            "items": [
-                                {
-                                    "key": "var_txt",
-                                    "title": "Definition",
-                                    "type": "textarea",
-                                    "class": "required",
-                                    "required": false,
-                                    "help_text": "Definition help text",
-                                    "rules":"max:1000",
-                                    "enabled":true
-                                },
-                                {
-                                    "key": "var_notes",
-                                    "title": "Notes",
-                                    "type": "textarea",                                    
-                                    "help_text": "Notes",
-                                    "rules":"max:1000",
-                                    "enabled":true
-                                },
-                                {
-                                    "key": "var_universe",
-                                    "title": "Universe",
-                                    "type": "text",
-                                    "class": "required",
-                                    "required": false,
-                                    "help_text": "Universe help text",
-                                    "rules":"max:3000",
-                                    "enabled": true
-                                },                            
-                                {
-                                    "key": "var_concept",
-                                    "title": "Concepts",
-                                    "type": "array",
-                                    "class": "required",
-                                    "enabled":true,
-                                    "props": {
-                                        "title": {
-                                            "key": "title",
-                                            "title": "Title",
-                                            "type": "text",
-                                            "rules":"required",
-                                            "name": "Concept title"
-                                        },
-                                        "vocab": {
-                                            "key": "vocab",
-                                            "title": "Vocabulary",
-                                            "type": "text"
-                                        },
-                                        "uri": {
-                                            "key": "uri",
-                                            "title": "Vocabulary URI",
-                                            "type": "text"
-                                        }
-                                    }
-                                },
-                            ]
-                        },
-                        {
-                            "type": "section",
-                            "key": "variable_question",
-                            "title": "Question",
-                            "expanded": true,
-                            "items": [
-                                {
-                                    "key": "var_qstn_preqtxt",
-                                    "title": "Pre-Question text",
-                                    "type": "text",
-                                    "enabled":true
-                                },
-                                {
-                                    "key": "var_qstn_qstnlit",
-                                    "title": "Literal question",
-                                    "type": "text",
-                                    "enabled":true
-                                },
-                                {
-                                    "key": "var_qstn_postqtxt",
-                                    "title": "Post-Question text",
-                                    "type": "text",
-                                    "enabled":true
-                                },
-                                {
-                                    "key": "var_qstn_ivuinstr",
-                                    "title": "Interviewer instructions",
-                                    "type": "text",
-                                    "enabled":true
-                                }
-                            ]
-                        },
-                        {
-                            "type": "section",
-                            "key": "variable_imputation",
-                            "title": "Imputation and derivation",
-                            "expanded": true,
-                            "items": [
-                                {
-                                    "key": "var_resp_unit",
-                                    "title": "Source of information",
-                                    "type": "textarea",
-                                    "enabled":true
-                                },                            
-                                {
-                                    "key": "var_imputation",
-                                    "title": "Imputation",
-                                    "type": "text",
-                                    "enabled":true
-                                },
-                                {
-                                    "key": "var_codinstr",
-                                    "title": "Recoding and derivation",
-                                    "type": "text",
-                                    "enabled":true
-                                }
-                            ]
-                        }                    
-                    ]
-                },
+                variables_active_tab:"documentation",                
+                variable_documentation_fields:[
+                    "variable.var_imputation",
+                    "variable.var_derivation",
+                    "variable.var_security",
+                    "variable.var_respunit",
+                    "variable.var_qstn_preqtxt",
+                    "variable.var_qstn_qstnlit",
+                    "variable.var_qstn_postqtxt",
+                    "variable.var_forward",
+                    "variable.var_backward",
+                    "variable.var_qstn_ivulnstr",
+                    "variable.var_universe",
+                    "variable.var_txt",
+                    "variable.var_codinstr",
+                    "variable.var_concept",
+                    "variable.var_notes"
+                ],
+                variable_template_items_enabled:[
+                    "variable.var_imputation",
+                    "variable.var_derivation",
+                    "variable.var_security",
+                    "variable.var_respunit",
+                    "variable.var_qstn_preqtxt",
+                    "variable.var_qstn_qstnlit",
+                    "variable.var_qstn_postqtxt",
+                    "variable.var_forward",
+                    "variable.var_backward",
+                    "variable.var_qstn_ivulnstr",
+                    "variable.var_universe",
+                    "variable.var_txt",
+                    "variable.var_codinstr",
+                    "variable.var_concept",
+                    "variable.var_notes"
+                ],                                    
                 formTextFieldStyle:
                 { 
                     clearable: true,
@@ -460,10 +369,7 @@
                             return state.data_files[i].file_name;
                         }
                     }
-                },
-                getVariableDocumentationTemplate(state){
-                    return state.variable_documentation_template;
-                },
+                },                
                 getVariablesAll(state) {                
                     return state.variables;
                 },
@@ -537,6 +443,9 @@
 
                     return item;
                 },
+                GetVariableDocumentationFields: function(state){                    
+                    return state.variable_documentation_fields;
+                },
             },
             actions: {               
                 async initData({commit},options) {
@@ -549,15 +458,33 @@
                     store.state.variables_loaded=true;
                     store.state.variables_isloading=false;
                 },
-                async initTreeItems({commit},options) {                    
+                async initTreeItems({commit},options) {               
+                    console.log("tree items before", JSON.stringify(store.state.formTemplate));     
                     store.state.treeItems=store.state.formTemplate.template.items;    
+                    console.log("tree items",store.state.formTemplate);
                 },
                 async loadTemplatesList({commit},options) {
-                    let url=CI.base_url + '/api/templates/list/'+store.state.project_type;;
+                    let url=CI.base_url + '/api/templates/list/'+store.state.project_type;
                     return axios
                     .get(url)
                     .then(function (response) {
                         store.state.templates=response.data.result;
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+                },
+                async loadTemplateByUID({commit},options) {
+                    let url=CI.base_url + '/api/templates/'+options.template_uid;
+                    return axios
+                    .get(url)
+                    .then(function (response) {                        
+                        if (response.data.result){
+                            store.state.formTemplate=response.data.result;
+                        }else{
+                            console.log("error load template", response.data);
+                            alert("error loading template");
+                        }
                     })
                     .catch(function (error) {
                         console.log(error);

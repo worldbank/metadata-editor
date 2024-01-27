@@ -26,7 +26,36 @@ Vue.component('variable-info', {
         OnValueUpdate: function () {
           this.variable.update_required = true;
           this.$emit('input', this.variable);
+        },
+        GetFieldTitle: function (code, default_title='') {
+            let template_field=this.FindTemplateByItemKey(this.VariableTemplate.items,code);
+            if (template_field){
+                return template_field.title;
+            }
+            return default_title;
+        },
+        FindTemplateByItemKey: function (items,key){            
+            let item=null;
+            let found=false;
+            let i=0;
+
+            while(!found && i<items.length){
+                if (items[i].key==key){
+                    item=items[i];
+                    found=true;
+                }else{
+                    if (items[i].items){
+                        item=this.FindTemplateByItemKey(items[i].items,key);
+                        if (item){
+                            found=true;
+                        }
+                    }
+                }
+                i++;                        
+            }
+            return item;        
         }
+
     },
     created: function(){
         
@@ -49,6 +78,12 @@ Vue.component('variable-info', {
             set(newValue){
                 this.$emit('input', newValue);                
             }
+        },
+        VariableTemplate: function()
+        {
+            let items=this.$store.state.formTemplate.template.items;
+            let item=this.FindTemplateByItemKey(items,'variable');
+            return item;        
         }
     },
     template: `
@@ -62,7 +97,7 @@ Vue.component('variable-info', {
                 <div class="form-group form-field switch-field" >
                     <v-switch
                     v-model="variable.var_wgt"
-                    :label="$t('is_weight_variable')"
+                    :label="GetFieldTitle('variable.var_wgt',$t('is_weight_variable'))"
                     true-value="1"
                     false-value="0"
                     ></v-switch>                    
@@ -70,13 +105,13 @@ Vue.component('variable-info', {
 
 
                 <div class="form-group form-field">
-                    <label>{{$t("interval_type")}}</label>                     
+                    <label>{{GetFieldTitle('variable.var_intrvl',$t("interval_type"))}}</label>                     
                     <select 
                         v-model="variable.var_intrvl" 
                         class="form-control  form-control-sm form-field-dropdown"
                         id="variable_intervals" 
                     >
-                        <option value="">Select</option>
+                        <option value="">-</option>
                         <option v-for="(option_key,option_value) in variable_intervals" v-bind:value="option_value">
                             {{ $t(option_value) }}
                         </option>
@@ -84,13 +119,13 @@ Vue.component('variable-info', {
                 </div>
                 
                 <div class="form-group form-field">
-                    <label>{{$t("format")}}</label>
+                    <label>{{GetFieldTitle('variable.var_format.type',$t("format"))}}</label>
                     <select 
                         v-model="variable.var_format.type" 
                         class="form-control  form-control-sm form-field-dropdown"
                         id="var_format_type" 
                     >
-                        <option value="">Select</option>
+                        <option value="">-</option>
                         <option v-for="(option_key,option_value) in variable_formats" v-bind:value="option_value">
                         {{$t(option_value)}}
                         </option>
@@ -100,22 +135,22 @@ Vue.component('variable-info', {
                 <div class="form-group form-field">                                        
                     <div class="row no-gutters">
                         <div class="col">
-                            <label>{{$t("min")}}</label>
+                            <label>{{GetFieldTitle('variable.var_valrng.range.min',$t("min"))}}</label>
                             <input type="number" class="form-control form-control-sm form-control-xs" v-model="variable.var_valrng.range.min" />
                         </div>
                         <div class="col mr-1 ml-1">
-                            <label>{{$t("max")}}</label>
+                            <label>{{GetFieldTitle('variable.var_valrng.range.max',$t("max"))}}</label>
                             <input type="number" class="form-control form-control-sm form-control-xs" v-model="variable.var_valrng.range.max" />
                         </div>
                         <div class="col">
-                            <label>{{$t("decimals")}}</label>
+                            <label>{{GetFieldTitle('variable.var_dcml',$t("decimals"))}}</label>
                             <input type="number" class="form-control form-control-sm form-control-xs" v-model="variable.var_dcml" />
                         </div>
                     </div>    
                 </div>
 
                 <div class="form-group form-field" v-if="variable.var_invalrng">
-                    <label>{{$t("missing")}}</label>
+                    <label>{{GetFieldTitle('variable.var_invalrng.values',$t("missing"))}}</label>
                     
                         <repeated-field
                                 @input="OnValueUpdate"  

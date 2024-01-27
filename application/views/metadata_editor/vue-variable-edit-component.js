@@ -5,8 +5,6 @@ Vue.component('variable-edit', {
         return {
             drawer: true,       
             drawer_mini: true,
-            //variable: this.value,            
-            //variable:{},
             form_local:{},
             sum_stats_options:
             {
@@ -20,57 +18,7 @@ Vue.component('variable-edit', {
                 'mean_wgt':true,
                 'stdev':true,
                 'stdev_wgt':true
-            },
-            concept_columns:[
-                {
-                    "key": "title",
-                    "title": "Title",
-                    "type": "text"
-                },
-                {
-                    "key": "vocab",
-                    "title": "Vocabulary",
-                    "type": "text"
-                },
-                {
-                    "key": "uri",
-                    "title": "Vocabulary URI",
-                    "type": "text"
-                },
-            ],
-            catgry_columns:[
-            {
-                "key": "value",
-                "title": "Value",
-                "type": "text"
-            },
-            {
-                "key": "labl",
-                "title": "Label",
-                "type": "text"
-            },
-            {
-                "key": "stats",
-                "title": "Stats",
-                "type": "table",
-                "props":[
-                    {
-                        "key": "type",
-                        "title": "Type",
-                        "type": "text"
-                    },
-                    {
-                        "key": "value",
-                        "title": "Value",
-                        "type": "text"
-                    },
-                    {
-                        "key": "wgtd",
-                        "title": "Weighted?",
-                        "type": "text"
-                    },
-                ]
-            }]
+            }            
         }        
     },
     watch: {          
@@ -116,10 +64,18 @@ Vue.component('variable-edit', {
         
     },
     computed: {
+        localVariable: {
+            get(){
+                let variable_= { 
+                    'variable':this.variable
+                }
+    
+                return variable_;
+            }
+        },
         Variable:{
             get(){
                 if (!this.variable.sum_stats_options){              
-                    //Vue.set(this.variable, 'sum_stats_options', this.sum_stats_options);
                     this.variable.sum_stats_options=JSON.parse(JSON.stringify(this.sum_stats_options));
                 }
                 return this.variable;
@@ -135,11 +91,9 @@ Vue.component('variable-edit', {
             set(newValue) {
               return this.$store.commit("variables_active_tab", newValue);
             },
-          },          
-        variable_template: function(){
-            return this.$store.getters["getVariableDocumentationTemplate"];
-        },
-        Variables(){         
+          },        
+                
+        Variables(){
             variablesByFile= this.$store.getters.getVariablesAll;
             if (!variablesByFile){
                 return [];
@@ -256,6 +210,26 @@ Vue.component('variable-edit', {
         },
     },
     methods: {
+
+        update: function (key, value)
+        {
+            key=key.replace('variable.','');
+            if (key.indexOf(".") !== -1 && this.variable[key]){
+                delete this.variable[key];
+            }
+            _.set(this.variable,key,value);
+        },
+        updateSection: function (obj)
+        {
+            this.update(obj.key,obj.value);
+        },
+
+        localValue: function(key)
+        {
+            //remove 'variable.' from key
+            key=key.replace('variable.','');
+            return _.get(this.variable,key);
+        },
         RoundNumbers(value, decimals){
             if (!value){
                 return value;
@@ -530,62 +504,10 @@ Vue.component('variable-edit', {
                     <pre>{{variable}}</pre>
                 </v-tab-item>
                 <v-tab-item key="documentation" value="documentation">
-
-                    <div xstyle="overflow-y: scroll;padding:10px;margin-bottom:50px;" class="mb-5">
-                    <div class="row mt-1">
-                        <div class="col-auto">
-                        <template>                        
-                                <v-navigation-drawer
-                                    v-model="drawer"
-                                    :mini-variant.sync="drawer_mini" permanent bottom>
-                                    <v-list-item class="px-2">
-                                        <v-app-bar-nav-icon></v-app-bar-nav-icon>
-                                            <v-list-item-title>Settings</v-list-item-title>                            
-                                            <v-btn icon @click.stop="drawer_mini = !drawer_mini">
-                                                <v-icon>mdi-chevron-left</v-icon>
-                                            </v-btn>
-                                    </v-list-item>                            
-                                    <v-divider></v-divider>                            
-                                    <v-list dense v-if="!drawer_mini">
-                                    <v-list-item
-                                        v-for="section in variable_template.items" :key="section.key" link>
-                                        <v-list-item-content>                            
-                                        <v-list-item-title>{{ section.title }}</v-list-item-title>
-                                        
-                                        <div v-for="subitem in section.items" :key="subitem.key">
-                                            <input type="checkbox" v-model="subitem.enabled"/> {{subitem.title}}
-                                        </div>
-                                        </v-list-item-content>
-                                    </v-list-item>
-                                    </v-list>
-                                </v-navigation-drawer>
-                                
-                            </template>
-                            </div>
-
-                    <div class="col">
-                        <template v-for="section in variable_template.items">
-                            <div class="mb-2" v-if="sectionEnabled(section)"><strong class="text-secondary mb-2">{{section.title}}</strong></div>
-                            <template v-for="var_field in section.items">
-
-                                <div v-if="var_field.enabled" class="form-group form-field">
-                                    <label>{{var_field.title}}</label> 
-                                    <span v-if="var_field.type!='array'">
-                                        <textarea class="form-control form-control-sm" v-model="variable[var_field.key]"/>
-                                    </span>
-                                    <span v-else-if="var_field.type=='array'">
-                                    <table-grid-component                                        
-                                        v-model="variable[var_field.key]" 
-                                        :columns="var_field.props">
-                                    </table-grid-component>
-                                    </span>
-                                </div>
-
-                            </template>
-                        </template>
-                    </div>
-                    </div>                        
-                    </div>
+                    
+                    <variable-edit-documentation
+                        :variable="variable"
+                    ></variable-edit-documentation>    
 
                 </v-tab-item>
             </v-tabs>

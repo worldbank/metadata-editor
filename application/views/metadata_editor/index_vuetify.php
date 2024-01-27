@@ -164,7 +164,7 @@
           dataset_id:sid,
           dataset_idno:project_idno,
           dataset_type:project_type,
-          form_template: form_template,
+          //form_template: form_template,
           //metadata_schema: metadata_schema,
           is_loading:false,
           vuex_is_loaded:false,
@@ -238,6 +238,9 @@
         );
       },
       computed:{
+        form_template(){
+          return this.$store.state.formTemplate;
+        },
         Title(){          
           let titles={
             "survey":"study_desc.title_statement.title",
@@ -383,6 +386,9 @@
         
       },      
       watch: {
+        '$store.state.formTemplate': function() {
+            this.init_tree_data();
+        },
         '$store.state.data_files': function() {
             this.update_tree();
         },
