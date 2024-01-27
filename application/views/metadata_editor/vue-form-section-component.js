@@ -44,12 +44,9 @@ Vue.component('form-section', {
         localValue: function(key)
         {
             let value= this.parentElement ? this.parentElement : {};
-
-            console.log("sectionsearach for key",key,value, _.get(value,key));
             return _.get(value,key);
         },
         parentValue: function(key){
-            console.log("searching for parent value path",key,this.parentElement);
             return _.get(this.parentElement,key);
         },
         update: function (key, value)
@@ -58,7 +55,6 @@ Vue.component('form-section', {
                 'key': key,
                 'value': JSON.parse(JSON.stringify(value))
             });
-            console.log("emitting from section",key,value);
         },
         fieldDisplayType(field)
         {
