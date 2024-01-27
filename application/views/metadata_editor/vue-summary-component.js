@@ -15,7 +15,6 @@ Vue.component('summary-component', {
         this.getProjectEditStats();
         this.getProjectDiskUsage();
     },
-    
     computed: {
         ProjectID(){
             return this.$store.state.project_id;
@@ -30,6 +29,29 @@ Vue.component('summary-component', {
         ProjectTemplate()
         {
             return this.$store.state.formTemplate;
+        },
+        projectTemplateUID(){
+            return this.$store.state.formTemplate.uid;
+        },
+        projectTemplateSelectedIndex: {
+            get: function () {
+                if (this.template_idx>-1){
+                    return this.template_idx;
+                }
+
+                let templates=this.ProjectTemplates;
+                let idx=-1;
+                for(let i=0;i<templates.length;i++){
+                    if(templates[i].uid==this.projectTemplateUID){
+                        idx=i;
+                        break;
+                    }
+                }                
+                return idx;
+            },
+            set: function (newValue) {
+                this.template_idx = newValue;
+            }
         },
         ProjectType(state){
             return this.$store.state.project_type;
@@ -87,29 +109,29 @@ Vue.component('summary-component', {
                 console.log("request completed");
             });
         },
-        UpdateTemplate: function(){
+        UpdateTemplate: function(){ 
             this.template_updating=true;
-            console.log("updating template", this.ProjectTemplates[this.template_idx]);
+            let vm=this;
             let form_data={
                 "template_uid":this.ProjectTemplates[this.template_idx]["uid"]
             };
 
-            console.log("form_data",form_data);
-            
-            vm=this;            
-            let url=CI.base_url + '/api/editor/options/'+ this.ProjectID;
+            store.dispatch('loadTemplateByUID',{template_uid:this.ProjectTemplates[this.template_idx]["uid"]}).then(function(){
+                //store.dispatch('initTreeItems');
+                let url=CI.base_url + '/api/editor/options/'+ vm.ProjectID;
 
-            axios.post( url,
-                form_data,{}
-            ).then(function(response){
-                console.log("template updated",response);
-                vm.dialog_template=false;
-                window.location.reload();
-                return false;
-                //router.push('/');
-            })
-            .catch(function(response){
-                vm.errors=response;
+                axios.post( url,
+                    form_data,{}
+                ).then(function(response){
+                    console.log("template updated",response);
+                    vm.dialog_template=false;
+                    vm.template_updating=false;
+                    return false;
+                })
+                .catch(function(response){
+                    vm.errors=response;
+                });
+
             });
         }
     },     
@@ -239,19 +261,18 @@ Vue.component('summary-component', {
                                 scrollable
                                 >
                                 <v-card >
-                                    <v-card-title class="text-h5 grey lighten-2">
-                                    {{$t("template")}}
+                                    <v-card-title class="text-h5 grey lighten-2">                                    
                                     </v-card-title>
 
                                     <v-card-text style="max-height:400px;">
                                     <div>
-
+                                    
                                             <!-- list -->
                                             <template>
                                                
                                                     <v-list two-line>
                                                     <v-list-item-group
-                                                        v-model="template_idx"
+                                                        v-model="projectTemplateSelectedIndex"
                                                         active-class="pink--text"                                                        
                                                     >
                                                         <template v-for="(item, index) in ProjectTemplates">
@@ -259,12 +280,6 @@ Vue.component('summary-component', {
                                                             <template v-slot:default="{ active }">
                                                             <v-list-item-content>
                                                                 <v-list-item-title v-text="item.name"></v-list-item-title>
-
-                                                                <v-list-item-subtitle
-                                                                class="text--primary"
-                                                                v-text="item.name"
-                                                                ></v-list-item-subtitle>
-
                                                                 <v-list-item-subtitle v-text="item.uid"></v-list-item-subtitle>
                                                             </v-list-item-content>
 
@@ -312,7 +327,7 @@ Vue.component('summary-component', {
                                         text
                                         @click="dialog_template = false"
                                     >
-                                        Close
+                                        {{$t('Close')}}
                                     </v-btn>
                                     <v-btn
                                         color="primary"
@@ -320,7 +335,7 @@ Vue.component('summary-component', {
                                         @click="UpdateTemplate"
                                         :disabled="template_idx==-1 || template_updating"
                                     >
-                                        Apply
+                                        {{$t('Apply')}}
                                     </v-btn>
                                     </v-card-actions>
                                 </v-card>
