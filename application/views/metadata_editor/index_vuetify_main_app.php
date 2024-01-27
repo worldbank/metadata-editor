@@ -459,9 +459,7 @@
                     store.state.variables_isloading=false;
                 },
                 async initTreeItems({commit},options) {               
-                    console.log("tree items before", JSON.stringify(store.state.formTemplate));     
                     store.state.treeItems=store.state.formTemplate.template.items;    
-                    console.log("tree items",store.state.formTemplate);
                 },
                 async loadTemplatesList({commit},options) {
                     let url=CI.base_url + '/api/templates/list/'+store.state.project_type;
@@ -689,9 +687,7 @@
                 let url='<?php echo site_url('/api/datasets/check_idno/');?>' + value + '/' + sid;
                 
                 return axios.get(url)
-                .then(function (response) {
-                    console.log(response);
-                    
+                .then(function (response) {                    
                     if (response.status==200 && response.data.id==sid){
                         return {
                             valid: true,
