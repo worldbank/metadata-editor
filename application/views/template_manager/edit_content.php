@@ -1,7 +1,26 @@
 <div v-if="!ActiveNode.key" class="m-3 p-3">{{$t("click_on_sidebar_to_edit")}}</div>
 
+<!--additional fields-->
+    <div class="mb-3">
+
+        <template v-if="ActiveNodeHasAdditionalPrefix">
+
+            <vue-key-field 
+                :key="ActiveNode.key"
+                :value="ActiveNode.key"
+                @input="UpdateActiveNodeKey"
+                >
+            </vue-key-field>
+        </template>
+        <template v-else>
+            <div><label>{{$t("key")}}:</label></div>
+            <div class="border p-1 text-secondary">{{ActiveNode.key}}</div>
+        </template>
+    </div>
+
+
 <!--item-->
-<div v-if="ActiveNode.key">
+<div v-if="ActiveNode.key ">
 
 <!--section container fields -->
 <div class="form-group">
@@ -12,7 +31,16 @@
 
 <div class="form-group">
     <label for="name">{{$t("type")}}:</label>
-    <input type="text" class="form-control" id="name" placeholder="Label" v-model="ActiveNode.type">    
+    <template v-if="ActiveNode.type=='section' || ActiveNode.type=='section_container' || ActiveNode.type=='nested_array'">        
+        <input type="text" class="form-control" id="name" placeholder="Label" v-model="ActiveNode.type" disabled="disabled">
+    </template>
+    <template v-else>        
+        <select v-model="ActiveNode.type" class="form-control form-field-dropdown" >
+            <option v-for="field_type in field_types">
+                {{field_type}}
+            </option>
+        </select>
+    </template>
 </div>
 
 <div class="row">
@@ -44,12 +72,20 @@
 </div>
 
 
-<div class="form-group mt-2 pb-5" v-if="ActiveNode.key && ActiveNode.props">
+<div class="form-group mt-2 pb-5" v-if="ActiveNode.key && (ActiveNode.type=='array' || ActiveNode.type=='nested_array')">
     <div><label>{{$t("field_properties")}}:</label></div>
-    <props-treeview :key="ActiveNode.key" :parent_type="ActiveNode.type" :parent_key="ActiveNode.key" v-model="ActiveNode.props" :core_props="coreTemplateParts[ActiveNode.key].props"></props-treeview>
+    <props-treeview 
+        :key="ActiveNode.key" 
+        :parent_node="ActiveNode"
+        :parent_type="ActiveNode.type" 
+        :parent_key="ActiveNode.key" 
+        v-model="getNodeProps(ActiveNode)" 
+        :core_props="getNodeProps(coreTemplateParts[ActiveNode.key])"
+    >
+    </props-treeview>
 </div>
 
-<template v-if="ActiveNode.type!=='section_container' && ActiveNode.type!=='section'">
+<template v-if="ActiveNode.type!=='section_container' && ActiveNode.type!=='section' ">
     <v-tabs background-color="transparent" class="mb-5">
         <v-tab v-if="ActiveNode.key && isControlField(ActiveNode.type) == true">{{$t("display")}}</v-tab>
         <v-tab v-if="!ActiveArrayNodeIsNested"><span v-if="ActiveNodeEnumCount>0"><v-icon style="color:green;">mdi-circle-medium</v-icon></span>{{$t("controlled_vocabulary")}}</v-tab>

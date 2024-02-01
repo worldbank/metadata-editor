@@ -19,20 +19,15 @@ Vue.component('prop-edit', {
         }
     },
     mounted: function(){
-      if (!this.value.enum){
-        //console.log("creating ENUM", this.value);
-        //this.$set(this.prop, "enum", []);
-      }
-    },
-    
+    },    
     computed: {
         prop:{           
             get(){
               return this.value;
-          },
-          set(val){
+            },
+            set(val){           
               this.$emit('input:value', val);
-          }
+            }
         },
         SimpleControlledVocabColumns: function(){
           return [
@@ -112,7 +107,6 @@ Vue.component('prop-edit', {
       {
         this.$set(this.prop, "rules", e);
       }
-      
     },
     template: `<?php require_once 'vue-prop-edit-component-template.php';?>`    
 });

@@ -198,6 +198,17 @@
                     <v-icon v-else color="rgb(0 0 0 / 12%)">mdi-content-paste</v-icon>
                   </div>
 
+                  <!--additional -->
+                  <div class="mt-5" v-if="ActiveNode.type=='section'">
+                    <v-icon title="Add custom field" v-if="ActiveNode.type=='section_container' || ActiveNode.type=='section'" color="#dc3545" @click="addAdditionalField()">mdi-text-box-plus-outline</v-icon>
+                    <v-icon title="Add custom field" v-else class="disabled-button-color">mdi-text-box-plus-outline</v-icon>
+                  </div>
+
+                  <div class="mt-1" v-if="ActiveNode.type=='section'">
+                    <v-icon title="Add custom Array field" v-if="ActiveNode.type=='section_container' || ActiveNode.type=='section'" color="#dc3545" @click="addAdditionalFieldArray()">mdi-table-large-plus</v-icon>
+                    <v-icon title="Add custom Array field" v-else class="disabled-button-color">mdi-table-large-plus</v-icon>
+                  </div>
+
                 </div>
               </div>
             </div>
@@ -284,6 +295,7 @@
       return Array.from(new Set(output));
     }
 
+    <?php echo include_once("vue-field-key-component.js"); ?>
     <?php echo include_once("vue-tree-component.js"); ?>
     <?php echo include_once("vue-tree-field-component.js"); ?>
     <?php echo include_once("vue-table-component.js"); ?>
@@ -413,14 +425,12 @@
             "dropdown-custom"
           ],
 
-          field_types: [ //tobe removed
-            "text",
+          field_types: [
             "string",
-            "integer",
-            "textarea",
-            "dropdown",
+            "array",
+            /*"number",
             "date",
-            "boolean"
+            "boolean"*/
           ],
           cut_fields: [],
           data_types: {
@@ -598,6 +608,60 @@
           this.tree_active_items.push(new_node_key);
           this.initiallyOpen.push(new_node_key);
         },
+        addAdditionalField: function() {
+          /*if (this.ActiveNodeContainerKey != 'additional_container') {
+            return false;
+          }*/
+
+          parentNode = this.ActiveNode;
+          new_node_key = "additional." + Date.now();
+          parentNode.items.push({
+            "key": new_node_key,
+            "title": "Untitled",
+            "type": "string",            
+            "help_text": ""
+          });
+
+          this.ActiveNode = parentNode.items[parentNode.items.length - 1];
+          this.tree_active_items = new Array();
+          this.tree_active_items.push(new_node_key);
+          this.initiallyOpen.push(new_node_key);
+        },
+        addAdditionalFieldArray: function() {
+          /*if (this.ActiveNodeContainerKey != 'additional_container') {
+            return false;
+          }*/
+
+          parentNode = this.ActiveNode;
+          new_node_key = "additional." + Date.now();
+          parentNode.items.push({
+            "key": new_node_key,
+            "title": "Untitled",
+            "type": "array",            
+            "help_text": "",
+            "props": [                           
+            ]
+          });
+
+          //this.ActiveNode.items.push(this.ActiveCoreNode);
+          //store.commit('activeCoreNode', {});
+        },
+        UpdateActiveNodeKey: function(e){
+          console.log("updating key", e);
+          this.ActiveNode.key = e;
+        },
+        getNodeProps: function(node) {
+
+          if (!node) {
+            return [];
+          }
+
+          if (node.props) {
+            return node.props;
+          }
+
+          return [];
+        },
         moveUp: function() {
           parentNode = this.findNodeParent(this.UserTemplate, this.ActiveNode.key);
           nodeIdx = this.findNodePosition(parentNode, this.ActiveNode.key);
@@ -760,6 +824,12 @@
             this.$store.state.active_node = newValue;
           }
         },
+        ActiveNodekey() {
+          return JSON.parse(JSON.stringify(this.ActiveNode.key));
+        },
+        ActiveNodeContainerKey(){
+          return this.getNodeContainerKey(this.UserTreeItems, this.ActiveNode.key);
+        },
         ActiveNodeEnum: {
           get: function() {
             if (this.ActiveNode.enum && this.ActiveNode.enum.length > 0 && typeof(this.ActiveNode.enum[0]) == 'string') {
@@ -785,6 +855,13 @@
             return this.ActiveNode.enum.length;
           }
           return 0;
+        },
+        ActiveNodeHasAdditionalPrefix(){
+            if (!this.ActiveNode.key) {
+              return false;
+            }
+
+            return this.ActiveNode.key.indexOf('additional.')==0;
         },
         ActiveCoreNode() {
           return this.$store.state.active_core_node;
@@ -818,6 +895,12 @@
         ActiveArrayNodeIsNested() {
           if (this.ActiveNode.type == 'array' || this.ActiveNode.type == 'nested_array') {
             let isNested = false;
+
+            //check if array has props
+            if (!this.ActiveNode.props) {
+              return false;
+            }
+
             this.ActiveNode.props.forEach((prop, index) => {
               if (prop.props) {
                 isNested = true;
