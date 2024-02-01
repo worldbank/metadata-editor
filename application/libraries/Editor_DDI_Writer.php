@@ -128,12 +128,12 @@ class Editor_DDI_Writer
 
         //codeBook start
         $writer->startElement('codeBook');
-        $writer->writeAttribute('version','1.2.2');
-        $writer->writeAttribute('ID',$dataset['idno']);
+        $writer->writeAttribute('version','2.5');
+        $writer->writeAttribute('ID',$dataset['study_idno']  ? $dataset['study_idno'] : $dataset['idno']);
         $writer->writeAttribute('xml-lang','en');
-        $writer->writeAttribute('xmlns','http://www.icpsr.umich.edu/DDI');
+        $writer->writeAttribute('xmlns','ddi:codebook:2_5');
         $writer->writeAttribute('xmlns:xsi','http://www.w3.org/2001/XMLSchema-instance');
-        $writer->writeAttribute('xsi:schemaLocation','http://www.icpsr.umich.edu/DDI http://www.icpsr.umich.edu/DDI/Version1-2-2.xsd');
+        $writer->writeAttribute('xsi:schemaLocation','ddi:codebook:2_5 http://www.ddialliance.org/Specification/DDI-Codebook/2.5/XMLSchema/codebook.xsd');
         
         //document description
         $writer->writeRaw("\n");
