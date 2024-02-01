@@ -455,9 +455,28 @@
         }
       },
       created: function() {
+        this.init_template();
         this.init_tree();
       },
       methods: {
+        init_template: function(){
+          //check if user template includes additional container and add if not
+
+          let user_template = this.$store.state.user_template;
+
+          //search for additional_container
+          let additional_container = user_template.items.find(item => item.key == 'additional_container');
+
+          if (!additional_container) {
+            user_template.items.push({
+              "key": "additional_container",
+              "title": "Additional Fields",
+              "type": "section_container",
+              "items": []
+            });
+          }
+
+        },
         init_tree: function() {
           this.$store.state.core_tree_items = this.$store.state.core_template.items;
           this.$store.state.user_tree_items = this.$store.state.user_template.items;
@@ -593,15 +612,21 @@
             return false;
           }
 
-          parentNode = this.ActiveNode;
-          new_node_key = parentNode.key + Date.now();
-          parentNode.items.push({
+          let parentNode = this.ActiveNode;
+          let new_node_key = parentNode.key + Date.now();
+          let new_node={
             "key": new_node_key,
             "title": "Untitled",
             "type": "section",
             "items": [],
             "help_text": ""
-          });
+          };
+
+          this.$set(parentNode, "items", [
+            ...parentNode.items,
+            new_node
+          ]);
+          
 
           this.ActiveNode = parentNode.items[parentNode.items.length - 1];
           this.tree_active_items = new Array();
@@ -619,7 +644,8 @@
             "key": new_node_key,
             "title": "Untitled",
             "type": "string",            
-            "help_text": ""
+            "help_text": "",
+            "display_type": "text"
           });
 
           this.ActiveNode = parentNode.items[parentNode.items.length - 1];
