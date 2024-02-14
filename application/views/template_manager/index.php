@@ -298,7 +298,6 @@
     <?php echo include_once("vue-field-key-component.js"); ?>
     <?php echo include_once("vue-tree-component.js"); ?>
     <?php echo include_once("vue-tree-field-component.js"); ?>
-    <?php echo include_once("vue-table-component.js"); ?>
     <?php echo include_once("vue-table-grid-component.js"); ?>
     <?php echo include_once("vue-validation-rules-component.js"); ?>
     <?php echo include_once("vue-props-tree-component.js"); ?>
