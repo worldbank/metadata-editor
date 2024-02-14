@@ -86,7 +86,7 @@
 </div>
 
 <template v-if="ActiveNode.type!=='section_container' && ActiveNode.type!=='section' ">
-    <v-tabs background-color="transparent" class="mb-5">
+    <v-tabs background-color="transparent" class="mb-5" :key="ActiveNode.key">
         <v-tab v-if="ActiveNode.key && isControlField(ActiveNode.type) == true">{{$t("display")}}</v-tab>
         <v-tab v-if="!ActiveArrayNodeIsNested"><span v-if="ActiveNodeEnumCount>0"><v-icon style="color:green;">mdi-circle-medium</v-icon></span>{{$t("controlled_vocabulary")}}</v-tab>
         <v-tab v-if="!ActiveArrayNodeIsNested || isControlField(ActiveNode.type) == true"><span v-if="ActiveNode.default"><v-icon style="color:green;">mdi-circle-medium</v-icon></span>{{$t("default")}}</v-tab>
@@ -126,11 +126,29 @@
             <div class="form-group" >
                 <label for="controlled_vocab">{{$t("controlled_vocabulary")}}:</label>
                 <div class="border bg-white" style="max-height:300px;overflow:auto;">
-                    <template v-if="!ActiveNodeControlledVocabColumns">
-                         <table-component :key="ActiveNode.key"  @update:value="EnumUpdate" v-model="ActiveNodeEnum" :columns="ActiveNodeSimpleControlledVocabColumns" class="border m-2 pb-2" />
+
+
+                    <template v-if="!ActiveNodeControlledVocabColumns"> 
+
+                        <table-grid-component
+                            :key="ActiveNode.key"
+                            :columns="ActiveNodeSimpleControlledVocabColumns" 
+                            v-model="ActiveNodeEnum"
+                            @update:value="EnumUpdate"
+                            class="border m-2 pb-2"
+                        ></table-grid-component>
+                         
                     </template>
                     <template v-else>
-                        <table-component :key="ActiveNode.key"  @update:value="EnumUpdate" v-model="ActiveNode.enum" :columns="ActiveNodeControlledVocabColumns" class="border m-2 pb-2" />
+
+                        <table-grid-component
+                            :key="ActiveNode.key"
+                            :columns="ActiveNodeControlledVocabColumns" 
+                            v-model="ActiveNodeEnum"
+                            @update:value="EnumUpdate"
+                            class="border m-2 pb-2"
+                        ></table-grid-component>
+                        
                     </template>
                 </div>
 
@@ -144,9 +162,17 @@
                 <div class="form-group" >
                     <label for="controlled_vocab">{{$t("default")}}:</label>
                     <div class="border bg-white" style="max-height:300px;overflow:auto;" v-if="ActiveNode.type=='array'">
-                        <table-component @update:value="DefaultUpdate" v-model="ActiveNode.default" :columns="ActiveNodeControlledVocabColumns" class="border m-2 pb-2" />
+                        
+                        <table-grid-component
+                            :key="ActiveNode.key"
+                            :columns="ActiveNodeControlledVocabColumns" 
+                            v-model="ActiveNode.default"                            
+                            class="border m-2 pb-2"
+                        ></table-grid-component>
+
                     </div>
                     <div class="border bg-white" v-else>
+                        
                         <div v-if="ActiveNode.type=='string' || ActiveNode.type=='text' || ActiveNode.type=='dropdown' || ActiveNode.type=='simple_array' ">
                             <input class="form-control" type="text" v-model="ActiveNode.default"/>
                         </div>

@@ -20,7 +20,7 @@ Vue.component('prop-edit', {
     },
     mounted: function(){
     },    
-    computed: {
+    computed: {        
         prop:{           
             get(){
               return this.value;
@@ -44,7 +44,11 @@ Vue.component('prop-edit', {
           ]
         },
         PropEnum: {
-          get: function() {
+          get() {
+            if (!this.prop.enum) {
+              return [{}];
+            }
+
             if (this.prop.enum && this.prop.enum.length>0 && typeof(this.prop.enum[0]) =='string')
             {
               let enum_list=[];
@@ -59,8 +63,8 @@ Vue.component('prop-edit', {
             }
             return this.prop.enum;
           },
-          set: function(newValue) {
-            this.prop.enum = newValue;
+          set(newValue) {
+            Vue.set(this.prop,"enum",newValue);
           }
         },
     },

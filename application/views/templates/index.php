@@ -384,7 +384,7 @@
               console.log(response);
               vm.loadTemplates();
               if (response.data.template.uid) {
-                window.open(CI.base_url + '/editor/templates/' + response.data.template.uid);
+                window.open(CI.base_url + '/templates/edit/' + response.data.template.uid);
               }
             })
             .catch(function(error) {
@@ -401,7 +401,7 @@
             });
         },
         editTemplate: function(uid) {
-          window.open(CI.base_url + '/editor/templates/' + uid);
+          window.open(CI.base_url + '/templates/edit/' + uid);
         },
         getProjectIcon: function(type) {
           projectIcon = this.project_types_icons[type];

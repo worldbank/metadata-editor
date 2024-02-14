@@ -25,7 +25,7 @@
         </div>
     </div>
     <template>
-        <v-tabs background-color="transparent" class="mb-5">
+        <v-tabs background-color="transparent" class="mb-5" :key="prop.prop_key">
             <v-tab  v-if="isField(prop.type) || prop.type=='simple_array'">{{$t("display")}}</v-tab>
             <v-tab><span v-if="prop.enum && prop.enum.length>0"><v-icon style="color:green;">mdi-circle-medium</v-icon></span>{{$t("controlled_vocabulary")}}</v-tab>
             <v-tab>{{$t("default")}}<span v-if="prop.default"><v-icon style="color:green;">mdi-circle-medium</v-icon></span></v-tab>
@@ -68,11 +68,27 @@
                     <label for="controlled_vocab">{{$t("controlled_vocabulary")}}:</label>
                     <div class="border bg-white" style="max-height:300px;overflow:auto;">
 
-                        <template v-if="isField(prop.type) || prop.type=='simple_array'">                        
-                            <table-component @update:value="EnumListUpdate" :key="prop.key"  v-model="PropEnum" :columns="SimpleControlledVocabColumns" class="border m-2 pb-2" />
+                        <template v-if="isField(prop.type) || prop.type=='simple_array'">                                                    
+
+                            <table-grid-component
+                                :key="prop.key"
+                                :columns="SimpleControlledVocabColumns" 
+                                v-model="PropEnum"
+                                @update:value="EnumListUpdate"
+                                class="border m-2 pb-2"
+                            ></table-grid-component>
+
                         </template>
                         <template v-else>
-                            <table-component @update:value="EnumListUpdate"  :key="prop.key"  v-model="prop.enum" :columns="prop.props" class="border m-2 pb-2" />
+                            
+                            <table-grid-component
+                                :key="prop.key"
+                                :columns="prop.props" 
+                                v-model="PropEnum"
+                                @update:value="EnumListUpdate"
+                                class="border m-2 pb-2"
+                            ></table-grid-component>
+                            
                         </template>
                     </div>
 
@@ -82,11 +98,19 @@
             </v-tab-item>
             <v-tab-item class="p-3">
                 <!-- default -->
-                <template v-if="prop.type!=='section_container' && prop.type!=='section' && prop.display_type">
+                <template v-if="prop.type!=='section_container' && prop.type!=='section'">
                     <div class="form-group" >
                         <label for="controlled_vocab">{{$t("default")}}:</label>
-                        <div class="border bg-white" style="max-height:300px;overflow:auto;" v-if="prop.type=='array'">
-                            <table-component @update:value="DefaultUpdate" v-model="prop.default" :columns="prop.props" class="border m-2 pb-2" />
+                        <div class="border bg-white" style="max-height:300px;overflow:auto;" v-if="prop.type=='array'">                            
+
+                            <table-grid-component
+                                :key="prop.key"
+                                :columns="prop.props" 
+                                v-model="prop.default"
+                                @update:value="DefaultUpdate"
+                                class="border m-2 pb-2"
+                            ></table-grid-component>
+
                         </div>
                         <div class="border bg-white" v-else>
                             <div v-if="prop.display_type=='textarea'">
