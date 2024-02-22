@@ -172,7 +172,18 @@
 	 * Error End Delimiter
 	 **/
 	$config['error_end_delimiter'] = '</p>';
-        
+
+	
+	/*
+	|--------------------------------------------------------------------------
+	| Default user roles
+	|--------------------------------------------------------------------------
+	|
+	|
+	*/
+
+	//Assign default user role for new users
+	$config['editor_user_roles']=['user'];
         
         
 	
