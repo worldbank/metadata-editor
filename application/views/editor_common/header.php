@@ -8,13 +8,13 @@
         <ul class="navbar-nav ml-auto">
 
             <li class="nav-item">
-                <a class="nav-link" href="<?php echo site_url('editor'); ?>" role="button">
+                <a class="nav-link" href="<?php echo site_url('projects'); ?>" role="button">
                 <i class="mdi mdi-folder-multiple-outline"></i> <?php echo t('my_projects'); ?>
                 </a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link" href="<?php echo site_url('editor/templates'); ?>" role="button">
+                <a class="nav-link" href="<?php echo site_url('templates'); ?>" role="button">
                     <i class="mdi mdi-alpha-t-box-outline"></i> <?php echo t('templates'); ?>                
                 </a>
             </li>
