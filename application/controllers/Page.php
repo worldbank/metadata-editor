@@ -11,13 +11,21 @@ class Page extends MY_Controller {
     
 	function index()
 	{	
+		show_404();
+	}
+
+	function home()
+	{
+		if (!$this->ion_auth->logged_in()) {
+			redirect("auth/login/", 'refresh');
+    	}
+
 		$content=$this->load->view('homepage', null,true);
 		$this->template->write('title', "Metadata editor",true);
 		$this->template->write('content', $content,true);
 	  	$this->template->render();
 	}
-
-
+	
 	function switch_language($lang=NULL)
 	{
 		if ($lang==NULL){
