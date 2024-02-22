@@ -5,16 +5,15 @@ class Admin extends MY_Controller {
     {
         parent::__construct();
 		$this->template->set_template('admin5'); 
-		$this->load->driver('cache', array('adapter' => 'dummy', 'backup' => 'file'));
-
 		$this->lang->load("general");
 		$this->lang->load("dashboard");
+		$this->load->library("Editor_acl");
 		//$this->output->enable_profiler(TRUE);
     }
 
 	function index()
 	{
-		$this->load->helper('date_helper');
+		$this->editor_acl->has_access_or_die($resource_='admin_dashboard',$privilege='view');
 		$data['title']=t('Dashboard');
 		$content="...";
 		$this->template->write('title', $data['title'],TRUE);

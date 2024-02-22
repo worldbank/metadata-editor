@@ -47,34 +47,18 @@
 | Examples:	my-controller/index	-> my_controller/index
 |		my-controller/my-method	-> my_controller/my_method
 */
-$route['default_controller'] = 'editor';
+$route['default_controller'] = 'page/home';
 $route['404_override'] = 'page';
 $route['translate_uri_dashes'] = FALSE;
 
-
-
-///////////////////////// API routes ////////////////////////////////////////
-
-
-
-///////////////////////// END API routes /////////////////////////////////////
-
-/*
-$route['api/datadeposits/(:any)'] = "api/datadeposits/projects/$1";
-$route['api/datadeposits'] = "api/datadeposits/projects";
-*/
-
-
-
 $route['switch_language/(.*)'] = "page/switch_language/$1";
-//$route['home'] = "catalog/repositories";
-/*$route['catalog/central/about'] = "catalog/repositories";*/
+$route['home'] = "page/home";
 
+$route['editor'] = "projects";
+$route['editor/(.*)'] = "projects/$1";
 
 //admin paths
 $route['admin'] = "admin/admin";
-
-
 $route['admin/permissions/(:num)'] = "admin/permissions/index/$1";
 
 /* End of file routes.php */
