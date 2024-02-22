@@ -345,9 +345,10 @@ class Editor_model extends CI_Model {
 		//keywords
 		if (isset($search_options['keywords']) && !empty($search_options['keywords'])) {
 			$escaped_keywords=$this->db->escape('%'.$search_options['keywords'].'%');
-			$where = sprintf('(title like %s OR idno like %s)',
+			$where = sprintf('(title like %s OR idno like %s OR study_idno like %s)',
                         $escaped_keywords,
-                        $escaped_keywords
+                        $escaped_keywords,
+						$escaped_keywords
                     );
             $this->db->where($where,NULL,FALSE);
 			$applied_filters['keywords']=$search_options['keywords'];
@@ -527,7 +528,7 @@ class Editor_model extends CI_Model {
 	//get project basic info
     function get_basic_info($sid)
     {
-		$this->db->select("id,idno,study_idno,type");		
+		$this->db->select("id,idno,study_idno,type,study_idno,title,abbreviation,nation,year_start,year_end,published,created,changed");
 		$this->db->where("id",$sid);
 		
 		$survey=$this->db->get("editor_projects")->row_array();
