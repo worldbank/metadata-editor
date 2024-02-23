@@ -134,7 +134,7 @@
                 </div>
                 <div class="col-md-3">
                   <div class="float-right pt-1 mr-5">
-                    <button type="button" class="btn btn-sm btn-success" @click="saveTemplate()"><v-icon style="color:white;">mdi-content-save-check</v-icon> {{$t('save')}}</button>
+                    <button type="button" class="btn btn-sm btn-success" @click="saveTemplate()"><v-icon style="color:white;">mdi-content-save-check</v-icon> {{$t('save')}} <span v-if="is_dirty">*</span></button>
                     <button type="button" class="btn btn-sm btn-default" @click="cancelTemplate()"><v-icon>mdi-exit-to-app</v-icon> {{$t('close')}}</button>
                   </div>
                 </div>
@@ -507,6 +507,7 @@
           user_template_info: user_template_info,
           initiallyOpen: [],
           tree_active_items: [],
+          is_dirty: false,
           files: {
             html: 'mdi-language-html5',
             js: 'mdi-nodejs',
@@ -566,8 +567,23 @@
       created: function() {
         this.init_template();
         this.init_tree();
+        let vm=this;
+        window.addEventListener('beforeunload', function(event) {
+          return vm.onWindowUnload(event);
+        });
       },
       methods: {
+        onWindowUnload: function(event){
+          console.log("window unload");
+          if (!this.is_dirty){
+            return null;
+          }
+
+          let message=this.$t('unsaved_changes');
+
+          event.returnValue = message;
+          return message;
+        },
         init_template: function(){
           //check if user template includes additional container and add if not
 
@@ -902,6 +918,7 @@
             ).then(function(response) {
               //window.location.href = CI.base_url + '/editor/templates';
               alert(vm.$t("changes_saved"));
+              vm.is_dirty = false;
             })
             .catch(function(response) {
               vm.errors = response;
@@ -923,7 +940,33 @@
           if (val == true) {
             this.tree_active_items = new Array();
           }
-        }
+        },
+        user_template_info: {
+          deep: true,
+          handler(val, oldVal) {
+            console.log("watching for changes");
+            if (JSON.stringify(oldVal) == '{}') {
+              this.is_dirty = false;
+              return;
+            }
+            this.is_dirty = true;
+            console.log("form is dirty");
+          }
+        },
+        UserTemplate: 
+         {            
+            deep:true,
+            handler(val, oldVal){
+              console.log("watching for changes");
+              if (JSON.stringify(oldVal) == '{}') {
+                this.is_dirty=false;
+                return;
+              }             
+              this.is_dirty=true;   
+              console.log("form is dirty");                         
+             }
+         }
+
       },
       computed: {
         UserTreeUsedKeys() {
