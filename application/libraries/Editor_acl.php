@@ -574,7 +574,7 @@ class Editor_acl
 			}
 		}
 		catch(Exception $e){
-			throw new Exception('Access denied:: '. $e->getMessage());
+			throw new Exception('Access denied. You don\'t have permissions to access this resource');
 		}
 		
 
