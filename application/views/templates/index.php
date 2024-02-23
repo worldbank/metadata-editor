@@ -100,8 +100,7 @@
                             <td>{{template.version}}</td>
                             <td>-</td>
                             <td>
-                              <button type="button" class="btn btn-sm btn-link" @click="duplicateTemplate(template.uid)">{{$t('duplicate')}}</button>
-                              <button type="button" class="btn btn-sm btn-link" @click="exportTemplate(template.uid)">{{$t('export')}}</button>
+                              <v-icon @click="showMenu($event, template.uid, true)">mdi-dots-vertical</v-icon>                              
                             </td>
                           </tr>
                         </template>
@@ -123,11 +122,8 @@
                             <td>{{template.lang}}</td>
                             <td>{{template.version}}</td>
                             <td>{{momentDate(template.changed)}}</td>
-                            <td>
-                              <button type="button" class="btn btn-sm btn-link" @click="duplicateTemplate(template.uid)">{{$t('duplicate')}}</button>
-                              <button type="button" class="btn btn-sm btn-link" @click="editTemplate(template.uid)">{{$t('edit')}}</button>
-                              <button type="button" class="btn btn-sm btn-link" @click="exportTemplate(template.uid)">{{$t('export')}}</button>
-                              <button type="button" class="btn btn-sm btn-link" @click="deleteTemplate(template.uid)">{{$t('delete')}}</button>
+                            <td>                              
+                              <v-icon @click="showMenu($event, template.uid)">mdi-dots-vertical</v-icon>
                             </td>
                           </tr>
                         </template>
@@ -191,6 +187,38 @@
     </template>
 
 
+    <template>
+      <v-menu
+        v-model="showTemplateMenu"
+        :position-x="menu_x"
+        :position-y="menu_y"
+        absolute
+        offset-y
+      >
+
+        <v-list>
+          <v-list-item>
+            <v-list-item-title @click="duplicateTemplate(menu_active_template_id)"><v-btn text>{{$t('duplicate')}}</v-btn></v-list-item-title>
+          </v-list-item>          
+          <v-list-item>
+            <v-list-item-title @click="exportTemplate(menu_active_template_id)"><v-btn text>{{$t('export')}}</v-btn></v-list-item-title>
+          </v-list-item>
+          <template v-if="!menu_active_template_core">
+            <v-list-item>
+              <v-list-item-title @click="deleteTemplate(menu_active_template_id)"><v-btn text>{{$t('delete')}}</v-btn></v-list-item-title>
+            </v-list-item>            
+          </template>
+          <v-list-item>
+            <v-list-item-title @click="previewTemplate(menu_active_template_id)"><v-btn text>{{$t('preview')}}</v-btn></v-list-item-title>
+          </v-list-item>
+          <v-list-item>
+            <v-list-item-title @click="pdfTemplate(menu_active_template_id)"><v-btn text>{{$t('pdf')}}</v-btn></v-list-item-title>
+          </v-list-item>          
+        </v-list>
+      </v-menu>
+    </template>
+
+
   </div>
 
   <script>  
@@ -247,7 +275,12 @@
         template_import_errors:[],
         dialog_import: {},
         templateFile: '',
-        importJSON: ''
+        importJSON: '',
+        showTemplateMenu: false,        
+        menu_x: 0,
+        menu_y: 0,
+        menu_active_template_id: null,
+        menu_active_template_core: false
       },
       created: async function() {
         //await this.$store.dispatch('initData',{dataset_idno:this.dataset_idno});
@@ -267,6 +300,17 @@
       },
       watch: {},
       methods: {
+        showMenu (e, templateId, isCore=false) {
+          e.preventDefault()
+          this.showTemplateMenu = false
+          this.menu_x = e.clientX
+          this.menu_y = e.clientY
+          this.menu_active_template_id = templateId
+          this.menu_active_template_core = isCore
+          this.$nextTick(() => {
+            this.showTemplateMenu = true
+          })
+        },
         loadDataTypes: function()
         {
           this.data_types={
@@ -367,6 +411,12 @@
         },
         exportTemplate: function(uid) {
           window.open(CI.base_url + '/api/templates/' + uid);
+        },
+        previewTemplate: function(uid) {
+          window.open(CI.base_url + '/templates/preview/' + uid);
+        },
+        pdfTemplate: function(uid) {
+          window.open(CI.base_url + '/templates/pdf/' + uid);
         },
         duplicateTemplate: function(uid) {
           vm = this;

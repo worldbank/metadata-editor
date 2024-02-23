@@ -18,6 +18,7 @@ class Editor_template_model extends ci_model {
 		"organization", 
 		"author", 
 		"description", 
+		"instructions",
 		"template", 
 		"created", 
 		"changed"

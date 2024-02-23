@@ -266,6 +266,12 @@
                   <textarea style="height:200px;" maxlength="1000" class="form-control" v-model="user_template_info.description"></textarea>
                 </div>
 
+                <div class="form-group">
+                  <label>{{$t('instructions')}}: </label>
+                  <span style="font-size:12px;color:gray">Markdown<a href="https://www.markdownguide.org/cheat-sheet/" target="_blannk"><v-icon style="font-size:14px;">mdi-open-in-new</v-icon> </a></span>
+                  <textarea style="min-height:300px;"  class="form-control" v-model="user_template_info.instructions"></textarea>
+                </div>
+
               </div>
             </div>
 

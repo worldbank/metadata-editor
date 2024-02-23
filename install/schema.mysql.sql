@@ -1732,3 +1732,18 @@ CREATE TABLE editor_variables_sort_tmp(
 
 
 alter table editor_projects add column study_idno varchar(300) default null;
+
+
+CREATE TABLE `audit_logs` (
+    `id` int NOT NULL AUTO_INCREMENT,
+    `obj_type` varchar(15) NOT NULL,
+    `obj_id` int NOT NULL,
+    `user_id` int DEFAULT NULL,
+    `description` varchar(200) NOT NULL,
+    `created` datetime NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+
+alter table editor_templates modify column description text;
+alter table editor_templates add instructions text;
