@@ -10,10 +10,12 @@ class Collections extends MY_Controller {
 	{
       	parent::__construct();
 		$this->load->model('Collection_model');
+		$this->load->library("Editor_acl");
 	}
 
 	function index()
 	{
+		$this->editor_acl->has_access_or_die($resource_='collection',$privilege='view');
 		$this->template->set_template('default');
 		echo $this->load->view('collections/index',$options=array(),true);
 	}
