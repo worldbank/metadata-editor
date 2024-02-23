@@ -518,7 +518,19 @@ class TTFontFile
 			return '';
 		}
 
-		return (fread($this->fh, $length));
+		$data = (fread($this->fh, $length));
+
+		// fix for #1504
+		// if fread is used to read from a compressed / buffered stream (e.g. phar://...)
+		// the $length parameter will be ignored - fread is limited in size (usually 8192 bytes)
+		// to fix this, the data length must be checked after reading. If the read was incomplete,
+		// try to read the rest of the data
+		$dataLen = strlen($data);
+		while ($dataLen < $length && !feof($this->fh)) {
+			$data .= fread($this->fh, $length - $dataLen);
+			$dataLen = strlen($data);
+		}
+		return $data;
 	}
 
 	function get_table($tag)
@@ -2285,7 +2297,7 @@ class TTFontFile
 											$key = $vs['match'][1];
 											$tag = $v['tag'];
 											if (isset($loclsubs[$key])) {
-												${$tag[$loclsubs[$key]]} = $sub;
+												${$tag}[$loclsubs[$key]] = $sub;
 											}
 											$tmp = &$$tag;
 											$tmp[hexdec($key)] = hexdec($sub);
@@ -2295,7 +2307,7 @@ class TTFontFile
 											$key = $vs['match'][0];
 											$tag = $v['tag'];
 											if (isset($loclsubs[$key])) {
-												${$tag[$loclsubs[$key]]} = $sub;
+												${$tag}[$loclsubs[$key]] = $sub;
 											}
 											$tmp = &$$tag;
 											$tmp[hexdec($key)] = hexdec($sub);
@@ -2314,7 +2326,7 @@ class TTFontFile
 										$key = substr($key, 6, 5);
 										$tag = $v['tag'];
 										if (isset($loclsubs[$key])) {
-											${$tag[$loclsubs[$key]]} = $sub;
+											${$tag}[$loclsubs[$key]] = $sub;
 										}
 										$tmp = &$$tag;
 										$tmp[hexdec($key)] = hexdec($sub);
@@ -2322,7 +2334,7 @@ class TTFontFile
 										$key = substr($key, 0, 5);
 										$tag = $v['tag'];
 										if (isset($loclsubs[$key])) {
-											${$tag[$loclsubs[$key]]} = $sub;
+											${$tag}[$loclsubs[$key]] = $sub;
 										}
 										$tmp = &$$tag;
 										$tmp[hexdec($key)] = hexdec($sub);
@@ -2876,27 +2888,28 @@ class TTFontFile
 							$lup = $Lookup[$i]['Subtable'][$c]['SubstLookupRecord'][$b]['LookupListIndex'];
 							$seqIndex = $Lookup[$i]['Subtable'][$c]['SubstLookupRecord'][$b]['SequenceIndex'];
 							for ($lus = 0; $lus < $Lookup[$lup]['SubtableCount']; $lus++) {
-								if (count($Lookup[$lup]['Subtable'][$lus]['subs'])) {
-									foreach ($Lookup[$lup]['Subtable'][$lus]['subs'] as $luss) {
-										$lookupGlyphs = $luss['Replace'];
-										$mLen = count($lookupGlyphs);
+								if (empty($Lookup[$lup]['Subtable'][$lus]['subs']) || ! is_array($Lookup[$lup]['Subtable'][$lus]['subs'])) {
+									continue;
+								}
 
-										// Only apply if the (first) 'Replace' glyph from the
-										// Lookup list is in the [inputGlyphs] at ['SequenceIndex']
-										// then apply the substitution
-										if (strpos($inputGlyphs[$seqIndex], $lookupGlyphs[0]) === false) {
-											continue;
-										}
+								foreach ($Lookup[$lup]['Subtable'][$lus]['subs'] as $luss) {
+									$lookupGlyphs = $luss['Replace'];
 
-										// Returns e.g. ¦(0612)¦(ignore) (0613)¦(ignore) (0614)¦
-										$contextInputMatch = $this->_makeGSUBcontextInputMatch($inputGlyphs, $ignore, $lookupGlyphs, $seqIndex);
-										$REPL = implode(" ", $luss['substitute']);
+									// Only apply if the (first) 'Replace' glyph from the
+									// Lookup list is in the [inputGlyphs] at ['SequenceIndex']
+									// then apply the substitution
+									if (strpos($inputGlyphs[$seqIndex], $lookupGlyphs[0]) === false) {
+										continue;
+									}
 
-										if (strpos("isol fina fin2 fin3 medi med2 init ", $tag) !== false && $scripttag == 'arab') {
-											$volt[] = ['match' => $lookupGlyphs[0], 'replace' => $REPL, 'tag' => $tag, 'prel' => $backtrackGlyphs, 'postl' => $lookaheadGlyphs, 'ignore' => $ignore];
-										} else {
-											$subRule['rules'][] = ['type' => $Lookup[$lup]['Type'], 'match' => $lookupGlyphs, 'replace' => $luss['substitute'], 'seqIndex' => $seqIndex, 'key' => $lookupGlyphs[0],];
-										}
+									// Returns e.g. ¦(0612)¦(ignore) (0613)¦(ignore) (0614)¦
+									$contextInputMatch = $this->_makeGSUBcontextInputMatch($inputGlyphs, $ignore, $lookupGlyphs, $seqIndex);
+									$REPL = implode(" ", $luss['substitute']);
+
+									if (strpos("isol fina fin2 fin3 medi med2 init ", $tag) !== false && $scripttag == 'arab') {
+										$volt[] = ['match' => $lookupGlyphs[0], 'replace' => $REPL, 'tag' => $tag, 'prel' => $backtrackGlyphs, 'postl' => $lookaheadGlyphs, 'ignore' => $ignore];
+									} else {
+										$subRule['rules'][] = ['type' => $Lookup[$lup]['Type'], 'match' => $lookupGlyphs, 'replace' => $luss['substitute'], 'seqIndex' => $seqIndex, 'key' => $lookupGlyphs[0],];
 									}
 								}
 							}
@@ -2960,7 +2973,7 @@ class TTFontFile
 
 		// Flag & 0x0010 = UseMarkFilteringSet
 		if ($flag & 0x0010) {
-			throw new \Mpdf\Exception\FontException("This font " . $this->fontkey . " contains MarkGlyphSets - Not tested yet");
+			throw new \Mpdf\Exception\FontException("Font \"" . $this->fontkey . "\" contains MarkGlyphSets which is not supported");
 			$str = $this->MarkGlyphSets[$MarkFilteringSet];
 		}
 

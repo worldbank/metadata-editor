@@ -18,11 +18,13 @@ Requirements
 PHP versions and extensions
 ---------------------------
 
-- `mPDF >=7.0` is supported on `PHP ^5.6 || ~7.0.0 || ~7.1.0 || ~7.2.0`
+- `PHP >=5.6 <7.3.0` is supported for `mPDF >= 7.0`
 - `PHP 7.3` is supported since `mPDF v7.1.7`
 - `PHP 7.4` is supported since `mPDF v8.0.4`
 - `PHP 8.0` is supported since `mPDF v8.0.10`
 - `PHP 8.1` is supported as of `mPDF v8.0.13`
+- `PHP 8.2` is supported as of `mPDF v8.1.3`
+- `PHP 8.3` is supported as of `mPDF v8.2.1`
 
 PHP `mbstring` and `gd` extensions have to be loaded.
 
@@ -98,6 +100,20 @@ in the section on Installation & Setup in the [manual][1].
 
 If you have problems, please read the section on
 [troubleshooting](https://mpdf.github.io/troubleshooting/known-issues.html) in the manual.
+
+About CSS support and development state
+=======================================
+
+mPDF as a whole is a quite dated software. Nowadays, better alternatives are available, albeit not written in PHP.
+
+Use mPDF if you cannot use non-PHP approach to generate PDF files or if you want to leverage some of the benefits of mPDF
+over browser approach – color handling, pre-print, barcodes support, headers and footers, page numbering, TOCs, etc.
+But beware that a HTML/CSS template tailored for mPDF might be necessary.
+
+If you are looking for state of the art CSS support, mirroring existing HTML pages to PDF, use headless Chrome.
+
+mPDF will still be updated to enhance some internal capabilities and to support newer versions of PHP,
+but better and/or newer CSS support will most likely not be implemented.
 
 Online manual
 =============
