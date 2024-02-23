@@ -574,7 +574,6 @@
       },
       methods: {
         onWindowUnload: function(event){
-          console.log("window unload");
           if (!this.is_dirty){
             return null;
           }
@@ -944,26 +943,22 @@
         user_template_info: {
           deep: true,
           handler(val, oldVal) {
-            console.log("watching for changes");
             if (JSON.stringify(oldVal) == '{}') {
               this.is_dirty = false;
               return;
             }
             this.is_dirty = true;
-            console.log("form is dirty");
           }
         },
         UserTemplate: 
          {            
             deep:true,
             handler(val, oldVal){
-              console.log("watching for changes");
               if (JSON.stringify(oldVal) == '{}') {
                 this.is_dirty=false;
                 return;
               }             
               this.is_dirty=true;   
-              console.log("form is dirty");                         
              }
          }
 
