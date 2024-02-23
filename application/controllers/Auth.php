@@ -12,7 +12,6 @@ class Auth extends MY_Controller {
         $this->load->library('session');
         $this->load->library('form_validation');
         $this->load->helper('url');
-    	$this->load->helper('admin_notifications');
 
     	$this->template->set_template('default');
     	//$this->template->write('sidebar', $this->_menu(),true);

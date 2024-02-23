@@ -90,6 +90,7 @@ class Ion_auth
 		$this->ci->load->config('ion_auth');
 		$this->ci->load->library('email');
         $this->ci->load->library('session');
+		$this->ci->load->library('mailer');
 //		$this->ci->load->library('language');
 		//$this->ci->lang->load('ion_auth');
 		$this->ci->load->model('ion_auth_model');
@@ -192,25 +193,22 @@ class Ion_auth
 						 );
 
 			$message = $this->ci->load->view($this->ci->config->item('email_templates').$this->ci->config->item('email_forgot_password'), $data, true);
-			$this->ci->email->clear();
-			$this->ci->email->initialize();			
-			$this->ci->email->from($this->ci->config->item('website_webmaster_email'), $this->ci->config->item('website_webmaster_name'));
-			$this->ci->email->to($profile->email);
-			$this->ci->email->subject(t('forgot_password_verification'));
-			$this->ci->email->message($message);
 
-			if ($this->ci->email->send())
-			{
-				$this->set_error('forgot_password_successful');
+			$email_sent=$this->ci->mailer->send($email_options=array(				
+				'subject'=>t('forgot_password_verification'), 
+				'message'=>$message, 
+				'to'=>$email
+			));
+
+			if ($email_sent){
+				$this->set_message('forgot_password_successful');
 				return TRUE;
 			}
 			else
 			{
 				$this->set_error('forgot_password_unsuccessful');
-				//log email error
-				//log_message('error', $this->ci->email->print_debugger());
 				return FALSE;
-			}
+			}			
 		}
 		else 
 		{
@@ -272,6 +270,9 @@ class Ion_auth
 				return FALSE; 
 			}
 
+			//set default user role
+			$this->set_user_default_roles($id);			
+
 			$activation_code = $this->ci->ion_auth_model->activation_code;
 			$identity        = $this->ci->config->item('identity');
 	    	$user            = $this->ci->ion_auth_model->get_user($id);
@@ -284,20 +285,18 @@ class Ion_auth
 						 );
             
 			$message = $this->ci->load->view($this->ci->config->item('email_templates').$this->ci->config->item('email_activate'), $data, true);
-            
-			$this->ci->email->clear();			
-			$this->ci->email->from($this->ci->config->item('website_webmaster_email'), $this->ci->config->item('website_webmaster_name'));
-			$this->ci->email->to($email);
-			$this->ci->email->subject($this->ci->config->item('website_title') . ' - '.t('account_activation'));
-			$this->ci->email->message($message);
+            			
+			$email_sent=$this->ci->mailer->send($email_options=array(				
+				'subject'=>$this->ci->config->item('website_title') . ' - '.t('account_activation'), 
+				'message'=>$message, 
+				'to'=>$email
+			));
 			
-			if ($this->ci->email->send() == TRUE) 
-			{
+			if ($email_sent) {
 				$this->set_message('activation_email_successful');
 				return TRUE;
 			}
-			else 
-			{
+			else {
 				$this->set_error('activation_email_unsuccessful');
 				return FALSE;
 			}
@@ -790,58 +789,7 @@ class Ion_auth
 		return $this->ci->ion_auth_model->get_admin_emails();
 	}
 
-	/**
-	*
-	* Check if the user has Admin rights for the site or not
-	* 
-	* Note: Checks user_site_roles table
-	*
-	* TODO: //disabled for now as there is no UI to create admins for different sites
-	*/
-	/*function is_site_admin()
-	{
-		
-		return TRUE;
-		
-		
-		//current site id
-		$site_id=$this->ci->db->database;
-		
-		//logged in user site roles
-		$site_user_roles=$this->ci->session->userdata('site_user_roles');
-		
-		foreach($site_user_roles as $role)
-		{
-			$role=(object)$role;
-			if ($role->siteid==$site_id && $role->groupid==1)
-			{
-				return TRUE;
-			}
-		}
-		return FALSE;
-	}*/
 	
-	/*function has_access($userid,$url)
-	{
-		return $this->ci->ion_auth_model->has_access($userid,$url);
-	}
-	
-	function is_study_owner($surveyid)
-	{
-		$userid=$this->get_current_user_id();
-		return $this->ci->ion_auth_model->is_study_owner($surveyid,$userid);
-	}*/
-	
-	/**
-	*
-	* Returns an array of repositories where current user has access
-	* todo: remove - no longer used
-	**/
-	/*function get_user_repositories()
-	{
-		$userid=$this->get_current_user_id();
-		return $this->ci->ion_auth_model->get_user_repositories($userid);
-	}*/
 	
 	function get_current_user_id()
 	{
@@ -928,18 +876,48 @@ class Ion_auth
 
 		//email
 		$message='Your verification code is: <b>'.$otp_code.'</b>';
-		$this->ci->email->clear();
-		$this->ci->email->from($this->ci->config->item('website_webmaster_email'), $this->ci->config->item('website_webmaster_name'));
-		$this->ci->email->to($user->email);
-		$this->ci->email->subject($this->ci->config->item('website_title') . ' - '.t('verification_code'));
-		$this->ci->email->message($message);
 
-		if (!$this->ci->email->send())
-		{
+		$email_sent=$this->ci->mailer->send($email_options=array(				
+			'subject'=>$this->ci->config->item('website_title') . ' - '.t('verification_code'),
+			'message'=>$message, 
+			'to'=>$user->email
+		));
+
+		if (!$email_sent){
 			throw new Exception("Email failed");
 		}
 		
 		return true;
+	}
+
+
+	/**
+	 * 
+	 * Set user default roles for newly created user
+	 */
+	function set_user_default_roles($user_id)
+	{
+		$user_roles=$this->ci->config->item("editor_user_roles");
+	
+		if (!$user_roles){
+			return false;
+		}
+
+		$roles=array();
+		foreach($user_roles as $role_name){
+			
+			if ($role_name=='admin'){
+				continue;
+			}
+
+			$role=$this->ci->acl_manager->get_role_by_name($role_name);
+
+			if ($role){
+				$this->ci->acl_manager->set_user_role($user_id, $role['id']);
+			}
+		}
+
+		return true;	
 	}
 
 

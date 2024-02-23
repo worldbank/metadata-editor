@@ -16,8 +16,7 @@ class DefaultAuth implements AuthInterface
         $this->ci->load->library('session');
         $this->ci->load->library('form_validation');
         $this->ci->load->database();
-        $this->ci->load->helper('url');
-    	$this->ci->load->helper('admin_notifications');
+        $this->ci->load->helper('url');    	
 
     	$this->ci->template->set_template('default');
     	//$this->ci->template->write('sidebar', $this->_menu(),true);
@@ -551,11 +550,6 @@ class DefaultAuth implements AuthInterface
         							);
         	$this->ci->ion_auth->register($username,$password,$email,$additional_data);
 			$content=$this->ci->load->view('auth/create_user_confirm',NULL,TRUE);
-
-			//notify admins
-			$subject=sprintf('[%s] - %s',t('notification'), t('new_user_registration')).' - '.$username;
-			$message=$this->ci->load->view('auth/email/admin_notice_new_registration', $additional_data,true);
-			notify_admin($subject,$message);
 		}
 		else
 		{

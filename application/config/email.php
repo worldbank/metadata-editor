@@ -62,7 +62,8 @@ $config['useragent']        = 'PHPMailer';
 $config['protocol']         = 'smtp';
 $config['smtp_host']        = 'your-smtp-server-name';
 $config['smtp_auth']        = true; //authentication is required
-$config['smtp_user']        = 'user@your-domain.com';
+$config['smtp_user']        = 'user@your-domain.com'; //email or user account e.g. \example\user
+$config['smtp_email']       = 'user@gmail.com'; //email address to send from
 $config['smtp_pass']        = 'password-here';
 $config['smtp_port']        = 25;
 $config['smtp_crypto']      = '';
@@ -84,6 +85,7 @@ $config['protocol']         = 'smtp';
 $config['smtp_host']        = 'smtp.gmail.com';
 $config['smtp_auth']        = true;
 $config['smtp_user']        = 'user@gmail.com';
+$config['smtp_email']       = 'user@gmail.com'; //from email address
 $config['smtp_pass']        = 'password';
 $config['smtp_port']        = 465;
 $config['smtp_crypto']      = 'ssl';
@@ -105,7 +107,10 @@ $config['protocol']         = 'smtp';
 $config['smtp_host']        = 'smtp.gmail.com';
 $config['smtp_auth']        = true;
 $config['smtp_user']        = 'user@gmail.com';
+$config['smtp_email']       = 'user@gmail.com'; //from email address
 $config['smtp_pass']        = 'password';
 $config['smtp_port']        = 587;
 $config['smtp_crypto']      = 'tls';
 */
+
+
