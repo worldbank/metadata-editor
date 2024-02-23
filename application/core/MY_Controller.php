@@ -216,11 +216,11 @@ class MY_Controller extends CI_Controller
 			//redirect them to the login page
 			redirect("auth/login/?destination=$destination", 'refresh');
     	}
-    	elseif (!$this->ion_auth->can_access_site_admin() && $this->is_admin==TRUE ) 
+    	/*elseif (!$this->ion_auth->can_access_site_admin() && $this->is_admin==TRUE ) 
 		{
 			log_message('error', 'MY_CONTROLLER::_auth::access denied for user: '.$this->ion_auth->current_user_identity());
-			show_error("access_denied");
-    	}
+			show_error("Access denied");
+    	}*/
 	}
 
 	//get public site menu
