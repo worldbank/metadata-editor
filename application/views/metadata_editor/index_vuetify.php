@@ -167,6 +167,7 @@
           //form_template: form_template,
           //metadata_schema: metadata_schema,
           is_loading:false,
+          is_dirty:false,//form data has been modified
           vuex_is_loaded:false,
           loading_status:null,
           form_errors:[],
@@ -216,11 +217,11 @@
         await this.$store.dispatch('initTreeItems');
         this.init_tree_data();
 
-        /*let node_path=this.getNodeKeyFromPath(this.$route.path);
+        let vm=this;
 
-        if (node_path){        
-          store.commit('tree_active_node_path',node_path);
-        }*/
+        window.addEventListener('beforeunload', function(event) {
+          return vm.onWindowUnload(event);
+        });
       }
       ,
       mounted: function(){
@@ -402,12 +403,27 @@
         ProjectMetadata: 
         {
             deep:true,
-            handler(val){
-              this.saveProjectDebounce(val);
+            handler(val, oldVal){
+              if (JSON.stringify(oldVal) == '{}') {
+                this.is_dirty=false;
+                return;
+              }
+              //this.saveProjectDebounce(val);              
+                this.is_dirty=true;                            
             }
         }
       },
       methods:{
+        onWindowUnload: function(event){
+          if (!this.is_dirty){
+            return null;
+          }
+
+          let message=this.$t('unsaved_changes');
+
+          event.returnValue = message;
+          return message;
+        },
         getNodeKeyFromPath: function(path)
         {
           path=path.substr(0,1)=="/" ? path.substr(1,path.length) : path;
@@ -712,18 +728,22 @@
           }
 
           router.push('/study/'+node.key);
-            /*router.push('/study/' +node.key,{
-                name: 'study',
-                params: {
-                    element_id: 'hello there' // or anything you want
-                }
-            });*/ 
+        },
+        cancelProject: function(){
+          if (this.is_dirty){
+            if (!confirm(this.$t('Do you want to discard changes?'))){
+              return;
+            }
+          }          
+          this.$store.dispatch('initData',{dataset_id:this.dataset_id}).then(()=>{
+            this.is_dirty=false;
+          });          
         },
         saveProjectDebounce: _.debounce(function(data) {
             this.saveProject(data);
         }, 500),
-        saveProject: function(){
-          vm=this;          
+        saveProject: function(){          
+          vm=this;
           let url=CI.base_url + '/api/editor/update/'+vm.dataset_type+'/' + vm.dataset_id;
           
           form_data=JSON.parse(JSON.stringify(vm.ProjectMetadata));
@@ -778,10 +798,18 @@
           )
           .then(function (response) {
               vm.schema_errors=[];
+              vm.is_dirty=false;
           })
           .catch(function (error) {
               console.log("data-errors",error);
               vm.schema_errors=error.response.data.errors;
+
+              let error_message='';
+              if (error.response.data.message){
+                error_message=error.response.data.message;
+              }
+
+              alert("Error saving project: " + error_message);
           });
       },
       removeEmpty: function (obj) {

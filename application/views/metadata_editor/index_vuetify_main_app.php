@@ -203,7 +203,7 @@
         <?php if (empty($metadata)):?>
             var project_metadata={};
         <?php else:?>
-            var project_metadata=<?php echo json_encode($metadata);?>;
+            var project_metadata={}<?php //echo json_encode($metadata);?>;
         <?php endif;?>
 
         <?php if (empty($sid)):?>
@@ -293,6 +293,7 @@
                 variables:{
                     "F1":{}
                 },
+                project_isloading:false,
                 variables_loaded:false,
                 variables_isloading:false,
                 variables_active_tab:"documentation",                
@@ -450,13 +451,16 @@
             actions: {               
                 async initData({commit},options) {
                     store.state.variables_isloading=true;
+                    store.state.project_isloading=true;
                     await store.dispatch('loadTemplatesList',{});
+                    await store.dispatch('loadProject',{dataset_id:options.dataset_id});
                     await store.dispatch('loadDataFiles',{dataset_id:options.dataset_id});
                     await store.dispatch('loadAllVariables',{dataset_id:options.dataset_id});
                     await store.dispatch('loadExternalResources',{dataset_id:options.dataset_id});
                     await store.dispatch('loadVariableGroups',{dataset_id:options.dataset_id});
                     store.state.variables_loaded=true;
                     store.state.variables_isloading=false;
+                    store.state.project_isloading=false;
                 },
                 async initTreeItems({commit},options) {               
                     store.state.treeItems=store.state.formTemplate.template.items;    

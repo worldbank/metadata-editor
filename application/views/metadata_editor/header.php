@@ -18,8 +18,26 @@
 
     */?>
 
-    <div class="pl-2" style="overflow:hidden;height:35px;">
+    <div class="pl-2" style="overflow:hidden;min-height:35px;">
         <div style="font-size:20px;" :title="Title"><i style="font-size:x-large;" :class="project_types_icons[dataset_type]"></i> <strong>{{Title}}</strong></div>
+        <div class="pl-5 ml-3" v-if="is_dirty">
+
+            <v-btn
+              x-small
+              color="green"
+              dark
+              @click="saveProject"
+            >
+              {{$t('Save project')}}
+            </v-btn>
+            <v-btn
+              x-small
+              dark
+                @click="cancelProject"
+            >
+              {{$t('Cancel')}}
+            </v-btn>  
+        </div>
     </div>
 
     <ul class="navbar-nav ml-5 ml-auto">
