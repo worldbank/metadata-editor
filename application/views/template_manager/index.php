@@ -134,7 +134,7 @@
                 </div>
                 <div class="col-md-3">
                   <div class="float-right pt-1 mr-5">
-                    <button type="button" class="btn btn-sm btn-success" @click="saveTemplate()"><v-icon style="color:white;">mdi-content-save-check</v-icon> {{$t('save')}} <span v-if="is_dirty">*</span></button>
+                    <button type="button" class="btn btn-sm btn-success" @click="saveTemplate()"><v-icon style="color:white;">mdi-content-save-check</v-icon> {{$t('save')}} <span v-if="is_dirty==true">*</span></button>
                     <button type="button" class="btn btn-sm btn-default" @click="cancelTemplate()"><v-icon>mdi-exit-to-app</v-icon> {{$t('close')}}</button>
                   </div>
                 </div>
@@ -568,9 +568,9 @@
         this.init_template();
         this.init_tree();
         let vm=this;
-        window.addEventListener('beforeunload', function(event) {
+        /*window.addEventListener('beforeunload', function(event) {
           return vm.onWindowUnload(event);
-        });
+        });*/
       },
       methods: {
         onWindowUnload: function(event){
@@ -940,27 +940,30 @@
             this.tree_active_items = new Array();
           }
         },
-        user_template_info: {
+        /*user_template_info: {
           deep: true,
           handler(val, oldVal) {
+            console.log(val,oldVal);
             if (JSON.stringify(oldVal) == '{}') {
               this.is_dirty = false;
               return;
             }
             this.is_dirty = true;
           }
-        },
-        UserTemplate: 
+        },*/
+        /*UserTemplate: 
          {            
             deep:true,
             handler(val, oldVal){
+              console.log(JSON.stringify(val)==JSON.stringify(oldVal));
+              console.log(val,oldVal);
               if (JSON.stringify(oldVal) == '{}') {
                 this.is_dirty=false;
                 return;
               }             
               this.is_dirty=true;   
              }
-         }
+         }*/
 
       },
       computed: {

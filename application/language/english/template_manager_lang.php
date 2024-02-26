@@ -17,6 +17,9 @@ $lang['show_all_elements']="Show all elements";
 
 $lang['array_properties']="Array properties";
 
+$lang['instructions']="Instructions";
+
+
 
 /* End of file template_manager_lang.php */
 /* Location: ./application/language/base/template_manager_lang.php */

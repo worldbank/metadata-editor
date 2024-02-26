@@ -74,7 +74,6 @@ $lang['delete_selection']="Delete selection";
 
 $lang['search']="Search";
 
-
 $lang['recent']=" Recent ↑";
 $lang['oldest']=" Oldest ↓";
 $lang['title_az']="Title (A-Z)";

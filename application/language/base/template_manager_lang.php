@@ -3,6 +3,7 @@
 $lang['template_manager']="Template manager";
 $lang['import_template']="Import template";
 $lang['no_templates_found']="No templates were found!";
+$lang['instructions']="Instructions";
 
 
 /* End of file template_manager_lang.php */
