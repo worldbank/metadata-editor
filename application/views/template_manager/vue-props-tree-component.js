@@ -525,7 +525,7 @@ Vue.component('props-treeview', {
             
             <div class="col-md-8 border">
 
-              <div v-if="active_prop.key">dfdfdf
+              <div v-if="active_prop.key">
                 <prop-edit :key="active_prop.prop_key" v-model="active_prop"></prop-edit>
               </div>
               <div v-else class="border p-3">{{$t('click_to_edit')}}</div>
