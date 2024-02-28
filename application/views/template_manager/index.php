@@ -568,9 +568,9 @@
         this.init_template();
         this.init_tree();
         let vm=this;
-        /*window.addEventListener('beforeunload', function(event) {
+        window.addEventListener('beforeunload', function(event) {
           return vm.onWindowUnload(event);
-        });*/
+        });
       },
       methods: {
         onWindowUnload: function(event){
@@ -940,33 +940,34 @@
             this.tree_active_items = new Array();
           }
         },
-        /*user_template_info: {
+        user_template_info: {
           deep: true,
           handler(val, oldVal) {
-            console.log(val,oldVal);
             if (JSON.stringify(oldVal) == '{}') {
               this.is_dirty = false;
               return;
             }
             this.is_dirty = true;
           }
-        },*/
-        /*UserTemplate: 
+        },
+        UserTemplateClone: 
          {            
             deep:true,
             handler(val, oldVal){
-              console.log(JSON.stringify(val)==JSON.stringify(oldVal));
-              console.log(val,oldVal);
               if (JSON.stringify(oldVal) == '{}') {
                 this.is_dirty=false;
                 return;
-              }             
+              }
+              
               this.is_dirty=true;   
              }
-         }*/
+         }
 
       },
       computed: {
+        UserTemplateClone(){
+          return JSON.parse(JSON.stringify(this.UserTemplate));
+        },
         UserTreeUsedKeys() {
           return this.$store.getters.getUserTreeKeys;
         },
