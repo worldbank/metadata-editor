@@ -85,6 +85,20 @@ Vue.component("form-input", {
 
                     </div>
                 </div>
+                <div v-else-if="field.type=='array'">                
+                    <div class="form-field form-field-table">
+                        <label :for="'field-' + field.key">{{field.title}}</label>
+                        <span class="small" v-if="field.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(field.key)" ><i class="far fa-question-circle"></i></span>
+                        <small :id="'field-toggle-' + normalizeClassID(field.key)" class="collapse help-text form-text text-muted mb-2">{{field.help_text}}</small>
+                        <table-grid-component 
+                            v-model="local" 
+                            :columns="field.props"
+                            :enums="field.enum" 
+                            class="border elevation-1"
+                            >
+                        </table-grid-component>
+                    </div>
+                </div>
                 <div v-else-if="field.type=='simple_array'" >
                     <label :for="'field-' + normalizeClassID(field.key)">{{field.title}}</label>
 
@@ -217,20 +231,7 @@ Vue.component("form-input", {
                     </div>
                 </div>               
                 
-                <div v-else-if="field.type=='array'">                
-                    <div class="form-field form-field-table">
-                        <label :for="'field-' + field.key">{{field.title}}</label>
-                        <span class="small" v-if="field.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(field.key)" ><i class="far fa-question-circle"></i></span>
-                        <small :id="'field-toggle-' + normalizeClassID(field.key)" class="collapse help-text form-text text-muted mb-2">{{field.help_text}}</small>
-                        <table-grid-component 
-                            v-model="local" 
-                            :columns="field.props"
-                            :enums="field.enum" 
-                            class="border elevation-1"
-                            >
-                        </table-grid-component>
-                    </div>
-                </div>
+                
 
             </div>  `,
   methods: {
