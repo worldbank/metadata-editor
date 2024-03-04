@@ -148,17 +148,14 @@ Vue.component('vue-key-field', {
 
               <div><label for="key">{{$t("key")}}:</label></div>
 
-                  <div class="form-inline">                
-                    <div class="form-group">
-                        <input type="text" class="form-control" id="key" placeholder="Key" v-model="local_value">
-                    </div>
-                    <button class="ml-1 btn btn-default" @click="UpdateKeyValue" :disabled="!isKeyValid==true" >Update</button>  
+                <div class="form-group">
+                    <input type="text" class="form-control" id="key" placeholder="Key" v-model="local_value" v-on:blur="UpdateKeyValue">
+                    <div class="text-secondary font-small" style="font-size:small">{{this.value}}</div>
+                </div>
 
-                  </div>
-
-              <div class="text-secondary font-small" style="margin-top:4px;font-size:small">
+                <div class="text-secondary font-small" style="margin-bottom:15px;font-size:small">                    
                     <div v-for="error in validation_errors" class="text-danger">{{error}}</div>
-              </div>  
+                </div>  
 
             </div>          
             `    

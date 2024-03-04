@@ -302,6 +302,7 @@
     }
 
     <?php echo include_once("vue-field-key-component.js"); ?>
+    <?php echo include_once("vue-prop-key-component.js"); ?>
     <?php echo include_once("vue-tree-component.js"); ?>
     <?php echo include_once("vue-tree-field-component.js"); ?>
     <?php echo include_once("vue-table-grid-component.js"); ?>

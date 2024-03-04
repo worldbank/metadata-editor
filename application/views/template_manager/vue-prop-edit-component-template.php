@@ -19,9 +19,14 @@
             <input type="text" class="form-control" v-model="prop.type">
         </div>
 
-        <div class="form-group">
+        <div class="form-group" v-if="HasAdditionalPrefix(parent.key)">
             <label for="name">{{$t('key')}}:</label>
-            <input type="text" class="form-control" v-model="prop.key">
+            <vue-prop-key-field                
+                :parent="parent"
+                :value="prop.key"
+                @input="updatePropKey"
+                >
+            </vue-prop-key-field>            
         </div>
     </div>
     <template>

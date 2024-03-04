@@ -161,7 +161,7 @@
             <template v-if="!ActiveArrayNodeIsNested || isControlField(ActiveNode.type) == true">
                 <div class="form-group" >
                     <label for="controlled_vocab">{{$t("default")}}:</label>
-                    <div class="border bg-white" style="max-height:300px;overflow:auto;" v-if="ActiveNode.type=='array'">
+                    <div class="bg-white" style="max-height:300px;overflow:auto;" v-if="ActiveNode.type=='array'">
                         
                         <table-grid-component
                             :key="ActiveNode.key"
@@ -171,13 +171,29 @@
                         ></table-grid-component>
 
                     </div>
-                    <div class="border bg-white" v-else>
+                    <div class="bg-white" v-else>
                         
-                        <div v-if="ActiveNode.type=='string' || ActiveNode.type=='text' || ActiveNode.type=='dropdown' || ActiveNode.type=='simple_array' ">
-                            <input class="form-control" type="text" v-model="ActiveNode.default"/>
+                        <div v-if="ActiveNode.type=='textarea'">
+                            <textarea class="form-control" style="height:200px;" v-model="ActiveNode.default"></textarea>                            
                         </div>
-                        <div v-else-if="ActiveNode.type=='textarea'">
-                            <textarea class="form-control" style="height:200px;" v-model="ActiveNode.default"></textarea>
+                        <div v-else-if="ActiveNode.type=='boolean'">                           
+                            <v-select
+                                v-model="ActiveNode.default"
+                                :items="['true', 'false']"
+                                dense 
+                                outlined
+                                clearable
+                                label="Select"
+                            ></v-select>
+                        </div>
+                        <div v-else>
+                            <v-text-field
+                                label=""
+                                dense 
+                                outlined
+                                clearable
+                                v-model="ActiveNode.default"
+                            ></v-text-field>
                         </div>
                     </div>
                 </div>

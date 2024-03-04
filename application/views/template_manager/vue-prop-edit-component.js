@@ -1,6 +1,6 @@
 ///prop edit componennt
 Vue.component('prop-edit', {
-    props:['value'],
+    props:['value','parent'],
     data: function () {    
         return {          
           field_data_types: [
@@ -68,7 +68,12 @@ Vue.component('prop-edit', {
           }
         },
     },
-    methods:{    
+    methods:{
+      updatePropKey: function(e)
+      {
+        console.log("updating prop key", e);
+        this.prop.key=e;
+      },    
       isField: function(field_type){
         let field_types= [
           "text",
@@ -110,7 +115,10 @@ Vue.component('prop-edit', {
       RulesUpdate: function (e)
       {
         this.$set(this.prop, "rules", e);
-      }
+      },
+      HasAdditionalPrefix(value){
+        return value.indexOf('additional.')==0;
+      },
     },
     template: `<?php require_once 'vue-prop-edit-component-template.php';?>`    
 });
