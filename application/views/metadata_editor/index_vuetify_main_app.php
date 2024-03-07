@@ -476,7 +476,7 @@
                         console.log(error);
                     });
                 },
-                async loadTemplateByUID({commit},options) {
+                async loadTemplateByUID({commit},options) {                    
                     let url=CI.base_url + '/api/templates/'+options.template_uid;
                     return axios
                     .get(url)
@@ -496,8 +496,15 @@
                     let url=CI.base_url + '/api/editor/'+options.dataset_id;
                     return axios
                     .get(url)
-                    .then(function (response) {
-                        store.state.formData=response.data.project.metadata;                        
+                    .then(function (response) {                        
+                        if (response.data.project && response.data.project.metadata){
+                            if (response.data.project.metadata.constructor.name == 'Object'){
+                                store.state.formData=response.data.project.metadata;                                
+                            }else{
+                                alert("Error reading project metadata");
+                                store.state.formData={};
+                            }
+                        }                        
                     })
                     .catch(function (error) {
                         console.log("error loading project",error);
