@@ -528,7 +528,7 @@ class Editor_model extends CI_Model {
 	//get project basic info
     function get_basic_info($sid)
     {
-		$this->db->select("id,idno,study_idno,type,study_idno,title,abbreviation,nation,year_start,year_end,published,created,changed");
+		$this->db->select("id,idno,study_idno,type,study_idno,title,abbreviation,nation,year_start,year_end,published,created,changed, template_uid");
 		$this->db->where("id",$sid);
 		
 		$survey=$this->db->get("editor_projects")->row_array();
@@ -571,8 +571,8 @@ class Editor_model extends CI_Model {
 
 		$options['type']=$type;
 
-		if (!isset($options['metadata'])){
-			$options['metadata']=$this->encode_metadata(array());
+		if (!isset($options['metadata'])){			
+			$options['metadata']=$this->encode_metadata(new stdClass);
 		}
 
 		$this->db->insert('editor_projects',$options);
@@ -663,6 +663,8 @@ class Editor_model extends CI_Model {
 			}else{
 				$image_title_field='image_description.iptc.photoVideoMetadataIPTC.title';
 			}
+		}else{
+			$image_title_field='image_description.iptc.photoVideoMetadataIPTC.title';
 		}
 
 		$core_fields=array(
