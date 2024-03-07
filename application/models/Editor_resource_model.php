@@ -35,7 +35,6 @@ class Editor_resource_model extends ci_model {
 			$this->db->select('*');
 		}
 		$this->db->where('sid',$sid);
-		$this->db->order_by('title','ASC');
 		return $this->db->get('editor_resources')->result_array();
 	}
 
