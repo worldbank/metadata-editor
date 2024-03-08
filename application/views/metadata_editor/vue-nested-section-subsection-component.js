@@ -137,7 +137,49 @@ Vue.component('nested-section-subsection', {
                                                 :field="column"
                                                 @input="update(column.key, $event)"
                                             ></form-input>
+                                            
                                     </div>
+
+                                    <div v-if="fieldDisplayType(column)=='array'">                                           
+                                            
+                                                <div class="form-group form-field form-field-table">
+                                                    <label :for="'field-' + path">{{column.title}}</label>
+                                                    <span class="small" v-if="column.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(column.key)" ><i class="far fa-question-circle"></i></span>
+                                                    <small :id="'field-toggle-' + normalizeClassID(column.key)" class="collapse help-text form-text text-muted">{{column.help_text}}</small>
+                                                    
+
+                                                    <table-grid-component 
+                                                        :value=" localValue(column.key)"
+                                                        @input="update(column.key, $event)"
+                                                        :columns="column.props"
+                                                        :enums="column.enum" 
+                                                        class="border elevation-1"
+                                                        >
+                                                    </table-grid-component>
+                                                </div>
+                                            
+                                    </div>
+
+                                    <div v-if="fieldDisplayType(column)=='nested_array'">                                           
+                                            
+                                                <div class="form-group form-field form-field-table">
+                                                    <label :for="'field-' + path">{{column.title}}</label>
+                                                    <span class="small" v-if="column.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(column.key)" ><i class="far fa-question-circle"></i></span>
+                                                    <small :id="'field-toggle-' + normalizeClassID(column.key)" class="collapse help-text form-text text-muted">{{column.help_text}}</small>
+                                                    
+
+                                                    <nested-array
+                                                        :key="column.key" 
+                                                        :value="localValue(column.key)"
+                                                        @input="update(column.key, $event)"
+                                                        :columns="column.props"                                                        
+                                                        :path="column.key">
+                                                    </nested-array> 
+                                                </div>
+                                            
+                                    </div>
+
+                                    
                                         
                                 </div>  
                             </v-expansion-panel-content>
