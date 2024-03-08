@@ -94,8 +94,6 @@ Vue.component('vue-prop-key-field', {
                 <div v-for="error in validation_errors" class="text-danger">{{error}}</div>
             </div>
 
-            <pre>{{parent}}</pre>
-
         </div>          
             `    
 });
