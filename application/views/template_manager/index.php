@@ -558,7 +558,8 @@
           field_types: [
             "string",
             "array",
-            "nested_array"
+            "nested_array",
+            "simple_array"
             /*"number",
             "date",
             "boolean"*/
