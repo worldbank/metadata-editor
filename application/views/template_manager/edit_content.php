@@ -59,7 +59,7 @@
     </div>
 </div>
 
-<div class="form-group mb-3" v-if="ActiveNode.key && ActiveNode.type!='section' && ActiveNode.type!='section_container'">
+<div class="form-group mb-3" v-if="ActiveNode.key">
     <label >{{$t("description")}}:</label>
     <textarea style="height:200px;" class="form-control"  v-model="ActiveNode.help_text"></textarea>
     <div class="text-secondary p-1" style="font-size:small;">
@@ -93,7 +93,7 @@
         <v-tab v-if="isControlField(ActiveNode.type)"><span v-if="ActiveNode.rules && Object.keys(ActiveNode.rules).length>0"><v-icon style="color:green;">mdi-circle-medium</v-icon></span>{{$t("validation_rules")}}</v-tab>
         <v-tab>{{$t("json")}}</v-tab>
 
-        <v-tab-item class="p-3" v-if="ActiveNode.key && isControlField(ActiveNode.type) == true">
+        <v-tab-item class="p-3 tab-display" v-if="ActiveNode.key && isControlField(ActiveNode.type) == true">
             <!--display-->
             <div class="form-group" v-if="ActiveNode.type!='simple_array'">
                 <label >{{$t("data_type")}}:</label>
@@ -120,9 +120,9 @@
             <!--end display -->
         </v-tab-item>
 
-        <v-tab-item class="p-3">
+        <v-tab-item class="p-3 tab-cv" v-if="!ActiveArrayNodeIsNested">
             <!-- controlled vocab -->
-            <template v-if="!ActiveArrayNodeIsNested">
+            <template >
             <div class="form-group" >
                 <label for="controlled_vocab">{{$t("controlled_vocabulary")}}:</label>
                 <div class="border bg-white" style="max-height:300px;overflow:auto;">
@@ -156,9 +156,9 @@
             </template>
             <!-- end controlled vocab -->
         </v-tab-item>
-        <v-tab-item class="p-3">
+        <v-tab-item class="p-3 tab-default" v-if="!ActiveArrayNodeIsNested || isControlField(ActiveNode.type) == true">
             <!-- default -->
-            <template v-if="!ActiveArrayNodeIsNested || isControlField(ActiveNode.type) == true">
+            <template >
                 <div class="form-group" >
                     <label for="controlled_vocab">{{$t("default")}}:</label>
                     <div class="bg-white" style="max-height:300px;overflow:auto;" v-if="ActiveNode.type=='array'">
@@ -200,7 +200,7 @@
             </template>
             <!-- end default -->
         </v-tab-item>
-        <v-tab-item class="p-3" v-if="isControlField(ActiveNode.type) ">
+        <v-tab-item class="p-3 tab-rules" v-if="isControlField(ActiveNode.type) ">
             <div class="form-group" >
                 <label for="controlled_vocab">{{$t("validation_rules")}}:</label>
                 <div class="bg-white border">
@@ -209,7 +209,7 @@
             </div>
         </v-tab-item>
 
-        <v-tab-item class="p-3">
+        <v-tab-item class="p-3 tab-json">
             <div class="form-group" >
                 <label for="controlled_vocab">{{$t("json")}}:</label>
                 <div class="bg-white border">

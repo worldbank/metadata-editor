@@ -254,8 +254,6 @@ Vue.component('props-treeview', {
       },
       addAdditionalField: function()
       {        
-        //add new prop to parentNode
-
         new_node_key = 'prop' + Date.now();
         new_node_prop_key = this.parent_key + '.' + new_node_key;
 
@@ -267,16 +265,87 @@ Vue.component('props-treeview', {
           "help_text": ""
         };
 
-        //check if ParentNode has props
-        if (!this.ParentNode.props){
-          Vue.set(this.ParentNode,"props",[new_prop]);
+        let target_parent= this.ParentNode;
+
+        //for sub-sections or array types, select as parent
+        if (this.active_prop && (this.active_prop.type=='section' || this.active_prop.type=='array' || this.active_prop.type=='nested_array') ){
+          target_parent=this.active_prop;
+        }        
+        
+        if (!target_parent.props){
+          Vue.set(target_parent,"props",[new_prop]);
         }else{
-          Vue.set(this.ParentNode.props,this.ParentNode.props.length,new_prop);
+          Vue.set(target_parent.props,target_parent.props.length,new_prop);
         }
-
         this.active_prop=new_prop;
-
+        this.tree_active_items = new Array();
+        this.tree_active_items.push(new_node_prop_key);
       },
+      addAdditionalFieldArray: function()
+      {        
+        new_node_key = 'prop' + Date.now();
+        new_node_prop_key = this.parent_key + '.' + new_node_key;
+
+        new_prop={
+          "key": new_node_key,
+          "prop_key": new_node_prop_key,
+          "title": "Untitled",
+          "type": "array",            
+            "help_text": "",
+            "props": [                           
+            ],          
+          "help_text": ""
+        };
+
+        let target_parent= this.ParentNode;
+
+        //for sub-sections, add to selected section
+        if (this.active_prop && this.active_prop.type=='section' || this.active_prop.type=='nested_array'){
+          target_parent=this.active_prop;
+        }        
+        
+        if (!target_parent.props){
+          Vue.set(target_parent,"props",[new_prop]);
+        }else{
+          Vue.set(target_parent.props,target_parent.props.length,new_prop);
+        }
+        this.active_prop=new_prop;
+        this.tree_active_items = new Array();
+        this.tree_active_items.push(new_node_prop_key);
+      },
+      addAdditionalFieldNestedArray: function()
+      {        
+        new_node_key = 'prop' + Date.now();
+        new_node_prop_key = this.parent_key + '.' + new_node_key;
+
+        new_prop={
+          "key": new_node_key,
+          "prop_key": new_node_prop_key,
+          "title": "Untitled",
+          "type": "nested_array",            
+            "help_text": "",
+            "props": [
+            ],          
+          "help_text": ""
+        };
+
+        let target_parent= this.ParentNode;
+
+        //for sub-sections, add to selected section
+        if (this.active_prop && this.active_prop.type=='section' || this.active_prop.type=='nested_array'){
+          target_parent=this.active_prop;
+        }        
+        
+        if (!target_parent.props){
+          Vue.set(target_parent,"props",[new_prop]);
+        }else{
+          Vue.set(target_parent.props,target_parent.props.length,new_prop);
+        }
+        this.active_prop=new_prop;
+        this.tree_active_items = new Array();
+        this.tree_active_items.push(new_node_prop_key);
+      },
+
       moveUp: function()
         {
           parentNode = this.getNodeParent(this.UserProps, this.active_prop.prop_key);
@@ -408,6 +477,19 @@ Vue.component('props-treeview', {
           }
           return false;
         },
+        isPropAdditional: function(prop){
+          return prop.key.startsWith('additional.');
+        },
+        getPropClasses: function(prop){
+          let classes=[];
+          if (this.isPropCut(prop)){
+            classes.push('iscut');
+          }
+          if (this.isPropAdditional(prop)){
+            classes.push('additional-item');
+          }        
+          return classes;
+        }
       
     },
     template: `
@@ -436,7 +518,7 @@ Vue.component('props-treeview', {
                       >
 
                         <template #label="{ item }" >
-                            <span @click="treeClick(item)" :title="item.title" class="tree-item-label" :class="{iscut: isPropCut(item)}">
+                            <span @click="treeClick(item)" :title="item.title" class="tree-item-label" :class="getPropClasses(item)">
                                 <span v-if="!item.title">untitled</span>
                                 <span v-else>{{item.title}}</span>
                                 <span v-if="isPropCut(item)">*</span>
@@ -497,8 +579,9 @@ Vue.component('props-treeview', {
 
                     <!--additional -->
                     <div class="mt-5" v-if="IsAdditonalField">
-                      <v-icon title="Add custom field" color="#dc3545" @click="addAdditionalField()">mdi-text-box-plus-outline</v-icon>
-                      
+                      <v-icon title="Add custom field" class="additional-item" @click="addAdditionalField()">mdi-text-box-plus-outline</v-icon>
+                      <v-icon title="Add custom field" class="additional-item" @click="addAdditionalFieldArray()">mdi-table-large-plus</v-icon>
+                      <v-icon title="Add custom NestedArray field" class="additional-item" @click="addAdditionalFieldNestedArray()">mdi-file-tree</v-icon>
                     </div>
 
                   </div>
@@ -523,8 +606,7 @@ Vue.component('props-treeview', {
             
             </div>
             
-            <div class="col-md-8 border">
-
+            <div class="col-md-8 border">                
               <div v-if="active_prop.key">               
                 <prop-edit :key="active_prop.prop_key" :parent="parent_node" v-model="active_prop"></prop-edit>
               </div>

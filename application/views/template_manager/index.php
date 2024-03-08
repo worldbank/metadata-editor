@@ -56,6 +56,14 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
+
+    .additional-item {
+      color: #6f42c1!important;
+    }
+
+    .font-small{
+      font-size:small;
+    }
   </style>
 
 
@@ -155,7 +163,13 @@
               <div class="col-md-11" style="height:100vh;">
                 <div @click="isEditingDescription=true" style="padding:5px;padding-left:38px;cursor:pointer;" class="pb-2" :class="{isactive: isEditingDescription}"><v-icon>mdi-ballot-outline</v-icon>{{$t('description')}}</div>
                 <div @click="isEditingDescription=false">
-                  <nada-treeview v-model="UserTreeItems" :cut_fields="cut_fields" :initially_open="initiallyOpen" :tree_active_items="tree_active_items"></nada-treeview>
+                  <nada-treeview 
+                      v-model="UserTreeItems" 
+                      :cut_fields="cut_fields" 
+                      :initially_open="initiallyOpen" 
+                      :tree_active_items="tree_active_items"
+                      @initially-open="updateInitiallyOpen"
+                      ></nada-treeview>
                 </div>
               </div>
               <div class="col-md-1 col-xs-2" style="position:relative;">
@@ -200,13 +214,18 @@
 
                   <!--additional -->
                   <div class="mt-5" v-if="ActiveNode.type=='section'">
-                    <v-icon title="Add custom field" v-if="ActiveNode.type=='section_container' || ActiveNode.type=='section'" color="#dc3545" @click="addAdditionalField()">mdi-text-box-plus-outline</v-icon>
+                    <v-icon title="Add custom field" v-if="ActiveNode.type=='section_container' || ActiveNode.type=='section'" class="additional-item" @click="addAdditionalField()">mdi-text-box-plus-outline</v-icon>
                     <v-icon title="Add custom field" v-else class="disabled-button-color">mdi-text-box-plus-outline</v-icon>
                   </div>
 
                   <div class="mt-1" v-if="ActiveNode.type=='section'">
-                    <v-icon title="Add custom Array field" v-if="ActiveNode.type=='section_container' || ActiveNode.type=='section'" color="#dc3545" @click="addAdditionalFieldArray()">mdi-table-large-plus</v-icon>
+                    <v-icon title="Add custom Array field" v-if="ActiveNode.type=='section_container' || ActiveNode.type=='section'" class="additional-item"  @click="addAdditionalFieldArray()">mdi-table-large-plus</v-icon>
                     <v-icon title="Add custom Array field" v-else class="disabled-button-color">mdi-table-large-plus</v-icon>
+                  </div>
+
+                  <div class="mt-1" v-if="ActiveNode.type=='section'">
+                    <v-icon title="Add custom NestedArray field" v-if="ActiveNode.type=='section_container' || ActiveNode.type=='section'" class="additional-item"  @click="addAdditionalFieldNestedArray()">mdi-file-tree</v-icon>
+                    <v-icon title="Add custom NestedArray field" v-else class="disabled-button-color">mdi-file-tree</v-icon>
                   </div>
 
                 </div>
@@ -605,7 +624,9 @@
         init_tree: function() {
           this.$store.state.core_tree_items = this.$store.state.core_template.items;
           this.$store.state.user_tree_items = this.$store.state.user_template.items;
-
+        },
+        updateInitiallyOpen: function (e){
+          this.initiallyOpen=e;
         },
         delete_tree_item: function(tree, item_key) {
           tree.forEach((item, idx) => {
@@ -757,6 +778,7 @@
           this.tree_active_items = new Array();
           this.tree_active_items.push(new_node_key);
           this.initiallyOpen.push(new_node_key);
+          this.initiallyOpen.push(parentNode.key);          
         },
         addAdditionalField: function() {
           /*if (this.ActiveNodeContainerKey != 'additional_container') {
@@ -777,6 +799,7 @@
           this.tree_active_items = new Array();
           this.tree_active_items.push(new_node_key);
           this.initiallyOpen.push(new_node_key);
+          this.initiallyOpen.push(parentNode.key);
         },
         addAdditionalFieldArray: function() {
           /*if (this.ActiveNodeContainerKey != 'additional_container') {
@@ -794,8 +817,32 @@
             ]
           });
 
+          this.ActiveNode = parentNode.items[parentNode.items.length - 1];
+          this.tree_active_items = new Array();
+          this.tree_active_items.push(new_node_key);
+          this.initiallyOpen.push(new_node_key);
+          this.initiallyOpen.push(parentNode.key);
+
           //this.ActiveNode.items.push(this.ActiveCoreNode);
           //store.commit('activeCoreNode', {});
+        },
+        addAdditionalFieldNestedArray: function() {
+          parentNode = this.ActiveNode;
+          new_node_key = "additional." + Date.now();
+          parentNode.items.push({
+            "key": new_node_key,
+            "title": "Untitled",
+            "type": "nested_array",            
+            "help_text": "",
+            "props": [                           
+            ]
+          });
+          
+          this.ActiveNode = parentNode.items[parentNode.items.length - 1];
+          this.tree_active_items = new Array();
+          this.tree_active_items.push(new_node_key);
+          this.initiallyOpen.push(new_node_key);
+          this.initiallyOpen.push(parentNode.key);
         },
         UpdateActiveNodeKey: function(e){
           this.ActiveNode.key = e;

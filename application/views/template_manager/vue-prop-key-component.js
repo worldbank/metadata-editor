@@ -77,31 +77,11 @@ Vue.component('vue-prop-key-field', {
                 this.validation_errors.push('Key cannot be empty');
             }
 
-            //break key into parts using dot as separator
-            let parts=key.split('.');
-
-            //check if key has any empty parts
-            if (parts.indexOf('')!==-1){
-                this.validation_errors.push('Key must not contain empty parts');
+            //key can only contain letters, numbers, and underscores
+            if (key.match(/^[a-zA-Z0-9_-]+$/)==null){
+                this.validation_errors.push('Key can only contain letters, numbers, and underscores');
             }
-
-            //check all parts only contain letters, numbers, dash, and underscores
-            for(let i=1;i<parts.length;i++){
-                if (parts[i].match(/^[a-zA-Z0-9_-]+$/)==null){
-                    this.validation_errors.push('Key can only contain letters, numbers, and underscores');
-                    break;
-                }
-            }
-
-            //check if key is unique
-            //check if key is unique for the current array element
-            for(let i=0;i<this.parent.props.length;i++){
-                if (this.parent.props[i].key==key && key!=this.value){
-                    console.log("key found", this.parent.props[i].key, key)
-                    this.validation_errors.push('Key already exists!');
-                }
-            }
-            
+           
             return this.validation_errors.length==0;
         }
     },
@@ -112,7 +92,9 @@ Vue.component('vue-prop-key-field', {
                 
             <div class="text-secondary font-small" style="margin-top:4px;font-size:small">
                 <div v-for="error in validation_errors" class="text-danger">{{error}}</div>
-            </div>  
+            </div>
+
+            <pre>{{parent}}</pre>
 
         </div>          
             `    

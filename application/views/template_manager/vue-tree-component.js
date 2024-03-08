@@ -19,9 +19,13 @@ Vue.component('nada-treeview', {
         }
     },
     created: function(){
-      
+      this.initiallyOpen=this.initially_open;
     },
-    
+    watch:{
+      initiallyOpen: function(val) {
+        this.$emit('initially-open',this.initiallyOpen);
+      }
+    },
     computed: {
         TreeActiveItems: {
           get: function() {
@@ -48,17 +52,11 @@ Vue.component('nada-treeview', {
     },
     methods:{
       treeClick: function (node){
-        //store.commit('tree_active_node',node.key);
-        console.log("treeClick",node);
-
-        //expand tree node          
         this.initiallyOpen.push(node.key);
         store.commit('activeNode',node);        
       },
       onTreeOpen: function (node){
-        console.log("tree node open");
-        
-      },
+      },      
       getNodePath: function(arr,name)
       {
           if (!arr){
@@ -92,10 +90,24 @@ Vue.component('nada-treeview', {
         }
         return false;
       },
+      isItemAdditional: function(item){
+        //check if item key has additional. prefix
+        return item.key.startsWith('additional.');
+      },
+      getItemClasses: function(item){
+        let classes=[];
+        if (this.isItemCut(item)){
+          classes.push('iscut');
+        }
+        if (this.isItemAdditional(item)){
+          classes.push('additional-item');
+        }        
+        return classes;
+      }
     },
     template: `
             <div class="nada-treeview-component">
-            <template>
+            <template>            
               <v-treeview                   
                   color="warning"
                   v-model="value"                   
@@ -114,14 +126,14 @@ Vue.component('nada-treeview', {
               >
 
                 <template #label="{ item }" >
-                    <span @click="treeClick(item)" :title="item.title" class="tree-item-label" :class="{iscut: isItemCut(item)}">
+                    <span @click="treeClick(item)" :title="item.title" class="tree-item-label" :class="getItemClasses(item)" >
                         <span v-if="item.type=='resource'" >{{item.title | truncate(23, '...') }}</span>
                         <span v-else>{{item.title}} <template v-if="item.title==''">Untitled</template></span>
                         <span v-if="isItemCut(item)">*</span>                        
                     </span>
                 </template>
 
-                <template v-slot:prepend="{ item, open }">
+                <template v-slot:prepend="{ item, open }" >
                   <v-icon v-if="item.type=='section_container'">
                     {{ open ? 'mdi-dresser' : 'mdi-dresser' }}
                   </v-icon> 
@@ -129,10 +141,10 @@ Vue.component('nada-treeview', {
                     {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
                   </v-icon>
                   
-                  <v-icon v-else-if="item.type=='nested_array'">
+                  <v-icon v-else-if="item.type=='nested_array'" >
                     {{ open ? 'mdi-file-tree-outline' : 'mdi-file-tree' }}
                   </v-icon> 
-                  <v-icon v-else-if="item.type=='array'">
+                  <v-icon v-else-if="item.type=='array'" >
                     {{ open ? 'mdi-folder-table-outline' : 'mdi-folder-table' }}
                   </v-icon> 
 

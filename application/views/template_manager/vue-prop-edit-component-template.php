@@ -1,5 +1,23 @@
 <div class="prop-edit-component">
     <div v-if="prop.key">
+
+        <div class="form-group" v-if="HasAdditionalPrefix(parent.key)">
+            <label for="name">{{$t('key')}}:</label>
+            <vue-prop-key-field                
+                :parent="parent"
+                :value="prop.key"
+                @input="updatePropKey"
+                >
+            </vue-prop-key-field>
+            <div class="text-secondary font-small mb-3" >Unique name for the field</div>
+               
+        </div>
+
+        <div class="form-group">
+            <label for="name">{{$t('type')}}:</label>
+            <input type="text" class="form-control" v-model="prop.type" disabled="disabled">
+        </div>
+
         <div class="form-group">
             <label for="name">{{$t('label')}}:</label>
             <input type="text" class="form-control" v-model="prop.title">
@@ -14,20 +32,6 @@
             <textarea class="form-control" v-model="prop.help_text"/>
         </div>
 
-        <div class="form-group">
-            <label for="name">{{$t('type')}}:</label>
-            <input type="text" class="form-control" v-model="prop.type">
-        </div>
-
-        <div class="form-group" v-if="HasAdditionalPrefix(parent.key)">
-            <label for="name">{{$t('key')}}:</label>
-            <vue-prop-key-field                
-                :parent="parent"
-                :value="prop.key"
-                @input="updatePropKey"
-                >
-            </vue-prop-key-field>            
-        </div>
     </div>
     <template>
         <v-tabs background-color="transparent" class="mb-5" :key="prop.prop_key">

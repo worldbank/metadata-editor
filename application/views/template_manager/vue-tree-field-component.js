@@ -29,7 +29,10 @@ Vue.component('nada-treeview-field', {
         Items(){
           if (this.TemplateActiveNode){
             parent=this.findNodeParent(this.UserTemplate,this.TemplateActiveNode.key);
-            return this.coreTemplateParts[parent.key].items;
+            if (this.coreTemplateParts[parent.key]){
+              return this.coreTemplateParts[parent.key].items;
+            }
+            return []
           }
         },
         filteredItems()
