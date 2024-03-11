@@ -15,6 +15,7 @@ class Editor extends MY_REST_Controller
 		$this->load->model("Collection_model");
 		
 		$this->load->library("Editor_acl");
+		$this->load->library("Audit_log");
 		$this->is_authenticated_or_die();
 	}
 
@@ -36,12 +37,12 @@ class Editor extends MY_REST_Controller
 	 */
 	function index_get($id=null)
 	{
-		try{
+		try{			
 			if($id){
 				return $this->single_get($id);
 			}
 
-			$this->has_access($resource_='editor',$privilege='view');
+			$this->has_access($resource_='editor',$privilege='view');			
 			
 			$offset=(int)$this->input->get("offset");
 			$limit=(int)$this->input->get("limit");
@@ -109,7 +110,9 @@ class Editor extends MY_REST_Controller
 	function single_get($sid=null)
 	{
 		try{
-			$this->editor_acl->user_has_project_access($sid,$permission='view');
+			$sid=$this->get_sid($sid);
+			$user=$this->api_user();
+			$this->editor_acl->user_has_project_access($sid,$permission='view',$user);
 
 			$result=$this->Editor_model->get_row($sid);
 			array_walk($result, 'unix_date_to_gmt_row',array('created','changed'));
@@ -208,7 +211,7 @@ class Editor extends MY_REST_Controller
 			$options['created']=date("U");
 			$options['changed']=date("U");
 			
-			//$this->has_dataset_access('edit',null,$options['repositoryid']);
+			//$this->has_dataset_access('edit',null,$options['repositoryid']);			
 
 			//validate & create dataset
 			$dataset_id=$this->Editor_model->create_project($type,$options);			
@@ -223,6 +226,8 @@ class Editor extends MY_REST_Controller
 			if (!empty($project_options)){
 				$this->update_post($type,$dataset_id);
 			}
+
+			$this->audit_log->log_event($obj_type='project',$obj_id=$dataset_id,$description='create');
 
 			$response=array(
 				'status'=>'success',
@@ -262,8 +267,8 @@ class Editor extends MY_REST_Controller
 	{
 		try{			
 			$options=$this->raw_json_input();
-			$user_id=$this->get_api_user_id();
 			$user=$this->api_user();
+			$user_id=$this->get_api_user_id();
 			$id=$this->get_sid($id);
 			
 			//check project exists and is of correct type
@@ -274,7 +279,7 @@ class Editor extends MY_REST_Controller
 			}
 
 			$this->editor_acl->user_has_project_access($id,$permission='edit',$user);
-			
+			$this->audit_log->log_event($obj_type='project',$obj_id=$id,$description='update');			
 			
 			$options['changed_by']=$user_id;
 			$options['changed']=date("U");
@@ -284,7 +289,7 @@ class Editor extends MY_REST_Controller
 			$this->Editor_model->create_project_folder($id);
 
 			$response=array(
-				'status'=>'success'				
+				'status'=>'success'
 			);
 
 			$this->set_response($response, REST_Controller::HTTP_OK);
@@ -1162,5 +1167,4 @@ class Editor extends MY_REST_Controller
 		}		
 	}
 
-	
 }

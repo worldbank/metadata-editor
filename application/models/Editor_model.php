@@ -589,6 +589,11 @@ class Editor_model extends CI_Model {
 			$this->validate_schema($type,$options);
 		}
 
+		//partial update metadata
+		if (isset($options['partial_update']) && $options['partial_update']==true){
+			$options=$this->apply_partial_update($id,$options);
+		}
+		
 		$options=array(
 			'changed'=>isset($options['changed']) ? $options['changed'] : date("U"),
 			'changed_by'=>isset($options['changed_by']) ? $options['changed_by'] : '',
@@ -600,6 +605,19 @@ class Editor_model extends CI_Model {
 
 		$this->db->where('id',$id);
 		$this->db->update('editor_projects',$options);
+	}
+
+	/**
+	 * 
+	 * Update partial metadata
+	 * 
+	 */
+	function apply_partial_update($id,$partial_options)
+	{
+		$options=$this->get_row($id);		
+		$options['metadata']=array_replace_recursive($options['metadata'],$partial_options);
+
+		return $options['metadata'];
 	}
 
 	function set_project_options($sid,$options=array())
@@ -1734,11 +1752,15 @@ class Editor_model extends CI_Model {
 	function get_project_id_by_idno($idno)
 	{
 		$this->db->select("id");
-		$this->db->where("idno",$idno);
-		$result=$this->db->get("editor_projects")->row_array();
+		$this->db->where("study_idno",$idno);
+		$result=$this->db->get("editor_projects")->result_array();
 
-		if (isset($result['id'])){
-			return $result['id'];
+		if ($result && count($result)>1){
+			throw new Exception("Multiple projects found with the same IDNO");
+		}
+		
+		if (isset($result[0]['id'])){
+			return $result[0]['id'];
 		}
 	}
 
