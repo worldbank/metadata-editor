@@ -897,11 +897,16 @@ definitions:
       collection_id:
         type: integer
         required: true
-      sid:
+      id_format:
+        type: string
+        default: "id"
+        enum:
+          - id
+          - idno                
+      projects:
         type: array
         items:
-          type: integer
-          format: int64   
+          type: string        
     xml:
       name: AddProjectsToCollection
   UserCollectionAccess:
