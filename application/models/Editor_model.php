@@ -1752,11 +1752,11 @@ class Editor_model extends CI_Model {
 	function get_project_id_by_idno($idno)
 	{
 		$this->db->select("id");
-		$this->db->where("study_idno",$idno);
+		$this->db->where("idno",$idno);
 		$result=$this->db->get("editor_projects")->result_array();
 
 		if ($result && count($result)>1){
-			throw new Exception("Multiple projects found with the same IDNO");
+			throw new Exception("Multiple projects found with the same IDNO: ". $idno);
 		}
 		
 		if (isset($result[0]['id'])){

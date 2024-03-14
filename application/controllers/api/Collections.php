@@ -173,7 +173,7 @@ class Collections extends MY_REST_Controller
 	{		
 		try{
 			$this->has_access($resource_='collection',$privilege='edit');
-			$options=$this->raw_json_input();			
+			$options=$this->raw_json_input();
 
 			if (!isset($options['collection_id'])){
 				throw new Exception("Missing parameter: collection_id");
@@ -181,6 +181,16 @@ class Collections extends MY_REST_Controller
 
 			if (!isset($options['projects'])){
 				throw new Exception("Missing parameter: projects");
+			}
+
+			if (isset($options['id_format']) && $options['id_format']=='idno'){
+				
+				$sid_arr=array();
+				foreach($options['projects'] as $idno){
+					$sid=$this->get_sid($idno);
+					$sid_arr[]=$sid;
+				}
+				$options['projects']=$sid_arr;
 			}
 			
 			$result=$this->Collection_model->add_projects($options['collection_id'], $options['projects']);
@@ -192,7 +202,11 @@ class Collections extends MY_REST_Controller
 			$this->set_response($output, REST_Controller::HTTP_OK);			
 		}
 		catch(Exception $e){
-			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
 

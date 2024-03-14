@@ -49,6 +49,10 @@ class Editor_partial_import
 
 		$project_db=$this->ci->Editor_model->get_row($sid);
 
+		if (!is_array($project_db['metadata'])){
+			$project_db['metadata']=(array)$project_db['metadata'];
+		}		
+
 		//remove doc_desc if not set
 		if (in_array("document_description",$import_options)){
 			if (isset($project_json['doc_desc'])){

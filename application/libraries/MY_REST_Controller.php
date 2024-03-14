@@ -245,10 +245,11 @@ abstract class MY_REST_Controller extends REST_Controller {
 			return $idno;
 		}
 
+        $this->load->model("Editor_model");
 		$sid=$this->Editor_model->get_project_id_by_idno($idno);
 
 		if(!$sid){
-			throw new Exception("IDNO-NOT-FOUND");
+			throw new Exception("IDNO-NOT-FOUND: ". $idno);
 		}
 
 		return $sid;
