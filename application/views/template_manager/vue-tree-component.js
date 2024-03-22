@@ -110,7 +110,6 @@ Vue.component('nada-treeview', {
             <template>            
               <v-treeview                   
                   color="warning"
-                  v-model="value"                   
                   :open.sync="initiallyOpen" 
                   :active.sync="TreeActiveItems"
                   @update:open="onTreeOpen" 
