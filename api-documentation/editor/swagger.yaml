@@ -464,26 +464,23 @@ paths:
               $ref: "#/definitions/AddProjectsToCollection"
         security:
           - ApiKeyAuth: []
-  /collections/remove_project/{collectionId}/{projectId}}:
+  /collections/remove_project:
       post:
         tags:
           - Collections
-        summary: Remove project from collection
-        description: Remove project from collection
+        summary: Remove projects from collection
+        description: Remove projects from collection
         operationId: removeProjectFromCollection
         consumes:
           - application/json
         produces:
           - application/json
         parameters:
-          - in: "path"
-            name: "collectionId"
+          - in: "body"
+            name: "body"
             required: true
-            type: integer            
-          - in: "path"
-            name: "projectId"
-            required: true
-            type: integer            
+            schema:
+              $ref: "#/definitions/AddProjectsToCollection"       
         responses:
           '200':
             description: successful operation
