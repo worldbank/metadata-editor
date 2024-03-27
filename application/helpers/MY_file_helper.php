@@ -295,6 +295,37 @@ if ( ! function_exists('get_dir_recursive'))
 		}		
 		return array('files'=>$files, 'folders'=>$folders);
 	}
+}
+
+if ( ! function_exists('get_dir_tree'))
+{
+	function get_dir_tree($path)
+	{	
+		$result = array();
+		$dir = scandir($path);
+		
+		foreach ($dir as $key => $value){		 
+			if (!in_array($value,array(".","..",".DS_Store"))){
+				if (is_dir($path . DIRECTORY_SEPARATOR . $value)){		 
+					$result[]=[
+					"type"=>"folder",						
+					"name"=>$value,
+					//"size"=>get_dir_size($path . DIRECTORY_SEPARATOR . $value),
+					"items"=>get_dir_tree($path . DIRECTORY_SEPARATOR . $value)
+					];				
+				}
+				else{		 
+				$result[]=[
+					"type"=>"file",
+					"name"=>$value,
+					"size"=>filesize($path . DIRECTORY_SEPARATOR . $value)
+				];					
+				} 		 
+			}
+		}
+		
+		return $result;
+	}
 }	
 
 

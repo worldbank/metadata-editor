@@ -5,39 +5,14 @@
 	"description": "Schema for timeseries data type",
 	"type": "object",
 	"properties": {
-		"repositoryid": {
+		"idno": {
 			"type": "string",
-			"title": "Collection ID that owns the series",
-			"description": "Collection that owns the series"
-		},
-		"access_policy": {
-			"type": "string",
-			"title": "Data access policy",
-			"description": "Data access policy for attached microdata resources",
-			"enum": [
-				"direct",
-				"open",
-				"public",
-				"licensed",
-				"remote",
-				"na"
-			],
-			"default": "na"
-		},
-		"data_remote_url": {
-			"type": "string",
-			"title": "Data website URL",
-			"description": "Link to the website where the data is available, this is only needed if `access_policy` is set to `remote`."
-		},
-		"published": {
-			"type": "integer",
-			"title": "Status",
-			"description": "Status of the study - 0=draft, 1=published",
-			"default": 0
-		},
+			"title": "Project unique identifier",
+			"description": "Project unique identifier"
+		},		
 		"overwrite": {
 			"type": "string",
-			"description": "Overwrite database if already exists?",
+			"description": "Overwrite project if already exists?",
 			"enum": [
 				"yes",
 				"no"

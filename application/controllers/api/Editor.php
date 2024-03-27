@@ -42,13 +42,14 @@ class Editor extends MY_REST_Controller
 				return $this->single_get($id);
 			}
 
+			$user_id=$this->get_api_user_id();
 			$this->has_access($resource_='editor',$privilege='view');			
 			
 			$offset=(int)$this->input->get("offset");
 			$limit=(int)$this->input->get("limit");
 
 			$search_options=$this->input->get();
-			$search_options['user_id']=$this->session->userdata('user_id');
+			$search_options['user_id']=$user_id;
 
 			if (!$limit){
 				$limit=100;
@@ -214,7 +215,7 @@ class Editor extends MY_REST_Controller
 			//$this->has_dataset_access('edit',null,$options['repositoryid']);			
 
 			//validate & create dataset
-			$dataset_id=$this->Editor_model->create_project($type,$options);			
+			$dataset_id=$this->Editor_model->create_project($type,$options);
 
 			if(!$dataset_id){
 				throw new Exception("FAILED_TO_CREATE_DATASET");

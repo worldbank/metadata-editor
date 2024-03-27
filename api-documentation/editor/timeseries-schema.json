@@ -5,39 +5,14 @@
 	"description": "Schema for timeseries data type",
 	"type": "object",
 	"properties": {
-		"repositoryid": {
+		"idno": {
 			"type": "string",
-			"title": "Collection ID that owns the series",
-			"description": "Collection that owns the series"
-		},
-		"access_policy": {
-			"type": "string",
-			"title": "Data access policy",
-			"description": "Data access policy for attached microdata resources",
-			"enum": [
-				"direct",
-				"open",
-				"public",
-				"licensed",
-				"remote",
-				"na"
-			],
-			"default": "na"
-		},
-		"data_remote_url": {
-			"type": "string",
-			"title": "Data website URL",
-			"description": "Link to the website where the data is available, this is only needed if `access_policy` is set to `remote`."
-		},
-		"published": {
-			"type": "integer",
-			"title": "Status",
-			"description": "Status of the study - 0=draft, 1=published",
-			"default": 0
-		},
+			"title": "Project unique identifier",
+			"description": "Project unique identifier"
+		},		
 		"overwrite": {
 			"type": "string",
-			"description": "Overwrite database if already exists?",
+			"description": "Overwrite project if already exists?",
 			"enum": [
 				"yes",
 				"no"
@@ -202,6 +177,10 @@
 					"items": {
 						"type": "object",
 						"properties": {
+							"name": {
+								"title": "Name",
+								"type": "string"
+							},
 							"label": {
 								"title": "Label",
 								"type": "string"
@@ -215,6 +194,11 @@
 							"label"
 						]
 					}
+				},
+				"release_calendar": {
+					"title": "Release calendar",
+					"description": "Release calendar",
+					"type": "string"
 				},
 				"periodicity": {
 					"type": "string",
@@ -290,18 +274,66 @@
 						]
 					}
 				},
+				"data_collection": {
+					"title": "Data collection",
+					"description": " This description should include, when applicable, the sample frame used, the questions used to collect the data, the type of interview, the dates/duration of fieldwork, the sample size and the response rate. Some additional information on questionnaire design and testing, interviewer training, methods used to monitor non-response etc.",
+					"type": "object",
+					"properties": {												
+						"data_source": {
+							"title": "Data source",
+							"type": "string"
+						},
+						"method": {
+							"title": "Data collection method",
+							"type": "string"
+						},
+						"period": {
+							"title": "Data collection period",
+							"type": "string"
+						},
+						"note": {
+							"title": "Data collection note",
+							"type": "string"
+						},
+						"uri": {
+							"title": "Data collection URL",
+							"type": "string"
+						}
+					}
+				},
 				"methodology": {
 					"type": "string",
 					"title": "Methodology"
+				},
+				"derivation": {
+					"type": "string",
+					"title": "Derivation"
 				},
 				"imputation": {
 					"type": "string",
 					"title": "Imputations"
 				},
+				"adjustments": {
+					"title": "Adjustments",
+					"description": " Description of any adjustments with respect to use of standard classifications and harmonization of breakdowns for age group and other dimensions, or adjustments made for compliance with specific international or national definitions.",
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
 				"missing": {
 					"type": "string",
 					"title": "Treatment of missing values"
 				},
+				"validation_rules": {
+					"title": "Validation rules",
+					"description": "Set of rules to validate values for indicators, e.g. range checks",
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				
 				"quality_checks": {
 					"type": "string",
 					"title": "Quality control methods"
@@ -399,8 +431,16 @@
 					"items": {
 						"type": "object",
 						"properties": {
+							"id": {
+								"title": "Unique Identifier",
+								"type": "string"
+							},
 							"name": {
 								"title": "Discipline title or name",
+								"type": "string"
+							},
+							"parent_id": {
+								"title": "Parent Identifier",
 								"type": "string"
 							},
 							"vocabulary": {
@@ -423,6 +463,20 @@
 					"type": "string",
 					"title": "Relavance"
 				},
+				"mandate": {
+					"title": "Mandate",
+					"description": "Mandate",
+					"type": "object",
+					"properties": {												
+						"mandate": {
+							"title": "Mandate",
+							"type": "string"
+						},
+						"uri": {
+							"title": "URL",
+							"type": "string"
+						}					}
+				},				
 				"time_periods": {
 					"type": "array",
 					"title": "Series dates",
@@ -436,6 +490,10 @@
 							"end": {
 								"type": "string",
 								"title": "End"
+							},
+							"notes": {
+								"type": "string",
+								"title": "Notes"
 							}
 						}
 					}
@@ -557,6 +615,7 @@
 					"type": "string",
 					"title": "Confidentiality note"
 				},
+				
 				"links": {
 					"type": "array",
 					"title": "Series links",
@@ -718,6 +777,26 @@
 						]
 					}
 				},
+				"errata": {
+					"type": "array",
+					"title": "Errata",
+					"description": "List of corrected errors in data or metadata",
+					"items": {
+					  "type": "object",
+					  "properties": {
+						"date": {
+						  "title": "Date of erratum",
+						  "description": "Date when the erratum was reported or published",
+						  "type": "string"
+						},
+						"description": {
+						  "title": "Description of the erratum",
+						  "description": "A description of the erratum, with information on which data or metadata were impacted",
+						  "type": "string"
+						}
+					  }
+					}
+				  },
 				"notes": {
 					"title": "Notes",
 					"description": "Notes",
@@ -748,6 +827,14 @@
 							},
 							"uri": {
 								"title": "URI",
+								"type": "string"
+							},
+							"relationship": {
+								"title": "Relationship",
+								"type": "string"
+							},
+							"type": {
+								"title": "Type",
 								"type": "string"
 							}
 						}
@@ -880,6 +967,43 @@
 							"uri": {
 								"type": "string",
 								"title": "URI"
+							}
+						}
+					},
+					"required": [
+						"name"
+					]
+				},
+				"contacts": {
+					"type": "array",
+					"title": "Contacts",
+					"description": "Contacts",
+					"items": {
+						"type": "object",
+						"properties": {
+							"name": {
+								"title": "Name",
+								"type": "string"
+							},
+							"role": {
+								"title": "Role",
+								"type": "string"
+							},
+							"affiliation": {
+								"title": "Affiliation",
+								"type": "string"
+							},
+							"email": {
+								"title": "Email",
+								"type": "string"
+							},
+							"telephone": {
+								"title": "Telephone",
+								"type": "string"
+							},
+							"uri": {
+								"title": "URI",
+								"type": "string"
 							}
 						}
 					},

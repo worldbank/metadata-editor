@@ -236,6 +236,29 @@ class Editor_resource_model extends ci_model {
 		);
 	}
 
+
+	/**
+	 * 
+	 * Delete thumbnail
+	 * 
+	 */
+	function delete_thumbnail($sid)
+	{
+		$thumbnail_path=$this->Editor_model->get_thumbnail_file($sid);
+
+		if (!$thumbnail_path){
+			return false;
+		}
+
+		if (file_exists($thumbnail_path)){
+			unlink($thumbnail_path);
+		}
+
+		return true;
+	}
+
+	
+
 	/**
 	 * 	
 	 *
@@ -702,6 +725,19 @@ class Editor_resource_model extends ci_model {
         return $result['files'];        
     }
 
+
+	/**
+	 * 
+	 * return project files as a nested tree
+	 */
+	function files_tree($sid) 
+    {
+        $this->load->helper("file");
+        $project_folder=$this->Editor_model->get_project_folder($sid);
+        $result=get_dir_recursive($project_folder,$make_relative_to=$project_folder);
+        return $result['files'];        
+    }
+
 	/**
 	 * 
 	 * 
@@ -976,6 +1012,74 @@ class Editor_resource_model extends ci_model {
 		if ($resource){
 			$this->delete_file($sid,'documentation',$resource['filename']);
 		}
+	}
+
+
+	function unzip_resource_file($sid,$resource_id)	
+	{
+		$resource=$this->select_single($sid,$resource_id);
+
+		if (!$resource || !$resource['filename']){
+			throw new Exception("Resource not found or filename not set");
+		}
+
+		//get resource filename extension
+		$ext=pathinfo($resource['filename'], PATHINFO_EXTENSION);
+
+		//get file name without extension
+		$filename=pathinfo($resource['filename'], PATHINFO_FILENAME);
+
+		if ($ext!=='zip'){
+			throw new Exception("Not a zip file");
+		}
+		
+		$project_folder=$this->Editor_model->get_project_folder($sid);
+		$resource_file=$project_folder.'/documentation/'.$resource['filename'];
+
+		$zip = new ZipArchive;
+		$res = $zip->open($resource_file);
+		if ($res === TRUE) {
+			$zip->extractTo($project_folder.'/tmp/'.$filename);
+			$zip->close();
+			return true;
+		} else {
+			throw new Exception("Failed to extract zip file");
+		}		
+	}
+
+	function unzip_file($sid,$file_name)
+	{
+		$project_folder=$this->Editor_model->get_project_folder($sid);
+		
+		$file_name=substr($file_name,1);
+		$file_parts=explode("/",$file_name);
+
+		if (!in_array($file_parts[0],array_keys($this->documentation_types))){
+			throw new Exception("Invalid file path");
+		}
+
+		$file_path=$project_folder.'/'.$file_name;
+
+		if (!file_exists($file_path)){
+			throw new Exception("File not found");
+		}
+
+		$ext=pathinfo($file_path, PATHINFO_EXTENSION);
+		$basename_no_ext=pathinfo($file_path, PATHINFO_FILENAME);
+
+		if ($ext!=='zip'){
+			throw new Exception("Not a zip file");
+		}
+
+		$zip = new ZipArchive;
+		$res = $zip->open($file_path);
+		if ($res === TRUE) {
+			$zip->extractTo($project_folder.'/tmp/'.$basename_no_ext);
+			$zip->close();
+			return true;
+		} else {
+			throw new Exception("Failed to extract zip file");
+		}		
 	}
 
 }    

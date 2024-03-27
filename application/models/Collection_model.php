@@ -121,11 +121,11 @@ class Collection_model extends CI_Model {
      * Remove project from collection
      * 
      */
-    function remove_project($collection_id,$sid)
+    function remove_projects($collection_id,$sids)
     {
         $this->db->where('collection_id',$collection_id);
-        $this->db->where('sid',$sid);
-        $this->db->delete('editor_collection_projects');
+        $this->db->where_in('sid',$sids);
+        return $this->db->delete('editor_collection_projects');
     }
 
     /**
@@ -191,6 +191,18 @@ class Collection_model extends CI_Model {
         $this->db->select('id,title');
         $this->db->order_by('title','ASC');
         return $this->db->get('editor_collections')->result_array();
+    }
+
+
+    function get_project_id_by_idno($idno)
+    {
+        $this->db->select('id');
+        $this->db->where('idno',$idno);
+        $result=$this->db->get('editor_projects')->row_array();
+
+        if ($result){
+            return $result['id'];
+        }
     }
 
 

@@ -9,7 +9,8 @@ class Files extends MY_REST_Controller
 		parent::__construct();
 		$this->load->helper("date");
 		$this->load->model("Editor_model");
-		$this->load->model("Editor_datafile_model");		
+		$this->load->model("Editor_datafile_model");
+		$this->load->model("Editor_resource_model");
 		
 		$this->load->library("Editor_acl");
 		$this->is_authenticated_or_die();
@@ -145,6 +146,50 @@ class Files extends MY_REST_Controller
 		}
 	}
 
+
+	/**
+	 * 
+	 * Return all files and folders for a project
+	 * 
+	 */
+	function tree_get($sid=null,$details=0)
+	{
+		try{
+			$sid=$this->get_sid($sid);
+			$exists=$this->Editor_model->check_id_exists($sid);
+
+			if(!$exists){
+				throw new Exception("Project not found");
+			}
+
+			if ($details==1){
+				$details=true;
+			}else{
+				$details=false;
+			}
+
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
+			
+			$this->load->helper("file");
+			$project_folder=$this->Editor_model->get_project_folder($sid);
+			$result=get_dir_tree($project_folder,$make_relative_to=$project_folder);
+			//return $result['files'];       
+			
+
+			$output=array(
+				'files'=>$result
+			);
+
+			$this->set_response($output, REST_Controller::HTTP_OK);			
+		}
+		catch(Exception $e){
+			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	
+
 	/**
 	 * 
 	 * 
@@ -236,8 +281,127 @@ class Files extends MY_REST_Controller
 		catch(Exception $e){
 			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
 		}
+	}
 
 
+	/**
+	 * 
+	 * 
+	 * Unzip resource file to a tmp folder
+	 * 
+	 */
+	function unzip_resource_post($sid=null,$resource_id=null)
+	{
+
+		try{
+			$sid=$this->get_sid($sid);
+			$user=$this->api_user();
+
+			if (!$sid){
+				throw new Exception("Missing parameter: sid");
+			}
+
+			if (!$resource_id){
+				throw new Exception("Missing parameter: resource_id");
+			}
+			
+			$this->editor_acl->user_has_project_access($sid,$permission='edit',$user);
+			$exists=$this->Editor_model->check_id_exists($sid);
+
+			if(!$exists){
+				throw new Exception("Project not found");
+			}
+
+			$result=$this->Editor_resource_model->unzip_resource_file($sid,$resource_id);
+
+			$output=array(
+				'status'=>'success'
+			);
+
+			$this->set_response($output, REST_Controller::HTTP_OK);			
+		}
+		catch(Exception $e){
+			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * 
+	 * 
+	 * Unzip file to a tmp folder
+	 * 
+	 * 
+	 */
+	function unzip_post($sid=null)
+	{
+
+		try{
+			$sid=$this->get_sid($sid);
+			$user=$this->api_user();
+			$file_name=$this->post('file_name');
+			$file_name=urldecode($file_name);
+
+			if (!$sid){
+				throw new Exception("Missing parameter: sid");
+			}
+
+			if (!$file_name){
+				throw new Exception("Missing parameter: file_name");
+			}
+
+			$this->editor_acl->user_has_project_access($sid,$permission='edit',$user);
+			$exists=$this->Editor_model->check_id_exists($sid);
+
+			if(!$exists){
+				throw new Exception("Project not found");
+			}
+
+			$result=$this->Editor_resource_model->unzip_file($sid,$file_name);
+
+			$output=array(
+				'status'=>'success'
+			);
+
+			$this->set_response($output, REST_Controller::HTTP_OK);			
+		}
+		catch(Exception $e){
+			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	/**
+	 * 
+	 * Delete project thumbnail
+	 * 
+	 */
+	function thumbnail_delete($sid=null)
+	{
+		try{
+			$sid=$this->get_sid($sid);
+			$user=$this->api_user();
+
+			$this->editor_acl->user_has_project_access($sid,$permission='edit',$user);
+			$result=$this->Editor_resource_model->delete_thumbnail($sid);
+			
+			$response=array(
+				'result'=>$result
+			);
+
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	//alieas for thumbnail_delete
+	function delete_thumbnail_post($sid=null){
+		return $this->thumbnail_delete($sid);
 	}
 
 }

@@ -186,7 +186,7 @@ class Collections extends MY_REST_Controller
 			if (isset($options['id_format']) && $options['id_format']=='idno'){
 				
 				$sid_arr=array();
-				foreach($options['projects'] as $idno){
+				foreach((array)$options['projects'] as $idno){
 					$sid=$this->get_sid($idno);
 					$sid_arr[]=$sid;
 				}
@@ -210,20 +210,34 @@ class Collections extends MY_REST_Controller
 		}
 	}
 
-	function remove_project_post($collection_id=null,$project_id=null)
+	function remove_projects_post()
 	{		
 		try{
 			$this->has_access($resource_='collection',$privilege='edit');
+			$options=$this->raw_json_input();
 
-			if (!$collection_id){
+			if (!isset($options['collection_id'])){
 				throw new Exception("Missing parameter: collection_id");
 			}
 
-			if (!$project_id){
-				throw new Exception("Missing parameter: project_id");
+			if (!isset($options['projects'])){
+				throw new Exception("Missing parameter: projects");
 			}
 
-			$result=$this->Collection_model->remove_project($collection_id, $project_id);
+			$sid_arr=array();
+			if (isset($options['id_format']) && $options['id_format']=='idno'){
+				foreach((array)$options['projects'] as $idno){
+					$sid=$this->Collection_model->get_project_id_by_idno($idno);
+					$sid_arr[]=$sid;
+				}				
+			}
+
+			if (count($sid_arr)==0){
+				throw new Exception("projects were not found");
+			}
+			
+
+			$result=$this->Collection_model->remove_projectS($options['collection_id'], $sid_arr);
 
 			$output=array(
 				'status'=>'success'
