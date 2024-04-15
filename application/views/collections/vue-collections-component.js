@@ -4,7 +4,9 @@ Vue.component('vue-collection', {
         return {     
             collections: [],
             edit_collection: {},
-            dialog_edit: false       
+            dialog_edit: false,
+            active_tab:1,
+            site_base_url: CI.base_url
         }
     },
     
@@ -96,6 +98,14 @@ Vue.component('vue-collection', {
                         <div class="projects col">
 
                             <h3 class="mt-3 mb-5">Collections</h3>
+
+                            <v-tabs background-color="transparent" v-model="active_tab">
+                                <v-tab><v-icon>mdi-text-box</v-icon> <a :href="site_base_url + '/editor'">{{$t("projects")}}</a></v-tab>
+                                <v-tab active><v-icon>mdi-folder-text</v-icon> <a :href="site_base_url + '/collections'">{{$t("collections")}}</a> </v-tab>
+                                <!--<v-tab>Archives</v-tab>-->
+                                <v-tab><v-icon>mdi-alpha-t-box</v-icon> <a :href="site_base_url + '/templates'">{{$t("templates")}}</a></v-tab>
+                            </v-tabs>
+
 
                             <div class="d-flex justify-content-end">
                                 <button type="button" class="btn btn-sm btn-primary" @click="createCollection">Create new collection</button>

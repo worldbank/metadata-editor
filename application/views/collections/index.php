@@ -10,10 +10,13 @@
     <script src="https://adminlte.io/themes/v3/plugins/jquery/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/moment@2.26.0/moment.js"></script>
+    <script src="https://unpkg.com/vue-i18n@8"></script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
 
+    
     <style>
+        <?php echo $this->load->view('metadata_editor/styles.css', null, true); ?>
         .capitalize {
             text-transform: capitalize;
         }
@@ -27,6 +30,11 @@
             font-size: 0.7rem;
             line-height: 1.4;
             border-radius: 0.2rem;
+        }
+
+        .v-tabs-bar{
+            background-color: transparent!important;
+            margin-bottom:50px;
         }
     </style>
 </head>
@@ -47,7 +55,7 @@
         
 
         <div class="wrapper">
-            <?php echo $this->load->view('editor_common/header', null, true); ?>
+            <?php echo $this->load->view('editor_common/global-header', null, true); ?>
             <router-view :key="$route.fullPath"></router-view>
         </div>
 
@@ -121,10 +129,38 @@
             routes // short for `routes: routes`
         })
 
+
+        <?php 
+        $translations="";
+        ?>
+
+        const translation_messages = {
+        default: <?php echo json_encode($translations,JSON_HEX_APOS);?>
+        }
+
+        const i18n = new VueI18n({
+        locale: 'default', // set locale
+        messages: translation_messages, // set locale messages
+        })
+
+        const vuetify = new Vuetify({
+            theme: {
+            themes: {
+                light: {
+                primary: '#526bc7',
+                secondary: '#b0bec5',
+                accent: '#8c9eff',
+                error: '#b71c1c',
+                },
+            },
+            },
+        })
+
         vue_app = new Vue({
             el: '#app',
+            i18n: i18n,
             router: router,
-            vuetify: new Vuetify(),
+            vuetify: vuetify,
             data: {                
             }
         })
