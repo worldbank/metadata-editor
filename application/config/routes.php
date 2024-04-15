@@ -47,12 +47,13 @@
 | Examples:	my-controller/index	-> my_controller/index
 |		my-controller/my-method	-> my_controller/my_method
 */
-$route['default_controller'] = 'page/home';
+$route['default_controller'] = 'projects';
 $route['404_override'] = 'page';
 $route['translate_uri_dashes'] = FALSE;
 
 $route['switch_language/(.*)'] = "page/switch_language/$1";
 $route['home'] = "page/home";
+$route['about'] = "page/about";
 
 $route['editor'] = "projects";
 $route['editor/(.*)'] = "projects/$1";
