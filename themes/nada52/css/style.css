@@ -204,3 +204,22 @@ footer .footer .social-icon ul li a:hover {
     text-decoration: none;
     opacity: .5;
 }
+
+.main-header{
+    background-color: #0c1a4d;
+}
+
+/* override colors */
+.btn-primary{
+    background-color: #526bc7;
+    border-color: #526bc7;
+}
+
+.btn-primary:hover{
+    background-color: #283564;
+    border-color: #283564;
+}
+
+.btn-link,a {
+    color: #526bc7;
+}

@@ -15,7 +15,7 @@
 <?php endif;?>    
 
 <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
-<link rel="stylesheet" href="<?php echo base_url().$bootstrap_theme ?>/css/style.css?v2023">
+<link rel="stylesheet" href="<?php echo base_url().$bootstrap_theme ?>/css/style.css?v2024">
 
 <?php if($use_cdn):?>
     <script src="//code.jquery.com/jquery-3.7.1.min.js"></script>
