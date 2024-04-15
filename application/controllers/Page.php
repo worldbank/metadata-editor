@@ -25,6 +25,11 @@ class Page extends MY_Controller {
 		$this->template->write('content', $content,true);
 	  	$this->template->render();
 	}
+
+	function about()
+	{
+		return $this->home();
+	}
 	
 	function switch_language($lang=NULL)
 	{
