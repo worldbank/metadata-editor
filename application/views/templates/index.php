@@ -34,6 +34,10 @@
 <style>
   <?php //echo $this->load->view('metadata_editor/bootstrap-forms.css',null,true); 
   ?><?php echo $this->load->view('metadata_editor/styles.css', null, true); ?>
+
+  .navigation-tabs .v-tabs-bar{
+    background-color: transparent!important;    
+  }
 </style>
 
 <body class="layout-top-nav">
@@ -48,7 +52,7 @@
 
     <div class="wrapper">
 
-      <?php echo $this->load->view('editor_common/header', null, true); ?>
+      <?php echo $this->load->view('editor_common/global-header', null, true); ?>
 
       <div class="content-wrapper" style="overflow:auto;height:100vh">
         <section class="content">
@@ -61,6 +65,15 @@
 
                 <div class=" mb-5">
                   <h2>{{$t('template_manager')}}</h2>
+
+                        <v-tabs background-color="transparent" class="navigation-tabs mb-5 mt-3" v-model="nav_tabs_active">
+                          <v-tab href="<?php echo site_url('projects');?>"><v-icon>mdi-text-box</v-icon>  {{$t("projects")}}</v-tab>
+                          <v-tab href="<?php echo site_url('collections');?>"><v-icon>mdi-folder-text</v-icon> {{$t("collections")}} </v-tab>
+                          <!--<v-tab>Archives</v-tab>-->
+                          <v-tab href="<?php echo site_url('templates');?>"><v-icon>mdi-alpha-t-box</v-icon> {{$t("templates")}}</v-tab>
+                        </v-tabs>
+
+
                   <div class="pull-right float-right">
                     <button type="button" @click="showImportTemplateDialog" class="btn btn-sm btn-outline-primary">{{$t('import_template')}}</button>
                   </div>
@@ -280,7 +293,8 @@
         menu_x: 0,
         menu_y: 0,
         menu_active_template_id: null,
-        menu_active_template_core: false
+        menu_active_template_core: false,
+        nav_tabs_active:2
       },
       created: async function() {
         //await this.$store.dispatch('initData',{dataset_idno:this.dataset_idno});
