@@ -64,7 +64,8 @@ class Editor_model extends CI_Model {
 		'varcount',
 		'created_by',
 		'changed_by',
-		'is_shared'
+		'is_shared',
+		"thumbnail"
 		);
 	
 
@@ -590,8 +591,11 @@ class Editor_model extends CI_Model {
 		}
 
 		//partial update metadata
-		if (isset($options['partial_update']) && $options['partial_update']==true){
-			$options=$this->apply_partial_update($id,$options);
+		if (isset($options['partial_update'])){
+			if ($options['partial_update']==true){
+				$options=$this->apply_partial_update($id,$options);
+			}
+			unset($options['partial_update']);
 		}
 		
 		$options=array(
@@ -1327,7 +1331,7 @@ class Editor_model extends CI_Model {
 		$thumbnail=$this->get_thumbnail($sid);
 
 		if(!$thumbnail){
-			return false;
+			throw new Exception("Thumbnail not found");
 		}
 
 		if (!$project_folder || !file_exists($project_folder)){
@@ -1342,6 +1346,8 @@ class Editor_model extends CI_Model {
 			die();
 			//$this->load->helper("download");
 			//force_download2($thumbnail_path);			
+		}else{
+			throw new Exception("Thumbnail not found");
 		}
 	}
 
@@ -1505,7 +1511,8 @@ class Editor_model extends CI_Model {
 
 		$metadata=(array)$project['metadata'];
 		$basic_info=array(
-			'type'=>$project['type']
+			'type'=>$project['type'],
+			'idno'=>$project['idno'],
 		);
 		
 		$output=array_merge($basic_info, $metadata );
@@ -1631,9 +1638,10 @@ class Editor_model extends CI_Model {
 	function get_indexed_variable_category_labels($cat_labels)
 	{
 		$output=array();
-		foreach($cat_labels as $cat)
-		{
-			$output[$cat['value']]=$cat['labl'];
+		foreach($cat_labels as $cat){
+			if (isset($cat['labl']) && isset($cat['value'])){
+				$output[$cat['value']]=$cat['labl'];
+			}
 		}
 
 		return $output;
