@@ -62,7 +62,10 @@
 <body class="hold-transition sidebar-mini layout-fixed">
 
     <script>
-        var CI = {'base_url': '<?php echo site_url();?>'}; 
+        var CI = {
+          'base_url': '<?php echo site_url();?>',
+          'base_asset_url': '<?php echo base_url();?>',
+        }; 
         let sid='<?php echo $sid;?>';
         let form_template=<?php echo $metadata_template;?>;
         let form_template_parts= <?php echo json_encode($template_parts,JSON_PRETTY_PRINT); ?>;
@@ -108,9 +111,6 @@
     <script src="<?php echo base_url();?>javascript/splitpanes.umd.min.js"></script>
     
 
-
-
-
 <!-- CDNJS :: Sortable (https://cdnjs.com/) -->
 <script src="//cdn.jsdelivr.net/npm/sortablejs@1.8.4/Sortable.min.js"></script>
 <!-- CDNJS :: Vue.Draggable (https://cdnjs.com/) -->
@@ -151,10 +151,23 @@
       return (val / (1024*1024)).toFixed(2) + ' MB';
     });
 
+    const vuetify = new Vuetify({
+    theme: {
+        themes: {
+          light: {
+            primary: '#526bc7',
+            secondary: '#b0bec5',
+            accent: '#8c9eff',
+            error: '#b71c1c',
+          },
+        },
+      },
+    })
+
     vue_app=new Vue({
       el: '#app',
       i18n,
-      vuetify: new Vuetify(),
+      vuetify: vuetify,
       router:router,
       store,
       data:{          
@@ -194,6 +207,7 @@
         tree: [],
         items: [],
         tree_active_items:[],
+        tree_search:'',
         login_dialog:false,
         show_fields_mandatory:false,
         show_fields_recommended:false,
@@ -269,6 +283,8 @@
             if (!title_){
               return "Untitled";
             }
+
+            return title_;
 
             return _.truncate(title_, {
               'length': 60,
@@ -383,8 +399,58 @@
             set(val){
               return this.$store.state.treeItems=val;
             }
-        }
-        
+        },
+        Items:function(){
+          
+          if (!this.tree_search || this.tree_search.length<1){
+            return this.items; 
+          }
+            
+          //keyword search
+          let search_keywords=this.tree_search.toLowerCase().split(" ");
+          let recursive_keyword_search=function(items){
+            let filtered_items=[];
+            for (let item of items){
+                if (item.items){
+                  let children=recursive_keyword_search(item.items);
+                  if (children.length>0){
+                    item.items=children;
+                    filtered_items.push(item);
+                  }
+                }else{
+                  
+                  let item_title=item.title.toLowerCase();
+                  let item_key=item.key.toLowerCase();
+                  let item_help_text='';
+
+                  if (item.help_text){
+                    item_help_text=item.help_text.toLowerCase();
+                  }
+                  
+                  let found=false;
+                  for (let keyword of search_keywords){
+                    if (item_title.includes(keyword) 
+                        || item_key.includes(keyword) 
+                        || item_help_text.includes(keyword) 
+                      ){
+                      found=true;                        
+                    }else{
+                      found=false;
+                      break;
+                    }
+                  }
+
+                  if (found){
+                    filtered_items.push(item);
+                  }
+
+                }
+            }
+            return filtered_items;
+          }
+
+          return recursive_keyword_search(JSON.parse(JSON.stringify(this.items)));
+        }        
       },      
       watch: {
         '$store.state.formTemplate': function() {

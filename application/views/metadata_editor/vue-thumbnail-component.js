@@ -6,7 +6,9 @@ Vue.component('project-thumbnail', {
             file:'',
             thumbnail:'',
             image_error:false,
-            errors:[]
+            errors:[],
+            base_asset_url: CI.base_asset_url,
+            placeholder_thumbnail: CI.base_asset_url + '/files/placeholder.png'
         }
     },
     created: function(){
@@ -19,6 +21,19 @@ Vue.component('project-thumbnail', {
         imageLoadError: function()
         {
             this.image_error=true;
+        },
+        RemoveThumbnail: function(){
+            let url=CI.base_url + '/api/files/delete_thumbnail/'+ this.ProjectID;
+            vm=this;
+            axios.post(url)
+            .then(function(response){
+                vm.thumbnail=vm.placeholder_thumbnail
+                vm.show_dialog=false;
+            })
+            .catch(function(response){
+                vm.errors=response;
+                alert("Failed to remove thumbnail", response.data.message);
+            });
         },
         UploadThumbnail: function(){
             let formData = new FormData();
@@ -42,6 +57,7 @@ Vue.component('project-thumbnail', {
             })
             .catch(function(response){
                 vm.errors=response;
+                alert("Failed to upload thumbnail", response.data.message);
             });
         }   
     },
@@ -53,14 +69,27 @@ Vue.component('project-thumbnail', {
     },  
     template: `
             <div class="thumbnail-component">
+
                 <div class="row">
-                    <div class="col-4" @click="show_dialog=true">
-                        <div v-if="image_error==true">
-                            <!--<i class="far fa-image" style="font-size:125px;"></i>-->
-                            <v-icon style="font-size:125px;">mdi-image-edit-outline</v-icon>
+                    <div class="col-12" @click="show_dialog=true">
+                        <div>
+                            <div class="text-center text-no-wrap rounded-xl" style="background:#4b6dce;">
+                                <v-img
+                                    :lazy-src="base_asset_url + '/files/placeholder.png'" 
+                                    max-height="200"
+                                    border
+                                    contain                               
+                                    :src="thumbnail" 
+                                    class="rounded-xl"                                                                   
+                                >
+                                <v-btn                                 
+                                    style="position:absolute; right:10px; bottom:10px;"
+                                    fab x-small color="white" @click="show_dialog=true" ><v-icon>mdi-pencil</v-icon></v-btn>
+                                </v-img>                                
+                            </div>
+
                         </div>
-                        <div v-if="image_error==false"><img class="img-fluid" style="max-width:150px;max-height:150px;" :src="thumbnail" @error="imageLoadError"/></div>
-                        <button type="button"  @click="show_dialog=true" class="btn btn-link">{{$t("change_thumbnail")}}</button>
+                        
                     </div>
                     <div class="col-auto">
                         
@@ -94,21 +123,28 @@ Vue.component('project-thumbnail', {
                             <v-divider></v-divider>
 
                             <v-card-actions>
-                            <v-spacer></v-spacer>
-                            <v-btn 
-                                color="secondary"
-                                text
-                                @click="show_dialog=false"
-                            >
-                            {{$t("cancel")}}
-                            </v-btn>
-                            <v-btn :disabled="!file"
-                                color="primary"
-                                text
-                                @click="UploadThumbnail()"
-                            >
-                                {{$t("upload")}}
-                            </v-btn>
+                                <v-btn 
+                                    color="secondary"
+                                    text
+                                    @click="RemoveThumbnail"
+                                >
+                                {{$t("remove")}}
+                                </v-btn>
+                                <v-spacer></v-spacer>
+                                <v-btn 
+                                    color="secondary"
+                                    text
+                                    @click="show_dialog=false"
+                                >
+                                {{$t("cancel")}}
+                                </v-btn>
+                                <v-btn :disabled="!file"
+                                    color="primary"
+                                    text
+                                    @click="UploadThumbnail()"
+                                >
+                                    {{$t("upload")}}
+                                </v-btn>
                             </v-card-actions>
                         </v-card>
                         </v-dialog>

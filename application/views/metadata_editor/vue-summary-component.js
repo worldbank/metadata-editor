@@ -139,29 +139,40 @@ Vue.component('summary-component', {
             <div class="summary-component mt-3 container-fluid">
 
                 <div class="row">
-                    <div class="col-6">
+                    <div class="col-12">
                         <v-card>
                             <v-card-text>
                             <div class="row">
-                            <div class="col-4" >
+                            <div class="col-3" >
                                 <div class="thumbnail-container">
                                     <project-thumbnail/>
                                 </div>
                             </div>
-                            <div class="col-8 border-left" >
+                            <div class="col-9" >
                             
                             <!-- project info -->
+
+                            <div class="col-12 bg-light mb-3" >
+                                <div>
+                                    <div><v-icon style="font-size:25px;">mdi-alpha-t-box</v-icon> {{$t("template")}}</div>
+                                    <div class="mt-1">
+                                        <v-btn text color="primary" @click="dialog_template=true">
+                                            {{ProjectTemplate.name}}
+                                        </v-btn>
+                                    </div>
+                                </div>
+                            </div>
 
                             <div class="project-info-container row">
                                 <div class="col-6">
 
                                     <div class="mb-3">
-                                        <strong>{{$t("project_owner")}}:</strong> 
+                                        <strong>{{$t("Project owner")}}:</strong> 
                                         <div class="text-capitalize">{{project_edit_stats.username}}</div>
                                     </div>
 
                                     <div class="mb-3">
-                                        <strong>{{$t("last_changed_by")}}:</strong>
+                                        <strong>{{$t("Last changed by")}}:</strong>
                                         <div class="text-capitalize">{{project_edit_stats.username_cr}}</div>
                                     </div>                                    
 
@@ -169,30 +180,16 @@ Vue.component('summary-component', {
                                 <div class="col-6">
                                 
                                     <div class="mb-3">
-                                        <strong>{{$t("created_on")}}:</strong>
+                                        <strong>{{$t("Created on")}}:</strong>
                                         <div>{{momentDate(project_edit_stats.created)}}</div>
                                     </div>
 
                                     <div class="mb-3">
-                                        <strong>{{$t("changed_on")}}:</strong>
+                                        <strong>{{$t("Changed on")}}:</strong>
                                         <div>{{momentDate(project_edit_stats.changed)}}</div>
                                     </div>
                                 
                                 </div>
-
-                                <div class="col-12">
-
-                                    
-                                    <div>
-                                        <div><v-icon style="font-size:25px;">mdi-alpha-t-box</v-icon> {{$t("template")}}</div>
-                                        <div class="border-top mt-1">
-                                            <div class="btn btn-link text-left" style="font-size:12px;" @click="dialog_template=true">
-                                                {{ProjectTemplate.name}} <v-icon>mdi-square-edit-outline</v-icon>                                                
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                    </div>
 
                             </div>
 
@@ -204,10 +201,10 @@ Vue.component('summary-component', {
                                 
                             </v-card-text>                     
                         </v-card>
+                    </div>
 
-
-
-                        <v-card class="project-validation-container  mt-3">
+                    <div class="col-6">
+                    <v-card class="project-validation-container">
                             <v-card-text>
                             <h5>{{$t("project_validation")}}</h5>                            
 
@@ -222,29 +219,23 @@ Vue.component('summary-component', {
                             <div class="mt-3 p-2 border" style="color:green" v-else>{{$t("no_validation_errors")}}</div>
                             </v-card-text>
                         </v-card>
-
-
                     </div>
 
                     <div class="col-6" >
-
-                        <v-card class="mb-2">
+                        <v-card>
                             <v-card-text>
-                                <h6>{{$t("disk_usage")}}</h6>
-                                <div v-if="project_disk_usage.size_formatted">{{project_disk_usage.size_formatted}}</div>
-                                <div v-else>-</div>
+                                <div class="d-flex justify-content-between">
+                                    <h6>{{$t("Project info")}}</h6>
+                                    <div v-if="project_disk_usage.size_formatted">
+                                        <span>{{$t("Disk usage")}} </span>
+                                        <span class="success--text ml-2">{{project_disk_usage.size_formatted}}</span>
+                                    </div>
+                                </div>
+                                <div class="files-container " v-if="ProjectType!=='timeseries-db'" style="max-height:400px;overflow:auto;">
+                                <summary-files></summary-files>
+                                </div>
                             </v-card-text>
                         </v-card>
-
-                        <v-card>
-                        <v-card-text>
-                            <h6>{{$t("project_information")}}</h6>
-                            <div class="files-container " v-if="ProjectType!=='timeseries-db'" style="max-height:400px;overflow:auto;">
-                             <summary-files></summary-files>
-                            </div>
-                        </v-card-text>
-                    </v-card>
-
                     </div>
 
 
@@ -256,6 +247,7 @@ Vue.component('summary-component', {
                         <template class="project-template">
                             <div class="text-center">
                                 <v-dialog
+                                style="z-index:5000"
                                 v-model="dialog_template"
                                 max-width="700px"
                                 scrollable

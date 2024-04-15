@@ -1,7 +1,16 @@
 html { overflow-y: auto } 
 
+#app ,
+.theme--light.v-application{
+    font-family: Roboto,sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #f3f5fb;
+}
+
 .editor-sidebar {
      overflow: auto;
+     overflow-x:hidden;
  }
 
  .pane-main-content {
@@ -21,6 +30,10 @@ html { overflow-y: auto }
 
  .v-expansion-panel-header {
      font-weight: bold;
+ }
+
+ .metadata-form{
+    background:white;
  }
 
  .metadata-form .nested-section {
@@ -94,7 +107,7 @@ html { overflow-y: auto }
  }
 
  .v-treeview-node__root:hover {
-     background: #ececec37;
+     /*background: #ececec37;*/
      cursor: pointer;
  }
 
@@ -153,10 +166,6 @@ html { overflow-y: auto }
  .grid-component {
      background: white;
      padding-bottom: 10px;
- }
-
- .nav-link {
-     color: #007bff !important;
  }
 
  .nav-active {
@@ -517,16 +526,12 @@ html { overflow-y: auto }
      margin-left: -5px;
  }
 
- .editor-sidebar {
+ /*.editor-sidebar {
      background: #00060c !important;
- }
-
- .pane-main-content {
-     background: white !important;
- }
+ }*/
 
  .bg-variable {
-     background: rgb(0 0 0 / 12%);
+     background: #526cc742;
  }
 
  .var-icon {
@@ -572,6 +577,7 @@ html { overflow-y: auto }
 
  .variable-documentation-container {
      font-size: small;
+     border-right:1px solid;
  }
 
  .switch-field label {
@@ -579,6 +585,9 @@ html { overflow-y: auto }
      font-size: 14px;
  }
 
+ #variables-table tbody tr:nth-of-type(odd){
+    background: #d2d9f19e !important;
+ }
 
 
  .var-vid-td {
@@ -636,6 +645,7 @@ html { overflow-y: auto }
      height: 100vh;
      overflow: auto;
      padding: 10px;
+     background:white;
  }
 
  .variable-frequencies .progress-text {
@@ -656,7 +666,7 @@ html { overflow-y: auto }
      display: none;
  }
 
-
+/*
  .v-treeview-node__content, .v-treeview-node__label {
      flex-shrink: 1;
  }
@@ -674,19 +684,20 @@ html { overflow-y: auto }
  .v-treeview .v-icon{
     color: #6c757d !important
  }
-
+*/
 
  .editor-sidebar::-webkit-scrollbar{
-    width:10px;
+    width:8px;
  }
 
  .editor-sidebar::-webkit-scrollbar-track{
-    border-radius: 20px;
+    border-radius: 0px;
+    background:#223974;
  }
 
  .editor-sidebar::-webkit-scrollbar-thumb{
-    width:24px;
-    background:#a6a6a7;
+    width:14px;
+    background:#526bc7;
     border-radius: 15px;
  }
 
@@ -698,3 +709,399 @@ html { overflow-y: auto }
     border-left: 0px solid white;
     margin-left: -1px;
  }
+ 
+
+ /* side navigation tree */
+ #app .side-navigation {
+    background-color: #223974;
+}
+
+#app .side-navigation__inner {
+    padding: 1.25rem;
+    height: 98%
+}
+
+#app .side-navigation__inner::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+    background-color: #223974
+}
+
+#app .side-navigation__inner::-webkit-scrollbar {
+    width: 6px;
+    background-color: #223974
+}
+
+#app .side-navigation__inner::-webkit-scrollbar-thumb {
+    background-color: #223974
+}
+
+#app .side-navigation__header {
+    font-weight: 600
+}
+
+#app .side-navigation .v-icon {
+    font-size: 20px
+}
+
+#app .side-navigation .v-input .v-text-field__details {
+    display: none
+}
+
+#app .side-navigation .v-treeview-node__root {
+    position: relative;
+    padding: 0
+}
+
+#app .side-navigation .v-treeview-node__root::before {
+    display: none
+}
+
+#app .side-navigation .v-treeview-node__toggle {
+    position: absolute;
+    right: 0;
+    -webkit-transform: none;
+    -ms-transform: none;
+    transform: none;
+    z-index:1000
+}
+
+#app .side-navigation .v-treeview-node__toggle:focus::after {
+    display: none
+}
+
+#app .side-navigation .v-treeview-node__toggle--open {
+    -webkit-transform: rotate(-180deg);
+    -ms-transform: rotate(-180deg);
+    transform: rotate(-180deg)
+}
+
+#app .side-navigation .v-treeview-node__content {
+    /*font-weight: 600;*/
+    margin: 0;
+    padding: 8px;
+    -webkit-transition: .3s ease-in-out;
+    transition: .3s ease-in-out;
+    border-radius: 8px;
+    z-index: 6
+}
+
+#app .side-navigation .v-treeview-node__prepend:has(.no-icon) {
+    display: none
+}
+
+#app .side-navigation .v-treeview-node__label {
+    max-width: 170px
+}
+
+#app .side-navigation .v-treeview-node__level {
+    width: 10px;
+    height: 50%;
+    position: absolute;
+    /*border-bottom-left-radius: 5px;
+    border-top-left-radius: 0;*/
+    top: 2px;
+    left: -1px;
+    border-right: 0 !important
+}
+
+#app .side-navigation .v-treeview-node__level::after {
+    content: "";
+    height: calc(50% + 1px);
+    width: 10px;
+    min-height: unset;
+    position: absolute;
+    top: -2px;
+    left: 0;
+    border-bottom-left-radius: 4px;
+    border-right: 0;
+    border-top: 0
+}
+
+#app .side-navigation .v-treeview-node__level:not(:first-of-type) {
+    display: none
+}
+
+#app .side-navigation .v-treeview-node__children .v-treeview-node {
+    margin-left: 17px
+}
+
+#app .side-navigation .v-treeview-node__children .v-treeview-node__content {
+    font-weight: 400;
+    margin-left: 8px
+}
+
+#app .side-navigation .v-treeview-node__children .v-treeview-node__content .v-icon {
+    font-size: 18px
+}
+
+#app .side-navigation .v-treeview-node__children .v-treeview-node__root {
+    padding: 0
+}
+
+#app .side-navigation .v-treeview-node__children .v-treeview-node__children .v-treeview-node__level {
+    left: -.8px
+}
+
+#app .side-navigation .v-treeview>.v-treeview-node>.v-treeview-node__children>.v-treeview-node>.v-treeview-node__children>.v-treeview-node:last-child .v-treeview-node__level {
+    left: 0;
+    top: 0
+}
+
+.editor-sidebar
+{
+    background:#223974!important;
+}
+
+#app .side-navigation {
+    color: #a2b0e1;
+    width:98%;
+}
+
+#app .side-navigation .v-icon {
+    color: #a2b0e1
+}
+
+#app .side-navigation .header-icon {
+    color: #fff
+}
+
+#app .side-navigation .v-btn.v-btn--icon:not(.v-treeview-node__toggle):hover {
+    color: #fff !important;
+    background-color: #3d5396 !important;
+    border: 1px solid #fff
+}
+
+#app .side-navigation .v-input .v-icon {
+    color: #a2b0e1 !important
+}
+
+#app .side-navigation .v-input .v-text-field__slot input {
+    color: #fff !important
+}
+
+#app .side-navigation .v-input .v-text-field__slot input::-webkit-input-placeholder {
+    color: #3d5396 !important
+}
+
+#app .side-navigation .v-input .v-text-field__slot input::-moz-placeholder {
+    color: #3d5396 !important
+}
+
+#app .side-navigation .v-input .v-text-field__slot input:-ms-input-placeholder {
+    color: #3d5396 !important
+}
+
+#app .side-navigation .v-input .v-text-field__slot input::-ms-input-placeholder {
+    color: #3d5396 !important
+}
+
+#app .side-navigation .v-input .v-text-field__slot input::placeholder {
+    color: #3d5396 !important
+}
+
+#app .side-navigation .v-treeview-node__root:has(.v-treeview-node__toggle--open) .v-icon, #app .side-navigation .v-treeview-node__root:has(.v-treeview-node__toggle--open) .v-treeview-node__content {
+    color: #fff
+}
+
+#app .side-navigation .v-treeview-node__content {
+    color: #a2b0e1
+}
+
+#app .side-navigation .v-treeview-node__content:hover {
+    background-color: rgba(0,0,0,.22);
+    color: #fff;
+    -webkit-transition: .3s ease-in-out;
+    transition: .3s ease-in-out
+}
+
+.side-navigation .v-treeview-node--active .v-treeview-node__content {
+    background-color:rgba(0,0,0,.38);
+    color: #fff
+}
+
+#app .side-navigation .v-treeview-node__level {
+    border: 1px solid #a2b0e1
+}
+
+#app .side-navigation .v-treeview-node__level::after {
+    background-color: #223974
+}
+
+#app .side-navigation .v-treeview-node__level:not(:first-of-type) {
+    display: none
+}
+
+#app .side-navigation .v-treeview>.v-treeview-node:not(:last-child)>.v-treeview-node__children>.v-treeview-node {
+    border-left: 1px solid #a2b0e1
+}
+
+#app .side-navigation .v-treeview>.v-treeview-node:not(:last-child)>.v-treeview-node__children>.v-treeview-node .v-treeview-node__children .v-treeview-node:not(:last-child) {
+    border-left: 1px solid #a2b0e1
+}
+
+#app .side-navigation.white {
+    color: #858585
+}
+
+#app .side-navigation.white .v-icon:not(.header-icon) {
+    color: #858585
+}
+
+#app .side-navigation.white .header-icon {
+    color: #526bc7
+}
+
+#app .side-navigation.white .v-btn.v-btn--icon:not(.v-treeview-node__toggle):hover {
+    color: #526bc7 !important;
+    background-color: rgba(82, 107, 199, .1) !important;
+    border: 1px solid #526bc7
+}
+
+#app .side-navigation.white .v-input .v-icon {
+    color: #858585 !important
+}
+
+#app .side-navigation.white .v-input .v-text-field__slot input {
+    color: #fff !important
+}
+
+#app .side-navigation.white .v-input .v-text-field__slot input::-webkit-input-placeholder {
+    color: #bdbdbd !important
+}
+
+#app .side-navigation.white .v-input .v-text-field__slot input::-moz-placeholder {
+    color: #bdbdbd !important
+}
+
+#app .side-navigation.white .v-input .v-text-field__slot input:-ms-input-placeholder {
+    color: #bdbdbd !important
+}
+
+#app .side-navigation.white .v-input .v-text-field__slot input::-ms-input-placeholder {
+    color: #bdbdbd !important
+}
+
+#app .side-navigation.white .v-input .v-text-field__slot input::placeholder {
+    color: #bdbdbd !important
+}
+
+#app .side-navigation.white .v-input:not(.v-input--is-focused):not(.v-input--has-state) fieldset {
+    border: 1px solid #858585 !important
+}
+
+#app .side-navigation.white .v-treeview-node__root:has(.v-treeview-node__toggle--open) .v-icon, #app .side-navigation.white .v-treeview-node__root:has(.v-treeview-node__toggle--open) .v-treeview-node__content {
+    color: #526bc7
+}
+
+#app .side-navigation.white .v-treeview-node__content {
+    color: #858585
+}
+
+#app .side-navigation.white .v-treeview-node__content:hover {
+    background-color: rgba(82, 107, 199, .1);
+    color: #526bc7;
+    -webkit-transition: .3s ease-in-out;
+    transition: .3s ease-in-out
+}
+
+#app .side-navigation.white .v-treeview-node__level {
+    border: .8px solid #858585
+}
+
+#app .side-navigation.white .v-treeview-node__level::after {
+    background-color: #fff
+}
+
+#app .side-navigation.white .v-treeview-node__level:not(:first-of-type) {
+    display: none
+}
+
+#app .side-navigation.white .v-treeview>.v-treeview-node:not(:last-child)>.v-treeview-node__children>.v-treeview-node {
+    border-left: 1px solid #858585
+}
+
+#app .side-navigation.white .v-treeview>.v-treeview-node:not(:last-child)>.v-treeview-node__children>.v-treeview-node .v-treeview-node__children .v-treeview-node:not(:last-child) {
+    border-left: 1px solid #858585
+}
+
+/* editor header bar */
+.editor-header {
+    background-color:#0c1a4d;
+    z-index:2000;
+}
+
+.editor-sidebar-header-icons,
+.editor-sidebar-header-icons .v-btn {
+    text-align:center;
+    color:#dce3f7;
+}
+
+.editor-sidebar-header-icons .theme--light.v-icon {
+    color: #dce3f7 !important;
+}
+
+.editor-sidebar-header-icons  .v-btn {
+    /*width: 2.25rem!important;
+    height: 3.25rem!important;*/
+    color: #858585!important;
+    border-radius: 0.5rem!important;
+    letter-spacing: .02em!important;
+    line-height: 20px!important;
+    min-width:20px!important;
+}
+
+.editor-sidebar-header-icons .v-btn:hover {
+    color: #fff!important;
+    background-color: #3d5396!important;
+    border: 1px solid #fff;
+}
+
+.editor-sidebar-header-icons .v-btn.active {
+    color: #fff!important;
+    background-color: #3d5396!important;
+    border: 1px solid #fff;
+}
+
+.editor-sidebar-header fieldset {
+    border: 1px solid #a2b0e1 !important
+}
+
+.editor-sidebar-header .v-input__slot .v-icon,
+.editor-sidebar-header .v-input input{
+    color: #a2b0e1 !important
+}
+.editor-sidebar-header .v-input ::placeholder
+{
+    color:#5b6589 !important
+}
+
+.wrap-text{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* project search box */
+.v-text-field__slot label{
+    font-size: 14px;
+    font-weight: normal;
+}
+
+.search-box .v-text-field--outlined fieldset{
+    top:-2px;
+}
+
+.table-projects tr:hover{
+    cursor: pointer;
+    background: rgba(82,107,199,.1)!important;
+}
+
+
+[v-cloak] {
+    display: none;
+  }
+
+  .v-image__image--preload{
+    filter:none!important;
+}

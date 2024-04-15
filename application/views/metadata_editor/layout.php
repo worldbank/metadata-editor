@@ -1,12 +1,7 @@
 <v-app style="position:relative;height: 100vh">
 
-    
-
-
     <!--header-->
-
-    <?php //echo $this->load->view('metadata_editor/header', array(), true); ?>
-
+    <?php echo $this->load->view('editor_common/global-header', array(), true); ?>
     <!--end-header-->
 
     <?php /* <div class="row no-gutters">
@@ -17,13 +12,39 @@
 
             <div class="container-fluid-x  pt-2 pb-3 editor-sidebar editor-sidebar-container" >
 
-                <div class="p-1 mb-3 pl-2 sticky-top" style="border-bottom:1px solid #343a40; color:#343a40">
-                    <a href="<?php echo site_url('projects');?>" class="navbar-brand">
-                        <i class="fas fa-compass" ></i> 
-                        <span class="brand-text font-weight-light color-white">Metadata Editor</span>
-                    </a>
+
+            <div class="editor-sidebar-header pa-5 pt-0">
+            <div class="editor-sidebar-header-icons d-flex justify-center align-center mb-5" >
+                
+                <div class="text-center pa-2" >
+                    <v-btn text outlined title="Show mandatory fields" :class="{ active: show_fields_mandatory }" @click="toggleFields('mandatory')">
+                        <v-icon class="icon">mdi-check-circle</v-icon>
+                    </v-btn>
+                    <div class="text-capitalize"><small>Required</small></div>
                 </div>
 
+                <div class="text-center pa-2" >
+                    <v-btn text outlined title="Show recommended fields" :class="{ active: show_fields_recommended }" @click="toggleFields('recommended')">
+                        <v-icon class="icon">mdi-circle-half-full</v-icon>
+                    </v-btn>
+                    <div class="text-capitalize"><small>Recommended</small></div>
+                </div>
+
+                <div class="text-center pa-2" >
+                    <v-btn text outlined title="Show empty fields" :class="{ active: show_fields_empty }" @click="toggleFields('empty')">
+                        <v-icon class="icon">mdi-circle-outline</v-icon>
+                    </v-btn>
+                    <div class="text-capitalize"><small>Empty</small></div>
+                </div>
+
+            </div>
+
+            <div class="mt-2" >
+                <v-text-field outlined clearable dense label="" v-model:value="tree_search" placeholder="Search..." prepend-inner-icon="mdi-magnify" ></v-text-field>
+            </div>
+            </div>
+
+                <?php /*
                 <!-- icons -->
                 <div class="pb-2 mb-3 sidebar-menu-bar d-flex justify-content-center" style="border-bottom:1px solid #343a40; color:#343a40">
 
@@ -51,6 +72,7 @@
 
                 </div>
                 <!-- end-icons -->
+                */ ?>
 
                 <?php /*
                 <div>
@@ -68,8 +90,23 @@
 
 
 
-                <div class="mb-5" >
-                    <v-treeview color="warning" v-model="tree" :active.sync="tree_active_items" @update:open="treeOnUpdate" :open.sync="initiallyOpen" :items="items" activatable dense item-key="key" item-text="title" expand-icon="mdi-chevron-down" indeterminate-icon="mdi-bookmark-minus" on-icon="mdi-bookmark" off-icon="mdi-bookmark-outline" item-children="items">
+                <div class="mb-5 ml-2 pr-3 side-navigation" >
+
+
+                    <v-treeview 
+                        color="warning" 
+                        v-model="tree" 
+                        :active.sync="tree_active_items" 
+                        @update:open="treeOnUpdate" 
+                        :open.sync="initiallyOpen" 
+                        :items="Items" 
+                        activatable dense item-key="key" 
+                        item-text="title" 
+                        expand-icon="mdi-chevron-down" 
+                        indeterminate-icon="mdi-bookmark-minus" 
+                        on-icon="mdi-bookmark" 
+                        off-icon="mdi-bookmark-outline" 
+                        item-children="items">
 
                         <template #label="{ item }">
                             <span @click="treeClick(item)" :title="item.title" class="tree-item-label">
