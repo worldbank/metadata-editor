@@ -86,8 +86,7 @@ class Editor extends MY_REST_Controller
 				'offset'=>$offset,
 				'limit'=>$limit,
 				'projects'=>$result['result'],
-				'filters'=>$result['filters'],
-				'db_query_'=>$result['db_query']
+				'filters'=>$result['filters']				
 			);
 						
 			$this->set_response($response, REST_Controller::HTTP_OK);
