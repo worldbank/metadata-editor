@@ -77,6 +77,7 @@ Vue.component('project-thumbnail', {
                                 <v-img
                                     :lazy-src="base_asset_url + '/files/placeholder.png'" 
                                     max-height="200"
+                                    aspect-ratio="1"
                                     border
                                     contain                               
                                     :src="thumbnail" 
