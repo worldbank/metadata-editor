@@ -76,17 +76,48 @@
                             "help_text": "The date the metadata on this indicator was produced (not distributed or archived), preferably entered in ISO 8601 format (YYYY-MM-DD or YYY-MM). A validation rule can be set in user templates to enforce a date format. This is a \"Recommended\" element, as information on the producer and on the date of metadata production is useful for catalog administration purposes.",
                             "is_recommended": true,
                             "display_type": "text"
-                        },
-                        {
-                            "key": "metadata_information.version",
-                            "title": "Version",
-                            "type": "string",
-                            "help_text": "The version of the metadata document (not the version of the indicator/time series itself).",
-                            "display_type": "text"
                         }
+                        
                     ],
                     "help_text": ""
+                },
+                {
+                    "key": "version-statement-section",
+                    "title": "Version statement",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "metadata_information.version_statement.version",
+                            "title": "Version",
+                            "type": "string",
+                            "help_text": "Version",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "metadata_information.version_statement.version_date",
+                            "title": "Date",
+                            "type": "string",
+                            "help_text": "Date",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "metadata_information.version_statement.version_notes",
+                            "title": "Version notes",
+                            "type": "string",
+                            "help_text": "Notes",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "metadata_information.version_statement.version_resp",
+                            "title": "Version responsibility",
+                            "type": "string",
+                            "help_text": "",
+                            "display_type": "text"
+                        }
+
+                    ]
                 }
+
             ]
         },
         {
@@ -172,6 +203,13 @@
                             "title": "Name",
                             "help_text": "The name (label) of the indicator/series. Make sure to use a unique name for each distinct indicator/series. Note that a field alias is provided (see below) to capture alternative names for the indicator/series. Pay attention to the consistent use of capitalization in the name of indicators/series.",
                             "is_required": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "series_description.display_name",
+                            "type": "string",
+                            "title": "display name",
+                            "help_text": "",                            
                             "display_type": "text"
                         },
                         {
@@ -411,14 +449,48 @@
                         {
                             "key": "series_description.sources",
                             "title": "Sources of data",
-                            "type": "array",
+                            "type": "nested_array",
                             "props": [
                                 {
-                                    "key": "id",
-                                    "title": "ID",
+                                    "key": "idno",
+                                    "title": "Identifier (IDNO)",
                                     "type": "string",
                                     "prop_key": "series_description.sources.id",
                                     "help_text": "This element records the Primary ID (unique identifier) of a source. If the source does not have a specific unique identifier, a sequential number can be used. If the source is a dataset or database that has its own unique identifier (possibly a DOI), this identifier should be used.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "other_identifiers",
+                                    "title": "Other identifiers",
+                                    "type": "array",
+                                    "help_text": "This repeatable element is used to enter identifiers (IDs) other than the primary ID. ",
+                                    "props": [
+                                        {
+                                            "key": "type",
+                                            "title": "Type",
+                                            "type": "string",                                            
+                                            "prop_key": "series_description.sources.other_identifiers.type",
+                                            "help_text": "The type of identifier. For example: “DOI”, or \"ISBN\". ",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "identifier",
+                                            "title": "Identifier",
+                                            "type": "string",
+                                            "name": "Identifier",
+                                            "prop_key": "series_description.sources.other_identifiers.identifier",
+                                            "help_text": "The identifier itself. ",
+                                            "display_type": "text"
+                                        }
+                                    ]                                    
+                                },
+                                {
+                                    "key": "type",
+                                    "title": "Type",
+                                    "type": "string",
+                                    "name": "Link type",
+                                    "prop_key": "series_description.sources.type",
+                                    "help_text": "The type of source, e.g. “household survey”, “administrative data”, or “external database”.",
                                     "display_type": "text"
                                 },
                                 {
@@ -440,14 +512,94 @@
                                     "display_type": "text"
                                 },
                                 {
-                                    "key": "type",
-                                    "title": "Type",
-                                    "type": "string",
-                                    "name": "Link type",
-                                    "prop_key": "series_description.sources.type",
-                                    "help_text": "The type of source, e.g. “household survey”, “administrative data”, or “external database”.",
+                                    "key": "authors",
+                                    "title": "Authors",
+                                    "type": "array",
+                                    "help_text": "Authors",
+                                    "props": [
+                                        {
+                                            "key": "name",
+                                            "title": "Name",
+                                            "type": "string",                                            
+                                            "prop_key": "series_description.sources.authors.name",
+                                            "help_text": "",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "affiliation",
+                                            "title": "Affiliation",
+                                            "type": "string",                                            
+                                            "prop_key": "series_description.sources.authors.affiliation",
+                                            "help_text": "",
+                                            "display_type": "text"
+                                        }
+                                    ]                                    
+                                },
+                                {
+                                    "key": "datasets",
+                                    "title": "Datasets",
+                                    "type": "array",
+                                    "help_text": "",
+                                    "props": [
+                                        {
+                                            "key": "idno",
+                                            "title": "Identifier (IDNO)",
+                                            "type": "string",                                            
+                                            "prop_key": "series_description.sources.datasets.idno",
+                                            "help_text": "",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "title",
+                                            "title": "Title",
+                                            "type": "string",                                            
+                                            "prop_key": "series_description.sources.datasets.title",
+                                            "help_text": "",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "uri",
+                                            "title": "URL",
+                                            "type": "string",                                            
+                                            "prop_key": "series_description.sources.datasets.uri",
+                                            "help_text": "Link to the dataset",
+                                            "display_type": "text"
+                                        }
+                                    ]                                    
+                                },
+                                {
+                                    "key": "publisher",
+                                    "title": "Publisher",
+                                    "type": "string",                                            
+                                    "prop_key": "series_description.sources.publisher",
+                                    "help_text": "",
                                     "display_type": "text"
                                 },
+                                {
+                                    "key": "publication_date",
+                                    "title": "Publication date",
+                                    "type": "string",                                            
+                                    "prop_key": "series_description.sources.publication_date",
+                                    "help_text": "",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",                                            
+                                    "prop_key": "series_description.sources.uri",
+                                    "help_text": "",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "access_date",
+                                    "title": "Date accessed",
+                                    "type": "string",                                            
+                                    "prop_key": "series_description.sources.access_date",
+                                    "help_text": "",
+                                    "display_type": "text"
+                                },
+                                
                                 {
                                     "key": "note",
                                     "title": "Notes",
@@ -1396,7 +1548,7 @@
                         {
                             "key": "series_description.notes",
                             "title": "Notes",
-                            "type": "array",
+                            "type": "nested_array",
                             "props": [
                                 {
                                     "key": "note",
@@ -1413,7 +1565,24 @@
                                     "prop_key": "series_description.notes.type",
                                     "help_text": "The type of note. This element should make use of a controlled vocabulary to organize the notes into categories. ",
                                     "display_type": "text"
+                                },
+                                {
+                                    "key": "geography",
+                                    "title": "Geography",
+                                    "type": "simple_array",
+                                    "display_type": "text",
+                                    "prop_key": "series_description.notes.geography",
+                                    "help_text": "Identification of the geographic areas to which the note applies. The geographic identifications should be the same as those used in the ref_country or geographic_units fields."
+                                },
+                                {
+                                    "key": "timeperiod",
+                                    "title": "Time period",
+                                    "type": "simple_array",
+                                    "display_type": "text",
+                                    "prop_key": "series_description.notes.timeperiod",
+                                    "help_text": "Identification of the time periods to which the note applies."
                                 }
+
                             ],
                             "help_text": "This element is open and reserved for explanatory notes deemed useful to the users of the data. Notes should account for additional information that might help: replicate the series; access the data and research area, or discoverability in general."
                         }
@@ -1602,7 +1771,7 @@
                                 }
                             ],
                             "help_text": "Contacts"
-                        },
+                        },                        
                         {
                             "key": "series_description.api_documentation",
                             "title": "API documentation",
@@ -1633,6 +1802,42 @@
                         }
                     ],
                     "help_text": ""
+                },
+                {
+                    "key": "indicator-description-version-statement-section",
+                    "title": "Version statement",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "series_description.version_statement.version",
+                            "title": "Version",
+                            "type": "string",
+                            "help_text": "Version",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "series_description.version_statement.version_date",
+                            "title": "Date",
+                            "type": "string",
+                            "help_text": "Date",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "series_description.version_statement.version_notes",
+                            "title": "Version notes",
+                            "type": "string",
+                            "help_text": "Notes",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "series_description.version_statement.version_resp",
+                            "title": "Version responsibility",
+                            "type": "string",
+                            "help_text": "",
+                            "display_type": "text"
+                        }
+
+                    ]
                 }
             ]
         },
