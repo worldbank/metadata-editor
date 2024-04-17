@@ -904,22 +904,11 @@
 								"title": "Note",
 								"type": "string"
 							},
-							"geography": {
-								"title": "Geography",
-								"description": "Identification of the geographic areas to which the note applies. The geographic identifications should be the same as those used in the ref_country or geographic_units fields.",
-								"type": "array",
-								"items": {
-									"type": "string"
-								}
-							},
-							"timeperiod": {
-								"title": "Time period",
-								"description": "Identification of the time periods to which the note applies.",
-								"type": "array",
-								"items": {
-									"type": "string"
-								}
-							}
+							"type": {
+								"title": "Note type",
+								"description": "Type of note",
+								"type": "string"
+							}							
 						}
 					}
 				},				

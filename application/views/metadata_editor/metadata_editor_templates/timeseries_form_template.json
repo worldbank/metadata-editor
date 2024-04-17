@@ -1565,24 +1565,7 @@
                                     "prop_key": "series_description.notes.type",
                                     "help_text": "The type of note. This element should make use of a controlled vocabulary to organize the notes into categories. ",
                                     "display_type": "text"
-                                },
-                                {
-                                    "key": "geography",
-                                    "title": "Geography",
-                                    "type": "simple_array",
-                                    "display_type": "text",
-                                    "prop_key": "series_description.notes.geography",
-                                    "help_text": "Identification of the geographic areas to which the note applies. The geographic identifications should be the same as those used in the ref_country or geographic_units fields."
-                                },
-                                {
-                                    "key": "timeperiod",
-                                    "title": "Time period",
-                                    "type": "simple_array",
-                                    "display_type": "text",
-                                    "prop_key": "series_description.notes.timeperiod",
-                                    "help_text": "Identification of the time periods to which the note applies."
                                 }
-
                             ],
                             "help_text": "This element is open and reserved for explanatory notes deemed useful to the users of the data. Notes should account for additional information that might help: replicate the series; access the data and research area, or discoverability in general."
                         }
