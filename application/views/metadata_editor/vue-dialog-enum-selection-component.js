@@ -6,7 +6,7 @@ Vue.component('vue-dialog-enum-selection-component', {
             singleSelect: false,
             selected: [],
             headers: [],
-            item_key: 'name',
+            item_key: 'index',
             search: '',
             table_options: {
                 itemsPerPage: -1
@@ -14,7 +14,7 @@ Vue.component('vue-dialog-enum-selection-component', {
         }
     }, 
     mounted: function () {
-        this.initColumnHeaders();        
+        this.initColumnHeaders();
     },      
     methods: {
         initColumnHeaders() {
@@ -40,7 +40,15 @@ Vue.component('vue-dialog-enum-selection-component', {
             }
         },
         items() {
-            return this.enums;
+            //add a numeric index to the enums
+            //this is needed for the v-data-table
+            let items=[];
+            for (let i=0;i<this.enums.length;i++){
+                let item=this.enums[i];
+                item.index=i;
+                items.push(item);
+            }
+            return items;
         }
     },
     template: `
@@ -52,7 +60,6 @@ Vue.component('vue-dialog-enum-selection-component', {
                     <v-card-title class="text-h5 grey lighten-2">
                         
                     </v-card-title>
-
                     <v-card-text style="height: 300px;">
                     <div>
                     
@@ -72,7 +79,7 @@ Vue.component('vue-dialog-enum-selection-component', {
                                 :headers="headers"
                                 :items="items"
                                 :single-select="singleSelect"
-                                item-key="name"
+                                item-key="index"
                                 show-select
                                 class="elevation-1"
                                 hide-default-header
