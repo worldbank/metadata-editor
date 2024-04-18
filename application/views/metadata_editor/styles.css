@@ -1,4 +1,7 @@
-html { overflow-y: auto } 
+html { 
+    overflow-y: auto;
+    background-color: #f3f5fb;
+ } 
 
 #app ,
 .theme--light.v-application{
@@ -1104,4 +1107,17 @@ html { overflow-y: auto }
 
   .v-image__image--preload{
     filter:none!important;
+}
+
+
+.geospatial-feature-component table{
+    font-size:small;
+}
+.geospatial-feature-component table tr.active{
+    background:#6c757d;
+    color:white;
+}
+
+.geospatial-feature-component table tr:hover{
+    cursor: pointer;
 }
