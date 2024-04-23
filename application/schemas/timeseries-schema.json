@@ -70,11 +70,30 @@
 					"description": "Document production date using format(YYYY-MM-DD)",
 					"type": "string"
 				},
-				"version": {
-					"title": "Document version",
-					"description": "Identify and describe the current version of the document",
-					"type": "string"
-				}
+				"version_statement": {
+					"type": "object",
+					"title": "Version Statement",
+					"description": "Version Statement",
+					"properties": {
+					  "version": {
+						"title": "Version",
+						"type": "string"						
+					  },
+					  "version_date": {
+						"title": "Version Date",
+						"type": "string"						
+					  },
+					  "version_resp": {
+						"title": "Version Responsibility Statement",
+						"description": "The organization or person responsible for the version of the work",
+						"type": "string"
+					  },
+					  "version_notes": {
+						"title": "Version Notes",
+						"type": "string"
+					  }
+					}
+				  }
 			},
 			"additionalProperties": false
 		},
@@ -94,6 +113,10 @@
 				"name": {
 					"type": "string",
 					"title": "Series Name"
+				},
+				"display_name": {
+					"type": "string",
+					"title": "Display Name"
 				},
 				"database_id": {
 					"type": "string",
@@ -697,27 +720,100 @@
 					"items": {
 						"type": "object",
 						"properties": {
-							"id": {
+							"idno": {
 								"title": "Source ID",
+								"type": "string"
+							},
+							"other_identifiers": {
+								"title": "Identifiers",
+								"type": "array",
+								"items": {
+									"type": "object",
+									"properties": {										
+										"type": {
+											"title": "Type",
+											"type": "string"
+										},
+										"identifier": {
+											"title": "Identifier",
+											"type": "string"
+										}
+									}
+								}
+							},
+							"type": {
+								"title": "Source type",
 								"type": "string"
 							},
 							"name": {
 								"title": "Name",
 								"description": "Source name",
 								"type": "string"
-							},
+							},							
 							"organization": {
 								"title": "Organization",
 								"type": "string"
 							},
-							"type": {
-								"title": "Source type",
+							"authors": {
+								"title": "Authors",
+								"type": "array",
+								"items": {
+									"type": "object",
+									"properties": {
+										"name": {
+											"title": "Name",
+											"type": "string"
+										},
+										"affiliation": {
+											"title": "Affiliation",
+											"type": "string"
+										}
+									}
+								}
+							},
+							"datasets": {
+								"title": "Datasets",
+								"type": "array",
+								"items": {
+									"type": "object",
+									"properties": {
+										"idno": {
+											"title": "Identifier (IDNO)",
+											"type": "string"
+										},
+										"title": {
+											"title": "Title",
+											"type": "string",
+											"description": "Title of the dataset inluding the country and year if relevant"
+										},										
+										"uri": {
+											"title": "URI",
+											"type": "string"
+										}
+									}
+								}
+							},
+							"publisher": {
+								"title": "Publisher",
+								"type": "string"
+							},
+							"publication_date": {
+								"title": "Publication date",
+								"type": "string"
+							},							
+							"uri": {
+								"title": "URI",
+								"type": "string"
+							},							
+							"access_date": {
+								"title": "Access date",
 								"type": "string"
 							},
 							"note": {
 								"title": "Note",
 								"type": "string"
 							}
+							
 						},
 						"required": [
 							"name"
@@ -807,10 +903,15 @@
 							"note": {
 								"title": "Note",
 								"type": "string"
-							}
+							},
+							"type": {
+								"title": "Note type",
+								"description": "Type of note",
+								"type": "string"
+							}							
 						}
 					}
-				},
+				},				
 				"related_indicators": {
 					"type": "array",
 					"description": "Related indicators",
@@ -1010,7 +1111,31 @@
 					"required": [
 						"name"
 					]
-				}
+				},
+				"version_statement": {
+					"type": "object",
+					"title": "Version Statement",
+					"description": "Version Statement",					
+					"properties": {
+					  "version": {
+						"title": "Version",
+						"type": "string"						
+					  },
+					  "version_date": {
+						"title": "Version Date",
+						"type": "string"
+					  },
+					  "version_resp": {
+						"title": "Version Responsibility Statement",
+						"description": "The organization or person responsible for the version of the work",
+						"type": "string"
+					  },
+					  "version_notes": {
+						"title": "Version Notes",
+						"type": "string"
+					  }
+					}
+				  }
 			},
 			"required": [
 				"idno",
