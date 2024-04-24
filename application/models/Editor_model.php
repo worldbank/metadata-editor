@@ -597,15 +597,19 @@ class Editor_model extends CI_Model {
 			}
 			unset($options['partial_update']);
 		}
-		
+
 		$options=array(
 			'changed'=>isset($options['changed']) ? $options['changed'] : date("U"),
-			'changed_by'=>isset($options['changed_by']) ? $options['changed_by'] : '',
-			//'idno'=>isset($options['idno']) ? $options['idno'] : $this->generate_uuid(),
+			'changed_by'=>isset($options['changed_by']) ? $options['changed_by'] : '',			
 			'study_idno'=>$this->get_project_metadata_field($type,'idno',$options),
 			'title'=>$this->get_project_metadata_field($type,'title',$options),
 			'metadata'=>$this->encode_metadata($options)
 		);
+
+		//idno
+		if (isset($options['idno']) && !$this->idno_exists($options['idno'])){
+			$options['idno']=$options['idno'];
+		}
 
 		$this->db->where('id',$id);
 		$this->db->update('editor_projects',$options);
@@ -632,13 +636,20 @@ class Editor_model extends CI_Model {
 			"created",
 			"created_by",
 			"changed_by",
-			"changed"			
+			"changed",
+			"idno"
 		);
 
 		foreach($options as $key=>$value){
 			if (!in_array($key,$valid_options)){
 				unset($options[$key]);
 			}
+		}
+
+		//idno
+		if (isset($options['idno']) && $this->idno_exists($options['idno'])){
+			//unset($options['idno']);
+			throw new Exception("IDNO_EXISTS: ". $options['idno']);
 		}
 
 		$this->db->where('id',$sid);

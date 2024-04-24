@@ -90,6 +90,10 @@ class ImportProject extends MY_REST_Controller
 				else if ($file_ext=='zip')
 				{
 					$result=$this->import_zip_package($sid,$zip_path=$uploaded_filepath);
+
+					if (isset($result['project_info']['idno'])){
+						$idno=$result['project_info']['idno'];
+					}
 				}			
 
 				$this->Editor_model->set_project_options($sid,$options=array(
@@ -97,6 +101,7 @@ class ImportProject extends MY_REST_Controller
 					'changed_by'=>$user_id,
 					'created'=>date("U"),
 					'changed'=>date("U"),
+					'idno'=>$idno
 				));
 
 				$output=array(
@@ -195,9 +200,9 @@ class ImportProject extends MY_REST_Controller
 		$thumbnail=$project_info['thumbnail'];
 
 		if ($thumbnail){
-				$this->Editor_model->set_project_options($sid,$options=array(
-					'thumbnail'=>$thumbnail
-				));
+			$this->Editor_model->set_project_options($sid,$options=array(
+				'thumbnail'=>$thumbnail
+			));
 		}
 
 		return array(
