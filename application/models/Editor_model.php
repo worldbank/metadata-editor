@@ -523,6 +523,15 @@ class Editor_model extends CI_Model {
 			$survey=$this->decode_encoded_fields($survey);
 		}
 
+		if (isset($survey['metadata'])){
+			if (isset($survey['idno'])){
+				$survey['metadata']['idno']=$survey['idno'];
+			}
+			if (isset($survey['type'])){
+				$survey['metadata']['type']=$survey['type'];
+			}
+		}
+
         return $survey;
 	}
 
