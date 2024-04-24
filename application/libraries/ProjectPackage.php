@@ -20,6 +20,8 @@ class ProjectPackage
 		$this->ci =& get_instance();
 
 		$this->ci->load->model("Editor_model");
+        $this->ci->load->model("Editor_resource_model");
+        $this->ci->load->model("Collection_model");
 	}
 
 
@@ -75,6 +77,7 @@ class ProjectPackage
      *  - json_file
      *  - rdf_xml_file
      *  - rdf_json_file
+     *  - collections
      * 
      * 
      */
@@ -97,11 +100,39 @@ class ProjectPackage
             'json_file'=>$project['idno'].'.json',
             'rdf_xml_file'=>$project['idno'].'.rdf',
             'rdf_json_file'=>$project['idno'].'.rdf.json',
+            'collections'=>$this->ci->Collection_model->get_collection_by_project($sid)
         );
 
         file_put_contents($project_folder_path.'/info.json', json_encode($info,JSON_PRETTY_PRINT));
     }
     
+
+    /**
+     * 
+     * 
+     * Prepare metadata for package export
+     * 
+     */
+    function prepare_package($sid)
+    {
+        set_time_limit(0);
+
+        try{
+            //project json
+            $this->ci->Editor_model->generate_project_json($sid);
+
+            //external resources json
+            $this->ci->Editor_resource_model->write_json($sid);
+
+            //generate zip
+            $zip_path=$this->generate_zip($sid);
+
+            return $zip_path;
+        }
+        catch(Exception $e){
+            throw new Exception("Failed to export package: ".$e->getMessage());
+        }
+    }
 
 }
 

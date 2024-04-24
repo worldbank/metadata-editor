@@ -761,62 +761,6 @@ class Editor extends MY_REST_Controller
 	}
 
 
-
-	function download_zip_get($sid,$generate=0)
-	{
-		try{
-			$sid=$this->get_sid($sid);
-			$this->editor_acl->user_has_project_access($sid,$permission='view');
-
-			$this->load->library('zip');
-			$path = $this->Editor_model->get_project_folder($sid);
-			$project=$this->Editor_model->get_basic_info($sid);
-
-			$zip_path=$path.'/'.$project['idno'].'.zip';
-
-			if (file_exists($zip_path) && $generate==0){
-				$this->load->helper('download');
-				force_download2($zip_path);
-				die();
-			}
-			else {
-				throw new Exception("Zip file not found");
-			}
-		}
-		catch(Exception $e){
-			show_error($e->getMessage(),500);
-			die();
-		}
-	}
-
-	function generate_zip_get($sid)
-	{		
-		try{
-			$sid=$this->get_sid($sid);
-			$this->editor_acl->user_has_project_access($sid,$permission='view');
-
-			$this->load->library("ProjectPackage");
-
-			$zip_path=$this->projectpackage->generate_zip($sid);
-
-			$response=array(
-				'status'=>'success',
-				'zip'=>$zip_path
-			);
-
-			$this->set_response($response, REST_Controller::HTTP_OK);
-		}
-		catch(Exception $e){
-			$error_output=array(
-				'status'=>'failed',
-				'message'=>$e->getMessage()
-			);
-			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
-		}
-	}
-
-
-
 	/**
 	 * 
 	 * Project thumbnail

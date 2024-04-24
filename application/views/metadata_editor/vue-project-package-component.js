@@ -78,7 +78,7 @@ Vue.component('project-package', {
             await this.prepareProjectExport();
 
             //download
-            let url=CI.base_url + '/api/editor/download_zip/'+this.ProjectID;
+            let url=CI.base_url + '/api/packager/download_zip/'+this.ProjectID;
             window.open(url, '_blank');
         },
         async prepareProjectExport()
@@ -157,7 +157,7 @@ Vue.component('project-package', {
             });            
         },
         async writeProjectZip() {
-            let url=CI.base_url + '/api/editor/generate_zip/'+this.ProjectID;
+            let url=CI.base_url + '/api/packager/generate_zip/'+this.ProjectID;
             return axios
             .get(url)
             .then(function (response) {
