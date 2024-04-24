@@ -248,7 +248,7 @@
                               {{project.type}} {{project.idno}}
                             </div>
                             <template v-for="collection in project.collections">
-                                <v-chip small color="#dce3f7" class="mr-1">
+                                <v-chip small color="#dce3f7" class="mr-1" close @click:close="removeFromCollection(collection.sid,collection.id)">
                                   {{collection.title}}                                      
                                 </v-chip>
                               </template>
@@ -434,17 +434,27 @@
         offset-y
       >
 
-        <v-list>
+        <v-list>          
           <v-list-item>
             <v-list-item-title @click="ShareProject(menu_active_project_id)"><v-btn text>{{$t('Share')}}</v-btn></v-list-item-title>
-          </v-list-item>          
+          </v-list-item>
           <v-list-item>
             <v-list-item-title @click="viewAccessPermissions(menu_active_project_id)"><v-btn text>{{$t('View access')}}</v-btn></v-list-item-title>
           </v-list-item>
           
           <v-list-item>
             <v-list-item-title @click="DeleteProject(menu_active_project_id)"><v-btn text>{{$t('delete')}}</v-btn></v-list-item-title>
-          </v-list-item>            
+          </v-list-item>
+
+          <v-divider></v-divider>
+          
+          <v-list-item>
+            <v-list-item-title @click="ExportProjectJSON(menu_active_project_id)"><v-btn text>{{$t('Export JSON')}}</v-btn></v-list-item-title>
+          </v-list-item>
+
+          <v-list-item>
+            <v-list-item-title @click="ExportProjectPackage(menu_active_project_id)"><v-btn text>{{$t('Export package (ZIP)')}}</v-btn></v-list-item-title>
+          </v-list-item>
         <!--
           <v-list-item>
             <v-list-item-title @click="previewTemplate(menu_active_project_id)"><v-btn text>{{$t('preview')}}</v-btn></v-list-item-title>
@@ -987,6 +997,14 @@
             };
             this.dialog_access_project = true;
         },
+        ExportProjectPackage: function(id) {
+          let url = CI.base_url + '/api/packager/download_zip/' + id + '/1';
+          window.open(url, '_blank');
+        },
+        ExportProjectJSON: function(id) {
+          let url = CI.base_url + '/api/editor/json/' + id;
+          window.open(url, '_blank');
+        },
         ShareProject: async function(id) { 
           try {
             let hasPermissionsToShare = await this.hasProjectAdminAccess(id);
@@ -1216,7 +1234,7 @@
             alert("Failed", JSON.stringify(e));
           }
         },
-        removeCollection: async function(project_id, collection_id) {
+        removeFromCollection: async function(project_id, collection_id) {
           if (!confirm("Are you sure you want to remove this collection from the project?")) {
             return false;
           }
@@ -1226,20 +1244,20 @@
             console.log("remove collection", project_id, collection_id);
 
             let form_data = {
-              'project_id': project_id,
+              'projects': project_id,
               'collection_id': collection_id
             };
-            let url = CI.base_url + '/api/collections/remove_project/' + collection_id + '/' + project_id;
+            let url = CI.base_url + '/api/collections/remove_projects/';
 
             let response = await axios.post(url,
               form_data
             );
 
-            console.log("completed removecollection", response);
             this.loadProjects();
           } catch (e) {
             console.log("removeCollection error", e);
-            alert("Failed", JSON.stringify(e));
+            let message = (e.response.data.message) ? e.response.data.message : JSON.stringify(e.response.data);
+            alert("Failed: " + message);
           }
         },
         importProject: function(){
