@@ -4,6 +4,8 @@ require(APPPATH.'/libraries/MY_REST_Controller.php');
 
 class Editor extends MY_REST_Controller
 {
+	private $api_user;
+
 	public function __construct()
 	{
 		parent::__construct();
@@ -17,6 +19,7 @@ class Editor extends MY_REST_Controller
 		$this->load->library("Editor_acl");
 		$this->load->library("Audit_log");
 		$this->is_authenticated_or_die();
+		$this->api_user=$this->api_user();		
 	}
 
 	//override authentication to support both session authentication + api keys
@@ -571,13 +574,13 @@ class Editor extends MY_REST_Controller
 	{		
 		try{
 			$sid=$this->get_sid($sid);
-			$exists=$this->Editor_model->check_id_exists($sid);
+			$exists=$this->Editor_model->check_id_exists($sid);			
 
 			if(!$exists){
 				throw new Exception("Project not found");
 			}
 
-			$this->editor_acl->user_has_project_access($sid,$permission='view');
+			$this->editor_acl->user_has_project_access($sid,$permission='view',$this->api_user);
 			$this->Editor_model->download_project_json($sid);
 			die();
 		}
@@ -597,6 +600,7 @@ class Editor extends MY_REST_Controller
 		try{
 			$sid=$this->get_sid($sid);
 			$exists=$this->Editor_model->check_id_exists($sid);
+			$user=$this->api_user();
 
 			if(!$exists){
 				throw new Exception("Project not found");
