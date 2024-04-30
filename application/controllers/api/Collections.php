@@ -111,8 +111,12 @@ class Collections extends MY_REST_Controller
 
 			$this->set_response($output, REST_Controller::HTTP_OK);			
 		}
-		catch(Exception $e){
-			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
+		catch(Exception $e){			
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);			
 		}
 	}
 
@@ -138,7 +142,12 @@ class Collections extends MY_REST_Controller
 			$this->set_response($output, REST_Controller::HTTP_OK);			
 		}
 		catch(Exception $e){
-			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
+
+			$output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($output, REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
 
@@ -230,23 +239,29 @@ class Collections extends MY_REST_Controller
 					$sid=$this->Collection_model->get_project_id_by_idno($idno);
 					$sid_arr[]=$sid;
 				}				
+			}else{
+				$sid_arr=(array)$options['projects'];
 			}
 
 			if (count($sid_arr)==0){
-				throw new Exception("projects were not found");
+				throw new Exception("project was not found");
 			}
-			
 
-			$result=$this->Collection_model->remove_projectS($options['collection_id'], $sid_arr);
+			$result=$this->Collection_model->remove_projects($options['collection_id'], $sid_arr);
 
 			$output=array(
-				'status'=>'success'
+				'status'=>'success',
+				'result'=>$result
 			);
 
 			$this->set_response($output, REST_Controller::HTTP_OK);			
 		}
 		catch(Exception $e){
-			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
 
@@ -305,7 +320,7 @@ class Collections extends MY_REST_Controller
 				throw new Exception("Missing parameter: permissions");
 			}
 
-			$result=$this->Collection_access_model->insert($options);
+			$result=$this->Collection_access_model->upsert($options);
 
 			$output=array(
 				'status'=>'success'
@@ -350,7 +365,5 @@ class Collections extends MY_REST_Controller
 			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
-
-
 	
 }
