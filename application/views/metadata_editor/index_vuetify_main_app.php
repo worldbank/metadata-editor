@@ -146,6 +146,7 @@
             echo $this->load->view("metadata_editor/vue-form-preview-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-nested-section-preview-component.js",null,true);
             
+            //echo $this->load->view("metadata_editor/vue-files-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-external-resources-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-external-resources-edit-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-datafiles-component.js",null,true);
@@ -198,6 +199,7 @@
             echo $this->load->view("metadata_editor/vue-dialog-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-dialog-datafile-replace-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-dialog-enum-selection-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-geospatial-feature-component.js",null,true);
         ?>
 
         <?php if (empty($metadata)):?>
@@ -232,8 +234,11 @@
         const Variables ={props: ['file_id'],template: '<div><variables xv-if="$store.state.variables"/> </div>'}
         const VariableGroups ={template: '<div><variable-groups /> </div>'}
         const ResourcesComp ={props: ['index'],template: '<div><external-resources /></div>'}
+        //const FileManager ={props: ['index'],template: '<div><file-manager /></div>'}
         const ResourcesImport ={template: '<div> <external-resources-import /></div>'}
         const ResourcesEditComp ={props: ['index'],template: '<div><external-resources-edit /></div>'}
+        const GeoFeatures ={props: ['index'],template: '<div>Geo-features</div>'}
+        const GeoFeature ={props: ['feature_name'],template: '<div><geospatial-feature/></div>'}
 
         //routes
         const routes = [
@@ -252,7 +257,10 @@
             { path: '/variable-groups', component: VariableGroups},
             { path: '/external-resources', component: ResourcesComp, props: true},
             { path: '/external-resources/import', component: ResourcesImport},
-            { path: '/external-resources/:index', component: ResourcesEditComp, props: true}
+            { path: '/external-resources/:index', component: ResourcesEditComp, props: true},            
+            //{ path: '/files', component: FileManager, props: true},
+            { path: '/geospatial-features', component: GeoFeatures, props: true},
+            { path: '/geospatial-feature/:feature_name', component: GeoFeature, props: true }
         ]
 
         const router = new VueRouter({

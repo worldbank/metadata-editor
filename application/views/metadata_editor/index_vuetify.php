@@ -450,7 +450,43 @@
           }
 
           return recursive_keyword_search(JSON.parse(JSON.stringify(this.items)));
-        }        
+        },
+        GeospatialFeatures(){
+          if (this.dataset_type!='geospatial'){
+            return false;
+          }
+
+          let features=_.get(this.ProjectMetadata,'description.feature_catalogue.featureType');
+          if (!features){
+            return [];
+          }
+
+          let feature_list=[];
+          for (let feature of features){
+            feature_list.push({
+              title:feature.typeName,
+              type:'geospatial-feature',
+              key:'feature/'+feature.typeName,
+              file:'datafile',
+              feature:feature,
+              items:[{
+                    title:this.$t('feature-attributes'),
+                    type: 'feature-attribute',
+                    file: 'variable',                    
+                    key:'feature-attributes/'+feature.typeName,
+                    feature:feature,
+                },
+                {
+                    title:this.$t('data'),
+                    type: 'feature-data',
+                    file: 'table',
+                    key:'feature-data'+feature.typeName
+                }]
+            });
+          }
+
+          return feature_list;
+        }
       },      
       watch: {
         '$store.state.formTemplate': function() {
@@ -686,7 +722,6 @@
               items:this.VariableGroupsTreeNodes
             });
           }
-
           
           tree_data.push({
               title: this.$t('external-resources'),
@@ -695,6 +730,16 @@
               key:'external-resources',
               items:this.ExternalResourcesTreeNodes
           });
+
+          if (this.dataset_type=='geospatial'){
+            tree_data.push({
+              title: this.$t('Geospatial features'),
+              type: 'geospatial-features',
+              file: 'database',
+              key:'geospatial-features',
+              items:this.GeospatialFeatures
+            });
+          }
           
 
           this.items=tree_data;
@@ -790,6 +835,11 @@
 
           if (node.type=='resource'){
             router.push('/external-resources/'+node.index);
+            return;
+          }
+
+          if (node.type=='feature-attribute'){
+            router.push('/geospatial-feature/'+node.feature.typeName);
             return;
           }
 
