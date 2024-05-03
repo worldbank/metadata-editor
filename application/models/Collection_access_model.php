@@ -18,7 +18,13 @@ CREATE TABLE editor_collection_access(
 class Collection_access_model extends CI_Model {
 
 
-    private $fields=array('id','collection_id','user_id','permissions');
+    private $fields=array(
+        'id',
+        'collection_id',
+        'user_id',
+        'permissions'
+    );
+
     private $permissions=array(
         'view'=>'View',
         'edit'=>'Edit',
@@ -67,6 +73,20 @@ class Collection_access_model extends CI_Model {
         return $this->db->count_all_results('editor_collection_access');
     }
 
+    function get_permission_id($collection_id,$user_id)
+    {
+        $this->db->select('id');
+        $this->db->where('collection_id',$collection_id);
+        $this->db->where('user_id',$user_id);        
+        $result=$this->db->get('editor_collection_access')->row_array();
+
+        if($result){
+            return $result['id'];
+        }
+
+        return false;
+    }
+
     function insert($data)
     {
         if ($this->permission_exists($data['collection_id'],$data['user_id'])){
@@ -93,6 +113,17 @@ class Collection_access_model extends CI_Model {
 
         $this->db->where('id',$id);
         $this->db->update('editor_collection_access',$data);
+    }
+
+    function upsert($data)
+    {
+        $permission_id=$this->get_permission_id($data['collection_id'],$data['user_id']);
+
+        if ($permission_id){
+            return $this->update($permission_id,$data);
+        }
+
+        return $this->insert($data);
     }
 
 
