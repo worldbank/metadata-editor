@@ -149,7 +149,7 @@
                             "type": "array",
                             "props": [
                                 {
-                                    "key": "name",
+                                    "key": "type",
                                     "title": "Type",
                                     "type": "string",
                                     "name": "Country name",
@@ -234,6 +234,20 @@
                             "class": "database_id",
                             "title": "Database ID",
                             "help_text": "The unique identifier of the database the indicator/series belongs to. This field must correspond to the element \"Database description / Title statement / Primary ID\" of the database metadata. This is the only field that is needed to establish the link between the indicator metadata and the information on the database it belongs to.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "series_description.date_last_update",
+                            "type": "string",
+                            "title": "Last update date",
+                            "help_text": "",                            
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "series_description.date_released",
+                            "type": "string",
+                            "title": "Date released",
+                            "help_text": "",                            
                             "display_type": "text"
                         }
                     ],
@@ -878,9 +892,65 @@
                                     "prop_key": "series_description.errata.description",
                                     "help_text": "A brief description of the error and remedy.",
                                     "display_type": "textarea"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "string",
+                                    "prop_key": "series_description.errata.uri",
+                                    "help_text": "",
+                                    "display_type": "text"
                                 }
+
                             ],
                             "help_text": "A list of errata for the indicator."
+                        },
+                        {
+                            "key": "series_description.acknowledgements",
+                            "type": "array",
+                            "title": "Acknowledgements",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "prop_key": "series_description.acknowledgements.name",
+                                    "help_text": "Acknowledgements of persons or organizations",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "string",
+                                    "prop_key": "series_description.acknowledgements.affiliation",
+                                    "help_text": "",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Role",
+                                    "type": "string",
+                                    "prop_key": "series_description.acknowledgements.role",
+                                    "help_text": "",
+                                    "display_type": "text"
+                                }
+
+                            ],
+                            "help_text": ""
+                        },
+                        {
+                            "key": "series_description.acknowledgement_statement",
+                            "type": "string",
+                            "title": "Acknowledgement statement",
+                            "help_text": "",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "series_description.disclaimer",
+                            "type": "string",
+                            "title": "Disclaimer",
+                            "help_text": "",
+                            "display_type": "textarea"
                         }
                     ],
                     "help_text": ""
@@ -1564,6 +1634,14 @@
                                     "type": "string",
                                     "prop_key": "series_description.notes.type",
                                     "help_text": "The type of note. This element should make use of a controlled vocabulary to organize the notes into categories. ",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "string",
+                                    "prop_key": "series_description.notes.uri",
+                                    "help_text": "",
                                     "display_type": "text"
                                 }
                             ],
