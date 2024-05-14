@@ -18,6 +18,7 @@ class Editor extends MY_REST_Controller
 		
 		$this->load->library("Editor_acl");
 		$this->load->library("Audit_log");
+		$this->load->library("Project_search");
 		$this->is_authenticated_or_die();
 		$this->api_user=$this->api_user();		
 	}
@@ -46,7 +47,7 @@ class Editor extends MY_REST_Controller
 			}
 
 			$user_id=$this->get_api_user_id();
-			$this->has_access($resource_='editor',$privilege='view');			
+			$this->has_access($resource_='editor',$privilege='view');
 			
 			$offset=(int)$this->input->get("offset");
 			$limit=(int)$this->input->get("limit");
@@ -58,7 +59,7 @@ class Editor extends MY_REST_Controller
 				$limit=100;
 			}
 			
-			$result=$this->Editor_model->get_all($limit,$offset,null,$search_options);
+			$result=$this->project_search->search($limit,$offset,null,$search_options);
 			array_walk($result['result'], 'unix_date_to_gmt',array('created','changed'));
 
 			//add collections and tags to each study
@@ -84,7 +85,7 @@ class Editor extends MY_REST_Controller
 			
 			$response=array(
 				'status'=>'success',
-				'total'=>$this->Editor_model->get_total_count($search_options),
+				'total'=>$this->project_search->get_total_count($search_options),
 				'found'=>is_array($result['result']) ? count($result['result']) : 0,
 				'offset'=>$offset,
 				'limit'=>$limit,
@@ -352,6 +353,45 @@ class Editor extends MY_REST_Controller
 				'errors'=>$e->GetValidationErrors()
 			);
 			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	/**
+	 * 
+	 * 
+	 * Set project template
+	 * 
+	 */
+	function template_post($sid=null,$template_uid=null)
+	{
+		try{
+			$this->has_dataset_access('edit');
+
+			$options=$this->raw_json_input();
+			$user=$this->api_user();
+			$user_id=$this->get_api_user_id();
+			$sid=$this->get_sid($sid);
+
+			if (!$template_uid){
+				throw new Exception("Template UID is required");
+			}
+
+			$this->editor_acl->user_has_project_access($sid,$permission='edit',$user);			
+			$this->Editor_model->set_project_template($sid,$template_uid);
+
+			$response=array(
+				'status'=>'success'
+			);
+
+			$this->set_response($response, REST_Controller::HTTP_OK);			
 		}
 		catch(Exception $e){
 			$error_output=array(
@@ -963,8 +1003,10 @@ class Editor extends MY_REST_Controller
 	function facets_get()
 	{
 		try{
+			$user_id=$this->get_api_user_id();
+			$this->has_access($resource_='editor',$privilege='view');
 
-			$result=$this->Editor_model->get_facets();
+			$result=$this->project_search->get_facets($user_id);
 
 			$response=array(
 				'status'=>'success',
