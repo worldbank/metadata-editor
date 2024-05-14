@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 
     <script src="https://adminlte.io/themes/v3/plugins/jquery/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.20/lodash.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/moment@2.26.0/moment.js"></script>
     <script src="https://unpkg.com/vue-i18n@8"></script>
@@ -36,6 +37,46 @@
             background-color: transparent!important;
             margin-bottom:50px;
         }
+       
+        .vue-tree-list .vue-tree-icon{
+            padding-left: 20px;        
+        }
+
+        .item-level-1{
+            
+        }
+        .item-level-2{
+            margin-left: 22px;            
+        }
+        .item-level-3{
+            margin-left: 40px;
+            
+        }
+        .item-level-4{
+            margin-left: 60px;
+            
+        }
+        .item-level-5{
+            margin-left: 80px;
+            
+        }
+        .collection-item:hover{
+            cursor:pointer;
+            color: #526bc7;
+        }
+        .collection-row{
+            padding-top: 15px;
+            padding-bottom:5px;
+        }
+
+        .collection-leaf{
+            padding-left:22px;
+        }
+
+        .v-card .primary {
+            background-color: #526bc7 !important;
+            border-color: #526bc7 !important;
+        }
     </style>
 </head>
 
@@ -55,8 +96,10 @@
         
 
         <div class="wrapper">
+            <v-app>
             <?php echo $this->load->view('editor_common/global-header', null, true); ?>
             <router-view :key="$route.fullPath"></router-view>
+            </v-app>
         </div>
 
 
@@ -70,6 +113,7 @@
 
     <script>
         <?php
+            echo $this->load->view("collections/vue-tree-list-component.js", null, true);
             echo $this->load->view("collections/vue-collections-component.js", null, true);
             echo $this->load->view("collections/vue-edit-collection-component.js", null, true);
             echo $this->load->view("collections/vue-manage-users-component.js", null, true);
@@ -147,10 +191,10 @@
             theme: {
             themes: {
                 light: {
-                primary: '#526bc7',
-                secondary: '#b0bec5',
-                accent: '#8c9eff',
-                error: '#b71c1c',
+                    primary: '#526bc7',
+                    secondary: '#b0bec5',
+                    accent: '#8c9eff',
+                    error: '#b71c1c',
                 },
             },
             },
