@@ -44,7 +44,7 @@ class ImportProject extends MY_REST_Controller
 			}
 
 			//temporary uuid
-			$idno=$this->Editor_model->generate_uuid();			
+			$idno=(string)$this->Editor_model->generate_uuid();			
 			
 			$options['created_by']=$user_id;
 			$options['changed_by']=$user_id;
@@ -52,8 +52,8 @@ class ImportProject extends MY_REST_Controller
 			$options['changed']=date("U");
 			$options['title']='untitled';
 			$options['type']=$type;
-			$options['idno']=$idno;					
-		
+			//$options['idno']=$idno;	
+			
 			//upload file and import metadata
 			$allowed_file_types="json|xml|zip";
 			$uploaded_filepath=$this->Editor_resource_model->upload_temporary_file($allowed_file_types,$file_field_name='file',$temp_upload_folder=null);
