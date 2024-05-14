@@ -2,22 +2,33 @@ Vue.component('vue-collection-share', {
     props: ['value','projects','collections'],
     data() {
         return {
-            selected: []
+            selected: [],
         }
     },
-    created:function(){
+    mounted: async function(){        
     },
     methods: {        
         shareWithCollection: function() {
             this.$emit('share-with-collection', 
                 {
-                    'collection_id':this.selected,
+                    'collections':this.selected,
                     'projects':this.projects
                 }
             );
             this.selected=[];
             this.dialog=false;
+        },        
+        errorResponseMessage: function(error) {
+        if (error.response.data.error) {
+            return error.response.data.error;
         }
+
+        if (error.response){
+            return JSON.stringify(error.response.data);
+        }
+
+        return JSON.stringify(error);
+    },
     },
     computed:{
         dialog: {
@@ -34,63 +45,43 @@ Vue.component('vue-collection-share', {
         <template v-if="projects">
             <div class="text-center">
                 <v-dialog
-                v-model="dialog"
-                width="600px"
+                v-model="dialog"                
                 scrollable
+                max-width="500px"
                 >
                 
                 <v-card>
-                    <v-card-title class="text-h5 grey lighten-2">Add Project(s) to collection</v-card-title>
+                    <v-card-title class="text-h5 lighten-2">
+                        Add to collection 
+                        <v-chip v-if="projects.length>0" color="indigo" text-color="white" class="ml-2">{{projects.length}} project(s)</v-chip>
+                    </v-card-title>
 
-                    <v-card-text>
-                        <v-row>
-                             <v-col cols="9">   
-                                <v-select
-                                    label="Select collection"
-                                    class="controls-border-top"
-                                    v-model="selected"
-                                    :items="collections"
-                                    solo
-                                    dense
-                                    item-text="title"
-                                    item-value="id"
-                                ></v-select>
-                            </v-col>
-                            <v-col cols="3">
-                                    <v-btn
-                                        :disabled="selected.length==0"
-                                        block
-                                        class="ma-2 mr-3"
-                                        outlined
-                                        color="indigo"
-                                        small                         
-                                        @click="shareWithCollection"
-                                    >Share
-                                    </v-btn>
-                            </v-col>
-                        </v-row>
-
-
-                        <div class="text-primary m-3">
-                            You have <strong>{{projects.length}}</strong> projects selected.
-                        </div>
-
-
-
+                    <v-card-text style="height: 300px;">
+                        <v-treeview
+                            :items="collections"
+                            item-children="items"
+                            activatable
+                            item-key="id"
+                            item-text="title"                            
+                            v-model="selected"
+                            selectable
+                            selection-type="independent"
+                            >                                                                
+                        </v-treeview>
                     </v-card-text>
 
                     <v-divider></v-divider>
 
                     <v-card-actions>
-                    <v-spacer></v-spacer>
                     <v-btn
-                        class="ma-2"
+                        :disabled="selected.length==0"
+                        block
+                        class="ma-2 mr-3"
                         outlined
                         color="indigo"
-                        small
-                        @click="selected=[];dialog = false"
-                    >
-                        Close
+                        small                         
+                        @click="shareWithCollection"
+                    >Share
                     </v-btn>
                     </v-card-actions>
                     

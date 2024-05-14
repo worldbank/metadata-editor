@@ -37,6 +37,17 @@
   table th {
     white-space: nowrap;
   }
+
+  /*v-tree spacing */
+  .v-treeview-node__root {
+    height: auto;
+    min-height: 30px;
+  }
+
+  .v-treeview-node.v-treeview-node--leaf {
+    margin-left: 14px;
+  }
+
 </style>
 
 <body class="layout-top-nav">
@@ -63,7 +74,7 @@
             <div class="row">
 
               <!--sidebar -->
-              <div class="sidebar col-md-2 col-sm-3">
+              <div class="sidebar col-md-3 col-sm-3">
 
                 <div class="mr-4 mt-5">
                   <v-expansion-panels v-model="facet_panel" multiple class="">
@@ -73,7 +84,23 @@
                         {{$t(facet_key)}}
                       </v-expansion-panel-header>
                       <v-expansion-panel-content>
-                        <div class="form-check" v-for="facet in facet_values">
+                        <div v-if="facet_key=='collection'">
+                          
+                          <v-treeview
+                              :items="facet_values"
+                              item-children="items"
+                              activatable
+                              item-key="id"
+                              item-text="title"                            
+                              v-model="search_filters[facet_key]"                              
+                              selectable
+                              selection-type="independent"
+                              >
+                                                          
+                          </v-treeview>
+
+                        </div>
+                        <div v-else class="form-check" v-for="facet in facet_values">
                           <input class="form-check-input" @click="onFilterClick(facet_key,facet)" type="checkbox" v-model="search_filters[facet_key]" :value="facet.id" :id="facet_key+facet.id">
                           <label class="form-check-label" :for="facet_key+facet.id">{{facet.title}}</label>
                         </div>
@@ -152,7 +179,7 @@
                         {{getFacetTitleById(filter_type,filter_value)}}                                     
                         </v-chip>
                       </template>
-                    </template>
+                    </template>                    
                   </div>
 
                   <div class="mt-5 p-3 border  text-danger" v-if="errors && errors.length>0"> 
@@ -166,10 +193,9 @@
 
                   <div class="bg-white shadow rounded p-3 pt-1 mt-2" elevation="10">
 
+                      <div class="mt-5 mb-3 p-3 border text-center text-danger" v-if="!errors && !Projects || projects.found<1"> No projects found!</div>
 
-                    <div class="mt-5 mb-3 p-3 border text-center text-danger" v-if="!errors && !Projects || projects.found<1"> No projects found!</div>
-
-                      <div v-if="!Projects || projects.found>0" class="row mb-2 border-bottom  mt-3">
+                      <div v-if="!Projects || projects.found>0" class="row mb-2 mt-3">
                         <div class="col-md-5">
                           <div class="p-2" v-if="Projects">
                             <strong>{{$t("showing_range_of_n", { row: parseInt(projects.offset) +1, page_size: parseInt(projects.offset + projects.projects.length), total:projects.total })}}</strong>
@@ -187,37 +213,26 @@
                       </div>
 
 
-                    <div class="row mb-1">
-                      
-                        <div class=" p-1" v-if="ProjectsCount>0">
-                          <span style="padding-left:25px;padding-right:30px;" > <input type="checkbox" v-model="select_all_projects" @change="toggleProjectSelection" /></span>
-                          
-                          <v-tooltip bottom>
-                            <template v-slot:activator="{ on, attrs }">
-                            <v-btn icon @click="addProjectsToCollection"  :disabled="selected_projects.length==0">
-                              <v-icon
-                                color="primary"
-                                dark
-                                v-bind="attrs"
-                                v-on="on"
-                              >
-                                mdi-folder-plus
-                              </v-icon>
-                            </v-btn>
-                            </template>
-                            <span>Add projects to collections</span>
-                          </v-tooltip>
-
-                        </div>
-                      
-                    </div>
-
-
-                    <table class="table table-hover table-projects" v-if="projects && projects.found>0">
+                    <table class="table table-hover border-bottom table-projects" v-if="projects && projects.found>0">
                       <thead>
                         <tr>
-                          <th style="width:30px;"></th>
-                          <th style="width:80px;"></th>
+                          <th style="width:30px;">
+                            <div v-if="ProjectsCount>0">
+                              <input type="checkbox" v-model="select_all_projects" @change="toggleProjectSelection" />
+                            </div>
+                          </th>
+                          <th style="width:80px;">
+                            <v-menu offset-y :disabled="selected_projects.length==0">
+                              <template v-slot:activator="{ on, attrs }">
+                                <v-btn icon v-bind="attrs" v-on="on">
+                                  <v-icon>mdi-dots-vertical</v-icon>
+                                </v-btn>
+                              </template>
+                              <v-list>
+                                <v-list-item @click="addProjectsToCollection">Add to collection</v-list-item>                                
+                              </v-list>
+                            </v-menu>
+                          </th>
                           <th style="width:17px;"></th>
                           <th class="project-title-col">Title</th>
                           <th>Owner</th>
@@ -245,7 +260,7 @@
                               </a>
                             </div>
                             <div class="text-secondary text-small">
-                              {{project.type}} {{project.idno}}
+                              {{project.idno}} | <span :title="project.template_uid">{{project.template_uid}}</span>
                             </div>
                             <template v-for="collection in project.collections">
                                 <v-chip small color="#dce3f7" class="mr-1" close @click:close="removeFromCollection(collection.sid,collection.id)">
@@ -632,7 +647,7 @@
         },*/
         sort_by_options:[],            
         sort_by:"updated_desc",
-
+        collections_flat_list:[],
 
       },
       created: async function() {
@@ -874,11 +889,39 @@
           //find facet by id
           let facet = this.facets[facet_name].find(x => x.id == facet_id);
 
+          if (facet_name == 'collection') {
+            facet=this.searchNestedCollectionsFacet(facet_id);
+          }
+
           if (facet) {
             return facet.title;
           }
 
           return facet_id;
+        },
+        searchNestedCollectionsFacet: function(facet_id) {
+
+          let searchCollections=function(collections){
+            
+            for (let i = 0; i < collections.length; i++) {
+              let collection = collections[i];
+
+              if (collection.id == facet_id) {
+                return collection;
+              }
+
+              if (collection.items){
+                let found=searchCollections(collection.items);
+                if (found){
+                  return found;
+                }
+              }
+            }
+                
+          }
+
+          let facet=searchCollections(this.facets.collection);
+          return facet;         
         },
         loadFacets: function() {
           vm = this;
@@ -892,13 +935,18 @@
               for (i = 0; i < facet_types.length; i++) {
                 let facet_name = facet_types[i];
                 Vue.set(vm.search_filters, facet_name, []);
+
+                /*if (facet_name=='collection'){
+                  vm.loadFlatCollectionsList(vm.facets[facet_name]);
+                }*/
+
               }
               vm.ReadFilterQS();
             })
             .catch(function(error) {
               console.log("error", error);
             });
-        },
+        },        
         getProjectSize: function(projectId,projectIndex) {
           vm = this;
           let url = CI.base_url + '/api/files/size/' + projectId;
@@ -1056,7 +1104,12 @@
           this.loadProjects();
         },
         removeFilter: function(filter_type, value_idx) {
-          this.$delete(this.search_filters[filter_type], value_idx);
+         this.$delete(this.search_filters[filter_type], value_idx);
+          /*if (filter_type=='collection'){
+            this.search_filters['collection']=[];
+          }else{
+            this.$delete(this.search_filters[filter_type], value_idx);
+          }*/
         },
         getUsersList: async function() {
           vm = this;
@@ -1205,7 +1258,7 @@
         },
         getCollectionsList: async function() {
           vm = this;
-          let url = CI.base_url + '/api/collections';
+          let url = CI.base_url + '/api/collections/tree';
           let response = await axios.get(url);
 
           if (response.status == 200) {
