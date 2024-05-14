@@ -430,7 +430,7 @@ class Collections extends MY_REST_Controller
 				$this->Collection_tree_model->insert($collection['id'],$collection['id']);
 			}
 
-			$walk_tree=function($collections_tree) use (&$walk_tree,){
+			$walk_tree=function($collections_tree) use (&$walk_tree){
 				foreach($collections_tree as $collection){
 					$parent_id=isset($collection['pid'])?$collection['pid']: $collection['id'];
 					$this->Collection_tree_model->insert($parent_id,$collection['id']);
