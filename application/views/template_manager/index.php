@@ -84,7 +84,7 @@
   $user_template_parts = array();
 
   //update template_parts
-  get_template_part($core_template_arr['items'], null, $core_template_parts);
+  //get_template_part($core_template_arr['items'], null, $core_template_parts);
   //get_template_part($user_template_arr['items'], null, $user_template_parts);
 
   function get_template_part($items, $parent = null, &$output)
