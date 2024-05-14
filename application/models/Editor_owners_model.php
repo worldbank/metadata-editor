@@ -49,7 +49,8 @@ class Editor_owners_model extends ci_model {
     
     function list_users()
     {
-        $this->db->select('id,username,email');
+        $this->db->select('users.id,username,email,meta.first_name,meta.last_name');
+        $this->db->join('meta','users.id=meta.user_id');
 		$this->db->order_by('username','ASC');
 		return $this->db->get('users')->result_array();
     }
@@ -146,6 +147,21 @@ class Editor_owners_model extends ci_model {
     {
         $this->db->where('sid',$sid);
         return $this->db->count_all_results('editor_project_owners');
+    }
+
+
+    function search_users($keywords)
+    {
+        $this->db->select('users.id,username,email,meta.first_name,meta.last_name');
+        $this->db->join('meta','users.id=meta.user_id');
+
+        $this->db->where("username like '".$keywords."%'");
+        $this->db->or_where("email like '".$keywords."%'");
+        $this->db->or_where("meta.first_name like '".$keywords."%'");
+        $this->db->or_where("meta.last_name like '".$keywords."%'");
+
+		$this->db->order_by('username','ASC');
+		return $this->db->get('users')->result_array();
     }
 
 }
