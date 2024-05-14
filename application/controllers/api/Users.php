@@ -56,7 +56,6 @@ class Users extends MY_REST_Controller
 		}
 	}
 
-
 	function user_get($userId=null)
 	{
 		try{
@@ -76,6 +75,42 @@ class Users extends MY_REST_Controller
 				'status'=>'success',
 				'user'=>$result
 			);			
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	/**
+	 * 
+	 * 
+	 * Search for suers
+	 * 
+	 */
+	function search_get()
+	{
+		try{
+			$keywords=$this->get('keywords');
+
+			if(!$keywords){
+				throw new Exception("Missing parameter for `keywords`");
+			}
+
+			//$this->has_dataset_access('view');
+			$result=$this->editor_owners_model->search_users($keywords);
+			
+			$response=array(
+				'status'=>'success',
+				'total'=>count($result),
+				'users'=>$result
+			);
+						
 			$this->set_response($response, REST_Controller::HTTP_OK);
 		}
 		catch(Exception $e){
