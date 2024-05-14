@@ -1632,16 +1632,21 @@ create table editor_project_owners (
   primary key (id)
 );
 
-create table editor_collections (
-  id int not null auto_increment,
-  title varchar(255) not null,
-  description text,
-  created int,
-  changed int,
-  created_by int,
-  changed_by int,
-  primary key (id)
-);
+
+CREATE TABLE `editor_collections` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `description` varchar(1000) DEFAULT NULL,
+  `created` int DEFAULT NULL,
+  `created_by` int DEFAULT NULL,
+  `changed` int DEFAULT NULL,
+  `changed_by` int DEFAULT NULL,
+  `pid` int DEFAULT NULL,
+  `wgt` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `title` (`title`,`pid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1;
+
 
 create table editor_collection_projects (
   id int not null auto_increment,
@@ -1790,3 +1795,5 @@ CREATE TABLE `editor_collections_tree` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_closure` (`parent_id`,`child_id`,`depth`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1;
+
+
