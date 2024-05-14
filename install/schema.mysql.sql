@@ -1377,7 +1377,7 @@ LOCK TABLES `roles` WRITE;
 /*!40000 ALTER TABLE `roles` DISABLE KEYS */;
 insert into roles(id,name,description, weight, is_admin, is_locked) values 
 (1,'admin','It is the site administrator and has access to all site content', 0,1,1),
-(2,'user','General user account with no access to site administration', 0,1,1);
+(2,'user','General user account with no access to site administration', 0,0,1);
 /*!40000 ALTER TABLE `roles` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1747,3 +1747,46 @@ CREATE TABLE `audit_logs` (
 
 alter table editor_templates modify column description text;
 alter table editor_templates add instructions text;
+
+
+
+drop table if exists editor_code_lists;
+
+CREATE TABLE editor_code_lists(  
+    pk_id int NOT NULL AUTO_INCREMENT,
+    id varchar(100) not null,
+    agency_id varchar(100) not null,
+    name varchar(300) not null,
+    description varchar(300) default null,
+    version varchar(30) default null,    
+    created int default null,
+    changed int default null,
+    created_by int DEFAULT null,
+    changed_by int default null,    
+    PRIMARY KEY (`pk_id`),
+    UNIQUE KEY `cl_id` (`id`,`agency_id`, `version`)
+);
+
+CREATE TABLE editor_code_list_items(  
+    pk_id int NOT NULL AUTO_INCREMENT,
+    cl_id int not null,
+    id varchar(100) not null,
+    name varchar(300) not null,
+    description varchar(300) default null,
+    created int default null,
+    changed int default null,
+    created_by int DEFAULT null,
+    changed_by int default null,    
+    PRIMARY KEY (`pk_id`),
+    UNIQUE KEY `cl_item_id` (`id`,`cl_id`)
+);
+
+
+CREATE TABLE `editor_collections_tree` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `parent_id` int DEFAULT NULL,
+  `child_id` int DEFAULT NULL,
+  `depth` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idx_closure` (`parent_id`,`child_id`,`depth`)
+) ENGINE=InnoDB AUTO_INCREMENT=1;
