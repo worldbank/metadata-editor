@@ -96,17 +96,28 @@ class Collections extends MY_REST_Controller
 	function index_post()
 	{		
 		try{
+			$user_id=$this->get_api_user_id();
 			$this->has_access($resource_='collection',$privilege='edit');
 			$options=$this->raw_json_input();
-			$options['created_by']=$this->session->userdata('user_id');
-			$options['changed_by']=$this->session->userdata('user_id');
+			$options['created_by']=$user_id;
+			$options['changed_by']=$user_id;
 			$options['created']=time();
 			$options['changed']=time();
-			$result=$this->Collection_model->insert($options);
+			$new_collection_id=$this->Collection_model->insert($options);
+
+			//Add user as owner
+			if ($new_collection_id){
+				$options=array(
+					'collection_id'=>$new_collection_id,
+					'user_id'=>$user_id,
+					'permissions'=>'admin'
+				);				
+				$this->Collection_access_model->upsert($options);
+			}
 
 			$output=array(
 				'status'=>'success',
-				'collection'=>$result
+				'collection'=>$new_collection_id
 			);
 
 			$this->set_response($output, REST_Controller::HTTP_OK);			
@@ -165,7 +176,7 @@ class Collections extends MY_REST_Controller
 			}
 			
 			$this->has_access($resource_='collection',$privilege='delete');
-			$result=$this->Collection_model->delete($id);
+			$result=$this->Collection_model->delete_nested($id);
 
 			$output=array(
 				'status'=>'success'
@@ -184,8 +195,8 @@ class Collections extends MY_REST_Controller
 			$this->has_access($resource_='collection',$privilege='edit');
 			$options=$this->raw_json_input();
 
-			if (!isset($options['collection_id'])){
-				throw new Exception("Missing parameter: collection_id");
+			if (!isset($options['collections'])){
+				throw new Exception("Missing parameter: collections");
 			}
 
 			if (!isset($options['projects'])){
@@ -202,7 +213,7 @@ class Collections extends MY_REST_Controller
 				$options['projects']=$sid_arr;
 			}
 			
-			$result=$this->Collection_model->add_projects($options['collection_id'], $options['projects']);
+			$result=$this->Collection_model->add_batch_projects($options['collections'], $options['projects']);
 
 			$output=array(
 				'status'=>'success'
@@ -365,5 +376,117 @@ class Collections extends MY_REST_Controller
 			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
+
+
+	/**
+	 * 
+	 * 
+	 * Return all Collections as Tree
+	 * 
+	 */
+	function tree_get($id=null)
+	{
+		try{
+			$this->has_access($resource_='collection',$privilege='view');
+			$result=$this->Collection_model->get_collection_tree($id);
+			
+			$response=array(
+				'status'=>'success',
+				'collections'=>$result
+			);
+						
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	/**
+	 * 
+	 * Re-build collection tree (clousure table)
+	 * 
+	 */
+	function tree_refresh_get()
+	{
+		try{
+			$this->has_access($resource_='collection',$privilege='admin');
+			$this->load->model("Collection_tree_model");
+			
+			//truncate all date
+			$this->Collection_tree_model->truncate_tree();
+
+			$collections_tree=$this->Collection_model->get_collection_tree();
+
+			//read all data from collections
+			$collections=$this->Collection_model->select_all();
+
+			foreach($collections as $collection){
+				$this->Collection_tree_model->insert($collection['id'],$collection['id']);
+			}
+
+			$walk_tree=function($collections_tree) use (&$walk_tree,){
+				foreach($collections_tree as $collection){
+					$parent_id=isset($collection['pid'])?$collection['pid']: $collection['id'];
+					$this->Collection_tree_model->insert($parent_id,$collection['id']);
+					
+					if (isset($collection['items'])){
+						$walk_tree($collection['items']);						
+					}
+				}
+			};
+
+			$walk_tree($collections_tree);
+
+			//get tree
+			//$result=$this->Collection_tree_model->get_tree_flat();
+
+			$response=array(
+				'status'=>'success',
+				//'collections'=>$result
+			);
+
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+
+	}
+
+
+	function tree_list_get($parent_id=null)
+	{
+		try{
+			$this->has_access($resource_='collection',$privilege='view');
+			$this->load->model("Collection_tree_model");
+			$result=$this->Collection_tree_model->get_tree_flat();
+			
+			$response=array(
+				'status'=>'success',
+				'collections'=>$result
+			);
+						
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	
 	
 }
