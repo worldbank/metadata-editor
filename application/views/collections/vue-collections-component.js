@@ -23,6 +23,9 @@ Vue.component('vue-collection', {
         }
     },
     methods: {
+        pageLink: function(page) {
+            window.location.href = CI.base_url + '/' + page;
+        },
         showMenu: function(data) {
             console.log("showMenu", data);
             let e=data.e;
@@ -167,10 +170,10 @@ Vue.component('vue-collection', {
                             <div class="d-flex">                            
 
                                 <v-tabs background-color="transparent" v-model="active_tab">
-                                    <v-tab><v-icon>mdi-text-box</v-icon> <a :href="site_base_url + '/editor'">{{$t("projects")}}</a></v-tab>
-                                    <v-tab active><v-icon>mdi-folder-text</v-icon> <a :href="site_base_url + '/collections'">{{$t("collections")}}</a> </v-tab>
+                                    <v-tab @click="pageLink('projects')"><v-icon>mdi-text-box</v-icon> <a :href="site_base_url + '/editor'">{{$t("projects")}}</a></v-tab>
+                                    <v-tab @click="pageLink('collections')" active><v-icon>mdi-folder-text</v-icon> <a :href="site_base_url + '/collections'">{{$t("collections")}}</a> </v-tab>
                                     <!--<v-tab>Archives</v-tab>-->
-                                    <v-tab><v-icon>mdi-alpha-t-box</v-icon> <a :href="site_base_url + '/templates'">{{$t("templates")}}</a></v-tab>
+                                    <v-tab @click="pageLink('templates')"><v-icon>mdi-alpha-t-box</v-icon> <a :href="site_base_url + '/templates'">{{$t("templates")}}</a></v-tab>
                                 </v-tabs>
 
 

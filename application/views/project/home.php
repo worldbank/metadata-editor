@@ -120,10 +120,10 @@
                     <div class="flex-grow-1 flex-shrink-0 mr-auto">
                       <div class="mb-5">
                         <v-tabs background-color="transparent">
-                          <v-tab><v-icon>mdi-text-box</v-icon> Projects</v-tab>
-                          <v-tab><v-icon>mdi-folder-text</v-icon> <a href="<?php echo site_url('collections');?>">{{$t("collections")}}</a> </v-tab>
+                          <v-tab @click="pageLink('projects')"><v-icon>mdi-text-box</v-icon> Projects</v-tab>
+                          <v-tab @click="pageLink('collections')"><v-icon>mdi-folder-text</v-icon> <a href="<?php echo site_url('collections');?>">{{$t("collections")}}</a> </v-tab>
                           <!--<v-tab>Archives</v-tab>-->
-                          <v-tab><v-icon>mdi-alpha-t-box</v-icon> <a href="<?php echo site_url('templates');?>">{{$t("templates")}}</a></v-tab>
+                          <v-tab @click="pageLink('templates')"><v-icon>mdi-alpha-t-box</v-icon> <a href="<?php echo site_url('templates');?>">{{$t("templates")}}</a></v-tab>
                         </v-tabs>
                       </div>
                     </div>
@@ -739,6 +739,9 @@
         }
       },
       methods: {
+        pageLink: function(page) {
+          window.location.href = CI.base_url + '/' + page;
+        },
         showProjectMenu (e, projectId) {
           e.preventDefault()
           this.show_project_menu = false
