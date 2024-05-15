@@ -196,7 +196,7 @@ class Collection_tree_model extends CI_Model {
                     $collection['items'] = $children;
                 }
                 $output[] = $collection;
-                unset($collections[$collection['id']]);
+                //unset($collections[$collection['id']]);
             }
         }
         return $output;
