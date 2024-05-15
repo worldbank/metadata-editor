@@ -82,6 +82,7 @@ class Editor_model extends CI_Model {
 		$this->load->model("Editor_variable_model");
 		$this->load->model("Editor_datafile_model");		
 		$this->load->model("Collection_model");
+		$this->load->model("Editor_template_model");
 	}
 
 
@@ -316,7 +317,10 @@ class Editor_model extends CI_Model {
 			throw new Exception("INVALID_TYPE: ".$type);
 		}
 
+		$default_template=$this->Editor_template_model->get_default_template($type);
+
 		$options['type']=$type;
+		$options['template_uid']=isset($default_template['template_uid']) ? $default_template['template_uid'] : '';
 
 		if (!isset($options['metadata'])){			
 			$options['metadata']=$this->encode_metadata(new stdClass);
