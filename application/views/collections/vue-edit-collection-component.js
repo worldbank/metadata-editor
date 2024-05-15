@@ -41,8 +41,7 @@ Vue.component('vue-edit-collection', {
                     Edit collection 
                     </v-card-title>
 
-                    <v-card-text>
-                        <pre>{{collection}}</pre>
+                    <v-card-text>                        
                         <div class="form-group">
                             <label>Title</label>
                             <input type="text" class="form-control" v-model="collection.title" maxlength="150">

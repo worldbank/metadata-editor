@@ -160,6 +160,7 @@ Vue.component('vue-manage-users', {
                 await this.AddUserCollectionAccess(this.collection_id,user.id,this.selected_permission);
             }
             this.is_updating = false;
+            this.selected_users=[];
         },
         AddUserCollectionAccess: async function(collection_id,user_id,permissions) {
             let vm=this;
