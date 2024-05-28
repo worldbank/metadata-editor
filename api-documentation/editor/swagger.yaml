@@ -31,6 +31,9 @@ tags:
   - name: Metadata
     description: Access metadata and documentation available for the studies in the catalog
 
+  - name: Templates
+    description: Templates
+
 
 x-tagGroups:
   - name: Editor
@@ -41,6 +44,7 @@ x-tagGroups:
       - External resources
       - Datafile
       - Variable
+      - Templates
 
   - name: Collections
     tags:
@@ -50,7 +54,10 @@ x-tagGroups:
       - Catalog
   - name: Metadata
     tags:
-      - Metadata    
+      - Metadata 
+  - name: Templates
+    tags:
+      - Templates   
 schemes:
   - http
 paths:
@@ -552,6 +559,29 @@ paths:
             description: successful operation            
         security:
           - ApiKeyAuth: []
+  /collections/template:
+      post:
+        tags:
+          - Collections
+          - Templates
+        summary: Set template for collection
+        description: Set template for all projects in a collection
+        operationId: SetTemplateForCollection
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/TemplateForCollection"
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
   /resources/{projectId}:
       get:
         tags:
@@ -851,8 +881,162 @@ paths:
             description: successful operation            
         security:
           - ApiKeyAuth: []
+  /templates:
+      get:
+        tags:
+          - Templates
+        summary: List templates
+        description: Get a list of all templates
+        operationId: listTemplates
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+      post:
+        tags:
+          - Templates
+        summary: Create template
+        description: Create a new template
+        operationId: createTemplate
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "template-schema.json"
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+  /templates/{uid}:
+      get:
+        tags:
+          - Templates
+        summary: Get template by UID
+        description: Get template by UID
+        operationId: getTemplate
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "uid"
+            type: string
+            required: true
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+  /templates/duplicate/{uid}:
+      post:
+        tags:
+          - Templates
+        summary: Duplicate template
+        description: Create duplicate template
+        operationId: duplicateTemplate
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "uid"
+            type: string
+            description: Template UID to create a duplicate
+            required: true
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+  /templates/update/{uid}:
+      post:
+        tags:
+          - Templates
+        summary: Update template
+        description: Update template
+        operationId: updateTemplate
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "uid"
+            type: string
+            description: Template UID to update
+            required: true
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/Template"
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+  /templates/delete/{uid}:
+      post:
+        tags:
+          - Templates
+        summary: Delete template
+        description: Delete template
+        operationId: deleteTemplate
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "uid"
+            type: string
+            description: Template UID to delete
+            required: true
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
 ###############################################################
 definitions:
+  Template:
+    type: object
+    properties:
+      type:
+        type: string
+        required: true
+      template:
+        type: object
+    xml:
+      name: template
+  TemplateForCollection:
+    type: object
+    properties:
+      collection_id:
+        type: integer
+        required: true
+      template_uid:
+        type: string
+        required: true
+      project_type:
+        type: string
+        required: true
+        description: survey, timeseries, table, document, geospatial, ...
+    xml:
+      name: TemplateForCollection
   Collection:
     type: object
     properties:

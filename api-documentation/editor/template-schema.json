@@ -1,0 +1,133 @@
+{
+  "$id": "http://ihsn.org/schemas/template",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Template schema",
+  "description": "Template schema",
+  "type": "object",
+  "definitions":{
+    "item": {
+      "type": "object",
+      "title": "Item",
+      "description": "Item",
+      "properties":{
+        "key": {
+          "type": "string",
+          "title": "Key",
+          "description": "unique item key"
+        },
+        "title": {
+          "type": "string",
+          "title": "Title",
+          "description": "Item title"
+        },
+        "help_text": {
+          "type": "string",
+          "title": "Help text",
+          "description": "Help text for the item"
+        },
+        "display_type": {
+          "type": "string",
+          "title": "Display type",
+          "description": "Display type for the item e.g. text, number, date, etc."
+        },
+        "is_required": {
+          "type": "boolean",
+          "title": "Required",
+          "description": "Is the item required?"
+        },
+        "is_recommend": {
+          "type": "boolean",
+          "title": "Recommend",
+          "description": "Is the item recommended?"
+        },
+        "items": {
+          "type": "array",
+          "title": "Items",
+          "description": "Sub items",
+          "items": {
+            "$ref": "#/definitions/item"
+          }
+        }
+
+      }
+    }
+  },
+  "properties": {    
+
+    "uid": {
+      "type": "string",
+      "title": "Template unique identifier",
+      "description": "Unique identifier for the template"
+    },
+
+    
+
+    "metadata_information": {
+      "type": "object",
+      "description": "Metadata information",
+      "properties": {
+        "title": {
+          "type": "string",
+          "title": "Title",
+          "description": "Title of the document"
+        },
+        "idno": {
+          "type": "string",
+          "title": "ID number",
+          "description": "Unique ID number for the document"
+        },
+        "producers": {
+          "type": "array",
+          "title": "Producers",
+          "description": "List of producers",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "title": "Name",
+                "description": "Name of the producer"
+              },
+              "abbr": {
+                "type": "string",
+                "title": "Abbreviation",
+                "description": "Abbreviation"
+              },
+              "affiliation": {
+                "type": "string",
+                "title": "Affiliation",
+                "description": "Affiliation"
+              },
+              "role": {
+                "type": "string",
+                "title": "Role",
+                "description": "Role"
+              }
+            }
+          }
+        },
+        "production_date": {
+          "type": "string",
+          "title": "Production date",
+          "description": "Date of production"
+        },
+        "version": {
+          "type": "string",
+          "title": "Version",
+          "description": "Document version"
+        }
+      }
+    },
+    "template":{
+      "type":"object",
+      "properties":{
+        "items":{
+          "type":"array",
+          "items":{
+            "$ref": "#/definitions/item"
+          }   
+        }
+      }
+    }
+  }    
+}
