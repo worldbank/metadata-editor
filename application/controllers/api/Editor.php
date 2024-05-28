@@ -716,6 +716,41 @@ class Editor extends MY_REST_Controller
 	}
 
 
+	function html_get($sid=null)
+	{
+		try{
+			$sid=$this->get_sid($sid);
+			$exists=$this->Editor_model->check_id_exists($sid);
+
+			$download=false;
+			if ($this->input->get("download")==1 || $this->input->get("download")=='true'){
+				$download=true;
+			}
+
+			if(!$exists){
+				throw new Exception("Project not found");
+			}
+
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
+			$this->load->library("html_report");
+			$html=$this->html_report->generate($sid);
+			
+			if ($download){
+				$this->load->helper('download');
+				$filename='project_metadata-'.$sid.'.html';
+				force_download($filename, $html);
+			}else{
+				echo $html;
+			}
+			die();
+		}
+		catch(Exception $e){
+			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	
+	}
+
+
 	/**
 	 * 
 	 * Download project metadata as DDI (only for Microdata)
