@@ -13,7 +13,7 @@
 ?>
 <div class="table-responsive field field-<?php echo $template['title'];?>">
     <?php if($hide_column_headings!==true):?>
-        <div class="field-label"><?php echo t($template['title']);?></div>
+        <h4 class="field-label"><?php echo t($template['title']);?></h4>
     <?php endif;?>
     <div class="field-value">                        
         <ul>
