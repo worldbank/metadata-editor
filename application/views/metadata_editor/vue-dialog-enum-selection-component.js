@@ -43,6 +43,11 @@ Vue.component('vue-dialog-enum-selection-component', {
             //add a numeric index to the enums
             //this is needed for the v-data-table
             let items=[];
+            
+            if (this.enums==null){
+                return items;
+            }
+
             for (let i=0;i<this.enums.length;i++){
                 let item=this.enums[i];
                 item.index=i;
