@@ -694,9 +694,9 @@
               "items":[
                 {
                 title: 'Preview',
-                type:'home',
+                type:'preview',
                 file: 'txt',
-                key: 'home.preview'
+                key: 'page-preview'
                 }
               ]
             });
@@ -836,6 +836,11 @@
 
           if (node.type=='feature-attribute'){
             router.push('/geospatial-feature/'+node.feature.typeName);
+            return;
+          }
+
+          if (node.type=='preview'){
+            router.push('/page-preview/');
             return;
           }
 

@@ -200,6 +200,8 @@
             echo $this->load->view("metadata_editor/vue-dialog-datafile-replace-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-dialog-enum-selection-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-geospatial-feature-component.js",null,true);
+
+            echo $this->load->view("metadata_editor/vue-page-preview-component.js",null,true);
         ?>
 
         <?php if (empty($metadata)):?>
@@ -239,10 +241,12 @@
         const ResourcesEditComp ={props: ['index'],template: '<div><external-resources-edit /></div>'}
         const GeoFeatures ={props: ['index'],template: '<div>Geo-features</div>'}
         const GeoFeature ={props: ['feature_name'],template: '<div><geospatial-feature/></div>'}
+        const PagePreview ={template: '<div><page-preview/></div>'}
 
         //routes
         const routes = [
             { path: '/', component: Home },
+            { path: '/page-preview', component: PagePreview },
             { path: '/publish', component: PublishProject },
             { path: '/project-package', component: ProjectPackage },
             { path: '/generate-pdf', component: ProjectPdf },            

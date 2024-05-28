@@ -31,6 +31,14 @@ html {
      border: 1px solid gainsboro;
  }
 
+ .vue-page-preview-component .section-container-title {
+    padding: 10px;
+    padding-left: 18px;
+    background: transparent;
+    box-shadow: none;
+    border: 0px;
+}
+
  .v-expansion-panel-header {
      font-weight: bold;
  }
