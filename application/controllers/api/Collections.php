@@ -9,6 +9,7 @@ class Collections extends MY_REST_Controller
 		parent::__construct();
 		$this->load->helper("date");
 		$this->load->model("Collection_model");
+		$this->load->model("Editor_model");
 		$this->load->model("Collection_access_model");
 		$this->load->library("Form_validation");
 		
@@ -477,6 +478,84 @@ class Collections extends MY_REST_Controller
 			);
 						
 			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	/**
+	 * 
+	 * 
+	 * Set project template by collection and project type
+	 * 
+	 * post @options {
+	 * 	collection_id: int,
+	 * 	project_type: string,  //project types: survey, timeseries, geospatial, document, table
+	 * 	template_uid: string
+	 * }
+	 * 
+	 */
+	function template_post()
+	{
+		try{
+			$this->has_dataset_access('edit');
+
+			$options=$this->raw_json_input();
+
+			$required_fields=array('collection_id','project_type','template_uid');
+
+			foreach($required_fields as $field){
+				if (!isset($options[$field])){
+					throw new Exception("Missing parameter: $field");
+				}
+			}
+
+			$collection_id=$options['collection_id'];
+			$project_type=$options['project_type'];
+			$template_uid=$options['template_uid'];
+
+
+			$user=$this->api_user();
+			$user_id=$this->get_api_user_id();
+
+			$this->has_access($resource_='collection',$privilege='edit');
+
+			//get all projects in collection
+			$projects=$this->Collection_model->get_projects($collection_id,$project_type);
+
+			$result=array();
+
+			foreach($projects as $project)
+			{
+				if (!isset($project['sid'])){
+					$result['skipped'][]=array(
+						'sid'=>$project['sid'],
+						'type'=>$project['type']
+					);
+					continue;
+				}
+
+				$sid=$project['sid'];				
+				$this->Editor_model->set_project_template($sid,$template_uid);
+
+				$result['updated'][]=array(
+					'sid'=>$sid,
+					'type'=>$project['type']
+				);				
+			}
+			
+			$response=array(
+				'status'=>'success',
+				'result'=>$result
+			);
+
+			$this->set_response($response, REST_Controller::HTTP_OK);			
 		}
 		catch(Exception $e){
 			$error_output=array(

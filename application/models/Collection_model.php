@@ -229,8 +229,18 @@ class Collection_model extends CI_Model {
      * Get collection projects
      * 
      */
-    function get_projects($collection_id)
+    function get_projects($collection_id, $project_type=null)
     {
+
+        if ($project_type)
+        {
+            $this->db->select('editor_projects.type,editor_collection_projects.sid');
+            $this->db->join('editor_projects','editor_projects.id=editor_collection_projects.sid');
+            $this->db->where('editor_collection_projects.collection_id',$collection_id);
+            $this->db->where('editor_projects.type',$project_type);
+            return $this->db->get('editor_collection_projects')->result_array();
+        }
+
         $this->db->select('sid');
         $this->db->where('collection_id',$collection_id);
         return $this->db->get('editor_collection_projects')->result_array();

@@ -436,6 +436,7 @@ class Editor_model extends CI_Model {
 
 		$this->db->where('id',$sid);
 		$this->db->update('editor_projects',$options);
+		return true;
 	}
 
 
