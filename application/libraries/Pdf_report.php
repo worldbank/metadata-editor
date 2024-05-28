@@ -55,8 +55,7 @@ class PDF_Report{
 	
 	function generate($output_filename='trash/test.pdf',$options=array())
     {
-		if (!$this->project)
-		{
+		if (!$this->project){
 			throw new Exception("Project not initialized");
 		}
 

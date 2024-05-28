@@ -52,7 +52,7 @@ class Pagepreview{
                     $output[]= $this->render_array($item);
                     break;
                 case 'simple_array':
-                    $output[]= $this->render_array($item);
+                    $output[]= $this->render_simple_array($item);
                     break;
                 case 'text':
                 case 'string':
@@ -135,7 +135,7 @@ class Pagepreview{
             return false;
         }
 
-        return $this->ci->load->view('project_preview/fields/field_array',array('data'=>$value,'template'=>$item),true);
+        return $this->ci->load->view('project_preview/fields/field_simple_array',array('data'=>$value,'template'=>$item),true);
     }
     
     private function render_text($item)
