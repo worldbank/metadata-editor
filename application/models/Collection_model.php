@@ -72,6 +72,7 @@ class Collection_model extends CI_Model {
         $this->db->delete('editor_collections');
     }
 
+
     function delete_nested($id)
     {
         //get all children of this collection
@@ -422,6 +423,39 @@ class Collection_model extends CI_Model {
     }
 
 
+    /**
+     * 
+     * Flatten collection tree
+     * 
+     */
+    private function flatten_collection_tree($tree,$parent,&$output)
+    {
+        foreach($tree as $branch){
+            $output[]=array(
+                'id'=>$branch['id'],
+                'title'=>$parent.$branch['title'],
+                'projects'=>$branch['projects'],
+                'users'=>$branch['users']
+            );
+
+            if (isset($branch['items'])){
+                $this->flatten_collection_tree($branch['items'],$parent.$branch['title'].' / ',$output);
+            }
+        }
+    }
+
+
+    function get_collection_flatten_tree($id=null)
+    {
+        $tree=$this->get_collection_tree($id);
+
+        $output=array();
+        $this->flatten_collection_tree($tree,$parent='',$output);
+
+        return $output;
+    }
+
+
     
     /**
      * 
@@ -481,6 +515,40 @@ class Collection_model extends CI_Model {
                 }
             }
         }
+    }
+
+
+
+
+    /**
+     * 
+     * Copy collection
+     *  - projects
+     * - users + permissions
+     * 
+     */
+    function copy($source_id,$target_id)
+    {
+        $source=$this->select_single($source_id);
+        $target=$this->select_single($target_id);
+
+        if (!$source){
+            throw new Exception('Source collection not found');
+        }
+
+        if (!$target){
+            throw new Exception('Target collection not found');
+        }
+
+        //copy projects from source to target
+        $this->db->query('insert into editor_collection_projects (collection_id, sid) '.
+            'select '.$target_id.' as collection_id,sid from editor_collection_projects where collection_id='.$source_id);
+
+        //copy users from source to target
+        $this->db->query('insert into editor_collection_access (collection_id, user_id, permissions) '.
+            'select '.$target_id.' as collection_id,user_id,permissions from editor_collection_access where collection_id='.$source_id);
+
+        return true;
     }
 
 }

@@ -117,6 +117,7 @@
             echo $this->load->view("collections/vue-collections-component.js", null, true);
             echo $this->load->view("collections/vue-edit-collection-component.js", null, true);
             echo $this->load->view("collections/vue-manage-users-component.js", null, true);
+            echo $this->load->view("collections/vue-copy-collection-component.js", null, true);
         ?>
 
 

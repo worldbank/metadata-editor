@@ -5,6 +5,7 @@ Vue.component('vue-collection', {
             collections: [],
             edit_collection: {},
             dialog_edit: false,
+            dialog_copy_collection: false,
             active_tab:1,
             site_base_url: CI.base_url,
             action_menu: false,        
@@ -40,6 +41,19 @@ Vue.component('vue-collection', {
         },
         momentDate(date) {
             return moment.utc(date).format("MMM d, YYYY")
+        },
+        refreshCollectionsTree: function() {
+            vm = this;
+            let url = CI.base_url + '/api/collections/tree_refresh/';
+
+            axios.get(url)
+                .then(function(response) {
+                    vm.loadCollections();
+                })
+                .catch(function(error) {
+                    console.log("error", error);
+                    alert("Failed: " +  vm.errorResponseMessage(error));
+                });
         },
         loadCollections: function() {
             vm = this;
@@ -158,6 +172,7 @@ Vue.component('vue-collection', {
     <div class="vue-collection-component">
         
             <vue-edit-collection v-model="dialog_edit" :collection="edit_collection" v-on:update-collection="updateCollection" vonremove-access="UnshareProjectWithUser"></vue-edit-collection>
+            <vue-copy-collection v-model="dialog_copy_collection"></vue-copy-collection>
             
             <section class="container">
 
@@ -203,7 +218,31 @@ Vue.component('vue-collection', {
                                     </div>
                                     <div class="col-1"><strong>Users</strong></div>
                                     <div class="col-1"><strong>Projects</strong></div>
-                                    <div class="col-1"></div>
+                                    <div class="col-1">
+                                    <!-- collection actions -->
+                                        <v-menu offset-y>
+                                            <template v-slot:activator="{ on, attrs }">
+                                                <v-btn
+                                                color="primary"
+                                                dark
+                                                v-bind="attrs"
+                                                v-on="on"
+                                                icon
+                                                >
+                                                <v-icon>mdi-dots-vertical</v-icon>
+                                                </v-btn>
+                                            </template>
+                                            <v-list>
+                                                <v-list-item>
+                                                    <v-list-item-title @click="dialog_copy_collection=true">Copy collection</v-list-item-title>
+                                                </v-list-item>
+                                                <v-list-item>
+                                                    <v-list-item-title @click="refreshCollectionsTree">Refresh tree</v-list-item-title>
+                                                </v-list-item>
+                                            </v-list>
+                                        </v-menu>
+                                    <!-- end collection actions -->                                    
+                                    </div>
                                 </div>
 
 

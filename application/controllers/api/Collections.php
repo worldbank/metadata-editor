@@ -408,6 +408,29 @@ class Collections extends MY_REST_Controller
 	}
 
 
+	function tree_flatten_get($id=null)
+	{
+		try{
+			$this->has_access($resource_='collection',$privilege='view');
+			$result=$this->Collection_model->get_collection_flatten_tree($id);
+			
+			$response=array(
+				'status'=>'success',
+				'collections'=>$result
+			);
+						
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
 	/**
 	 * 
 	 * Re-build collection tree (clousure table)
@@ -553,6 +576,51 @@ class Collections extends MY_REST_Controller
 			$response=array(
 				'status'=>'success',
 				'result'=>$result
+			);
+
+			$this->set_response($response, REST_Controller::HTTP_OK);			
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	/**
+	 * 
+	 * Copy collection 
+	 * 
+	 * 	- projects
+	 *  - users + permissions
+	 * 
+	 * 
+	 */
+	function copy_post()
+	{
+		try{
+			$this->has_access($resource_='collection',$privilege='admin');
+			$options=$this->raw_json_input();
+
+			if (!isset($options['source_id'])){
+				throw new Exception("Missing parameter: source_id");
+			}
+
+			if (!isset($options['target_id'])){
+				throw new Exception("Missing parameter: target_id");
+			}
+
+			$source_id=(int)$options['source_id'];
+			$target_id=(int)$options['target_id'];
+
+			$result=$this->Collection_model->copy($source_id,$target_id);
+
+			$response=array(
+				'status'=>'success',
+				'collection_id'=>$result
 			);
 
 			$this->set_response($response, REST_Controller::HTTP_OK);			
