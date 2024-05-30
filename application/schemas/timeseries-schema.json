@@ -109,10 +109,49 @@
 					"type": "string",
 					"title": "Display Name"
 				},
+				"authoring_entity": {
+					"type": "array",
+					"title": "Authoring entity",
+					"description": "The person, corporate body, or agency responsible for the work's substantive and intellectual content. Repeat the element for each author, and use 'affiliation' attribute if available. Invert first and last name and use commas.",
+					"items": {
+						"type": "object",
+						"properties": {
+							"name": {
+								"title": "Agency Name",
+								"type": "string",
+								"description": "Name of the person, corporate body, or agency responsible for the work's substantive and intellectual content. If a person, invert first and last name and use commas."
+							},
+							"affiliation": {
+								"title": "Affiliation",
+								"type": "string"
+							},
+							"abbreviation": {
+								"title": "Abbreviation",
+								"description": "Abbreviation"
+							},
+							"email": {
+								"title": "Email",
+								"description": "Email"
+							},
+							"uri": {
+								"title": "URI",
+								"type": "string"
+							}
+						},
+						"required": [
+							"name"
+						]
+					}
+				},
 				"database_id": {
 					"type": "string",
 					"title": "Database ID",
 					"description": "Series database ID"
+				},
+				"database_name": {
+					"type": "string",
+					"title": "Database name",
+					"description": "Series database name"
 				},
 				"date_last_update": {
 					"type": "string",
@@ -293,6 +332,33 @@
 					"type": "string",
 					"title": "Statistical concept"
 				},
+				"statistical_concept_references": {
+					"type": "array",
+					"title": "Statistical concept references",
+					"description": "URLs for statistical concept references",
+					"items": {
+						"type": "object",
+						"properties": {
+							"source": {
+								"title": "Source",
+								"type": "string"
+							},
+							"uri": {
+								"title": "URI",
+								"description": "URI",
+								"type": "string"
+							},
+							"note": {
+								"title": "Note",
+								"description": "Note",
+								"type": "string"
+							}
+						},
+						"required": [
+							"uri"
+						]
+					}
+				},
 				"concepts": {
 					"type": "array",
 					"title": "Related concepts",
@@ -351,13 +417,94 @@
 					"type": "string",
 					"title": "Methodology"
 				},
+				"methodology_references": {
+					"type": "array",
+					"title": "Methodology references",
+					"description": "URLs for methodology references",
+					"items": {
+						"type": "object",
+						"properties": {
+							"source": {
+								"title": "Source",
+								"type": "string"
+							},
+							"uri": {
+								"title": "URI",
+								"description": "URI",
+								"type": "string"
+							},
+							"note": {
+								"title": "Note",
+								"description": "Note",
+								"type": "string"
+							}
+						},
+						"required": [
+							"uri"
+						]
+					}
+				},
 				"derivation": {
 					"type": "string",
 					"title": "Derivation"
 				},
+				"derivation_references": {
+					"type": "array",
+					"title": "Derivation references",
+					"description": "URLs for derivation references",
+					"items": {
+						"type": "object",
+						"properties": {
+							"source": {
+								"title": "Source",
+								"type": "string"
+							},
+							"uri": {
+								"title": "URI",
+								"description": "URI",
+								"type": "string"
+							},
+							"note": {
+								"title": "Note",
+								"description": "Note",
+								"type": "string"
+							}
+						},
+						"required": [
+							"uri"
+						]
+					}
+				},
 				"imputation": {
 					"type": "string",
 					"title": "Imputations"
+				},
+				"imputation_references": {
+					"type": "array",
+					"title": "Imputation references",
+					"description": "URLs for imputation references",
+					"items": {
+						"type": "object",
+						"properties": {
+							"source": {
+								"title": "Source",
+								"type": "string"
+							},
+							"uri": {
+								"title": "URI",
+								"description": "URI",
+								"type": "string"
+							},
+							"note": {
+								"title": "Note",
+								"description": "Note",
+								"type": "string"
+							}
+						},
+						"required": [
+							"uri"
+						]
+					}
 				},
 				"adjustments": {
 					"title": "Adjustments",
@@ -619,6 +766,33 @@
 					"type": "string",
 					"title": "Aggregation method"
 				},
+				"aggregation_method_references": {
+					"type": "array",
+					"title": "Aggregation method references",
+					"description": "URLs for aggregation method references",
+					"items": {
+						"type": "object",
+						"properties": {
+							"source": {
+								"title": "Source",
+								"type": "string"
+							},
+							"uri": {
+								"title": "URI",
+								"description": "URI",
+								"type": "string"
+							},
+							"note": {
+								"title": "Note",
+								"description": "Note",
+								"type": "string"
+							}
+						},
+						"required": [
+							"uri"
+						]
+					}
+				},
 				"disaggregation": {
 					"type": "string",
 					"title": "Dissaggregation"
@@ -702,40 +876,7 @@
 						}
 					}
 				},
-				"authoring_entity": {
-					"type": "array",
-					"title": "Authoring entity",
-					"description": "The person, corporate body, or agency responsible for the work's substantive and intellectual content. Repeat the element for each author, and use 'affiliation' attribute if available. Invert first and last name and use commas.",
-					"items": {
-						"type": "object",
-						"properties": {
-							"name": {
-								"title": "Agency Name",
-								"type": "string",
-								"description": "Name of the person, corporate body, or agency responsible for the work's substantive and intellectual content. If a person, invert first and last name and use commas."
-							},
-							"affiliation": {
-								"title": "Affiliation",
-								"type": "string"
-							},
-							"abbreviation": {
-								"title": "Abbreviation",
-								"description": "Abbreviation"
-							},
-							"email": {
-								"title": "Email",
-								"description": "Email"
-							},
-							"uri": {
-								"title": "URI",
-								"type": "string"
-							}
-						},
-						"required": [
-							"name"
-						]
-					}
-				},
+				
 				"sources": {
 					"type": "array",
 					"title": "Sources",
@@ -783,12 +924,41 @@
 								"items": {
 									"type": "object",
 									"properties": {
-										"name": {
-											"title": "Name",
+										"first_name": {
+											"title": "First name",
+											"type": "string"
+										},
+										"initial": {
+											"title": "Initial",
+											"type": "string"
+										},
+										"last_name": {
+											"title": "Last name",
 											"type": "string"
 										},
 										"affiliation": {
 											"title": "Affiliation",
+											"type": "string"
+										},
+										"author_id": {
+											"title": "Author ID",
+											"type": "array",
+											"items": {
+												"type": "object",
+												"properties": {
+													"type": {
+														"title": "Type",
+														"type": "string"
+													},
+													"id": {
+														"title": "Identifier",
+														"type": "string"
+													}
+												}
+											}
+										}, 
+										"full_name": {
+											"title": "Full name",
 											"type": "string"
 										}
 									}
@@ -1155,6 +1325,10 @@
 								"title": "Role",
 								"type": "string"
 							},
+							"position": {
+								"title": "Position",
+								"type": "string"
+							},
 							"affiliation": {
 								"title": "Affiliation",
 								"type": "string"
@@ -1182,6 +1356,11 @@
 				"idno",
 				"name"
 			]
+		},
+		"datacite": {
+			"type": "object",
+			"description": "DataCite metadata for generating DOI",			
+			"$ref": "datacite-schema.json"			
 		},
 		"provenance": {
 			"type": "array",
