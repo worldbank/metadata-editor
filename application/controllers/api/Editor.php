@@ -337,7 +337,7 @@ class Editor extends MY_REST_Controller
 			$options['changed_by']=$user_id;
 			$options['sid']=$sid;
 
-			$this->editor_acl->user_has_project_access($sid,$permission='edit');			
+			$this->editor_acl->user_has_project_access($sid,$permission='edit', $this->api_user());			
 			$this->Editor_model->set_project_options($sid,$options);
 
 			$response=array(
@@ -766,7 +766,7 @@ class Editor extends MY_REST_Controller
 				throw new Exception("Project not found");
 			}
 
-			$this->editor_acl->user_has_project_access($sid,$permission='view');
+			$this->editor_acl->user_has_project_access($sid,$permission='view', $user=$this->api_user());
 			$this->Editor_model->download_project_pdf($sid);
 			die();
 		}
@@ -790,7 +790,7 @@ class Editor extends MY_REST_Controller
 				throw new Exception("Project not found");
 			}
 
-			$this->editor_acl->user_has_project_access($sid,$permission='view');
+			$this->editor_acl->user_has_project_access($sid,$permission='view', $user=$this->api_user());
 			$result=$this->Editor_model->generate_project_pdf($sid);
 
 			$output=array(
