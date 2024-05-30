@@ -237,6 +237,13 @@
                             "display_type": "text"
                         },
                         {
+                            "key": "series_description.database_name",
+                            "type": "string",
+                            "title": "Database name",
+                            "help_text": "Database name",
+                            "display_type": "text"
+                        },
+                        {
                             "key": "series_description.date_last_update",
                             "type": "string",
                             "title": "Last update date",
@@ -394,11 +401,85 @@
                             "display_type": "textarea"
                         },
                         {
+                            "key": "series_description.methodology_references",
+                            "title": "Methodology references",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "source",
+                                    "title": "Source",
+                                    "type": "string",
+                                    "name": "Source",
+                                    "prop_key": "series_description.methodology_references.source",
+                                    "help_text": "The source of the definition (title, or label).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "rules_": "required",
+                                    "prop_key": "series_description.methodology_references.uri",
+                                    "help_text": "A link (URL) to the source of the definition.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "note",
+                                    "title": "Note",
+                                    "type": "string",
+                                    "prop_key": "series_description.methodology_references.note",
+                                    "help_text": "This element provides for annotating or explaining the reason the reference has been included as part of the metadata.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "This element is provided to link to an external resources from which the definition was extracted."
+                        },
+                        {
                             "key": "series_description.derivation",
                             "type": "string",
                             "title": "Derivation",
                             "help_text": "Description of the derivation method (not including imputations, which should be described in element \"Imputation\").",
                             "display_type": "textarea"
+                        },
+                        {
+                            "key": "series_description.derivation_references",
+                            "title": "Derivation references",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "source",
+                                    "title": "Source",
+                                    "type": "string",
+                                    "name": "Source",
+                                    "prop_key": "series_description.derivation_references.source",
+                                    "help_text": "The source of the definition (title, or label).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "rules_": "required",
+                                    "prop_key": "series_description.derivation_references.uri",
+                                    "help_text": "A link (URL) to the source of the definition.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "note",
+                                    "title": "Note",
+                                    "type": "string",
+                                    "prop_key": "series_description.derivation_references.note",
+                                    "help_text": "This element provides for annotating or explaining the reason the reference has been included as part of the metadata.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "This element is provided to link to an external resources from which the definition was extracted."
                         },
                         {
                             "key": "series_description.imputation",
@@ -409,12 +490,86 @@
                             "display_type": "textarea"
                         },
                         {
+                            "key": "series_description.imputation_references",
+                            "title": "Imputation references",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "source",
+                                    "title": "Source",
+                                    "type": "string",
+                                    "name": "Source",
+                                    "prop_key": "series_description.imputation_references.source",
+                                    "help_text": "The source of the definition (title, or label).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "rules_": "required",
+                                    "prop_key": "series_description.imputation_references.uri",
+                                    "help_text": "A link (URL) to the source of the definition.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "note",
+                                    "title": "Note",
+                                    "type": "string",
+                                    "prop_key": "series_description.imputation_references.note",
+                                    "help_text": "This element provides for annotating or explaining the reason the reference has been included as part of the metadata.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "This element is provided to link to an external resources from which the definition was extracted."
+                        },
+                        {
                             "key": "series_description.statistical_concept",
                             "type": "string",
                             "class": "statistical_concept",
                             "title": "Statistical concept",
                             "help_text": "A reference of the series with content of a statistical character. This can include coding concepts or standards that are applied to render the data statistically relevant.",
                             "display_type": "textarea"
+                        },
+                        {
+                            "key": "series_description.statistical_concept_references",
+                            "title": "Concept references",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "source",
+                                    "title": "Source",
+                                    "type": "string",
+                                    "name": "Source",
+                                    "prop_key": "series_description.statistical_concept_references.source",
+                                    "help_text": "The source of the definition (title, or label).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "rules_": "required",
+                                    "prop_key": "series_description.statistical_concept_references.uri",
+                                    "help_text": "A link (URL) to the source of the definition.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "note",
+                                    "title": "Note",
+                                    "type": "string",
+                                    "prop_key": "series_description.statistical_concept_references.note",
+                                    "help_text": "This element provides for annotating or explaining the reason the reference has been included as part of the metadata.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "This element is provided to link to an external resources from which the definition was extracted."
                         },
                         {
                             "key": "series_description.concepts",
@@ -459,6 +614,43 @@
                             "title": "Aggregation method",
                             "help_text": "The \"Aggregation method\" element describes how values can be aggregated from one geographic level (for example, a country) to a higher-level geographic area (for example, a group of country defined based on a geographic criteria (region, world) or another criteria (low/medium/high-income countries, island countries, OECD countries, etc.). The aggregation method can be simple (like “sum” or “population-weighted average”) or more complex, involving weighting of values.",
                             "display_type": "textarea"
+                        },
+                        {
+                            "key": "series_description.aggregation_method_references",
+                            "title": "Aggregation references",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "source",
+                                    "title": "Source",
+                                    "type": "string",
+                                    "name": "Source",
+                                    "prop_key": "series_description.aggregation_method_references.source",
+                                    "help_text": "The source of the definition (title, or label).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "rules_": "required",
+                                    "prop_key": "series_description.aggregation_method_references.uri",
+                                    "help_text": "A link (URL) to the source of the definition.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "note",
+                                    "title": "Note",
+                                    "type": "string",
+                                    "prop_key": "series_description.aggregation_method_references.note",
+                                    "help_text": "This element provides for annotating or explaining the reason the reference has been included as part of the metadata.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "This element is provided to link to an external resources from which the definition was extracted."
                         },
                         {
                             "key": "series_description.sources",
@@ -509,9 +701,8 @@
                                 },
                                 {
                                     "key": "name",
-                                    "title": "Title",
-                                    "type": "string",
-                                    "name": "Source name",
+                                    "title": "Name",
+                                    "type": "string",                                    
                                     "rules_": "required",
                                     "prop_key": "series_description.sources.name",
                                     "help_text": "The title (name, or label) of the source.",
@@ -528,22 +719,70 @@
                                 {
                                     "key": "authors",
                                     "title": "Authors",
-                                    "type": "array",
+                                    "type": "nested_array",
                                     "help_text": "Authors",
                                     "props": [
                                         {
-                                            "key": "name",
-                                            "title": "Name",
-                                            "type": "string",                                            
-                                            "prop_key": "series_description.sources.authors.name",
+                                            "key": "first_name",
+                                            "title": "First name",
+                                            "type": "string",
+                                            "prop_key": "series_description.sources.authors.first_name",
                                             "help_text": "",
                                             "display_type": "text"
                                         },
+                                        {
+                                            "key": "initial",
+                                            "title": "Initial",
+                                            "type": "string",
+                                            "prop_key": "series_description.sources.authors.initial",
+                                            "help_text": "",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "last_name",
+                                            "title": "Last name",
+                                            "type": "string",
+                                            "prop_key": "series_description.sources.authors.last_name",
+                                            "help_text": "",
+                                            "display_type": "text"
+                                        },                                        
                                         {
                                             "key": "affiliation",
                                             "title": "Affiliation",
                                             "type": "string",                                            
                                             "prop_key": "series_description.sources.authors.affiliation",
+                                            "help_text": "",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "author_id",
+                                            "title": "Author ID",
+                                            "type": "array",                                            
+                                            "prop_key": "series_description.sources.authors.author_id",
+                                            "help_text": "",
+                                            "props":[
+                                                {
+                                                    "key": "type",
+                                                    "title": "Type",
+                                                    "type": "string",
+                                                    "prop_key": "series_description.sources.authors.author_id.type",
+                                                    "help_text": "",
+                                                    "display_type": "text"
+                                                },
+                                                {
+                                                    "key": "id",
+                                                    "title": "Identifier (ID)",
+                                                    "type": "string",
+                                                    "prop_key": "series_description.sources.authors.author_id.id",
+                                                    "help_text": "",
+                                                    "display_type": "text"
+                                                }]                                            
+                                        },
+                                        {
+                                            "key": "full_name",
+                                            "title": "Full name",
+                                            "type": "string",                                            
+                                            "prop_key": "series_description.sources.authors.full_name",
                                             "help_text": "",
                                             "display_type": "text"
                                         }

@@ -53,7 +53,7 @@ $config['timeseries'][]=array(
     'template' => 'metadata_editor/metadata_editor_templates/timeseries_form_template.json',
     'lang'=>'en',
     'uid'=>'timeseries-system-en',
-    'name'=>'Indicator IHSN Schema 1.0 EN',
+    'name'=>'Indicator Schema 1.0 EN',
     'version'=>'1.0',
     'description'=>'This template contains all elements available in the metadata schema developed by the IHSN for the documentation of indicators and time series of indicators. It can be used as basis for the production of user templates consisting of a subset of the available elements, with customized labels, instructions, ordering and grouping of metadata elements, controlled vocabularies, validation rules, and default values.'
 ); 
