@@ -1535,7 +1535,15 @@
                                     "type": "string",
                                     "prop_key": "project_desc.contacts.role",
                                     "help_text": "Role of the contact person. A research project may have contact persons depending on the output or some of the technical input. Some complex projects may have various data collection processes that have different processing channels and contacts. This section should provide for a key primary public interface that can refer the public inquiry or provide a collection of entry points.",
-                                    "display_type": "textarea"
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "position",
+                                    "title": "Position",
+                                    "type": "string",
+                                    "prop_key": "project_desc.contacts.position",
+                                    "help_text": "",
+                                    "display_type": "text"
                                 },
                                 {
                                     "key": "affiliation",
