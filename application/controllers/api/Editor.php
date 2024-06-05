@@ -181,6 +181,31 @@ class Editor extends MY_REST_Controller
 	}
 
 
+	private function get_collection_options(&$options)
+	{
+		$collections=array();
+		if (isset($options['collection_ids'])){
+			//$collections['id_list']=$options['collection_ids'];
+			$id_list=$options['collection_ids'];
+			unset($options['collection_ids']);
+			return $id_list;			
+		}
+		if (isset($options['collection_names'])){
+			//$collections['names']=$options['collection_names'];
+			$names=$options['collection_names'];
+			unset($options['collection_names']);
+
+			foreach($names as $collection_name){
+				$collection_id=$this->Collection_model->get_collection_id_by_name($collection_name);
+				if ($collection_id){
+					$collections[]=$collection_id;
+				}
+			}
+			
+		}
+		return $collections;
+	}
+
 
 	/**
 	 * 
@@ -191,7 +216,7 @@ class Editor extends MY_REST_Controller
 	 */
 	function create_post($type=null)
 	{
-		try{			
+		try{
 			$user_id=$this->get_api_user_id();
 			$project_options=$this->raw_json_input();
 
@@ -202,6 +227,18 @@ class Editor extends MY_REST_Controller
 				$idno=$this->Editor_model->generate_uuid();
 			}
 
+			//overwrite
+			if (isset($project_options['overwrite']) 
+				&& ($project_options['overwrite']==1 
+				|| strtolower($project_options['overwrite'])=='true')){
+
+				$sid=$this->Editor_model->get_project_id_by_idno($idno);				
+
+				if ($sid){
+					return $this->update_post($type,$sid);
+				}
+			}
+			
 			$this->validate_project_idno($idno);
 			
 			$options=array(
@@ -274,7 +311,8 @@ class Editor extends MY_REST_Controller
 			$user=$this->api_user();
 			$user_id=$this->get_api_user_id();
 			$id=$this->get_sid($id);
-			
+			$collections=$this->get_collection_options($options);
+
 			//check project exists and is of correct type
 			$exists=$this->Editor_model->check_id_exists($id,$type);
 
@@ -291,6 +329,11 @@ class Editor extends MY_REST_Controller
 			//validate & update project
 			$this->Editor_model->update_project($type,$id,$options,$validate);
 			$this->Editor_model->create_project_folder($id);
+
+			//add to collections
+			if (is_array($collections) && count($collections)>0){
+				$this->Collection_model->add_batch_projects($collections, array($id));
+			}
 
 			$response=array(
 				'status'=>'success'

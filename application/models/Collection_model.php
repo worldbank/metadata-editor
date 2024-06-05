@@ -317,6 +317,19 @@ class Collection_model extends CI_Model {
     }
 
 
+    function get_collection_id_by_name($name)
+    {
+        $this->db->select('id');
+        $this->db->where('title',$name);
+        $this->db->where('pid',null);
+        $result=$this->db->get('editor_collections')->row_array();
+
+        if ($result){
+            return $result['id'];
+        }
+    }
+
+
 
     /**
      * Get collections by projects
