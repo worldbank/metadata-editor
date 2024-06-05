@@ -269,10 +269,7 @@
 				"presentationForm": {
 					"title": "Presentation form",
 					"description": "The resource presentation form. e.g. 'mapDigital'. Recommended code following the [ISO/TS 19139](http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_PresentationFormCode) PresentationForm codelist. Suggested values: {`documentDigital`, `imageDigital`, `documentHardcopy`, `imageHardcopy`, `mapDigital`, `mapHardcopy`, `modelDigital`, `modelHardcopy`, `profileDigital`, `profileHardcopy`, `tableDigital`, `tableHardcopy`, `videoDigital`, `videoHardcopy`, `audioDigital`, `audioHardcopy`, `multimediaDigital`, `multimediaHardcopy`, `physicalSample`, `diagramDigital`, `diagramHardcopy`}",
-					"type": "array",
-					"items": {
-						"type": "string"
-					}
+					"type": "string"					
 				},
 				"series": {
 					"title": "Series",
@@ -645,25 +642,11 @@
 		}
 	},
 	"properties": {
-		"repositoryid": {
+		"idno": {
 			"type": "string",
-			"title": "Collection ID that owns the dataset",
-			"description": "Abbreviation for the collection that owns this dataset"
-		},
-		"published": {
-			"type": "integer",
-			"description": "Status of the dataset - 0=draft, 1=published",
-			"default": 0
-		},
-		"overwrite": {
-			"type": "string",
-			"description": "Overwrite if already exists?",
-			"enum": [
-				"yes",
-				"no"
-			],
-			"default": "no"
-		},
+			"title": "Project unique identifier",
+			"description": "Project unique identifier"
+		},	
 		"metadata_information": {
 			"type": "object",
 			"title": "Document metadata information",
@@ -749,20 +732,15 @@
 				"hierarchyLevel": {
 					"title": "Scope(s) / Hierarchy Level(s)",
 					"description": "List of Scope(s), or 'hierarchy level(s)'. e.g. `dataset`, `service`. Recommended code following the [ISO/TS 19139](http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MX_ScopeCode) Scope codelist.  (string)",
-					"type": "array",
-					"_xpath": "gmd:hierarchyLevel",
-					"items": {
-						"type": "string"
-					}
+					"type": "string",
+					"_xpath": "gmd:hierarchyLevel"
+					
 				},
 				"hierarchyLevelName": {
 					"title": "Scope / hierarchy level names.",
 					"description": "List of scope / hierarchy level names. Alternative to the use of 'hierarchyLevel' code items.",
-					"type": "array",
-					"_xpath": "gmd:hierarchyLevelName",
-					"items": {
-						"type": "string"
-					}
+					"type": "string",
+					"_xpath": "gmd:hierarchyLevelName"
 				},
 				"contact": {
 					"title": "Contacts",
@@ -920,525 +898,522 @@
 				"identificationInfo": {
 					"title": "Identification Info(s)",
 					"description": "Identification(s) of the resource",
-					"type": "array",
+					"type": "object",
 					"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification",
-					"items": {
-						"type": "object",
-						"properties": {
-							"citation": {
+					"properties": {
+						"citation": {
+							"type": "object",
+							"title": "Citation",
+							"description": "Dataset citation",
+							"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation",
+							"$ref": "#/definitions/citation"
+						},
+						"abstract": {
+							"title": "Abstract",
+							"description": "Abstract describing the dataset resource",
+							"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:abstract",
+							"type": "string"
+						},
+						"purpose": {
+							"title": "Purpose",
+							"description": "Purpose of the dataset resource",
+							"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:purpose",
+							"type": "string"
+						},
+						"credit": {
+							"title": "Credit",
+							"description": "Credit associated to the dataset resource",
+							"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:credit",
+							"type": "string"
+						},
+						"status": {
+							"title": "Status",
+							"description": "Status of the dataset resource. Recommended code following the [ISO/TS 19139](http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_ProgressCode) Progress codelist. Suggested values: {`completed`, `historicalArchive`, `obsolete`, `onGoing`, `planned`, `required`, `underDevelopment`, `final`, `pending`, `retired`, `superseded`, `tentative`, `valid`, `accepted`, `notAccepted`, `withdrawn`, `proposed`, `deprecated`}",
+							"type": "string",
+							"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:status/gmd:MD_ProgressCode"
+						},
+						"pointOfContact": {
+							"title": "Points of contact",
+							"description": "One or more points of contacts for the resource",
+							"type": "array",
+							"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:pointOfContact",
+							"items": {
 								"type": "object",
-								"title": "Citation",
-								"description": "Dataset citation",
-								"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:citation",
-								"$ref": "#/definitions/citation"
-							},
-							"abstract": {
-								"title": "Abstract",
-								"description": "Abstract describing the dataset resource",
-								"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:abstract",
-								"type": "string"
-							},
-							"purpose": {
-								"title": "Purpose",
-								"description": "Purpose of the dataset resource",
-								"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:purpose",
-								"type": "string"
-							},
-							"credit": {
-								"title": "Credit",
-								"description": "Credit associated to the dataset resource",
-								"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:credit",
-								"type": "string"
-							},
-							"status": {
-								"title": "Status",
-								"description": "Status of the dataset resource. Recommended code following the [ISO/TS 19139](http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_ProgressCode) Progress codelist. Suggested values: {`completed`, `historicalArchive`, `obsolete`, `onGoing`, `planned`, `required`, `underDevelopment`, `final`, `pending`, `retired`, `superseded`, `tentative`, `valid`, `accepted`, `notAccepted`, `withdrawn`, `proposed`, `deprecated`}",
-								"type": "string",
-								"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:status/gmd:MD_ProgressCode"
-							},
-							"pointOfContact": {
-								"title": "Points of contact",
-								"description": "One or more points of contacts for the resource",
-								"type": "array",
-								"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:pointOfContact",
-								"items": {
-									"type": "object",
-									"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty",
-									"$ref": "#/definitions/responsibleParty"
+								"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:pointOfContact/gmd:CI_ResponsibleParty",
+								"$ref": "#/definitions/responsibleParty"
+							}
+						},
+						"resourceMaintenance": {
+							"title": "Resource maintenance",
+							"description": "Information about the dataset resource maintenance",
+							"type": "array",
+							"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceMaintenance",
+							"items": {
+								"type": "object",
+								"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceMaintenance/gmd:MD_MaintenanceInformation",
+								"$ref": "#/definitions/maintenanceInfo"
+							}
+						},
+						"graphicOverview": {
+							"title": "Graphic Overview(s)",
+							"description": "Graphic Overview(s) for the dataset resource",
+							"type": "array",
+							"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:graphicOverview",
+							"items": {
+								"type": "object",
+								"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:graphicOverview/gmd:MD_BrowseGraphic",
+								"$ref": "#/definitions/graphicOverview"
+							}
+						},
+						"resourceFormat": {
+							"title": "Resource format(s)",
+							"description": "Resource format(s)",
+							"type": "array",
+							"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceFormat",
+							"items": {
+								"type": "object",
+								"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceFormat/gmd:MD_Format",
+								"$ref": "#/definitions/format"
+							}
+						},
+						"descriptiveKeywords": {
+							"title": "Descriptive keywords",
+							"description": "Descriptive keywords, organized by keyword type",
+							"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords",
+							"type": "array",
+							"items": {
+								"type": "object",
+								"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords",
+								"$ref": "#/definitions/keywords"
+							}
+						},
+						"resourceConstraints": {
+							"title": "Resource constraints",
+							"description": "Constraints associated to the resource",
+							"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceConstraints",
+							"_xpath_note": "gmd:MD_LegalConstraints or gmd:MD_SecurityConstraints",
+							"type": "array",
+							"items": {
+								"type": "object",
+								"$ref": "#/definitions/constraints"
+							}
+						},
+						"resourceSpecificUsage": {
+							"title": "Resource specific usage(s)",
+							"description": "Resource specific usage(s) - if applicable",
+							"type": "array",
+							"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceSpecificUsage",
+							"items": {
+								"type": "object",
+								"properties": {
+									"specificUsage": {
+										"title": "Specific usage description",
+										"description": "A description of a specific usage of this resource relevant to highlight, eg. use case of interest, success story, data paper",
+										"type": "string",
+										"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceSpecificUsage/gmd:specificUsage/gco:CharacterString"
+									},
+									"usageDateTime": {
+										"title": "Metadata Date Stamp",
+										"type": "string",
+										"description": "Date and time of the usage. Requires an extended ISO 8601 formatted combined UTC date and time string (2009-11-17T10:00:00)",
+										"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceSpecificUsage/gmd:usageDateTime/gco:DateTime"
+									},
+									"userDeterminedLimitations": {
+										"title": "User determined limitations",
+										"type": "string",
+										"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceSpecificUsage/gmd:userDeterminedLimitations/gco:CharacterString"
+									},
+									"userContactInfo": {
+										"title": "User contact(s)",
+										"type": "array",
+										"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceSpecificUsage/gmd:userContactInfo/gmd:CI_ResponsibleParty",
+										"items": {
+											"$ref": "#/definitions/responsibleParty"
+										}
+									}
 								}
-							},
-							"resourceMaintenance": {
-								"title": "Resource maintenance",
-								"description": "Information about the dataset resource maintenance",
-								"type": "array",
-								"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceMaintenance",
-								"items": {
-									"type": "object",
-									"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceMaintenance/gmd:MD_MaintenanceInformation",
-									"$ref": "#/definitions/maintenanceInfo"
-								}
-							},
-							"graphicOverview": {
-								"title": "Graphic Overview(s)",
-								"description": "Graphic Overview(s) for the dataset resource",
-								"type": "array",
-								"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:graphicOverview",
-								"items": {
-									"type": "object",
-									"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:graphicOverview/gmd:MD_BrowseGraphic",
-									"$ref": "#/definitions/graphicOverview"
-								}
-							},
-							"resourceFormat": {
-								"title": "Resource format(s)",
-								"description": "Resource format(s)",
-								"type": "array",
-								"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceFormat",
-								"items": {
-									"type": "object",
-									"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceFormat/gmd:MD_Format",
-									"$ref": "#/definitions/format"
-								}
-							},
-							"descriptiveKeywords": {
-								"title": "Descriptive keywords",
-								"description": "Descriptive keywords, organized by keyword type",
-								"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords",
-								"type": "array",
-								"items": {
-									"type": "object",
-									"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords",
-									"$ref": "#/definitions/keywords"
-								}
-							},
-							"resourceConstraints": {
-								"title": "Resource constraints",
-								"description": "Constraints associated to the resource",
-								"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceConstraints",
-								"_xpath_note": "gmd:MD_LegalConstraints or gmd:MD_SecurityConstraints",
-								"type": "array",
-								"items": {
-									"type": "object",
-									"$ref": "#/definitions/constraints"
-								}
-							},
-							"resourceSpecificUsage": {
-								"title": "Resource specific usage(s)",
-								"description": "Resource specific usage(s) - if applicable",
-								"type": "array",
-								"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceSpecificUsage",
-								"items": {
-									"type": "object",
+							}
+						},
+						"aggregationInfo": {
+							"title": "Aggregate information",
+							"description": "Identification of aggregate that encompasses the described resource, eg. data collection",
+							"type": "object",
+							"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:aggregateInfo",
+							"properties": {
+								"aggregateDataSetName": {
+									"type": "string",
+									"title": "Name of the Aggregate dataset",
+									"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:aggregateInfo/gmd:aggregateDataSetName"
+								},
+								"aggregateDataSetIdentifier": {
+									"type": "string",
+									"title": "Identifier of the Aggregate dataset",
+									"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:aggregateInfo/gmd:aggregateDataSetIdentifier"
+								},
+								"associationType": {
+									"type": "string",
+									"title": "Association type",
+									"description": "Type of association between the dataset resource and the aggregate Resource",
+									"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:aggregateInfo/gmd:associationType/gmd:DS_AssociationTypeCode",
 									"properties": {
-										"specificUsage": {
-											"title": "Specific usage description",
-											"description": "A description of a specific usage of this resource relevant to highlight, eg. use case of interest, success story, data paper",
+										"codeListValue": {
+											"title": "Association type, eg. 'isComposedOf'. Recommended code following the [ISO/TS 19139](http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#DS_AssociationTypeCode) AssociationType codelist. Suggested values: {crossReference, largerWorkCitation, partOfSeamlessDatabase, source, stereoMate, isComposedOf, collectiveTitle, series, dependency, revisionOf}",
 											"type": "string",
-											"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceSpecificUsage/gmd:specificUsage/gco:CharacterString"
+											"propertyType": "attribute"
 										},
-										"usageDateTime": {
-											"title": "Metadata Date Stamp",
+										"codeList": {
+											"title": "Codelist used for association types. Recommended URI: http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#DS_AssociationTypeCode",
 											"type": "string",
-											"description": "Date and time of the usage. Requires an extended ISO 8601 formatted combined UTC date and time string (2009-11-17T10:00:00)",
-											"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceSpecificUsage/gmd:usageDateTime/gco:DateTime"
+											"propertyType": "attribute"
 										},
-										"userDeterminedLimitations": {
-											"title": "User determined limitations",
+										"codeSpace": {
+											"title": "Codespace of the association types codelist. Recommended value: ISOTC211/19115",
 											"type": "string",
-											"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceSpecificUsage/gmd:userDeterminedLimitations/gco:CharacterString"
-										},
-										"userContactInfo": {
-											"title": "User contact(s)",
-											"type": "array",
-											"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:resourceSpecificUsage/gmd:userContactInfo/gmd:CI_ResponsibleParty",
-											"items": {
-												"$ref": "#/definitions/responsibleParty"
-											}
+											"propertyType": "attribute"
 										}
 									}
-								}
-							},
-							"aggregationInfo": {
-								"title": "Aggregate information",
-								"description": "Identification of aggregate that encompasses the described resource, eg. data collection",
-								"type": "object",
-								"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:aggregateInfo",
-								"properties": {
-									"aggregateDataSetName": {
-										"type": "string",
-										"title": "Name of the Aggregate dataset",
-										"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:aggregateInfo/gmd:aggregateDataSetName"
-									},
-									"aggregateDataSetIdentifier": {
-										"type": "string",
-										"title": "Identifier of the Aggregate dataset",
-										"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:aggregateInfo/gmd:aggregateDataSetIdentifier"
-									},
-									"associationType": {
-										"type": "string",
-										"title": "Association type",
-										"description": "Type of association between the dataset resource and the aggregate Resource",
-										"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:aggregateInfo/gmd:associationType/gmd:DS_AssociationTypeCode",
-										"properties": {
-											"codeListValue": {
-												"title": "Association type, eg. 'isComposedOf'. Recommended code following the [ISO/TS 19139](http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#DS_AssociationTypeCode) AssociationType codelist. Suggested values: {crossReference, largerWorkCitation, partOfSeamlessDatabase, source, stereoMate, isComposedOf, collectiveTitle, series, dependency, revisionOf}",
-												"type": "string",
-												"propertyType": "attribute"
-											},
-											"codeList": {
-												"title": "Codelist used for association types. Recommended URI: http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#DS_AssociationTypeCode",
-												"type": "string",
-												"propertyType": "attribute"
-											},
-											"codeSpace": {
-												"title": "Codespace of the association types codelist. Recommended value: ISOTC211/19115",
-												"type": "string",
-												"propertyType": "attribute"
-											}
-										}
-									},
-									"initiativeType": {
-										"type": "string",
-										"title": "Initiative type",
-										"description": "Type of initative behind the aggregate Resource",
-										"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:initiativeType/gmd:DS_InitiativeTypeCode",
-										"properties": {
-											"codeListValue": {
-												"title": "Initiative type, eg. 'collection'. Recommended code following the [ISO/TS 19139](http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#DS_InitiativeTypeCode) InitiativeType codelist. Suggested values: {campaign, collection, dataDictionary, exercise, experiment, investigation, mission, sensor, operation, platform, process, program, project, sciencePaper, study, task, trial, userGuide}",
-												"type": "string",
-												"propertyType": "attribute"
-											},
-											"codeList": {
-												"title": "Codelist used for initiative types. Recommended URI: http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#DS_InitiativeTypeCode",
-												"type": "string",
-												"propertyType": "attribute"
-											},
-											"codeSpace": {
-												"title": "Codespace of the initiative types codelist. Recommended value: ISOTC211/19115",
-												"type": "string",
-												"propertyType": "attribute"
-											}
-										}
-									}
-								}
-							},
-							"extent": {
-								"title": "Extent of the resource",
-								"description": "Defines the spatial (horizontal and vertical) and temporal region to which the content of the resource applies.",
-								"type": "object",
-								"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent",
-								"properties": {
-									"geographicElement": {
-										"type": "array",
-										"title": "Geographic extent(s)",
-										"description": "Geographic extent(s)",
-										"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement",
-										"items": {
-											"type": "object",
-											"properties": {
-												"geographicBoundingBox": {
-													"title": "Geographic Bounding Box",
-													"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicBoundingBox",
-													"type": "object",
-													"properties": {
-														"westBoundLongitude": {
-															"title": "West",
-															"type": "number",
-															"minimum": -180,
-															"maximum": 180,
-															"_xpath": "gmd:westBoundLongitude/gco:Decimal"
-														},
-														"eastBoundLongitude": {
-															"title": "East",
-															"type": "number",
-															"minimum": -180,
-															"maximum": 180,
-															"_xpath": "gmd:eastBoundLongitude/gco:Decimal"
-														},
-														"southBoundLatitude": {
-															"title": "South",
-															"type": "number",
-															"minimum": -180,
-															"maximum": 180,
-															"_xpath": "gmd:southBoundLatitude/gco:Decimal"
-														},
-														"northBoundLatitude": {
-															"title": "North",
-															"type": "number",
-															"minimum": -180,
-															"maximum": 180,
-															"_xpath": "gmd:northBoundLongitude/gco:Decimal"
-														}
-													}
-												},
-												"geographicDescription": {
-													"title": "Geographic description identifier",
-													"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/EX_GeographicDescription/gmd:geographicIdentifier/gmd:MD_Identifier/gmd:code/gco:CharacterString",
-													"type": "string"
-												}
-											}
-										}
-									},
-									"temporalElement": {
-										"type": "array",
-										"title": "Temporal extent(s)",
-										"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_TemporalExtent",
-										"items": {
-											"type": "object",
-											"properties": {
-												"extent": {
-													"TimePeriod": {
-														"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_TemporalExtent/gmd:extent/gml:TimePeriod",
-														"properties": {
-															"beginPosition": {
-																"title": "Begin time position",
-																"description": "Begin time position. Requires an extended ISO 8601 formatted combined UTC date and time string (2009-11-17T10:00:00)",
-																"type": "string",
-																"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_TemporalExtent/gmd:extent/gml:TimePeriod/gml:beginPosition"
-															},
-															"endPosition": {
-																"title": "End time position",
-																"description": "End time position. Requires an extended ISO 8601 formatted combined UTC date and time string (2009-11-17T10:00:00)",
-																"type": "string",
-																"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_TemporalExtent/gmd:extent/gml:TimePeriod/gml:endPosition"
-															}
-														}
-													},
-													"TimeInstant": {
-														"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_TemporalExtent/gmd:extent/gml:TimeInstant",
-														"properties": {
-															"timePosition": {
-																"title": "Time Position",
-																"description": "Time position. Requires an extended ISO 8601 formatted combined UTC date and time string (2009-11-17T10:00:00)",
-																"type": "string",
-																"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_TemporalExtent/gmd:extent/gml:TimeInstant/gml:timePosition"
-															}
-														}
-													}
-												}
-											}
-										}
-									},
-									"verticalElement": {
-										"type": "array",
-										"title": "Vertical extent(s)",
-										"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_VerticalExtent",
-										"items": {
-											"type": "object",
-											"properties": {
-												"minimumValue": {
-													"title": "Minimum vertical value",
-													"type": "number",
-													"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_VerticalExtent/gmd:minimumValue/gco:Real"
-												},
-												"maximumValue": {
-													"title": "Maximum vertical value",
-													"type": "number",
-													"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_VerticalExtent/gmd:maximumValue/gco:Real"
-												},
-												"verticalCRS": {
-													"title": "Vertical CRS",
-													"description": "Vertical coordinate reference system used (as defined in the ISO 19136 / GML standard",
-													"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_VerticalExtent/gmd:verticalCRS"
-												}
-											}
-										}
-									}
-								}
-							},
-							"spatialRepresentationType": {
-								"type": "string",
-								"title": "Spatial Representation type",
-								"description": "Spatial representation type of the resource. e.g. 'vector'. Recommended code following the [ISO/TS 19139](http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_SpatialRepresentationTypeCode) SpatialRepresentationType codelist. Suggested values: {`vector`, `grid`, `textTable`, `tin`, `stereoModel`, `video`}",
-								"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:spatialRepresentationType/gmd:MD_SpatialRepresentationTypeCode"
-							},
-							"spatialResolution": {
-								"title": "Spatial Resolution",
-								"description": "Spatial resolution of the resource",
-								"type": "number",
-								"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:spatialResolution/gmd:MD_Resolution/gco:Distance",
-								"properties": {
-									"uom": {
-										"title": "Unit Of Measure",
-										"description": "Unit considered for the resolution measure",
-										"type": "string",
-										"propertyType": "attribute"
-									}
-								}
-							},
-							"language": {
-								"type": "array",
-								"title": "Resource language(s)",
-								"description": "Resource language(s). Preferred code following the [ISO 639-2](http://www.loc.gov/standards/iso639-2/) (alpha-3 code)",
-								"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:language/gmd:LanguageCode",
-								"items": {
+								},
+								"initiativeType": {
 									"type": "string",
-									"$ref": "#/definitions/language"
+									"title": "Initiative type",
+									"description": "Type of initative behind the aggregate Resource",
+									"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:initiativeType/gmd:DS_InitiativeTypeCode",
+									"properties": {
+										"codeListValue": {
+											"title": "Initiative type, eg. 'collection'. Recommended code following the [ISO/TS 19139](http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#DS_InitiativeTypeCode) InitiativeType codelist. Suggested values: {campaign, collection, dataDictionary, exercise, experiment, investigation, mission, sensor, operation, platform, process, program, project, sciencePaper, study, task, trial, userGuide}",
+											"type": "string",
+											"propertyType": "attribute"
+										},
+										"codeList": {
+											"title": "Codelist used for initiative types. Recommended URI: http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#DS_InitiativeTypeCode",
+											"type": "string",
+											"propertyType": "attribute"
+										},
+										"codeSpace": {
+											"title": "Codespace of the initiative types codelist. Recommended value: ISOTC211/19115",
+											"type": "string",
+											"propertyType": "attribute"
+										}
+									}
 								}
-							},
-							"characterSet": {
-								"type": "array",
-								"title": "Resource character set(s)",
-								"description": "Resource character set(s)",
-								"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:characterSet/gmd:MD_CharacterSetCode",
-								"items": {
-									"type": "object",
-									"$ref": "#/definitions/characterSet"
-								}
-							},
-							"topicCategory": {
-								"type": "array",
-								"title": "Topic categories",
-								"description": "Topic category of the resource. e.g. `owner`. Recommended code following the [ISO/TS 19139](http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_TopicCategoryCode) TopicCategory codelist. Suggested values: {`farming`, `biota`, `boundaries`, `climatologyMeteorologyAtmosphere`, `economy`, `elevation`, `environment`, `geoscientificInformation`, `health`, `imageryBaseMapsEarthCover`, `intelligenceMilitary`, `inlandWaters`, `location`, `oceans`, `planningCadastre`, `society`, `structure`, `transportation`, `utilitiesCommunication`, `extraTerrestrial`, `disaster`}",
-								"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:topicCategory/gmd:MD_TopicCategoryCode",
-								"items": {
-									"type": "string",
-									"$ref": "#/definitions/topicCategory"
-								}
-							},
-							"supplementalInformation": {
-								"title": "Supplemental Information",
-								"description": "Additional information about the resource",
-								"type": "string"
-							},
-							"serviceIdentification": {
-								"type": "object",
-								"title": "Service identification",
-								"description": "Service identification",
-								"_xpath": "gmd:identificationInfo/gmd:SV,_ServiceIdentification",
-								"properties": {
-									"serviceType": {
-										"type": "string",
-										"title": "Service type",
-										"description": "Service type name",
-										"_xpath": "gmd:identificationInfo/gmd:SV_ServiceIdentification/gmd:serviceType/gco:CharacterString"
-									},
-									"serviceTypeVersion": {
-										"type": "string",
-										"title": "Service type version",
-										"description": "Service type version",
-										"_xpath": "gmd:identificationInfo/gmd:SV_ServiceIdentification/gmd:serviceTypeVersion/gco:CharacterString"
-									},
-									"accessProperties": {
+							}
+						},
+						"extent": {
+							"title": "Extent of the resource",
+							"description": "Defines the spatial (horizontal and vertical) and temporal region to which the content of the resource applies.",
+							"type": "object",
+							"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent",
+							"properties": {
+								"geographicElement": {
+									"type": "array",
+									"title": "Geographic extent(s)",
+									"description": "Geographic extent(s)",
+									"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement",
+									"items": {
 										"type": "object",
-										"title": "Access properties",
-										"_xpath": "gmd:identificationInfo/gmd:SV_ServiceIdentification/gmd:accessProperties/gmd:MD_StandardOrderProcess",
 										"properties": {
-											"fees": {
-												"type": "string",
-												"title": "Fees",
-												"description": "Eventual fees associated with the service",
-												"_xpath": "gmd:identificationInfo/gmd:SV_ServiceIdentification/gmd:accessProperties/gmd:MD_StandardOrderProcess/gmd:fees/gco:CharacterString"
-											},
-											"plannedAvailableDateTime": {
-												"title": "Service availability Date Stamp",
-												"type": "string",
-												"description": "Date and time when the metadata record was created or updated. Requires an extended ISO 8601 formatted combined UTC date and time string (2009-11-17T10:00:00)",
-												"_xpath": "gmd:identificationInfo/gmd:SV_ServiceIdentification/gmd:accessProperties/gmd:MD_StandardOrderProcess/gmd:plannedAvailableDateTime/gco:DateTime"
-											},
-											"orderingInstructions": {
-												"type": "string",
-												"title": "Ordering instructions",
-												"description": "Eventual instructions for the ordering",
-												"_xpath": "gmd:identificationInfo/gmd:SV_ServiceIdentification/gmd:accessProperties/gmd:MD_StandardOrderProcess/gmd:orderingInstructions/gco:CharacterString"
-											},
-											"turnaround": {
-												"type": "string",
-												"title": "Turnaround",
-												"description": "Turnaround",
-												"_xpath": "gmd:identificationInfo/gmd:SV_ServiceIdentification/gmd:accessProperties/gmd:MD_StandardOrderProcess/gmd:turnaround/gco:CharacterString"
-											}
-										}
-									},
-									"restrictions": {
-										"title": "Service constraints",
-										"description": "Constraints associated to the service",
-										"_xpath": "gmd:identificationInfo/gmd:SV_ServiceIdentification/gmd:restrictions",
-										"_xpath_note": "gmd:MD_LegalConstraints or gmd:MD_SecurityConstraints",
-										"type": "array",
-										"items": {
-											"type": "object",
-											"$ref": "#/definitions/constraints"
-										}
-									},
-									"keywords": {
-										"title": "Service keywords",
-										"description": "Service keywords, organized by keyword type",
-										"_xpath": "gmd:identificationInfo/gmd:SV_ServiceIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords",
-										"type": "array",
-										"items": {
-											"type": "object",
-											"$ref": "#/definitions/keywords"
-										}
-									},
-									"coupledResource": {
-										"type": "array",
-										"title": "Coupled resource(s)",
-										"description": "Coupled resource(s)",
-										"_xpath": "gmd:identificationInfo/gmd:SV_ServiceIdentification/gmd:coupledResource",
-										"items": {
-											"type": " object",
-											"title": "Coupled resource",
-											"_xpath": "gmd:identificationInfo/gmd:SV_ServiceIdentification/gmd:coupledResource/gmd:SV_CoupledResource",
-											"properties": {
-												"operationName": {
-													"type": "string",
-													"title": "Operation name"
-												},
-												"identifier": {
-													"type": "string",
-													"title": "Identifier of the coupled resource"
+											"geographicBoundingBox": {
+												"title": "Geographic Bounding Box",
+												"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_GeographicBoundingBox",
+												"type": "object",
+												"properties": {
+													"westBoundLongitude": {
+														"title": "West",
+														"type": "number",
+														"minimum": -180,
+														"maximum": 180,
+														"_xpath": "gmd:westBoundLongitude/gco:Decimal"
+													},
+													"eastBoundLongitude": {
+														"title": "East",
+														"type": "number",
+														"minimum": -180,
+														"maximum": 180,
+														"_xpath": "gmd:eastBoundLongitude/gco:Decimal"
+													},
+													"southBoundLatitude": {
+														"title": "South",
+														"type": "number",
+														"minimum": -180,
+														"maximum": 180,
+														"_xpath": "gmd:southBoundLatitude/gco:Decimal"
+													},
+													"northBoundLatitude": {
+														"title": "North",
+														"type": "number",
+														"minimum": -180,
+														"maximum": 180,
+														"_xpath": "gmd:northBoundLongitude/gco:Decimal"
+													}
 												}
+											},
+											"geohash": {
+												"title": "Geohash",												
+												"type": "object",
+												"properties": {
+													"geohash": {
+														"title": "Geohash",
+														"type": "string"
+													},
+													"note": {
+														"title": "Note",
+														"type": "string"
+													}													
+												}
+											},
+											"geographicDescription": {
+												"title": "Geographic description identifier",
+												"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/EX_GeographicDescription/gmd:geographicIdentifier/gmd:MD_Identifier/gmd:code/gco:CharacterString",
+												"type": "string"
 											}
 										}
-									},
-									"couplingType": {
-										"type": "string",
-										"title": "Coupling type",
-										"description": "Coupling type",
-										"_xpath": "gmd:identificationInfo/gmd:SV_ServiceIdentification/gmd:couplingType/gmd:SV_CouplingType",
+									}
+								},
+								"temporalElementExtent": {
+									"type": "array",
+									"title": "Temporal extent(s)",
+									"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_TemporalExtent",
+									"items": {
+										"type": "object",
 										"properties": {
-											"codeListValue": {
-												"title": "Coupling type, eg. 'loose'. Recommended code following the [ISO/TS 19139](http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#SV_CouplingTypeCode) CouplingType codelist. Suggested values: {loose, mixed, tight}",
+											"beginPosition": {
+												"title": "Begin time position",
+												"description": "Begin time position. Requires an extended ISO 8601 formatted combined UTC date and time string (2009-11-17T10:00:00)",
 												"type": "string",
-												"propertyType": "attribute"
+												"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_TemporalExtent/gmd:extent/gml:TimePeriod/gml:beginPosition"
 											},
-											"codeList": {
-												"title": "Codelist used for coupling types. Recommended URI: http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#SV_CouplingTypeCode",
+											"endPosition": {
+												"title": "End time position",
+												"description": "End time position. Requires an extended ISO 8601 formatted combined UTC date and time string (2009-11-17T10:00:00)",
 												"type": "string",
-												"propertyType": "attribute"
-											},
-											"codeSpace": {
-												"title": "Codespace of the coupling types codelist. Recommended value: ISOTC211/19119",
-												"type": "string",
-												"propertyType": "attribute"
+												"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_TemporalExtent/gmd:extent/gml:TimePeriod/gml:endPosition"
 											}
 										}
-									},
-									"containsOperations": {
-										"type": "array",
-										"title": "Contained operation(s)",
-										"description": "Operation(s) contained in the service",
-										"_xpath": "gmd:identificationInfo/gmd:SV_ServiceIdentification/gmd:containsOperations",
-										"items": {
-											"type": "object",
-											"$ref": "#/definitions/operationMetadata"
+									}
+								},
+								"verticalElement": {
+									"type": "array",
+									"title": "Vertical extent(s)",
+									"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_VerticalExtent",
+									"items": {
+										"type": "object",
+										"properties": {
+											"minimumValue": {
+												"title": "Minimum vertical value",
+												"type": "number",
+												"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_VerticalExtent/gmd:minimumValue/gco:Real"
+											},
+											"maximumValue": {
+												"title": "Maximum vertical value",
+												"type": "number",
+												"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_VerticalExtent/gmd:maximumValue/gco:Real"
+											},
+											"verticalCRS": {
+												"title": "Vertical CRS",
+												"description": "Vertical coordinate reference system used (as defined in the ISO 19136 / GML standard",
+												"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/gmd:EX_VerticalExtent/gmd:verticalCRS"
+											}
 										}
-									},
-									"operatesOn": {
-										"type": "array",
-										"title": "Operates on relationship(s)",
-										"description": "List identifiers of datasets on which service operates on",
-										"items": {
-											"type": "object",
-											"title": "Operates On",
-											"description": "Operates On relationship",
-											"properties": {
-												"uuidref": {
-													"type": "string",
-													"title": "Unique dataset identifier within the same catalogue",
-													"propertyType": "attribute"
-												}
+									}
+								}
+							}
+						},
+						"spatialRepresentationType": {
+							"type": "string",
+							"title": "Spatial Representation type",
+							"description": "Spatial representation type of the resource. e.g. 'vector'. Recommended code following the [ISO/TS 19139](http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_SpatialRepresentationTypeCode) SpatialRepresentationType codelist. Suggested values: {`vector`, `grid`, `textTable`, `tin`, `stereoModel`, `video`}",
+							"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:spatialRepresentationType/gmd:MD_SpatialRepresentationTypeCode"
+						},
+						"spatialResolution": {
+							"title": "Spatial Resolution",
+							"description": "Spatial resolution of the resource",
+							"type": "object",
+							"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:spatialResolution/gmd:MD_Resolution/gco:Distance",
+							"properties": {
+								"uom": {
+									"title": "Unit Of Measure",
+									"description": "Unit considered for the resolution measure",
+									"type": "string"										
+								},
+								"value": {
+									"title": "Value",
+									"description": "Value",
+									"type": "number"
+								}
+							}
+						},
+						"language": {
+							"type": "array",
+							"title": "Resource language(s)",
+							"description": "Resource language(s). Preferred code following the [ISO 639-2](http://www.loc.gov/standards/iso639-2/) (alpha-3 code)",
+							"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:language/gmd:LanguageCode",
+							"items": {
+								"type": "string",
+								"$ref": "#/definitions/language"
+							}
+						},
+						"characterSet": {
+							"type": "array",
+							"title": "Resource character set(s)",
+							"description": "Resource character set(s)",
+							"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:characterSet/gmd:MD_CharacterSetCode",
+							"items": {
+								"type": "object",
+								"$ref": "#/definitions/characterSet"
+							}
+						},
+						"topicCategory": {
+							"type": "array",
+							"title": "Topic categories",
+							"description": "Topic category of the resource. e.g. `owner`. Recommended code following the [ISO/TS 19139](http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_TopicCategoryCode) TopicCategory codelist. Suggested values: {`farming`, `biota`, `boundaries`, `climatologyMeteorologyAtmosphere`, `economy`, `elevation`, `environment`, `geoscientificInformation`, `health`, `imageryBaseMapsEarthCover`, `intelligenceMilitary`, `inlandWaters`, `location`, `oceans`, `planningCadastre`, `society`, `structure`, `transportation`, `utilitiesCommunication`, `extraTerrestrial`, `disaster`}",
+							"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:topicCategory/gmd:MD_TopicCategoryCode",
+							"items": {
+								"type": "string",
+								"$ref": "#/definitions/topicCategory"
+							}
+						},
+						"supplementalInformation": {
+							"title": "Supplemental Information",
+							"description": "Additional information about the resource",
+							"type": "string"
+						},
+						"serviceIdentification": {
+							"type": "object",
+							"title": "Service identification",
+							"description": "Service identification",
+							"_xpath": "gmd:identificationInfo/gmd:SV,_ServiceIdentification",
+							"properties": {
+								"serviceType": {
+									"type": "string",
+									"title": "Service type",
+									"description": "Service type name",
+									"_xpath": "gmd:identificationInfo/gmd:SV_ServiceIdentification/gmd:serviceType/gco:CharacterString"
+								},
+								"serviceTypeVersion": {
+									"type": "string",
+									"title": "Service type version",
+									"description": "Service type version",
+									"_xpath": "gmd:identificationInfo/gmd:SV_ServiceIdentification/gmd:serviceTypeVersion/gco:CharacterString"
+								},
+								"accessProperties": {
+									"type": "object",
+									"title": "Access properties",
+									"_xpath": "gmd:identificationInfo/gmd:SV_ServiceIdentification/gmd:accessProperties/gmd:MD_StandardOrderProcess",
+									"properties": {
+										"fees": {
+											"type": "string",
+											"title": "Fees",
+											"description": "Eventual fees associated with the service",
+											"_xpath": "gmd:identificationInfo/gmd:SV_ServiceIdentification/gmd:accessProperties/gmd:MD_StandardOrderProcess/gmd:fees/gco:CharacterString"
+										},
+										"plannedAvailableDateTime": {
+											"title": "Service availability Date Stamp",
+											"type": "string",
+											"description": "Date and time when the metadata record was created or updated. Requires an extended ISO 8601 formatted combined UTC date and time string (2009-11-17T10:00:00)",
+											"_xpath": "gmd:identificationInfo/gmd:SV_ServiceIdentification/gmd:accessProperties/gmd:MD_StandardOrderProcess/gmd:plannedAvailableDateTime/gco:DateTime"
+										},
+										"orderingInstructions": {
+											"type": "string",
+											"title": "Ordering instructions",
+											"description": "Eventual instructions for the ordering",
+											"_xpath": "gmd:identificationInfo/gmd:SV_ServiceIdentification/gmd:accessProperties/gmd:MD_StandardOrderProcess/gmd:orderingInstructions/gco:CharacterString"
+										},
+										"turnaround": {
+											"type": "string",
+											"title": "Turnaround",
+											"description": "Turnaround",
+											"_xpath": "gmd:identificationInfo/gmd:SV_ServiceIdentification/gmd:accessProperties/gmd:MD_StandardOrderProcess/gmd:turnaround/gco:CharacterString"
+										}
+									}
+								},
+								"restrictions": {
+									"title": "Service constraints",
+									"description": "Constraints associated to the service",
+									"_xpath": "gmd:identificationInfo/gmd:SV_ServiceIdentification/gmd:restrictions",
+									"_xpath_note": "gmd:MD_LegalConstraints or gmd:MD_SecurityConstraints",
+									"type": "array",
+									"items": {
+										"type": "object",
+										"$ref": "#/definitions/constraints"
+									}
+								},
+								"keywords": {
+									"title": "Service keywords",
+									"description": "Service keywords, organized by keyword type",
+									"_xpath": "gmd:identificationInfo/gmd:SV_ServiceIdentification/gmd:descriptiveKeywords/gmd:MD_Keywords",
+									"type": "array",
+									"items": {
+										"type": "object",
+										"$ref": "#/definitions/keywords"
+									}
+								},
+								"coupledResource": {
+									"type": "array",
+									"title": "Coupled resource(s)",
+									"description": "Coupled resource(s)",
+									"_xpath": "gmd:identificationInfo/gmd:SV_ServiceIdentification/gmd:coupledResource",
+									"items": {
+										"type": "object",
+										"title": "Coupled resource",
+										"_xpath": "gmd:identificationInfo/gmd:SV_ServiceIdentification/gmd:coupledResource/gmd:SV_CoupledResource",
+										"properties": {
+											"operationName": {
+												"type": "string",
+												"title": "Operation name"
+											},
+											"identifier": {
+												"type": "string",
+												"title": "Identifier of the coupled resource"
+											}
+										}
+									}
+								},
+								"couplingType": {
+									"type": "string",
+									"title": "Coupling type",
+									"description": "Coupling type",
+									"_xpath": "gmd:identificationInfo/gmd:SV_ServiceIdentification/gmd:couplingType/gmd:SV_CouplingType",
+									"properties": {
+										"codeListValue": {
+											"title": "Coupling type, eg. 'loose'. Recommended code following the [ISO/TS 19139](http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#SV_CouplingTypeCode) CouplingType codelist. Suggested values: {loose, mixed, tight}",
+											"type": "string",
+											"propertyType": "attribute"
+										},
+										"codeList": {
+											"title": "Codelist used for coupling types. Recommended URI: http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#SV_CouplingTypeCode",
+											"type": "string",
+											"propertyType": "attribute"
+										},
+										"codeSpace": {
+											"title": "Codespace of the coupling types codelist. Recommended value: ISOTC211/19119",
+											"type": "string",
+											"propertyType": "attribute"
+										}
+									}
+								},
+								"containsOperations": {
+									"type": "array",
+									"title": "Contained operation(s)",
+									"description": "Operation(s) contained in the service",
+									"_xpath": "gmd:identificationInfo/gmd:SV_ServiceIdentification/gmd:containsOperations",
+									"items": {
+										"type": "object",
+										"$ref": "#/definitions/operationMetadata"
+									}
+								},
+								"operatesOn": {
+									"type": "array",
+									"title": "Operates on relationship(s)",
+									"description": "List identifiers of datasets on which service operates on",
+									"items": {
+										"type": "object",
+										"title": "Operates On",
+										"description": "Operates On relationship",
+										"properties": {
+											"uuidref": {
+												"type": "string",
+												"title": "Unique dataset identifier within the same catalogue",
+												"propertyType": "attribute"
 											}
 										}
 									}

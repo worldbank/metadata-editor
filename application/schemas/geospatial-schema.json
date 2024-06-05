@@ -642,25 +642,11 @@
 		}
 	},
 	"properties": {
-		"repositoryid": {
+		"idno": {
 			"type": "string",
-			"title": "Collection ID that owns the dataset",
-			"description": "Abbreviation for the collection that owns this dataset"
-		},
-		"published": {
-			"type": "integer",
-			"description": "Status of the dataset - 0=draft, 1=published",
-			"default": 0
-		},
-		"overwrite": {
-			"type": "string",
-			"description": "Overwrite if already exists?",
-			"enum": [
-				"yes",
-				"no"
-			],
-			"default": "no"
-		},
+			"title": "Project unique identifier",
+			"description": "Project unique identifier"
+		},	
 		"metadata_information": {
 			"type": "object",
 			"title": "Document metadata information",

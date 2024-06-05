@@ -835,6 +835,10 @@
 					"type": "string",
 					"title": "Confidentiality note"
 				},
+				"citation_requirement": {
+					"type": "string",
+					"description": "Citation requirement (can include a specific recommended citation)"
+				  },
 				
 				"links": {
 					"type": "array",
