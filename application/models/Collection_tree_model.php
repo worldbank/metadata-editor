@@ -255,6 +255,41 @@ class Collection_tree_model extends CI_Model {
         return $this->db->get('editor_collections')->result_array();
     }
 
+
+    /**
+     * 
+     * Rebuild tree
+     * 
+     */
+    function rebuild_tree()
+	{
+			//truncate all data
+			$this->truncate_tree();
+
+			$collections_tree=$this->Collection_model->get_collection_tree();
+
+			//read all data from collections
+			$collections=$this->Collection_model->select_all();
+
+			foreach($collections as $collection){
+				$this->insert($collection['id'],$collection['id']);
+			}
+
+			$walk_tree=function($collections_tree) use (&$walk_tree){
+				foreach($collections_tree as $collection){
+					$parent_id=isset($collection['pid'])?$collection['pid']: $collection['id'];
+					$this->insert($parent_id,$collection['id']);
+					
+					if (isset($collection['items'])){
+						$walk_tree($collection['items']);						
+					}
+				}
+			};
+
+			$walk_tree($collections_tree);
+
+	}
+
     
 
 }

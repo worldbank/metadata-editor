@@ -6,6 +6,7 @@ Vue.component('vue-collection', {
             edit_collection: {},
             dialog_edit: false,
             dialog_copy_collection: false,
+            dialog_move_collection: false,
             active_tab:1,
             site_base_url: CI.base_url,
             action_menu: false,        
@@ -172,7 +173,8 @@ Vue.component('vue-collection', {
     <div class="vue-collection-component">
         
             <vue-edit-collection v-model="dialog_edit" :collection="edit_collection" v-on:update-collection="updateCollection" vonremove-access="UnshareProjectWithUser"></vue-edit-collection>
-            <vue-copy-collection v-model="dialog_copy_collection"></vue-copy-collection>
+            <vue-copy-collection v-model="dialog_copy_collection" v-on:collection-copied="loadCollections"></vue-copy-collection>
+            <vue-move-collection v-model="dialog_move_collection" v-on:collection-moved="loadCollections"></vue-move-collection>
             
             <section class="container">
 
@@ -235,6 +237,9 @@ Vue.component('vue-collection', {
                                             <v-list>
                                                 <v-list-item>
                                                     <v-list-item-title @click="dialog_copy_collection=true">Copy collection</v-list-item-title>
+                                                </v-list-item>
+                                                <v-list-item>
+                                                    <v-list-item-title @click="dialog_move_collection=true">Move collection</v-list-item-title>
                                                 </v-list-item>
                                                 <v-list-item>
                                                     <v-list-item-title @click="refreshCollectionsTree">Refresh tree</v-list-item-title>

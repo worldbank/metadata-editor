@@ -440,35 +440,8 @@ class Collections extends MY_REST_Controller
 	{
 		try{
 			$this->has_access($resource_='collection',$privilege='admin');
-			$this->load->model("Collection_tree_model");
-			
-			//truncate all date
-			$this->Collection_tree_model->truncate_tree();
-
-			$collections_tree=$this->Collection_model->get_collection_tree();
-
-			//read all data from collections
-			$collections=$this->Collection_model->select_all();
-
-			foreach($collections as $collection){
-				$this->Collection_tree_model->insert($collection['id'],$collection['id']);
-			}
-
-			$walk_tree=function($collections_tree) use (&$walk_tree){
-				foreach($collections_tree as $collection){
-					$parent_id=isset($collection['pid'])?$collection['pid']: $collection['id'];
-					$this->Collection_tree_model->insert($parent_id,$collection['id']);
-					
-					if (isset($collection['items'])){
-						$walk_tree($collection['items']);						
-					}
-				}
-			};
-
-			$walk_tree($collections_tree);
-
-			//get tree
-			//$result=$this->Collection_tree_model->get_tree_flat();
+			$this->load->model("Collection_tree_model");			
+			$this->Collection_tree_model->rebuild_tree();
 
 			$response=array(
 				'status'=>'success',
@@ -617,6 +590,51 @@ class Collections extends MY_REST_Controller
 			$target_id=(int)$options['target_id'];
 
 			$result=$this->Collection_model->copy($source_id,$target_id);
+
+			$response=array(
+				'status'=>'success',
+				'collection_id'=>$result
+			);
+
+			$this->set_response($response, REST_Controller::HTTP_OK);			
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	/**
+	 * 
+	 * Copy collection 
+	 * 
+	 * 	- projects
+	 *  - users + permissions
+	 * 
+	 * 
+	 */
+	function move_post()
+	{
+		try{
+			$this->has_access($resource_='collection',$privilege='admin');
+			$options=$this->raw_json_input();
+
+			if (!isset($options['source_id'])){
+				throw new Exception("Missing parameter: source_id");
+			}
+
+			if (!isset($options['target_id'])){
+				throw new Exception("Missing parameter: target_id");
+			}
+
+			$source_id=(int)$options['source_id'];
+			$target_id=(int)$options['target_id'];
+
+			$result=$this->Collection_model->move($source_id,$target_id);
 
 			$response=array(
 				'status'=>'success',

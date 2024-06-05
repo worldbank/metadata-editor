@@ -42,9 +42,6 @@
             padding-left: 20px;        
         }
 
-        .item-level-1{
-            
-        }
         .item-level-2{
             margin-left: 22px;            
         }
@@ -118,6 +115,7 @@
             echo $this->load->view("collections/vue-edit-collection-component.js", null, true);
             echo $this->load->view("collections/vue-manage-users-component.js", null, true);
             echo $this->load->view("collections/vue-copy-collection-component.js", null, true);
+            echo $this->load->view("collections/vue-move-collection-component.js", null, true);
         ?>
 
 

@@ -386,6 +386,8 @@ class Collection_model extends CI_Model {
 
         if ($pid){
             $this->db->where('pid',$pid);
+        }else{
+            $this->db->where('pid is null');
         }
 
         if ($id){
@@ -561,6 +563,45 @@ class Collection_model extends CI_Model {
         $this->db->query('insert into editor_collection_access (collection_id, user_id, permissions) '.
             'select '.$target_id.' as collection_id,user_id,permissions from editor_collection_access where collection_id='.$source_id);
 
+        return true;
+    }
+
+
+     /**
+     * 
+     * move collection
+     *  
+     * - set the PID for source to target
+     * 
+     */
+    function move($source_id,$target_id)
+    {
+        $source=$this->select_single($source_id);
+        $target=$this->select_single($target_id);
+
+        if (!$source){
+            throw new Exception('Source collection not found');
+        }
+
+        if ($target_id>0 && !$target){
+            throw new Exception('Target collection not found');
+        }
+
+        if ($source_id==$target_id){
+            throw new Exception('Source and target collection cannot be the same');
+        }
+
+        //check if title + pid is unique
+        if ($this->is_unique($source['title'],$target_id)){
+            throw new Exception('Collection already exists');
+        }
+
+        //update source collection
+        $this->db->where('id',$source_id);
+        $this->db->update('editor_collections',array('pid'=>$target_id));
+
+        //rebuild tree
+        $this->Collection_tree_model->rebuild_tree();
         return true;
     }
 

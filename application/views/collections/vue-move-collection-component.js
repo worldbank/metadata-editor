@@ -1,4 +1,4 @@
-Vue.component('vue-copy-collection', {
+Vue.component('vue-move-collection', {
     props: ['value'],
     data() {
         return {
@@ -25,9 +25,9 @@ Vue.component('vue-copy-collection', {
                 console.log(error);
             });
         },
-        copyCollection: function() {
+        moveCollection: function() {
             let vm=this;
-            let url = CI.base_url + '/api/collections/copy';
+            let url = CI.base_url + '/api/collections/move';
             
             let form_data = {
                 'source_id':vm.source_collection_id,                
@@ -36,11 +36,12 @@ Vue.component('vue-copy-collection', {
 
             axios.post(url, form_data)
             .then(response => {
-                console.log("copy-collection",response);
+                console.log("move-collection",response);
                 vm.loadCollections();
-                alert("Collection copied successfully");
+                alert("Collection moved successfully");
                 vm.dialog=false;
-                vm.$emit('collection-copied');
+                //trigger event
+                vm.$emit('collection-moved');
             })
             .catch(function (error) {
                 alert("Error:" + error.response.data.message);
@@ -58,8 +59,27 @@ Vue.component('vue-copy-collection', {
             }
        },
        isCopyDisabled: function() {
-              return this.source_collection_id==null || this.target_collection_id==null;
-         }
+            if (this.source_collection_id==null || this.target_collection_id==null){
+                return true;
+            }
+
+            if (this.source_collection_id==this.target_collection_id){
+                return true;
+            }
+
+        },
+        TargetCollections: function() {
+            let items=[];
+            items.push({id:0,title:"/"});
+            
+            //add the rest of the collections
+            for (let i=0;i<this.collections.length;i++){
+                let item=this.collections[i];
+                items.push(item);
+            }
+            return items;
+        }
+            
     },
     template: `
         <div class="vue-copy-collection container">
@@ -77,12 +97,12 @@ Vue.component('vue-copy-collection', {
 
                 <v-card>
                     <v-card-title class="text-h5 grey lighten-2">
-                    Copy collection                    
+                    Move collection                    
                     </v-card-title>
                     
 
                     <v-card-text> 
-                        <div class="text-muted text-small">Copy projects and users from one collection to another</div>                        
+                        <div class="text-muted text-small">Select the source and target collections to move the collection</div>
 
                         <div class="form-group mt-3">
                             <label>Source</label>
@@ -100,7 +120,7 @@ Vue.component('vue-copy-collection', {
                         <div class="form-group">
                             <label>Target</label>                            
                             <v-select
-                                :items="collections"
+                                :items="TargetCollections"
                                 item-text="title"
                                 item-value="id"
                                 v-model="target_collection_id"
@@ -121,9 +141,9 @@ Vue.component('vue-copy-collection', {
                             class="ma-2 mr-1"                                                    
                             color="primary"
                             small
-                            @click="copyCollection"
+                            @click="moveCollection"
                             :disabled="isCopyDisabled"
-                        >Copy</v-btn>
+                        >Move</v-btn>
                         <v-btn
                             class="ma-2"
                             outlined
