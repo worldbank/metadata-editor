@@ -124,6 +124,10 @@
     "url": {
       "type": "string",
       "title": "URL"
+    },
+    "language": {
+      "type": "string",
+      "title": "Language"
     }
   }
 }
