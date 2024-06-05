@@ -1082,4 +1082,32 @@ class Editor_resource_model extends ci_model {
 		}		
 	}
 
+
+
+	function download_resource($sid,$resource_id,$resource_type='documentation')
+	{
+		$resource=$this->select_single($sid,$resource_id);
+
+		if (!$resource || !$resource['filename']){
+			throw new Exception("Resource not found or filename not set");
+		}
+
+		$project_folder=$this->Editor_model->get_project_folder($sid);
+		$resource_file=$project_folder.'/'.$resource_type.'/'.$resource['filename'];
+
+		if (!file_exists($resource_file)){
+			throw new Exception("File not found:" . $resource_file);
+		}
+
+		$ext=pathinfo($resource['filename'], PATHINFO_EXTENSION);
+		$basename_no_ext=pathinfo($resource['filename'], PATHINFO_FILENAME);
+
+		//download
+		header('Content-Type: application/octet-stream');
+		header('Content-Disposition: attachment; filename="'.$basename_no_ext.'.'.$ext.'"');
+		header('Content-Length: ' . filesize($resource_file));
+		readfile($resource_file);
+		exit;
+	}
+
 }    

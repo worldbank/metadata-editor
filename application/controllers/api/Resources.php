@@ -246,10 +246,10 @@ class Resources extends MY_REST_Controller
 						throw new Exception("Resource not found");
 					}
 
-					if($resource['filename'] && $options['filename']){
+					/*if($resource['filename'] && $options['filename']){						
 						//delete old file
 						$this->Editor_resource_model->delete_file_by_resource($sid,$resource_id);
-					}
+					}*/
 					
 					$resource_id=$this->Editor_resource_model->update($resource_id,$options);
 				}				
@@ -308,6 +308,18 @@ class Resources extends MY_REST_Controller
 				'message'=>$e->getMessage()
 			);
 			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	function download_get($sid, $resource_id)
+	{
+		try{
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
+			$this->Editor_resource_model->download_resource($sid,$resource_id,$resource_type='documentation');
+		}
+		catch(Exception $e){
+			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
 }
