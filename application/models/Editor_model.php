@@ -261,21 +261,16 @@ class Editor_model extends CI_Model {
 			$survey=$this->decode_encoded_fields($survey);
 		}
 
+		if (!is_array($survey['metadata']) && !empty($survey['metadata'])){
+			$survey['metadata']=array(
+				'type'=>$survey['type']			
+			);
+		}
+
 		if (isset($survey['metadata'])){
-			if (isset($survey['idno'])){
-				if (is_object($survey['metadata'])){
-					$survey['metadata']->idno=$survey['idno'];
-				}else{
-					$survey['metadata']['idno']=$survey['idno'];
-				}				
-			}
-			if (isset($survey['type'])){
-				if (is_object($survey['metadata'])){
-					$survey['metadata']->type=$survey['type'];
-				}else{
-					$survey['metadata']['type']=$survey['type'];
-				}
-			}
+			if (isset($survey['idno'])){			
+				$survey['metadata']['idno']=$survey['idno'];
+			}			
 		}
 
         return $survey;
@@ -331,7 +326,7 @@ class Editor_model extends CI_Model {
 		$options['template_uid']=isset($default_template['template_uid']) ? $default_template['template_uid'] : '';
 
 		if (!isset($options['metadata'])){			
-			$options['metadata']=$this->encode_metadata(new stdClass);
+			$options['metadata']=$this->encode_metadata(array('type'=>$type));
 		}
 
 		$this->db->insert('editor_projects',$options);
