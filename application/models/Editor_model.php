@@ -263,10 +263,18 @@ class Editor_model extends CI_Model {
 
 		if (isset($survey['metadata'])){
 			if (isset($survey['idno'])){
-				$survey['metadata']['idno']=$survey['idno'];
+				if (is_object($survey['metadata'])){
+					$survey['metadata']->idno=$survey['idno'];
+				}else{
+					$survey['metadata']['idno']=$survey['idno'];
+				}				
 			}
 			if (isset($survey['type'])){
-				$survey['metadata']['type']=$survey['type'];
+				if (is_object($survey['metadata'])){
+					$survey['metadata']->type=$survey['type'];
+				}else{
+					$survey['metadata']['type']=$survey['type'];
+				}
 			}
 		}
 
