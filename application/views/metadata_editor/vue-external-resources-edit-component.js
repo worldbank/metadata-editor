@@ -330,9 +330,10 @@ Vue.component('external-resources-edit', {
                     <span v-if="ResourceAttachmentType=='file'">File:</span>
                     <span v-if="ResourceAttachmentType=='url'">Link:</span>
                     {{Resource.filename}}
-                    <span v-if="Resource.filename!=''">
+                    <span v-if="Resource.filename">
                         <button type="button" class="btn btn-link btn-sm" @click="resourceDeleteFile">Remove</button>
                     </span>
+                    <span v-else>No file attached</span>
 
                     <div v-if="file_exists && file" class="border bg-danger text-light p-2 m-2"><strong>{{file.name}}</strong> File already exists, use a different file!</div>
                 </div>

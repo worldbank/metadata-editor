@@ -37,7 +37,12 @@ Vue.component('v-form-preview', {
     computed: {       
         formData () {
             return this.$deepModel('formData')
+        },
+        
+        ProjectType(){
+            return this.$store.state.project_type;
         }
+        
     },
     template: `
         <div :class="'v-form ' + css_class"   style="background:white;padding:5px;">

@@ -735,6 +735,14 @@
               key:'geospatial-features',
               items:this.GeospatialFeatures
             });
+
+            tree_data.push({
+              title: this.$t('Image Gallery'),
+              type: 'geospatial-gallery',
+              file: 'database',
+              key:'geospatial-gallery'
+            });
+
           }
           
 
@@ -841,6 +849,11 @@
 
           if (node.type=='preview'){
             router.push('/page-preview/');
+            return;
+          }
+
+          if (node.type=='geospatial-gallery'){
+            router.push('/geospatial-gallery');
             return;
           }
 

@@ -202,6 +202,7 @@
             echo $this->load->view("metadata_editor/vue-geospatial-feature-component.js",null,true);
 
             echo $this->load->view("metadata_editor/vue-page-preview-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-geospatial-gallery-component.js",null,true);
         ?>
 
         <?php if (empty($metadata)):?>
@@ -242,6 +243,7 @@
         const GeoFeatures ={props: ['index'],template: '<div>Geo-features</div>'}
         const GeoFeature ={props: ['feature_name'],template: '<div><geospatial-feature/></div>'}
         const PagePreview ={template: '<div><page-preview/></div>'}
+        const GeoGallery ={template: '<div><geospatial-gallery/></div>'}
 
         //routes
         const routes = [
@@ -264,7 +266,8 @@
             { path: '/external-resources/:index', component: ResourcesEditComp, props: true},            
             //{ path: '/files', component: FileManager, props: true},
             { path: '/geospatial-features', component: GeoFeatures, props: true},
-            { path: '/geospatial-feature/:feature_name', component: GeoFeature, props: true }
+            { path: '/geospatial-feature/:feature_name', component: GeoFeature, props: true },
+            { path: '/geospatial-gallery', component: GeoGallery, props: true }
         ]
 
         const router = new VueRouter({

@@ -800,8 +800,12 @@ html {
     display: none
 }
 
-#app .side-navigation .v-treeview-node__label {
+/*#app .side-navigation .v-treeview-node__label {
     max-width: 170px
+}*/
+
+#app .side-navigation .v-treeview-node__content{
+    margin-right:20px;
 }
 
 #app .side-navigation .v-treeview-node__level {
