@@ -1977,6 +1977,13 @@
                             "display_type": "textarea"
                         },
                         {
+                            "key":"series_description.citation_requirement",
+                            "type":"string",
+                            "title":"Citation requirement",
+                            "help_text":"This element is used to provide information on how the data should be cited. This can include the preferred citation format, the name of the author, the title of the data, the date of publication, the version of the data, and the URL of the data.",
+                            "display_type":"textarea"
+                        },
+                        {
                             "key": "series_description.links",
                             "title": "Links",
                             "type": "array",
