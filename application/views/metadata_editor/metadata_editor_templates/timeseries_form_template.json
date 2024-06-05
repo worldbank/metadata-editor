@@ -2035,6 +2035,14 @@
                                     "display_type": "textarea"
                                 },
                                 {
+                                    "key": "position",
+                                    "title": "Position",
+                                    "type": "string",
+                                    "prop_key": "series_description.contacts.position",
+                                    "help_text": "",
+                                    "display_type": "text"
+                                },
+                                {
                                     "key": "affiliation",
                                     "title": "Affiliation",
                                     "type": "string",
@@ -2279,7 +2287,15 @@
                             "type": "string",                            
                             "help_text": "",
                             "display_type": "text"
-                        }                                                    
+                        },
+                        {
+                            "key": "datacite.language",
+                            "title": "Language",
+                            "type": "string",                            
+                            "help_text": "",
+                            "display_type": "text"
+                        }
+
                     ]
         }
     ]
