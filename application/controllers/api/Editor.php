@@ -774,7 +774,7 @@ class Editor extends MY_REST_Controller
 				throw new Exception("Project not found");
 			}
 
-			$this->editor_acl->user_has_project_access($sid,$permission='view');
+			$this->editor_acl->user_has_project_access($sid,$permission='view',$this->api_user);
 			$this->load->library("html_report");
 			$html=$this->html_report->generate($sid);
 			
