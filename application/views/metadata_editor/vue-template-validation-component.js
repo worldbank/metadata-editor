@@ -88,6 +88,7 @@ Vue.component('template-validation-component', {
         {
             let vm=this;
             let validation_report=[];
+            this.validation_report=[];
 
             //recursively walk through template items and validate
             async function walkTemplate(item, metadata){
