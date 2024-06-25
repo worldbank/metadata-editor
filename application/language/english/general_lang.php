@@ -44,7 +44,7 @@ $lang['label']="Label";
 
 $lang['required']="Required";
 $lang['recommended']="Recommended";
-$lang['required']="Required";
+$lang['private']="Private";
 
 $lang['na']="N/A";
 $lang['json']="JSON";
