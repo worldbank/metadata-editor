@@ -27,6 +27,31 @@
             </div>
         </div>
 
+        <div class="row">
+            <div class="col-auto">
+                <div class="form-group form-check" v-if="prop.type!=='section' &&  prop.type!=='section_container'">
+                    <input type="checkbox" class="form-check-input" id="required_prop" v-model="prop.is_required" >
+                    <label class="form-check-label" for="required_prop">{{$t("required")}}</label>
+                </div>
+            </div>
+
+            <div class="col-auto">
+                <div class="form-group form-check" v-if="prop.type!=='section' &&  prop.type!=='section_container'">
+                    <input type="checkbox" class="form-check-input" id="recommended_prop" v-model="prop.is_recommended">
+                    <label class="form-check-label" for="recommended_prop">{{$t("recommended")}}</label>
+                </div>
+            </div>
+
+            <!--
+            <div class="col-auto">
+                <div class="form-group form-check" v-if="prop.type!=='section' &&  prop.type!=='section_container'">
+                    <input type="checkbox" class="form-check-input" id="private_prop" v-model="prop.is_private">
+                    <label class="form-check-label" for="private_prop">{{$t("private")}}</label>
+                </div>
+            </div>
+            -->
+        </div>
+
         <div class="form-group">
             <label for="name">{{$t('description')}}:</label>
             <textarea class="form-control" v-model="prop.help_text"/>

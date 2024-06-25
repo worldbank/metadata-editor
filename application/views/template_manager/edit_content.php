@@ -57,6 +57,13 @@
             <label class="form-check-label" for="recommended">{{$t("recommended")}}</label>
         </div>
     </div>
+
+    <div class="col-auto">
+        <div class="form-group form-check" v-if="ActiveNode.type!=='section' &&  ActiveNode.type!=='section_container'">
+            <input type="checkbox" class="form-check-input" id="private" v-model="ActiveNode.is_private">
+            <label class="form-check-label" for="private">{{$t("private")}}</label>
+        </div>
+    </div>
 </div>
 
 <div class="form-group mb-3" v-if="ActiveNode.key">
