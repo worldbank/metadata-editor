@@ -74,7 +74,7 @@ paths:
       produces:
         - application/json
       parameters:
-        - name: keyowrds
+        - name: keywords
           in: path
           title: Project search keywords
           description: Keywords for searching project by title and IDNO
