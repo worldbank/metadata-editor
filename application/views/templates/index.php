@@ -49,6 +49,7 @@
   </script>
 
   <div id="app" data-app>
+  <v-app>
 
     <div class="wrapper">
 
@@ -63,85 +64,84 @@
 
               <div class="projects col">
 
-                <div class=" mb-5">
-                  <h2>{{$t('template_manager')}}</h2>
+                <div class="mt-3 mb-5">
+                  <h3>{{$t('template_manager')}}</h3>
 
-                        <v-tabs background-color="transparent" class="navigation-tabs mb-5 mt-3" v-model="nav_tabs_active">
-                          <v-tab href="<?php echo site_url('projects');?>"><v-icon>mdi-text-box</v-icon>  {{$t("projects")}}</v-tab>
-                          <v-tab href="<?php echo site_url('collections');?>"><v-icon>mdi-folder-text</v-icon> {{$t("collections")}} </v-tab>
-                          <!--<v-tab>Archives</v-tab>-->
-                          <v-tab href="<?php echo site_url('templates');?>"><v-icon>mdi-alpha-t-box</v-icon> {{$t("templates")}}</v-tab>
-                        </v-tabs>
+                  <div class="d-flex">
 
+                  <v-tabs background-color="transparent" v-model="nav_tabs_model">
+                      <v-tab @click="pageLink('projects')"><v-icon>mdi-text-box</v-icon> <a :href="site_base_url + '/editor'">{{$t("projects")}}</a></v-tab>
+                      <v-tab @click="pageLink('collections')" active><v-icon>mdi-folder-text</v-icon> <a :href="site_base_url + '/collections'">{{$t("collections")}}</a> </v-tab>
+                      <!--<v-tab>Archives</v-tab>-->
+                      <v-tab @click="pageLink('templates')"><v-icon>mdi-alpha-t-box</v-icon> <a :href="site_base_url + '/templates'">{{$t("templates")}}</a></v-tab>
+                  </v-tabs>
 
-                  <div class="pull-right float-right">
-                    <button type="button" @click="showImportTemplateDialog" class="btn btn-sm btn-outline-primary">{{$t('import_template')}}</button>
+                  <div class="justify-content-end">
+                    <v-btn class="primary" @click="showImportTemplateDialog">{{$t('import_template')}}</v-btn>
                   </div>
-                </div>
 
+                  </div>
+                  
+                </div>
+               
                 <div>
                   <div v-if="!templates"> {{$t('no_templates_found')}}</div>
 
                   <div v-for="(data_type_label,data_type) in data_types" class="mb-3">
-                    <h4 class="p-2"><i :class="getProjectIcon(data_type)"></i> {{data_type_label}}</h4>
+                    
+                      <v-card-title>
+                        <i :class="getProjectIcon(data_type)"></i>&nbsp;{{data_type_label}}
+                      </v-card-title>
+                      
+                    <v-data-table                      
+                      :headers="[
+                        { text: $t('type'), value: 'template_type' },
+                        { text: $t('default'), value: 'default'},
+                        { text: $t('title'), value: 'name' },
+                        { text: $t('language'), value: 'lang' },
+                        { text: $t('version'), value: 'version' },
+                        { text: $t('last_updated'), value: 'changed' },
+                        { text: '', value: 'actions' }
+                      ]"
+                      :items="getTemplatesByType(data_type)"
+                      class="elevation-1 pt-3"
+                      :disable-pagination="true"
+                      :items-per-page="100"
+                      :hide-default-footer="true"
 
-                    <table class="table table-sm table-striped border bg-white mb-5">
-                      <tr class="bg-secondary">
-                        <th>{{$t('type')}}</th>
-                        <th>{{$t('default')}}</th>
-                        <th>{{$t('title')}}</th>
-                        <th>{{$t('language')}}</th>
-                        <th>{{$t('version')}}</th>
-                        <th>{{$t('last_updated')}}</th>
-                        <th></th>
-                      </tr>
-                      <template v-for="template in templates.core">
-                        <template v-if="data_type==template.data_type">
-                          <tr>
-                            <td>{{$t(template.template_type)}}</td>
-                            <td>
-                              <span class="btn btn-sm btn-link" @click="setDefaultTemplate(template.data_type,template.uid)">
-                                <v-icon v-if="template.default">mdi-radiobox-marked</v-icon>
-                                <v-icon v-else>mdi-radiobox-blank</v-icon>
-                              </span>
-                            </td>
-                            <td>
-                              <span style="font-weight:bold;" href="#">{{template.name}}</span>
-                              <div>{{template.uid}}</div>
-                            </td>
-                            <td>{{template.lang}}</td>
-                            <td>{{template.version}}</td>
-                            <td>-</td>
-                            <td>
-                              <v-icon @click="showMenu($event, template.uid, true)">mdi-dots-vertical</v-icon>                              
-                            </td>
-                          </tr>
-                        </template>
-                      </template>
 
-                      <template v-for="template in templates.custom">
-                        <template v-if="data_type==template.data_type">
-                          <tr>
-                            <td>{{$t(template.template_type)}}</td>
-                            <td>
-                              <span class="btn btn-sm btn-link" @click="setDefaultTemplate(template.data_type,template.uid)">
-                                <v-icon v-if="template.default">mdi-radiobox-marked</v-icon>
-                                <v-icon v-else>mdi-radiobox-blank</v-icon>
-                              </span>
-                            </td>
-                            <td>
-                              <a href="#" @click="editTemplate(template.uid)">{{template.name}}</a>
-                            </td>
-                            <td>{{template.lang}}</td>
-                            <td>{{template.version}}</td>
-                            <td>{{momentDate(template.changed)}}</td>
-                            <td>                              
-                              <v-icon @click="showMenu($event, template.uid)">mdi-dots-vertical</v-icon>
-                            </td>
-                          </tr>
-                        </template>
+                    >
+                      <!--
+                      <template v-slot:top>
+                            <div class="d-flex pl-6 pb-4 align-center">                                
+                                <div class="v-data-table--title"><i :class="getProjectIcon(data_type)"></i>&nbsp;{{data_type_label}}</div>                                
+                            </div>
+                        </template>    
+                      -->                                    
+                      <template v-slot:item.default="{ item }">
+                        <span class="btn btn-sm btn-link" @click="setDefaultTemplate(item.data_type,item.uid)">
+                          <v-icon v-if="item.default">mdi-radiobox-marked</v-icon>
+                          <v-icon v-else>mdi-radiobox-blank</v-icon>
+                        </span>                        
                       </template>
-                    </table>
+                      <template v-slot:item.actions="{ item }">
+                        <v-icon @click="showMenu($event, item.uid, item.template_type=='core')">mdi-dots-vertical</v-icon>
+                      </template>
+                      <template v-slot:item.changed="{ item }">
+                        <span v-if="item.changed">{{momentDate(item.changed)}}</span>
+                      </template>
+                      <template v-slot:item.name="{ item }">
+                        <div v-if="item.template_type=='core'">                          
+                          <span style="font-weight:bold;" href="#">{{item.name}}</span>
+                          <div>{{item.uid}}</div>
+                        </div>
+                        <div v-else>
+                          <a target="_blank" :href="getTemplateEditLink(item)" @click="editTemplate(item.uid)">{{item.name}}</a>
+                        </div>
+                      </template>
+                      
+
+                    </v-data-table>
 
                   </div>
 
@@ -153,10 +153,10 @@
 
           </div>
         </section>
-      </div>
-
+      </div>    
     </div>
 
+  </v-app>
 
     <template class="import-template">
       <div class="text-center">
@@ -210,9 +210,12 @@
       >
 
         <v-list>
+          <!--<v-list-item>
+            <v-list-item-title @click="editTemplate(menu_active_template_id)"><v-btn text>{{$t('edit')}}</v-btn></v-list-item-title>
+          </v-list-item> -->
           <v-list-item>
             <v-list-item-title @click="duplicateTemplate(menu_active_template_id)"><v-btn text>{{$t('duplicate')}}</v-btn></v-list-item-title>
-          </v-list-item>          
+          </v-list-item>
           <v-list-item>
             <v-list-item-title @click="exportTemplate(menu_active_template_id)"><v-btn text>{{$t('export')}}</v-btn></v-list-item-title>
           </v-list-item>
@@ -258,12 +261,26 @@
       routes
     })
 
+    const vuetify = new Vuetify({
+            theme: {
+            themes: {
+                light: {
+                    primary: '#526bc7',
+                    secondary: '#b0bec5',
+                    accent: '#8c9eff',
+                    error: '#b71c1c',
+                },
+            },
+            },
+        })
+
     vue_app = new Vue({
       i18n,
       el: '#app',
-      vuetify: new Vuetify(),
+      vuetify: vuetify,
       router: router,
       data: {
+        site_base_url: CI.base_url,
         templates: [],
         data_types: {},
         is_loading: false,
@@ -294,7 +311,8 @@
         menu_y: 0,
         menu_active_template_id: null,
         menu_active_template_core: false,
-        nav_tabs_active:2
+        nav_tabs_active:2,
+        nav_tabs_model:2
       },
       created: async function() {
         //await this.$store.dispatch('initData',{dataset_idno:this.dataset_idno});
@@ -314,6 +332,19 @@
       },
       watch: {},
       methods: {
+        getTemplateEditLink: function(template) {
+          return CI.base_url + '/templates/edit/' + template.uid;
+        },
+        getTemplatesByType: function(type) {
+          if (!this.templates.core || !this.templates.custom){
+            return [];
+          }
+          
+          return this.templates.core.filter(template => template.data_type == type).concat(this.templates.custom.filter(template => template.data_type == type));
+        },
+        pageLink: function(page){
+          window.location.href = CI.base_url + '/'+page;
+        },
         showMenu (e, templateId, isCore=false) {
           e.preventDefault()
           this.showTemplateMenu = false
@@ -321,6 +352,7 @@
           this.menu_y = e.clientY
           this.menu_active_template_id = templateId
           this.menu_active_template_core = isCore
+          console.log("showMenu", e.clientX, e.clientY, templateId, isCore);
           this.$nextTick(() => {
             this.showTemplateMenu = true
           })
