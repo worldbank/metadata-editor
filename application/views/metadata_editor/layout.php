@@ -110,7 +110,7 @@
 
                         <template #label="{ item }">
                             <span @click="treeClick(item)" :title="item.title" class="tree-item-label">
-                                <span v-if="item.type=='resource'">{{item.title | truncate(23, '...') }}</span>
+                                <span v-if="item.type=='resource'">{{item.title}}</span>
                                 <span v-else>
                                     <span v-if="item.is_required"><strong>{{item.title}}</strong></span>
                                     <span v-else>{{item.title}}</span>
@@ -173,6 +173,7 @@
                     <div class="container-fluid-x">
 
                         <v-login v-model="login_dialog"></v-login>
+                        <project-export-json-component v-model="export_json_dialog"></project-export-json-component>
 
                         <?php /*
                 //route path: {{$route.fullPath}}

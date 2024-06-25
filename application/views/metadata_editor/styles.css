@@ -597,7 +597,7 @@ html {
  }
 
  #variables-table tbody tr:nth-of-type(odd){
-    background: #d2d9f19e !important;
+    background: #f8f9fa !important;
  }
 
 
@@ -1132,4 +1132,9 @@ html {
 
 .geospatial-feature-component table tr:hover{
     cursor: pointer;
+}
+
+.font-weigh-normal label,
+.font-weigh-normal{
+    font-weight:normal;
 }

@@ -136,6 +136,9 @@
         })
         
         <?php 
+            echo $this->load->view("metadata_editor/vue-project-export-json-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-template-validation-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-template-apply-defaults-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-toast-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-login-component.js",null,true);
             echo $this->load->view("metadata_editor/fields/vue-field-date.js",null,true);
@@ -277,8 +280,11 @@
 
         router.beforeEach((to, from, next)=>{
             route_path=to.path.replace('/study/','');
+
+            console.log("route path",route_path);
             
             if (!store.state.treeActiveNode){
+                console.log("no active node");
                 if (store.getters.getTemplateItemByKey(route_path)){
                     store.commit('tree_active_node_path',route_path);
                 }
@@ -667,6 +673,7 @@
                     state.treeActiveNode=store.getters.getTemplateItemByKey(node_key);
                 },
                 tree_active_node_data(state,node){
+                    console.log("active node",node);
                     state.treeActiveNode=node;
                 },
 
