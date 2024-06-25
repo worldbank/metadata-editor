@@ -204,6 +204,7 @@ Vue.component('template-validation-component', {
         },        
         validateProject: function() {
             let vm=this;
+            this.validation_errors="";
             let url=CI.base_url + '/api/editor/validate/'+this.ProjectID;
 
             axios.get(url)
@@ -231,7 +232,7 @@ Vue.component('template-validation-component', {
                     
                     <div style="overflow:auto;max-height:400px;">
 
-                    <div>{{$t("Schema validation")}}</div>
+                    <div>{{$t("Schema validation")}} <v-icon small :title="$t('Requires project to be saved')" >mdi-information-outline</v-icon></div>
                     <div class="validation-errors mt-2" v-if="validation_errors!=''" style="color:red;font-size:small;" >
                         
                         <v-list dense>                            
