@@ -385,11 +385,12 @@ Vue.component('datafiles', {
     },
     template: `
         <div class="datfiles-component">
-
         
             <div class="container-fluid pt-5 mt-5 mb-5 pb-5">
 
-            <h3>{{$t("data-files")}}</h3>
+            <v-card>
+                <v-card-title>{{$t("data-files")}}</v-card-title>
+                <v-card-text>
             <div v-show="page_action=='list'">
 
             <strong>{{data_files.length}}</strong> {{$t("files")}}
@@ -400,8 +401,7 @@ Vue.component('datafiles', {
                     
                     </v-col>
                     <v-col md="4" align="right" class="mb-2">
-                        <!-- <button type="button" class="btn btn-sm btn-outline-primary" @click="addFile">Create file</button> -->
-                        <router-link class="btn btn-sm btn-outline-primary" :to="'datafiles/import'">{{$t("import_files")}}</router-link> 
+                        <v-btn color="primary" :to="'datafiles/import'" outlined small>{{$t("import_files")}}</v-btn>
                     </v-col>
                 </v-row>
                 
@@ -492,6 +492,9 @@ Vue.component('datafiles', {
                     <datafile-edit :value="data_files[edit_item]" @input="saveFile" @exit-edit="exitEditMode"></datafile-edit>                
                 </div>
             </div>
+
+            </v-card-text>
+            </v-card>
 
             </div>
 

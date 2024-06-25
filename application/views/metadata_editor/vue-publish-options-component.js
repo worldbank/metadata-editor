@@ -463,14 +463,16 @@ Vue.component('publish-options', {
         }
     },  
     template: `
-            <div class="import-options-component mt-5 p-5">
-                            
-                <h3>{{$t("publish_to_nada")}}</h3>
-                <p>{{$t("publish_to_nada_note")}}</p>
-                <div>
+            <div class="import-options-component mt-5 p-3">
 
-                <v-card class="p-3 mb-5"
-                    elevation="2"
+                <v-card>
+                    <v-card-title>{{$t("publish_to_nada")}}</v-card-title>
+                    <v-card-subtitle>{{$t("publish_to_nada_note")}}</v-card-subtitle>
+                
+                    <v-card-text>
+                    
+                <v-card 
+                    elevation="2" class="p-3 mb-3"
                 >
                         <div class="form-group" elevation="10">
                             <label for="catalog_id">{{$t("catalog")}} <router-link class="btn btn-sm btn-link" to="/configure-catalog">{{$t("configure_catalog")}}</router-link></label>
@@ -624,8 +626,11 @@ Vue.component('publish-options', {
                            
                     </div>
 
-                    <button :disabled="is_publishing==true" type="button" class="btn btn-primary" @click="publishToCatalog()">{{$t("publish")}}</button>
+                    <v-btn :disabled="is_publishing==true" color="primary" @click="publishToCatalog()">{{$t("publish")}}</v-btn>
                 </div>
+
+                </v-card-text>
+                </v-card>
 
                 
 

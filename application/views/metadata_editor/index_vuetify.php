@@ -205,6 +205,8 @@
         tree_active_items:[],
         tree_search:'',
         login_dialog:false,
+        export_json_dialog:false,
+        base_url:CI.base_url,
         show_fields_mandatory:false,
         show_fields_recommended:false,
         show_fields_empty:false,
@@ -512,6 +514,12 @@
         }
       },
       methods:{
+        onLinkClick: function(link){
+            window.open(link, '_blank');
+        },
+        onRouterLinkClick: function(link){
+            router.push(link);
+        },
         onWindowUnload: function(event){
           if (!this.is_dirty){
             return null;

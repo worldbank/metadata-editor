@@ -106,41 +106,51 @@ Vue.component('configure-catalog', {
 
                     <div class="row">                        
                         <div class="col-6">
-                            <h5>Catalogs</h5>
-                            <table class="table table-sm table-bordered table-striped">
-                                <tr>
-                                    <th>Title</th>
-                                    <th>Catalog URL</th>
-                                </tr>
-                                <tr v-for="connection in catalog_connections">
-                                    <td>{{connection.title}}</td>
-                                    <td>{{connection.url}}</td>
-                                    <td><button type="button" class="btn btn-sm" @click="DeleteCatalogConnection(connection.id)">
-                                    <v-icon color="red">mdi-close-circle-outline</v-icon>
-                                    </button></td>
-                                </tr>
-                            </table>
+                            <v-card>
+                                <v-card-title>Catalogs</v-card-title>
+                                <v-card-text>
+                                    <table class="table table-sm table-bordered table-striped">
+                                        <tr>
+                                            <th>Title</th>
+                                            <th>Catalog URL</th>
+                                        </tr>
+                                        <tr v-for="connection in catalog_connections">
+                                            <td>{{connection.title}}</td>
+                                            <td>{{connection.url}}</td>
+                                            <td><button type="button" class="btn btn-sm" @click="DeleteCatalogConnection(connection.id)">
+                                            <v-icon color="red">mdi-close-circle-outline</v-icon>
+                                            </button></td>
+                                        </tr>
+                                    </table>
+                                </v-card-text>
+                            </v-card>
                         </div>
 
                         <div class="col-6">
-                            <h5 class="mb-4">Configure new catalog</h5>
 
-                            <div class="form-group form-field">
-                                <label for="titlte">Catalog title</label> 
-                                <span><input type="text" id="title" class="form-control" v-model="catalog.title"/></span> 
-                            </div>
+                            <v-card>
+                                <v-card-title>Configure new catalog</v-card-title>
+                                <v-card-text>
 
-                            <div class="form-group form-field">
-                                <label for="url">Catalog URL</label> 
-                                <span><input type="text" id="url" class="form-control" v-model="catalog.url"/></span>                                 
-                            </div>
+                                <div class="form-group form-field">
+                                    <label for="titlte">Catalog title</label> 
+                                    <span><input type="text" id="title" class="form-control" v-model="catalog.title"/></span> 
+                                </div>
 
-                            <div class="form-group form-field">
-                                <label for="api_key">API Key</label> 
-                                <span><input type="password" id="api_key" class="form-control" v-model="catalog.api_key"/></span>
-                            </div>
+                                <div class="form-group form-field">
+                                    <label for="url">Catalog URL</label> 
+                                    <span><input type="text" id="url" class="form-control" v-model="catalog.url"/></span>                                 
+                                </div>
 
-                            <button type="button" class="btn btn-primary" @click="CreateCatalogConnection">Submit</button>
+                                <div class="form-group form-field">
+                                    <label for="api_key">API Key</label> 
+                                    <span><input type="password" id="api_key" class="form-control" v-model="catalog.api_key"/></span>
+                                </div>
+
+                                <v-btn small color="primary"  @click="CreateCatalogConnection">Submit</v-btn>
+                                </v-card-text>
+                            </v-card>
+
                         </div>
                     </div>
 

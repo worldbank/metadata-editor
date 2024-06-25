@@ -115,8 +115,7 @@ class Editor extends MY_REST_Controller
 	{
 		try{
 			$sid=$this->get_sid($sid);
-			$user=$this->api_user();
-			$this->editor_acl->user_has_project_access($sid,$permission='view',$user);
+			$this->editor_acl->user_has_project_access($sid,$permission='view',$this->api_user);
 
 			$result=$this->Editor_model->get_row($sid);
 			array_walk($result, 'unix_date_to_gmt_row',array('created','changed'));
@@ -140,45 +139,7 @@ class Editor extends MY_REST_Controller
 			);
 			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}
-	}
-
-
-	/**
-	 * 
-	 * Check if a study IDNO exists
-	 * 
-	 */
-	function check_idno_get($idno=null)
-	{
-		try{
-			$sid=$this->dataset_manager->find_by_idno($idno);
-			$this->has_dataset_access('view',$sid);
-			
-			if ($sid){
-				$response=array(
-					'status'=>'success',
-					'idno'=>$idno,
-					'id'=>$sid
-				);			
-				$this->set_response($response, REST_Controller::HTTP_OK);
-			}
-			else{
-				$response=array(
-					'status'=>'not-found',
-					'idno'=>$idno,
-					'message'=>'IDNO NOT FOUND'
-				);
-				$this->set_response($response, REST_Controller::HTTP_NOT_FOUND);
-			}
-		}
-		catch(Exception $e){
-			$error_output=array(
-				'status'=>'failed',
-				'message'=>$e->getMessage()
-			);
-			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
-		}
-	}
+	}	
 
 
 	private function get_collection_options(&$options)
@@ -498,11 +459,11 @@ class Editor extends MY_REST_Controller
 	{
 		try{
 			$sid=$this->get_sid($sid);
-			$this->editor_acl->user_has_project_access($sid,$permission='edit');
+			$this->editor_acl->user_has_project_access($sid,$permission='edit',$this->api_user());
 			$this->Editor_model->delete_project($sid);
 				
 			$response=array(
-				'status'=>'success'					
+				'status'=>'success'
 			);
 
 			$this->set_response($response, REST_Controller::HTTP_OK);
@@ -653,18 +614,20 @@ class Editor extends MY_REST_Controller
 	 * Download project metadata as JSON
 	 * 
 	 */
-	function json_get($sid=null)
+	function json_get($sid=null,$exclude_private_fields=0)
 	{		
 		try{
 			$sid=$this->get_sid($sid);
-			$exists=$this->Editor_model->check_id_exists($sid);			
+			$exists=$this->Editor_model->check_id_exists($sid);
 
 			if(!$exists){
 				throw new Exception("Project not found");
 			}
 
 			$this->editor_acl->user_has_project_access($sid,$permission='view',$this->api_user);
-			$this->Editor_model->download_project_json($sid);
+
+			$this->load->library('Project_json_writer');
+			$this->project_json_writer->download_project_json($sid,$exclude_private_fields);
 			die();
 		}
 		catch(Exception $e){

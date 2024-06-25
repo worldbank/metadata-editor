@@ -7,13 +7,15 @@ Vue.component('summary-component', {
           template_idx:-1,
           template_updating:false,
           project_edit_stats:{},
-          project_disk_usage:{}
+          project_disk_usage:{},
+          project_validation:[],
+          apply_defaults_dialog:false,
+          apply_defaults_dialog_key:0
         }
       },
     created: function(){      
-        this.validateProject();
         this.getProjectEditStats();
-        this.getProjectDiskUsage();
+        this.getProjectDiskUsage();        
     },
     computed: {
         ProjectID(){
@@ -56,8 +58,15 @@ Vue.component('summary-component', {
         ProjectType(state){
             return this.$store.state.project_type;
         },
+        ProjectMetadata(){
+            return this.$store.state.formData;
+        }
     },
     methods:{
+        templateApplyDefaults: function(){
+            this.apply_defaults_dialog_key+=1;
+            this.apply_defaults_dialog=true;
+        },
         momentDate(date) {
             //gmt to utc
             let utc_date = moment(date, "YYYY-MM-DD HH:mm:ss").toDate();
@@ -91,24 +100,6 @@ Vue.component('summary-component', {
                 console.log("disk_usage_stats_failed",error);
             });
         },
-        validateProject: function() {
-            let vm=this;
-            let url=CI.base_url + '/api/editor/validate/'+this.ProjectID;
-
-            axios.get(url)
-            .then(function (response) {
-                if(response.data){                    
-                    console.log("validation response",response);
-                }
-            })
-            .catch(function (error) {
-                console.log("validation errors",error);                
-                vm.validation_errors=error.response.data;
-            })
-            .then(function () {
-                console.log("request completed");
-            });
-        },
         UpdateTemplate: function(){ 
             this.template_updating=true;
             let vm=this;
@@ -133,6 +124,9 @@ Vue.component('summary-component', {
                 });
 
             });
+        },
+        loadTemplates: async function(){
+            await store.dispatch('loadTemplatesList',{});
         }
     },     
     template: `
@@ -154,10 +148,15 @@ Vue.component('summary-component', {
 
                             <div class="col-12 bg-light mb-3" >
                                 <div>
-                                    <div><v-icon style="font-size:25px;">mdi-alpha-t-box</v-icon> {{$t("template")}}</div>
+                                    
+                                    <div class="d-flex justify-space-between">
+                                        <div><v-icon style="font-size:25px;">mdi-alpha-t-box</v-icon> {{$t("template")}}</div>                                        
+                                        <v-btn small title="Apply template default values" text @click="templateApplyDefaults"><v-icon>mdi-checkbox-multiple-marked-circle</v-icon>Defaults</v-btn>        
+                                    </div>
+
                                     <div class="mt-1">
-                                        <v-btn text color="primary" @click="dialog_template=true">
-                                            {{ProjectTemplate.name}}
+                                        <v-btn text color="primary" @click="loadTemplates();dialog_template=true">
+                                            {{ProjectTemplate.name}} - {{ProjectTemplate.version}}
                                         </v-btn>
                                     </div>
                                 </div>
@@ -204,21 +203,11 @@ Vue.component('summary-component', {
                     </div>
 
                     <div class="col-6">
-                    <v-card class="project-validation-container">
+                        <v-card class="project-validation-container">
                             <v-card-text>
-                            <h5>{{$t("project_validation")}}</h5>                            
-
-                            <div class="validation-errors mt-2 border" v-if="validation_errors!=''" style="color:red;font-size:small;" >
-                                <div class="border-bottom p-2 mb-2"><strong>{{$t("validation_errors")}}</strong></div>
-                                <ul v-for="error in validation_errors.errors" class="mb-2 ml-3">
-                                    <li><strong>{{error.message}}</strong><br/>
-                                    Property: {{error.property}}
-                                    </li>                                    
-                                </ul>
-                            </div>
-                            <div class="mt-3 p-2 border" style="color:green" v-else>{{$t("no_validation_errors")}}</div>
+                                <template-validation-component></template-validation-component>
                             </v-card-text>
-                        </v-card>
+                        </v-card>                        
                     </div>
 
                     <div class="col-6" >
@@ -253,7 +242,8 @@ Vue.component('summary-component', {
                                 scrollable
                                 >
                                 <v-card >
-                                    <v-card-title class="text-h5 grey lighten-2">                                    
+                                    <v-card-title class="text-h5 grey lighten-2">
+                                    {{$t('Template')}}
                                     </v-card-title>
 
                                     <v-card-text style="max-height:400px;">
@@ -271,8 +261,12 @@ Vue.component('summary-component', {
                                                         <v-list-item :key="item.uid">
                                                             <template v-slot:default="{ active }">
                                                             <v-list-item-content>
-                                                                <v-list-item-title v-text="item.name"></v-list-item-title>
-                                                                <v-list-item-subtitle v-text="item.uid"></v-list-item-subtitle>
+                                                                <v-list-item-title><strong>{{item.name}}</strong></v-list-item-title>
+                                                                <v-list-item-subtitle>
+                                                                    {{item.uid}}
+                                                                    <span v-if="item.version">| Version: {{item.version}}</span>  
+                                                                    <span v-if="item.lang">| Language: {{item.lang}}</span>
+                                                                </v-list-item-subtitle>                                                                
                                                             </v-list-item-content>
 
                                                             <v-list-item-action>
@@ -343,6 +337,8 @@ Vue.component('summary-component', {
                     </div>
                    
                 </div>
+
+                <template-apply-defaults-component v-model="apply_defaults_dialog" :key="apply_defaults_dialog_key"></template-apply-defaults-component>
 
             </div>          
             `    

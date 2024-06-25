@@ -260,7 +260,7 @@
                               </a>
                             </div>
                             <div class="text-secondary text-small">
-                              {{project.idno}} | <span :title="project.template_uid">{{project.template_uid}}</span>
+                              {{project.idno}} <!-- | <span :title="project.template_uid">{{project.template_uid}} --></span>
                             </div>
                             <template v-for="collection in project.collections">
                                 <v-chip small color="#dce3f7" class="mr-1" close @click:close="removeFromCollection(collection.sid,collection.id)">

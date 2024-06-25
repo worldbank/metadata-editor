@@ -428,6 +428,24 @@ class Editor_template_model extends ci_model {
 	}
 
 
+	function get_project_template($sid)
+	{
+		$this->db->select("template_uid");
+		$this->db->where("id",$sid);
+		$result=$this->db->get("editor_projects")->row_array();
+
+		if (!isset($result['template_uid'])){
+			throw new Exception("Project does not have a template");
+		}
+
+		$template=$this->get_template_by_uid($result['template_uid']);
+
+		if (!$template){
+			throw new Exception("Template not found");
+		}
+
+		return $template;
+	}
 
     
 }

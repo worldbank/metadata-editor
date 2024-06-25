@@ -234,9 +234,15 @@ Vue.component('external-resources-edit', {
 
     },
     template: `
-        <div class="container-fluid edit-resource-container mt-5">
+        <div class="container-fluid edit-resource-container mt-5 pt-5">
             <div v-if="Resource">
-            <h3>Edit resource</h3>
+
+            <v-card>
+            <v-card-title>
+            Edit resource
+            </v-card-title>
+
+            <v-card-text>
             
             <div class="form-group form-field" >
                 <label>File type *</label>
@@ -377,9 +383,11 @@ Vue.component('external-resources-edit', {
             </div>
 
 
-            <button type="button" class="btn btn-primary" @click="uploadFile" :disabled="file_exists==true">Save</button>
-            <button type="button" class="btn btn-secondary" @click="cancelSave">Cancel</button>
+            <v-btn color="primary" @click="uploadFile" :disabled="file_exists==true">Save</v-btn>
+            <v-btn @click="cancelSave">Cancel</v-btn>
 
+
+            </v-card-text>
             
         </div>
         </div>

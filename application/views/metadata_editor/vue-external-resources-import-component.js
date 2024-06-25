@@ -10,24 +10,16 @@ Vue.component('external-resources-import', {
     created () {
         //this.loadDataFiles();
     },   
-    methods: {
-        saveFile: function(data)
-        {
-            console.log("saving file",this.data_files[this.edit_item]);
-            this.$set(this.data_files, this.edit_item, data);            
-        },
-        uploadResources: function(){
+    methods: {        
+        uploadResources: async function(){
+            this.errors=[];
             let formData = new FormData();
             formData.append('file', this.file);
-
-            if (this.errors!=''){
-                return false;
-            }
 
             vm=this;
             let url=CI.base_url + '/api/resources/import/'+ this.ProjectID;
 
-            axios.post( url,
+            await axios.post( url,
                 formData,
                 {
                     headers: {
@@ -38,12 +30,18 @@ Vue.component('external-resources-import', {
                 vm.$store.dispatch('loadExternalResources',{dataset_id:vm.ProjectID});
                 router.push('/external-resources/');
             })
-            .catch(function(response){
-                vm.errors=response;
+            .catch(function(err){
+                if (err.response.data && err.response.data.message){
+                    vm.errors.push(err.response.data.message);
+                }
+                else{
+                    vm.errors.push('An error occurred');
+                }
+                console.log("error",err);
             });
         },
         handleFileUpload( event ){
-            this.file = event.target.files[0];
+            this.file = event;            
             this.errors='';            
         },
     },
@@ -57,27 +55,45 @@ Vue.component('external-resources-import', {
         }
     },
     template: `
-        <div>
+        <div class="external-resources-import-component mt-5 p-3">
+
+                        <v-card>
+                            <v-card-title>
+                                Import external resources
+                            </v-card-title>
+
+                            <v-card-text>
+                                <v-file-input                            
+                                    label=""
+                                    outlined
+                                    truncate-length="50"
+                                    dense
+                                    prepend-icon=""
+                                    prepend-inner-icon="mdi-paperclip"
+                                    @change="handleFileUpload( $event )"                                    
+                                    ref="fileUpload"
+                                ></v-file-input>
+                                <div class="mb-3">
+                                    <small>Allowed file types: RDF, JSON</small>
+                                </div>
+
+                                <div style="color:red" class="mb-3" v-if="errors.length>0">
+                                    <div>Errors:</div>
+                                    <div v-for="error in errors">
+                                        {{error}}
+                                    </div>
+                                </div>
+
+                                <v-btn color="primary" @click="uploadResources">Import file</v-btn>
+
+                            </v-card-text>
+
+                            <v-card-actions>                                
+                                
+                            </v-card-actions>
+
+                        </v-card>
             
-            <v-container>
-
-                    <h3>Import external resources</h3>
-
-                    <div class="bg-white p-3" >
-                        <div v-if="errors.length>0">{{errors}}</div>
-                        <div class="form-container-x" >
-                        
-                            <div class="file-group form-field mb-3">
-                                <label class="l" for="customFile">Choose file</label>
-                                <input type="file" class="form-control" id="customFile" @change="handleFileUpload( $event )">
-                                <small>Allowed file types: RDF, JSON</small>
-                            </div>
-
-                            <button type="button" class="btn btn-primary" @click="uploadResources">Import file</button>
-
-                        </div>
-                    </div>
-            </v-container>
 
         </div>
     `

@@ -290,8 +290,9 @@ Vue.component('datafile-import', {
     template: `
             <div class="datafile-import-component container-fluid mt-5 p-3">
 
-                <h3>{{$t("import_data_files")}}</h3>                
-                <div class="bg-white" >
+                <v-card>
+                    <v-card-title>{{$t("import_data_files")}}</v-card-title>
+                    <v-card-text>                
 
                     <div class="form-container-x" >
 
@@ -320,7 +321,7 @@ Vue.component('datafile-import', {
                         </div>
                                                 
                         <div xv-if="update_status==''">
-                            <button type="button" :disabled="!FilesCount>0" class="btn btn-primary" @click="processImport">{{$t("import")}}</button>
+                            <v-btn color="primary" :disabled="!FilesCount>0"  @click="processImport">{{$t("import")}}</v-btn>
                         </div>
                         
                     </div>
@@ -331,13 +332,9 @@ Vue.component('datafile-import', {
                         <div v-if="errors.response">{{errors.response.data.message}}</div>
                     </div>
 
-                    
+                    </v-card-text>
+                </v-card>
 
-
-                </div>
-
-
-            
 
 
             <v-dialog v-model="dialog_process" width="700" height="600" persistent>

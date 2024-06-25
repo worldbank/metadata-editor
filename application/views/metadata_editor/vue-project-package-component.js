@@ -193,12 +193,17 @@ Vue.component('project-package', {
     template: `
             <div class="import-options-component p-3 mt-5">
             
-                <h3>{{$t("project_package")}}</h3>
-                                
-                <div>{{$t("project_package_note")}}</div>
-
-                <button :disabled="project_export_status!=''" type="button" class="mt-3 btn btn-primary" @click="downloadZip()">{{$t("download_zip_package")}}</button>
-                <span v-if="project_export_status!='done' && project_export_status!=''"><i class="fas fa-circle-notch fa-spin"></i> {{project_export_status}}</span>
+                <v-card>
+                    <v-card-title>
+                    {{$t("project_package")}}
+                    </v-card-title>
+                    <v-card-text>
+                        <div class="mb-3">{{$t("project_package_note")}}</div>
+                        <v-btn color="primary" :disabled="project_export_status!=''" @click="downloadZip()">{{$t("download_zip_package")}}</v-btn>
+                        <span v-if="project_export_status!='done' && project_export_status!=''"><i class="fas fa-circle-notch fa-spin"></i> {{project_export_status}}</span>
+                    </v-card-text>
+                </v-card>
+                
 
             </div>          
             `    

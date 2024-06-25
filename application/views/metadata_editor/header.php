@@ -107,6 +107,12 @@
         </v-btn>
         </template>
 
+        <!--
+        <v-btn color="primary"  large icon  style="margin-left:23px;">
+            <v-icon>mdi-alpha-t-box-outline</v-icon>
+        </v-btn>
+        -->
+
     <template>
     <div class="text-center">        
         <v-menu min-width="600px">
@@ -133,45 +139,45 @@
                         <v-list-item-group       
                             color="primary"
                         >
-                            <v-list-item>
+                            <v-list-item @click="onRouterLinkClick('/project-package')">
                             <v-list-item-icon>
                                 <v-icon>mdi-package-down</v-icon>
                             </v-list-item-icon>
                             <v-list-item-title>
-                                <a href="#/project-package"><?php echo t("export_package_zip"); ?></a>
+                                <?php echo t("export_package_zip"); ?>
                             </v-list-item-title>
                             </v-list-item>
                             
-                            <v-list-item v-if="dataset_type=='survey'" >
+                            <v-list-item v-if="dataset_type=='survey'" @click="onLinkClick(base_url + '/api/editor/ddi/' + dataset_id)">
                                 <v-list-item-icon>
                                     <v-icon>mdi-file</v-icon>
                                 </v-list-item-icon>
-                                <v-list-item-title>                                
-                                    <a :href="'<?php echo site_url('api/editor/ddi/'); ?>' + dataset_id" target="_blank"><?php echo t("export_ddi"); ?></a>
+                                <v-list-item-title>                                    
+                                    <?php echo t("export_ddi"); ?>
                                 </v-list-item-title>
                             </v-list-item>
-                            <v-list-item>
+                            <v-list-item @click="export_json_dialog=true">
                                 <v-list-item-icon>
                                     <v-icon>mdi-file</v-icon>
                                 </v-list-item-icon>
                                 <v-list-item-title>
-                                    <a  :href="'<?php echo site_url('api/editor/json/'); ?>' + dataset_id" target="_blank"><?php echo t("export_json"); ?></a>                                
+                                    <?php echo t("export_json"); ?>
                                 </v-list-item-title>
                             </v-list-item>
-                            <v-list-item>
+                            <v-list-item @click="onRouterLinkClick('/publish')">
                             <v-list-item-icon>
                                 <v-icon>mdi-arrow-top-right-thick</v-icon>
                             </v-list-item-icon>
                             <v-list-item-title>
-                                <a href="#/publish"><?php echo t("publish_to_nada"); ?></a>
+                                <?php echo t("publish_to_nada"); ?>
                             </v-list-item-title>
                             </v-list-item>
-                            <v-list-item>
+                            <v-list-item @click="onRouterLinkClick('/generate-pdf')">
                             <v-list-item-icon>
                                 <v-icon>mdi-file-pdf-box</v-icon>
                             </v-list-item-icon>
                             <v-list-item-title>
-                                <a  href="#/generate-pdf"><?php echo t("pdf_documentation"); ?></a>
+                                <?php echo t("pdf_documentation"); ?>
                             </v-list-item-title>
                             </v-list-item>                                                        
                         </v-list-item-group>
@@ -185,23 +191,20 @@
                             color="primary"
                         >
                         
-                        <v-list-item>
+                        <v-list-item @click="onRouterLinkClick('/import')">
                         <v-list-item-icon>
                             <v-icon>mdi-import</v-icon>
                         </v-list-item-icon>
-                            <v-list-item-title>
-                            <router-link
-                                to="/import">
-                                <?php echo t("import_project_metadata"); ?>
-                            </router-link>
+                            <v-list-item-title>                            
+                                <?php echo t("import_project_metadata"); ?>                            
                             </v-list-item-title>
                         </v-list-item>
-                        <v-list-item>
+                        <v-list-item @click="onRouterLinkClick('/external-resources/import')">
                             <v-list-item-icon>
                                 <v-icon>mdi-file-import</v-icon>
                             </v-list-item-icon>
                             <v-list-item-title>
-                                <a href="#/external-resources/import"><?php echo t("import_external_resources"); ?></a>
+                                <?php echo t("import_external_resources"); ?>
                             </v-list-item-title>
                         </v-list-item>                                                
                         </v-list-item-group>
@@ -210,20 +213,20 @@
                         <v-list-item-group       
                             color="primary"
                         >
-                        <v-list-item>
+                        <v-list-item @click="onLinkClick(base_url + '/api/resources/rdf/' + dataset_id)">
                             <v-list-item-icon>
                                 <v-icon>mdi-file</v-icon>
                             </v-list-item-icon>
                             <v-list-item-title>
-                                <a :href="'<?php echo site_url('api/resources/rdf/'); ?>' + dataset_id" target="_blank"> Export RDF/XML</a>
+                                Export RDF/XML
                             </v-list-item-title>
                         </v-list-item>
-                        <v-list-item>
+                        <v-list-item @click="onLinkClick(base_url + '/api/resources/' + dataset_id)">
                             <v-list-item-icon>
                                 <v-icon>mdi-file</v-icon>
                             </v-list-item-icon>
                             <v-list-item-title>
-                            <a :href="'<?php echo site_url('api/resources/'); ?>' + dataset_id" target="_blank"> Export JSON</a>
+                                Export RDF/JSON
                             </v-list-item-title>
                         </v-list-item>
                         </v-list-item-group>
@@ -239,7 +242,6 @@
         </v-menu>
     </div>
     </template>
-    </ul>
-
+    </ul>    
 
 </nav>
