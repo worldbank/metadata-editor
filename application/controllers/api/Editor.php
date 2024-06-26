@@ -19,6 +19,7 @@ class Editor extends MY_REST_Controller
 		$this->load->library("Editor_acl");
 		$this->load->library("Audit_log");
 		$this->load->library("Project_search");
+		$this->load->library('Project_json_writer');
 		$this->is_authenticated_or_die();
 		$this->api_user=$this->api_user();		
 	}
@@ -624,9 +625,7 @@ class Editor extends MY_REST_Controller
 				throw new Exception("Project not found");
 			}
 
-			$this->editor_acl->user_has_project_access($sid,$permission='view',$this->api_user);
-
-			$this->load->library('Project_json_writer');
+			$this->editor_acl->user_has_project_access($sid,$permission='view',$this->api_user);			
 			$this->project_json_writer->download_project_json($sid,$exclude_private_fields);
 			die();
 		}
@@ -653,7 +652,7 @@ class Editor extends MY_REST_Controller
 			}
 
 			$this->editor_acl->user_has_project_access($sid,$permission='view');
-			$this->Editor_model->generate_project_json($sid);
+			$this->project_json_writer->generate_project_json($sid);
 
 			$output=array(
 				'status'=>'success'

@@ -22,6 +22,7 @@ class ProjectPackage
 		$this->ci->load->model("Editor_model");
         $this->ci->load->model("Editor_resource_model");
         $this->ci->load->model("Collection_model");
+        $this->ci->load->library("Project_json_writer");
 	}
 
 
@@ -119,7 +120,7 @@ class ProjectPackage
 
         try{
             //project json
-            $this->ci->Editor_model->generate_project_json($sid);
+            $this->ci->project_json_writer->generate_project_json($sid);
 
             //external resources json
             $this->ci->Editor_resource_model->write_json($sid);
