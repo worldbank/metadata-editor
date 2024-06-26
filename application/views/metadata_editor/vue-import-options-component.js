@@ -85,13 +85,15 @@ Vue.component('import-options', {
         }
     },  
     template: `
-            <div class="import-options-component">
+            <div class="import-options-component import-project-metadata p-3 mt-5">
             
-                <div class="container-fluid mt-3 p-3">
+                <v-card>
+                    <v-card-title>
+                        Import project metadata
+                    </v-card-title>
+                    <v-card-text>
 
-                <h3>Import Metadata</h3>
-
-                <div class="bg-white" >
+                
 
                     <div class="form-container-x" >
 
@@ -148,11 +150,8 @@ Vue.component('import-options', {
 
                     </div>
 
-
-                </div>
-
-
-            </div>
+                </v-card-text>
+            </v-card>
 
             </div>          
             `    
