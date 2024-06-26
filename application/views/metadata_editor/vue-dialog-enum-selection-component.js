@@ -25,7 +25,7 @@ Vue.component('vue-dialog-enum-selection-component', {
             }
         },
         addSelection: function(){
-            this.$emit('selection', JSON.parse(JSON.stringify(this.selected)));
+            this.$emit('selection', JSON.parse(JSON.stringify(this.selectedItems)));
             this.dialog=false;
             this.selected=[];
         }
@@ -50,7 +50,17 @@ Vue.component('vue-dialog-enum-selection-component', {
 
             for (let i=0;i<this.enums.length;i++){
                 let item=this.enums[i];
-                item.index=i;
+                item.index__=i;
+                items.push(item);
+            }
+            return items;
+        },
+        selectedItems(){
+            //exclude column index__
+            let items=[];
+            for (let i=0;i<this.selected.length;i++){
+                let item=JSON.parse(JSON.stringify(this.selected[i]));
+                delete item.index__;
                 items.push(item);
             }
             return items;
@@ -84,7 +94,7 @@ Vue.component('vue-dialog-enum-selection-component', {
                                 :headers="headers"
                                 :items="items"
                                 :single-select="singleSelect"
-                                item-key="index"
+                                item-key="index__"
                                 show-select
                                 class="elevation-1"
                                 hide-default-header
