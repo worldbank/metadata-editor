@@ -333,7 +333,7 @@ Vue.component('publish-options', {
             });            
         },
         async writeProjectZip() {
-            let url=CI.base_url + '/api/editor/generate_zip/'+this.ProjectID;
+            let url=CI.base_url + '/api/packager/generate_zip/'+this.ProjectID;
             return axios
             .get(url)
             .then(function (response) {
