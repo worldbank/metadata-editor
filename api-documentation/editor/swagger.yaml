@@ -447,6 +447,64 @@ paths:
         security:
           - ApiKeyAuth: []   
 
+  /editor/create/document:
+      post:
+        tags:
+          - Projects 
+          - Document
+        summary: Create Document
+        description: Create a new document project
+        operationId: createDocument
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: 'document-schema.json'
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: 'document-schema.json'
+        security:
+          - ApiKeyAuth: []
+
+  /editor/update/document/{id}:
+      post:
+        tags:
+          - Document
+          - Projects
+        summary: Update Document
+        description: Update document project
+        operationId: updateDocument
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "id"
+            description: Project ID
+            type: string
+            format: string
+            required: true
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: 'document-schema.json'
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: 'document-schema.json'
+        security:
+          - ApiKeyAuth: []
+
 
   /collections:
       get:
