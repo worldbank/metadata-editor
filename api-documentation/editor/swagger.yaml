@@ -5,7 +5,7 @@ info:
     
 
     Find out more about Editor at
-    [http://editor.ihsn.org](http://editor.ihsn.org).  
+    [https://github.com/ihsn/editor](https://github.com/ihsn/editor).  
 
     
   version: 1.0.0
@@ -16,8 +16,32 @@ info:
     altText: ""
 basePath: /index.php/api/
 tags:
-  - name: Editor
+  - name: Projects
     description: Create, update projects
+
+  - name: Microdata
+    description: Manage microdata projects
+
+  - name: Timeseries
+    description: Manage timeseries projects
+
+  - name: Geospatial
+    description: Manage geospatial projects
+
+  - name: Document
+    description: Manage document projects
+
+  - name: Table
+    description: Manage table projects
+
+  - name: Image
+    description: Manage image projects
+
+  - name: Script
+    description: Manage scripts
+
+  - name: Video
+    description: Manage video projects
 
   - name: External resources
     description: Manage external resources and files for projects
@@ -25,36 +49,44 @@ tags:
   - name: Collections
     description: Collections
 
-  - name: Catalog
-    description: API to browse, search and explore studies in the catalog
-
-  - name: Metadata
-    description: Access metadata and documentation available for the studies in the catalog
-
   - name: Templates
     description: Templates
 
 
-x-tagGroups:
-  - name: Editor
+x-tagGroups:  
+  - name: Projects
     tags:
-      - Editor
+      - Projects
+  - name: Microdata
+    tags:
       - Microdata
+  - name: Timeseries
+    tags:
       - Timeseries
-      - External resources
-      - Datafile
-      - Variable
-      - Templates
-
+  - name: Geospatial    
+    tags:
+      - Geospatial
+  - name: Document
+    tags:
+      - Document
+  - name: Table
+    tags:
+      - Table
+  - name: Image
+    tags:
+      - Image
+  - name: Script
+    tags:
+      - Script
+  - name: Video
+    tags:
+      - Video
+  - name: External resources
+    tags:
+      - External resources      
   - name: Collections
     tags:
       - Collections
-  - name: Catalog
-    tags:
-      - Catalog
-  - name: Metadata
-    tags:
-      - Metadata 
   - name: Templates
     tags:
       - Templates   
@@ -65,7 +97,7 @@ paths:
   /editor:
     get:
       tags:
-        - Editor
+        - Projects
       summary: List projects
       description: List and find projects
       operationId: EditorProjects
@@ -127,7 +159,7 @@ paths:
   /editor/{id}:
     get:
       tags:
-        - Editor
+        - Projects
       summary: Get project by ID
       description: "Get study level metadata for a project"
       operationId: singleProject
@@ -146,11 +178,32 @@ paths:
         '200':
           description: successful operation
 
+  /editor/delete/{id}:
+    get:
+      tags:
+        - Projects
+      summary: Delete project by ID
+      description: Delete project
+      operationId: deleteProject
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          title: Project unique ID
+          description: Project unique ID number
+          type: string
+          required: true
+      responses:
+        '200':
+          description: successful operation
+
   /editor/{id}/data_files:
     get:
       tags:
-        - Editor
-        - Datafile
+        - Microdata
       summary: List data files
       description: List all data files for a Microdata type project
       operationId: listDataFiles
@@ -172,8 +225,7 @@ paths:
   /editor/{id}/variables:
     get:
       tags:
-        - Editor
-        - Variable
+        - Microdata
       summary: List variables
       description: List variables by a Microdata project 
       operationId: listVariables
@@ -194,8 +246,7 @@ paths:
   /editor/{id}/variables/{varId}:
     get:
       tags:
-        - Editor
-        - Variable
+        - Microdata
       summary: Find variable
       description: Get a single variable metadata
       operationId: findSingleVariable
@@ -225,6 +276,7 @@ paths:
   /editor/create/survey:
       post:
         tags:
+          - Projects
           - Microdata
         summary: Create Microdata
         description: Create a new microdata project
@@ -250,6 +302,7 @@ paths:
   /editor/update/survey/{id}:
       post:
         tags:
+          - Projects
           - Microdata
         summary: Update Microdata
         description: Update Microdata project
@@ -282,6 +335,7 @@ paths:
   /editor/create/timeseries:
       post:
         tags:
+          - Projects 
           - Timeseries
         summary: Create Timeseries
         description: Create a new timeseries project
@@ -307,6 +361,7 @@ paths:
       post:
         tags:
           - Timeseries
+          - Projects
         summary: Update Timeseries
         description: Update Timeseries project
         operationId: updateTimseries
@@ -333,6 +388,65 @@ paths:
               $ref: 'timeseries-schema.json'
         security:
           - ApiKeyAuth: []   
+
+  /editor/create/geospatial:
+      post:
+        tags:
+          - Projects 
+          - Geospatial
+        summary: Create Geospatial
+        description: Create a new geospatial project
+        operationId: createGeoSpatial
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: 'geospatial-schema.json'
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: 'geospatial-schema.json'
+        security:
+          - ApiKeyAuth: []
+
+  /editor/update/geospatial/{id}:
+      post:
+        tags:
+          - Geospatial
+          - Projects
+        summary: Update Geospatial
+        description: Update Geospatial project
+        operationId: updateGeospatial
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "id"
+            description: Project ID
+            type: string
+            format: string
+            required: true
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: 'geospatial-schema.json'
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: 'geospatial-schema.json'
+        security:
+          - ApiKeyAuth: []   
+
 
   /collections:
       get:
@@ -1075,9 +1189,11 @@ definitions:
   AddProjectsToCollection:
     type: object
     properties:
-      collection_id:
-        type: integer
+      collections:
+        type: array
         required: true
+        items:
+          type: integer
       id_format:
         type: string
         default: "id"
