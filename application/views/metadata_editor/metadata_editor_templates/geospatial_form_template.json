@@ -638,7 +638,7 @@
                                 {
                                     "key": "description.identificationInfo.citation.alternateTitle",
                                     "title": "Alternate title",
-                                    "type": "string",
+                                    "type": "simple_array",
                                     "prop_key": "description.identificationInfo.citation.alternateTitle",
                                     "help_text": "An alternate title (if applicable)",
                                     "display_type": "text"
@@ -752,21 +752,30 @@
                                     "display_type": "text"
                                 },
                                 {
-                                    "key": "description.identificationInfo.citation.identifier.code",
+                                    "key": "description.identificationInfo.citation.identifier",
                                     "title": "Identifier",
-                                    "type": "string",
-                                    "prop_key": "description.identificationInfo.citation.identifier.code",
-                                    "display_type": "text",
-                                    "help_text": "A value uniquely identifying an object within a namespace."
+                                    "type": "array",                                                                        
+                                    "help_text": "",
+                                    "props": [
+                                        {
+                                            "key": "code",
+                                            "title": "Identifier",
+                                            "type": "string",
+                                            "prop_key": "description.identificationInfo.citation.identifier.code",
+                                            "display_type": "text",
+                                            "help_text": "A value uniquely identifying an object within a namespace."
+                                        },
+                                        {
+                                            "key": "authority",
+                                            "title": "Authority",
+                                            "type": "string",
+                                            "prop_key": "description.identificationInfo.citation.identifier.authority",
+                                            "display_type": "text",
+                                            "help_text": "A unique persistent identifier for the metadata. If a DOI is available for the resource, the DOI should be entered here. The same file identifier should be used if no other persistent identifier is available."
+                                        }
+                                    ]
                                 },
-                                {
-                                    "key": "description.identificationInfo.citation.identifier.authority",
-                                    "title": "Identifier authority",
-                                    "type": "string",
-                                    "prop_key": "description.identificationInfo.citation.identifier.authority",
-                                    "help_text": "A unique persistent identifier for the metadata. If a DOI is available for the resource, the DOI should be entered here. The same file identifier should be used if no other persistent identifier is available.",
-                                    "display_type": "text"
-                                },
+                                
                                 {
                                     "key": "description.identificationInfo.citation.citedResponsibleParty",
                                     "type": "nested_array",
@@ -995,7 +1004,7 @@
                                 {
                                     "key": "description.identificationInfo.citation.presentationForm",
                                     "title": "Presentation form",
-                                    "type": "string",
+                                    "type": "simple_array",
                                     "enum": [
                                         {
                                             "code": "documentDigital",
@@ -1174,7 +1183,7 @@
                                 {
                                     "key": "description.identificationInfo.status",
                                     "title": "Status",
-                                    "type": "string",
+                                    "type": "simple_array",
                                     "enum": [
                                         {
                                             "code": "completed",
@@ -1496,7 +1505,7 @@
                                 {
                                     "key": "description.identificationInfo.resourceMaintenance",
                                     "title": "Resource maintenance",
-                                    "type": "array",
+                                    "type": "nested_array",
                                     "props": [
                                         {
                                             "key": "maintenanceAndUpdateFrequency",
@@ -1555,7 +1564,277 @@
                                             ],
                                             "prop_key": "description.identificationInfo.resourceMaintenance.maintenanceAndUpdateFrequency",
                                             "display_type": "dropdown-custom"
+                                        },
+                                        {
+                                            "key": "dateOfNextUpdate",
+                                            "title": "Date of next update",
+                                            "type": "string",
+                                            "prop_key": "description.identificationInfo.resourceMaintenance.dateOfNextUpdate",
+                                            "display_type": "text",
+                                            "help_text": "Date of the next update of the resource in ISO format."
+                                        },
+                                        {
+                                            "key": "userDefinedMaintenanceFrequency",
+                                            "title": "User defined maintenance frequency",
+                                            "type": "string",
+                                            "prop_key": "description.identificationInfo.resourceMaintenance.userDefinedMaintenanceFrequency",
+                                            "display_type": "text",
+                                            "help_text": "User defined maintenance frequency."                                                                                        
+                                        },
+                                        {
+                                            "key":"updateScope",
+                                            "title":"Update scope",
+                                            "type":"array",
+                                            "props":[
+                                                {
+                                                    "key":"scope",
+                                                    "title":"Update scope",
+                                                    "type":"string",
+                                                    "prop_key":"description.identificationInfo.resourceMaintenance.updateScope.scope",
+                                                    "display_type":"text",
+                                                    "help_text":"Update scope."                                                    
+                                                },
+                                                {
+                                                    "key":"description",
+                                                    "title":"Description",
+                                                    "type":"string",
+                                                    "prop_key":"description.identificationInfo.resourceMaintenance.updateScope.description",
+                                                    "display_type":"textarea",
+                                                    "help_text":"Description of the update scope."
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "key": "maintenanceNote",
+                                            "title": "Maintenance note",
+                                            "type": "string",
+                                            "prop_key": "description.identificationInfo.resourceMaintenance.maintenanceNote",
+                                            "display_type": "textarea",
+                                            "help_text": "Maintenance note."
+                                        },
+                                        {
+                                            "key": "contact",
+                                            "title": "Contact",
+                                            "type": "nested_array",
+                                            "props": [
+                                                {
+                                                    "key": "individualName",
+                                                    "title": "Individual name",
+                                                    "type": "string",
+                                                    "prop_key": "description.identificationInfo.resourceMaintenance.contact.individualName",
+                                                    "display_type": "text"
+                                                },
+                                                {
+                                                    "key": "organisationName",
+                                                    "title": "Organisation name",
+                                                    "type": "string",
+                                                    "prop_key": "description.identificationInfo.resourceMaintenance.contact.organisationName",
+                                                    "display_type": "text"
+                                                },
+                                                {
+                                                    "key": "positionName",
+                                                    "title": "Position",
+                                                    "type": "string",
+                                                    "prop_key": "description.identificationInfo.resourceMaintenance.contact.positionName",
+                                                    "display_type": "text"
+                                                },
+                                                {
+                                                    "key": "role",
+                                                    "title": "Role",
+                                                    "type": "string",
+                                                    "prop_key": "description.identificationInfo.resourceMaintenance.contact.role",
+                                                    "display_type": "dropdown-custom",
+                                                    "enum": [
+                                                        {
+                                                            "code": "resourceProvider",
+                                                            "label": "Resource provider"
+                                                        },
+                                                        {
+                                                            "code": "custodian",
+                                                            "label": "Custodian"
+                                                        },
+                                                        {
+                                                            "code": "owner",
+                                                            "label": "Owner"
+                                                        },
+                                                        {
+                                                            "code": "sponsor",
+                                                            "label": "Sponsor"
+                                                        },
+                                                        {
+                                                            "code": "user",
+                                                            "label": "User"
+                                                        },
+                                                        {
+                                                            "code": "distributor",
+                                                            "label": "Distributor"
+                                                        },
+                                                        {
+                                                            "code": "originator",
+                                                            "label": "Originator"
+                                                        },
+                                                        {
+                                                            "code": "pointOfContact",
+                                                            "label": "Point of contact"
+                                                        },
+                                                        {
+                                                            "code": "principalInvestigator",
+                                                            "label": "Principal investigator"
+                                                        },
+                                                        {
+                                                            "code": "processor",
+                                                            "label": "Processor"
+                                                        },
+                                                        {
+                                                            "code": "publisher",
+                                                            "label": "Publisher"
+                                                        },
+                                                        {
+                                                            "code": "author",
+                                                            "label": "Author"
+                                                        },
+                                                        {
+                                                            "code": "coAuthor",
+                                                            "label": "Co-author"
+                                                        },
+                                                        {
+                                                            "code": "collaborator",
+                                                            "label": "Collaborator"
+                                                        },
+                                                        {
+                                                            "code": "editor",
+                                                            "label": "Editor"
+                                                        },
+                                                        {
+                                                            "code": "mediator",
+                                                            "label": "Mediator"
+                                                        },
+                                                        {
+                                                            "code": "rightsHolder",
+                                                            "label": "Rights holder"
+                                                        },
+                                                        {
+                                                            "code": "contributor",
+                                                            "label": "Contributor"
+                                                        },
+                                                        {
+                                                            "code": "funder",
+                                                            "label": "Funder"
+                                                        },
+                                                        {
+                                                            "code": "stakeholder",
+                                                            "label": "Stakeholder"
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "key": "contactInfo.address.electronicMailAddress",
+                                                    "title": "Email",
+                                                    "type": "string",
+                                                    "prop_key": "description.identificationInfo.resourceMaintenance.contact.contactInfo.address.electronicMailAddress",
+                                                    "display_type": "text"
+                                                },
+                                                {
+                                                    "key": "contactInfo.phone.voice",
+                                                    "title": "Voice",
+                                                    "type": "string",
+                                                    "prop_key": "description.identificationInfo.resourceMaintenance.contact.contactInfo.phone.voice",
+                                                    "display_type": "text"
+                                                },
+                                                {
+                                                    "key": "contactInfo.phone.facsimile",
+                                                    "title": "Facsimile",
+                                                    "type": "string",
+                                                    "prop_key": "description.identificationInfo.resourceMaintenance.contact.contactInfo.phone.facsimile",
+                                                    "display_type": "text"
+                                                },
+                                                {
+                                                    "key": "section-1676484775072",
+                                                    "prop_key": "description.identificationInfo.resourceMaintenance.contact.section-1676484775072",
+                                                    "title": "Address",
+                                                    "type": "section",
+                                                    "props": [
+                                                        {
+                                                            "key": "contactInfo.address.deliveryPoint",
+                                                            "title": "Delivery point",
+                                                            "type": "string",
+                                                            "prop_key": "description.identificationInfo.resourceMaintenance.contact.contactInfo.address.deliveryPoint",
+                                                            "display_type": "text"
+                                                        },
+                                                        {
+                                                            "key": "contactInfo.address.city",
+                                                            "title": "City",
+                                                            "type": "string",
+                                                            "prop_key": "description.identificationInfo.resourceMaintenance.contact.contactInfo.address.city",
+                                                            "display_type": "text"
+                                                        },
+                                                        {
+                                                            "key": "contactInfo.address.country",
+                                                            "title": "Country",
+                                                            "type": "string",
+                                                            "prop_key": "description.identificationInfo.resourceMaintenance.contact.contactInfo.address.country",
+                                                            "display_type": "text"
+                                                        },
+                                                        {
+                                                            "key": "contactInfo.address.postalCode",
+                                                            "title": "Postal code",
+                                                            "type": "string",
+                                                            "prop_key": "description.identificationInfo.resourceMaintenance.contact.contactInfo.address.postalCode",
+                                                            "display_type": "text"
+                                                        }
+                                                    ],
+                                                    "help_text": ""
+                                                },
+                                                {
+                                                    "key": "section-1676484798167",
+                                                    "prop_key": "description.identificationInfo.resourceMaintenance.contact.section-1676484798167",
+                                                    "title": "Online resource",
+                                                    "type": "section",
+                                                    "props": [
+                                                        {
+                                                            "key": "contactInfo.onlineResource.name",
+                                                            "title": "Name",
+                                                            "type": "string",
+                                                            "prop_key": "description.identificationInfo.resourceMaintenance.contact.contactInfo.onlineResource.name",
+                                                            "display_type": "text"
+                                                        },
+                                                        {
+                                                            "key": "contactInfo.onlineResource.description",
+                                                            "title": "Description",
+                                                            "type": "string",
+                                                            "prop_key": "description.identificationInfo.resourceMaintenance.contact.contactInfo.onlineResource.description",
+                                                            "display_type": "textarea"
+                                                        },
+                                                        {
+                                                            "key": "contactInfo.onlineResource.linkage",
+                                                            "title": "URL",
+                                                            "type": "string",
+                                                            "prop_key": "description.identificationInfo.resourceMaintenance.contact.contactInfo.onlineResource.linkage",
+                                                            "rules": {
+                                                                "is_uri": true
+                                                            },
+                                                            "display_type": "text"
+                                                        },
+                                                        {
+                                                            "key": "contactInfo.onlineResource.protocol",
+                                                            "title": "Protocol",
+                                                            "type": "string",
+                                                            "prop_key": "description.identificationInfo.resourceMaintenance.contact.contactInfo.onlineResource.protocol",
+                                                            "display_type": "text"
+                                                        },
+                                                        {
+                                                            "key": "contactInfo.onlineResource.function",
+                                                            "title": "Function",
+                                                            "type": "string",
+                                                            "prop_key": "description.identificationInfo.resourceMaintenance.contact.contactInfo.onlineResource.function",
+                                                            "display_type": "text"
+                                                        }
+                                                    ],
+                                                    "help_text": ""
+                                                }
+                                            ]
                                         }
+
                                     ],
                                     "prop_key": "description.identificationInfo.resourceMaintenance"
                                 }
@@ -2296,7 +2575,67 @@
                                             "type": "string",
                                             "prop_key": "description.identificationInfo.extent.geographicElement.geographicDescription",
                                             "display_type": "textarea"
-                                        }                                        
+                                        },
+                                        {
+                                            "key": "geographicBoundingPolygon",
+                                            "title": "Bounding polygon",
+                                            "type": "section",
+                                            "props": [
+                                                {
+                                                    "key":"id",
+                                                    "type":"string",
+                                                    "title":"Polygon Identifier (ID)",
+                                                    "prop_key":"description.identificationInfo.extent.geographicElement.geographicBoundingPolygon.id"
+                                                },
+                                                {
+                                                    "key": "polygon",
+                                                    "type": "array",
+                                                    "title": "Polygon",
+                                                    "prop_key": "description.identificationInfo.extent.geographicElement.geographicBoundingPolygon.polygon",
+                                                    "props":[
+                                                        {
+                                                            "key":"ring",
+                                                            "type":"string",
+                                                            "title":"Interior or exterior ring",
+                                                            "prop_key":"description.identificationInfo.extent.geographicElement.geographicBoundingPolygon.polygon.ring",
+                                                            "display_type":"dropdown-custom",
+                                                            "enum":[
+                                                                {"code":"interior","label":"Interior"},
+                                                                {"code":"exterior","label":"Exterior"}
+                                                            ]
+                                                        },
+                                                        {
+                                                            "key":"type",
+                                                            "type":"string",
+                                                            "title":"Type",
+                                                            "prop_key":"description.identificationInfo.extent.geographicElement.geographicBoundingPolygon.polygon.type",
+                                                            "display_type":"dropdown-custom",
+                                                            "enum":[
+                                                                {"code":"point","label":"Point"},
+                                                                {"code":"line","label":"Line"},
+                                                                {"code":"polygon","label":"Polygon"}
+                                                            ],
+                                                            "help_text":"Type of geometry"
+                                                        },
+                                                        {
+                                                            "key":"coordinates",
+                                                            "type":"textarea",
+                                                            "title":"Coordinates",
+                                                            "prop_key":"description.identificationInfo.extent.geographicElement.geographicBoundingPolygon.polygon.coordinates",                                                            
+                                                            "help_text":"Coordinates of the polygon. The first and last coordinate pairs must be the same to close the polygon."
+                                                        }
+                                                        
+                                                    ]
+                                                }
+                                               
+                                            ]
+                                        } 
+
+
+
+
+
+
                                     ],
                                     "prop_key": "description.identificationInfo.extent.geographicElement",
                                     "help_text": "Spatial (horizontal) extent element. This can be defined either with a Bounding Box (recommended); or using Geographic Description - free text that defines the area covered. When the dataset covers one or more countries, it is recommended to enter the country names in this element, as it can then be used in data catalogs for filtering by geography.\n\nThe bounding box shall be as small as possible.\nThe bounding box shall be expressed in decimal degree with a precision of at least 2 decimals.",
@@ -2367,7 +2706,7 @@
                             "items": [
                                 {
                                     "key": "description.identificationInfo.spatialRepresentationType",
-                                    "type": "string",
+                                    "type": "simple_array",
                                     "title": "Spatial representation type",
                                     "enum": [
                                         {
@@ -2401,11 +2740,11 @@
                                 },
                                 {
                                     "key": "description.identificationInfo.spatialResolution",
-                                    "type": "string",
+                                    "type": "array",
                                     "title": "Spatial resolution",
                                     "prop_key": "description.identificationInfo.spatialResolution",
                                     "help_text": "The spatial resolution of the data as numeric value associated to a unit of measure. Spatial resolution refers to the level of detail of the data set. It shall be expressed as a set of zero to many resolution distances (typically for gridded data and imagery-derived products) or equivalent scales (typically for maps or map-derived products). An equivalent scale is generally expressed as an integer value expressing the scale denominator. A resolution distance shall be expressed as a numerical value associated with a unit of length.\n\nEXAMPLES:\n- 50000 (e.g. 1:50000 scale map)\n- 0.25 (degrees)\n\nNOTES:\n- For services, it is not possible to express the restriction of a service concerning the spatial resolution in the current version of ISO 19119. While the problem is addressed by the standardization community, spatial resolution restrictions for services shall be expressed in the Abstract.\n- When two equivalent scales or two ground sample distances are expressed, the spatial resolution is an interval bounded by these two values",
-                                    "items":[
+                                    "props":[
                                         {
                                             "key": "description.identificationInfo.spatialResolution.uom",
                                             "type": "string",
