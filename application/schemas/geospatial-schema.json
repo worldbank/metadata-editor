@@ -222,7 +222,10 @@
 				"alternateTitle": {
 					"title": "Alternate Title",
 					"description": "Resource alternate title",
-					"type": "string"
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
 				},
 				"date": {
 					"title": "Citation date(s)",
@@ -244,19 +247,22 @@
 				},
 				"identifier": {
 					"title": "Identifier",
-					"description": "Unique identifier for the resource metadata",
-					"type": "object",
-					"properties": {
-						"authority": {
-							"title": "Authority",
-							"description": "The authority that identifies uniquely the resource metadata",
-							"type": "string"
-						},
-						"code": {
-							"title": "Code",
-							"description": "A code uniquely identifying the resource metadata"
-						}
-					}
+					"description": "Identifiers for the resource metadata",
+					"type":"array",
+					"items": {
+						"type":"object",
+						"properties": {
+							"authority": {
+								"title": "Authority",
+								"description": "The authority that identifies uniquely the resource metadata",
+								"type": "string"
+							},
+							"code": {
+								"title": "Code",
+								"description": "A code uniquely identifying the resource metadata"
+							}
+						}						
+					}					
 				},
 				"citedResponsibleParty": {
 					"title": "Responsible party(ies)",
@@ -269,7 +275,7 @@
 				"presentationForm": {
 					"title": "Presentation form",
 					"description": "The resource presentation form. e.g. 'mapDigital'. Recommended code following the [ISO/TS 19139](http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_PresentationFormCode) PresentationForm codelist. Suggested values: {`documentDigital`, `imageDigital`, `documentHardcopy`, `imageHardcopy`, `mapDigital`, `mapHardcopy`, `modelDigital`, `modelHardcopy`, `profileDigital`, `profileHardcopy`, `tableDigital`, `tableHardcopy`, `videoDigital`, `videoHardcopy`, `audioDigital`, `audioHardcopy`, `multimediaDigital`, `multimediaHardcopy`, `physicalSample`, `diagramDigital`, `diagramHardcopy`}",
-					"type": "string"					
+					"type": ["array"]
 				},
 				"series": {
 					"title": "Series",
@@ -340,7 +346,53 @@
 					"title": "Maintenance and Update Frequency",
 					"description": "Frequency of maintenance/update of a resource. Recommended code following the [ISO/TS 19139](http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_MaintenanceFrequencyCode) MaintenanceFrequency codelist. Suggested values: {`continual`, `daily`, `weekly`, `fortnightly`, `monthly`, `quarterly`, `biannually`, `annually`, `asNeeded`, `irregular`, `notPlanned`, `unknown`}",
 					"type": "string"
+				},
+				"dateOfNextUpdate": {
+					"title": "Date of Next Update",
+					"description": "Date of the next update of the resource. Requires an extended ISO 8601 formatted combined UTC date and time string (2009-11-17T10:00:00)",
+					"type": "string"
+				},
+				"userDefinedMaintenanceFrequency": {
+					"title": "User Defined Maintenance Frequency",
+					"description": "User defined maintenance frequency",
+					"type": "string"
+				},
+				"updateScope": {
+					"title": "Update Scope",
+					"description": "Scope of data to which maintenance is applied",
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"scope": {
+								"title": "Update Scope",
+								"description": "Scope of data to which maintenance is applied",
+								"type": "string"
+							},
+							"description": {
+								"title": "Update Scope Description",
+								"description": "Additional information about the range or extent of the resource",
+								"type": "string"
+							}
+						}
+					}
+				},
+
+				"maintenanceNote": {
+					"title": "Maintenance Note",
+					"description": "Note about the maintenance",
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"contact": {
+					"title": "Contact",
+					"description": "Contact information for the maintenance",
+					"type": "object",
+					"$ref": "#/definitions/responsibleParty"
 				}
+
 			}
 		},
 		"graphicOverview": {
@@ -929,7 +981,7 @@
 						"status": {
 							"title": "Status",
 							"description": "Status of the dataset resource. Recommended code following the [ISO/TS 19139](http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_ProgressCode) Progress codelist. Suggested values: {`completed`, `historicalArchive`, `obsolete`, `onGoing`, `planned`, `required`, `underDevelopment`, `final`, `pending`, `retired`, `superseded`, `tentative`, `valid`, `accepted`, `notAccepted`, `withdrawn`, `proposed`, `deprecated`}",
-							"type": "string",
+							"type": "array",
 							"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:status/gmd:MD_ProgressCode"
 						},
 						"pointOfContact": {
@@ -1165,7 +1217,53 @@
 												"title": "Geographic description identifier",
 												"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:extent/gmd:EX_Extent/gmd:geographicElement/EX_GeographicDescription/gmd:geographicIdentifier/gmd:MD_Identifier/gmd:code/gco:CharacterString",
 												"type": "string"
+											},
+											"geographicBoundingPolygon": {
+												"title": "Geographic Bounding Polygon",
+												"description": "Geographic Bounding Polygon",
+												"type": "object",												
+												"properties": {
+													"id":{
+														"title": "Identifier",
+														"type": "string"
+													},
+													"polygon": {
+														"title": "Polygon",
+														"type": "array",
+														"items": {
+															"type": "object",
+															"properties": {
+
+																"ring":{
+																	"title": "Ring boundary",
+																	"type": "string",
+																	"enum": ["exterior", "interior"]
+																},
+
+																"type":{
+																	"title": "Type",
+																	"type": "string",
+																	"enum": ["Point", "LineString", "Polygon"]
+																},
+																"coordinates": {
+																	"title": "Coordinates",
+																	"type": "array",
+																	"items": {
+																		"type": "array",
+																		"items": {
+																			"type": "number"
+																		}
+																	}
+																}
+															}
+														}
+													}												
+												}
 											}
+
+
+
+
 										}
 									}
 								},
@@ -1219,28 +1317,35 @@
 							}
 						},
 						"spatialRepresentationType": {
-							"type": "string",
+							"type": "array",
 							"title": "Spatial Representation type",
 							"description": "Spatial representation type of the resource. e.g. 'vector'. Recommended code following the [ISO/TS 19139](http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_SpatialRepresentationTypeCode) SpatialRepresentationType codelist. Suggested values: {`vector`, `grid`, `textTable`, `tin`, `stereoModel`, `video`}",
-							"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:spatialRepresentationType/gmd:MD_SpatialRepresentationTypeCode"
+							"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:spatialRepresentationType/gmd:MD_SpatialRepresentationTypeCode",
+							"items": {
+								"type": "string"							
+							}
 						},
 						"spatialResolution": {
 							"title": "Spatial Resolution",
 							"description": "Spatial resolution of the resource",
-							"type": "object",
+							"type": "array",
 							"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:spatialResolution/gmd:MD_Resolution/gco:Distance",
-							"properties": {
-								"uom": {
-									"title": "Unit Of Measure",
-									"description": "Unit considered for the resolution measure",
-									"type": "string"										
-								},
-								"value": {
-									"title": "Value",
-									"description": "Value",
-									"type": "number"
+							"items":{
+								"type": "object",
+								"properties": {
+									"uom": {
+										"title": "Unit Of Measure",
+										"description": "Unit considered for the resolution measure",
+										"type": "string"										
+									},
+									"value": {
+										"title": "Value",
+										"description": "Value",
+										"type": "number"
+									}
 								}
 							}
+							
 						},
 						"language": {
 							"type": "array",
