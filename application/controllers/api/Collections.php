@@ -522,8 +522,20 @@ class Collections extends MY_REST_Controller
 
 			$this->has_access($resource_='collection',$privilege='edit');
 
+
+			//get collection by id
+			$collection=$this->Collection_model->select_single($collection_id);
+
+			if (!$collection){
+				throw new Exception("Collection not found");
+			}
+
 			//get all projects in collection
 			$projects=$this->Collection_model->get_projects($collection_id,$project_type);
+
+			if (!$projects){
+				throw new Exception("No projects found in collection");
+			}
 
 			$result=array();
 
