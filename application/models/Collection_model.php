@@ -29,6 +29,7 @@ class Collection_model extends CI_Model {
     {
         parent::__construct();
         $this->load->model("Collection_tree_model");
+        $this->load->model("Editor_model");
     }
 
 
@@ -182,6 +183,14 @@ class Collection_model extends CI_Model {
         $sids=(array)$sids;
 
         foreach($collections as $collection_id){
+
+            //check if collection id exists
+            $collection_exists=$this->collection_id_exists($collection_id);
+
+            if (!$collection_exists){
+                throw new Exception('Collection not found: '.$collection_id);
+            }
+
             $this->add_projects($collection_id,$sids);
         }
     }
@@ -192,6 +201,13 @@ class Collection_model extends CI_Model {
 
         foreach($sids as $sid)
         {
+            //check if project id exists
+            $project_exists=$this->Editor_model->check_id_exists($sid);
+
+            if (!$project_exists){
+                throw new Exception('Project not found: '.$sid);
+            }
+
             if (!$this->collection_project_exists($collection_id,$sid)){
                 $data[]=array(
                     'collection_id'=>$collection_id,
