@@ -206,13 +206,14 @@ class Collections extends MY_REST_Controller
 			}
 
 			$result=$this->Collection_model->get_projects_list($collection_id);
-			
+
 			if ($result){
 				array_walk($result, 'unix_date_to_gmt',array('created','changed'));
 			}
 
 			$response=array(
 				'status'=>'success',
+				'found'=>count($result),
 				'projects'=>$result
 			);
 						
