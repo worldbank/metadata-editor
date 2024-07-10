@@ -570,7 +570,7 @@ class Collections extends MY_REST_Controller
 			$projects=$this->Collection_model->get_projects($collection_id,$project_type);
 
 			if (!$projects){
-				throw new Exception("No projects found in collection");
+				throw new Exception("No projects found in collection matching the type: $project_type");
 			}
 
 			$result=array();
