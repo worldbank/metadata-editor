@@ -579,7 +579,7 @@ class Collections extends MY_REST_Controller
 			{
 				if (!isset($project['sid'])){
 					$result['skipped'][]=array(
-						'sid'=>$project['sid'],
+						'id'=>$project['sid'],
 						'type'=>$project['type']
 					);
 					continue;
@@ -589,7 +589,7 @@ class Collections extends MY_REST_Controller
 				$this->Editor_model->set_project_template($sid,$template_uid);
 
 				$result['updated'][]=array(
-					'sid'=>$sid,
+					'id'=>$sid,
 					'type'=>$project['type']
 				);				
 			}
