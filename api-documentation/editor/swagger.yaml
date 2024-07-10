@@ -618,7 +618,28 @@ paths:
             description: successful operation
         security:
           - ApiKeyAuth: []
-
+  /collections/projects:
+      post:
+        tags:
+          - Collections
+        summary: List projects by collection
+        description: List projects by collection
+        operationId: listProjectsByCollection
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "url"
+            name: "collection_id"
+            required: true
+            type: integer
+            description: "Collection ID"
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
   /collections/add_projects:
       post:
         tags:

@@ -82,11 +82,9 @@ class Project_search
 			$result=$this->ci->Editor_model->decode_encoded_fields_rows($result);
 		}
 
-		//var_dump($this->ci->db->last_query());
-
 		return array(
 			'result'=>$result,
-			'db_query'=>$this->ci->db->last_query(),
+			//'db_query'=>$this->ci->db->last_query(),
 			'filters'=>$search_filters
 		);
 	}

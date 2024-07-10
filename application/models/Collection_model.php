@@ -263,6 +263,19 @@ class Collection_model extends CI_Model {
         return $this->db->get('editor_collection_projects')->result_array();
     }
 
+    /**
+     * 
+     * Get collection projects list
+     * 
+     */
+    function get_projects_list($collection_id)
+    {
+        $this->db->select('editor_projects.id,editor_projects.idno, editor_projects.type,editor_projects.title,editor_projects.created, editor_projects.changed ');
+        $this->db->join('editor_projects','editor_projects.id=editor_collection_projects.sid');
+        $this->db->where('collection_id',$collection_id);
+        return $this->db->get('editor_collection_projects')->result_array();
+    }
+
 
 
     /**

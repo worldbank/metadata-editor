@@ -190,6 +190,41 @@ class Collections extends MY_REST_Controller
 		}
 	}
 
+
+	/**
+	 * 
+	 * Return projects in a collection
+	 * 
+	 */
+	function projects_get($collection_id=null)
+	{
+		try{
+			$this->has_access($resource_='collection',$privilege='view');
+
+			if (!$collection_id){
+				throw new Exception("Missing parameter: collection ID");
+			}
+
+			$result=$this->Collection_model->get_projects_list($collection_id);
+			
+			if ($result){
+				array_walk($result, 'unix_date_to_gmt',array('created','changed'));
+			}
+
+			$response=array(
+				'status'=>'success',
+				'projects'=>$result
+			);
+						
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
+		}	
+	}
+
+
+
 	function add_projects_post()
 	{		
 		try{
