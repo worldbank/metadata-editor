@@ -117,7 +117,7 @@ class Collection_tree_model extends CI_Model {
 
     /**
      * 
-     * Return all children of a collection node
+     * Return all children of a collection node + parent node
      * 
      */
     function select_collection_tree_nodes($parent_id)
@@ -134,6 +134,28 @@ class Collection_tree_model extends CI_Model {
         $output=array();
         foreach($result as $row){
             $output[]=$row['parent_id'];
+        }
+        return $output;
+    }
+
+     /**
+     * 
+     * Return all children of a collection node
+     * 
+     */
+    function select_collection_children_nodes($parent_id)
+    {
+        /*
+        select * from editor_collections_tree where parent_id=60;
+        */
+        
+        $this->db->select('child_id');
+        $this->db->where('parent_id',$parent_id);
+        $result= $this->db->get('editor_collections_tree')->result_array();
+        
+        $output=array();
+        foreach($result as $row){
+            $output[]=$row['child_id'];
         }
         return $output;
     }

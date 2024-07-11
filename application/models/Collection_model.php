@@ -77,7 +77,7 @@ class Collection_model extends CI_Model {
     function delete_nested($id)
     {
         //get all children of this collection
-        $items=$this->Collection_tree_model->select_collection_tree_nodes($id);
+        $items=$this->Collection_tree_model->select_collection_children_nodes($id);
 
         //remove tree (node + children)
         $this->Collection_tree_model->delete($id);
