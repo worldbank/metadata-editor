@@ -59,8 +59,8 @@ Vue.component('datafile-edit', {
                     <span><textarea id="description" class="form-control" v-model="form_local.notes"/></span> 
                 </div>
 
-                <button type="button" class="btn btn-primary" @click="saveForm">{{$t("save")}}</button>
-                <button type="button" class="btn btn-danger" @click="cancelForm">{{$t("cancel")}}</button>
+                <v-btn color="primary" @click="saveForm">{{$t("save")}}</v-btn>
+                <v-btn  @click="cancelForm">{{$t("cancel")}}</v-btn>
 
                 </div>
                 <div class="col-md-4">

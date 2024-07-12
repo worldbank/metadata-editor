@@ -217,7 +217,7 @@ class Datafiles extends MY_REST_Controller
 		try{
 			$sid=$this->get_sid($sid);
 			$this->editor_acl->user_has_project_access($sid,$permission='edit');
-			$this->Editor_datafile_model->cleanup($sid,$file_id);
+			//$this->Editor_datafile_model->cleanup($sid,$file_id);
 			$this->Editor_datafile_model->delete_physical_file($sid,$file_id);
 			$this->Editor_datafile_model->delete($sid,$file_id);
 				

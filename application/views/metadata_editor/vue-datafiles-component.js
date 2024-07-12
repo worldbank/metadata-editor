@@ -30,10 +30,6 @@ Vue.component('datafiles', {
             if (oldVal.length<1){
                 return;
             }
-            //console.log("length",newVal.length,oldVal.length);
-            //console.log("data_files changed", JSON.stringify(this.getRowSequence(newVal)), JSON.stringify(this.getRowSequence(oldVal)));
-
-            //update sequence
             this.updateDataFilesWeight();
         },
     }, 
@@ -44,17 +40,12 @@ Vue.component('datafiles', {
         },
         addFile:function(){
             this.page_action="edit";
-            //console.log(this.data_files);
-            //let new_idx=this.data_files.push({file_name:""}) -1;
             this.$store.commit('data_files_add',{file_name:'untitled'});
             newIdx=this.data_files.length -1;
             this.edit_item=newIdx;
         },
         saveFile: function(data)
-        {
-            //console.log("saving file",data, this.edit_item);
-            //this.$set(this.data_files, this.edit_item, data);
-            
+        {            
             vm=this;
             let url=CI.base_url + '/api/datafiles/'+vm.dataset_id;
             form_data=data;
@@ -66,7 +57,6 @@ Vue.component('datafiles', {
                 }*/
             )
             .then(function (response) {
-                //vm.$set(vm.data_files, vm.edit_item, JSON.parse(JSON.stringify(data)));
                 vm.$store.dispatch('loadDataFiles',{dataset_id:vm.dataset_id});
             })
             .catch(function (error) {
@@ -212,9 +202,7 @@ Vue.component('datafiles', {
             .catch(function (error) {
                 console.log(error);
                 alert("Failed to delete: "+ error.message);
-            });
-            
-            vm.data_files.splice(file_idx, 1);
+            });                        
         },
         exitEditMode: function()
         {
@@ -423,15 +411,15 @@ Vue.component('datafiles', {
                         <td><i class="far fa-file-alt"></i> {{data_file.file_id}}</td>
                         <td>
                             <div>
-                                <button type="button" class="btn btn-sm btn-link ml-0 pl-0" @click="editFile(index)">{{data_file.file_name}}</button>
+                                <h5 style="cursor:pointer;color:#0D47A1"  @click="editFile(index)">{{data_file.file_name}}</h5>
                                 <v-icon style="color:red;margin-top:-4px;" title="Physical file not found" v-if="!data_file.file_info.original">mdi-alert-circle</v-icon></div>
-                            <div class="text-secondary text-small" v-if="data_file.file_info.original">                            
-                                <!-- <span v-if="data_file.file_info.original.file_exists" class="mr-3">
-                                    <span>{{data_file.file_info.original.filename}}</span>
-                                    <span>{{data_file.file_info.original.file_size}}</span> -->
-                                </span>
-                                <span v-if="data_file.file_info.csv.file_exists" >{{data_file.file_info.csv.filename}} {{data_file.file_info.csv.file_size}}</span>
-                            </div>
+                                <div class="text-secondary text-small" v-if="data_file.file_info.original">                            
+                                    <!-- <span v-if="data_file.file_info.original.file_exists" class="mr-3">
+                                        <span>{{data_file.file_info.original.filename}}</span>
+                                        <span>{{data_file.file_info.original.file_size}}</span> -->
+                                    </span>
+                                    <span v-if="data_file.file_info.csv.file_exists" >{{data_file.file_info.csv.filename}} {{data_file.file_info.csv.file_size}}</span>
+                                </div>
 
                             <div class="mt-2 datafile-actions">                                
                                 <router-link :to="'/variables/' + data_file.file_id"><button type="button" class="btn btn-sm btn-default"><v-icon>mdi-table</v-icon> {{$t("variables")}}</button></router-link>
