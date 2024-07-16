@@ -131,6 +131,8 @@ class Project_json_writer
 			$this->json_remove_private_fields($sid,$metadata);
 		}
 
+		array_remove_empty($metadata);
+
 		$basic_info=array(
 			'type'=>$project['type'],
 			'idno'=>$project['idno'],
