@@ -167,12 +167,12 @@ Vue.component('summary-component', {
 
                                     <div class="mb-3">
                                         <strong>{{$t("Project owner")}}:</strong> 
-                                        <div class="text-capitalize">{{project_edit_stats.username}}</div>
+                                        <div class="text-capitalize">{{project_edit_stats.username_cr}}</div>
                                     </div>
 
                                     <div class="mb-3">
                                         <strong>{{$t("Last changed by")}}:</strong>
-                                        <div class="text-capitalize">{{project_edit_stats.username_cr}}</div>
+                                        <div class="text-capitalize">{{project_edit_stats.username}}</div>
                                     </div>                                    
 
                                 </div>

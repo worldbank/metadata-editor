@@ -236,8 +236,8 @@
                           <th style="width:17px;"></th>
                           <th class="project-title-col">Title</th>
                           <th>Owner</th>
-                          <th style="width:120px;">Modified</th>
-                          <th>Created by</th>
+                          <th>Last modified</th>
+                          <th style="width:120px;">Modified</th>                          
                           <th>Actions</th>
                         </tr>
                       </thead>
@@ -269,9 +269,9 @@
                               </template>
 
                           </td>
-                          <td class="capitalize">{{project.username}}</td>
-                          <td>{{momentDate(project.changed)}}</td>
                           <td class="capitalize">{{project.username_cr}}</td>
+                          <td class="capitalize">{{project.username}}</td>
+                          <td>{{momentDate(project.changed)}}</td>                          
                           <td class="text-right">
                             
                           <v-icon @click.stop.prevent="showProjectMenu($event, project.id, true)">mdi-dots-vertical</v-icon> 
