@@ -466,9 +466,6 @@ class Editor_datafile_model extends CI_Model {
 					unlink($path_);
 				}
 			}
-			else{
-				throw new Exception("CSV file not found: ".$project_folder.'/data/'.$filename_csv);
-			}
 		}
 		
 		return $deleted;
