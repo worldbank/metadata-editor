@@ -31,9 +31,20 @@ class Datafiles extends MY_REST_Controller
 	 * list study data files
 	 * 
 	 */
-	function index_get($id=null)
+	function index_get($id=null, $file_id=null)
 	{
 		try{
+
+			if (!$id){
+				throw new Exception("Missing required parameter: id");
+			}
+
+			if ($file_id){
+				$this->file_get($id,$file_id);
+				return;
+			}
+
+
 			$this->editor_acl->user_has_project_access($id,$permission='view');
 			
 			$user_id=$this->get_api_user_id();
@@ -41,6 +52,31 @@ class Datafiles extends MY_REST_Controller
 			
 			$response=array(
 				'datafiles'=>$survey_datafiles
+			);
+
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	function file_get($sid=null,$file_id=null)
+	{
+		try{
+			$sid=$this->get_sid($sid);
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
+			
+			$user_id=$this->get_api_user_id();
+			$survey_datafiles=$this->Editor_datafile_model->data_file_by_id($sid,$file_id);
+			
+			$response=array(
+				'datafile'=>$survey_datafiles
 			);
 
 			$this->set_response($response, REST_Controller::HTTP_OK);
