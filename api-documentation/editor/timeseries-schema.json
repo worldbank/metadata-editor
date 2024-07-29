@@ -13,7 +13,7 @@
 		"metadata_information": {
 			"type": "object",
 			"title": "Metadata creation",
-			"description": "Information on who generated the documentation",
+			"description": "Information on the production of the metadata",
 			"properties": {
 				"title": {
 					"title": "Document title",
@@ -256,6 +256,11 @@
 					"type": "string",
 					"title": "Series unit of measure"
 				},
+				"power_code":{ 
+					"type": "string",
+					"title": "Power code",
+					"description": "Power of 10 by which the reported statistics should be multiplied. e.g. '6' indicating millions of units"
+				},
 				"dimensions": {
 					"type": "array",
 					"title": "Dimensions",
@@ -386,6 +391,13 @@
 						]
 					}
 				},
+				
+				"universe":{
+					"title":"Universe",
+					"description":"Target population (the statistical universe about which information is sought)",
+					"type":"string"
+				},
+				
 				"data_collection": {
 					"title": "Data collection",
 					"description": " This description should include, when applicable, the sample frame used, the questions used to collect the data, the type of interview, the dates/duration of fieldwork, the sample size and the response rate. Some additional information on questionnaire design and testing, interviewer training, methods used to monitor non-response etc.",
@@ -506,14 +518,19 @@
 						]
 					}
 				},
+				"seasonal_adjustment": {
+					"type": "string",
+					"title": "Seasonal adjustment",
+					"description": "Application of statistical techniques to time series data in order to remove seasonal fluctuations and to better understand underlying trends."
+				},
 				"adjustments": {
-					"title": "Adjustments",
-					"description": " Description of any adjustments with respect to use of standard classifications and harmonization of breakdowns for age group and other dimensions, or adjustments made for compliance with specific international or national definitions.",
+					"title": "Other adjustments",
+					"description": "Description of any adjustments with respect to use of standard classifications and harmonization of breakdowns for age group and other dimensions, or adjustments made for compliance with specific international or national definitions.",
 					"type": "array",
 					"items": {
 						"type": "string"
 					}
-				},
+				},				
 				"missing": {
 					"type": "string",
 					"title": "Treatment of missing values"
@@ -1021,6 +1038,32 @@
 					"type": "string",
 					"title": "Notes form original sources"
 				},
+				"direct_sources":{
+					"type":"array",
+					"title":"Direct sources",
+					"description":"Refers to the sources from where the data was directly collected",
+					"items":{
+						"type":"object",
+						"properties":{
+							"name":{
+								"title":"Name",
+								"type":"string"
+							},
+							"organization":{
+								"title":"Organization",
+								"type":"string"
+							},
+							"uri":{
+								"title":"URI",
+								"type":"string"
+							},
+							"note":{
+								"title":"Note",
+								"type":"string"
+							}
+						}
+					}
+				},
 				"keywords": {
 					"type": "array",
 					"description": "Keywords",
@@ -1360,6 +1403,155 @@
 				"idno",
 				"name"
 			]
+		},
+		"data_structure": {
+			"type": "array",
+			"description": "Data structure definition",			
+				"items": {
+					"type": "object",
+					"properties": {
+						"name": {
+							"title": "Name",
+							"description": "Name (required)",
+							"type": "string"
+						},
+						"label": {
+							"title": "Label",
+							"type": "string"
+						},
+						"description": {
+							"title": "Description",
+							"type": "string"
+						},
+						"data_type": {							
+							"title": "Data type",
+							"type": "string",
+							"enum":[
+								"string",
+								"integer",
+								"float",
+								"date",
+								"boolean"
+							]
+						},
+						"column_type": {
+							"title": "Column type",
+							"type": "string",
+							"enum":[
+								"dimension",
+								"time_period",
+								"measure",
+								"attribute",
+								"indicator_id",
+								"indicator_name",
+								"annotation",
+								"geography",
+								"observation_value"
+							]
+						},	
+						"time_period_format": 
+						{
+							"title":"Time period format",
+							"type": "string",
+							"enum":[
+								"YYYY",
+								"YYYY-MM",
+								"YYYY-MM-DD",
+								"YYYY-MM-DDTHH:MM:SS",
+								"YYYY-MM-DDTHH:MM:SSZ"
+							]
+						},
+						"code_list": {
+							"title": "Code list",
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"code": {
+										"title": "Code",
+										"type": "string"
+									},
+									"label": {
+										"title": "Label",
+										"type": "string"
+									},
+									"description": {
+										"title": "Description",
+										"type": "string"
+									}
+								}
+							}
+						},
+						"code_list_reference": {
+							"title": "Code list reference",							
+								"type": "object",
+								"properties": {
+									"id": {
+										"title": "Identifier (ID)",
+										"type": "string"
+									},
+									"name": {
+										"title": "Name",
+										"type": "string"
+									},
+									"version": {
+										"title": "Version",
+										"type": "string"
+									},
+									"uri": {
+										"title": "URI",
+										"description": "URI",
+										"type": "string"
+									},
+									"note": {
+										"title": "Note",
+										"description": "Note",
+										"type": "string"
+									}
+								},
+								"required": [
+									"uri"
+								]
+						}
+					}
+				}
+		},
+		"data_notes":{
+			"type": "array",
+			"title": "Data notes",
+			"description": "Data notes",
+			"items": {
+				"type": "object",
+				"properties": {					
+					  "filters":{
+						"type": "array",
+						"title": "Filters",
+						"description": "Filters",
+						"items": {
+							"type": "object",
+							"properties": {
+											"field": {
+												"title": "Field",
+												"type": "string"
+											},
+											"operator": {
+												"title": "Operator",												
+												"type": "string",
+												"enum": ["=", "!=", "<", "<=", ">", ">=", "in", "!in"]
+											},
+											"value": {
+												"title": "Value",
+												"type": ["string", "number", "boolean", "array"]
+											}
+										}
+					  	}
+					},					
+					"note": {
+						"title": "Note",			
+						"type": "string"
+					}
+				}
+			}
 		},
 		"datacite": {
 			"type": "object",
