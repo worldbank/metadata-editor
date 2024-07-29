@@ -82,7 +82,7 @@
   <script src="https://unpkg.com/vuex@3.4.0/dist/vuex.js"></script>
 -->
 
-  <script src="<?php echo base_url();?>javascript/vue-router.min.js"></script>
+  <script src="<?php echo base_url();?>javascript/vue-router.min.js?v3.6.5"></script>
   <script src="<?php echo base_url();?>javascript/vuex.min.js"></script>
   <script src="<?php echo base_url();?>javascript/axios.min.js"></script>
 
