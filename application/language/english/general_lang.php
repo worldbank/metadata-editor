@@ -92,6 +92,15 @@ $lang['paste_replace']="Paste (replace)";
 $lang['paste_append']="Paste (append)";
 $lang['undo_paste']="Undo paste";
 
+$lang['confirm_delete_selected']="Are you sure you want to delete the selected items?";
+
+
+$lang['Save']="Save";
+$lang['Export project metadata as JSON']="Export project metadata as JSON";
+$lang['Cancel changes']="Cancel changes";
+$lang['unsaved_changed']="Unsaved changes";
+
+
 
 /* End of file general_lang.php */
 /* Location: ./application/language/base/general_lang.php */
