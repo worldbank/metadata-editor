@@ -63,7 +63,7 @@ class Collection_tree_model extends CI_Model {
     function delete($parent_id)
     {
         /*
-            note: note supported by MYSQL
+            note: not supported by MYSQL
 
             delete from editor_collections_tree
             where child_id in (select child_id from editor_collections_tree where parent_id=28)
@@ -127,13 +127,13 @@ class Collection_tree_model extends CI_Model {
         where child_id in (select child_id from editor_collections_tree where parent_id=28)
         */
         
-        $this->db->select('parent_id');
+        $this->db->select('child_id');
         $this->db->where('child_id in (select child_id from editor_collections_tree where parent_id='. $this->db->escape($parent_id) .')');
         $result= $this->db->get('editor_collections_tree')->result_array();
         
         $output=array();
         foreach($result as $row){
-            $output[]=$row['parent_id'];
+            $output[]=$row['child_id'];
         }
         return $output;
     }
