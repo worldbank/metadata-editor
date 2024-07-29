@@ -35,8 +35,13 @@ Vue.component('datafiles', {
     }, 
     methods: {        
         editFile:function(file_id){
-            this.page_action="edit";
-            this.edit_item=file_id;
+            //this.page_action="edit";
+            //this.edit_item=file_id;
+            let file_=this.data_files[file_id];
+
+            if (!file_) return;
+
+            router.push('/datafile/'+file_.file_id);
         },
         addFile:function(){
             this.page_action="edit";
@@ -101,22 +106,7 @@ Vue.component('datafiles', {
                     });
             }
             return seq;
-        },
-        batchDelete: function()
-        {
-            if (!confirm(this.$t("confirm_delete_selected"))){
-                return;
-            }
-            
-            let vm=this;
-            
-            this.selected_files.forEach(function(file_id){
-                let file_idx=vm.data_files.findIndex(function(item){return item.file_id==file_id});
-                vm.deleteFile(file_idx,true);
-            });
-
-            this.selected_files=[];
-        },
+        },        
         replaceFile:function(file_idx){
             let data_file=this.data_files[file_idx];
             this.dialog_datafile_import_fid=data_file.file_id;
@@ -179,8 +169,39 @@ Vue.component('datafiles', {
                     this.dialog.is_loading=false;
                     this.dialog.message_error=this.$t("failed")+": "+e.response.data.message;
                 }
-            },
+        },
+        batchDelete: async function() {
+            if (!confirm(this.$t("confirm_delete_selected"))) {
+                return;
+            }
+        
+            let deletionPromises = this.selected_files.map(async (file_id) => {                
+                try {
+                    await this.deleteFileByFileId(file_id);
+                } catch (error) {
+                    console.error(`Error deleting file with ID ${file_id}:`, error);
+                    // Optionally, handle the error, e.g., by notifying the user
+                }
+            });
+        
+            await Promise.all(deletionPromises);
+            this.reloadDataFiles();
+            this.selected_files = [];
+        },
+        deleteFileByFileId: async function(file_id)
+        {
+            vm=this;
+            let url=CI.base_url + '/api/datafiles/delete/'+vm.dataset_id + '/'+ file_id;
+            form_data={};
 
+            try {
+                await axios.post(url, form_data);
+                return true;
+            } catch (error) {
+                console.log(error);
+                return error; // Return the error object in case of failure
+            }
+        },
         deleteFile:function(file_idx,confirm_=false)
         {
             let data_file=this.data_files[file_idx];
@@ -392,8 +413,9 @@ Vue.component('datafiles', {
                         <v-btn color="primary" :to="'datafiles/import'" outlined small>{{$t("import_files")}}</v-btn>
                     </v-col>
                 </v-row>
+
                 
-                <table class="table table-striped">
+                <table class="table table-striped" v-if="data_files.length>0">
                     <thead>
                     <tr>
                         <th><input type="checkbox" v-model="select_all_files" @change="toggleFilesSelection" /></th>

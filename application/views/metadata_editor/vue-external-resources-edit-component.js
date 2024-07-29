@@ -1,10 +1,11 @@
 //external resources
-Vue.component('external-resources-edit', {
+const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
     props: ['index'],
     data() {
         return {
             file:'',
             errors:[],
+            is_dirty:false,
             attachment_type:'',
             attachment_url:'',
             resource_template:'',
@@ -29,9 +30,42 @@ Vue.component('external-resources-edit', {
             }
         }
     }, 
-    created () {
+    watch: {
+        Resource: {
+            handler: function (val, oldVal) {
+                if (!oldVal){return;}
+                this.is_dirty=true;
+            },
+            deep: true
+        },
+        attachment_url: function(val){
+            this.is_dirty=true;
+        },
+        file: function(val){
+            this.is_dirty=true;
+        }
     },
-    methods: {        
+    beforeRouteLeave(to, from, next) {
+        if (!this.showUnsavedMessage()){
+            return false;
+        }
+        next();
+    },
+    beforeRouteUpdate(to, from, next) {
+        if (!this.showUnsavedMessage()){
+            return false;
+        }
+        next();
+    },
+    methods: {
+        showUnsavedMessage: function(){
+            if (this.is_dirty){
+                if (!confirm("You have unsaved changes. Are you sure you want to leave this page?")){
+                    return false;
+                }
+            }
+            return true;
+        },
         getResourceByID: function(){
             this.ExternalResources.forEach((resource, index) => {                
                 if (resource.id==this.ActiveResourceIndex){
@@ -81,6 +115,7 @@ Vue.component('external-resources-edit', {
                 }
             ).then(function(response){
                 vm.$store.dispatch('loadExternalResources',{dataset_id:vm.ProjectID});
+                vm.is_dirty=false;
                 router.push('/external-resources/');
             })
             .catch(function(response){
@@ -235,6 +270,8 @@ Vue.component('external-resources-edit', {
     },
     template: `
         <div class="container-fluid edit-resource-container mt-5 pt-5">
+
+        {{is_dirty}}
             <div v-if="Resource">
 
             <v-card>
@@ -388,6 +425,8 @@ Vue.component('external-resources-edit', {
 
 
             </v-card-text>
+
+            </v-card>
             
         </div>
         </div>

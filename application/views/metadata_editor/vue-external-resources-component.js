@@ -1,5 +1,5 @@
 //external resources
-Vue.component('external-resources', {
+const VueExternalResources = Vue.component('external-resources', {
     props: ['index', 'id'],
     data() {
         return {
@@ -7,7 +7,7 @@ Vue.component('external-resources', {
     }, 
     created () {
         //this.loadDataFiles();
-    },   
+    },
     methods: {
         editResource:function(id){
             this.page_action="edit";
@@ -95,7 +95,7 @@ Vue.component('external-resources', {
                 <table class="table table-striped">
                     <tr v-for="(resource, index) in ExternalResources" class="resource-row">                        
                         <td>
-                            <i class="fas fa-file-alt"></i> <router-link class="nav-item" :to="'/external-resources/' + resource.id">{{resource.title}}</router-link>
+                            <i class="fas fa-file-alt"></i> <router-link :key="resource.id" class="nav-item" :to="'/external-resources/' + resource.id">{{resource.title}}</router-link>
                             <div class="text-small text-secondary">{{resource.filename}}</div>
                         </td>
                         <td>{{resource.dctype}}</td>
@@ -110,6 +110,7 @@ Vue.component('external-resources', {
             </div>
 
             </v-card-text>
+            </v-card>
         </div>
     `
 })

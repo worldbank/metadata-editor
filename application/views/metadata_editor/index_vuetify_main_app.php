@@ -235,14 +235,17 @@
         const _main = {props: ['active_section'],template: '<div><study-metadata/></div>' }
         const Datafiles ={template: '<div><datafiles/></div>'}
         const Datafile = {props: ['file_id'],template: '<div><datafile/></div>' }
+        const DatafileEdit=VueDatafileEdit;
         const DatafileExplorer = {props: ['file_id'],template: '<div><datafile-data-explorer/></div>' }
         const DatafileImport = {template: '<div><datafile-import/></div>' }
         const Variables ={props: ['file_id'],template: '<div><variables xv-if="$store.state.variables"/> </div>'}
         const VariableGroups ={template: '<div><variable-groups /> </div>'}
-        const ResourcesComp ={props: ['index'],template: '<div><external-resources /></div>'}
+        //const ResourcesComp ={props: ['index'],template: '<div><external-resources /></div>'}
+        const ResourcesComp =VueExternalResources;
         //const FileManager ={props: ['index'],template: '<div><file-manager /></div>'}
         const ResourcesImport ={template: '<div> <external-resources-import /></div>'}
-        const ResourcesEditComp ={props: ['index'],template: '<div><external-resources-edit /></div>'}
+        //const ResourcesEditComp ={props: ['index'],template: '<div><external-resources-edit /></div>'}
+        const ResourcesEditComp =VueExternalResourcesEdit;
         const GeoFeatures ={props: ['index'],template: '<div>Geo-features</div>'}
         const GeoFeature ={props: ['feature_name'],template: '<div><geospatial-feature/></div>'}
         const PagePreview ={template: '<div><page-preview/></div>'}
@@ -258,15 +261,15 @@
             { path: '/configure-catalog', component: ConfigureCatalog },
             { path: '/import', component: ImportOptions },
             { path: '/study/:element_id', component: main, name: 'study',props: true },
-            { path: '/datafile/:file_id', component: Datafile, props:true },
+            { path: '/datafile/:file_id', component: DatafileEdit, props:true, name: 'datafile-edit' },
             { path: '/data-explorer/:file_id', component: DatafileExplorer, props:true },
             { path: '/datafiles', component: Datafiles },
             { path: '/datafiles/import', component: DatafileImport },
             { path: '/variables/:file_id', component: Variables, props: true },
             { path: '/variable-groups', component: VariableGroups},
-            { path: '/external-resources', component: ResourcesComp, props: true},
+            { path: '/external-resources', component: ResourcesComp, props: true, name: 'external-resources'},
             { path: '/external-resources/import', component: ResourcesImport},
-            { path: '/external-resources/:index', component: ResourcesEditComp, props: true},            
+            { path: '/external-resources/:index', component: ResourcesEditComp, props: true, name: 'external-resources-edit'},
             //{ path: '/files', component: FileManager, props: true},
             { path: '/geospatial-features', component: GeoFeatures, props: true},
             { path: '/geospatial-feature/:feature_name', component: GeoFeature, props: true },

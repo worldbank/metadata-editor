@@ -1,28 +1,103 @@
 /// datafile add/edit form
-Vue.component('datafile-edit', {
-    props:['value'],
+const VueDatafileEdit= Vue.component('datafile-edit', {
     data: function () {    
         return {
-            field_data: this.value,
-            form_local:{}
+            form_local: {},
+            is_dirty: false,
+            is_loading: true
         }
     },
     mounted: function () {
-        //set data to array if empty or not set
-        if (!this.field_data){
-            this.field_data=[];
-            this.field_data.push({});
-        }
-
-        this.form_local = Object.assign({}, this.field_data);        
+        window.onbeforeunload = function () {
+            if (this.is_dirty) {
+                return "You have unsaved changes. Are you sure you want to leave?";
+            }
+        }.bind(this);
+        
+        this.loadFile();
     },
-    computed: {
+    beforeRouteLeave(to, from, next) {
+        if (!this.showUnsavedMessage()){
+            return false;
+        }
+        next();
+    },
+    beforeRouteUpdate(to, from, next) {
+        if (!this.showUnsavedMessage()){
+            return false;
+        }
+        next();
+    },
+    watch: {
+        form_local: {
+            handler: function (newVal, oldVal) {                
+                if (this.is_loading){return;}
+                if (!oldVal.file_id){return;}                
+                this.is_dirty=true;
+            },
+            deep: true
+        },
+    },
+    methods:{
+        showUnsavedMessage: function(){
+            if (this.is_dirty){
+                if (!confirm("You have unsaved changes. Are you sure you want to leave this page?")){
+                    return false;
+                }
+            }
+            return true;
+        },
+        saveForm: function (){    
+            this.saveFile();
+        },
+        cancelForm: function (){
+            this.is_dirty=false;
+            router.push('/datafiles/');
+        },
+        loadFile: function(){
+            //load file data
+            vm=this;
+            this.is_loading=true;
+            let url=CI.base_url + '/api/datafiles/'+ this.ProjectID + '/' + this.ActiveDatafileIndex;
+            axios.get( url
+            ).then(function(response){
+                vm.form_local=response.data.datafile;
+                vm.is_loading=false;
+            })
+            .catch(function(response){
+                vm.errors=response;
+            });
+        },
+        saveFile: function(){
+            vm=this;
+            let url=CI.base_url + '/api/datafiles/'+ this.ProjectID;
+            axios.post( url,
+                this.form_local
+            ).then(function(response){
+                vm.$store.dispatch('loadDataFiles',{dataset_id:vm.ProjectID});
+                vm.is_dirty=false;
+                router.push('/datafiles/');
+            })
+            .catch(function(response){
+                vm.errors=response;
+            });
+        }
+    },
+    computed:{
+        ActiveDatafileIndex(){
+            return this.$route.params.file_id;
+        },
+        ProjectID(){
+            return this.$store.state.project_id;
+        }        
     },  
     template: `
-            <div class="datafile-edit-component container-fluid">
+            <div class="datafile-edit-component container-fluid mt-5">
 
             <div class="row">
                 <div class="col-md-8">
+
+                <h3>{{$t("Edit file")}}</h3> {{is_dirty}}
             
                 <div class="form-group form-field">
                     <label for="filename">File name</label> 
@@ -87,16 +162,5 @@ Vue.component('datafile-edit', {
                 </div>
 
             </div>          
-            `,
-    methods:{
-        saveForm: function (){    
-            this.field_data = Object.assign({}, this.field_data, this.form_local);
-            this.$emit('input', this.field_data);
-            this.$emit("exit-edit", true);
-        },
-        cancelForm: function (){
-            this.form_local = Object.assign({}, this.field_data);
-            this.$emit("exit-edit", false);
-        }        
-    }
+            `    
 })
