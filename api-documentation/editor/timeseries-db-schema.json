@@ -5,20 +5,10 @@
 	"description": "Schema for timeseries database",
 	"type": "object",
 	"properties": {
-		"published": {
-			"type": "integer",
-			"title": "Status",
-			"description": "0=draft, 1=published",
-			"default": 0
-		},
-		"overwrite": {
+		"idno": {
 			"type": "string",
-			"description": "Overwrite database if already exists?",
-			"enum": [
-				"yes",
-				"no"
-			],
-			"default": "no"
+			"title": "Project unique identifier",
+			"description": "Project unique identifier"
 		},
 		"metadata_information": {
 			"type": "object",
@@ -290,6 +280,11 @@
 							}
 						}
 					}
+				},
+				"release_calendar": {
+					"title": "Release calendar",
+					"description": "Release calendar",
+					"type": "string"
 				},
 				"themes":{
 					"type":"array",
