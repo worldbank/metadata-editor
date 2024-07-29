@@ -272,7 +272,7 @@ class Editor_datafile_model extends CI_Model {
 		$files=$this->db->get("editor_data_files")->result_array();
 
 		if(empty($files)){
-			return false;
+			return array();
 		}
 
 		//get varcounts
