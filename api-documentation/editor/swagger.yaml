@@ -111,25 +111,32 @@ paths:
           title: Project search keywords
           description: Keywords for searching project by title and IDNO
           type: string
-        - name: from
-          in: path
-          title: Start year
-          description: Starting year for a project
-          type: int
-        - name: to
-          in: path
-          title: End year
-          description: Project end year
-          type: int
-        - name: data_type
+        - name: type
           in: path
           title: Project data type
           description: Project data type e.g. Microdata, Document, Table, ...
           type: string
-        - name: page
+          enum:          
+          - microdata
+          - document
+          - table
+          - timeseries
+          - timeseries-db
+          - geospatial
+          - image
+          - script
+          - video
+          
+        - name: offset
           in: path
-          title: Page
-          description: Page to return for the search result
+          title: Offset
+          description: Offset for pagination e.g. 10 to skip first 10 records
+          type: int
+
+        - name: limit
+          in: path
+          title: Page size
+          description: Page size e.g. 10 to show 10 records
           type: int
         
         - name: sort_by
@@ -138,17 +145,10 @@ paths:
           description: Sort results
           type: string
           enum:
-          - title
-          - created
-          - year
-        - name: sort_order
-          in: path
-          title: Sort order
-          description: Set results sort order. Ascending = `asc`, Descending= `desc`
-          type: string
-          enum:
-          - asc
-          - desc
+          - title_asc
+          - title_desc
+          - updated_asc
+          - updated_desc
       responses:
         '200':
           description: successful operation
