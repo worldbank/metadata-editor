@@ -664,13 +664,13 @@ paths:
               $ref: "#/definitions/AddProjectsToCollection"
         security:
           - ApiKeyAuth: []
-  /collections/remove_project:
+  /collections/remove_projects:
       post:
         tags:
           - Collections
-        summary: Remove projects from collection
-        description: Remove projects from collection
-        operationId: removeProjectFromCollection
+        summary: Remove projects from collections
+        description: Remove projects from collections
+        operationId: removeProjectsFromCollections
         consumes:
           - application/json
         produces:

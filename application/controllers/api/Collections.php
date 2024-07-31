@@ -273,8 +273,8 @@ class Collections extends MY_REST_Controller
 			$this->has_access($resource_='collection',$privilege='edit');
 			$options=$this->raw_json_input();
 
-			if (!isset($options['collection_id'])){
-				throw new Exception("Missing parameter: collection_id");
+			if (!isset($options['collections'])){
+				throw new Exception("Missing parameter: collections");
 			}
 
 			if (!isset($options['projects'])){
@@ -295,11 +295,10 @@ class Collections extends MY_REST_Controller
 				throw new Exception("project was not found");
 			}
 
-			$result=$this->Collection_model->remove_projects($options['collection_id'], $sid_arr);
+			$this->Collection_model->remove_batch_projects($options['collections'], $sid_arr);
 
 			$output=array(
-				'status'=>'success',
-				'result'=>$result
+				'status'=>'success'
 			);
 
 			$this->set_response($output, REST_Controller::HTTP_OK);			

@@ -231,6 +231,31 @@ class Collection_model extends CI_Model {
         return $this->db->count_all_results('editor_collection_projects');
     }
 
+
+    /**
+     * 
+     * Batch remove projects from multiple collections
+     * 
+     */
+    function remove_batch_projects($collections,$sids)
+    {
+        $collections=(array)$collections;
+        $sids=(array)$sids;
+        $sids = array_map('intval', $sids);
+
+        foreach($collections as $collection_id){
+
+            //check if collection id exists
+            $collection_exists=$this->collection_id_exists($collection_id);
+
+            if (!$collection_exists){
+                throw new Exception('Collection not found: '.$collection_id);
+            }
+
+            $this->remove_projects($collection_id,$sids);
+        }
+    }
+
     /**
      * Remove project from collection
      * 
