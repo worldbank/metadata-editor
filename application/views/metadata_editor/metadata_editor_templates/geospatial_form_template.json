@@ -2577,18 +2577,18 @@
                                             "display_type": "textarea"
                                         },
                                         {
-                                            "key": "geographicBoundingPolygon",
+                                            "key": "geographicBoundingPolygon-section",
                                             "title": "Bounding polygon",
                                             "type": "section",
                                             "props": [
                                                 {
-                                                    "key":"id",
-                                                    "type":"string",
+                                                    "key":"geographicBoundingPolygon.id",
+                                                    "type":"text",
                                                     "title":"Polygon Identifier (ID)",
                                                     "prop_key":"description.identificationInfo.extent.geographicElement.geographicBoundingPolygon.id"
                                                 },
                                                 {
-                                                    "key": "polygon",
+                                                    "key": "geographicBoundingPolygon.polygon",
                                                     "type": "array",
                                                     "title": "Polygon",
                                                     "prop_key": "description.identificationInfo.extent.geographicElement.geographicBoundingPolygon.polygon",
