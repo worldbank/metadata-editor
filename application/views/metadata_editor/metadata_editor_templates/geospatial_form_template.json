@@ -3296,7 +3296,7 @@
                                                 },
                                                 {
                                                     "key": "accessConstraints",
-                                                    "type": "string",
+                                                    "type": "simple_array",
                                                     "title": "Access constraints",
                                                     "prop_key": "description.identificationInfo.serviceIdentification.restrictions.legalConstraints.accessConstraints",
                                                     "enum": [
