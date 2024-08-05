@@ -2006,7 +2006,7 @@
                                                 },
                                                 {
                                                     "key": "legalConstraints.accessConstraints",
-                                                    "type": "string",
+                                                    "type": "simple_array",
                                                     "title": "Access constraints",
                                                     "prop_key": "description.identificationInfo.resourceConstraints.section-1676478956897.legalConstraints.accessConstraints",
                                                     "enum": [
