@@ -1243,7 +1243,7 @@
 																"type":{
 																	"title": "Type",
 																	"type": "string",
-																	"enum": ["Point", "LineString", "Polygon"]
+																	"enum": ["point", "lineString", "polygon"]
 																},
 																"coordinates": {
 																	"title": "Coordinates",
@@ -1252,8 +1252,10 @@
 																		"type": "array",
 																		"items": {
 																			"type": "number"
-																		}
-																	}
+																		},
+																		"minItems": 2
+																	},
+																	"minItems": 2
 																}
 															}
 														}
