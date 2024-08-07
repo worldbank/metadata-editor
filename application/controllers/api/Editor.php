@@ -324,6 +324,68 @@ class Editor extends MY_REST_Controller
 	/**
 	 * 
 	 * 
+	 * Patch project - add, remove, update fields
+	 * 
+	 * @type - survey, timeseries, geospatial
+	 * 
+	 * 
+	 */
+	function patch_post($type=null,$id=null)
+	{
+		try{			
+			$options=$this->raw_json_input();
+			$user=$this->api_user();
+			$user_id=$this->get_api_user_id();
+			$id=$this->get_sid($id);			
+
+			//check project exists and is of correct type
+			$exists=$this->Editor_model->check_id_exists($id,$type);
+
+			if(!$exists){
+				throw new Exception("Project with the type [".$type ."] not found");
+			}
+
+			$this->editor_acl->user_has_project_access($id,$permission='edit',$user);
+			$this->audit_log->log_event($obj_type='project',$obj_id=$id,$description='patch');
+			
+			$options['changed_by']=$user_id;
+			$options['changed']=date("U");
+
+			$validate=true;
+			if (isset($options['validate']) && $options['validate']==false){
+				$validate=false;
+			}
+
+			//patch project
+			$this->Editor_model->patch_project($type,$id,$options, $validate);
+
+			$response=array(
+				'status'=>'success'
+			);
+
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(ValidationException $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage(),
+				'errors'=>$e->GetValidationErrors()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	/**
+	 * 
+	 * 
 	 * Update project options
 	 * set:
 	 * 	- template

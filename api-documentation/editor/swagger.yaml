@@ -331,6 +331,62 @@ paths:
         security:
           - ApiKeyAuth: []        
 
+  /editor/patch/{project-type}/{id}:
+      post:
+        tags:
+          - Projects
+          - Microdata
+          - Timeseries
+          - Timeseries-db
+          - Geospatial
+          - Document
+          - Table
+          - Image
+          - Script
+          - Video
+
+        summary: Partial Metadata update
+        description: Add, update, delete or replace parts of a project metadata
+        operationId: patchProject
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "id"
+            description: Project ID
+            type: string
+            format: string
+            required: true
+          - in: "path"
+            name: "project-type"
+            description: Project type
+            type: string
+            format: string
+            required: true
+            enum:
+              - survey
+              - timeseries
+              - timeseries-db
+              - geospatial
+              - document
+              - table
+              - image
+              - script
+              - video
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: 'json-patch-schema.json'
+        responses:
+          '200':
+            description: successful operation
+            
+        security:
+          - ApiKeyAuth: []                  
+
 
   /editor/create/timeseries:
       post:

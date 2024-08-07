@@ -32,6 +32,7 @@ class ComposerStaticInitab9d8e64f1fcd2c6192dafeec2ffec2d
             'Symfony\\Contracts\\EventDispatcher\\' => 34,
             'Symfony\\Component\\Finder\\' => 25,
             'Symfony\\Component\\EventDispatcher\\' => 34,
+            'Swaggest\\JsonDiff\\' => 18,
             'Spatie\\ArrayToXml\\' => 18,
             'Solarium\\' => 9,
             'Slim\\Csrf\\' => 10,
@@ -109,6 +110,10 @@ class ComposerStaticInitab9d8e64f1fcd2c6192dafeec2ffec2d
         'Symfony\\Component\\EventDispatcher\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/event-dispatcher',
+        ),
+        'Swaggest\\JsonDiff\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/swaggest/json-diff/src',
         ),
         'Spatie\\ArrayToXml\\' => 
         array (

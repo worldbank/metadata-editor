@@ -6,6 +6,10 @@ use JsonSchema\Constraints\Factory;
 use JsonSchema\Constraints\Constraint;
 use Ramsey\Uuid\Uuid;
 
+use Swaggest\JsonDiff\JsonDiff;
+use Swaggest\JsonDiff\JsonPatch;
+use Swaggest\JsonDiff\JsonPointer;
+
 
 /**
  * 
@@ -375,7 +379,7 @@ class Editor_model extends CI_Model {
 	 */
 	function apply_partial_update($id,$partial_options)
 	{
-		$options=$this->get_row($id);		
+		$options=$this->get_row($id);
 		$options['metadata']=array_replace_recursive($options['metadata'],$partial_options);
 
 		return $options['metadata'];
@@ -407,6 +411,54 @@ class Editor_model extends CI_Model {
 
 		$this->db->where('id',$sid);
 		$this->db->update('editor_projects',$options);
+	}
+
+
+	function patch_project($type,$id,$options=array(), $validate=true)
+	{
+		if (!array_key_exists($type,$this->types)){
+			throw new Exception("INVALID_TYPE: ".$type);
+		}
+
+		if (!isset($options['patches'])){
+			throw new Exception("`Patches` parameter is required");
+		}
+
+		$project=$this->get_row($id);
+
+		if (!$project){
+			throw new Exception("PROJECT_NOT_FOUND: ".$id);
+		}
+
+		$metadata=$project['metadata'];
+
+		if (!is_object($metadata)){
+			$metadata=json_decode(json_encode($metadata));
+		}
+
+		//apply patches
+		$patch = JsonPatch::import($options['patches']);
+		$patch->setFlags(1);
+		$patch->apply($metadata);
+
+		//convert metadata to array
+		$metadata=json_decode(json_encode($metadata),true);
+
+		//validate schema
+		if ($validate==true){
+			$this->validate_schema($type,$metadata);
+		}
+		
+		$db_options=array(
+			'changed'=>isset($options['changed']) ? $options['changed'] : date("U"),
+			'changed_by'=>isset($options['changed_by']) ? $options['changed_by'] : '',			
+			'study_idno'=>$this->get_project_metadata_field($type,'idno',$metadata),
+			'title'=>$this->get_project_metadata_field($type,'title',$metadata),
+			'metadata'=>$this->encode_metadata($metadata)
+		);
+
+		$this->db->where('id',$id);
+		$this->db->update('editor_projects',$db_options);
 	}
 
 	/**
