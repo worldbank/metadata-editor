@@ -14,6 +14,7 @@ Vue.component('datafile-import', {
             file_type:'',
             sleep_time:500,
             sleep_counter:0,
+            overwrite_if_exists:false,
             file_types:{
                 "DTA": "Stata (DTA)",
                 "SAV": "SPSS (SAV)",
@@ -72,7 +73,9 @@ Vue.component('datafile-import', {
 
             this.update_status="completed";
             this.is_processing=false;
-            this.$store.dispatch('initData',{dataset_id:this.ProjectID});
+            this.$store.dispatch('loadDataFiles',{dataset_id:this.ProjectID});
+            this.$store.dispatch('loadAllVariables',{dataset_id:this.ProjectID});
+            this.$store.dispatch('loadVariableGroups',{dataset_id:this.ProjectID}); 
         },
 
         /**
@@ -134,6 +137,10 @@ Vue.component('datafile-import', {
         {            
             let formData = new FormData();
             formData.append('file', this.files[fileIdx]);
+
+            if (this.overwrite_if_exists){
+                formData.append("overwrite", "1");
+            }           
 
             /*if (this.errors!=''){
                 return false;
@@ -319,6 +326,10 @@ Vue.component('datafile-import', {
                             </div>
 
                         </div>
+
+                        <div>                        
+                            <v-checkbox v-model="overwrite_if_exists" :label="$t('Overwrite (if file already exists)')"></v-checkbox>
+                        </div>
                                                 
                         <div xv-if="update_status==''">
                             <v-btn color="primary" :disabled="!FilesCount>0"  @click="processImport">{{$t("import")}}</v-btn>
@@ -381,7 +392,7 @@ Vue.component('datafile-import', {
                             <div v-for="report in upload_report" class="row border-top">
                                 <div class="col-md-3">{{report.file_name}}</div>
                                 <div class="col-md-2">{{report.status}}</div>
-                                <div class="col-md-auto">
+                                <div class="col">
                                     <div style="color:red;" v-if="report.error">{{report.error.response.data.message}}</div>
                                 </div>                                
                                 <hr/>
