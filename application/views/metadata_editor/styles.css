@@ -1138,3 +1138,7 @@ html {
 .font-weigh-normal{
     font-weight:normal;
 }
+
+.v-dialog__content{
+    z-index: 2000!important;
+}
