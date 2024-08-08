@@ -92,7 +92,18 @@ class Editor_owners_model extends ci_model {
         return $result;
 	}
 
-    function add($sid,$user_id, $permissions=null)
+
+    function add($sid,$users, $permissions=null)
+    {
+        $result=array();
+        foreach($users as $user_id){
+            $result[]=$this->add_single_user($sid,$user_id,$permissions);
+        }
+        return $result;
+    }
+
+
+    function add_single_user($sid,$user_id, $permissions=null)
     {
         //check if user is the owner
         $owner=$this->get_project_owner($sid);
