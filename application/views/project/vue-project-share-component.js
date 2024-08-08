@@ -1,44 +1,142 @@
 Vue.component('vue-project-share', {
-    props: ['value','users','project_id','shared_users'],
+    props: ['value','users','project_id'],
     data() {
         return {            
             selected: [],
-            user_access: 'view',
-            user_selected:''
+            user_access: 'view',            
+            is_loading: false,
+            selected_users: [],
+            search: null,
+            shared_users: [],//users with access to the project
+            user_roles: [
+                {
+                    'value':'view',
+                    'text':'View'
+                },
+                {
+                    'value':'edit',
+                    'text':'Edit'
+                },
+                {
+                    'value':'admin',
+                    'text':'Admin'
+                }
+            ],
         }
     },
     created:function(){
+        this.loadProjectUsers();
     },
-    methods: {        
-        addAccess: function() {
-            this.$emit('share-project', 
-                {
-                    'project_id':this.project_id,
-                    'user_id':this.user_selected,
-                    'permissions':this.user_access
-                }
-            );
-            this.user_selected='';
-            this.user_access='view';            
+    watch:{
+        search (val) {
+            if (!val) return
+            if (this.is_loading) return
+            this.is_loading = true
+  
+          let vm=this;
+          this.searchUsers(val);
+        }          
+    },
+    methods: {     
+        getSelectedUsersList: function(){
+            let selected_users = [];
+            for (let i = 0; i < this.selected_users.length; i++) {
+                selected_users.push(this.selected_users[i].id);
+            }
+            return selected_users;
         },
+        loadProjectUsers: function(){
+            let vm = this;
+            let url = CI.base_url + '/api/share/list/' + this.project_id;
+            axios.get(url)
+            .then(response => {
+                vm.shared_users = response.data.users;
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+            .finally(() => (this.is_loading = false));
+        },
+        addAccess: async function() {
+            let vm = this;
+            vm = this;
+            let form_data = {
+                'permissions': this.user_access,
+                'users': this.getSelectedUsersList()
+            };
+            let url = CI.base_url + '/api/share/' + this.project_id;
+
+            axios.post(url,
+                form_data
+            )
+            .then(response => {
+                vm.selected_users = [];
+                vm.user_access = 'view';
+                vm.loadProjectUsers();
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+            .finally(() => (this.is_loading = false));
+        },        
         updateAccess: function(index){
-            this.$emit('share-project', 
-                {
-                    'project_id':this.project_id,
-                    'user_id':this.shared_users[index]['user_id'],
-                    'permissions':this.shared_users[index]['permissions']
-                }
-            );
+            let form_data={
+                'users': Array(this.shared_users[index]['user_id']),
+                'permissions':this.shared_users[index]['permissions']
+            }
+
+            let url = CI.base_url + '/api/share/' + this.project_id;
+            axios.post(url,
+                form_data
+            )
+            .then(response => {
+                console.log(response);
+                vm.loadProjectUsers();
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+            
         },
         removeAccess: function(index) {
-            this.$emit('remove-access', 
-                {
-                    'project_id':this.project_id,
-                    'user_id':this.shared_users[index]['user_id']
-                }
-            );
-            this.shared_users.splice(index, 1);
-        }
+            
+            if (!confirm("Are you sure you want to remove access for this user?")) {
+                return;
+            }
+
+            let form_data ={
+                'project_id':this.project_id,
+                'user_id':this.shared_users[index]['user_id']
+            }
+
+            let user_id = this.shared_users[index]['user_id'];
+
+            let vm=this;
+            let url = CI.base_url + '/api/share/delete/' + this.project_id + '/' + user_id;
+
+            axios.post(url)
+            .then(response => {
+                console.log(response);
+                vm.shared_users.splice(index, 1);
+            })
+            .catch(function (error) {
+                console.log(error);
+                alert("Error removing user access");
+            });
+        },
+        
+        searchUsers: _.debounce(function(val) {
+            let vm=this;
+            axios.get(CI.base_url + '/api/users/search?keywords='+val)
+            .then(response => {
+                vm.users = response.data.users;
+                console.log("users",vm.users);
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+            .finally(() => (this.is_loading = false));
+        },300)
     },
     computed:{
         dialog: {
@@ -57,8 +155,8 @@ Vue.component('vue-project-share', {
             <div class="text-center">
                 <v-dialog
                 v-model="dialog"
-                width="600px"
-                scrollable
+                width="800px"
+                scrollable                
                 >
 
                 <v-card>
@@ -68,66 +166,80 @@ Vue.component('vue-project-share', {
                     <v-card-text>
                         <v-row>
                             <v-col cols="6">
-                                <select class="form-control" v-model="user_selected">
-                                    <option value="">Select user</option>
-                                    <option v-for="user in users" :value="user.id">{{user.username}}</option>
-                                </select>
+                                
+                                <!--select-->
+                    <v-autocomplete
+                        v-model="selected_users"
+                        :loading="is_loading"
+                        :search-input.sync="search"
+                        :items="users"
+                        solo
+                        chips
+                        color="blue-grey lighten-2"
+                        label="Search users to select"
+                        item-text="username"
+                        item-value="id"
+                        multiple
+                        cache-items
+                        return-object
+                        no-data-text="Type user name or email to search for a user"                        
+                    >
+                        <template v-slot:selection="data">
+                            <v-chip
+                                v-bind="data.attrs"
+                                :input-value="data.selected"
+                                close
+                                @click="data.select"
+                                @click:close="removeSelectionItem(data.item)"
+                            >                                
+                                {{ data.item.username }}
+                            </v-chip>
+                        </template>
+
+                        <template v-slot:item="data">
+                            <template v-if="typeof data.item !== 'object'">
+                                <v-list-item-content v-text="data.item"></v-list-item-content>
+                            </template>
+                            <template v-else>
+                                <v-list-item-content>
+                                <v-list-item-title v-html="data.item.username"></v-list-item-title>
+                                <v-list-item-subtitle v-html="data.item.email"></v-list-item-subtitle>
+                                </v-list-item-content>
+                            </template>
+                        </template>
+                  </v-autocomplete>
+                    <!--end-select-->
+
                             </v-col>
                             <v-col cols="4">
-                                <select class="form-control" v-model="user_access">
-                                    <option value="">Select access</option>
-                                    <option value="view">View</option>
-                                    <option value="edit">Edit</option>
-                                    <option value="admin">Admin</option>
-                                </select>
+                                <v-select
+                                    :items="user_roles"
+                                    v-model="user_access"
+                                    solo
+                                    item-text="text"
+                                    item-value="value"
+                                    label=""
+                                ></v-select>
                             </v-col>
                             <v-col cols="2">
                                 <v-btn
                                     block
                                     class="ma-2 mr-3"
                                     outlined
-                                    color="indigo"
-                                    small
+                                    color="primary"
+                                    large
                                     @click="addAccess"
                                 >Share
                                 </v-btn>
                             </v-col>
+
                         </v-row>
-                        <!--
-                        <v-row style="display:none;">
-                             <v-col cols="9">   
-                                <v-autocomplete
-                                    class="controls-border-top"
-                                    v-model="selected"
-                                    :items="users"
-                                    solo
-                                    dense
-                                    chips
-                                    small-chips
-                                    item-text="username"
-                                    item-value="id"
-                                    multiple
-                                ></v-autocomplete>
-                            </v-col>
-                            <v-col cols="3">
-                                    <v-btn
-                                        :disabled="selected.length==0"
-                                        block
-                                        class="ma-2 mr-3"
-                                        outlined
-                                        color="indigo"
-                                        small                         
-                                        @click="shareProject"
-                                    >Share
-                                    </v-btn>
-                            </v-col>
-                        </v-row>
-                        -->
+                        
 
 
                     <div class="table-responsive mt-3" style="max-height:200px;overflow:auto;" v-if="shared_users!=''">
                     
-                        <table class="table table-sm table-hover" style="font-size:small;">
+                        <v-simple-table style="font-size:small;">
                             <thead>
                             <tr>
                                 <th>Username</th>
@@ -135,24 +247,29 @@ Vue.component('vue-project-share', {
                                 <th></th>
                             </tr>
                             </thead>
+                            <tbody>
                             <tr v-for="(user,index) in shared_users" :key="index">
                                 <td>
                                     <div class="capitalize">{{user.username}}</div>
                                     <div class="text-muted text-secondary">{{user.email}}</div>
                                 </td>
                                 <td>
-                                    <select class="form-control form-control-sm" v-model="user.permissions">
+                                    <select 
+                                        class="form-control form-control-sm" 
+                                        v-model="user.permissions" 
+                                        @change="updateAccess(index)"
+                                    >
                                         <option value="view">View</option>
                                         <option value="edit">Edit</option>
                                         <option value="admin">Admin</option>
                                     </select>
                                 </td>
                                 <td>
-                                    <button class="btn btn-sm btn-xs btn-danger" @click="removeAccess(index)">Remove</button>
-                                    <button class="btn btn-sm btn-xs btn-primary" @click="updateAccess(index)">Update</button>
+                                    <v-btn icon small color="red" @click="removeAccess(index)"><v-icon>mdi-delete-outline</v-icon></v-btn>
                                 </td>
                             </tr>
-                        </table>
+                            </tbody>
+                        </v-simple-table>
                     </div>
                     <div v-else>
                         <div class="text-center m-3" >No users have access to this project</div>

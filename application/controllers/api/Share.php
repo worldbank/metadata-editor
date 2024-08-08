@@ -152,10 +152,19 @@ class Share extends MY_REST_Controller
 
 	/**
 	 * 
-	 * Add a new owner to a project
+	 * Add one or more members to a project
+	 * 
+	 * @param string $sid
+	 * 
+	 * 
+	 * JSON payload:
+	 * 		{ 			
+	 * 			"permissions":"view",
+	 * 			"users":[1, 2, 3]
+	 * 		}
 	 * 
 	 */
-	function index_post($sid=null, $userId=null)
+	function index_post($sid=null)
 	{
 		try{
 			$this->editor_acl->user_has_project_access($sid,$permission='admin');
@@ -164,18 +173,22 @@ class Share extends MY_REST_Controller
 				throw new Exception("Missing parameter `sid`");
 			}
 
-			if(!$userId){
-				throw new Exception("Missing parameter `userId`");
-			}
-
 			$options=$this->raw_json_input();
-			$permissions='view';
 
-			if (isset($options['permissions'])){
-				$permissions=$options['permissions'];
+
+			if (!isset($options['permissions'])){
+				throw new Exception("Missing parameter `permissions`");
 			}
 
-			$result=$this->editor_owners_model->add($sid,$userId,$permissions);
+			if (!isset($options['users'])){
+				throw new Exception("Missing parameter `users`");
+			}
+
+			if (!is_array($options['users'])){
+				throw new Exception("Parameter `users` must be an array");
+			}
+
+			$result=$this->editor_owners_model->add($sid,$options['users'],$options['permissions']);
 			
 			$response=array(
 				'status'=>'success',

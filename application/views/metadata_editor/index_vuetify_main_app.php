@@ -189,6 +189,7 @@
             echo $this->load->view("metadata_editor/vue-configure-catalog-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-summary-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-summary-files-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-summary-sharing-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-thumbnail-component.js",null,true);
 
             echo $this->load->view("metadata_editor/vue-table-grid-component.js",null,true);
@@ -206,6 +207,10 @@
 
             echo $this->load->view("metadata_editor/vue-page-preview-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-geospatial-gallery-component.js",null,true);
+
+            echo $this->load->view("project/vue-project-share-component.js", null, true);
+            echo $this->load->view("project/vue-collection-share-component.js", null, true);
+            echo $this->load->view("metadata_editor/vue-summary-collections-component.js", null, true);
         ?>
 
         <?php if (empty($metadata)):?>

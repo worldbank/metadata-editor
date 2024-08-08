@@ -211,6 +211,17 @@ Vue.component('summary-component', {
                     </div>
 
                     <div class="col-6" >
+
+                        <div class="mb-5">
+                            <!-- project sharing -->
+                            <vue-summary-sharing-stats></vue-summary-sharing-stats>                            
+                        </div>
+
+                        <div class="mb-5">
+                            <!-- project collections -->
+                            <vue-summary-collections></vue-summary-collections>
+                        </div>
+                
                         <v-card>
                             <v-card-text>
                                 <div class="d-flex justify-content-between">
@@ -227,8 +238,8 @@ Vue.component('summary-component', {
                         </v-card>
                     </div>
 
-
                 </div>
+
 
                 <div class="row" >
                     <div class="col-6" >

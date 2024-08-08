@@ -304,10 +304,10 @@
     <vue-project-access-dialog v-model="dialog_access_project" v-bind="dialog_access_options">
     </vue-project-access-dialog>
 
-    <vue-project-share v-model="dialog_share_project" v-bind="dialog_share_options" v-on:share-project="ShareProjectWithUser" v-on:remove-access="UnshareProjectWithUser">
+    <vue-project-share v-model="dialog_share_project" v-bind="dialog_share_options">
     </vue-project-share>
 
-    <vue-collection-share v-model="dialog_share_collection" v-bind="dialog_share_collection_options" v-on:share-with-collection="AddProjectsToCollection">
+    <vue-collection-share v-model="dialog_share_collection" v-bind="dialog_share_collection_options" v-on:share-with-collection="OnAddProjectsToCollection">
     </vue-collection-share>
 
     <template class="create-new-project">
@@ -452,6 +452,9 @@
         <v-list>          
           <v-list-item>
             <v-list-item-title @click="ShareProject(menu_active_project_id)"><v-btn text>{{$t('Share')}}</v-btn></v-list-item-title>
+          </v-list-item>          
+          <v-list-item>
+            <v-list-item-title @click="addProjectToCollection(menu_active_project_id)"><v-btn text>Add to collection</v-btn></v-list-item-title>
           </v-list-item>
           <v-list-item>
             <v-list-item-title @click="viewAccessPermissions(menu_active_project_id)"><v-btn text>{{$t('View access')}}</v-btn></v-list-item-title>
@@ -554,7 +557,7 @@
     ]
 
     const router = new VueRouter({
-    routes, // short for `routes: routes`
+    routes, 
     mode: 'history'
   })
 
@@ -1164,54 +1167,7 @@
           }
 
           throw new Error(response);
-        },
-        ShareProjectWithUser: async function(obj) {
-          try {
-            let vm = this;
-            console.log("share project", obj);
-
-            let response = await this._shareProject(obj.project_id, obj.user_id, obj.permissions);
-            this.dialog_share_project = false;
-            this.loadProjects();
-          } catch (e) {
-            console.log("shareProject error", e);
-            alert("Failed", JSON.stringify(e));
-          }
-
-        },
-        _shareProject: async function(project_id, user_id, permissions) {
-          vm = this;
-          let form_data = {
-            'permissions': permissions
-          };
-          let url = CI.base_url + '/api/share/' + project_id + '/' + user_id;
-
-          let response = await axios.post(url,
-            form_data
-          );
-
-          return response;
-        },
-        _unshareProject: async function(project_id, user_id) {
-          vm = this;
-          let form_data = {};
-          let url = CI.base_url + '/api/share/delete/' + project_id + '/' + user_id;
-
-          try{
-          let response = await axios.post(url,
-            form_data
-          );
-          return response;
-        } catch (e) {
-            alert("Error:" +  e.response.data.message);            
-        }
-        return false;          
-        },
-        UnshareProjectWithUser: async function(obj) {
-            let vm = this;
-            let result = this._unshareProject(obj.project_id, obj.user_id);
-            this.loadProjects();
-        },
+        },                
         toggleProjectSelection: function() {
           this.selected_projects = [];
           if (this.select_all_projects == true) {
@@ -1235,9 +1191,21 @@
           }
           return true;
         },
+        addProjectToCollection: async function(project_id) {
+          try {
+            let collections = await this.getCollectionsList();
+            this.dialog_share_collection_options = {
+              'collections': collections,
+              'projects': [project_id]
+            };
+            this.dialog_share_collection = true;
+          } catch (e) {
+            console.log("shareProject error", e);
+            alert("Failed", JSON.stringify(e));
+          }
+        },
         addProjectsToCollection: async function() {
           try {
-
             if (this.selected_projects.length == 0) {
               alert("Please select at least one project");
               return false;
@@ -1257,7 +1225,6 @@
             console.log("shareProject error", e);
             alert("Failed", JSON.stringify(e));
           }
-
         },
         getCollectionsList: async function() {
           vm = this;
@@ -1270,7 +1237,7 @@
 
           return response.data;
         },
-        AddProjectsToCollection: async function(obj) {
+        OnAddProjectsToCollection: async function(obj) {
           try {
             let vm = this;
             console.log("add projects to collection", obj);
@@ -1301,7 +1268,7 @@
 
             let form_data = {
               'projects': project_id,
-              'collection_id': collection_id
+              'collections': collection_id
             };
             let url = CI.base_url + '/api/collections/remove_projects/';
 
