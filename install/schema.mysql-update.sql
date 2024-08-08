@@ -12,6 +12,6 @@ ALTER TABLE `editor_collections` ADD UNIQUE index `idx_title_pid` (`title`,`pid`
 
 
 # Add fulltext index to editor_projects
-ALTER TABLE `nada_editor`.`editor_projects` 
+ALTER TABLE `editor_projects` 
 ADD FULLTEXT INDEX `ft_projects` (`title`) ;
 
