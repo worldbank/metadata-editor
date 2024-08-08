@@ -1552,8 +1552,10 @@ CREATE TABLE `editor_projects` (
   `thumbnail` varchar(300) DEFAULT NULL,
   `metadata` mediumtext CHARACTER SET utf8,
   `template_uid` varchar(100),
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  FULLTEXT KEY `ft_projects` (`title`)
 ) AUTO_INCREMENT=1;
+
 
 CREATE TABLE `editor_resources` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -1795,5 +1797,4 @@ CREATE TABLE `editor_collections_tree` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_closure` (`parent_id`,`child_id`,`depth`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1;
-
 
