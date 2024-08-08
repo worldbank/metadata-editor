@@ -347,7 +347,7 @@ class Collection_model extends CI_Model {
      */
     function get_collection_by_project($sid)
     {
-        $this->db->select('editor_collections.id,editor_collections.title');
+        $this->db->select('editor_collections.id,editor_collections.title, editor_collections.pid');
         $this->db->join('editor_collections','editor_collections.id=editor_collection_projects.collection_id');
         $this->db->where('sid',$sid);
         $result=$this->db->get('editor_collection_projects')->result_array();

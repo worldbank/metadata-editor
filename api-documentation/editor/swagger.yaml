@@ -562,6 +562,30 @@ paths:
           - ApiKeyAuth: []
 
 
+  /editor/collections/{id}:
+    get:
+      tags:
+        - Projects
+        - Collections
+      summary: Get collections by project
+      description: Get a list of collections by project ID
+      operationId: getCollectionsByProject
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          title: Project unique ID
+          description: Project unique ID number
+          type: string
+          required: true
+      responses:
+        '200':
+          description: successful operation
+
+
   /collections:
       get:
         tags:

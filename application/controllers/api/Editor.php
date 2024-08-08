@@ -1259,4 +1259,32 @@ class Editor extends MY_REST_Controller
 		}		
 	}
 
+
+	/**
+	 * 
+	 * 
+	 * Return collections for a project
+	 * 
+	 */
+	function collections_get($sid=null)
+	{
+		try{
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
+			$collections=$this->Collection_model->get_collection_by_project($sid);
+			
+			$response=array(
+				'collections'=>$collections
+			);
+
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}		
+	}
+
 }
