@@ -220,13 +220,15 @@ class Project_search
 
 		//keywords
 		if (isset($search_options['keywords']) && !empty($search_options['keywords'])) {
+			$keywords_query=$this->build_keywords_fulltext_query($search_options['keywords']);
 			$escaped_keywords=$this->ci->db->escape('%'.$search_options['keywords'].'%');
-			$where = sprintf('(title like %s OR idno like %s OR study_idno like %s)',
+			$where = sprintf('(title like %s OR idno like %s OR study_idno like %s) OR %s',
                         $escaped_keywords,
                         $escaped_keywords,
-						$escaped_keywords
+						$escaped_keywords,
+						$keywords_query
                     );
-            $this->ci->db->where($where,NULL,FALSE);
+            $this->ci->db->where($where,NULL,FALSE);			
 			$applied_filters['keywords']=$search_options['keywords'];
 		}
 
@@ -252,6 +254,32 @@ class Project_search
 		*/
 		
 		return $applied_filters;		
+	}
+
+
+	function build_keywords_like_query($keywords)
+	{
+		//split keywords
+		$keywords_list=explode(" ",$keywords);
+		
+		$keyword_query=array();
+		foreach($keywords_list as $idx=>$keyword){
+			$keyword_query[]='title like ' .$this->ci->db->escape('%'.$keyword.'%');
+		}
+
+		$keyword_query=implode(" OR ",$keyword_query);		
+		return '('.$keyword_query.')';
+	}
+
+	function build_keywords_fulltext_query($keywords)
+	{
+		$keywords_list=explode(" ",$keywords);
+		$keyword_query=array();
+		foreach($keywords_list as $idx=>$keyword){
+			$keyword_query[]='+'.$keyword.'*';
+		}
+
+		return 'MATCH(title) AGAINST('.$this->ci->db->escape( implode(" ", $keyword_query) ).' IN BOOLEAN MODE)';
 	}
 
 	function parse_filter_values_as_int($values)
