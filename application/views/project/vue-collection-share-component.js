@@ -73,16 +73,24 @@ Vue.component('vue-collection-share', {
                     <v-divider></v-divider>
 
                     <v-card-actions>
-                    <v-btn
-                        :disabled="selected.length==0"
-                        block
-                        class="ma-2 mr-3"
-                        outlined
-                        color="indigo"
-                        small                         
-                        @click="shareWithCollection"
-                    >Share
-                    </v-btn>
+                    
+                        <v-btn
+                            :disabled="selected.length==0"                            
+                            class="mr-3"                            
+                            color="indigo"
+                            small                         
+                            @click="shareWithCollection"
+                        >Share
+                        </v-btn>
+                        <v-btn                            
+                            class=""
+                            color="grey"
+                            small
+                            @click="dialog=false"
+                        >Close
+                        </v-btn>
+
+                    
                     </v-card-actions>
                     
                 </v-card>

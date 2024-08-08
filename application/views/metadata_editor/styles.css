@@ -1140,5 +1140,5 @@ html {
 }
 
 .v-dialog__content{
-    z-index: 2000!important;
+    z-index: 5000!important;
 }
