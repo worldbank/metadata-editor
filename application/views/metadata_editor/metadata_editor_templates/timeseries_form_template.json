@@ -1764,6 +1764,14 @@
                             "type": "array",
                             "props": [
                                 {
+                                    "key": "id",
+                                    "title": "Identifier (ID)",
+                                    "type": "string",
+                                    "prop_key": "series_description.related_indicators.id",
+                                    "help_text": "The unique identifier of the related indicator.",
+                                    "display_type": "text"
+                                },
+                                {
                                     "key": "code",
                                     "title": "Code",
                                     "type": "string",
