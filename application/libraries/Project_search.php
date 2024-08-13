@@ -93,7 +93,10 @@ class Project_search
 	function get_total_count($search_options=array())
 	{
 		$this->apply_search_filters(($search_options));
-		return $this->ci->db->count_all_results('editor_projects');
+		$this->ci->db->join("users", "users.id=editor_projects.changed_by");
+		$result=$this->ci->db->count_all_results('editor_projects');
+
+		return $result;
 	}
 
 
