@@ -327,10 +327,7 @@
 								"description": "Note",
 								"type": "string"
 							}
-						},
-						"required": [
-							"uri"
-						]
+						}
 					}
 				},
 				"statistical_concept": {
@@ -358,10 +355,7 @@
 								"description": "Note",
 								"type": "string"
 							}
-						},
-						"required": [
-							"uri"
-						]
+						}
 					}
 				},
 				"concepts": {
@@ -450,10 +444,7 @@
 								"description": "Note",
 								"type": "string"
 							}
-						},
-						"required": [
-							"uri"
-						]
+						}
 					}
 				},
 				"derivation": {
@@ -481,10 +472,7 @@
 								"description": "Note",
 								"type": "string"
 							}
-						},
-						"required": [
-							"uri"
-						]
+						}
 					}
 				},
 				"imputation": {
@@ -512,10 +500,7 @@
 								"description": "Note",
 								"type": "string"
 							}
-						},
-						"required": [
-							"uri"
-						]
+						}
 					}
 				},
 				"seasonal_adjustment": {
@@ -804,10 +789,7 @@
 								"description": "Note",
 								"type": "string"
 							}
-						},
-						"required": [
-							"uri"
-						]
+						}
 					}
 				},
 				"disaggregation": {
