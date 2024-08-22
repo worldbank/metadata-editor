@@ -228,6 +228,7 @@
 
         let project_idno='<?php echo isset($idno) ? $idno : '';?>';
         let project_type='<?php echo isset($type) ? $type : '';?>';
+        let user_has_edit_access=<?php echo $user_has_edit_access ? 'true' : 'false';?>;
 
         //Define route components
         const main = {props:['element_id'],template: '<div><form-main/></div>' }
@@ -303,6 +304,7 @@
 
         var store = new Vuex.Store({
             state: {
+                user_has_edit_access:user_has_edit_access,
                 active_section: "not set",
                 project_type:project_type,
                 idno:project_idno,
@@ -371,6 +373,9 @@
                 }
             },
             getters: {
+                getUserHasEditAccess(state){
+                    return state.user_has_edit_access;
+                },
                 getIDNO(state){
                     return state.idno;
                 },
@@ -556,7 +561,7 @@
                         console.log("error loading datafiles", error);
                     });                    
                 },
-                async loadAllVariables({commit,state},options) {
+                async loadAllVariables({commit,state},options) {                    
                     i=0;
                     for (let file of state.data_files) {
                         store.dispatch('loadVariables',{dataset_id:options.dataset_id, fid:file.file_id});

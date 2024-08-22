@@ -65,8 +65,9 @@
     */?>
 
     <ul class="navbar-nav ml-5 ml-auto">
+        <template v-if="UserHasEditAccess">
         <template v-if="is_dirty">            
-            <v-btn        
+            <v-btn                
                 color="primary"
                 dark
                 @click="saveProject"
@@ -106,6 +107,18 @@
             {{$t('Save')}}
         </v-btn>
         </template>
+        </template>
+        <template v-else>
+            <v-btn
+                color="red"
+                dark
+                   
+                outlined             
+                >
+                <v-icon left>mdi-content-save-off</v-icon>
+                {{$t('READ ONLY')}}
+            </v-btn>
+        </template>
 
         <!--
         <v-btn color="primary"  large icon  style="margin-left:23px;">
@@ -114,7 +127,7 @@
         -->
 
     <template>
-    <div class="text-center">        
+    <div class="text-center" v-if="UserHasEditAccess">
         <v-menu min-width="600px">
         <template v-slot:activator="{ on, attrs }">
             

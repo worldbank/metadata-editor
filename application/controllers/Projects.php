@@ -41,7 +41,7 @@ class Projects extends MY_Controller {
 				show_error('Project was not found');
 			}
 
-			$this->editor_acl->user_has_project_access($project['id'],$permission='edit');					
+			$this->editor_acl->user_has_project_access($project['id'],$permission='view');
 			$schema_path="application/schemas/{$project['type']}-schema.json";
 
 			if(!file_exists($schema_path)){
@@ -51,18 +51,8 @@ class Projects extends MY_Controller {
 			$options['sid']=$id;
 			$options['idno']=$project['idno'];
 			$options['title']=$project['title'];
-			$options['type']=$project['type'];		
-			//$options['metadata']=$project['metadata'];
+			$options['type']=$project['type'];			
 			$options['translations']=$this->lang->language;
-
-			//fix schema elements with mixed types
-			/*if ($project['type']=='survey'){
-				//coll_mode
-				$coll_mode=array_data_get($options['metadata'], 'study_desc.method.data_collection.coll_mode');
-				if(!empty($coll_mode) && !is_array($coll_mode)){
-					set_array_nested_value($options['metadata'],'study_desc.method.data_collection.coll_mode',(array)$coll_mode,'.');
-				}
-			}*/
 
 			$template=$this->get_project_template($project);
 
@@ -74,6 +64,7 @@ class Projects extends MY_Controller {
 			$options['metadata_template_arr']=$template['template'];
 			$options['metadata_schema']=file_get_contents($schema_path);
 			$options['post_url']=site_url('api/editor/update/'.$project['type'].'/'.$project['id']);
+			$options['user_has_edit_access']=$this->user_has_edit_access($project['id']);
 
 			$content= $this->load->view('metadata_editor/index_vuetify',$options,true);
 			echo $content;
@@ -170,37 +161,27 @@ class Projects extends MY_Controller {
 
 	function template_edit($uid)
 	{
-		redirect('templates/'.$uid);
-		/*
+		redirect('templates/'.$uid);		
+	}
 
-		$this->template->set_template('blank');		
-		$user_template=$this->Editor_template_model->get_template_by_uid($uid);
 
-		if(!$user_template){
-			show_error("Template not found");
+	/**
+	 * 
+	 * Check if user has edit access to the project
+	 * 
+	 */
+	private function user_has_edit_access($sid)
+	{
+		try{
+			$this->editor_acl->user_has_project_access($sid,$permission='edit');
+			return true;
 		}
-
-		$core_templates=$this->Editor_template_model->get_core_template_by_data_type($user_template['data_type']);
-
-		if (!$core_templates){
-			throw new Exception("No system templates found for type: " . $user_template['data_type']);
+		catch(Exception $e){
+			return false;
 		}
-
-		$core_template=$this->Editor_template_model->get_template_by_uid($core_templates[0]["uid"]);
-
-		$options=array(
-			'user_template_info'=>$user_template,
-			'core_template'=>$core_template,
-			'user_template'=>$user_template,
-			'translations'=>$this->lang->language
-		);
-
-		unset($options['user_template_info']['template']);
-		echo $this->load->view('template_manager/index',$options,true);
-		*/
 	}
 
 	
 }
-/* End of file metadata_editor.php */
-/* Location: ./controllers/admin/metadata_editor.php */
+/* End of file projects.php */
+/* Location: ./controllers/projects.php */

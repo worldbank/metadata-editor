@@ -239,7 +239,7 @@
       mounted: function(){
         let vm=this;
         axios.interceptors.response.use(
-          function(resp) {
+          function(resp) {            
             return resp;
           },
           function(error) {
@@ -253,6 +253,9 @@
       computed:{
         form_template(){
           return this.$store.state.formTemplate;
+        },
+        UserHasEditAccess(){
+          return this.$store.state.user_has_edit_access;
         },
         Title(){          
           let titles={
@@ -521,6 +524,11 @@
             router.push(link);
         },
         onWindowUnload: function(event){
+
+          if (this.UserHasEditAccess==false){
+            return null;
+          }
+
           if (!this.is_dirty){
             return null;
           }

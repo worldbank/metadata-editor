@@ -73,7 +73,7 @@ Vue.component('datafile-import', {
 
             this.update_status="completed";
             this.is_processing=false;
-            this.$store.dispatch('loadDataFiles',{dataset_id:this.ProjectID});
+            await this.$store.dispatch('loadDataFiles',{dataset_id:this.ProjectID});
             this.$store.dispatch('loadAllVariables',{dataset_id:this.ProjectID});
             this.$store.dispatch('loadVariableGroups',{dataset_id:this.ProjectID}); 
         },
@@ -90,10 +90,7 @@ Vue.component('datafile-import', {
         {
             try{                
                 //upload file
-                console.log("processing file",fileIdx);
                 let resp=await this.uploadFile(fileIdx);
-                console.log("finished uploading file",fileIdx,resp);
-
                 let fileid=resp.result.file_id;
                 
                 if (!fileid){

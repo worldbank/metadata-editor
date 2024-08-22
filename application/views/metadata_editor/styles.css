@@ -1142,3 +1142,8 @@ html {
 .v-dialog__content{
     z-index: 5500!important;
 }
+
+.v-card .primary {
+    background-color: #526bc7 !important;
+    border-color: #526bc7 !important;
+}
