@@ -527,7 +527,7 @@
         },
         "crossref": {
           "type": "string",
-          "title": "Book title",
+          "title": "Cross reference",
           "description": "The database key of the entry being cross referenced"
         },
         "howpublished": {
