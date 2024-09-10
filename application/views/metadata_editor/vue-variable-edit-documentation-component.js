@@ -175,7 +175,7 @@ Vue.component('variable-edit-documentation', {
             if (key.indexOf(".") !== -1 && this.variable[key]){
                 delete this.variable[key];
             }
-            _.set(this.variable,key,value);
+            Vue.set(this.variable,key,value);
         },
         updateSection: function (obj)
         {
