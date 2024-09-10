@@ -1607,13 +1607,47 @@ CREATE TABLE `editor_templates` (
   `version` varchar(45) DEFAULT NULL,
   `organization` varchar(300) DEFAULT NULL,
   `author` varchar(100) DEFAULT NULL,
-  `description` varchar(1000) DEFAULT NULL,
+  `description` text,
   `template` mediumtext,
   `created` int DEFAULT NULL,
   `changed` int DEFAULT NULL,
+  `instructions` text,
+  `created_by` int DEFAULT NULL,
+  `changed_by` int DEFAULT NULL,
+  `owner_id` int DEFAULT NULL,
+  `is_private` int DEFAULT NULL,
+  `is_published` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uid_UNIQUE` (`uid`)
-) AUTO_INCREMENT=1;
+) ENGINE=InnoDB AUTO_INCREMENT=1;
+
+
+
+CREATE TABLE `editor_templates_archive` (
+  `id` int NOT NULL,
+  `uid` varchar(45) DEFAULT NULL,
+  `data_type` varchar(45) NOT NULL,
+  `lang` varchar(45) DEFAULT NULL,
+  `name` varchar(100) NOT NULL,
+  `version` varchar(45) DEFAULT NULL,
+  `organization` varchar(300) DEFAULT NULL,
+  `author` varchar(100) DEFAULT NULL,
+  `description` text,
+  `template` mediumtext,
+  `created` int DEFAULT NULL,
+  `changed` int DEFAULT NULL,
+  `instructions` text,
+  `created_by` int DEFAULT NULL,
+  `changed_by` int DEFAULT NULL,
+  `owner_id` int DEFAULT NULL,
+  `is_private` int DEFAULT NULL,
+  `is_published` int DEFAULT NULL,
+  `deleted` int DEFAULT NULL,
+  `deleted_by` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uid_UNIQUE` (`uid`)
+) ENGINE=InnoDB;
+
 
 
 
@@ -1623,6 +1657,16 @@ CREATE TABLE `editor_templates_default` (
   `template_uid` varchar(255) NOT NULL,  
   PRIMARY KEY (`id`)
 ) DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE `editor_template_acl` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `template_id` int NOT NULL,
+  `permissions` varchar(100) DEFAULT NULL,
+  `user_id` int NOT NULL,
+  `created` int DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1;
 
 
 create table editor_project_owners (
@@ -1742,14 +1786,16 @@ alter table editor_projects add column study_idno varchar(300) default null;
 
 
 CREATE TABLE `audit_logs` (
-    `id` int NOT NULL AUTO_INCREMENT,
-    `obj_type` varchar(15) NOT NULL,
-    `obj_id` int NOT NULL,
-    `user_id` int DEFAULT NULL,
-    `description` varchar(200) NOT NULL,
-    `created` datetime NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `obj_type` varchar(15) NOT NULL,
+  `obj_id` int NOT NULL,
+  `user_id` int DEFAULT NULL,
+  `action_type` varchar(10) NOT NULL,
+  `created` datetime NOT NULL,
+  `metadata` json DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
 
 
 alter table editor_templates modify column description text;
