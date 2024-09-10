@@ -33,6 +33,21 @@ class Editor extends MY_REST_Controller
 		parent::_auth_override_check();
 	}
 
+
+	/**
+	 * 
+	 * Is user logged in?
+	 * 
+	 * 
+	 */
+	function is_connected_get()
+	{
+		$response=array(
+			'status'=>'success'			
+		);
+		$this->set_response($response, REST_Controller::HTTP_OK);
+	}
+
 	
 	/**
 	 * 
@@ -73,13 +88,9 @@ class Editor extends MY_REST_Controller
 				//get collections
 				$collections=$this->Collection_model->collections_by_projects($project_id_list);
 
-				//get tags
-				//$tags=$this->Editor_model->get_tags($project_id_list);
-
 				//add collections and tags to each study
 				foreach($result['result'] as $key=>$row){
 					$result['result'][$key]['collections']=isset($collections[$row['id']]) ? $collections[$row['id']] : array();
-					//$result['result'][$key]['tags']=$tags[$row['id']];
 				}
 			}
 
@@ -125,8 +136,6 @@ class Editor extends MY_REST_Controller
 				throw new Exception("DATASET_NOT_FOUND");
 			}
 
-			//$result['metadata']=$this->dataset_manager->get_metadata($sid);
-			
 			$response=array(
 				'status'=>'success',
 				'project'=>$result
@@ -282,15 +291,21 @@ class Editor extends MY_REST_Controller
 				throw new Exception("Project with the type [".$type ."] not found");
 			}
 
-			$this->editor_acl->user_has_project_access($id,$permission='edit',$user);
-			$this->audit_log->log_event($obj_type='project',$obj_id=$id,$description='update');			
+			$this->editor_acl->user_has_project_access($id,$permission='edit',$user);			
 			
 			$options['changed_by']=$user_id;
 			$options['changed']=date("U");
+
+			//get project metadata
+			//$project_metadata=$this->Editor_model->get_metadata($id);
 			
 			//validate & update project
 			$this->Editor_model->update_project($type,$id,$options,$validate);
 			$this->Editor_model->create_project_folder($id);
+
+			//generate diff
+			//$diff=$this->Editor_model->get_metadata_diff($project_metadata,$options);
+			//$this->audit_log->log_event($obj_type='project',$obj_id=$id,$action='update', $metadata=$diff);
 
 			//add to collections
 			if (is_array($collections) && count($collections)>0){
@@ -345,8 +360,12 @@ class Editor extends MY_REST_Controller
 				throw new Exception("Project with the type [".$type ."] not found");
 			}
 
+			if (!isset($options['patches'])){
+				throw new Exception("`Patches` parameter is required");
+			}
+
 			$this->editor_acl->user_has_project_access($id,$permission='edit',$user);
-			$this->audit_log->log_event($obj_type='project',$obj_id=$id,$description='patch');
+			$this->audit_log->log_event($obj_type='project',$obj_id=$id,$action='patch', $metadata=$options['patches']);
 			
 			$options['changed_by']=$user_id;
 			$options['changed']=date("U");
@@ -646,35 +665,11 @@ class Editor extends MY_REST_Controller
 	}
 
 
-	/*function convert_ddi_post($sid=null)
-	{		
-		try{
-			$sid=$this->get_sid($sid);
-			$exists=$this->Editor_model->check_id_exists($sid);
-
-			if(!$exists){
-				throw new Exception("Project not found");
-			}
-
-			$this->editor_acl->user_has_project_access($sid,$permission='edit');
-			$result=$this->Editor_model->importDDI($sid,$parseOnly=true);
-
-			$output=array(
-				'status'=>'success',
-				'ddi'=>$result
-			);
-
-			$this->set_response($output, REST_Controller::HTTP_OK);			
-		}
-		catch(Exception $e){
-			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
-		}
-	}*/
-
-
 	/**
 	 * 
 	 * Download project metadata as JSON
+	 * 
+	 * @exclude_private_fields - exclude private fields - 0 = include, 1 = exclude
 	 * 
 	 */
 	function json_get($sid=null,$exclude_private_fields=0)
@@ -685,6 +680,10 @@ class Editor extends MY_REST_Controller
 
 			if(!$exists){
 				throw new Exception("Project not found");
+			}
+
+			if ((int)$this->input->get("exclude_private_fields")===1){
+				$exclude_private_fields=1;
 			}
 
 			$this->editor_acl->user_has_project_access($sid,$permission='view',$this->api_user);			
@@ -1269,7 +1268,7 @@ class Editor extends MY_REST_Controller
 	function collections_get($sid=null)
 	{
 		try{
-			$this->editor_acl->user_has_project_access($sid,$permission='view');
+			$this->editor_acl->user_has_project_access($sid,$permission='view', $this->api_user);
 			$collections=$this->Collection_model->get_collection_by_project($sid);
 			
 			$response=array(

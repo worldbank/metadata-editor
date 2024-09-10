@@ -6,8 +6,9 @@ class Audit_log_model extends CI_Model {
 		"obj_type",
 		"obj_id",
 		"user_id",
-		"description",
-		"created"
+		"action_type", //create, update, delete, patch
+		"created",
+		"metadata"
 	);
  
     public function __construct()

@@ -1010,16 +1010,16 @@ class Ion_auth_model extends CI_Model
 		
 		//user role membership
 
-		//remove any existing user roles
-		$this->db->query(sprintf('delete from %s where user_id=%d',
-							'user_roles', 
-							(int)$id ));
-
         //update user roles info
 		if (is_array($roles) && count($roles)>0)
 		{
-			foreach($roles as $role_id)
-			{
+
+			//remove any existing user roles
+			$this->db->query(sprintf('delete from %s where user_id=%d',
+				'user_roles', 
+				(int)$id ));
+
+			foreach($roles as $role_id){
 				$options=array(
 						'role_id'	=> $role_id,
 						'user_id'	=> $id 
@@ -1589,5 +1589,18 @@ class Ion_auth_model extends CI_Model
 		$this->db->update('users',$options);
 
 		return $code;
+	}
+
+
+	function is_user_id_valid($user_id)
+	{
+		$this->db->where('id',$user_id);
+		$result=$this->db->get('users')->row_array();
+
+		if(!$result){
+			return false;
+		}
+
+		return true;
 	}
 }

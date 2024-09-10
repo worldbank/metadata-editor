@@ -48,9 +48,6 @@ class Project_json_writer
 		//load project template
 		$template=$this->ci->Editor_template_model->get_project_template($sid);
 		
-		//$project=$this->ci->Editor_model->get_row($sid);
-		//$metadata=(array)$project['metadata'];
-
 		$output=array();
 		$this->walk_template($template['template']['items'], $output);
 
@@ -72,9 +69,7 @@ class Project_json_writer
 		foreach($items as $key=>$item){
 			$is_private=isset($item['is_private']) ? $item['is_private'] : false;
 
-
 			if ($is_private){
-				//echo "Key: ".$item['key']. " - " . $is_private  . "\n";
 				$output[]=$item['key'];
 			}
 

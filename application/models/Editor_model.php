@@ -9,6 +9,7 @@ use Ramsey\Uuid\Uuid;
 use Swaggest\JsonDiff\JsonDiff;
 use Swaggest\JsonDiff\JsonPatch;
 use Swaggest\JsonDiff\JsonPointer;
+use Swaggest\JsonDiff\JsonMergePatch;
 
 
 /**
@@ -82,7 +83,8 @@ class Editor_model extends CI_Model {
     {
 		parent::__construct();
 		$this->load->helper("Array");
-		$this->load->library("form_validation");		
+		$this->load->library("form_validation");
+		$this->load->library("Audit_log");
 		$this->load->model("Editor_variable_model");
 		$this->load->model("Editor_datafile_model");		
 		$this->load->model("Collection_model");
@@ -271,6 +273,7 @@ class Editor_model extends CI_Model {
 			);
 		}
 
+
 		if (isset($survey['metadata'])){
 			if (isset($survey['idno'])){			
 				$survey['metadata']['idno']=$survey['idno'];
@@ -278,6 +281,21 @@ class Editor_model extends CI_Model {
 		}
 
         return $survey;
+	}
+
+
+	/**
+	 * 
+	 * Return metadata for a project by SID
+	 * 
+	 */
+	function get_metadata($sid)
+	{
+		$project=$this->get_row($sid);
+
+		if (isset($project['metadata'])){
+			return $project['metadata'];
+		}
 	}
 
 	//get project basic info
@@ -347,6 +365,10 @@ class Editor_model extends CI_Model {
 			$this->validate_schema($type,$options);
 		}
 
+		//generate/log diff
+		$diff=$this->get_metadata_diff($this->get_metadata($id),$options);
+		$this->audit_log->log_event($obj_type='project',$obj_id=$id,$action='update', $metadata=$diff);
+
 		//partial update metadata
 		if (isset($options['partial_update'])){
 			if ($options['partial_update']==true){
@@ -381,7 +403,6 @@ class Editor_model extends CI_Model {
 	{
 		$options=$this->get_row($id);
 		$options['metadata']=array_replace_recursive($options['metadata'],$partial_options);
-
 		return $options['metadata'];
 	}
 
@@ -1465,6 +1486,28 @@ class Editor_model extends CI_Model {
 		return $result;
 	}
 
+
+	/**
+	 * 
+	 * Return patch for metadata diff
+	 * 
+	 */
+	function get_metadata_diff($metadata_original, $metadata_updated, $ignore_errors=false)
+	{
+		try{
+			$diff = new JsonDiff($metadata_original, $metadata_updated, JsonDiff::TOLERATE_ASSOCIATIVE_ARRAYS);
+
+			$patch=$diff->getPatch();
+			return json_encode($patch);
+		} catch (Exception $e) {
+			if ($ignore_errors==true){
+				return false;
+			}
+			throw new Exception("Metadata diff failed: ".$e->getMessage());
+		}
+		
+	}
+	
 
 	
 }//end-class

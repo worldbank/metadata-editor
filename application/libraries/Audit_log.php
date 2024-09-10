@@ -21,14 +21,24 @@ class Audit_log
 	 * 
 	 * 
 	 */
-	function log_event($obj_type,$obj_id,$description)
+	function log_event($obj_type,$obj_id,$action, $metadata=NULL)
 	{
+		//validate metadata is json
+		if($metadata != NULL){
+			$metadata_=json_decode($metadata);
+			if($metadata_ == NULL){
+				return false;
+			}
+		}
+
 		$data=array(
 			"obj_type"=>$obj_type,
 			"obj_id"=>$obj_id,
 			"user_id"=>$this->ci->session->userdata('user_id'),
-			"description"=>$description
+			"action_type"=>$action,
+			"metadata"=>$metadata
 		);
+
 		$this->ci->Audit_log_model->insert($data);
 	}
 

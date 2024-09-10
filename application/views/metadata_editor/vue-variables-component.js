@@ -39,6 +39,7 @@ Vue.component('variables', {
                 },
                 "var_wgt_id":"",
                 "var_wgt":false,
+                "update_required":false,
                 "var_type": "",
                 "var_concept": [],
                 "var_txt": "",
@@ -57,7 +58,7 @@ Vue.component('variables', {
                 },
                 "time_stamp":0
               },
-              variableMultiple:{},
+            variableMultiple:{},
             variableMultipleUpdateFields: //fields to be updated for multiple selection
             [
                 "var_txt",
@@ -72,12 +73,15 @@ Vue.component('variables', {
                 "var_resp_unit",
                 "sum_stats_options",
                 "var_wgt_id",
-                "var_wgt"
+                "var_wgt",
+                "update_required"
             ],
             showSpreadMetadataDialog: false,
             summaryStatsDialog:{
                 show:false                
-            }
+            },
+            has_clicked_edit:true //to ignore watch from triggering on editVariable click
+            
         }
     }, 
     created: async function(){
@@ -85,8 +89,9 @@ Vue.component('variables', {
         //this.editVariable(0);
     },
     mounted: function () {
-        //this.loadData();     
-        this.editVariable(0);
+        setTimeout(() => {
+            this.editVariable(0);
+        }, 2000);
         //this.initializeMultiVariable();
     },
     watch: {
@@ -94,6 +99,12 @@ Vue.component('variables', {
             deep: true,
             handler(val,oldVal){
                 if (this.page_action!="edit"){
+                    return;
+                }
+
+                if (this.has_clicked_edit){
+                    //console.log("user has clicked on a row",this.has_clicked_edit);
+                    this.has_clicked_edit=false;
                     return;
                 }
 
@@ -117,8 +128,8 @@ Vue.component('variables', {
               }
               else{                
                 if (!val){return;}
-                //console.log("CHANGE DETECTED saving variable",val,oldVal);
-                this.saveVariableDebounce(val);
+                //console.log("CHANGE DETECTED saving variable",JSON.stringify(val),JSON.stringify(oldVal));
+                this.saveVariableDebounce(val);                
               }
             }
           }
@@ -245,6 +256,7 @@ Vue.component('variables', {
             this.exitEditMode();
             this.$nextTick().then(() => {
                 this.page_action="edit";
+                this.has_clicked_edit=true;
                 this.edit_items=[index];
                 this.variable_copy=_.cloneDeep(this.variables[index]);
             });
@@ -349,9 +361,11 @@ Vue.component('variables', {
             )
             .then(function (response) {
                 //console.log("saveVariable", response);
+                EventBus.$emit('onSuccess', 'Variable saved!');
             })
             .catch(function (error) {
                 console.log(error);
+                EventBus.$emit('onFail', 'Failed to save variable');
             })
             .then(function () {
                 //console.log("request completed");
@@ -863,7 +877,7 @@ Vue.component('variables', {
                                         @click.exact="editVariable(index)"                                         
                                         
                                         :class="variableActiveClass(index,variable.name)"                                         
-                                        :id="'v-'+index"
+                                        :id="'v-'+index"                                        
                                     >
                                         <td class="var-vid-td bg-secondary handle">V{{index+1}}</td>                                        
 
@@ -912,7 +926,7 @@ Vue.component('variables', {
                                 <div class="col">
                                     <div class="pt-1" v-if="activeVariable">{{activeVariable.name}} - <span v-if="activeVariable.labl">{{activeVariable.labl.substring(0,50)}}</span> </div>
                                 </div>
-                                <div class="col-2 pr-3">
+                                <div class="col-3 pr-3">
                                     <div class="float-right">
                                         <span @click="varNavigate('first')"><v-icon aria-hidden="false" class="var-icon">mdi-chevron-double-left</v-icon></span>
                                         <span @click="varNavigate('prev')"><v-icon aria-hidden="false" class="var-icon">mdi-chevron-left</v-icon></span>
