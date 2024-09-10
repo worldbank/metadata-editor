@@ -31,14 +31,13 @@ Vue.component('v-toast', {
             <template>
                 <div class="text-center ma-2">
                     
-                    <v-snackbar
+                    <v-snackbar right timeout="3000" 
                     v-model="snackbar"
                     >
                     {{ text }}
 
                     <template v-slot:action="{ attrs }">
-                        <v-btn
-                        color="pink"
+                        <v-btn                        
                         text
                         v-bind="attrs"
                         @click="snackbar = false"
