@@ -619,6 +619,11 @@
             "first_name"
           ]
         },
+        "acknowledgement_statement": {
+					"title": "Acknowledgement statement",
+					"description": "Acknowledgement statement",
+					"type": "string"
+				},
         "contacts": {
           "type": "array",
           "title": "Contacts",

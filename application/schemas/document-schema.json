@@ -4,55 +4,39 @@
   "title": "Script Schema [DRAFT]",
   "description": "Schema for Document data type",
   "type": "object",
-  "definitions":{
-    "keyword":{
-      "type":"array",
-      "items":{
-        "type":"object",
-        "properties":{
-          "name":{
-            "title":"Name",
-            "type":"string"
+  "definitions": {
+    "keyword": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
           },
-          "vocabulary":{
-            "title":"Vocabulary name",
-            "type":"string"
+          "vocabulary": {
+            "title": "Vocabulary name",
+            "type": "string"
           },
-          "uri":{
-            "title":"Vocabulary URI",
-            "type":"string"
+          "uri": {
+            "title": "Vocabulary URI",
+            "type": "string"
           }
         }
       }
     }
   },
-  "properties": {    
-
-    "repositoryid": {
+  "properties": {
+    "idno": {
       "type": "string",
-      "title": "Collection ID that owns the document",
-      "description": "Abbreviation for the collection that owns the document"
+      "title": "Project unique identifier",
+      "description": "Project unique identifier"
     },
-
-    "published": {
-      "type": "integer",
-      "title": "Status",
-      "description": "Status  - 0=draft, 1=published",
-      "default": 0
-    },
-    
-    "overwrite": {
-      "type": "string",
-      "description": "Overwrite document if already exists?",            
-      "enum":["yes","no"],
-      "default": "no"
-    },
-
-    "metadata_information": {      
+    "metadata_information": {
       "type": "object",
       "title": "Document metadata information",
       "description": "Document description",
-      "properties": {        
+      "properties": {
         "title": {
           "title": "Document title",
           "description": "Document title",
@@ -109,8 +93,7 @@
       "type": "object",
       "title": "Document Description",
       "description": "Document Description",
-      "properties": {  
-
+      "properties": {
         "title_statement": {
           "type": "object",
           "description": "Study title",
@@ -122,7 +105,7 @@
             },
             "title": {
               "type": "string",
-              "title": "Title"              
+              "title": "Title"
             },
             "sub_title": {
               "type": "string",
@@ -133,8 +116,8 @@
               "title": "Abbreviation or Acronym"
             },
             "translated_title": {
-              "title": "Translated Title",              
-              "type": "string"              
+              "title": "Translated Title",
+              "type": "string"
             }
           },
           "required": [
@@ -142,7 +125,6 @@
             "title"
           ]
         },
-
         "authors": {
           "type": "array",
           "title": "Authors",
@@ -161,7 +143,7 @@
               "last_name": {
                 "title": "Last name",
                 "type": "string"
-              },              
+              },
               "affiliation": {
                 "title": "Affiliation",
                 "type": "string"
@@ -195,7 +177,6 @@
             "first_name"
           ]
         },
-
         "editors": {
           "type": "array",
           "title": "Editors",
@@ -214,7 +195,7 @@
               "last_name": {
                 "title": "Last name",
                 "type": "string"
-              },              
+              },
               "affiliation": {
                 "title": "Affiliation",
                 "type": "string"
@@ -225,28 +206,26 @@
             "first_name"
           ]
         },
-
         "date_created": {
           "type": "string",
-          "title":"Date created",
+          "title": "Date created",
           "description": "Date of creation"
         },
         "date_available": {
           "type": "string",
-          "title":"Date available",
-          "description": "Date (often a range) that the resource will become or did become available."    
+          "title": "Date available",
+          "description": "Date (often a range) that the resource will become or did become available."
         },
         "date_modified": {
           "type": "string",
-          "title":"Date last modified",
-          "description": "Date on which the resource was changed."    
+          "title": "Date last modified",
+          "description": "Date on which the resource was changed."
         },
         "date_published": {
           "type": "string",
-          "title":"Date published",
-          "description": "Date on which document was published."    
+          "title": "Date published",
+          "description": "Date on which document was published."
         },
-
         "identifiers": {
           "type": "array",
           "title": "Other identifiers",
@@ -268,20 +247,17 @@
               "identifier"
             ]
           }
-        }, 
-
+        },
         "type": {
           "type": "string",
-          "title":"Resource type",
+          "title": "Resource type",
           "description": "Valid values include - `article`, `book`, `booklet`, `collection`, `conference`, `inbook`, `incollection`, `inproceeding`,`manual`, `masterthesis`, `patent`, `phdthesis`, `proceedings`, `techreport`, `working-paper`, `website`, `other` "
         },
-
         "status": {
           "title": "Status",
           "type": "string",
           "description": "Status of the document - e.g. `Draft`, `Draft released for comment`, `Final draft released for comment`, `Final` "
         },
-
         "description": {
           "title": "Description",
           "type": "string",
@@ -305,16 +281,17 @@
               },
               "parent_id": {
                 "title": "Parent Identifier",
-                "description":"For sub levels, provide the ID of the parent TOC ID",
+                "description": "For sub levels, provide the ID of the parent TOC ID",
                 "type": "string"
               },
               "name": {
                 "title": "Title",
                 "type": "string"
-              }              
+              }
             },
             "required": [
-              "id","name"
+              "id",
+              "name"
             ]
           }
         },
@@ -325,7 +302,7 @@
         },
         "notes": {
           "type": "array",
-          "title": "Notes",          
+          "title": "Notes",
           "items": {
             "type": "object",
             "properties": {
@@ -336,16 +313,14 @@
             }
           }
         },
-
         "scope": {
           "title": "Scope",
           "type": "string",
           "description": "The extent or scope of the content of the resource. This fields maps to Dublin Core's coverage field."
         },
-
         "ref_country": {
           "type": "array",
-          "title": "Reference country",          
+          "title": "Reference country",
           "items": {
             "type": "object",
             "properties": {
@@ -360,7 +335,6 @@
             }
           }
         },
-
         "geographic_units": {
           "title": "Geographic locations",
           "description": "List of geographic locations (regions, countries, states, provinces, etc.) describing the geographic coverahe of the research project.",
@@ -389,33 +363,31 @@
             ]
           }
         },
-
-        "bbox":{
-          "title":"Geographic bounding box",
-          "type":"array",
-          "items":{
-            "type":"object",
-            "properties":{
-              "west":{
-                "title":"West",
-                "type":"string"
+        "bbox": {
+          "title": "Geographic bounding box",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "west": {
+                "title": "West",
+                "type": "string"
               },
-              "east":{
-                "title":"East",
-                "type":"string"
+              "east": {
+                "title": "East",
+                "type": "string"
               },
-              "south":{
-                "title":"South",
-                "type":"string"
+              "south": {
+                "title": "South",
+                "type": "string"
               },
-              "north":{
-                "title":"North",
-                "type":"string"
+              "north": {
+                "title": "North",
+                "type": "string"
               }
             }
           }
         },
-
         "spatial_coverage": {
           "title": "Spatial coverage",
           "type": "string",
@@ -425,18 +397,16 @@
           "title": "Temporal coverage",
           "type": "string",
           "description": "The temporal extent or scope of the content of the resource."
-        },            
-
+        },
         "publication_frequency": {
           "type": "string",
-          "title":"Publication frequency",
-          "description": "Current stated publication frequency of either an item or an update to an item. Dates are included when the beginning date of the current frequency is not the same as the beginning date of publication."    
+          "title": "Publication frequency",
+          "description": "Current stated publication frequency of either an item or an update to an item. Dates are included when the beginning date of the current frequency is not the same as the beginning date of publication."
         },
-
         "languages": {
           "type": "array",
           "title": "Language",
-          "description": "Documentation language e.g. English, French, etc.",  
+          "description": "Documentation language e.g. English, French, etc.",
           "items": {
             "type": "object",
             "properties": {
@@ -446,7 +416,7 @@
               },
               "code": {
                 "title": "Code",
-                "type": "string"              
+                "type": "string"
               }
             },
             "required": [
@@ -454,10 +424,9 @@
             ]
           }
         },
-
         "license": {
           "type": "array",
-          "title": "License",          
+          "title": "License",
           "items": {
             "type": "object",
             "properties": {
@@ -470,13 +439,14 @@
                 "type": "string"
               }
             },
-            "required":["name"]
+            "required": [
+              "name"
+            ]
           }
         },
-
         "bibliographic_citation": {
           "type": "array",
-          "title":"Bibliographic citation",
+          "title": "Bibliographic citation",
           "description": "A bibliographic reference for the resource.",
           "items": {
             "type": "object",
@@ -490,110 +460,99 @@
                 "type": "string"
               }
             },
-            "required":["citation"]
+            "required": [
+              "citation"
+            ]
           }
         },
-
         "chapter": {
           "type": "string",
           "title": "Chapter number",
-          "description":"A chapter or section number"              
+          "description": "A chapter or section number"
         },
         "edition": {
           "type": "string",
           "title": "Edition",
-          "description":"The edition of a book"              
+          "description": "The edition of a book"
         },
-
         "institution": {
           "type": "string",
           "title": "Institution",
-          "description":"The sponsoring institution of a document."              
+          "description": "The sponsoring institution of a document."
         },
-
         "journal": {
           "type": "string",
           "title": "Journal name",
-          "description":"Name of the Journal"              
+          "description": "Name of the Journal"
         },
-
         "volume": {
           "type": "string",
           "title": "Volume number",
-          "description":"Volume number"
-        },        
-
+          "description": "Volume number"
+        },
         "number": {
           "type": "string",
           "title": "Number",
-          "description":"The number of a journal, magazine, technical report, or of a work in a series. An issue of a journal or magazine is usually identified by its volume and number; the organization that issues a technical report usually gives it a number; and sometimes books are given numbers in a named series."
+          "description": "The number of a journal, magazine, technical report, or of a work in a series. An issue of a journal or magazine is usually identified by its volume and number; the organization that issues a technical report usually gives it a number; and sometimes books are given numbers in a named series."
         },
-
         "pages": {
           "type": "string",
           "title": "Page numbers",
-          "description":"One or more page numbers or ranges of number, such as 37--42, or 7,53,82--94"              
+          "description": "One or more page numbers or ranges of number, such as 37--42, or 7,53,82--94"
         },
         "series": {
           "type": "string",
           "title": "Series name",
-          "description":"The name given to a series or set of books. When citing an entire book, the title field gives its title and the optional series field gives the name of a series in which the book was published."              
+          "description": "The name given to a series or set of books. When citing an entire book, the title field gives its title and the optional series field gives the name of a series in which the book was published."
         },
-
         "publisher": {
           "type": "string",
           "title": "Publisher",
-          "description":"Entity responsible for making the resource available"              
+          "description": "Entity responsible for making the resource available"
         },
-
         "publisher_address": {
           "type": "string",
-          "title":"Publisher's address",
-          "description": "For major publishing houses, just the city is given. For small publishers, you can help the reader by giving the complete address."    
-        }, 
-
+          "title": "Publisher's address",
+          "description": "For major publishing houses, just the city is given. For small publishers, you can help the reader by giving the complete address."
+        },
         "annote": {
           "type": "string",
           "title": "Annotation",
-          "description":"For annotation, element will not be used by standard bibliography styles like the MLA, APA or Chicago, but may be used by others that produce an annotated bibliography."
+          "description": "For annotation, element will not be used by standard bibliography styles like the MLA, APA or Chicago, but may be used by others that produce an annotated bibliography."
         },
-
         "booktitle": {
           "type": "string",
           "title": "Book title",
-          "description":"Title of a book, part of which is being cited"
+          "description": "Title of a book, part of which is being cited"
         },
-
         "crossref": {
           "type": "string",
           "title": "Cross reference",
-          "description":"The database key of the entry being cross referenced"
+          "description": "The database key of the entry being cross referenced"
         },
-
         "howpublished": {
           "type": "string",
           "title": "Store the notice for unusual publications",
-          "description":"The element is used to store the notice for unusual publications. The first word should be capitalized. For example, `WebPage`, or `Distributed at the local tourist office`"
+          "description": "The element is used to store the notice for unusual publications. The first word should be capitalized. For example, `WebPage`, or `Distributed at the local tourist office`"
         },
-
         "key": {
           "type": "string",
           "title": "Key",
-          "description":"A key is a field used for alphabetizing, cross referencing, and creating a label when the `author' information is missing"
+          "description": "A key is a field used for alphabetizing, cross referencing, and creating a label when the `author' information is missing"
         },
-
         "organization": {
           "type": "string",
           "title": "Organization",
-          "description":"The organization that sponsors a conference or that publishes a manual"
+          "description": "The organization that sponsors a conference or that publishes a manual"
         },
-
         "url": {
-          "type": ["string", "array"],
+          "type": [
+            "string",
+            "array"
+          ],
           "title": "URL",
-          "description":"URL of the document, preferably a permanent URL"
+          "description": "URL of the document, preferably a permanent URL"
         },
-        
         "translators": {
           "type": "array",
           "title": "Translators",
@@ -612,7 +571,7 @@
               "last_name": {
                 "title": "Last name",
                 "type": "string"
-              },              
+              },
               "affiliation": {
                 "title": "Affiliation",
                 "type": "string"
@@ -641,9 +600,13 @@
               "last_name": {
                 "title": "Last name",
                 "type": "string"
-              },              
+              },
               "affiliation": {
                 "title": "Affiliation",
+                "type": "string"
+              },
+              "role": {
+                "title": "Role",
                 "type": "string"
               },
               "contribution": {
@@ -656,111 +619,107 @@
             "first_name"
           ]
         },
-
-        "contacts": {
-					"type": "array",
-					"title": "Contacts",
-					"description": "Contacts",
-					"items": {
-						"type": "object",
-						"properties": {
-							"name": {
-								"title": "Name",
-								"type": "string"
-							},
-							"role": {
-								"title": "Role",
-								"type": "string"
-							},
-							"affiliation": {
-								"title": "Affiliation",
-								"type": "string"
-							},
-							"email": {
-								"title": "Email",
-								"type": "string"
-							},
-							"telephone": {
-								"title": "Telephone",
-								"type": "string"
-							},
-							"uri": {
-								"title": "URI",
-								"type": "string"
-							}
-						}
-					},
-					"required": [
-						"name"
-					]
+        "acknowledgement_statement": {
+					"title": "Acknowledgement statement",
+					"description": "Acknowledgement statement",
+					"type": "string"
 				},
-
+        "contacts": {
+          "type": "array",
+          "title": "Contacts",
+          "description": "Contacts",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "title": "Name",
+                "type": "string"
+              },
+              "role": {
+                "title": "Role",
+                "type": "string"
+              },
+              "affiliation": {
+                "title": "Affiliation",
+                "type": "string"
+              },
+              "email": {
+                "title": "Email",
+                "type": "string"
+              },
+              "telephone": {
+                "title": "Telephone",
+                "type": "string"
+              },
+              "uri": {
+                "title": "URI",
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "name"
+          ]
+        },
         "rights": {
           "type": "string",
           "title": "Rights",
-          "description":"Information about rights held in and over the resource."              
+          "description": "Information about rights held in and over the resource."
         },
-
         "copyright": {
           "type": "string",
           "title": "Copyright",
-          "description":"Statement and identifier indicating the legal ownership and rights regarding use and re-use of all or part of the resource."
+          "description": "Statement and identifier indicating the legal ownership and rights regarding use and re-use of all or part of the resource."
         },
-
         "usage_terms": {
           "type": "string",
           "title": "Terms governing use and reproduction",
-          "description":"Terms Governing Use and Reproduction"
+          "description": "Terms Governing Use and Reproduction"
         },
-
         "disclaimer": {
           "type": "string",
           "title": "Disclaimer",
-          "description":"Disclaimer"
+          "description": "Disclaimer"
         },
-
         "security_classification": {
           "type": "string",
           "title": "Security classification control",
-          "description":"Specifics pertaining to the security classification associated with the document, title, abstract, contents note, and/or the author. In addition, it can contain handling instructions and external dissemination information pertaining to the dissemination of the document, title, abstract, contents note, and author."
+          "description": "Specifics pertaining to the security classification associated with the document, title, abstract, contents note, and/or the author. In addition, it can contain handling instructions and external dissemination information pertaining to the dissemination of the document, title, abstract, contents note, and author."
         },
-
         "access_restrictions": {
           "type": "string",
           "title": "Restrictions on Access",
-          "description":"Information about restrictions imposed on access to the described materials."
+          "description": "Information about restrictions imposed on access to the described materials."
         },
-
         "sources": {
-          "type":"array",
+          "type": "array",
           "title": "Sources",
-          "description": "Description of sources used. The element is nestable so that the sources statement might encompass a series of discrete source statements, each of which could contain the facts about an individual source. ",          
-          "items":{
-          "type": "object",          
-            "properties": {              
-              "source_origin":{
-                "type":"string",
-                "title":"Origin of Source",
-                "description":"For historical materials, information about the origin(s) of the sources and the rules followed in establishing the sources should be specified. May not be relevant to survey data. "
+          "description": "Description of sources used. The element is nestable so that the sources statement might encompass a series of discrete source statements, each of which could contain the facts about an individual source. ",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source_origin": {
+                "type": "string",
+                "title": "Origin of Source",
+                "description": "For historical materials, information about the origin(s) of the sources and the rules followed in establishing the sources should be specified. May not be relevant to survey data. "
               },
-              "source_char":{
-                "type":"string",
-                "title":"Characteristics of Source Noted",
-                "description":"Assessment of characteristics and quality of source material. May not be relevant to survey data."
+              "source_char": {
+                "type": "string",
+                "title": "Characteristics of Source Noted",
+                "description": "Assessment of characteristics and quality of source material. May not be relevant to survey data."
               },
-              "source_doc":{
-                "type":"string",
-                "title":"Source documentation",
-                "description":"Documentation and Access to Sources"
-              }                
+              "source_doc": {
+                "type": "string",
+                "title": "Source documentation",
+                "description": "Documentation and Access to Sources"
+              }
             }
           }
         },
-
-        "data_sources":{
-          "type":"array",
-          "title":"Data Sources",
-          "description":"Used to list the book(s), article(s), serial(s), and/or machine-readable data file(s)--if any--that served as the source(s) of the data collection.",
+        "data_sources": {
+          "type": "array",
+          "title": "Data Sources",
+          "description": "Used to list the book(s), article(s), serial(s), and/or machine-readable data file(s)--if any--that served as the source(s) of the data collection.",
           "items": {
             "type": "object",
             "properties": {
@@ -774,7 +733,7 @@
                 "type": "string"
               },
               "note": {
-                "title": "Note",                
+                "title": "Note",
                 "type": "string"
               }
             },
@@ -783,17 +742,18 @@
             ]
           }
         },
-                
-        "keywords":{
-          "allOf": [ 
-            {"$ref":"#/definitions/keyword"}
+        "keywords": {
+          "allOf": [
+            {
+              "$ref": "#/definitions/keyword"
+            }
           ],
-          "title":"Keywords",
-          "description":"Keywords"
+          "title": "Keywords",
+          "description": "Keywords"
         },
-        "themes":{
-          "type":"array",
-          "description":"Themes",
+        "themes": {
+          "type": "array",
+          "description": "Themes",
           "items": {
             "type": "object",
             "properties": {
@@ -842,7 +802,7 @@
               },
               "parent_id": {
                 "title": "Parent topic Identifier",
-                "description":"For subtopics, provide the ID of the parent topic",
+                "description": "For subtopics, provide the ID of the parent topic",
                 "type": "string"
               },
               "vocabulary": {
@@ -861,7 +821,6 @@
             ]
           }
         },
-
         "disciplines": {
           "type": "array",
           "title": "Disciplines",
@@ -879,7 +838,7 @@
               },
               "parent_id": {
                 "title": "Parent discipline Identifier",
-                "description":"Parent discipline ID",
+                "description": "Parent discipline ID",
                 "type": "string"
               },
               "vocabulary": {
@@ -898,24 +857,21 @@
             ]
           }
         },
-
         "audience": {
           "title": "Audience",
           "type": "string",
-          "description":"A category of user for whom the resource is intended."
-        },        
-
-        "mandate": {
-          "title": "Mandate",
-          "type": "string"          
+          "description": "A category of user for whom the resource is intended."
         },
-
+        "mandate": {
+          "title": "Audience",
+          "type": "string",
+          "description": "A category of user for whom the resource is intended."
+        },
         "pricing": {
           "title": "Pricing",
           "type": "string",
-          "description":"Current price of an item or the special export price of an item in any currency."
+          "description": "Current price of an item or the special export price of an item in any currency."
         },
-                
         "relations": {
           "type": "array",
           "title": "Document relations",
@@ -930,7 +886,7 @@
               "type": {
                 "title": "Type",
                 "type": "string",
-                "enum":[
+                "enum": [
                   "isPartOf",
                   "hasPart",
                   "isVersionOf",
@@ -953,7 +909,7 @@
         "reproducibility": {
           "title": "Reproducibility",
           "type": "object",
-          "properties":{
+          "properties": {
             "statement": {
               "title": "Statement",
               "type": "string"
@@ -961,7 +917,7 @@
             "links": {
               "title": "Link",
               "type": "array",
-              "items":{
+              "items": {
                 "type": "object",
                 "properties": {
                   "uri": {
@@ -974,21 +930,23 @@
                   }
                 },
                 "required": [
-                "uri"
-              ]
+                  "uri"
+                ]
               }
             }
-          }          
-        }        
+          }
+        }
       },
-      "required":["title_statement"],
+      "required": [
+        "title_statement"
+      ],
       "additionalProperties": false
     },
-    "provenance":{
-      "type":"array",
-      "description":"Provenance",
-      "items":{
-        "$ref":"provenance-schema.json"
+    "provenance": {
+      "type": "array",
+      "description": "Provenance",
+      "items": {
+        "$ref": "provenance-schema.json"
       }
     },
     "tags": {
@@ -1062,7 +1020,7 @@
             "required": [
               "model_id"
             ]
-          },              
+          },
           "topic_description": {
             "type": "array",
             "title": "Topic information",
@@ -1071,11 +1029,17 @@
               "properties": {
                 "topic_id": {
                   "title": "Topic identifier",
-                  "type": ["integer", "string"]
+                  "type": [
+                    "integer",
+                    "string"
+                  ]
                 },
                 "topic_score": {
                   "title": "Topic score",
-                  "type": ["number", "string"]
+                  "type": [
+                    "number",
+                    "string"
+                  ]
                 },
                 "topic_label": {
                   "title": "Topic label",
@@ -1108,12 +1072,11 @@
               "topic_id"
             ]
           }
-          
         },
         "additionalProperties": false
       }
     },
-    "embeddings":{
+    "embeddings": {
       "type": "array",
       "title": "Word embeddings",
       "description": "Word embeddings",
@@ -1134,11 +1097,15 @@
           },
           "vector": {
             "title": "Vector",
-            "type": ["object","array"]
+            "type": [
+              "object",
+              "array"
+            ]
           }
         },
         "required": [
-          "id","vector"
+          "id",
+          "vector"
         ]
       }
     },
@@ -1146,9 +1113,9 @@
       "type": "object",
       "description": "Additional metadata",
       "properties": {}
-    }    
+    }
   },
-  "required":[
+  "required": [
     "document_description"
   ]
 }
