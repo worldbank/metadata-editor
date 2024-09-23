@@ -97,9 +97,9 @@ class Mailer
 			}			
 		}
 
-		if (!$options['from']){
+		/*if (!$options['from']){
 			throw new Exception("Email [FROM] not set");
-		}
+		}*/
 
 		return $options;
 	}
