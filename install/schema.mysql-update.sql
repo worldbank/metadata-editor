@@ -45,6 +45,10 @@ ADD COLUMN `deleted_by` INT NULL AFTER `is_deleted`,
 ADD COLUMN `deleted_at` INT NULL AFTER `deleted_by`;
 
 
+update editor_template set created_by=1 where created_by is null;
+update editor_template set owner_id=created_by where owner_id is null;
+
+
 
 CREATE TABLE `edit_history` (
   `id` int NOT NULL AUTO_INCREMENT,
