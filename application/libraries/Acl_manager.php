@@ -355,7 +355,9 @@ class Acl_manager
 		//check roles has access to resource
 		foreach($permissions as $perm){
 			if ($perm['resource']==$resource){
-				$acl->addResource(new Resource($perm['resource']));
+				if (!$acl->hasResource($resource)){
+					$acl->addResource(new Resource($resource));
+				}
 				$acl->allow($perm['role_id'],$perm['resource'], $this->get_resource_sub_priveleges($perm['resource'],$perm['permissions']));
 			}
 		}
@@ -363,7 +365,9 @@ class Acl_manager
 		//resources by repository
 		if(!empty($repositoryid)){
 			foreach($permissions as $perm){
-				$acl->addResource(new Resource($repositoryid.'-'.$perm['resource']));
+				if (!$acl->hasResource($resource)){
+					$acl->addResource(new Resource($repositoryid.'-'.$perm['resource']));
+				}
 				$acl->allow($perm['role_id'],$repositoryid.'-'.$perm['resource'], $perm['permissions']);
 			}
 		}

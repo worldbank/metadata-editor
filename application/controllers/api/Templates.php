@@ -4,16 +4,24 @@ require(APPPATH.'/libraries/MY_REST_Controller.php');
 
 class Templates extends MY_REST_Controller
 {
+
+	private $user_id=null;
+	private $user=null;
+
 	public function __construct()
 	{
 		parent::__construct();
 		$this->load->helper("date");
 		$this->load->model("Editor_template_model");
+		$this->load->model("Edit_history_model");
 		
 		$this->load->library("Form_validation");
 		//$this->is_admin_or_die();
 		$this->load->library("Editor_acl");
 		$this->is_authenticated_or_die();
+
+		$this->user_id=$this->get_api_user_id();
+		$this->user=$this->api_user();
 	}
 
 	//override authentication to support both session authentication + api keys
@@ -42,7 +50,7 @@ class Templates extends MY_REST_Controller
 			$this->has_access($resource_='template_manager',$privilege='view');
 			
 			$result=$this->Editor_template_model->select_all();
-			array_walk($result, 'unix_date_to_gmt',array('created','changed'));
+			//array_walk($result, 'unix_date_to_gmt',array('created','changed'));
 			
 			$response=array(
 				'status'=>'success',
@@ -194,10 +202,13 @@ class Templates extends MY_REST_Controller
 	 **/ 
 	function duplicate_post($uid=null)
 	{		
-		try{
+		try{			
 			$this->has_access($resource_='template_manager',$privilege='duplicate');
+			$result=$this->Editor_template_model->duplicate_template($uid, $this->user_id);
 
-			$result=$this->Editor_template_model->duplicate_template($uid);
+			if (!$result){
+				throw new Exception("Failed to duplicate template");
+			}
 
 			$output=array(
 				'status'=>'success',
@@ -215,10 +226,11 @@ class Templates extends MY_REST_Controller
 	function create_post()
 	{		
 		try{
-
 			$this->has_access($resource_='template_manager',$privilege='edit');
 
 			$options=$this->raw_json_input();
+			$options['created_by']=$this->user_id;
+			$options['changed_by']=$this->user_id;
 			$result=$this->Editor_template_model->create_template($options);
 
 			$output=array(
@@ -240,14 +252,17 @@ class Templates extends MY_REST_Controller
 
 	function update_post($uid=null)
 	{		
-		try{
-			$this->has_access($resource_='template_manager',$privilege='edit');
+		try{			
+			//$this->has_access($resource_='template_manager',$privilege='edit');
+			$this->editor_acl->user_has_template_access($uid,$permission='edit',$this->user);	
 
 			if (!$uid){
 				throw new Exception("Missing parameter: UID");
 			}
 
-			$options=$this->raw_json_input();
+			$options=$this->raw_json_input(); 			
+			$options['changed_by']=$this->user_id;
+
 			$result=$this->Editor_template_model->update($uid,$options);
 
 			$output=array(
@@ -258,7 +273,11 @@ class Templates extends MY_REST_Controller
 			$this->set_response($output, REST_Controller::HTTP_OK);			
 		}
 		catch(Exception $e){
-			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
 
@@ -266,14 +285,13 @@ class Templates extends MY_REST_Controller
 	function delete_post($uid=null)
 	{		
 		try{
-			
 			$this->has_access($resource_='template_manager',$privilege='delete');
 
 			if (!$uid){
 				throw new Exception("Missing parameter: UID");
 			}
 
-			$result=$this->Editor_template_model->delete($uid);
+			$result=$this->Editor_template_model->delete($uid, $this->user_id);
 
 			$output=array(
 				'status'=>'success'
@@ -282,7 +300,11 @@ class Templates extends MY_REST_Controller
 			$this->set_response($output, REST_Controller::HTTP_OK);			
 		}
 		catch(Exception $e){
-			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
 
@@ -297,7 +319,6 @@ class Templates extends MY_REST_Controller
 	{		
 		try{			
 			$this->has_access($resource_='template_manager',$privilege='admin');
-
 			$result=$this->Editor_template_model->set_default_template($type,$uid);
 
 			$output=array(
@@ -317,7 +338,6 @@ class Templates extends MY_REST_Controller
 	{
 		try{
 			$this->has_access($resource_='template_manager',$privilege='view');
-
 			$result=$this->Editor_template_model->get_default_template($type);
 				
 			$response=array(
@@ -339,7 +359,6 @@ class Templates extends MY_REST_Controller
 	{
 		try{
 			$this->has_access($resource_='template_manager',$privilege='view');
-
 			$result=$this->Editor_template_model->get_all_default_templates();
 				
 			$response=array(
@@ -358,5 +377,131 @@ class Templates extends MY_REST_Controller
 	}
 
 
+
+	/**
+	 * 
+	 * Share template with user
+	 * 
+	 * @options JSON array
+	 * [
+	 * 	{
+	 * 		"template_id": "template id",
+	 * 		"user_id": "user id",
+	 * 		"permissions": "view|edit|admin"
+	 * 	}
+	 * ]
+	 * 
+	 */
+	function share_post()
+	{		
+		try{			
+			$this->has_access($resource_='template_manager',$privilege='edit');
+
+			$options=$this->raw_json_input();
+			$result=$this->Editor_template_model->share_template($options, $this->user_id);
+
+			$output=array(
+				'status'=>'success',
+				'template'=>$result
+			);
+
+			$this->set_response($output, REST_Controller::HTTP_OK);			
+		}
+		catch(Exception $e){
+			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	function share_get($uid)
+	{
+		try{
+			$this->has_access($resource_='template_manager',$privilege='view');
+
+			$result=$this->Editor_template_model->template_users($uid);
+				
+			$response=array(
+				'status'=>'success',
+				'users'=>$result
+			);			
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	function remove_access_post()
+	{
+		try{			
+			$this->has_access($resource_='template_manager',$privilege='edit');
+
+			$options=$this->raw_json_input();
+
+			if (!isset($options['template_uid'])){
+				throw new Exception("Missing parameter: UID");
+			}
+
+			if (!isset($options['user_id'])){
+				throw new Exception("Missing parameter: user_id");
+			}
+
+
+			$result=$this->Editor_template_model->unshare_template($options['template_uid'], $options['user_id']);
+
+			$output=array(
+				'status'=>'success',
+				'template'=>$result
+			);
+
+			$this->set_response($output, REST_Controller::HTTP_OK);			
+		}
+		catch(Exception $e){
+			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+
+	/**
+	 * 
+	 * 
+	 * Revision history for a template
+	 * 
+	 */
+	function revisions_get($uid=null)
+	{
+		try{
+			$this->has_access($resource_='template_manager',$privilege='view');
+
+			if(!$uid){
+				throw new Exception("Missing parameter for `UID`");
+			}
+
+			$result=$this->Editor_template_model->get_template_revision_history($uid);	
+			array_walk($result['history'], 'unix_date_to_gmt',array('created'));
+			
+			$response=array(
+				'status'=>'success',
+				//'total'=>count($result),
+				//'found'=>count($result),
+				'data'=>$result
+			);
+						
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
 	
 }

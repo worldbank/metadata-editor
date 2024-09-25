@@ -543,18 +543,22 @@ class Editor_acl
 		//add roles
 		foreach($user_roles as $role_id=>$role){
 			$acl->addRole(new Role($role_id));
-		}
+		}		
 
 		//check roles has access to resource
 		foreach($permissions as $perm){
-			$acl->addResource(new Resource($perm['resource']));
+			if (!$acl->hasResource($perm['resource'])){
+				$acl->addResource(new Resource($perm['resource']));						
+			}
 			$acl->allow($perm['role_id'],$perm['resource'], $perm['permissions']);
 		}
 
 		//resources by repository
 		if(!empty($repositoryid)){
-			foreach($permissions as $perm){			
-				$acl->addResource(new Resource($repositoryid.'-'.$perm['resource']));
+			foreach($permissions as $perm){
+				if (!$acl->hasResource($repositoryid.'-'.$perm['resource'])){
+					$acl->addResource(new Resource($repositoryid.'-'.$perm['resource']));
+				}				
 				$acl->allow($perm['role_id'],$repositoryid.'-'.$perm['resource'], $perm['permissions']);
 			}
 		}
@@ -656,5 +660,158 @@ class Editor_acl
     }
 
 
+
+	/**
+	 * 
+	 * 
+	 * 
+	 */
+	function user_has_template_access($template_uid,$permission=null,$user=null)
+	{
+		if (!$user){
+			$user=(object)$this->current_user();
+		}
+
+		if (!$user){
+			throw new Exception("User not set");
+		}
+
+		//check if user is template owner
+		if ($this->is_user_template_owner($template_uid,$user)){
+			return true;
+		}
+
+		//check if user is template collaborator
+		if ($this->user_has_shared_template_access($template_uid,$user,$permission)){
+			return true;
+		}
+
+		throw new Exception("You don't have permissions to access this template");
+	}
+
+	/**
+	 * 
+	 * Check if user is template owner
+	 * 
+	 */
+	function is_user_template_owner($template_uid,$user=null)
+	{
+		if (!$user){
+			$user=(object)$this->current_user();
+		}
+
+		if (!$user){
+			throw new Exception("User not set");
+		}
+
+		$this->ci->db->select("owner_id");
+		$this->ci->db->where("uid",$template_uid);
+		$template=$this->ci->db->get("editor_templates")->row_array();
+		
+		if (!$template){
+			return false;
+		}
+
+		//check if user is template owner
+		if ($template['owner_id']==$user->id){
+			return true;
+		}
+
+		return false;
+	}
+
+
+	/**
+	 * 
+	 * check if user has shared access to the template
+	 * 
+	 */
+	function user_has_shared_template_access($template_uid,$user=null,$permission='view')
+	{
+		if (!$user){
+			$user=(object)$this->current_user();
+		}
+
+		if (!$user){
+			throw new Exception("User not set");
+		}
+
+		//editor_template_acl -template_id, permissions, user_id
+		//check if template is shared with user
+		$this->ci->db->select("user_id,permissions");
+		$this->ci->db->join("editor_templates","editor_templates.id=editor_template_acl.template_id");
+		$this->ci->db->where("editor_templates.uid",$template_uid);
+		$this->ci->db->where("editor_template_acl.user_id",$user->id);
+		$template_users=$this->ci->db->get("editor_template_acl")->result_array();
+
+		if (!$template_users){
+			return false;
+		}
+
+		$user_permissions=[];
+		foreach($template_users as $row)
+		{
+			$user_permissions[]=$row['permissions'];
+		}
+
+		//test access
+		$has_access=$this->user_has_shared_template_access_acl($user_permissions, $permission);
+
+		if (!$has_access){
+			//throw new AclAccessDeniedException("Access denied, you don't have permissions");
+			throw new Exception("Access denied, you don't have permissions");
+		}
+
+		return true;
+	}
+
+
+	/**
+	 * 
+	 * Check if user has access to the template
+	 * 
+	 * @privilege - array - view, edit, admin
+	 * @permission - permission - view, edit, admin
+	 * 
+	 */
+	private function user_has_shared_template_access_acl($privileges,$permission)
+	{
+
+		$acl = new Acl();
+
+		//base role/user
+		$acl->addRole(new Role('user'));
+
+		$permissions_list=array('view','edit','admin');
+
+		//for each permission add a role
+		$acl->addRole(new Role('user-view'), 'user');
+		$acl->addRole(new Role('user-edit'), 'user-view');
+		$acl->addRole(new Role('user-admin'), 'user-edit');
+
+		//add resources
+		$acl->addResource(new Resource('template'));
+
+		//allow access
+		$acl->allow('user-view','template',array('view'));
+		$acl->allow('user-edit','template',array('edit'));
+		$acl->allow('user-admin','template',array('admin'));
+		
+		//add access
+		foreach($privileges as $priv)
+		{
+			$role='user-'.$priv;
+			$acl->allow($role,'template',$privileges);
+		}
+
+		if ($acl->isAllowed($role,'template',$permission) ){
+			return true;
+		}
+
+		return false;	
+
+	}
+
+	
 }
 

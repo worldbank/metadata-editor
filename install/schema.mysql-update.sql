@@ -15,3 +15,44 @@ ALTER TABLE `editor_collections` ADD UNIQUE index `idx_title_pid` (`title`,`pid`
 ALTER TABLE `editor_projects` 
 ADD FULLTEXT INDEX `ft_projects` (`title`) ;
 
+
+ALTER TABLE `audit_logs` 
+ADD COLUMN `metadata` JSON NULL;
+
+ALTER TABLE `audit_logs` 
+CHANGE COLUMN `description` `action_type` VARCHAR(10) NOT NULL ;
+
+
+CREATE TABLE `editor_template_acl` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `template_id` int NOT NULL,
+  `permissions` varchar(100) DEFAULT NULL,
+  `user_id` int NOT NULL,
+  `created` int DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1;
+
+
+
+ALTER TABLE `editor_templates` 
+ADD COLUMN `created_by` INT,
+ADD COLUMN `changed_by` INT,
+ADD COLUMN `owner_id` INT,
+ADD COLUMN `is_private` INT NULL,
+ADD COLUMN `is_published` INT NULL,
+ADD COLUMN `is_deleted` INT NULL AFTER `is_published`,
+ADD COLUMN `deleted_by` INT NULL AFTER `is_deleted`,
+ADD COLUMN `deleted_at` INT NULL AFTER `deleted_by`;
+
+
+
+CREATE TABLE `edit_history` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `obj_type` varchar(15) NOT NULL,
+  `obj_id` int NOT NULL,
+  `user_id` int DEFAULT NULL,
+  `action_type` varchar(10) NOT NULL,
+  `created` datetime NOT NULL,
+  `metadata` json DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb3;

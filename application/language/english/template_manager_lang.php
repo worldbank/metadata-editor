@@ -18,6 +18,9 @@ $lang['show_all_elements']="Show all elements";
 $lang['array_properties']="Array properties";
 
 $lang['instructions']="Instructions";
+$lang['owner']="Owner";
+$lang['changed_at']="Updated on";
+$lang['changed_by']="Last updated by";
 
 
 

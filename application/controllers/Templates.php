@@ -63,7 +63,7 @@ class Templates extends MY_Controller {
 	
 	function preview($uid)
 	{
-		$this->editor_acl->has_access_or_die($resource_='template',$privilege='view');
+		$this->editor_acl->has_access_or_die($resource_='template_manager',$privilege='view');
 		$this->template->set_template('blank');		
 		$user_template=$this->Editor_template_model->get_template_by_uid($uid);
 
@@ -84,7 +84,7 @@ class Templates extends MY_Controller {
 	function pdf($uid)
 	{
 		$this->load->library('Pdf_report_template');
-		//$this->editor_acl->has_access_or_die($resource_='template',$privilege='view');
+		$this->editor_acl->has_access_or_die($resource_='template_manager',$privilege='view');
 		//$this->template->set_template('blank');
 		$this->pdf_report_template->initialize($uid);
 		$this->pdf_report_template->generate($output_file_name=$uid.'.pdf');

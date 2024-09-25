@@ -27,6 +27,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ajv/6.12.2/ajv.bundle.js" integrity="sha256-u9xr+ZJ5hmZtcwoxwW8oqA5+MIkBpIp3M2a4AgRNH1o=" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/deepdash/browser/deepdash.standalone.min.js"></script>
 
+  <script src="https://cdn.jsdelivr.net/npm/vue-json-pretty@1.9.5/lib/vue-json-pretty.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vue-json-pretty@1.9.5/lib/styles.min.css">
 
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
 </head>
@@ -55,30 +57,67 @@
 
       <?php echo $this->load->view('editor_common/global-header', null, true); ?>
 
-      <div class="content-wrapper" style="overflow:auto;height:100vh">
+      <div class="content-wrapper" xstyle="overflow:auto;height:100vh">
         <section class="content">
-          <!-- Provides the application the proper gutter -->
-          <div class="container" style="overflow:auto;">
+          
+          <div class="container-fluid" >
 
             <div class="row">
 
-              <div class="projects col">
+              <div class="sidebar mt-5 mr-5" style="width: 300px; ">
+                <!-- sidebar -->
 
-                <div class="mt-3 mb-5">
+                  <v-card rounded class="v-card--app-filter pa-3 mt-5 ml-2 elevation-3" style="position:sticky; top:50px;">
+                    <!-- header -->
+                    <section class="d-flex justify-space-between align-center py-3 px-5 v-card--app-filter__title">
+                        Types
+                    </section>
+
+                    <!-- content -->
+                    <section>
+                        <v-list flat>
+                            <v-list-item-group color="primary">
+                                <v-list-item @click="sidebar_selected=''">
+                                    <v-list-item-icon>
+                                        <i class="fa fa-filter"></i>
+                                    </v-list-item-icon>
+                                    <v-list-item-content>
+                                        <v-list-item-title>All</v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                                <v-list-item v-for="(item, i) in sidebar_data_types" :key="i" :class="{'v-list-item-active' : sidebar_selected === item.to}" @click="sidebar_selected=item.data_type">
+                                    <v-list-item-icon>                                        
+                                        <i :class="getProjectIcon(item.data_type)"></i>
+                                    </v-list-item-icon>
+                                    <v-list-item-content>
+                                        <v-list-item-title v-text="item.title"></v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                            </v-list-item-group>
+                        </v-list>
+                    </section>
+                  </v-card>
+
+                 <!-- end sidebar -->
+              </div>
+
+              <div class="projects col" style="overflow:auto;" >
+
+                <div class="mt-5 mb-5">
                   <h3>{{$t('template_manager')}}</h3>
 
                   <div class="d-flex">
 
-                  <v-tabs background-color="transparent" v-model="nav_tabs_model">
-                      <v-tab @click="pageLink('projects')"><v-icon>mdi-text-box</v-icon> <a :href="site_base_url + '/editor'">{{$t("projects")}}</a></v-tab>
-                      <v-tab @click="pageLink('collections')" active><v-icon>mdi-folder-text</v-icon> <a :href="site_base_url + '/collections'">{{$t("collections")}}</a> </v-tab>
-                      <!--<v-tab>Archives</v-tab>-->
-                      <v-tab @click="pageLink('templates')"><v-icon>mdi-alpha-t-box</v-icon> <a :href="site_base_url + '/templates'">{{$t("templates")}}</a></v-tab>
-                  </v-tabs>
+                    <v-tabs background-color="transparent" v-model="nav_tabs_model">
+                        <v-tab @click="pageLink('projects')"><v-icon>mdi-text-box</v-icon> <a :href="site_base_url + '/editor'">{{$t("projects")}}</a></v-tab>
+                        <v-tab @click="pageLink('collections')" active><v-icon>mdi-folder-text</v-icon> <a :href="site_base_url + '/collections'">{{$t("collections")}}</a> </v-tab>
+                        <!--<v-tab>Archives</v-tab>-->
+                        <v-tab @click="pageLink('templates')"><v-icon>mdi-alpha-t-box</v-icon> <a :href="site_base_url + '/templates'">{{$t("templates")}}</a></v-tab>
+                    </v-tabs>
 
-                  <div class="justify-content-end">
-                    <v-btn class="primary" @click="showImportTemplateDialog">{{$t('import_template')}}</v-btn>
-                  </div>
+                    <div class="justify-content-end">
+                      <v-btn class="primary" @click="showImportTemplateDialog">{{$t('import_template')}}</v-btn>
+                    </div>
 
                   </div>
                   
@@ -87,12 +126,8 @@
                 <div>
                   <div v-if="!templates"> {{$t('no_templates_found')}}</div>
 
-                  <div v-for="(data_type_label,data_type) in data_types" class="mb-3">
+                  <div v-for="(data_type_label,data_type) in data_types" class="mb-5" v-if="sidebar_selected==data_type || sidebar_selected==''">
                     
-                      <v-card-title>
-                        <i :class="getProjectIcon(data_type)"></i>&nbsp;{{data_type_label}}
-                      </v-card-title>
-                      
                     <v-data-table                      
                       :headers="[
                         { text: $t('type'), value: 'template_type' },
@@ -100,7 +135,9 @@
                         { text: $t('title'), value: 'name' },
                         { text: $t('language'), value: 'lang' },
                         { text: $t('version'), value: 'version' },
-                        { text: $t('last_updated'), value: 'changed' },
+                         { text: $t('owner'), value: 'owner_username' },
+                        { text: $t('changed_by'), value: 'changed_by_username' },
+                        { text: $t('changed_at'), value: 'changed' },
                         { text: '', value: 'actions' }
                       ]"
                       :items="getTemplatesByType(data_type)"
@@ -108,16 +145,15 @@
                       :disable-pagination="true"
                       :items-per-page="100"
                       :hide-default-footer="true"
-
-
+                      class="elevation-7 mb-5"
                     >
-                      <!--
+                      
                       <template v-slot:top>
                             <div class="d-flex pl-6 pb-4 align-center">                                
-                                <div class="v-data-table--title"><i :class="getProjectIcon(data_type)"></i>&nbsp;{{data_type_label}}</div>                                
+                                <div class="v-data-table--title" style="font-size:20px;"><i :class="getProjectIcon(data_type)"></i>&nbsp;{{data_type_label}}</div>                                
                             </div>
-                        </template>    
-                      -->                                    
+                        </template>                                                   
+                      
                       <template v-slot:item.default="{ item }">
                         <span class="btn btn-sm btn-link" @click="setDefaultTemplate(item.data_type,item.uid)">
                           <v-icon v-if="item.default">mdi-radiobox-marked</v-icon>
@@ -128,15 +164,20 @@
                         <v-icon @click="showMenu($event, item.uid, item.template_type=='core')">mdi-dots-vertical</v-icon>
                       </template>
                       <template v-slot:item.changed="{ item }">
-                        <span v-if="item.changed">{{momentDate(item.changed)}}</span>
+                        <span  v-if="item.changed">{{momentDate(item.changed)}}</span>
+                      </template>
+                      <template v-slot:item.owner_username="{ item }">
+                        <span :title="item.owner_email" v-if="item.owner_username">{{item.owner_username}}</span>
+                      </template>
+                      <template v-slot:item.changed_by_username="{ item }">
+                        <span :title="item.changed_by_email" v-if="item.changed_by_username">{{item.changed_by_username}}</span>
                       </template>
                       <template v-slot:item.name="{ item }">
-                        <div v-if="item.template_type=='core'">                          
-                          <span style="font-weight:bold;" href="#">{{item.name}}</span>
-                          <div>{{item.uid}}</div>
+                        <div v-if="item.template_type=='core'">
+                          <span :title="'UID: ' + item.uid" href="#">{{item.name}}</span>                          
                         </div>
                         <div v-else>
-                          <a target="_blank" :href="getTemplateEditLink(item)" @click="editTemplate(item.uid)">{{item.name}}</a>
+                          <a :title="'UID: ' + item.uid"  target="_blank" :href="getTemplateEditLink(item)" @click="editTemplate(item.uid)">{{item.name}}</a>
                         </div>
                       </template>
                       
@@ -210,34 +251,66 @@
       >
 
         <v-list>
-          <!--<v-list-item>
-            <v-list-item-title @click="editTemplate(menu_active_template_id)"><v-btn text>{{$t('edit')}}</v-btn></v-list-item-title>
-          </v-list-item> -->
-          <v-list-item>
-            <v-list-item-title @click="duplicateTemplate(menu_active_template_id)"><v-btn text>{{$t('duplicate')}}</v-btn></v-list-item-title>
+          <v-list-item v-if="!isCoreTemplate(menu_active_template_id)">
+            <v-list-item-icon>
+              <v-icon>mdi-share</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title @click="shareTemplate(menu_active_template_id)"><v-btn text> {{$t('share')}}</v-btn></v-list-item-title>
           </v-list-item>
           <v-list-item>
-            <v-list-item-title @click="exportTemplate(menu_active_template_id)"><v-btn text>{{$t('export')}}</v-btn></v-list-item-title>
+            <v-list-item-icon>
+              <v-icon>mdi-content-duplicate</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title @click="duplicateTemplate(menu_active_template_id)"><v-btn text> {{$t('duplicate')}}</v-btn></v-list-item-title>
+          </v-list-item>
+          <v-list-item>
+            <v-list-item-icon>
+              <v-icon>mdi-code-json</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title @click="exportTemplate(menu_active_template_id)"><v-btn text> {{$t('export')}}</v-btn></v-list-item-title>
           </v-list-item>
           <template v-if="!menu_active_template_core">
             <v-list-item>
-              <v-list-item-title @click="deleteTemplate(menu_active_template_id)"><v-btn text>{{$t('delete')}}</v-btn></v-list-item-title>
+              <v-list-item-icon>
+                <v-icon>mdi-delete-outline</v-icon>
+              </v-list-item-icon>
+              <v-list-item-title @click="deleteTemplate(menu_active_template_id)"><v-btn text> {{$t('delete')}}</v-btn></v-list-item-title>
             </v-list-item>            
           </template>
           <v-list-item>
-            <v-list-item-title @click="previewTemplate(menu_active_template_id)"><v-btn text>{{$t('preview')}}</v-btn></v-list-item-title>
+            <v-list-item-icon>
+              <v-icon>mdi-eye-outline</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title @click="previewTemplate(menu_active_template_id)"><v-btn text> {{$t('preview')}}</v-btn></v-list-item-title>
           </v-list-item>
           <v-list-item>
-            <v-list-item-title @click="pdfTemplate(menu_active_template_id)"><v-btn text>{{$t('pdf')}}</v-btn></v-list-item-title>
-          </v-list-item>          
+            <v-list-item-icon>
+              <v-icon>mdi-file-pdf-box</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title @click="pdfTemplate(menu_active_template_id)"><v-btn text> {{$t('pdf')}}</v-btn></v-list-item-title>
+          </v-list-item>  
+          <v-list-item>
+            <v-list-item-icon>
+                <v-icon>mdi-content-copy</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title @click="viewTemplateRevisions(menu_active_template_id)"><v-btn text> {{$t('revisions')}}</v-btn></v-list-item-title>        
         </v-list>
       </v-menu>
     </template>
 
+    <vue-template-share :key="menu_active_template_id" v-if="menu_active_template_id && !isCoreTemplate(menu_active_template_id)" v-model="dialog_share_template" :template_id="menu_active_template_id"></vue-template-share>
+    <vue-template-revision-history :key="'r' +menu_active_template_id" v-if="menu_active_template_id && !isCoreTemplate(menu_active_template_id)" v-model="dialog_template_revision" :template_id="menu_active_template_id"></vue-template-revision-history>
 
   </div>
 
-  <script>  
+  <script>
+  
+    
+    <?php echo include_once("vue-template-revision-history.js"); ?>
+
+    <?php echo include_once("vue-template-share-component.js"); ?>
+  
+
     const translation_messages = {
       default: <?php echo json_encode($translations,JSON_HEX_APOS);?>
     }
@@ -289,6 +362,8 @@
         facet_panel: [],
         pagination_page: 1,
         dialog_create_project: false,
+        dialog_share_template:false,
+        dialog_template_revision:false,
         search_keywords: '',
         project_types_icons: {
           "document": "fa fa-file-code",
@@ -299,7 +374,8 @@
           "timeseries-db": "fa fa-chart-line",
           "image": "fa fa-image",
           "video": "fa fa-video",
-          "script": "fa fa-file-code"
+          "script": "fa fa-file-code",
+          "resource": "fas fa-th-large"
         },
         dialog_import_template: false,
         template_import_errors:[],
@@ -312,7 +388,50 @@
         menu_active_template_id: null,
         menu_active_template_core: false,
         nav_tabs_active:2,
-        nav_tabs_model:2
+        nav_tabs_model:2,
+        sidebar_data_types: [
+          {
+            title: 'Microdata',
+            data_type: 'survey'
+          },
+          {
+            title: 'Timeseries',
+            data_type: 'timeseries'
+          },
+          {
+            title: 'Timeseries DB',
+            data_type: 'timeseries-db'
+          },
+          {
+            title: 'Script',
+            data_type: 'script'
+          },
+          {
+            title: 'Geospatial',
+            data_type: 'geospatial'
+          },
+          {
+            title: 'Document',
+            data_type: 'document'
+          },
+          {
+            title: 'Table',
+            data_type: 'table'
+          },
+          {
+            title: 'Image',
+            data_type: 'image'
+          },
+          {
+            title: 'Video',
+            data_type: 'video'
+          },
+          {
+            title: 'External Resources',
+            data_type: 'resource'
+          }
+        ],
+        sidebar_selected: ''
       },
       created: async function() {
         //await this.$store.dispatch('initData',{dataset_idno:this.dataset_idno});
@@ -332,6 +451,12 @@
       },
       watch: {},
       methods: {
+        viewTemplateRevisions(uid){
+          this.dialog_template_revision=true;
+        },
+        shareTemplate(uid){          
+          this.dialog_share_template=true;
+        },        
         getTemplateEditLink: function(template) {
           return CI.base_url + '/templates/edit/' + template.uid;
         },
@@ -424,6 +549,23 @@
               console.log("request completed");
             });
         },
+        isCoreTemplate: function(uid) {
+
+          if (!this.templates.core){
+            return false;
+          }
+
+          if (!uid){
+            return false;
+          }
+
+          template= this.templates.core.find(template => template.uid == uid);          
+
+          if (template){
+            return true;
+          }
+          return false;
+        },
         deleteTemplate: function(uid) {
           if (!confirm("Confirm to delete?")) {
             return false;
@@ -435,9 +577,6 @@
 
           axios.post(url,
               form_data
-              /*headers: {
-                  "xname" : "value"
-              }*/
             )
             .then(function(response) {
               console.log(response);
@@ -445,10 +584,10 @@
             })
             .catch(function(error) {
               console.log("error", error);
-              if (error.response.data.error){
-                alert ("Failed: " + error.response.data.error);
+              if (error.response.data.message){
+                alert ("Failed: " + error.response.data.message);
               }else{
-                alert("Failed", error);
+                alert("Failed: "+ JSON.stringify(error.response.data));
               }
             })
             .then(function() {
@@ -547,6 +686,11 @@
         }
       }
     })
+
+    //register components
+    //vue_app.component('vue-template-share', VueTemplateShareComponent);
+    Vue.component('VueJsonPretty', VueJsonPretty.default)
+
   </script>
 </body>
 

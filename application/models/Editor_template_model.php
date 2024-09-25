@@ -1,5 +1,10 @@
 <?php
 
+use Swaggest\JsonDiff\JsonDiff;
+use Swaggest\JsonDiff\JsonPatch;
+use Swaggest\JsonDiff\JsonPointer;
+use Swaggest\JsonDiff\JsonMergePatch;
+
 /**
  * 
  * Editor templates
@@ -20,8 +25,21 @@ class Editor_template_model extends ci_model {
 		"description", 
 		"instructions",
 		"template", 
-		"created", 
-		"changed"
+		"created",
+		"created_by", 
+		"changed",
+		"changed_by",
+		"owner_id",
+		"deleted_at",
+		"deleted_by",
+		"is_deleted"
+	);
+
+
+	private $permissions=array(
+		'view'=>'View',
+		'edit'=>'Edit',		
+		'admin'=>'Admin'
 	);
 
 	private $core_templates=[];
@@ -32,6 +50,7 @@ class Editor_template_model extends ci_model {
         parent::__construct();		
 		$this->ci =& get_instance();
 		$this->init_core_templates();
+		$this->ci->load->model('Template_acl_model');
     }
 
 
@@ -43,10 +62,6 @@ class Editor_template_model extends ci_model {
 			throw new Exception("config/editor_templates not loaded");
 		}
 
-		//echo "<pre>";
-		//print_r($config);
-		//die();
-		
 		foreach($config as $key=>$templates){
 
 			foreach($templates as $idx=>$template){
@@ -166,12 +181,33 @@ class Editor_template_model extends ci_model {
 	function select_all()
 	{
 		$fields=array_diff($this->fields,["template"]);
-		$fields[]="'custom' as template_type";
-		$this->db->select($fields);
-		$this->db->order_by('name','ASC');
-		$this->db->order_by('changed','DESC');
-		$result= $this->db->get('editor_templates')->result_array();
+		
+		//add prefix to fields
+		$fields=array_map(function($field){
+			return 'editor_templates.'.$field;
+		},$fields);
 
+		$fields[]="'custom' as template_type";
+
+		$this->db->select($fields);
+
+		//get user info
+		$this->db->join('users','users.id=editor_templates.owner_id','left');
+		$this->db->select('users.username as owner_username, users.email as owner_email');
+
+		//get changed by
+		$this->db->join('users as changed_by','changed_by.id=editor_templates.changed_by','left');
+		$this->db->select('changed_by.username as changed_by_username, changed_by.email as changed_by_email');
+
+		//get created by
+		$this->db->join('users as created_by','created_by.id=editor_templates.created_by','left');
+		$this->db->select('created_by.username as created_by_username, created_by.email as created_by_email');
+
+		$this->db->order_by('editor_templates.changed','DESC');
+		$this->db->order_by('editor_templates.name','ASC');
+		$this->db->where('editor_templates.is_deleted is NULL or editor_templates.is_deleted =0',null, false);
+
+		$result= $this->db->get('editor_templates')->result_array();
 		$default_templates=$this->get_all_default_templates();
 
 		$defaults=array();
@@ -214,6 +250,18 @@ class Editor_template_model extends ci_model {
 		return $this->db->get('editor_templates')->row_array();
 	}
 
+	function get_id_by_uid($uid)
+	{
+		$this->db->select('id');
+		$this->db->where('uid',$uid);
+		$result=$this->db->get('editor_templates')->row_array();
+
+		if (isset($result['id'])){
+			return $result['id'];
+		}
+		return false;
+	}
+
 	function check_uid_exists($uid)
 	{
 		$this->db->select('uid');
@@ -226,10 +274,54 @@ class Editor_template_model extends ci_model {
 		return false;
 	}
 
-    function delete($uid)
-	{		
+
+    function delete($uid, $user_id=null)
+	{
+		$template=$this->select_single($uid);
+		
+		if (!$template){
+			throw new Exception("Template not found: " .$uid);
+		}
+
+		//check if template is in use
+		$count=$this->get_project_count($uid);
+
+		if ($count>0){
+			throw new Exception("Template is in use by ".$count. " projects");
+		}
+
+		//only delete if is_deleted is 1
+		if ($template['is_deleted']==0){
+			//soft delete
+			return $this->soft_delete($uid,$user_id);
+		}
+
         $this->db->where('uid',$uid);
 		return $this->db->delete('editor_templates');
+	}
+
+	/**
+	 * 
+	 * 
+	 * Flag template as deleted
+	 * 
+	 * 
+	 * 
+	 */
+	function soft_delete($uid, $user_id=null)
+	{
+		$template=$this->select_single($uid);
+		
+		if (!$template){
+			throw new Exception("Template not found: " .$uid);
+		}
+
+		$options=array();
+		$options['deleted_at']=date("U");
+		$options['deleted_by']=$user_id;
+		$options['is_deleted']=1;
+
+		return $this->update($uid,$options);
 	}
 
     /**
@@ -239,12 +331,22 @@ class Editor_template_model extends ci_model {
 	**/
 	function update($uid,$options)
 	{
-		//allowed fields
+		$template=$this->select_single($uid);
+
+		if (!$template){
+			throw new Exception("Template not found: " .$uid);
+		}
+
 		$valid_fields=$this->fields;
 		unset($valid_fields['id']);
 		unset($valid_fields['uid']);
 
-		$options['changed']=date("U");		
+		$options['changed']=date("U");	
+		
+		if (!isset($options['changed'])){
+			$options["changed"]=date("U");
+		}
+		
 		$update_arr=array();
 
 		foreach($options as $key=>$value){
@@ -258,13 +360,41 @@ class Editor_template_model extends ci_model {
 		}
 		
 		$this->db->where('uid', $uid);
-		$result=$this->db->update('editor_templates', $update_arr); 		
-		return $result;		
+		$result=$this->db->update('editor_templates', $update_arr);
+
+		if ($result==false){
+			throw new Exception("Update failed");
+		}
+
+		//generate diff
+		//$compare_fields=explode(",","author,description,data_type,instructions,lang,name,organization,uid,version,template");
+		$compare_fields=array('template');//only compare template field
+
+		$template_id=$template['id'];
+		$changed_by=isset($options['changed_by']) ? $options['changed_by'] : null;
+
+		//filter $template fields to only include fields that are in $compare_fields
+		$template=array_intersect_key($template,array_flip($compare_fields));
+		//remove empty db fields
+		$template=array_filter($template);
+		$template['template']=json_decode($template['template'],true);
+
+		//filter $options
+		$options=array_intersect_key($options,array_flip($compare_fields));
+
+		//generate diff as json-patch
+		$diff=$this->get_metadata_diff($template,$options, $ignore_errors=true);
+		
+		if ($diff!=false && $diff!='[]'){
+			$this->Edit_history_model->log($obj_type='template',$obj_id=$template_id,$action='update', $metadata=$diff, $user_id=$changed_by);
+		}
+
+//		return $diff;
+		return $result;
 	}
 
 	function create_template($options)
 	{
-
 		$template_options=array();
 
 		if (isset($options['result']['template'])){
@@ -296,13 +426,17 @@ class Editor_template_model extends ci_model {
 			}
 		}
 
-
 		if (isset($template_options['template'])){
 			$template_options['template']=json_encode($template_options['template']);
 		}
 
-		$template_options["created"]=date("U");
-		$template_options["changed"]=date("U");
+		if (!isset($template_options['created'])){
+			$template_options["created"]=date("U");
+		}
+
+		if (!isset($template_options['changed'])){
+			$template_options["changed"]=date("U");
+		}
 
 		return $this->insert($template_options);
 	}
@@ -333,7 +467,7 @@ class Editor_template_model extends ci_model {
 	}
 
 
-	function duplicate_template($uid)
+	function duplicate_template($uid, $user_id=null)
 	{
 		//check core template for uid
 		$template=$this->get_core_template_by_uid($uid);
@@ -360,7 +494,10 @@ class Editor_template_model extends ci_model {
 			"name"=>$template['name']. ' - copy', 
 			"template"=>json_encode($template['template']),
 			"created"=>date("U"), 
-			"changed"=>date("U")
+			"changed"=>date("U"),
+			"created_by"=>$user_id,
+			"changed_by"=>$user_id,
+			"owner_id"=>$user_id
 		);
 		
 		return array(
@@ -447,5 +584,187 @@ class Editor_template_model extends ci_model {
 		return $template;
 	}
 
+
+	function set_template_owner($uid,$user_id)
+	{
+		$this->db->where('uid',$uid);
+		$this->db->update('editor_templates',array('owner_id'=>$user_id));
+	}
+
+
+	function share_template($options, $user_id=null)
+	{
+		if (!is_array($options)){
+			throw new Exception("Invalid options. Must be an array");
+		}
+
+		foreach($options as $key=>$value)
+		{
+			if (!isset($value['template_uid'])){
+				throw new Exception("Missing parameter: Template UID");
+			}
+
+			if (!isset($value['user_id'])){
+				throw new Exception("Missing parameter: User ID");
+			}
+
+			if (!isset($value['permissions'])){
+				$value['permissions']='view';
+			}else{
+				if (!array_key_exists($value['permissions'],$this->permissions)){
+					throw new Exception("Invalid permission: ".$value['permissions']);
+				}
+			}
+
+			//validate template_uid
+			$template_id=$this->get_id_by_uid($value['template_uid']);
+
+			if (!$template_id){
+				throw new Exception("Template not found: " .$value['template_uid']);
+			}
+
+			//validate user_id
+			if ($this->ion_auth_model->is_user_id_valid($value['user_id'])==false){
+				throw new Exception("User not found: ".$value['user_id']);
+			}
+
+			$this->Template_acl_model->add_user($template_id,$value['user_id'],$value['permissions']);
+		}		
+	}
+
+
+	/**
+	 * 
+	 * Get a list of users that have access to a template
+	 * 
+	 */
+	function template_users($uid)
+	{
+		$template_id=$this->get_id_by_uid($uid);
+
+		if (!$template_id){
+			throw new Exception("Template not found: " .$uid);
+		}
+
+		return $this->Template_acl_model->list_users($template_id);
+	}
+
+
+	function unshare_template($template_uid, $user_id)
+	{
+		$template_id=$this->get_id_by_uid($template_uid);
+
+		if (!$template_id){
+			throw new Exception("Template not found: " .$template_uid);
+		}
+
+		return $this->Template_acl_model->remove_user($template_id,$user_id);
+	}
+
+
+	
+	/**
+	 * 
+	 * 
+	 * Get a count of projects using a template
+	 * 
+	 * 
+	 */
+	function get_project_count($template_uid)
+	{
+		$this->db->select("count(id) as count");
+		$this->db->where("template_uid",$template_uid);
+		$result=$this->db->get("editor_projects")->row_array();
+
+		if (isset($result['count'])){
+			return $result['count'];
+		}
+		return 0;
+	}
+
+
+	/**
+	 * 
+	 * Return patch for metadata diff
+	 * 
+	 */
+	function get_metadata_diff($metadata_original, $metadata_updated, $ignore_errors=false)
+	{
+		try{
+			$diff = new JsonDiff($metadata_original, $metadata_updated, JsonDiff::TOLERATE_ASSOCIATIVE_ARRAYS);
+
+			$patch=$diff->getPatch();
+			return json_encode($patch);
+		} catch (Exception $e) {
+			if ($ignore_errors==true){
+				return false;
+			}
+			throw new Exception("Metadata diff failed: ".$e->getMessage());
+		}
+		
+	}
+
+
+	/**
+	 * 
+	 * 
+	 * Get template revision history
+	 */
+	function get_template_revision_history($template_uid, $offset=0, $limit=10)
+	{
+		$template_id=$this->get_id_by_uid($template_uid);
+
+		if (!$template_id){
+			throw new Exception("Template not found: " .$template_uid);
+		}
+
+		$output=array();
+		$output['total']=$this->get_template_revision_history_count($template_uid);
+		$output['limit']=$limit;
+		$output['offset']=$offset;
+
+		$this->db->select('edit_history.*,users.username');
+		$this->db->join('users','users.id=edit_history.user_id','left');
+		$this->db->where('obj_type','template');
+		$this->db->where('obj_id',$template_id);		
+		$this->db->limit($limit,$offset);		
+
+		$this->db->order_by('created','desc');
+		$result = $this->db->get("edit_history")->result_array();		
+
+		foreach($result as $idx=>$row)
+		{
+			$result[$idx]['metadata']=json_decode($row['metadata'],true);
+		}
+
+		$output['found']=count($result);
+		$output['history']=$result;
+		return $output;
+	}
+
+	/**
+	 * 
+	 * 
+	 * Get template revision history count
+	 * 
+	 */
+	function get_template_revision_history_count($template_uid)
+	{
+		$template_id=$this->get_id_by_uid($template_uid);
+
+		if (!$template_id){
+			throw new Exception("Template not found: " .$template_uid);
+		}
+
+		$this->db->select('count(id) as count');
+		$this->db->where('obj_type','template');
+		$this->db->where('obj_id',$template_id);		
+		$result = $this->db->get("edit_history")->row_array();		
+
+		if (isset($result['count'])){
+			return $result['count'];
+		}
+		return 0;
+	}
     
 }
