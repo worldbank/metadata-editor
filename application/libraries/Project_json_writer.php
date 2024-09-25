@@ -192,14 +192,17 @@ class Project_json_writer
 			}
 		}
 
-		if (isset($variable['metadata']['var_sumstat']) && is_array($variable['metadata']['var_sumstat']) ){
-			foreach($variable['metadata']['var_sumstat'] as $idx=>$sumstat){
-				if (!in_array($sumstat['type'], $sum_stats_enabled_list)){
-					unset($variable['metadata']['var_sumstat'][$idx]);
+		//keep only enabled summary statistics (if sum_stats_options is set)
+		if (count($sum_stats_enabled_list) > 0){			
+			if (isset($variable['metadata']['var_sumstat']) && is_array($variable['metadata']['var_sumstat']) ){
+				foreach($variable['metadata']['var_sumstat'] as $idx=>$sumstat){
+					if (!in_array($sumstat['type'], $sum_stats_enabled_list)){
+						unset($variable['metadata']['var_sumstat'][$idx]);
+					}
 				}
+				//fix to get a JSON array instead of Object
+				$variable['metadata']['var_sumstat']=array_values((array)$variable['metadata']['var_sumstat']);
 			}
-			//fix to get a JSON array instead of Object
-			$variable['metadata']['var_sumstat']=array_values((array)$variable['metadata']['var_sumstat']);
 		}
 
 		//value ranges [counts, min, max] - remove min and max if not enabled
@@ -210,24 +213,28 @@ class Project_json_writer
 					continue;
 				}
 
-				if (!in_array($range_key, $sum_stats_enabled_list)){
-					unset($variable['metadata']['var_valrng']['range'][$range_key]);
+				if (count($sum_stats_enabled_list) > 0){	
+					if (!in_array($range_key, $sum_stats_enabled_list)){
+						unset($variable['metadata']['var_valrng']['range'][$range_key]);
+					}
 				}
 			}
 		}
 
-		//remove category freq if not enabled
-		if (!in_array('freq', $sum_stats_enabled_list)){
-			if (isset($variable['metadata']['var_catgry']) && is_array($variable['metadata']['var_catgry']) ){
-				foreach($variable['metadata']['var_catgry'] as $idx=>$cat){
+		if (count($sum_stats_enabled_list) > 0){	
+			//remove category freq if not enabled
+			if (!in_array('freq', $sum_stats_enabled_list)){
+				if (isset($variable['metadata']['var_catgry']) && is_array($variable['metadata']['var_catgry']) ){
+					foreach($variable['metadata']['var_catgry'] as $idx=>$cat){
 
-					//remove freq if not enabled
-					if (isset($cat['stats']) && is_array($cat['stats']) ){
-						foreach($cat['stats'] as $stat_idx=>$stat){
-							if ($stat['type']=='freq'){
-								unset($variable['metadata']['var_catgry'][$idx]['stats'][$stat_idx]);
-							}
-						}						
+						//remove freq if not enabled
+						if (isset($cat['stats']) && is_array($cat['stats']) ){
+							foreach($cat['stats'] as $stat_idx=>$stat){
+								if ($stat['type']=='freq'){
+									unset($variable['metadata']['var_catgry'][$idx]['stats'][$stat_idx]);
+								}
+							}						
+						}
 					}
 				}
 			}
