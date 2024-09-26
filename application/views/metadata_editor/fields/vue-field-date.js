@@ -59,7 +59,8 @@ Vue.component('editor-date-field', {
               @click:clear="date = null"
               prepend-inner-icon="mdi-calendar"
               :hint="'Date format: YYYY-MM-DD - ' + value"
-              persistent-hint   
+              persistent-hint
+              :disabled="field.is_readonly"
             ></v-text-field>            
           </template>
           <v-date-picker

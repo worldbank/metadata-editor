@@ -554,7 +554,14 @@
             "dropdown",
             "dropdown-custom"
           ],
-
+          field_content_formats: {
+            "text": "Text",
+            "html": "HTML",
+            "markdown": "Markdown",
+            "latex": "LaTeX",
+            "json": "JSON"
+          },
+          
           field_types: [
             "string",
             "array",

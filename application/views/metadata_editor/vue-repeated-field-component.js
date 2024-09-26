@@ -22,6 +22,9 @@ Vue.component('repeated-field', {
         }
     },
     methods:{
+        isReadOnly(){
+            return this.field.is_readonly;
+        },
         update: function (index, value)
         {
             /*if (Array.isArray(this.local[index])){
@@ -60,10 +63,11 @@ Vue.component('repeated-field', {
                             >
                         
                         <input type="text"
-                                :value="local[index]"
-                                @input="update(index,$event.target.value)"
-                                class="form-control form-control-sm"                                 
-                            >
+                            :value="local[index]"
+                            @input="update(index,$event.target.value)"
+                            class="form-control form-control-sm"
+                            :disabled="field.is_readonly"
+                        >
 
                         <span v-if="errors[0]" class="error">{{ errors[0] }}</span>
                     </validation-provider>
@@ -80,9 +84,11 @@ Vue.component('repeated-field', {
             </tbody>
         </table>
 
-        <div class="d-flex justify-content-center">
-            <button type="button" class="btn btn-link btn-block btn-sm" @click="addRow" ><i class="fas fa-plus-square"></i> {{$t("add_row")}}</button>    
+
+        <div class="d-flex justify-content-center" v-if="!isReadOnly">                
+            <v-btn @click="addRow" class="m-2" text small ><v-icon>mdi-plus</v-icon>{{ $t("add_row") }}</v-btn>
         </div>
+
 
         </div>`    
 });

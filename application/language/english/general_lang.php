@@ -45,6 +45,7 @@ $lang['label']="Label";
 $lang['required']="Required";
 $lang['recommended']="Recommended";
 $lang['private']="Private";
+$lang['readonly']="Read-only";
 
 $lang['na']="N/A";
 $lang['json']="JSON";
@@ -99,6 +100,10 @@ $lang['Save']="Save";
 $lang['Export project metadata as JSON']="Export project metadata as JSON";
 $lang['Cancel changes']="Cancel changes";
 $lang['unsaved_changed']="Unsaved changes";
+
+
+$lang['field_content_format']="Input format";
+$lang['field_content_format_help']="Text, Markdown, LaTex, HTML. Default is Text";
 
 
 

@@ -80,7 +80,9 @@ Vue.component("form-input", {
                             v-model="local"
                             :columns="field.props"
                             :title="field.title"
-                            :path="field.key">
+                            :path="field.key"
+                            :field="field"
+                            >
                         </nested-array>
 
                     </div>
@@ -94,6 +96,7 @@ Vue.component("form-input", {
                             v-model="local" 
                             :columns="field.props"
                             :enums="field.enum" 
+                            :field="field"
                             class="border elevation-1"
                             >
                         </table-grid-component>
@@ -109,7 +112,7 @@ Vue.component("form-input", {
                             >
                         </repeated-field>
                     </div>
-                    <div v-else-if="fieldDisplayType(field)=='dropdown' || fieldDisplayType(field)=='dropdown-custom'">
+                    <div v-else-if="fieldDisplayType(field)=='dropdown' || fieldDisplayType(field)=='dropdown-custom'">                    
                         <v-combobox
                             v-model="fieldEnumByCodeMultiple"
                             :items="field.enum"
@@ -120,7 +123,8 @@ Vue.component("form-input", {
                             :multiple="field.type=='simple_array'"
                             small-chips
                             v-bind="formTextFieldStyle"
-                            background-color="#FFFFFF"                    
+                            background-color="#FFFFFF"
+                            :disabled="field.is_readonly"
                         ></v-combobox>
                         
                     </div>
@@ -143,6 +147,7 @@ Vue.component("form-input", {
 
                             <v-text-field
                                 v-model="local"
+                                :disabled="field.is_readonly"
                                 v-bind="formTextFieldStyle"
                             ></v-text-field>                                                                                        
                             <small :id="'field-toggle-' + normalizeClassID(field.key)" class="collapse help-text form-text text-muted">{{field.help_text}}</small>
@@ -164,8 +169,17 @@ Vue.component("form-input", {
                             v-slot="{ errors }"                            
                             :name="field.title"
                             >   
+
+                            <v-textarea-latex 
+                                v-if="field.content_format=='latex'" 
+                                v-model="local" 
+                                :field="field"
+                              ></v-textarea-latex>
+                            
                             <v-textarea
+                                v-else
                                 variant="outlined"
+                                :disabled="field.is_readonly"
                                 v-model="local"
                                 v-bind="formTextFieldStyle"
                                 class="v-textarea-field"
@@ -188,6 +202,7 @@ Vue.component("form-input", {
                     <div class="form-field-dropdown-custom">
                         <label :for="'field-' + normalizeClassID(field.key)">{{field.title}}</label>                
                         <span class="small" v-if="field.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(field.key)" ><i class="far fa-question-circle"></i></span>
+                        <small :id="'field-toggle-' + normalizeClassID(field.key)" class="collapse help-text form-text text-muted mb-2">{{field.help_text}}</small>
                         <v-combobox
                             v-model="fieldEnumByCode"
                             :items="field.enum"
@@ -198,9 +213,10 @@ Vue.component("form-input", {
                             :multiple="field.type=='simple_array'"
                             v-bind="formTextFieldStyle"
                             background-color="#FFFFFF"                    
+                            :disabled="field.is_readonly"
                         ></v-combobox>
-
-                        <small :id="'field-toggle-' + normalizeClassID(field.key)" class="collapse help-text form-text text-muted mb-2">{{field.help_text}}</small>
+                        <small class="text-muted">{{local}}</small>
+                        
                     </div>
                 </div>
                 
@@ -208,8 +224,9 @@ Vue.component("form-input", {
                     <div class="form-field-dropdown">
                         <label :for="'field-' + normalizeClassID(field.key)">{{field.title}}</label>
                         <span class="small" v-if="field.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(field.key)" ><i class="far fa-question-circle"></i></span>
+                        <small :id="'field-toggle-' + normalizeClassID(field.key)" class="collapse help-text form-text text-muted mb-2">{{field.help_text}}</small>                        
                         <v-select
-                            v-model="local"
+                            v-model="fieldEnumByCode"
                             :items="field.enum"  
                             item-text="label"
                             item-value="code"                            
@@ -217,9 +234,10 @@ Vue.component("form-input", {
                             outlined
                             dense
                             clearable
-                            background-color="#FFFFFF"                    
-                        ></v-select>
-                        <small :id="'field-toggle-' + normalizeClassID(field.key)" class="collapse help-text form-text text-muted mb-2">{{field.help_text}}</small>                        
+                            background-color="#FFFFFF"  
+                            :disabled="field.is_readonly"                  
+                        ></v-select>                        
+                        <small class="text-muted">{{local}}</small>
                     </div>
                 </div>
 

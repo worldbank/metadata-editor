@@ -64,6 +64,13 @@
             <label class="form-check-label" for="private">{{$t("private")}}</label>
         </div>
     </div>
+
+    <div class="col-auto">
+        <div class="form-group form-check" v-if="ActiveNode.type!=='section' &&  ActiveNode.type!=='section_container'">
+            <input type="checkbox" class="form-check-input" id="readonly" v-model="ActiveNode.is_readonly">
+            <label class="form-check-label" for="private">{{$t("readonly")}}</label>
+        </div>
+    </div>
 </div>
 
 <div class="form-group mb-3" v-if="ActiveNode.key">
@@ -122,8 +129,22 @@
                         {{display_type}}
                     </option>
                 </select>
-
             </div>
+
+
+            <div class="form-group" v-if="ActiveNode.display_type=='textarea'">
+                <label>{{$t("field_content_format")}}:</label>
+                <div class="text-secondary font-small">{{$t("field_content_format_help")}}</div>
+                <select 
+                    v-model="ActiveNode.content_format" 
+                    class="form-control form-field-dropdown" >        
+                    <option value="">None</option>
+                    <option v-for="content_format,format_key in field_content_formats" :value="format_key">
+                        {{content_format}}
+                    </option>
+                </select>
+            </div>
+
             <!--end display -->
         </v-tab-item>
 

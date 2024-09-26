@@ -31,7 +31,7 @@ Vue.component('v-toast', {
             <template>
                 <div class="text-center ma-2">
                     
-                    <v-snackbar right timeout="3000" 
+                    <v-snackbar right timeout="1000" 
                     v-model="snackbar"
                     >
                     {{ text }}

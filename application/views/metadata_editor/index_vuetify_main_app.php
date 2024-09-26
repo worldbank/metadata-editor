@@ -211,6 +211,7 @@
             echo $this->load->view("project/vue-project-share-component.js", null, true);
             echo $this->load->view("project/vue-collection-share-component.js", null, true);
             echo $this->load->view("metadata_editor/vue-summary-collections-component.js", null, true);
+            echo $this->load->view("metadata_editor/vue-textarea-latex-component.js", null, true);
         ?>
 
         <?php if (empty($metadata)):?>
