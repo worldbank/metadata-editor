@@ -153,10 +153,29 @@
             <template >
             <div class="form-group" >
                 <label for="controlled_vocab">{{$t("controlled_vocabulary")}}:</label>
-                <div class="border bg-white" style="max-height:300px;overflow:auto;">
+                <div class="bg-white border " style="max-height:300px;overflow:auto;">
 
 
                     <template v-if="!ActiveNodeControlledVocabColumns"> 
+
+                        <div>
+
+                            <div class="m-3">
+                                <div>{{$t("enum_store_options_label")}}:</div>
+
+                                <v-select
+                                    style="max-width:300px;"
+                                    v-model="ActiveNodeEnumStoreColumn"
+                                    :items="enum_store_options"
+                                    :item-text="item => item.label"
+                                    :item-value="item => item.value"
+                                    dense 
+                                    outlined
+                                    clearable
+                                    label=""
+                                ></v-select>
+                            </div>
+                        </div>
 
                         <table-grid-component
                             :key="ActiveNode.key"

@@ -106,6 +106,9 @@ $lang['field_content_format']="Input format";
 $lang['field_content_format_help']="Text, Markdown, LaTex, HTML. Default is Text";
 
 
+$lang['enum_store_options_label']="Select column to use as value";
+
+
 
 /* End of file general_lang.php */
 /* Location: ./application/language/base/general_lang.php */

@@ -50,13 +50,40 @@ Vue.component("form-input", {
         return code || this.local;
       },
       set: function (value) {
-        let code = this.findEnumByCode(value);
 
-        if (code) {
-          this.local = code.label + " [" + code.code + "]";
-        } else {
-          this.local = value;
+        let enum_store_column = this.field.enum_store_column;
+
+        if (!enum_store_column) {
+          enum_store_column = "both";
         }
+
+        //if enum_store_column is both, store the code and label
+        if (enum_store_column == "both") {
+          let code = this.findEnumByCode(value);
+
+          if (code) {
+            this.local = code.label + " [" + code.code + "]";
+          } else {
+            this.local = value;
+          }
+        }
+        else if (enum_store_column == "code") {
+          let code = this.findEnumByCode(value);
+          if (code) {
+            this.local = code.code;
+          } else {
+            this.local = value;
+          }
+        }
+        else if (enum_store_column == "label") {
+          let code = this.findEnumByCode(value);
+          if (code) {
+            this.local = code.label;
+          } else {
+            this.local = value;
+          }
+        }
+        
       },
     },
     formTextFieldStyle() {
@@ -215,8 +242,7 @@ Vue.component("form-input", {
                             background-color="#FFFFFF"                    
                             :disabled="field.is_readonly"
                         ></v-combobox>
-                        <small class="text-muted">{{local}}</small>
-                        
+                        <small class="text-muted">{{field.enum_store_column}} - {{local}}</small>                        
                     </div>
                 </div>
                 

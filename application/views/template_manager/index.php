@@ -590,7 +590,21 @@
             "image": "fa fa-image",
             "video": "fa fa-video",
             "script": "fa fa-file-code"
-          }
+          },
+          enum_store_options:[
+            {
+              "value":"both",
+              "label":"Label with code"
+            },
+            {
+              "value":"code",
+              "label":"Code"
+            },
+            {
+              "value":"label",
+              "label":"Label"
+            }            
+          ]          
         }
       },
       created: function() {
@@ -602,6 +616,7 @@
         });
       },
       methods: {
+        
         onWindowUnload: function(event){
           if (!this.is_dirty){
             return null;
@@ -1081,6 +1096,18 @@
           set: function(newValue) {
             Vue.set(this.ActiveNode, "enum", newValue);
           }
+        },
+        ActiveNodeEnumStoreColumn:{
+          get: function(){
+            if (this.ActiveNode.enum_store_column){
+              return this.ActiveNode.enum_store_column;
+            }
+            return 'both';
+          },
+          set: function(newValue){
+            Vue.set(this.ActiveNode, "enum_store_column", newValue);
+        }
+          
         },
         ActiveNodeEnumCount() {
           if (this.ActiveNode.enum) {

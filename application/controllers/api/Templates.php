@@ -254,7 +254,7 @@ class Templates extends MY_REST_Controller
 	{		
 		try{			
 			//$this->has_access($resource_='template_manager',$privilege='edit');
-			$this->editor_acl->user_has_template_access($uid,$permission='edit',$this->user);	
+			$this->editor_acl->user_has_template_access($uid,$permission='edit',$this->user);
 
 			if (!$uid){
 				throw new Exception("Missing parameter: UID");
@@ -394,10 +394,22 @@ class Templates extends MY_REST_Controller
 	 */
 	function share_post()
 	{		
-		try{			
-			$this->has_access($resource_='template_manager',$privilege='edit');
-
+		try{
+			
 			$options=$this->raw_json_input();
+
+			if (!is_array($options)){
+				throw new Exception("Invalid input: must be an array");
+			}
+
+			foreach($options as $option){
+				if (!isset($option['template_uid'])){
+					throw new Exception("Missing parameter: template_uid");
+				}
+
+				$this->editor_acl->user_has_template_access($option['template_uid'],$permission='admin',$this->user);	
+			}
+
 			$result=$this->Editor_template_model->share_template($options, $this->user_id);
 
 			$output=array(
@@ -408,7 +420,11 @@ class Templates extends MY_REST_Controller
 			$this->set_response($output, REST_Controller::HTTP_OK);			
 		}
 		catch(Exception $e){
-			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
 
@@ -438,9 +454,7 @@ class Templates extends MY_REST_Controller
 
 	function remove_access_post()
 	{
-		try{			
-			$this->has_access($resource_='template_manager',$privilege='edit');
-
+		try{
 			$options=$this->raw_json_input();
 
 			if (!isset($options['template_uid'])){
@@ -451,7 +465,7 @@ class Templates extends MY_REST_Controller
 				throw new Exception("Missing parameter: user_id");
 			}
 
-
+			$this->editor_acl->user_has_template_access($options['template_uid'],$permission='admin',$this->user);
 			$result=$this->Editor_template_model->unshare_template($options['template_uid'], $options['user_id']);
 
 			$output=array(
@@ -462,7 +476,11 @@ class Templates extends MY_REST_Controller
 			$this->set_response($output, REST_Controller::HTTP_OK);			
 		}
 		catch(Exception $e){
-			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
 

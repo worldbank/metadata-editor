@@ -37,7 +37,18 @@ Vue.component('vue-template-share', {
           this.searchUsers(val);
         }          
     },
-    methods: {     
+    methods: {   
+        erorrMessageToText: function(error){
+            let error_text = '';
+            if (error.response.data.errors) {
+                for (let key in error.response.data.errors) {
+                    error_text += error.response.data.errors[key] + '\n';
+                }
+            } else {
+                error_text = error.response.data.message;
+            }
+            return error_text;
+        },  
         getSelectedUsersList: function(){
             let selected_users = [];
             for (let i = 0; i < this.selected_users.length; i++) {
@@ -81,6 +92,7 @@ Vue.component('vue-template-share', {
             })
             .catch(function (error) {
                 console.log(error);
+                alert("Failed: " + vm.erorrMessageToText(error));
             })
             .finally(() => (this.is_loading = false));
         },        
@@ -104,6 +116,7 @@ Vue.component('vue-template-share', {
             })
             .catch(function (error) {
                 console.log(error);
+                alert("Failed: " + vm.erorrMessageToText(error));
             });
             
         },
@@ -130,7 +143,7 @@ Vue.component('vue-template-share', {
             })
             .catch(function (error) {
                 console.log(error);
-                alert("Error removing user access");
+                alert("Failed: " + vm.erorrMessageToText(error));
             });
         },
         
@@ -181,6 +194,7 @@ Vue.component('vue-template-share', {
                         v-model="selected_users"
                         :loading="is_loading"
                         :search-input.sync="search"
+                        @input="search=null"
                         :items="users"
                         solo
                         chips
@@ -191,7 +205,7 @@ Vue.component('vue-template-share', {
                         multiple
                         cache-items
                         return-object
-                        no-data-text="Type user name or email to search for a user"                        
+                        no-data-text="Type user name or email to search for a user"                                                
                     >
                         <template v-slot:selection="data">
                             <v-chip
