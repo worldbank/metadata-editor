@@ -224,7 +224,8 @@ class Project_search
 		//keywords
 		if (isset($search_options['keywords']) && !empty($search_options['keywords'])) {
 			$keywords_query=$this->build_keywords_fulltext_query($search_options['keywords']);
-			$escaped_keywords=$this->ci->db->escape('%'.$search_options['keywords'].'%');
+
+			$escaped_keywords=$this->ci->db->escape('%'.trim($search_options['keywords']).'%');
 			$where = sprintf('(title like %s OR idno like %s OR study_idno like %s) OR %s',
                         $escaped_keywords,
                         $escaped_keywords,
@@ -276,6 +277,10 @@ class Project_search
 
 	function build_keywords_fulltext_query($keywords)
 	{
+		//remove characters that are not allowed in fulltext search
+		$keywords=preg_replace('/[@+\-&|!(){}[\]^"~*?:\/\\\]/','',$keywords);
+		$keywords=trim($keywords);		
+
 		$keywords_list=explode(" ",$keywords);
 		$keyword_query=array();
 		foreach($keywords_list as $idx=>$keyword){
