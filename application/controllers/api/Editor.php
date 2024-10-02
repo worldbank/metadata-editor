@@ -239,7 +239,7 @@ class Editor extends MY_REST_Controller
 				$this->update_post($type,$dataset_id);
 			}
 
-			$this->audit_log->log_event($obj_type='project',$obj_id=$dataset_id,$description='create');
+			$this->audit_log->log_event($obj_type='project',$obj_id=$dataset_id,$action='create');			
 
 			$response=array(
 				'status'=>'success',

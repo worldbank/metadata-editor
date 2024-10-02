@@ -25,10 +25,7 @@ class Audit_log
 	{
 		//validate metadata is json
 		if($metadata != NULL){
-			$metadata_=json_decode($metadata);
-			if($metadata_ == NULL){
-				return false;
-			}
+			$metadata=json_encode($metadata);
 		}
 
 		$data=array(
@@ -39,7 +36,12 @@ class Audit_log
 			"metadata"=>$metadata
 		);
 
-		$this->ci->Audit_log_model->insert($data);
+		try{
+			$this->ci->Audit_log_model->insert($data);
+		}
+		catch(Exception $e){
+			log_message('error', 'audit_log:: failed to log_event '.$e->getMessage());
+		}		
 	}
 
 }

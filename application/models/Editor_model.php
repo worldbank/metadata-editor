@@ -1497,8 +1497,8 @@ class Editor_model extends CI_Model {
 		try{
 			$diff = new JsonDiff($metadata_original, $metadata_updated, JsonDiff::TOLERATE_ASSOCIATIVE_ARRAYS);
 
-			$patch=$diff->getPatch();
-			return json_encode($patch);
+			$patch=(array)$diff->getPatch();
+			return $patch;
 		} catch (Exception $e) {
 			if ($ignore_errors==true){
 				return false;

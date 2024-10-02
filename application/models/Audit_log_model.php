@@ -26,6 +26,10 @@ class Audit_log_model extends CI_Model {
 			$data['created']=date("Y-m-d H:i:s");
 		}
 
+		if (isset($data['metadata']) && is_array($data['metadata'])){
+			$data['metadata']=json_encode($data['metadata']);			
+		}
+
 		$this->db->insert('audit_logs', $data); 
 		return $this->db->insert_id();
 	}

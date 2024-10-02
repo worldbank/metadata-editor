@@ -85,8 +85,7 @@
 					  }
 					}
 				  }
-			},
-			"additionalProperties": false
+			}			
 		},
 		"series_description": {
 			"description": "Series information",
