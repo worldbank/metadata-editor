@@ -142,21 +142,6 @@ class Project_search
 			"shared"
 		);
 
-		/*
-		if (isset($search_options['ownership']) && in_array($search_options['ownership'],$ownership_types)) {
-			switch($search_options['ownership']){
-				case 'self':
-					$this->ci->db->where('editor_projects.created_by',(int)$project_owners[0]);
-					break;
-				case 'shared':
-					$this->ci->db->where('editor_projects.created_by !=',(int)$project_owners[0]);
-					break;
-			}		
-			
-			$applied_filters['ownerships']=$search_options['ownership'];
-		}
-		*/
-
 		//filter by ownership
 		$project_owners=$this->parse_filter_values_as_int($this->get_search_filter($search_options,'user_id'));
 
@@ -235,27 +220,6 @@ class Project_search
             $this->ci->db->where($where,NULL,FALSE);			
 			$applied_filters['keywords']=$search_options['keywords'];
 		}
-
-		/*
-		//ownership
-		$ownership_types=array(
-			"self",
-			"shared"
-		);
-
-		if (isset($search_options['ownership']) && in_array($search_options['ownership'],$ownership_types)) {
-			switch($search_options['ownership']){
-				case 'self':
-					$this->ci->db->where('editor_projects.created_by',(int)$project_owners[0]);
-					break;
-				case 'shared':
-					$this->ci->db->where('editor_projects.created_by !=',(int)$project_owners[0]);
-					break;
-			}		
-			
-			$applied_filters['ownerships']=$search_options['ownership'];
-		}
-		*/
 		
 		return $applied_filters;		
 	}

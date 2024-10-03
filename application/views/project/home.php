@@ -971,18 +971,16 @@
           vm = this;
 
           let urlParams = new URLSearchParams(window.location.search);          
+          let keywords= urlParams.get('keywords');
+          urlParams.delete('keywords');
           
-          /*if (!this.search_keywords) {
-            this.search_keywords = '';
-          }
-
-          let url = CI.base_url + '/api/editor/?offset=' + this.PaginationOffset +
-            '&' + 'keywords=' + this.search_keywords +
-            '&' + this.SearchFiltersQuerystring;
-          */
 
           let url = CI.base_url + '/api/editor/?offset=' + this.PaginationOffset +
             '&' + urlParams.toString();
+
+          if (keywords.length>0){
+            url += '&keywords=' + keywords;
+          }
 
           this.loading_status = "Loading projects...";
           this.errors = [];
