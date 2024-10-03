@@ -8,6 +8,13 @@ Vue.component('editor-date-field', {
       }
   },
     methods:{
+      isFieldReadOnly() {
+        if (!this.$store.getters.getUserHasEditAccess) {
+          return true;
+        }
+  
+        return this.field.is_readonly;
+      },
       momentDateISO(date) {        
         return moment(date).toISOString();        
       },
@@ -60,12 +67,13 @@ Vue.component('editor-date-field', {
               prepend-inner-icon="mdi-calendar"
               :hint="'Date format: YYYY-MM-DD - ' + value"
               persistent-hint
-              :disabled="field.is_readonly"
+              :disabled="isFieldReadOnly"
             ></v-text-field>            
           </template>
           <v-date-picker
             v-model="date"
             @change="menu1 = false"
+            :disabled="isFieldReadOnly"
           ></v-date-picker>
         </v-menu>
     </div>

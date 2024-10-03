@@ -36,6 +36,7 @@ const VueExternalResources = Vue.component('external-resources', {
             })
             .catch(function(response){
                 vm.errors=response;
+                alert("Failed: " + vm.erorrMessageToText(response));
             });
         },
         importResource:function(){
@@ -56,7 +57,19 @@ const VueExternalResources = Vue.component('external-resources', {
             })
             .catch(function(response){
                 vm.errors=response;
+                alert("Failed: " + vm.erorrMessageToText(response));
             });            
+        },
+        erorrMessageToText: function(error){
+            let error_text = '';
+            if (error.response.data.errors) {
+                for (let key in error.response.data.errors) {
+                    error_text += error.response.data.errors[key] + '\n';
+                }
+            } else {
+                error_text = error.response.data.message;
+            }
+            return error_text;
         },
     },
     computed: {
@@ -69,7 +82,10 @@ const VueExternalResources = Vue.component('external-resources', {
         },
         ProjectID(){
             return this.$store.state.project_id;
-        }
+        },
+        isProjectEditable(){
+            return this.$store.getters.getUserHasEditAccess;
+        }            
     },
     template: `
         <div class="external-resources container-fluid pt-5 mt-5">

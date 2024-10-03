@@ -6,6 +6,13 @@ Vue.component("form-input", {
   },
   mounted: function () {},
   computed: {
+    isFieldReadOnly() {
+      if (!this.$store.getters.getUserHasEditAccess) {
+        return true;
+      }
+
+      return this.field.is_readonly;
+    },
     local: {
       get: function () {
         return this.value;
@@ -139,7 +146,7 @@ Vue.component("form-input", {
                             >
                         </repeated-field>
                     </div>
-                    <div v-else-if="fieldDisplayType(field)=='dropdown' || fieldDisplayType(field)=='dropdown-custom'">                    
+                    <div v-else-if="fieldDisplayType(field)=='dropdown' || fieldDisplayType(field)=='dropdown-custom'">
                         <v-combobox
                             v-model="fieldEnumByCodeMultiple"
                             :items="field.enum"
@@ -151,7 +158,7 @@ Vue.component("form-input", {
                             small-chips
                             v-bind="formTextFieldStyle"
                             background-color="#FFFFFF"
-                            :disabled="field.is_readonly"
+                            :disabled="isFieldReadOnly"
                         ></v-combobox>
                         
                     </div>
@@ -174,7 +181,7 @@ Vue.component("form-input", {
 
                             <v-text-field
                                 v-model="local"
-                                :disabled="field.is_readonly"
+                                :disabled="isFieldReadOnly"
                                 v-bind="formTextFieldStyle"
                             ></v-text-field>                                                                                        
                             <small :id="'field-toggle-' + normalizeClassID(field.key)" class="collapse help-text form-text text-muted">{{field.help_text}}</small>
@@ -206,7 +213,7 @@ Vue.component("form-input", {
                             <v-textarea
                                 v-else
                                 variant="outlined"
-                                :disabled="field.is_readonly"
+                                :disabled="isFieldReadOnly"
                                 v-model="local"
                                 v-bind="formTextFieldStyle"
                                 class="v-textarea-field"
@@ -240,7 +247,7 @@ Vue.component("form-input", {
                             :multiple="field.type=='simple_array'"
                             v-bind="formTextFieldStyle"
                             background-color="#FFFFFF"                    
-                            :disabled="field.is_readonly"
+                            :disabled="isFieldReadOnly"
                         ></v-combobox>
                         <small class="text-muted">{{field.enum_store_column}} - {{local}}</small>                        
                     </div>
@@ -261,7 +268,7 @@ Vue.component("form-input", {
                             dense
                             clearable
                             background-color="#FFFFFF"  
-                            :disabled="field.is_readonly"                  
+                            :disabled="isFieldReadOnly"
                         ></v-select>                        
                         <small class="text-muted">{{local}}</small>
                     </div>

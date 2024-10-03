@@ -228,8 +228,10 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
         }
     },
     computed: {
-        ExternalResources()
-        {
+        isProjectEditable(){
+            return this.$store.getters.getUserHasEditAccess;
+        },
+        ExternalResources(){
           return this.$store.state.external_resources;
         },
         ActiveResourceIndex(){
@@ -239,17 +241,8 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
 
         },
         Resource(){
-            //return this.ExternalResources[this.ActiveResourceIndex];            
-
             return this.$store.state.external_resources.find(resource => {
                 return resource.id == this.ActiveResourceIndex
-            });
-
-            return this.$store.state.external_resources.forEach((resource, index) => {
-                if (resource.id==this.ActiveResourceIndex){
-                    console.log(":resource",resource, this.ActiveResourceIndex);
-                    return this.ExternalResources[index];
-                }
             });
         },
         ResourceAttachmentType()
@@ -271,7 +264,6 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
     template: `
         <div class="container-fluid edit-resource-container mt-5 pt-5">
 
-        {{is_dirty}}
             <div v-if="Resource">
 
             <v-card>
@@ -419,8 +411,7 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
 
             </div>
 
-
-            <v-btn color="primary" @click="uploadFile" :disabled="file_exists==true">Save</v-btn>
+            <v-btn color="primary" @click="uploadFile" :disabled="file_exists==true || !isProjectEditable">Save</v-btn>
             <v-btn @click="cancelSave">Cancel</v-btn>
 
 

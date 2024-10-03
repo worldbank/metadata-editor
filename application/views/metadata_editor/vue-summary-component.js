@@ -18,6 +18,9 @@ Vue.component('summary-component', {
         this.getProjectDiskUsage();        
     },
     computed: {
+        isProjectEditable(){
+            return this.$store.getters.getUserHasEditAccess;
+        },
         ProjectID(){
             return this.$store.state.project_id;
         },
@@ -151,11 +154,11 @@ Vue.component('summary-component', {
                                     
                                     <div class="d-flex justify-space-between">
                                         <div><v-icon style="font-size:25px;">mdi-alpha-t-box</v-icon> {{$t("template")}}</div>                                        
-                                        <v-btn small title="Apply template default values" text @click="templateApplyDefaults"><v-icon>mdi-checkbox-multiple-marked-circle</v-icon>Defaults</v-btn>        
+                                        <v-btn :disabled="!isProjectEditable" small title="Apply template default values" text @click="templateApplyDefaults"><v-icon>mdi-checkbox-multiple-marked-circle</v-icon>Defaults</v-btn>
                                     </div>
 
                                     <div class="mt-1">
-                                        <v-btn text color="primary" @click="loadTemplates();dialog_template=true">
+                                        <v-btn text color="primary" @click="loadTemplates();dialog_template=true" :disabled="!isProjectEditable">
                                             {{ProjectTemplate.name}} - {{ProjectTemplate.version}}
                                         </v-btn>
                                     </div>

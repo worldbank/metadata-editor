@@ -41,10 +41,15 @@ Vue.component('table-grid-component', {
             }
             return keys;
         },
-        isReadOnly(){
+        isFieldReadOnly() {
+            if (!this.$store.getters.getUserHasEditAccess) {
+                return true;
+            }
+        
             if (this.field && this.field.is_readonly){
                 return this.field.is_readonly;
             }
+
             return false;
         }
     },
@@ -240,7 +245,7 @@ Vue.component('table-grid-component', {
                 <tr>
                     <th>
                     <!--options -->
-                    <v-menu bottom left v-if="!isReadOnly">
+                    <v-menu bottom left v-if="!isFieldReadOnly">
                         <template v-slot:activator="{ on, attrs }">
                         <v-btn
                             light
@@ -302,7 +307,7 @@ Vue.component('table-grid-component', {
                         </span>
                     </th>
                     <th scope="col">
-                    <span class="float-right" v-show="enums" v-if="!isReadOnly">
+                    <span class="float-right" v-show="enums" v-if="!isFieldReadOnly">
                     <v-btn
                             light
                             icon
@@ -324,7 +329,7 @@ Vue.component('table-grid-component', {
                     <td v-for="(column,idx_col) in localColumns" scope="row">
                         <div v-if="fieldDisplayType(column)=='textarea'" >
                             <textarea class="form-control form-control-sm"
-                                :disabled="isReadOnly"
+                                :disabled="isFieldReadOnly"
                                 :value="local[index][column.key]"
                                 @input="update(index,column.key, $event.target.value)"
                             >
@@ -344,7 +349,7 @@ Vue.component('table-grid-component', {
                                     item-value="code"
                                     :return-object="false"
                                     class="form-field-dropdown-custom"
-                                    :disabled="isReadOnly"
+                                    :disabled="isFieldReadOnly"
                                 ></v-combobox>
                         </div>
                         <div v-else>
@@ -352,14 +357,14 @@ Vue.component('table-grid-component', {
                                 :value="local[index][column.key]"
                                 @input="update(index,column.key, $event.target.value)"
                                 class="form-control form-control-sm"
-                                :disabled="isReadOnly"
+                                :disabled="isFieldReadOnly"
                             >
                         </div>
                         
                     </td>
                     <td scope="row">        
                         <div class="mr-1">
-                            <v-icon  v-if="!isReadOnly" class="v-delete-icon" v-on:click="remove(index)">mdi-trash-can-outline</v-icon>
+                            <v-icon  v-if="!isFieldReadOnly" class="v-delete-icon" v-on:click="remove(index)">mdi-trash-can-outline</v-icon>
                         </div>
                     </td>
                 </tr>
@@ -367,7 +372,7 @@ Vue.component('table-grid-component', {
                 </tbody>
             </table>
 
-            <div class="d-flex justify-content-center" v-if="!isReadOnly">                
+            <div class="d-flex justify-content-center" v-if="!isFieldReadOnly">                
                 <v-btn @click="addRow" class="m-2" text small ><v-icon>mdi-plus</v-icon>{{ $t("add_row") }}</v-btn>
             </div>
 
