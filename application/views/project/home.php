@@ -978,7 +978,7 @@
           let url = CI.base_url + '/api/editor/?offset=' + this.PaginationOffset +
             '&' + urlParams.toString();
 
-          if (keywords.length>0){
+          if (keywords && keywords.length>0){
             url += '&keywords=' + keywords;
           }
 
