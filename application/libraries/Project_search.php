@@ -186,6 +186,22 @@ class Project_search
 			}
 		}
 
+
+		//filter by created_by
+		$created_by=$this->parse_filter_values_as_int($this->get_search_filter($search_options,'created_by'));
+		if ($created_by){
+			$this->ci->db->where_in('editor_projects.created_by',$created_by);
+			$applied_filters['created_by']=$created_by;
+		}
+
+		//filter by changed_by
+		$changed_by=$this->parse_filter_values_as_int($this->get_search_filter($search_options,'changed_by'));
+		if ($changed_by){
+			$this->ci->db->where_in('editor_projects.changed_by',$changed_by);
+			$applied_filters['changed_by']=$changed_by;
+		}
+
+
 		//filter by collection
 		$collection_filters=$this->parse_filter_values_as_int($this->get_search_filter($search_options,'collection'));
 		
