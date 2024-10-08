@@ -39,6 +39,7 @@ class Editor_acl
 
 		//check if user has access to the collection
 		if ($this->user_has_collection_access($permission,$project_id,$user)){
+
 			return true;
 		}
  
@@ -237,16 +238,15 @@ class Editor_acl
 			return false;
 		}
 		
-		//add access
+		//add access and test permissions
 		foreach($collection_permissions as $collection_permission)
 		{
 			$role='user-'.$collection_permission['permissions'];
 			$acl->allow($role,'project',array($collection_permission['permissions']));
-		}
 
-
-		if ($acl->isAllowed($role,'project',$permission) ){
-			return true;
+			if ($acl->isAllowed($role,'project',$permission) ){
+				return true;
+			}
 		}
 
 		return false;		
