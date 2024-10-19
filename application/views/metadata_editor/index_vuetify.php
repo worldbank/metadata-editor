@@ -99,6 +99,10 @@
 <script src="//cdnjs.cloudflare.com/ajax/libs/Vue.Draggable/2.20.0/vuedraggable.umd.min.js"></script>
 
 
+  <script src="https://cdn.jsdelivr.net/npm/vue-json-pretty@1.9.5/lib/vue-json-pretty.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vue-json-pretty@1.9.5/lib/styles.min.css">
+
+
 
   <?php echo $this->load->view("metadata_editor/index_vuetify_main_app",null,true);?>
 
@@ -969,6 +973,8 @@
       }
     }
     })
+
+    Vue.component('VueJsonPretty', VueJsonPretty.default);
   </script>
 
   <script>

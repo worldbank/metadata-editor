@@ -66,4 +66,34 @@ class Audit_log_model extends CI_Model {
 		return $query->result_array();
 	}
 
+
+	/**
+	 * 
+	 * Returns the history of a specific object
+	 * 
+	 */
+	function get_history($obj_type,$obj_id,$limit=10, $offset=0)
+	{
+		$this->db->select('audit_logs.*, users.username, users.email');
+		$this->db->where('obj_type',$obj_type);
+		$this->db->where('obj_id',$obj_id);
+		$this->db->join('users', 'users.id = audit_logs.user_id');
+		$this->db->order_by('created','desc');
+		$this->db->limit($limit);
+
+		if ($offset>0){
+			$this->db->offset($offset);
+		}
+
+		$query = $this->db->get("audit_logs");
+		$result=$query->result_array();
+
+		foreach($result as $idx=>$row)
+		{
+			$result[$idx]['metadata']=json_decode($row['metadata'],true);
+		}
+
+		return $result;
+	}
+
 }

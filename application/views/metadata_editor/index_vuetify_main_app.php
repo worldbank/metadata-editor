@@ -212,6 +212,7 @@
             echo $this->load->view("project/vue-collection-share-component.js", null, true);
             echo $this->load->view("metadata_editor/vue-summary-collections-component.js", null, true);
             echo $this->load->view("metadata_editor/vue-textarea-latex-component.js", null, true);
+            echo $this->load->view("metadata_editor/vue-project-history-component.js",null,true);
         ?>
 
         <?php if (empty($metadata)):?>
@@ -257,6 +258,7 @@
         const GeoFeature ={props: ['feature_name'],template: '<div><geospatial-feature/></div>'}
         const PagePreview ={template: '<div><page-preview/></div>'}
         const GeoGallery ={template: '<div><geospatial-gallery/></div>'}
+        const ProjectHistory ={template: '<div><project-history/></div>'}
 
         //routes
         const routes = [
@@ -280,7 +282,8 @@
             //{ path: '/files', component: FileManager, props: true},
             { path: '/geospatial-features', component: GeoFeatures, props: true},
             { path: '/geospatial-feature/:feature_name', component: GeoFeature, props: true },
-            { path: '/geospatial-gallery', component: GeoGallery, props: true }
+            { path: '/geospatial-gallery', component: GeoGallery, props: true },
+            { path: '/history', component: ProjectHistory },
         ]
 
         const router = new VueRouter({

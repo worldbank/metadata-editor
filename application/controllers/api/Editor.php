@@ -17,6 +17,7 @@ class Editor extends MY_REST_Controller
 		$this->load->model("Collection_model");
 		
 		$this->load->library("Editor_acl");
+		$this->load->model("Audit_log_model");
 		$this->load->library("Audit_log");
 		$this->load->library("Project_search");
 		$this->load->library('Project_json_writer');
@@ -1285,5 +1286,35 @@ class Editor extends MY_REST_Controller
 			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}		
 	}
+
+
+	/**
+	 * 
+	 * Get edit history for a project
+	 * 
+	 */
+	function history_get($sid=null)
+	{
+		try{
+			$sid=$this->get_sid($sid);
+			$this->editor_acl->user_has_project_access($sid,$permission='view',$this->api_user);
+
+			$result=$this->Audit_log_model->get_history($obj_type='project',$obj_id=$sid,$limit=10, $offset=0);
+			//array_walk($result, 'unix_date_to_gmt_row',array('created','changed'));
+				
+			$response=array(
+				'status'=>'success',
+				'history'=>$result
+			);			
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}	
 
 }
