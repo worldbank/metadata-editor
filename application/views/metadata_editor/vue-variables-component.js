@@ -311,6 +311,8 @@ Vue.component('variables', {
                 for(k=0;k<this.variableMultipleUpdateFields.length;k++){
                     field_name=this.variableMultipleUpdateFields[k];
 
+                    //console.log("field_name",field_name, this.variableMultiple[field_name]);
+
                     //key exists
                     if(this.variableMultiple[field_name]!=null){
 
@@ -328,7 +330,16 @@ Vue.component('variables', {
                             Vue.set(variable_,'sum_stats_options',JSON.parse(JSON.stringify(sum_stats_options_)));
                         }
                         else{
-                            variable_[field_name]=JSON.parse(JSON.stringify(this.variableMultiple[field_name]));
+
+                            //don't apply weights to string variables
+                            if (variable_.var_format.type=='character'){
+                                if (field_name=='var_wgt' || field_name=='var_wgt_id'){
+                                    continue;
+                                }
+                            }
+
+                            //variable_[field_name]=JSON.parse(JSON.stringify(this.variableMultiple[field_name]));
+                            Vue.set(variable_,field_name,JSON.parse(JSON.stringify(this.variableMultiple[field_name])));
                         }
                     }
                 }
@@ -399,11 +410,15 @@ Vue.component('variables', {
         },        
         deleteVariable: function()
         {
+            if (!confirm("Delete selected variable(s)?")){
+                return;
+            }
+
             let vm=this;
             let url=CI.base_url + '/api/variables/delete/'+vm.ProjectID;
             let var_uid_list=[];
 
-            console.log("variables to be deleted",this.edit_items);
+            //console.log("variables to be deleted",this.edit_items);
             this.edit_items.forEach((item) => {
                 //console.log("variable delete",this.variables[item]);
                 var_uid_list.push(this.variables[item].uid);
@@ -423,6 +438,13 @@ Vue.component('variables', {
                     vm.$store.commit('variable_remove',{fid:vm.fid, idx:item});
                 });
                 vm.edit_items=[];
+
+                //select item before the deleted item or after the deleted item
+                let newIdx=edit_items_descending[0]-1;
+                if (newIdx<0){
+                    newIdx=edit_items_descending[0]+1;
+                }
+                vm.editVariable(newIdx);
             })
             .catch(function (error) {
                 alert("Error deleting variables");
@@ -835,12 +857,6 @@ Vue.component('variables', {
                                             <v-icon aria-hidden="false" class="var-icon">mdi-content-copy</v-icon>
                                         </span>
 
-                                        <!-- 
-                                        <span @click="addVariable" :title="$t('add_new_variable')">
-                                            <v-icon aria-hidden="false" class="var-icon">mdi-plus-box</v-icon>                                            
-                                        </span>
-                                        -->
-
                                         <span @click="deleteVariable" :title="$t('delete_selection')">
                                             <v-icon aria-hidden="false" class="var-icon">mdi-trash-can-outline</v-icon>
                                         </span>
@@ -851,8 +867,7 @@ Vue.component('variables', {
                                             </span>
                                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="font-size:small;">
                                                 <a class="dropdown-item" href="#"><i class="fas fa-spell-check"></i> {{$t('change_case')}}</a>
-                                                <a class="dropdown-item" href="#"><i class="fas fa-clone"></i> {{$t('spread_metadata')}}</a>
-                                                <!-- <a class="dropdown-item" href="#"><i class="fas fa-file-download"></i> Export variable(s)</a> -->
+                                                <a class="dropdown-item" href="#"><i class="fas fa-clone"></i> {{$t('spread_metadata')}}</a>                                                
                                             </div>
                                         </span>
 

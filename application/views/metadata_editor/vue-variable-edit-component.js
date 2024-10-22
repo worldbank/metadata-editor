@@ -239,7 +239,23 @@ Vue.component('variable-edit', {
             return value.toFixed(decimals);
         },
         OnVariableWeightChange(e){
-            this.variable.update_required=true;
+            
+            if (e){
+                //check variable format type e.g. numeric, character
+                if (this.variable.var_format && this.variable.var_format.type){
+                    if (this.variable.var_format.type=='character'){
+                        Vue.delete(this.variable, 'var_wgt_id');
+                        alert("Variable " + this.variable.name + " is a character type and cannot be weighted.");                        
+                        return;
+                    }
+                }
+
+                Vue.set(this.variable, 'var_wgt_id', e);
+            }
+            else{
+                Vue.delete(this.variable, 'var_wgt_id');
+            }            
+            Vue.set(this.variable, 'update_required', true);
         },
         sectionEnabled: function(section){
             
