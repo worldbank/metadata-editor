@@ -50,9 +50,6 @@ table td, table th {
 }
 
 
-.field-accordion{
-}
-
 .field-accordion .card-heading
 {
     border-bottom:1px solid #ccc;
@@ -60,4 +57,10 @@ table td, table th {
 
 .field-accordion .card-body{
     padding-left:20px;
+}
+
+
+.xsl-caption{
+    font-weight:bold;
+    margin-top:10px;
 }

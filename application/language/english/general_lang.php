@@ -108,6 +108,9 @@ $lang['field_content_format_help']="Text, Markdown, LaTex, HTML. Default is Text
 
 $lang['enum_store_options_label']="Select column to use as value";
 
+$lang['export_file']="Export file";
+$lang['finished_processing']="Finished processing";
+
 
 
 /* End of file general_lang.php */

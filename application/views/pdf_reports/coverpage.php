@@ -20,7 +20,7 @@
     
     <div style="margin-top:5px;font-size:12pt;color:gray;">
         <?php echo t('Report generated on');?>: <?php echo date("F j, Y",date("U")); ?>
-        <div style="margin-top:15px;">Project type: <?php echo $project['type']; ?></div>
+        <div style="margin-top:15px;">Project type: <?php echo $project['type'] =='survey' ? 'Microdata' : $project['type']; ?></div>
     </div>
 
     <div style="margin-top:50px;font-size:12pt;color:gray;">
