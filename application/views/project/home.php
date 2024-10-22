@@ -641,13 +641,7 @@
           "image": "fa fa-image",
           "video": "fa fa-video",
           "script": "fa fa-file-code"
-        },
-        /*sort_by_options:{
-          "title_asc":"Title (A-Z)",
-          "title_desc":"Title (Z-A)",
-          "updated_asc":"Oldest ↓",
-          "updated_desc":"Recent ↑" 
-        },*/
+        },        
         sort_by_options:[],            
         sort_by:"updated_desc",
         collections_flat_list:[],
@@ -781,12 +775,6 @@
           }
         },
         initSortOptions: function(){
-          /*this.sort_by_options={
-            "title_asc":this.$t("title_az"),
-            "title_desc":this.$t("title_za"),
-            "updated_asc":this.$t("oldest"),
-            "updated_desc":this.$t("recent") 
-          }*/
           this.sort_by_options=[
             {value:"title_asc",text:this.$t("title_az")},
             {value:"title_desc",text:this.$t("title_za")},
@@ -825,8 +813,6 @@
             }
           }
 
-            //this.searchText=urlParams.get('searchText');
-
           //apply filters
           for(f=0;f<Object.keys(search_filters).length;f++){
             let filter_name=Object.keys(search_filters)[f];
@@ -843,11 +829,6 @@
               this.sort_by=sort_;
             }
           }
-
-          /*this.filter1=search_filters.filter1;
-          this.filter2=search_filters.filter2;
-          this.filter3=search_filters.filter3;
-          this.countries=search_filters.countries.split(",");*/
         },
         onWindowFocus: function() {
           this.search();
@@ -994,7 +975,6 @@
                 throw new Error(response.data);
               }
 
-              console.log("success", response);
               vm.projects = response.data;
               vm.pagination_page = vm.PaginationCurrentPage;
             })
@@ -1002,7 +982,6 @@
               console.log("error", error);
             })
             .then(function() {
-              console.log("request completed");
               this.loading_status = "";
             });
         },
@@ -1015,9 +994,6 @@
 
           axios.post(url,
               form_data
-              /*headers: {
-                  "xname" : "value"
-              }*/
             )
             .then(function(response) {
               if (response.data.id) {
@@ -1026,8 +1002,7 @@
               vm.loadProjects();
             })
             .catch(function(error) {
-              console.log("error", error);
-              alert("Failed", error);
+              alert("Failed: " + error);
             })
             .then(function() {
               // always executed
@@ -1109,11 +1084,6 @@
         },
         removeFilter: function(filter_type, value_idx) {
          this.$delete(this.search_filters[filter_type], value_idx);
-          /*if (filter_type=='collection'){
-            this.search_filters['collection']=[];
-          }else{
-            this.$delete(this.search_filters[filter_type], value_idx);
-          }*/
         },
         getUsersList: async function() {
           vm = this;
@@ -1252,7 +1222,13 @@
             this.loadProjects();
           } catch (e) {
             console.log("addProjectsToCollection error", e);
-            alert("Failed", JSON.stringify(e));
+            if (e.response.data.message) {
+              alert("Failed: " + e.response.data.message);
+            } else if (e.response.data.error) {
+              alert("Failed: " + JSON.stringify(e.response.data.error));
+            } else {
+              alert("Failed: " + JSON.stringify(e.response));
+            }            
           }
         },
         removeFromCollection: async function(project_id, collection_id) {
