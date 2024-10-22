@@ -3,7 +3,7 @@ Vue.component('project-export-json-component', {
     props:['value'],
     data () {
         return {
-            options: 'all',
+            options: 'public',
             base_url: CI.base_url
         }
       },
