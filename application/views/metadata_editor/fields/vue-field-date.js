@@ -7,14 +7,7 @@ Vue.component('editor-date-field', {
         date:''
       }
   },
-    methods:{
-      isFieldReadOnly() {
-        if (!this.$store.getters.getUserHasEditAccess) {
-          return true;
-        }
-  
-        return this.field.is_readonly;
-      },
+    methods:{      
       momentDateISO(date) {        
         return moment(date).toISOString();        
       },
@@ -30,6 +23,13 @@ Vue.component('editor-date-field', {
       
     },
     computed:{
+      isFieldReadOnly() {
+        if (!this.$store.getters.getUserHasEditAccess) {
+          return true;
+        }
+  
+        return this.field.is_readonly;
+      },
       Value(){
         if (!this.value){
           return null;
