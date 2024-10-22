@@ -41,9 +41,11 @@ Vue.component('variable-groups', {
                     },
                     "display_type": "text"
                     }
-                ],
+                ]                        
+            },
+            custom_fields:[ "variable_groups.variables", "variable_groups.variable_groups"],
+            is_saving:false
         }
-    }
     }, 
     mounted: function () {
         this.treeItemOpen.push('-1');
@@ -95,12 +97,11 @@ Vue.component('variable-groups', {
             }
         },
         removeGroupByVGID: function(vgid){
-            console.log("removing group by vgid",vgid);
+            
             let remove=function(item){
                 for(let i=0;i<item.length;i++){
-                    console.log("searching", item[i].vgid, vgid, item[i].label, item[i].group_type, item[i].vgid=="VG1");
-                    if (item[i].vgid==vgid){
-                        console.log("group found, removing", item[i].vgid, vgid, item[i].label, item[i].group_type, item[i].vgid=="VG1");
+                    
+                    if (item[i].vgid==vgid){                        
                         item.splice(i,1);
                         return true;
                     }
@@ -110,9 +111,8 @@ Vue.component('variable-groups', {
                 }
                 if (item.variable_groups){
                     for(let i=0;i<item.variable_groups.length;i++){
-                        console.log("searching", item);
-                        if (item.variable_groups[i].vgid==vgid){
-                            console.log("group found, removing", item.variable_groups[i].vgid, vgid, item.variable_groups[i].label, item.variable_groups[i].group_type, item.variable_groups[i].vgid=="VG1");
+                        
+                        if (item.variable_groups[i].vgid==vgid){                            
                             item.variable_groups.splice(i,1);
                             return true;
                         }
@@ -126,6 +126,10 @@ Vue.component('variable-groups', {
             remove(this.VariableGroups);
         },
         removeVariable: function(idx){
+            if (!confirm("Are you sure you want to remove this variable?")){
+                return;
+            }
+
             this.activeItem.variables.splice(idx,1);
         },
 
@@ -152,13 +156,12 @@ Vue.component('variable-groups', {
         },
         
         saveVariableGroupsDebounce: _.debounce(function(data) {
-            console.log("savingto db");
             this.saveVariableGroups();
         }, 500),
         saveVariableGroups: function()
         {
             vm=this;
-            let url=CI.base_url + '/api/variable_groups/'+vm.project_id;
+            let url=CI.base_url + '/api/variable_groups/'+vm.project_id;            
             form_data={
                 'variable_groups':this.VariableGroups
             }
@@ -171,11 +174,13 @@ Vue.component('variable-groups', {
             )
             .then(function (response) {
                 console.log("updating",response);
+                EventBus.$emit('onSuccess', 'Variable group saved!');
                 //vm.$set(vm.data_files, vm.edit_item, JSON.parse(JSON.stringify(data)));
                 //vm.$store.dispatch('loadDataFiles',{dataset_id:vm.dataset_id});
             })
             .catch(function (error) {
                 console.log(error);
+                EventBus.$emit('onFail', 'Failed to save changes');
                 let message='';
                 if (error.response.data.message){
                     message=error.response.data.message;
@@ -194,7 +199,48 @@ Vue.component('variable-groups', {
                 this.$set(this.activeItem, 'variables', []);
             }
             this.activeItem.variables.push(...selected);
-        }
+        },
+        findTemplateByItemKey: function (items,key){
+            let item=null;
+            let found=false;
+            let i=0;
+
+            while(!found && i<items.length){
+                console.log("searching", items[i].key, key);
+                if (items[i].key==key){
+                    item=items[i];
+                    found=true;
+                }else{
+                    if (items[i].items){
+                        item=this.findTemplateByItemKey(items[i].items,key);
+                        if (item){
+                            found=true;
+                        }
+                    }
+                }
+                i++;                        
+            }
+            return item;
+        },
+        update: function (key, value)
+        {
+            key=key.replace('variable_groups.','');
+            if (key.indexOf(".") !== -1 && this.activeItem[key]){
+                delete this.activeItem[key];
+            }
+            Vue.set(this.activeItem,key,value);
+        },
+        updateSection: function (obj)
+        {
+            this.update(obj.key,obj.value);
+        },
+
+        localValue: function(key)
+        {
+            //remove 'variable_groups.' from key
+            key=key.replace('variable_groups.','');
+            return _.get(this.activeItem,key);
+        },
     },
     computed: {
         treeItems(){
@@ -230,7 +276,7 @@ Vue.component('variable-groups', {
             }
 
             ActiveItemVariables=this.ActiveItemVariables;
-            $variables = [];
+            let $variables = [];
 
             for (var $file in $variablesByFile){
                 for (var $variable in $variablesByFile[$file]){
@@ -240,186 +286,171 @@ Vue.component('variable-groups', {
                     }
                 }
             }
-            console.log("variables dfdfdfdf", $variables);
+            
             return $variables;
-        }
+        },
+        
+        VariableGroupTemplate(){
+                let key='variable_groups';                
+                let items=this.$store.state.formTemplate.template.items;
+                let item=this.findTemplateByItemKey(items,key);
+                return item;        
+        },
+
+        VariableGroupTypeField(){
+
+            let key='variable_groups.group_type';                
+            let items=this.$store.state.formTemplate.template.items;
+            let group_type_field=this.findTemplateByItemKey(items,key);
+            
+            if (group_type_field){
+                return group_type_field;
+            }
+
+            return {
+                "key": "group_type",
+                "title": "Group type",
+                "type": "string",
+                "prop_key": "variable_groups.group_type",
+                "help_text": "The type of the group.",
+                "display_type": "text"
+            }
+        },
 
     },
     template: `
         <div class="variable-groups-component">
-        <dialog-variable-selection v-if="activeItem" :key="activeItem.vgid" v-model="showDialog" :selected_items="ActiveItemVariables" @selected="OnVariableSelection"></dialog-variable-selection>
+            <dialog-variable-selection v-if="activeItem" :key="activeItem.vgid" v-model="showDialog" :selected_items="ActiveItemVariables" @selected="OnVariableSelection"></dialog-variable-selection>
         
-            <div class="container-fluid mt-5 pt-5 ">
+            <div class="container-fluid mt-5 pt-5">
 
-            <h3>Variable Groups</h3>
+                <div class="bg-white p-3 border">
 
-            <div class="row">
-                <div class="col-md-4">
-                    
-                    <div class="float-right" style="width:100px;" v-if="activeItem" >
-                        <div><v-icon color="primary" @click="addGroup">mdi-plus</v-icon></div>
-                        <div><v-icon color="primary" @click="removeGroup">mdi-minus</v-icon></div>
-                        <div><v-icon color="primary" >mdi-arrow-up-thin</v-icon></div>
-                        <div><v-icon color="primary" >mdi-arrow-down-thin</v-icon></div>
-                    </div>
+                <h3 class="mb-3">Variable Groups</h3>                
 
-                    <v-treeview 
-                        color="warning" 
-                        :items="treeItems" 
-                        activatable dense 
-                        :active.sync="treeActiveItem"
-                        :open.sync="treeItemOpen"
-                        item-key="vgid" 
-                        item-text="label" 
-                        expand-icon="mdi-chevron-down" 
-                        indeterminate-icon="mdi-bookmark-minus" 
-                        on-icon="mdi-bookmark" 
-                        off-icon="mdi-bookmark-outline" 
-                        item-children="variable_groups">
+                <div class="row mt-2">
+                    <div class="col-md-4">
+                        
+                        <div class="float-right" style="width:100px;" v-if="activeItem" >
+                            <div><v-icon color="primary" @click="addGroup">mdi-plus</v-icon></div>
+                            <div><v-icon color="primary" @click="removeGroup">mdi-minus</v-icon></div>
+                            <div><v-icon color="primary" >mdi-arrow-up-thin</v-icon></div>
+                            <div><v-icon color="primary" >mdi-arrow-down-thin</v-icon></div>
+                        </div>
 
-                        <template #label="{ item }">
-                            <span @click="treeClick(item)" :title="item.label" class="tree-item-label">                            
-                                    <span>{{item.label}}</span>
+                        <v-treeview 
+                            color="warning" 
+                            :items="treeItems" 
+                            activatable dense 
+                            :active.sync="treeActiveItem"
+                            :open.sync="treeItemOpen"
+                            item-key="vgid" 
+                            item-text="label" 
+                            expand-icon="mdi-chevron-down" 
+                            indeterminate-icon="mdi-bookmark-minus" 
+                            on-icon="mdi-bookmark" 
+                            off-icon="mdi-bookmark-outline" 
+                            item-children="variable_groups">
+
+                            <template #label="{ item }">
+                                <span @click="treeClick(item)" :title="item.label" class="tree-item-label">                            
+                                        <span>{{item.label}}</span>
+                                    </span>
                                 </span>
-                            </span>
+                            </template>
+
+                            <template v-slot:prepend="{ item, open }">
+                                <v-icon v-if="item.vgid==-1">
+                                    {{ open ? 'mdi-dresser' : 'mdi-dresser' }}
+                                </v-icon>
+                                <v-icon v-else-if="item.type=='section'">
+                                    {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
+                                </v-icon>
+                                <v-icon v-else>
+                                    {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
+                                </v-icon>
                         </template>
-
-                        <template v-slot:prepend="{ item, open }">
-                            <v-icon v-if="item.vgid==-1">
-                                {{ open ? 'mdi-dresser' : 'mdi-dresser' }}
-                            </v-icon>
-                            <v-icon v-else-if="item.type=='section'">
-                                {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
-                            </v-icon>
-                            <v-icon v-else>
-                                {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
-                            </v-icon>
-                    </template>
-                    </v-treeview>
-                </div>
-                <div class="col-md-8"> 
-                    <div v-if="VariableGroups.length==0">
-                        <div class="border text-center text-primary p-3 m-3">You don't have any variable groups. Click on the + to create a new variable group</div>
+                        </v-treeview>
                     </div>
-
-                    <div v-if="activeItem && activeItem.vgid!=-1">
-                        <div class="form-group form-field">
-                            <label>Group type</label>
-                            <input type="text" class="form-control form-control-sm" v-model="activeItem.group_type">
-                        </div>
-                        <div class="form-group form-field">
-                            <label>Label</label>
-                            <input type="text" class="form-control form-control-sm" v-model="activeItem.label">
+                    <div class="col-md-8"> 
+                        <div v-if="VariableGroups.length==0">
+                            <div class="border text-center text-primary p-3 m-3">You don't have any variable groups. Click on the + to create a new variable group</div>
                         </div>
 
-                        <div class="form-group form-field">
-                            <label>Universe</label>
-                            <v-textarea
-                                variant="outlined"
-                                v-model="activeItem.universe"
-                                class="v-textarea-field"
-                                auto-grow
-                                clearable
-                                rows="2"
-                                row-height="40"
-                                max-height="200"
-                                max-rows="5"                            
-                                density="compact"
-                            ></v-textarea>
-                        </div>
-
-                        <div class="form-group form-field">
-                            <label>Notes</label>
-                            <v-textarea
-                                variant="outlined"
-                                v-model="activeItem.notes"
-                                class="v-textarea-field"
-                                auto-grow
-                                clearable
-                                rows="2"
-                                row-height="40"
-                                max-height="200"
-                                max-rows="5"                            
-                                density="compact"
-                            ></v-textarea>
-                        </div>
-
-                        <div class="form-group form-field">
-                            <label>Text</label>
-                            <v-textarea
-                                variant="outlined"
-                                v-model="activeItem.txt"
-                                class="v-textarea-field"
-                                auto-grow
-                                clearable
-                                rows="2"
-                                row-height="40"
-                                max-height="200"
-                                max-rows="5"                            
-                                density="compact"
-                            ></v-textarea>
-                        </div>
-
-                        <div class="form-group form-field">
-                            <label>Definitino</label>
-                            <v-textarea
-                                variant="outlined"
-                                v-model="activeItem.definition"
-                                class="v-textarea-field"
-                                auto-grow
-                                clearable
-                                rows="2"
-                                row-height="40"
-                                max-height="200"
-                                max-rows="5"                            
-                                density="compact"
-                            ></v-textarea>
-                        </div>
+                        <div v-if="activeItem && activeItem.vgid!=-1">
 
 
-                        <div class="form-group form-field">
-                            <label>Variables</label> <button class="btn btn-sm btn-link" @click="showDialog=true">Select variables</button> 
-                            <table class="table table-sm table-xs table-bordered" v-if="Variables.length>0">
-                                <thead>
-                                    <tr>                                    
-                                        <th>FID</th>
-                                        <th>Name</th>
-                                        <th>Label</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="(variable,index) in Variables" :key="index">
-                                        <td>{{variable.fid}}</td>
-                                        <td>{{variable.name}}</td>
-                                        <td>{{variable.labl}}</td>
-                                        <td>
-                                            <button type="btn btn-primary" v-on:click="removeVariable(index)" ><v-icon color="primary" >mdi-trash-can</v-icon></button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <div v-else>
-                                <p class="text-muted text-secondary border text-center p-2">No variables selected</p>
+                            <div v-for="(column,idx_col) in VariableGroupTemplate.items" scope="row" :key="column.key"  v-if="custom_fields.indexOf(column.key)<0">
+
+                                <template v-if="column.type=='section'">
+                                
+                                    <form-section
+                                        :parentElement="localVariable"
+                                        :value="localValue(column.key)"
+                                        :columns="column.items"
+                                        :title="column.title"
+                                        :path="column.key"
+                                        :field="column"                            
+                                        @sectionUpdate="updateSection($event)"
+                                    ></form-section>  
+                                    
+                                </template>
+                                <template v-else>
+                                                                
+                                    <form-input
+                                        :value="localValue(column.key)"
+                                        :field="column"
+                                        @input="update(column.key, $event)"
+                                    ></form-input>                              
+                                    
+                                </template>
                             </div>
-                        </div>
 
 
-                        <div class="form-group form-field">
-                            <label>Concepts</label>
-                            <table-grid-component 
-                                v-model="activeItem.concepts" 
-                                :columns="conceptColumns.props" 
-                                class="border elevation-1"
-                                >
-                            </table-grid-component>
-                        </div>
+                            <div class="form-group form-field">
+                                <label>Variables</label> <button class="btn btn-sm btn-link" @click="showDialog=true">Select variables</button> 
+                                <table class="table table-sm table-xs table-bordered bg-white elevation-1" v-if="Variables.length>0">
+                                    <thead>
+                                        <tr class="bg-light">
+                                            <th>FID</th>
+                                            <th>Name</th>
+                                            <th>Label</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(variable,index) in Variables" :key="index">
+                                            <td>{{variable.fid}}</td>
+                                            <td>{{variable.name}}</td>
+                                            <td>{{variable.labl}}</td>
+                                            <td>
+                                                <button type="btn btn-primary" v-on:click="removeVariable(index)" ><v-icon color="primary" >mdi-trash-can</v-icon></button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div v-else>
+                                    <p class="text-muted text-secondary border text-center p-2">No variables selected</p>
+                                </div>
+                            </div>
 
 
-                    </div>       
-                    
+                            <div class="form-group form-field">
+                                <label>Concepts</label>
+                                <table-grid-component 
+                                    v-model="activeItem.concepts" 
+                                    :columns="conceptColumns.props" 
+                                    class="border elevation-1"
+                                    >
+                                </table-grid-component>
+                            </div>
+
+
+                        </div>       
+                        
+                    </div>
                 </div>
-            </div>
+                </div>
 
 
             </div>
