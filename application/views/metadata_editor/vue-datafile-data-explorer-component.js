@@ -12,7 +12,15 @@ Vue.component('datafile-data-explorer', {
             data_import_options:'replace',
             file:null,
             rows_limit:50,
-            data_loading_dialog:false
+            data_loading_dialog:false,
+            dialog:{
+                show:false,
+                title:'',
+                loading_message:'',
+                message_success:'',
+                message_error:'',
+                is_loading:false
+            }
         }
     },
     mounted: function(){
@@ -119,14 +127,98 @@ Vue.component('datafile-data-explorer', {
         {
             page_offset=(page - 1) * this.PaginationPageSize;
             this.loadData(page_offset, this.PaginationPageSize);
+        },
+        exportFile: async function(format){
+            let data_file=this.activeDataFile;
+
+            this.dialog={
+                show:true,
+                title:this.$t('export_file') + '[' + format + ']',
+                loading_message:this.$t('processing_please_wait'),
+                message_success:'',
+                message_error:'',
+                is_loading:true
+            }
+
+            try{
+                //add to queue
+                let result=await this.$store.dispatch('exportDatafileQueue',{file_id:data_file.file_id, format:format});
+                console.log("queued for export",result);
+                this.exportFileStatusCheck(data_file.file_id,result.data.job_id,format);
+            }catch(e){
+                console.log("failed",e);
+                this.dialog.is_loading=false;
+                this.dialog.message_error=this.$t("failed")+": "+e.response.data.message;                
+            }
+        },        
+        exportFileStatusCheck: async function(file_id,job_id,format){
+                this.dialog={
+                    show:true,
+                    title:'',
+                    loading_message:'',
+                    message_success:'',
+                    message_error:'',
+                    is_loading:false
+                }
+    
+                this.dialog.is_loading=true;
+                this.dialog.title=this.$t('export_file');
+                this.dialog.loading_message=this.$t('processing_please_wait');
+                try{
+                    await this.sleep(5000);
+                    let result=await this.$store.dispatch('getJobStatus',{job_id:job_id});
+                    console.log("export status",result);
+                    this.dialog.is_loading=true;
+                    this.dialog.loading_message="Job status: " + result.data.job_status;
+                    if (result.data.job_status!=='done'){
+                        this.exportFileStatusCheck(file_id,job_id,format);
+                    }else if (result.data.job_status==='done'){
+                        this.dialog.is_loading=false;
+                        this.dialog.message_success=this.$t('finished_processing');
+
+                        let download_url=CI.base_url + '/api/datafiles/download_tmp_file/'+this.ProjectID + '/' + file_id + '/' + format;
+                        window.open(download_url, '_blank').focus();
+                    }
+                    
+                }catch(e){
+                    console.log("failed",e);
+                    this.dialog.is_loading=false;
+                    this.dialog.message_error=this.$t("failed")+": "+e.response.data.message;
+                }
+        },
+        sleep: function(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
         }
     },  
     template: `
             <div class="datafile-component mt-5 pt-3 m-3" v-if="activeDataFile">
 
             <div class="float-right"">
-                <button type="button" class="btn btn-sm btn-outline-primary" @click="show_dialog=true">Import Data</button>
-                <button type="button" class="btn btn-sm btn-outline-primary">Export Data</button>
+                <v-btn color="primary" outlined small @click="show_dialog=true">Import Data</v-btn>                
+                <v-menu offset-y>
+                    <template v-slot:activator="{ on, attrs }">
+                        <v-btn color="primary" outlined small v-bind="attrs" v-on="on">
+                            <v-icon title="More options">mdi-export</v-icon> {{$t("export")}} <v-icon title="More options">mdi-dots-vertical</v-icon>
+                        </v-btn>
+                    </template>
+                    <v-list>
+                        <v-list-item @click="exportFile('sav')">
+                            <v-list-item-title>SPSS</v-list-item-title>
+                        </v-list-item>
+                        <v-list-item  @click="exportFile('dta')">
+                            <v-list-item-title>Stata</v-list-item-title>
+                        </v-list-item>
+                        <v-list-item  @click="exportFile('csv')">
+                            <v-list-item-title>CSV</v-list-item-title>
+                        </v-list-item>
+                        <v-list-item  @click="exportFile('json')">
+                            <v-list-item-title>JSON</v-list-item-title>
+                        </v-list-item>
+                        <v-list-item  @click="exportFile('xpt')">
+                            <v-list-item-title>SAS</v-list-item-title>
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
             </div>
 
             <h2>Data</h2>
@@ -256,6 +348,46 @@ Vue.component('datafile-data-explorer', {
                     </div>
                     </template>
                 <!--end dialog -->
+
+                <!-- dialog -->
+            <v-dialog v-model="dialog.show" width="500" height="300" persistent>
+                <v-card>
+                    <v-card-title class="text-h5 grey lighten-2">
+                        {{dialog.title}}
+                    </v-card-title>
+
+                    <v-card-text>
+                    <div>
+                        <!-- card text -->
+                        <div v-if="dialog.is_loading">{{dialog.loading_message}}</div>
+                        <v-app>
+                        <v-progress-linear v-if="dialog.is_loading"
+                            indeterminate
+                            color="green"
+                            ></v-progress-linear>
+                        </v-app>
+
+                        <div class="alert alert-success" v-if="dialog.message_success" type="success">
+                            {{dialog.message_success}}
+                        </div>
+
+                        <div class="alert alert-danger" v-if="dialog.message_error" type="error">
+                            {{dialog.message_error}}
+                        </div>
+
+                        <!-- end card text -->
+                    </div>
+                    </v-card-text>
+
+                    <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="primary" text @click="dialog.show=false" v-if="dialog.is_loading==false">
+                        Close
+                    </v-btn>
+                    </v-card-actions>
+                </v-card>
+                </v-dialog>
+            <!-- end dialog -->
             
             </div>          
             `    
