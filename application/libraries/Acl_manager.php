@@ -298,8 +298,8 @@ class Acl_manager
 		}
 
 		foreach($user_roles as $role){
-			if ($role['role_id']==2){ //user
-				return false;
+			if ($role['role_id']==1){ //admin
+				return true;
 			}
 		}
 

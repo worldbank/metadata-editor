@@ -112,6 +112,8 @@ $lang['export_file']="Export file";
 $lang['finished_processing']="Finished processing";
 
 
+$lang['change_password']="Change password";
+
 
 /* End of file general_lang.php */
 /* Location: ./application/language/base/general_lang.php */

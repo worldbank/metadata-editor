@@ -176,8 +176,6 @@ $site_navigation_menu=get_site_menu();
           <li><?php echo anchor('auth/logout',t('logout'));?></li>
           <li class="divider"></li>
           <li><a target="_blank" href="<?php echo site_url();?>"><?php echo t('home');?></a></li>
-          <li><a  target="_blank" href="<?php echo site_url('catalog');?>"><?php echo t('data_catalog');?></a></li>
-          <li><a  target="_blank" href="<?php echo site_url('citations');?>"><?php echo t('citations');?></a></li>
         </ul>
         <?php endif;?>
       </li>
