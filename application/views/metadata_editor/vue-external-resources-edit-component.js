@@ -9,6 +9,7 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
             attachment_type:'',
             attachment_url:'',
             resource_template:'',
+            resource_template_custom_fields:[ "filename" ], //fields not to render
             file_exists:false,
             dc_types:{                
                 "doc/adm":"Document, Administrative [doc/adm]",
@@ -29,6 +30,9 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
                 "web":"Web Site [web]"
             }
         }
+    },
+    mounted: function(){
+        this.loadResourceTemplate();
     }, 
     watch: {
         Resource: {
@@ -58,6 +62,13 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
         next();
     },
     methods: {
+        localValue: function(key)
+        {
+            console.log("searching for local value path",key,this.Resource, _.get(this.Resource,key));
+            //remove 'variable_groups.' from key
+            //key=key.replace('variable_groups.','');
+            return _.get(this.Resource,key);
+        },
         showUnsavedMessage: function(){
             if (this.is_dirty){
                 if (!confirm("You have unsaved changes. Are you sure you want to leave this page?")){
@@ -76,7 +87,7 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
         },
         loadResourceTemplate: function(){
             vm=this;
-            let url=CI.base_url + '/api/templates/resource-system-en';
+            let url=CI.base_url + '/api/templates/default/resource';
 
             axios.get( url
             ).then(function(response){
@@ -225,7 +236,36 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
             .catch(function(response){
                 console.log("resourceFileDeleted",response);
             });    
-        }
+        },
+        findTemplateByItemKey: function (items,key){
+            let item=null;
+            let found=false;
+            let i=0;
+
+            while(!found && i<items.length){
+                console.log("searching", items[i].key, key);
+                if (items[i].key==key){
+                    item=items[i];
+                    found=true;
+                }else{
+                    if (items[i].items){
+                        item=this.findTemplateByItemKey(items[i].items,key);
+                        if (item){
+                            found=true;
+                        }
+                    }
+                }
+                i++;                        
+            }
+            return item;
+        },
+        updateSection: function (obj)
+        {            
+            if (obj.key.indexOf(".") !== -1 && this.Resource[obj.key]){
+                delete this.Resource[obj.key];
+            }
+            Vue.set(this.Resource,obj.key,obj.value);
+        },
     },
     computed: {
         isProjectEditable(){
@@ -237,14 +277,11 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
         ActiveResourceIndex(){
             return this.$route.params.index;
         },
-        ActiveResourceIndexByID(){
-
-        },
         Resource(){
             return this.$store.state.external_resources.find(resource => {
                 return resource.id == this.ActiveResourceIndex
             });
-        },
+        },        
         ResourceAttachmentType()
         {
             if (this.isValidUrl(this.Resource.filename)){
@@ -258,109 +295,75 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
         },
         ResourceFileExists(){
             return this.resourceFileExists();
-        }
+        },
+        ResourceTemplate(){
+            let key='resource_container';                
+            //let items=this.$store.state.formTemplate.template.items;
+            let items=[]
+            if (this.resource_template && this.resource_template.template && this.resource_template.template.items){
+                items= this.resource_template.template.items;
+            }
+            
+            let item=this.findTemplateByItemKey(items,key);
+            return item;        
+        },
 
     },
     template: `
-        <div class="container-fluid edit-resource-container mt-5 pt-5">
+        <div class="container-fluid edit-resource-container">
 
-            <div v-if="Resource">
+            <section style="display: flex; flex-flow: column;height: calc(100vh - 140px);" v-if="Resource">
 
-            <v-card>
-            <v-card-title>
-            Edit resource
-            </v-card-title>
+            <v-card class="mt-4 mb-2">                    
+                    <v-card-title class="d-flex justify-space-between">
+                        <div style="font-weight:normal">{{$t("Edit resource")}}</div>
+
+                        <div>
+                            <v-btn color="primary" small @click="uploadFile" :disabled="file_exists==true || !isProjectEditable">{{$t("Save")}} <span v-if="is_dirty">*</span></v-btn>
+                            <v-btn @click="cancelSave" small>Cancel</v-btn>
+                        </div>
+                    </v-card-title>
+                </v-card>
+
+
+            <v-card style="flex: 1;overflow:auto;">
+            <v-card-text class="mb-5" v-if="ResourceTemplate && ResourceTemplate.items">
+
+            <div  v-for="(column,idx_col) in ResourceTemplate.items" scope="row" :key="column.key"  >
+            
+                <template v-if="column.type=='section'">
+                
+                    <form-section
+                        :parentElement="Resource"
+                        :value="localValue(column.key)"
+                        :columns="column.items"
+                        :title="column.title"
+                        :path="column.key"
+                        :field="column"                            
+                        @sectionUpdate="updateSection($event)"
+                    ></form-section>  
+                    
+                </template>
+                <template v-else>
+                                          {{column.key}}      
+                    <form-input
+                        :value="localValue(column.key)"
+                        :field="column"
+                        @input="update(column.key, $event)"
+                    ></form-input>                              
+                    
+                </template>
+            </div>
+            
+            
+
+            <v-card class="mt-2">
+                <v-card-title class="d-flex justify-space-between">
+                    <div style="font-weight:normal">Resource attachment</div>
+                </v-card-title>
 
             <v-card-text>
-            
-            <div class="form-group form-field" >
-                <label>File type *</label>
-                <select 
-                    v-model="Resource.dctype" 
-                    class="form-control  form-control-sm form-field-dropdown"
-                    id="dctype">
-
-                    <option value="">Select</option>
-                    <option v-for="(option_key,option_value) in dc_types" v-bind:value="option_key">
-                        {{ option_key }}
-                    </option>
-                </select>
-                <small class="help-text form-text text-muted">{{Resource.dc_type}}</small>                    
-            </div>
-
-            <div class="form-group form-field">
-                <label for="title">Title</label> 
-                <span><input type="text" id="title" class="form-control" v-model="Resource.title"/></span> 
-            </div>
-
-            <div class="form-group form-field">
-                <label for="subtitle">Subtitle</label> 
-                <span><input type="text" id="subtitle" class="form-control" v-model="Resource.subtitle"/></span> 
-            </div>
-
-            <div class="form-group form-field">
-                <label for="author">Author</label> 
-                <span><input type="text" id="author" class="form-control" v-model="Resource.author"/></span> 
-            </div>
-
-            <div class="form-group form-field">
-                <label for="date">Date (YYYY-MM-DD)</label> 
-                <span><input type="text" id="date" class="form-control" v-model="Resource.dcdate"/></span> 
-            </div>
-
-            <div class="form-group form-field">
-                <label for="country">Country</label> 
-                <span><input type="text" id="country" class="form-control" v-model="Resource.country"/></span> 
-            </div>
-
-            <div class="form-group form-field">
-                <label for="language">Language</label> 
-                <span><input type="text" id="language" class="form-control" v-model="Resource.language"/></span> 
-            </div>
-
-            <div class="form-group form-field">
-                <label for="contributor">Contributor</label> 
-                <span><input type="text" id="contributor" class="form-control" v-model="Resource.contributor"/></span> 
-            </div>
-
-            <div class="form-group form-field">
-                <label for="publisher">Publisher</label> 
-                <span><input type="text" id="publisher" class="form-control" v-model="Resource.publisher"/></span> 
-            </div>
-
-            <div class="form-group form-field">
-                <label for="rights">Rights</label> 
-                <span><input type="text" id="rights" class="form-control" v-model="Resource.rights"/></span> 
-            </div>
-
-            <div class="form-group form-field">
-                <label for="description">Description</label> 
-                <span><textarea style="height:200px;" id="description" class="form-control" v-model="Resource.description"/></span> 
-            </div>
-
-            <div class="form-group form-field">
-                <label for="abstract">Abstract</label> 
-                <span><textarea style="height:200px;" id="abstract" class="form-control" v-model="Resource.abstract"/></span> 
-            </div>
-
-            <div class="form-group form-field">
-                <label for="toc">Table of contents</label> 
-                <span><textarea style="height:200px;" id="toc" class="form-control" v-model="Resource.toc"/></span> 
-            </div>
-
-            <div class="form-group form-field">
-                <label for="subjects">Subjects</label> 
-                <span><textarea style="height:200px;" id="subjects" class="form-control" v-model="Resource.subjects"/></span> 
-            </div>
-
-            <div class="form-group form-field">
-                <label for="dcformat">Format</label> 
-                <span><input type="text" id="dcformat" class="form-control" v-model="Resource.dcformat"/></span> 
-            </div>
-
-
-            <div class="bg-white border mb-2 mt-2 p-1">
-                <div class="p1 mb-2"><strong>Resource attachment</strong> (Upload file or URL)</div>
+            <div>                
                 <div class="bg-light border p-2 text-small" style="font-size:12px;">
                     <span v-if="ResourceAttachmentType=='file'">File:</span>
                     <span v-if="ResourceAttachmentType=='url'">Link:</span>
@@ -410,16 +413,16 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
                 </div>
 
             </div>
+            </v-card-text>
+            </v-card>
 
-            <v-btn color="primary" @click="uploadFile" :disabled="file_exists==true || !isProjectEditable">Save</v-btn>
-            <v-btn @click="cancelSave">Cancel</v-btn>
-
+            
 
             </v-card-text>
 
             </v-card>
             
-        </div>
+        </section>
         </div>
     `
 })
