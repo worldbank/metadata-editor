@@ -339,10 +339,17 @@ class Templates extends MY_REST_Controller
 		try{
 			$this->has_access($resource_='template_manager',$privilege='view');
 			$result=$this->Editor_template_model->get_default_template($type);
+
+			if (!isset($result['template_uid'])){
+				throw new Exception("Default template not found");
+			}
+
+			$template=$this->Editor_template_model->get_template_by_uid($result['template_uid']);
+			
 				
 			$response=array(
 				'status'=>'success',
-				'result'=>$result
+				'result'=>$template
 			);			
 			$this->set_response($response, REST_Controller::HTTP_OK);
 		}
