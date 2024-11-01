@@ -241,6 +241,10 @@
         );
       },
       computed:{
+        hideProjectSaveOnRoute(){
+          return this.$route.path.startsWith("/datafile/") 
+            || this.$route.path.startsWith("/external-resources/") ;
+        },
         form_template(){
           return this.$store.state.formTemplate;
         },

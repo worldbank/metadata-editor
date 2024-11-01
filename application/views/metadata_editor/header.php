@@ -27,7 +27,7 @@
         */?>
     </div>
 
-    <ul class="navbar-nav ml-5 ml-auto">
+    <ul class="navbar-nav ml-5 ml-auto" id="projectMenuBar" ref="projectMenuBar" v-show="!hideProjectSaveOnRoute">         
         <template v-if="UserHasEditAccess">
         <template v-if="is_dirty">            
             <v-btn                
