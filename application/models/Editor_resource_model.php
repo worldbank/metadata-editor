@@ -246,13 +246,11 @@ class Editor_resource_model extends ci_model {
 	{
 		$thumbnail_path=$this->Editor_model->get_thumbnail_file($sid);
 
-		if (!$thumbnail_path){
-			return false;
-		}
-
 		if (file_exists($thumbnail_path)){
 			unlink($thumbnail_path);
 		}
+
+		$this->Editor_model->set_project_options($sid,$options=array('thumbnail'=>null));
 
 		return true;
 	}
@@ -719,7 +717,7 @@ class Editor_resource_model extends ci_model {
 	 */
     function files($sid) 
     {
-        $this->load->helper("file");
+        $this->load->helper("file"); 
         $project_folder=$this->Editor_model->get_project_folder($sid);
         $result=get_dir_recursive($project_folder,$make_relative_to=$project_folder);
         return $result['files'];        
