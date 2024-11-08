@@ -51,6 +51,11 @@ const VueDatafileEdit= Vue.component('datafile-edit', {
             this.saveFile();
         },
         cancelForm: function (){
+            if (this.is_dirty){
+                if (!confirm("You have unsaved changes. Are you sure you want to leave this page?")){
+                    return false;
+                }
+            }
             this.is_dirty=false;
             router.push('/datafiles/');
         },
@@ -92,74 +97,95 @@ const VueDatafileEdit= Vue.component('datafile-edit', {
         }        
     },  
     template: `
-            <div class="datafile-edit-component container-fluid mt-5">
+            <div class="datafile-edit-component container-fluid" >
 
-            <div class="row">
-                <div class="col-md-8">
 
-                <h3>{{$t("Edit file")}}</h3> {{is_dirty}}
+            <section style="display: flex; flex-flow: column;height: calc(100vh - 140px);">
+             
             
-                <div class="form-group form-field">
-                    <label for="filename">File name</label> 
-                    <span><input readonly type="text" id="filename" class="form-control" v-model="form_local.file_name"/></span> 
-                </div>
+                <v-card class="mt-4 mb-2">                    
+                    <v-card-title class="d-flex justify-space-between">
+                        <div style="font-weight:normal">{{$t("Data file")}}: {{form_local.file_name}}</div>
 
-                <div class="form-group form-field">
-                    <label for="description">Description</label> 
-                    <span><textarea id="description" class="form-control" v-model="form_local.description"/></span> 
-                </div>
-
-                <div class="form-group form-field">
-                    <label for="description">Producer</label> 
-                    <span><textarea id="description" class="form-control" v-model="form_local.producer"/></span> 
-                </div>
-
-                <div class="form-group form-field">
-                    <label for="description">Data checks</label> 
-                    <span><textarea id="description" class="form-control" v-model="form_local.data_checks"/></span> 
-                </div>
-
-                <div class="form-group form-field">
-                    <label for="description">Missing data</label> 
-                    <span><textarea id="description" class="form-control" v-model="form_local.missing_data"/></span> 
-                </div>
-
-                <div class="form-group form-field">
-                    <label for="description">Version</label> 
-                    <span><textarea id="description" class="form-control" v-model="form_local.version"/></span> 
-                </div>
-
-                <div class="form-group form-field">
-                    <label for="description">Notes</label> 
-                    <span><textarea id="description" class="form-control" v-model="form_local.notes"/></span> 
-                </div>
-
-                <v-btn color="primary" @click="saveForm">{{$t("save")}}</v-btn>
-                <v-btn  @click="cancelForm">{{$t("cancel")}}</v-btn>
-
-                </div>
-                <div class="col-md-4">
-                    <div><strong>{{$t("file_information")}}</strong></div>
-                    <div class="mt-2">
                         <div>
-                            <label>{{$t("physical_name")}}:</label>
-                            <div>{{form_local.file_physical_name}}</div>
-                        </div>                            
-                        <div class="mt-2">
-                            <label>{{$t("rows")}}:</label>
-                            <div>{{form_local.case_count}}</div>
+                            <v-btn color="primary" small  @click="saveForm">{{$t("Save")}} <span v-if="is_dirty">*</span></v-btn>
+                            <v-btn  @click="cancelForm" small>{{$t("cancel")}}</v-btn>
                         </div>
-                        <div class="mt-2">
-                            <label>{{$t("variables")}}:</label>
-                            <div>{{form_local.var_count}}</div>
-                        </div>
-                        <div class="mt-2" v-if="form_local.file_info">
-                            <label>{{$t("file_size")}}:</label>
-                            <div v-if="form_local && form_local.file_info && form_local.file_info.original ">{{form_local.file_info.original.file_size}}</div>                        
-                        </div>
-                    </div> 
-                </div>
-                </div>
+                    </v-card-title>
+                </v-card>
+
+
+                <v-card style="flex: 1;overflow:auto;">                    
+                    <v-card-text>
+            
+
+                        <div class="row">
+                            <div class="col-md-8">
+
+                            <div class="form-group form-field">
+                                <label for="filename">File name</label> 
+                                <span><input readonly type="text" id="filename" class="form-control" v-model="form_local.file_name"/></span> 
+                            </div>
+
+                            <div class="form-group form-field">
+                                <label for="description">Description</label> 
+                                <span><textarea id="description" class="form-control" v-model="form_local.description"/></span> 
+                            </div>
+
+                            <div class="form-group form-field">
+                                <label for="description">Producer</label> 
+                                <span><textarea id="description" class="form-control" v-model="form_local.producer"/></span> 
+                            </div>
+
+                            <div class="form-group form-field">
+                                <label for="description">Data checks</label> 
+                                <span><textarea id="description" class="form-control" v-model="form_local.data_checks"/></span> 
+                            </div>
+
+                            <div class="form-group form-field">
+                                <label for="description">Missing data</label> 
+                                <span><textarea id="description" class="form-control" v-model="form_local.missing_data"/></span> 
+                            </div>
+
+                            <div class="form-group form-field">
+                                <label for="description">Version</label> 
+                                <span><textarea id="description" class="form-control" v-model="form_local.version"/></span> 
+                            </div>
+
+                            <div class="form-group form-field">
+                                <label for="description">Notes</label> 
+                                <span><textarea id="description" class="form-control" v-model="form_local.notes"/></span> 
+                            </div>
+
+                            </div>
+                            <div class="col-md-4" style="display:none;">
+                                <div><strong>{{$t("file_information")}}</strong></div>
+                                <div class="mt-2">
+                                    <div>
+                                        <label>{{$t("physical_name")}}:</label>
+                                        <div>{{form_local.file_physical_name}}</div>
+                                    </div>                            
+                                    <div class="mt-2">
+                                        <label>{{$t("rows")}}:</label>
+                                        <div>{{form_local.case_count}}</div>
+                                    </div>
+                                    <div class="mt-2">
+                                        <label>{{$t("variables")}}:</label>
+                                        <div>{{form_local.var_count}}</div>
+                                    </div>
+                                    <div class="mt-2" v-if="form_local.file_info">
+                                        <label>{{$t("file_size")}}:</label>
+                                        <div v-if="form_local && form_local.file_info && form_local.file_info.original ">{{form_local.file_info.original.file_size}}</div>                        
+                                    </div>
+                                </div> 
+                            </div>
+                            </div>
+
+                </v-card-text>
+                </v-card>
+
+
+                </section>
 
             </div>          
             `    

@@ -28,7 +28,8 @@ class Editor_datafile_model extends CI_Model {
 		'version',
 		'notes',
 		'metadata',
-		'wght'
+		'wght',
+		'store_data',
 	);
 		
 
@@ -52,7 +53,7 @@ class Editor_datafile_model extends CI_Model {
 	 * Create new data file by uploading a data file (csv, dta, sav)
 	 * 
 	 */
-	function upload_create($sid,$overwrite=false)
+	function upload_create($sid,$overwrite=false, $store_data=null)
 	{
 		$datafile_info=$this->check_uploaded_file_exists($sid);
 
@@ -65,6 +66,12 @@ class Editor_datafile_model extends CI_Model {
 		$uploaded_file_name=$upload_result['file_name'];
 		$uploaded_path=$upload_result['full_path'];
 
+		if ($store_data=='store'){
+			$store_data=1;
+		}else {
+			$store_data=0;
+		}
+
 		if (!$datafile_info){
 			//create data file
 			$options=array(
@@ -72,7 +79,8 @@ class Editor_datafile_model extends CI_Model {
 				'file_id'=>$this->generate_fileid($sid),
 				'file_physical_name'=>$uploaded_file_name,
 				'file_name'=>$this->filename_part($uploaded_file_name),
-				'wght'=>$this->max_wght($sid)+1
+				'wght'=>$this->max_wght($sid)+1,
+				'store_data'=>$store_data
 			);
 
 			$result=$this->insert($sid,$options);
@@ -82,6 +90,7 @@ class Editor_datafile_model extends CI_Model {
 				'file_physical_name'=>$uploaded_file_name,
 				'file_name'=>$this->filename_part($uploaded_file_name),
 				'file_path'=>$uploaded_path,
+				'store_data'=>$store_data
 			);
 
 			$result=$this->update($datafile_info['id'],$options);
@@ -145,13 +154,13 @@ class Editor_datafile_model extends CI_Model {
 		$files=$this->get_files_info($sid,$file_id);
 
 		if (!isset($files['csv'])){
-			throw new Exception("CSV file not found");
+			return false;
 		}
 
 		$csv_path=$files['csv']['filepath'];
 
 		if (!file_exists($csv_path)){
-			throw new Exception("Data file CSV not found: ".$csv_path);
+			return false;
 		}
 
 		return $csv_path;
@@ -166,6 +175,11 @@ class Editor_datafile_model extends CI_Model {
 	{
 		try{
 			$csv_path=$this->get_file_csv_path($sid,$file_id);
+			
+			if (!$csv_path){
+				return false;
+			}
+
 			return $csv_path;
 		}
 		catch(Exception $e){
@@ -424,51 +438,100 @@ class Editor_datafile_model extends CI_Model {
 
 	/**
 	 * 
-	 * Clean up original data files - except CSV version
+	 * Clean up data files
+	 * 
+	 *  - remove files marked to be deleted
+	 *  - remove original (non-csv) files if csv exists
 	 * 
 	 */
 	function cleanup($sid, $file_id=null)
 	{
-		//get all data files for this project
-		$files=$this->select_all($sid);
+		$files=[];
+		if ($file_id){
 
-		if (!$files){
-			return false;
+			$file=$this->data_file_by_id($sid,$file_id);
+			
+			if (!$file){
+				throw new Exception("Data file not found: " . $file_id);
+			}
+
+			$files[]=$file;
+		}
+		else {
+			$files=$this->select_all($sid);
 		}
 
 		//get project folder
 		$project_folder=$this->Editor_model->get_project_folder($sid);
 
-		$deleted=array();
+		$output=array();
 
-		//remove original data files except csv
 		foreach($files as $file){
 
-			if ($file_id && $file['file_id']!=$file_id){
-				continue;
-			}
+			//is csv file?
+			$is_csv=strtolower($this->get_file_extension($file['file_physical_name']))=='csv';
 
-			$file_info=pathinfo($file['file_physical_name']);
-			
-			if (isset($file_info['extension']) && $file_info['extension']=='csv'){
-				continue; //skip csv
-			}
+			//data csv file name
+			$filename_csv=$file['file_name'].'.csv';
 
-			$filename_csv=$file_info['filename'].'.csv';
+			//original file path
+			$original_path=$project_folder.'/data/'.$file['file_physical_name'];
 
-			//check if csv exists?
-			if (file_exists($project_folder.'/data/'.$filename_csv)){
-				//delete original if exists
-				$path_=$project_folder.'/data/'.$file['file_physical_name'];
+			//csv file path
+			$csv_path=$project_folder.'/data/'.$filename_csv;
 
-				if (file_exists($path_)){
-					$deleted[]=basename($path_);
-					unlink($path_);
+			//if store_data==0, delete the file
+			//remove original + csv file
+			if ($file['store_data']==0){
+				
+				//remove original file
+				if (file_exists($original_path)){
+					unlink($original_path);
+
+					$output[]=[
+						'file_id'=>$file['file_id'],
+						'file_name'=>$file['file_physical_name'],
+						//'file_path'=>$original_path,
+						'status'=>'deleted'
+					];
+				}
+
+				//remove csv file
+				if (file_exists($csv_path)){
+					unlink($csv_path);
+
+					$output[]=[
+						'file_id'=>$file['file_id'],
+						'file_name'=>$filename_csv,
+						//'file_path'=>$csv_path,
+						'status'=>'deleted'
+					];
 				}
 			}
+			else{
+				//remove original file (non-csv) if csv exists
+				if (!$is_csv && file_exists($original_path)){
+					unlink($original_path);
+
+					$output[]=[
+						'file_id'=>$file['file_id'],
+						'file_name'=>$file['file_physical_name'],
+						//'file_path'=>$original_path,
+						'status'=>'deleted'
+					];
+				}
+			}
+
 		}
-		
-		return $deleted;
+
+		return $output;
+	}
+
+
+	private function get_file_extension($filename)
+	{
+		$info=pathinfo($filename);
+		return $info['extension'];
 	}
 
 

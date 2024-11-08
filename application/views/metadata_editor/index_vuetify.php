@@ -188,7 +188,8 @@
             table:'mdi-table',
             datafile:'mdi-database',
             variable:'mdi-file-table-outline',
-            resource: 'mdi-folder-multiple'
+            resource: 'mdi-folder-text',
+            'file-manager':'mdi-folder-network',
           },
         tree: [],
         items: [],
@@ -212,7 +213,9 @@
           "image": "fa fa-image",
           "video": "fa fa-video",
           "script": "fa fa-file-code"
-        }
+        },
+        apply_defaults_dialog:false,
+        apply_defaults_dialog_key:0
       },
       created: async function(){
         await this.$store.dispatch('initData',{dataset_id:this.dataset_id});
@@ -511,6 +514,10 @@
         }
       },
       methods:{
+        templateApplyDefaults: function(){
+            this.apply_defaults_dialog_key+=1;
+            this.apply_defaults_dialog=true;
+        },
         onLinkClick: function(link){
             window.open(link, '_blank');
         },
@@ -737,6 +744,13 @@
               items:this.ExternalResourcesTreeNodes
           });
 
+          tree_data.push({
+              title: this.$t('File manager'),
+              type: 'files',
+              file: 'file-manager',
+              key:'files'
+          });
+
           if (this.dataset_type=='geospatial'){
             tree_data.push({
               title: this.$t('Geospatial features'),
@@ -844,6 +858,11 @@
 
           if (node.type=='resources'){
             router.push('/external-resources');
+            return;
+          }
+
+          if (node.type=='files'){
+            router.push('/files');
             return;
           }
 

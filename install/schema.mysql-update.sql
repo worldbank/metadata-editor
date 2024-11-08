@@ -70,3 +70,7 @@ CREATE TABLE `edit_history` (
   `metadata` json DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb3;
+
+
+ALTER TABLE .`editor_data_files` 
+ADD COLUMN `store_data` INT NULL;

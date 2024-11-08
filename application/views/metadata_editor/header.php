@@ -4,7 +4,7 @@
         <div style="font-size:20px;" :title="Title" class="wrap-text">
             <i style="font-size:x-large;" :class="project_types_icons[dataset_type]"></i> <strong>{{Title}}</strong>
         </div>
-        <div>{{ProjectMetadata.idno}} <router-link class="pl-3" to="/history">{{$t('History')}}</router-link> </div>
+        <!--<div>{{ProjectMetadata.idno}} </div>-->
         <?php /*
         <div class="pl-5 ml-3" v-if="is_dirty">
 
@@ -155,7 +155,15 @@
                             <v-list-item-title>
                                 <?php echo t("pdf_documentation"); ?>
                             </v-list-item-title>
-                            </v-list-item>                                                        
+                            </v-list-item>                             
+                            <v-list-item @click="onRouterLinkClick('/change-log')">
+                                <v-list-item-icon>
+                                    <v-icon>mdi-content-copy</v-icon>
+                                </v-list-item-icon>
+                                <v-list-item-title>
+                                    {{$t('Change log')}}
+                                </v-list-item-title>
+                            </v-list-item>
                         </v-list-item-group>
                     </v-list>
                 </v-col>
@@ -163,14 +171,20 @@
                     
                     <v-list dense>
                         <v-subheader>Metadata</v-subheader>
-                        <v-list-item-group       
-                            color="primary"
-                        >
+                        <v-list-item-group color="primary">
                         
+                        <v-list-item @click="templateApplyDefaults">
+                            <v-list-item-icon>
+                                <v-icon>mdi-checkbox-multiple-marked-circle</v-icon>
+                            </v-list-item-icon>
+                            <v-list-item-title>                            
+                                <?php echo t("apply_template_defaults"); ?>                            
+                            </v-list-item-title>
+                        </v-list-item>
                         <v-list-item @click="onRouterLinkClick('/import')">
-                        <v-list-item-icon>
-                            <v-icon>mdi-import</v-icon>
-                        </v-list-item-icon>
+                            <v-list-item-icon>
+                                <v-icon>mdi-import</v-icon>
+                            </v-list-item-icon>
                             <v-list-item-title>                            
                                 <?php echo t("import_project_metadata"); ?>                            
                             </v-list-item-title>

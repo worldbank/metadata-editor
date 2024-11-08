@@ -1,12 +1,16 @@
 ///Project files summary
 Vue.component('summary-files', {
     props:[],
-    data: function () {    
+    
+    data: function() {
         return {
-            files:[]            
-        }
+            files: {},
+            resources: {}
+        };
     },
+    
     created: function(){    
+        this.loadResources();
         this.loadData();    
     },
     
@@ -17,27 +21,59 @@ Vue.component('summary-files', {
     },
     methods:{
         loadData: function() {
-            vm=this;
-            let url=CI.base_url + '/api/files/'+this.ProjectID;
+            let vm = this;
+            let url = CI.base_url + '/api/files/' + this.ProjectID;
             axios.get(url)
             .then(function (response) {
-                if(response.data){                    
-                    vm.files=response.data.files;
+                if(response.data){               
+                    vm.files = response.data.files;
                 }
             })
             .catch(function (error) {
                 console.log(error);
-            })
-            .then(function () {
-                console.log("request completed");
             });
         },
+        loadResources: function(){
+            let vm=this;
+            let url=CI.base_url + '/api/resources/' + this.ProjectID + '?resources';
+            axios.get(url)
+            .then(function(response){
+                if (response.data && response.data.resources){
+                    vm.resources=response.data.resources;
+                }
+            })
+            .catch(function(response){
+                vm.errors=response;
+            });
+        }
     },    
     template: `
     <div class="project-summary-files-component">
         
         <div class="component-container">
 
+        <v-simple-table>
+            <template v-slot:default>
+                <thead>
+                    <tr>
+                        <th class="text-left"></th>
+                        <th class="text-left">Title</th>
+                        <th class="text-left">Type</th>                        
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="resource in resources">
+                        <td class="text-top" ><v-icon>mdi-file-outline</v-icon></td>
+                        <td><a :href="'#/external-resources/' + resource.id">{{resource.title}}</a></td>
+                        <td>{{resource.dctype}}</td>
+                        
+                    </tr>
+                </tbody>
+            </template>
+        </v-simple-table>
+
+        
+<!--
             <div v-for="doc in files.documentation">
                 <div class="border-bottom small">{{doc.file}}</div>
             </div>
@@ -56,9 +92,10 @@ Vue.component('summary-files', {
                 </div>
             </div>
 
+            -->
+
         </div>
 
-    </div>          
-    `    
+    </div>         
+    `
 });
-

@@ -226,4 +226,5 @@
     </div>*/?>
 
 <v-toast></v-toast>
+<template-apply-defaults-component v-model="apply_defaults_dialog" :key="apply_defaults_dialog_key"></template-apply-defaults-component>
 </v-app>

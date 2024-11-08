@@ -149,7 +149,7 @@
             echo $this->load->view("metadata_editor/vue-form-preview-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-nested-section-preview-component.js",null,true);
             
-            //echo $this->load->view("metadata_editor/vue-files-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-files-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-external-resources-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-external-resources-edit-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-datafiles-component.js",null,true);
@@ -250,7 +250,7 @@
         const VariableGroups ={template: '<div><variable-groups /> </div>'}
         //const ResourcesComp ={props: ['index'],template: '<div><external-resources /></div>'}
         const ResourcesComp =VueExternalResources;
-        //const FileManager ={props: ['index'],template: '<div><file-manager /></div>'}
+        const FileManager ={props: ['index'],template: '<div><file-manager /></div>'}
         const ResourcesImport ={template: '<div> <external-resources-import /></div>'}
         //const ResourcesEditComp ={props: ['index'],template: '<div><external-resources-edit /></div>'}
         const ResourcesEditComp =VueExternalResourcesEdit;
@@ -279,11 +279,11 @@
             { path: '/external-resources', component: ResourcesComp, props: true, name: 'external-resources'},
             { path: '/external-resources/import', component: ResourcesImport},
             { path: '/external-resources/:index', component: ResourcesEditComp, props: true, name: 'external-resources-edit'},
-            //{ path: '/files', component: FileManager, props: true},
+            { path: '/files', component: FileManager, props: true},
             { path: '/geospatial-features', component: GeoFeatures, props: true},
             { path: '/geospatial-feature/:feature_name', component: GeoFeature, props: true },
             { path: '/geospatial-gallery', component: GeoGallery, props: true },
-            { path: '/history', component: ProjectHistory },
+            { path: '/change-log', component: ProjectHistory },
         ]
 
         const router = new VueRouter({
@@ -675,7 +675,13 @@
                     let url=CI.base_url + '/api/data/job_status/'+ options.job_id;
                     let resp = await axios.get(url);
                     return resp;                
-                }                   
+                },
+                async cleanUpData({commit,getters}, options)
+                {
+                    let url=CI.base_url + '/api/datafiles/cleanup/'+getters.getProjectID;
+                    let resp = await axios.post(url);
+                    return resp;                
+                },                  
             },
             mutations: VueDeepSet.extendMutation({
                 // other mutations

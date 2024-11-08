@@ -80,7 +80,7 @@ Vue.component('dialog-datafile-replace', {
         }        
     },
     template: `
-        <div class="vue-dialog-datafile-replace-component" style="z-index:6000">
+        <div class="vue-dialog-datafile-replace-component" style="z-index:7000">
 
             <!-- dialog -->
             <v-dialog v-model="dialog" width="700" height="400" persistent>

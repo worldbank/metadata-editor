@@ -38,6 +38,7 @@ $lang['preview']="Preview";
 $lang['refresh_stats']="Refresh stats";
 $lang['export_csv']="Export CSV";
 $lang['remove']="Remove";
+$lang['actions']="Actions";
 $lang['replace_file']="Replace file";
 $lang['confirm_import_summary_statistics']="Are you sure you want to import summary statistics for this file? This will overwrite any existing summary statistics.";
 $lang['summary_stats']="Summary statistics";
@@ -150,13 +151,45 @@ $lang['publish_thumbnail']="Publish thumbnail";
 $lang['download_pdf']="Download PDF";
 $lang['generate_pdf']="Generate PDF";
 $lang['pdf_documentation_note']="Generate PDF documentation for the project";
-$lang['']="";
-$lang['']="";
-$lang['']="";
-$lang['']="";
-$lang['']="";
 
 
+$lang['Share']="Share";
+$lang['View access']="View access";
+$lang['Export JSON']="Export JSON";
+$lang['Export package (ZIP)']="Export package (ZIP)";
+$lang['ownership']="Ownership";
+$lang['Project owner']="Project owner";
+$lang['Last changed by']="Last changed by";
+$lang['Project IDNO']="Project IDNO";
+$lang['Created on']="Created on";
+$lang['Changed on']="Changed on";
+$lang['Project info']="Project info";
+$lang['Template']="Template";
+$lang['close']="Close";
+$lang['upload']="Upload";
+$lang['Disk usage']="Disk usage";
+$lang['Schema validation']="Schema validation";
+$lang['Requires project to be saved']="Requires project to be saved";
+$lang['Template validation']="Template validation";
+$lang['Collaborators']="Collaborators";
+$lang['Collections']="Collections";
+$lang['apply_template_defaults']="Apply default values from template";
+$lang['apply_template_defaults_description']="Apply defaults values defined in the template to the metadata";
+$lang['update_empty_fields']="Update only empty fields";
+$lang['update_all_fields']="Update all fields (overwrite existing values)";
+$lang['items_updated']="Items updated";
+$lang['no_items_updated']="No items updated";
+$lang['Change log']="Change log";
+
+$lang['']="";
+$lang['']="";
+$lang['']="";
+$lang['']="";
+$lang['']="";
+$lang['']="";
+$lang['']="";
+$lang['']="";
+$lang['']="";
 
 
 

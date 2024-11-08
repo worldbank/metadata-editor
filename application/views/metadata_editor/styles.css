@@ -1140,10 +1140,23 @@ html {
 }
 
 .v-dialog__content{
-    z-index: 5500!important;
+    z-index: 8000!important;
 }
 
 .v-card .primary {
     background-color: #526bc7 !important;
     border-color: #526bc7 !important;
+}
+
+
+tr .action-buttons-hover {
+    visibility: hidden;
+  }
+  
+  tr:hover .action-buttons-hover {
+    visibility: visible;
+  }
+
+.v-overlay{
+    z-index: 1100!important;
 }

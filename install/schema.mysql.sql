@@ -1525,6 +1525,7 @@ CREATE TABLE `editor_data_files` (
   `version` varchar(255) DEFAULT NULL,
   `notes` TEXT DEFAULT NULL,
   `metadata` TEXT DEFAULT NULL,
+  `store_data` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
 ) AUTO_INCREMENT=1;

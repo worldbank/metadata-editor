@@ -8,9 +8,7 @@ Vue.component('summary-component', {
           template_updating:false,
           project_edit_stats:{},
           project_disk_usage:{},
-          project_validation:[],
-          apply_defaults_dialog:false,
-          apply_defaults_dialog_key:0
+          project_validation:[]
         }
       },
     created: function(){      
@@ -65,15 +63,12 @@ Vue.component('summary-component', {
             return this.$store.state.formData;
         }
     },
-    methods:{
-        templateApplyDefaults: function(){
-            this.apply_defaults_dialog_key+=1;
-            this.apply_defaults_dialog=true;
-        },
+    methods:{        
         momentDate(date) {
             //gmt to utc
-            let utc_date = moment(date, "YYYY-MM-DD HH:mm:ss").toDate();
-            return moment.utc(utc_date).format("YYYY-MM-DD")
+            //let utc_date = moment(date, "YYYY-MM-DD HH:mm:ss").toDate();
+            //return moment.utc(utc_date).local().format("YYYY-MM-DD HH:mm:ss");
+            return moment.utc(date).local().format("YYYY-MM-DD HH:mm:ss");
           },
         getProjectEditStats: function() {
             let vm=this;
@@ -151,12 +146,6 @@ Vue.component('summary-component', {
 
                             <div class="col-12 bg-light mb-3" >
                                 <div>
-                                    
-                                    <div class="d-flex justify-space-between">
-                                        <div><v-icon style="font-size:25px;">mdi-alpha-t-box</v-icon> {{$t("template")}}</div>                                        
-                                        <v-btn :disabled="!isProjectEditable" small title="Apply template default values" text @click="templateApplyDefaults"><v-icon>mdi-checkbox-multiple-marked-circle</v-icon>Defaults</v-btn>
-                                    </div>
-
                                     <div class="mt-1">
                                         <v-btn text color="primary" @click="loadTemplates();dialog_template=true" :disabled="!isProjectEditable">
                                             {{ProjectTemplate.name}} - {{ProjectTemplate.version}}
@@ -176,7 +165,13 @@ Vue.component('summary-component', {
                                     <div class="mb-3">
                                         <strong>{{$t("Last changed by")}}:</strong>
                                         <div class="text-capitalize">{{project_edit_stats.username}}</div>
-                                    </div>                                    
+                                    </div>   
+                                    
+                                    <div class="mb-3">
+                                        <strong>{{$t("Project IDNO")}}:</strong>
+                                        <div class="text-capitalize">{{ProjectIDNo}}</div>
+                                    </div>   
+                                    
 
                                 </div>
                                 <div class="col-6">
@@ -190,7 +185,7 @@ Vue.component('summary-component', {
                                         <strong>{{$t("Changed on")}}:</strong>
                                         <div>{{momentDate(project_edit_stats.changed)}}</div>
                                     </div>
-                                
+                                    
                                 </div>
 
                             </div>
@@ -228,7 +223,7 @@ Vue.component('summary-component', {
                         <v-card>
                             <v-card-text>
                                 <div class="d-flex justify-content-between">
-                                    <h6>{{$t("Project info")}}</h6>
+                                    <h6>{{$t("Data and Documentation")}}</h6>
                                     <div v-if="project_disk_usage.size_formatted">
                                         <span>{{$t("Disk usage")}} </span>
                                         <span class="success--text ml-2">{{project_disk_usage.size_formatted}}</span>
@@ -327,7 +322,7 @@ Vue.component('summary-component', {
                                         text
                                         @click="dialog_template = false"
                                     >
-                                        {{$t('Close')}}
+                                        {{$t('close')}}
                                     </v-btn>
                                     <v-btn
                                         color="primary"
@@ -335,7 +330,7 @@ Vue.component('summary-component', {
                                         @click="UpdateTemplate"
                                         :disabled="template_idx==-1 || template_updating"
                                     >
-                                        {{$t('Apply')}}
+                                        {{$t('apply')}}
                                     </v-btn>
                                     </v-card-actions>
                                 </v-card>
@@ -351,8 +346,6 @@ Vue.component('summary-component', {
                     </div>
                    
                 </div>
-
-                <template-apply-defaults-component v-model="apply_defaults_dialog" :key="apply_defaults_dialog_key"></template-apply-defaults-component>
 
             </div>          
             `    

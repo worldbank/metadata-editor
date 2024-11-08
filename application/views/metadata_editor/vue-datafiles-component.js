@@ -21,6 +21,7 @@ Vue.component('datafiles', {
                 message_error:'',
                 is_loading:false
             }
+            
         }
     }, 
     mounted: function () {
@@ -151,16 +152,15 @@ Vue.component('datafiles', {
                 try{
                     await this.sleep(5000);
                     let result=await this.$store.dispatch('getJobStatus',{job_id:job_id});
-                    console.log("export status",result);
+                    
                     this.dialog.is_loading=true;
                     this.dialog.loading_message="Job status: " + result.data.job_status;
                     if (result.data.job_status!=='done'){
                         this.exportFileStatusCheck(file_id,job_id,format);
                     }else if (result.data.job_status==='done'){
-                        this.dialog.is_loading=false;
-                        this.dialog.message_success=this.$t('finished_processing');
-
+                        this.dialog.is_loading=false;                        
                         let download_url=CI.base_url + '/api/datafiles/download_tmp_file/'+this.dataset_id + '/' + file_id + '/' + format;
+                        this.dialog.message_success=this.$t('finished_processing') + " <a href='"+download_url+"'>Download file</a>";
                         window.open(download_url, '_blank').focus();
                     }
                     
@@ -423,7 +423,8 @@ Vue.component('datafiles', {
                         <th style="width:80px;">{{$t("file")}}#</th>
                         <th>{{$t("file_name")}}</th>
                         <th>{{$t("variables")}}</th>
-                        <th>{{$t("cases")}}</th>                        
+                        <th>{{$t("cases")}}</th>
+                        <th></th>
                     </tr>
                     </thead>
                     <tbody is="draggable" :list="data_files" tag="tbody" handle=".handle" >
@@ -443,51 +444,87 @@ Vue.component('datafiles', {
                                     <span v-if="data_file.file_info.csv.file_exists" >{{data_file.file_info.csv.filename}} {{data_file.file_info.csv.file_size}}</span>
                                 </div>
 
-                            <div class="mt-2 datafile-actions">                                
-                                <router-link :to="'/variables/' + data_file.file_id"><button type="button" class="btn btn-sm btn-default"><v-icon>mdi-table</v-icon> {{$t("variables")}}</button></router-link>
-                                <router-link :to="'/data-explorer/' + data_file.file_id"><button type="button" class="btn btn-sm btn-default"><v-icon>mdi-table-eye</v-icon> {{$t("preview")}}</button></router-link>
-                                <span v-if="data_file.file_info.original">
-                                <button type="button" class="btn btn-sm btn-link ink ml-0 pl-0" @click="importSummaryStatistics(data_file.file_id)"><v-icon title="Refresh summary statistics" >mdi-update</v-icon> {{$t("refresh_stats")}}</button>                                
-                                </span>
-                                <button type="button" class="btn btn-sm btn-link ink ml-0 pl-0" @click="deleteFile(index)"><v-icon>mdi-delete-outline</v-icon>{{$t("remove")}}</button>
-                                <button type="button" class="btn btn-sm btn-link ink ml-0 pl-0" @click="replaceFile(index)"><v-icon>mdi-file-upload-outline</v-icon>{{$t("replace_file")}}</button>
-                                                                    
+                            <!-- 
+                                <div class="mt-2 datafile-actions" style="display:none;">                                
+                                    <router-link :to="'/variables/' + data_file.file_id"><v-btn small text><v-icon>mdi-table</v-icon> {{$t("variables")}}</v-btn></router-link>
+                                    <router-link :to="'/data-explorer/' + data_file.file_id"><button type="button" class="btn btn-sm btn-default"><v-icon>mdi-table-eye</v-icon> {{$t("preview")}}</button></router-link>
+                                    <span v-if="data_file.file_info.original">
+                                    <button type="button" class="btn btn-sm btn-link ink ml-0 pl-0" @click="importSummaryStatistics(data_file.file_id)"><v-icon title="Refresh summary statistics" >mdi-update</v-icon> {{$t("refresh_stats")}}</button>                                
+                                    </span>
+                                    <button type="button" class="btn btn-sm btn-link ink ml-0 pl-0" @click="deleteFile(index)"><v-icon>mdi-delete-outline</v-icon>{{$t("remove")}}</button>
+                                    <button type="button" class="btn btn-sm btn-link ink ml-0 pl-0" @click="replaceFile(index)"><v-icon>mdi-file-upload-outline</v-icon>{{$t("replace_file")}}</button>
+                                </div>
+                            -->
+                        </td>
+                        <td>{{data_file.var_count}}</td>
+                        <td>{{data_file.case_count}}</td>
+                        <td>
+                            <div class="action-buttons-hover">
+                                <router-link :to="'/variables/' + data_file.file_id"><v-btn small text><v-icon>mdi-table</v-icon> {{$t("variables")}}</v-btn></router-link>
+                                <router-link :to="'/data-explorer/' + data_file.file_id"><v-btn small text><v-icon>mdi-table-eye</v-icon> {{$t("preview")}}</v-btn></router-link>
+                                <v-btn color="red" text small @click="deleteFile(index)"><v-icon>mdi-delete-outline</v-icon> {{$t("remove")}}</v-btn>
+                                
                                 <v-menu offset-y>
                                     <template v-slot:activator="{ on, attrs }">
-                                        <button type="button" class="btn btn-sm btn-link ink ml-0 pl-2"  v-bind="attrs" v-on="on">
-                                            <v-icon title="More options">mdi-export</v-icon> {{$t("export")}} <v-icon title="More options">mdi-dots-vertical</v-icon>
-                                        </button>                                                
+                                        <v-btn small text  v-bind="attrs" v-on="on">
+                                            <v-icon title="More options">mdi-database-export</v-icon> {{$t("export")}}
+                                        </v-btn>
                                     </template>
                                     <v-list>
                                         <v-list-item @click="exportFile(index,'sav')">
+                                            <v-list-item-icon>
+                                                <v-icon>mdi-file</v-icon>
+                                            </v-list-item-icon>
                                             <v-list-item-title>SPSS</v-list-item-title>
                                         </v-list-item>
                                         <v-list-item  @click="exportFile(index,'dta')">
+                                            <v-list-item-icon>
+                                                <v-icon>mdi-file</v-icon>
+                                            </v-list-item-icon>
                                             <v-list-item-title>Stata</v-list-item-title>
                                         </v-list-item>
                                         <v-list-item  @click="exportFile(index,'csv')">
+                                            <v-list-item-icon>
+                                                <v-icon>mdi-file</v-icon>
+                                            </v-list-item-icon>
                                             <v-list-item-title>CSV</v-list-item-title>
                                         </v-list-item>
                                         <v-list-item  @click="exportFile(index,'json')">
+                                            <v-list-item-icon>
+                                                <v-icon>mdi-file</v-icon>
+                                            </v-list-item-icon>
                                             <v-list-item-title>JSON</v-list-item-title>
                                         </v-list-item>
                                         <v-list-item  @click="exportFile(index,'xpt')">
+                                            <v-list-item-icon>
+                                                <v-icon>mdi-file</v-icon>
+                                            </v-list-item-icon>
                                             <v-list-item-title>SAS</v-list-item-title>
                                         </v-list-item>
                                     </v-list>
                                 </v-menu>
 
-                            </div>
-                        </td>
-                        <td>{{data_file.var_count}}</td>
-                        <td>{{data_file.case_count}}</td>
-                        <td style="display:none;">
-                            <div>                                
-                                <button type="button" class="btn btn-sm btn-link" @click="deleteFile(index)"><i class="fas fa-trash-alt" title="Delete"></i></button>
-                                <router-link :to="'/variables/' + data_file.file_id"><button type="button" class="btn btn-sm btn-link"><i class="fas fa-table"></i> {{$t("variables")}}</button></router-link>
-                                <router-link :to="'/data-explorer/' + data_file.file_id"><button type="button" class="btn btn-sm btn-link"><i class="fas fa-table"></i> {{$t("data")}}</button></router-link>
-                                <v-icon title="Refresh summary statistics" @click="importSummaryStatistics(data_file.file_id)">mdi-update</v-icon>
-                            </div>
+                                <v-menu offset-y>
+                                    <template v-slot:activator="{ on, attrs }">                                        
+                                            <v-btn small icon v-on="on"><v-icon>mdi-dots-vertical</v-icon></v-btn>
+                                    </template>
+                                                                    
+                                    <v-list>
+                                        <v-list-item @click="importSummaryStatistics(data_file.file_id)">
+                                            <v-list-item-icon>
+                                                <v-icon>mdi-update</v-icon>
+                                            </v-list-item-icon>
+                                            <v-list-item-title>{{$t("Refresh summary statistics")}}</v-list-item-title>
+                                        </v-list-item>
+                                        <v-list-item  @click="replaceFile(index)">
+                                            <v-list-item-icon>
+                                                <v-icon>mdi-file-upload-outline</v-icon>
+                                            </v-list-item-icon>
+                                            <v-list-item-title>{{$t("Replace file")}}</v-list-item-title>
+                                        </v-list-item>
+                                    </v-list>
+                                </v-menu>
+                                </div>
                         </td>
                     </tr>
                     </tbody>
@@ -545,7 +582,7 @@ Vue.component('datafiles', {
                     </v-card-actions>
                 </v-card>
                 </v-dialog>
-            <!-- end dialog -->
+            <!-- end dialog -->           
 
             <dialog-datafile-replace 
                 v-model="dialog_datafile_import" 

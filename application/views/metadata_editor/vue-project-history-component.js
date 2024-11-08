@@ -54,7 +54,7 @@ Vue.component('project-history', {
 
             <div v-else>
                 <div class="bg-light p-3">
-                Revisions   
+                {{$t('Change log')}}   
                 </div>
             </div>
 

@@ -49,7 +49,7 @@ class Data extends MY_REST_Controller
 	 *  Get status of the Data api service
 	 * 
 	 */
-	public function status_get($type=NULL)
+	public function status_get()
 	{
 		try{
 			$response=$this->datautils->status();
@@ -81,9 +81,14 @@ class Data extends MY_REST_Controller
 			}
 
 			$overwrite=$this->input->post("overwrite") ? (int)$this->input->post("overwrite") : 0;
+			$store_data=$this->input->post("store_data");
+
+			if ($store_data !== "store" && $store_data !== "remove") {
+				throw new Exception("Invalid value for store_data. Valid values are 'store', 'remove'");
+			}
 
 			$this->editor_acl->user_has_project_access($sid,$permission='edit',$this->api_user());
-			$result=$this->Editor_datafile_model->upload_create($sid,$overwrite);
+			$result=$this->Editor_datafile_model->upload_create($sid,$overwrite,$store_data);
 
 			$output=array(
 				'status'=>'success',
@@ -103,7 +108,7 @@ class Data extends MY_REST_Controller
 		}
 	}
 
-
+	
 	/**
 	 * 
 	 *  Import basic metadata info for a data file (stata, csv, sav)
@@ -176,10 +181,14 @@ class Data extends MY_REST_Controller
 				$datafile_path=$this->Editor_datafile_model->get_file_path($sid,$file_id);
 			}else{
 				$datafile_path=$this->Editor_datafile_model->get_file_csv_path($sid,$file_id);
+
+				if (!file_exists($datafile_path)){
+					$datafile_path=$this->Editor_datafile_model->get_file_path($sid,$file_id);
+				}
 			}
 
 			if (!$datafile_path){
-				throw new Exception("Data file not found");
+				throw new Exception("Data file not found: ". basename($datafile_path));
 			}
 
 			$dict_params=$this->datautils->prepare_data_dictionary_params($sid,$file_id,$datafile_path);

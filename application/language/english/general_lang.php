@@ -114,6 +114,18 @@ $lang['finished_processing']="Finished processing";
 
 $lang['change_password']="Change password";
 
+$lang['data_upload_notice']="<p>The uploaded files will be processed on the server to extract variable-level 
+                                    information such as names, labels, categories, and to generate summary statistics.
+                                    </p> 
+                                    <p>Select whether to store the data on the server or have it removed after processing. 
+                                    If the data is not stored, certain features will be unavailable — such as data preview,
+                                     weighting, and data export. Any data stored on the server can be removed at any time.
+                                     </p>";
+
+$lang['History']="History";
+$lang['Refresh summary statistics']="Refresh summary statistics";
+$lang['Replace file']="Replace file";
+$lang['File manager']="File manager";
 
 /* End of file general_lang.php */
 /* Location: ./application/language/base/general_lang.php */

@@ -438,7 +438,7 @@ class Datafiles extends MY_REST_Controller
 			$sid=$this->get_sid($sid);
 			$user_id=$this->get_api_user_id();
 
-			$this->editor_acl->user_has_project_access($sid,$permission='edit');			
+			$this->editor_acl->user_has_project_access($sid,$permission='edit');
 			$result=$this->Editor_datafile_model->cleanup($sid, $file_id);
 
 			$response=array(
@@ -456,6 +456,5 @@ class Datafiles extends MY_REST_Controller
 			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
-
 
 }

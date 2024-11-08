@@ -158,13 +158,13 @@ Vue.component('template-apply-defaults-component', {
             <div class="template-apply-defaults-component">
 
             <!-- dialog -->
-            <v-dialog v-model="dialog" max-width="400" scrollable persistent style="z-index:5000">
+            <v-dialog v-model="dialog" max-width="500" scrollable persistent xstyle="z-index:5000">
                 <v-card>
                     <v-card-title class="text-h5 grey lighten-2">
-                        {{$t('Apply default values')}}
+                        {{$t('apply_template_defaults')}}
                     </v-card-title>
                     <v-card-subtitle>
-                        {{$t('Apply defaults values defined in the template to the metadata')}}
+                        <div class="pt-2">{{$t('apply_template_defaults_description')}}</div>
                     </v-card-subtitle>
                     <v-card-text style="min-height: 100px;">
                     <div>                    
@@ -174,12 +174,12 @@ Vue.component('template-apply-defaults-component', {
                         mandatory
                         >
                         <v-radio
-                            label="Update only empty fields"
+                            :label="$t('update_empty_fields')"
                             value="empty"
                             class="font-weigh-normal"
                         ></v-radio>
                         <v-radio
-                            label="Update all fields (overwrite existing values)"
+                            :label="$t('update_all_fields')"
                             value="all"
                             class="font-weigh-normal"
                         ></v-radio>
@@ -190,7 +190,7 @@ Vue.component('template-apply-defaults-component', {
                     <div v-if="validation_report.length>0">
                         <v-divider></v-divider>
                         <div>
-                            {{$t('Items updated')}}:
+                            {{$t('items_updated')}}:
                         </div>
                         <ul style="margin-left:20px;">
                             <template v-for="item in validation_report">
@@ -201,7 +201,7 @@ Vue.component('template-apply-defaults-component', {
                     <div v-if="is_processed && validation_report.length==0">
                         <v-divider></v-divider>
                         <div>
-                            {{$t('No items updated')}}
+                            {{$t('no_items_updated')}}
                         </div>
                     </div>
 
@@ -211,10 +211,10 @@ Vue.component('template-apply-defaults-component', {
                     <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn color="primary" text @click="templateApplyDefaults" >
-                        Apply
+                        {{$t('apply')}}
                     </v-btn>
                     <v-btn color="primary" text @click="dialog=false;is_processed=false;" >
-                        Close
+                        {{$t('close')}}
                     </v-btn>
                     </v-card-actions>
                 </v-card>
