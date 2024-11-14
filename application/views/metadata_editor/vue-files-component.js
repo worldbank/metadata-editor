@@ -17,28 +17,6 @@ Vue.component('file-manager', {
         addFile:function(){
             alert("TODO");
             return;
-            vm=this;
-            let url=CI.base_url + '/api/files/'+ this.ProjectID;
-
-            formData={
-                "title": "untitled",
-                "dctype" :"doc/oth"
-            }
-
-            axios.post( url,
-                formData,
-                {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                }
-            ).then(function(response){
-                vm.$store.dispatch('loadExternalResources',{dataset_id:vm.ProjectID});
-                router.push('/external-resources/'+response.data.resource.id);
-            })
-            .catch(function(response){
-                vm.errors=response;
-            });
         },
         deleteFile: function(file){
             if (!confirm(this.$t("confirm_delete") + ' ' + file.name)){
@@ -102,7 +80,7 @@ Vue.component('file-manager', {
         colorByFolderType: function(dir_path){
             let parts=dir_path.split('/');
 
-            if (dir_path=='data/tmp'){
+            if (dir_path=='data/tmp' || dir_path=='.'){
                 return 'red';
             }
 
@@ -239,7 +217,7 @@ Vue.component('file-manager', {
                         </td>
                         <td>
                             <v-chip :color="colorByFolderType(file.dir_path)" small outlined class="text-small text-secondary text-uppercase">
-                            <span v-if="file.dir_path=='data/tmp'">TEMPORARY</span>
+                            <span v-if="file.dir_path=='data/tmp' || file.dir_path=='.'">TEMPORARY</span>
                             <span v-else>{{file.dir_path}}</span>                            
                             </v-chip>
                         </td>
