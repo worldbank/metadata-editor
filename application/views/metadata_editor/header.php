@@ -1,4 +1,4 @@
-<nav class="main-header sticky-top navbar navbar-expand navbar-white navbar-light bg-light border-bottom" style="margin-left:0px;">
+<nav class="main-header sticky-top navbar navbar-expand navbar-white navbar-light bg-light border-bottom elevation-2" style="margin-left:0px;">
 
     <div class="pl-2" style="overflow:hidden;min-height:35px;margin-right:40px;">
         <div style="font-size:20px;" :title="Title" class="wrap-text">
