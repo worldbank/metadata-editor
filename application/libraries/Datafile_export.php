@@ -82,7 +82,7 @@ class Datafile_export
                 $tmp_code_labels=new stdClass();
                 $has_code_labels=false;			
 				foreach($catgry_labels as $cat_value_label){
-                    if (trim($cat_value_label['labl'])!=''){
+                    if (isset($cat_value_label['labl']) && trim($cat_value_label['labl'])!=''){
                         $has_code_labels=true;
 					    $tmp_code_labels->{$cat_value_label['value']}=$cat_value_label['labl'];
                     }
