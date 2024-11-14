@@ -45,6 +45,12 @@ Vue.component('vue-project-share', {
             }
             return selected_users;
         },
+        removeSelectionItem: function(item) {
+            let index = this.selected_users.indexOf(item);
+            if (index > -1) {
+                this.selected_users.splice(index, 1);
+            }
+        },
         loadProjectUsers: function(){
             let vm = this;
             let url = CI.base_url + '/api/share/list/' + this.project_id;
@@ -172,6 +178,7 @@ Vue.component('vue-project-share', {
                         v-model="selected_users"
                         :loading="is_loading"
                         :search-input.sync="search"
+                        @change="search=''"
                         :items="users"
                         solo
                         chips
@@ -272,7 +279,7 @@ Vue.component('vue-project-share', {
                         </v-simple-table>
                     </div>
                     <div v-else>
-                        <div class="text-center m-3" >No users have access to this project</div>
+                        <div class="text-center m-3" >None</div>
                     </div>
 
 

@@ -47,18 +47,18 @@ Vue.component('datafile-data-explorer', {
             return this.variable_data.offset;
         },
         CurrentPage:{
-                get: function () {
-                    currentPage_ = Math.ceil(this.variable_data.offset / this.rows_limit);
+            get: function () {
+                currentPage_ = Math.ceil(this.variable_data.offset / this.rows_limit);
 
-                    if (currentPage_<=0){
-                        return 1;
-                    }
-        
-                    return currentPage_+1;
-                },
-                set: function (newValue) {
-                    
+                if (currentPage_<=0){
+                    return 1;
                 }
+    
+                return currentPage_+1;
+            },
+            set: function (newValue) {
+                
+            }
         },
         
         PaginationTotalRecords()
@@ -88,6 +88,8 @@ Vue.component('datafile-data-explorer', {
             })
             .catch(function (error) {
                 console.log(error);
+                vm.data_loading_dialog=false;
+                vm.errors=error;
             })
             .then(function () {
                 console.log("request completed");
@@ -165,10 +167,11 @@ Vue.component('datafile-data-explorer', {
 
             <v-card>
                 <v-card-title>
+                    {{$t('Data')}}
                 </v-card-title>
-                <v-card-text>
+                <v-card-text style="min-height:200px;">
 
-                    <div class="float-right"">
+                    <div class="float-right" v-if="variable_data.records">
                                       
                         <v-menu offset-y>
                             <template v-slot:activator="{ on, attrs }">
@@ -195,8 +198,7 @@ Vue.component('datafile-data-explorer', {
                             </v-list>
                         </v-menu>
                     </div>
-
-                    <h2>Data</h2>
+                    <br/>
 
                     <template>
                         <div v-if="data_loading_dialog==true">
@@ -209,6 +211,18 @@ Vue.component('datafile-data-explorer', {
                             </div>
                         </div>                
                     </template>
+
+                    
+                    <div v-if="!variable_data.records" class="text-center m-3 p-3" >                        
+                        <v-alert
+                        text
+                        outlined
+                        color="deep-orange"
+                        icon="mdi-fire"
+                        >
+                        {{$t('no_data_available')}}
+                        </v-alert>
+                    </div>
 
                     <template v-if="variable_data.records" >
 

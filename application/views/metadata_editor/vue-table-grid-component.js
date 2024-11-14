@@ -9,13 +9,23 @@ Vue.component('table-grid-component', {
             snackbar:false,
             snackbar_message:'',
             dialog_enum_selection:false,
+            validation_errors:[]
         }
     },
     watch: {
+        local: {
+            handler: function (newVal, oldVal) {
+                this.validation_errors=[];
+                this.validateUniqueValues();    
+            },
+            deep: true
+        },
+        
     },
     
     mounted: function () {   
-        
+        //this.validation_errors=[];
+        //this.validateUniqueValues();
     },
     computed: {
         local(){
@@ -30,6 +40,16 @@ Vue.component('table-grid-component', {
             }
         
             return value;
+        },
+        //get columns that require unique values
+        columnsRequireUnique(){
+            let keys=[];
+            for (let i=0;i<this.columns.length;i++){
+                if (this.columns[i]['is_unique']){
+                    keys.push(this.columns[i]['key']);
+                }
+            }
+            return keys;
         },
         localColumns(){
             return this.columns;
@@ -54,6 +74,40 @@ Vue.component('table-grid-component', {
         }
     },
     methods:{
+        columnHasUniqueValues(data, key){
+            let values=[];
+            for (let i=0;i<data.length;i++){
+                let value=data[i][key];
+
+                if (value){
+                    value=value.toString().trim();
+                }
+
+                if (values.includes(value)){
+                    return false;
+                }
+                values.push(value);
+            }
+            return true;
+        },
+        validateUniqueValues: function(){
+            let keys=this.columnsRequireUnique;
+
+            if (keys.length<1){
+                return;
+            }
+
+            let has_errors=false;
+
+            for (let i=0;i<keys.length;i++){                
+                if (!this.columnHasUniqueValues(this.local,keys[i])){
+                    this.validation_errors.push("Duplicate values found in column: ["+keys[i] +"]");
+                    has_errors=true;
+                }
+            }
+
+            return !has_errors;
+        },
         showToast: function(message){
             this.snackbar=true;
             this.snackbar_message=message;
@@ -239,6 +293,12 @@ Vue.component('table-grid-component', {
     },  
     template: `
             <div class="table-grid-component">
+            
+            <div v-if="validation_errors.length>0" class="sticky-top">
+                <v-alert dense type="error" v-for="error in validation_errors">{{error}}</v-alert>
+            </div>
+
+
 
             <table class="table table-striped table-sm border-bottom">
                 <thead class="thead-light">
@@ -301,7 +361,7 @@ Vue.component('table-grid-component', {
                     </th>
                     <th v-for="(column,idx_col) in columns" scope="col">
                         <span @click="sortColumn(column.key)" role="button" title="Click to sort">
-                            {{column.title}} 
+                            {{column.title}}
                             <i v-if="sort_field==column.key && !sort_asc" class="fas fa-caret-down"></i>
                             <i v-if="sort_field==column.key && sort_asc==true" class="fas fa-caret-up"></i>
                         </span>

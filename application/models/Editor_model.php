@@ -50,7 +50,12 @@ class Editor_model extends CI_Model {
 		'version',
 		'notes',
 		'metadata',
-		'wght'
+		'wght',
+		'created',
+		'changed',
+		'created_by',
+		'changed_by',
+		'store_data'
 	);
 	
 	private $listing_fields=array(
@@ -262,6 +267,10 @@ class Editor_model extends CI_Model {
 		$this->db->where("id",$sid);
 		
 		$survey=$this->db->get("editor_projects")->row_array();
+
+		if (!$survey){
+			return false;
+		}
 		
 		if($survey){
 			$survey=$this->decode_encoded_fields($survey);
@@ -687,8 +696,8 @@ class Editor_model extends CI_Model {
 	function data_file_insert($sid,$options)
 	{		
 		$data=array();
-		//$data['created']=date("U");
-		//$data['changed']=date("U");
+		$data['created']=date("U");
+		$data['changed']=date("U");
 		
 		foreach($options as $key=>$value){
 			if (in_array($key,$this->data_file_fields) ){
@@ -743,6 +752,8 @@ class Editor_model extends CI_Model {
 				$data[$key]=$value;
 			}
 		}
+
+		$data['changed']=date("U");
 
 		//filename
 		if (isset($data['file_name'])){
@@ -1506,6 +1517,30 @@ class Editor_model extends CI_Model {
 			throw new Exception("Metadata diff failed: ".$e->getMessage());
 		}
 		
+	}
+
+
+	/**
+	 * 
+	 * Transfer project ownership
+	 * 
+	 */
+	function transfer_ownership($sid,$new_owner_id)
+	{
+		$project=$this->get_row($sid);
+
+		if (!$project){
+			throw new Exception("Project not found");
+		}
+
+		$options=array(
+			'changed'=>date("U"),
+			'changed_by'=>$new_owner_id,
+			'created_by'=>$new_owner_id
+		);
+
+		$this->db->where('id',$sid);
+		return $this->db->update('editor_projects',$options);
 	}
 	
 

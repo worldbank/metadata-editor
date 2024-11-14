@@ -126,7 +126,7 @@ Vue.component('vue-summary-collections', {
                 </div>
 
                 <div v-if="project_collections.length==0" class="text-muted text-secondary">
-                    {{$t("No users have access to this project")}}
+                    {{$t("None")}}
                 </div>
                 
                 <template v-for="collection in project_collections">

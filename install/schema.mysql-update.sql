@@ -74,3 +74,10 @@ CREATE TABLE `edit_history` (
 
 ALTER TABLE .`editor_data_files` 
 ADD COLUMN `store_data` INT NULL;
+
+
+ALTER TABLE `editor_data_files` 
+ADD COLUMN `created` INT NULL AFTER `store_data`,
+ADD COLUMN `changed` INT NULL AFTER `created`,
+ADD COLUMN `created_by` INT NULL AFTER `changed`,
+ADD COLUMN `changed_by` INT NULL AFTER `created_by`;

@@ -88,7 +88,12 @@ class Data extends MY_REST_Controller
 			}
 
 			$this->editor_acl->user_has_project_access($sid,$permission='edit',$this->api_user());
-			$result=$this->Editor_datafile_model->upload_create($sid,$overwrite,$store_data);
+			$result=$this->Editor_datafile_model->upload_create(
+				$sid,
+				$overwrite,
+				$store_data,
+				$this->get_api_user_id()
+			);
 
 			$output=array(
 				'status'=>'success',

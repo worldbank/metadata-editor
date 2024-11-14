@@ -10,7 +10,10 @@ Vue.component('file-manager', {
     mounted () {
         this.loadFiles();
     },   
-    methods: {        
+    methods: {      
+        momentDate(date) {
+            return moment.utc(date).format("YYYY-MM-DD HH:mm:ss");
+        },  
         addFile:function(){
             alert("TODO");
             return;
@@ -98,6 +101,11 @@ Vue.component('file-manager', {
 
         colorByFolderType: function(dir_path){
             let parts=dir_path.split('/');
+
+            if (dir_path=='data/tmp'){
+                return 'red';
+            }
+
             if (parts[0]=='data'){
                 return 'purple';
             }
@@ -201,16 +209,22 @@ Vue.component('file-manager', {
                 </v-col>
             </v-row>
 
-            <v-simple-table class="elevation-2 border">
+            <v-simple-table class="elevation-2 border mb-5" >
                 <template v-slot:default>
                     <thead>
                         <tr>                            
                             <th></th>
                             <th class="text-left">
-                                Name
+                            {{$t('Type')}}
                             </th>
                             <th class="text-left">
-                                File size
+                            {{$t('Name')}}
+                            </th>                            
+                            <th class="text-left">
+                                {{$t('Size')}}
+                            </th>
+                            <th class="text-left">
+                                {{$t('Created')}}
                             </th>
                             <th class="text-left">
                                 
@@ -224,10 +238,17 @@ Vue.component('file-manager', {
                             <v-icon style="font-size:24px;" v-if="file.is_dir==false" :color="colorByFolderType(file.dir_path)">mdi-file-document-outline</v-icon>                            
                         </td>
                         <td>
-                            {{file.name}}
-                            <div class="text-small text-secondary">{{file.dir_path}}</div>
+                            <v-chip :color="colorByFolderType(file.dir_path)" small outlined class="text-small text-secondary text-uppercase">
+                            <span v-if="file.dir_path=='data/tmp'">TEMPORARY</span>
+                            <span v-else>{{file.dir_path}}</span>                            
+                            </v-chip>
                         </td>
+                        <td>
+                            {{file.name}}                            
+                        </td>
+                        
                         <td>{{file.size_human}}</td>
+                        <td>{{momentDate(file.timestamp)}}</td>
                         
                         <td>
                             <v-btn danger text color="red" @click="deleteFile(file)">

@@ -20,7 +20,8 @@ Vue.component('datafiles', {
                 message_success:'',
                 message_error:'',
                 is_loading:false
-            }
+            },
+            attrs: {}
             
         }
     }, 
@@ -34,7 +35,33 @@ Vue.component('datafiles', {
             this.updateDataFilesWeight();
         },
     }, 
-    methods: {        
+    methods: {
+        momentDate(date) {
+            return moment.unix(date).format("YYYY-MM-DD")
+        },
+        removeData: async function(data_file){
+            if (!confirm("Are you sure you want to remove the data from this file?")){
+                data_file.store_data=1;
+                return false;
+            }
+
+            //save file, set store_data to 0
+            let result=await this.saveFile(data_file);
+
+            vm=this;
+            let url=CI.base_url + '/api/datafiles/cleanup/'+ vm.dataset_id;
+            let formData=new FormData();            
+
+            axios.post( url, formData,
+            ).then(function(response){
+                
+            })
+            .catch(function(response){
+                console.log(response);
+                alert("Failed to remove data: "+ response.message);
+            });
+        },
+
         editFile:function(file_id){
             //this.page_action="edit";
             //this.edit_item=file_id;
@@ -50,7 +77,7 @@ Vue.component('datafiles', {
             newIdx=this.data_files.length -1;
             this.edit_item=newIdx;
         },
-        saveFile: function(data)
+        saveFile: async function(data)
         {            
             vm=this;
             let url=CI.base_url + '/api/datafiles/'+vm.dataset_id;
@@ -58,9 +85,6 @@ Vue.component('datafiles', {
 
             axios.post(url, 
                 form_data
-                /*headers: {
-                    "name" : "value"
-                }*/
             )
             .then(function (response) {
                 vm.$store.dispatch('loadDataFiles',{dataset_id:vm.dataset_id});
@@ -424,30 +448,42 @@ Vue.component('datafiles', {
                         <th>{{$t("file_name")}}</th>
                         <th>{{$t("variables")}}</th>
                         <th>{{$t("cases")}}</th>
+                        <th>{{$t("Modified")}}</th>
+                        <th>{{$t("Data")}} 
+                       <v-tooltip top max-width="300" color="primary">
+                            <template v-slot:activator="{ on, attrs }">
+                                <span
+                                v-bind="attrs"
+                                v-on="on"
+                                >
+                                <v-icon color="primary" >mdi-help-circle-outline</v-icon>
+                                </span>
+                            </template>
+                            <span>{{$t("note_data_stored_on_server")}}</span>
+                        </v-tooltip>
+                        
+                        </th>                        
                         <th></th>
                     </tr>
                     </thead>
                     <tbody is="draggable" :list="data_files" tag="tbody" handle=".handle" >
                     <tr v-for="(data_file, index) in data_files" :key="data_file.file_id">
                         <td><input type="checkbox" v-model="selected_files" :value="data_file.file_id" /></td>
-                        <td><span title="Drag to re-order" class="mdi mdi-drag handle"></span></td>
-                        <td><i class="far fa-file-alt"></i> {{data_file.file_id}}</td>
+                        <td><v-icon class="handle">mdi-drag</v-icon></td>
+                        <td><v-icon color="primary" >mdi-file-document</v-icon> {{data_file.file_id}}</td>
                         <td>
                             <div>
-                                <h5 style="cursor:pointer;color:#0D47A1"  @click="editFile(index)">{{data_file.file_name}}</h5>
+                                <div style="cursor:pointer;color:#0D47A1"  @click="editFile(index)">{{data_file.file_name}}</div>
                                 <v-icon style="color:red;margin-top:-4px;" title="Physical file not found" v-if="!data_file.file_info.original">mdi-alert-circle</v-icon></div>
-                                <div class="text-secondary text-small" v-if="data_file.file_info.original">                            
-                                    <!-- <span v-if="data_file.file_info.original.file_exists" class="mr-3">
-                                        <span>{{data_file.file_info.original.filename}}</span>
-                                        <span>{{data_file.file_info.original.file_size}}</span> -->
+                                <div class="text-secondary text-small" v-if="data_file.file_info.original">                                                                
+                                    <span v-if="data_file.file_info.csv.file_exists" >
+                                    <v-chip small outlined>{{data_file.file_info.csv.filename}} {{data_file.file_info.csv.file_size}}</v-chip>
                                     </span>
-                                    <span v-if="data_file.file_info.csv.file_exists" >{{data_file.file_info.csv.filename}} {{data_file.file_info.csv.file_size}}</span>
                                 </div>
-
                             <!-- 
                                 <div class="mt-2 datafile-actions" style="display:none;">                                
                                     <router-link :to="'/variables/' + data_file.file_id"><v-btn small text><v-icon>mdi-table</v-icon> {{$t("variables")}}</v-btn></router-link>
-                                    <router-link :to="'/data-explorer/' + data_file.file_id"><button type="button" class="btn btn-sm btn-default"><v-icon>mdi-table-eye</v-icon> {{$t("preview")}}</button></router-link>
+                                    <router-link :to="'/data-explorer/' + data_file.file_id"><button type="button" class="btn btn-sm btn-default"><v-icon>mdi-table-eye</v-icon> {{$t("data")}}</button></router-link>
                                     <span v-if="data_file.file_info.original">
                                     <button type="button" class="btn btn-sm btn-link ink ml-0 pl-0" @click="importSummaryStatistics(data_file.file_id)"><v-icon title="Refresh summary statistics" >mdi-update</v-icon> {{$t("refresh_stats")}}</button>                                
                                     </span>
@@ -457,14 +493,41 @@ Vue.component('datafiles', {
                             -->
                         </td>
                         <td>{{data_file.var_count}}</td>
-                        <td>{{data_file.case_count}}</td>
+                        <td>{{data_file.case_count}}</td>                       
+                        <td>{{momentDate(data_file.changed)}}</td>
                         <td>
-                            <div class="action-buttons-hover">
-                                <router-link :to="'/variables/' + data_file.file_id"><v-btn small text><v-icon>mdi-table</v-icon> {{$t("variables")}}</v-btn></router-link>
-                                <router-link :to="'/data-explorer/' + data_file.file_id"><v-btn small text><v-icon>mdi-table-eye</v-icon> {{$t("preview")}}</v-btn></router-link>
-                                <v-btn color="red" text small @click="deleteFile(index)"><v-icon>mdi-delete-outline</v-icon> {{$t("remove")}}</v-btn>
+                            <v-btn 
+                                v-if="data_file.file_info.csv.file_exists || data_file.store_data==1" 
+                                small text color="primary" 
+                                @click="removeData(data_file)" 
+                                >
+                                {{$t("Clear data")}}
+                            </v-btn>
+                            <v-btn v-else small text color="primary" disabled>{{$t("No data")}}</v-btn>                            
+                        </td>
+                        <td>
+                            <div class="zxaction-buttons-hover">
+                                <router-link 
+                                    :title="$t('Variables')"
+                                    :to="'/variables/' + data_file.file_id">
+                                        <v-btn small text><v-icon>mdi-table</v-icon> </v-btn>
+                                </router-link>
+                                <router-link v-if="data_file.file_info.csv.file_exists || data_file.store_data==1" 
+                                    :to="'/data-explorer/' + data_file.file_id"
+                                    :title="$t('data')"
+                                    ><v-btn small text><v-icon>mdi-table-eye</v-icon> </v-btn>
+                                </router-link>
+                                <v-btn v-else small text disabled
+                                    :title="$t('data')"
+                                    ><v-icon>mdi-table-eye</v-icon> 
+                                </v-btn>
+                                <v-btn color="red" text small 
+                                    title="$t('Delete')"
+                                    @click="deleteFile(index)"
+                                    ><v-icon>mdi-delete-outline</v-icon> 
+                                </v-btn>
                                 
-                                <v-menu offset-y>
+                                <v-menu offset-y v-if="data_file.file_info.csv.file_exists || data_file.store_data==1"  >
                                     <template v-slot:activator="{ on, attrs }">
                                         <v-btn small text  v-bind="attrs" v-on="on">
                                             <v-icon title="More options">mdi-database-export</v-icon> {{$t("export")}}
@@ -503,6 +566,9 @@ Vue.component('datafiles', {
                                         </v-list-item>
                                     </v-list>
                                 </v-menu>
+                                <v-btn v-else disabled small text  v-bind="attrs" v-on="on">
+                                    <v-icon title="More options">mdi-database-export</v-icon> {{$t("export")}}
+                                </v-btn>
 
                                 <v-menu offset-y>
                                     <template v-slot:activator="{ on, attrs }">                                        
@@ -522,6 +588,7 @@ Vue.component('datafiles', {
                                             </v-list-item-icon>
                                             <v-list-item-title>{{$t("Replace file")}}</v-list-item-title>
                                         </v-list-item>
+                                        
                                     </v-list>
                                 </v-menu>
                                 </div>

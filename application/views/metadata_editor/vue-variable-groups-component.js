@@ -206,7 +206,7 @@ Vue.component('variable-groups', {
             let i=0;
 
             while(!found && i<items.length){
-                console.log("searching", items[i].key, key);
+                
                 if (items[i].key==key){
                     item=items[i];
                     found=true;

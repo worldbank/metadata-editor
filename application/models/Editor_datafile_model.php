@@ -30,6 +30,10 @@ class Editor_datafile_model extends CI_Model {
 		'metadata',
 		'wght',
 		'store_data',
+		'created',
+		'changed',
+		'created_by',
+		'changed_by'
 	);
 		
 
@@ -53,7 +57,7 @@ class Editor_datafile_model extends CI_Model {
 	 * Create new data file by uploading a data file (csv, dta, sav)
 	 * 
 	 */
-	function upload_create($sid,$overwrite=false, $store_data=null)
+	function upload_create($sid,$overwrite=false, $store_data=null,$user_id=null)
 	{
 		$datafile_info=$this->check_uploaded_file_exists($sid);
 
@@ -80,7 +84,9 @@ class Editor_datafile_model extends CI_Model {
 				'file_physical_name'=>$uploaded_file_name,
 				'file_name'=>$this->filename_part($uploaded_file_name),
 				'wght'=>$this->max_wght($sid)+1,
-				'store_data'=>$store_data
+				'store_data'=>$store_data,
+				'created_by'=>$user_id,
+				'changed_by'=>$user_id
 			);
 
 			$result=$this->insert($sid,$options);
@@ -90,7 +96,8 @@ class Editor_datafile_model extends CI_Model {
 				'file_physical_name'=>$uploaded_file_name,
 				'file_name'=>$this->filename_part($uploaded_file_name),
 				'file_path'=>$uploaded_path,
-				'store_data'=>$store_data
+				'store_data'=>$store_data,
+				'changed_by'=>$user_id
 			);
 
 			$result=$this->update($datafile_info['id'],$options);
@@ -585,6 +592,14 @@ class Editor_datafile_model extends CI_Model {
 			}
 		}
 
+		if(!isset($data['created'])){
+			$data['created']=date("U");
+		}
+
+		if(!isset($data['changed'])){
+			$data['changed']=date("U");
+		}
+
 		//filename
 		if ($data['file_name']){
 			$data['file_name']=$this->filename_part($data['file_name']);
@@ -633,6 +648,8 @@ class Editor_datafile_model extends CI_Model {
 			}
 		}
 
+		$data['changed']=date("U");
+
 		//filename
 		if (isset($data['file_name'])){
 			$data['file_name']=$this->filename_part($data['file_name']);
@@ -670,6 +687,8 @@ class Editor_datafile_model extends CI_Model {
 				unset($options[$key]);
 			}
 		}
+
+		$options['changed']=date("U");
 		
 		$this->db->where('sid',$sid);
 		$this->db->where('file_name',$file_name);

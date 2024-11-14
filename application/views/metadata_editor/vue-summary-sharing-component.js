@@ -55,7 +55,7 @@ Vue.component('vue-summary-sharing-stats', {
                 </div>
 
                 <div v-if="project_users.length==0" class="text-muted text-secondary">
-                    {{$t("No users have access to this project")}}
+                    {{$t("None")}}
                 </div>
                 
                 <v-simple-table style="font-size:small;" v-if="project_users.length>0">

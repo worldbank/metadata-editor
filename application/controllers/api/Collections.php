@@ -12,8 +12,10 @@ class Collections extends MY_REST_Controller
 		$this->load->model("Editor_model");
 		$this->load->model("Collection_access_model");
 		$this->load->library("Form_validation");
+		$this->load->library("Editor_acl");
 		
 		$this->is_authenticated_or_die();
+		$this->api_user=$this->api_user();
 	}
 
 	function _auth_override_check()
@@ -249,6 +251,31 @@ class Collections extends MY_REST_Controller
 				}
 				$options['projects']=$sid_arr;
 			}
+
+			//check permissions for each project
+			$access_errors=array();			
+			foreach($options['projects'] as $sid){
+				try{
+					$this->editor_acl->user_has_project_access($sid,$permission='admin',$this->api_user);
+				}
+				catch(Exception $e){
+					$access_errors[]=array(
+						'sid'=>$sid,
+						'error'=>$e->getMessage()
+					);
+				}
+			}
+
+			if (count($access_errors)>0){
+				$response=array(
+					'status'=>'failed',
+					'errors'=>$access_errors
+				);
+
+				$this->set_response($response, REST_Controller::HTTP_BAD_REQUEST);
+				return;
+			}
+			
 			
 			$result=$this->Collection_model->add_batch_projects($options['collections'], $options['projects']);
 

@@ -133,14 +133,6 @@
             template: '<div><vue-manage-users/></div>'
         }
 
-        const Foo = {
-            template: '<div>foo</div>'
-        }
-
-        const Bar = {
-            template: '<div>bar</div>'
-        }
-
         // 2. Define some routes
         // Each route should map to a component. The "component" can
         // either be an actual component constructor created via
@@ -149,15 +141,6 @@
         const routes = [
             { path: '/edit/:id', component: EditCollection, name:"edit" },
             { path: '/manage-users/:id', component: ManageAccess, name:"manage-access" },
-            {
-                path: '/foo',
-                component: Foo
-            },
-            {
-                path: '/bar',
-                component: Bar
-            },
-            
             {
                 path: '*',
                 component: Home,

@@ -171,11 +171,6 @@ Vue.component('vue-collection', {
     },
     template: `
     <div class="vue-collection-component">
-        
-            <vue-edit-collection v-model="dialog_edit" :collection="edit_collection" v-on:update-collection="updateCollection" vonremove-access="UnshareProjectWithUser"></vue-edit-collection>
-            <vue-copy-collection v-model="dialog_copy_collection" v-on:collection-copied="loadCollections"></vue-copy-collection>
-            <vue-move-collection v-model="dialog_move_collection" v-on:collection-moved="loadCollections"></vue-move-collection>
-            
             <section class="container">
 
                     <div class="row">
@@ -263,6 +258,9 @@ Vue.component('vue-collection', {
                     </div>
             </section>
 
+            <vue-edit-collection v-model="dialog_edit" :collection="edit_collection" v-on:update-collection="updateCollection" vonremove-access="UnshareProjectWithUser"></vue-edit-collection>
+            <vue-copy-collection v-model="dialog_copy_collection" v-on:collection-copied="loadCollections"></vue-copy-collection>
+            <vue-move-collection v-model="dialog_move_collection" v-on:collection-moved="loadCollections"></vue-move-collection>
 
             <template>
                 <v-menu

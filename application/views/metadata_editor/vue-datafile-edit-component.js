@@ -158,7 +158,7 @@ const VueDatafileEdit= Vue.component('datafile-edit', {
                             </div>
 
                             </div>
-                            <div class="col-md-4" style="display:none;">
+                            <div class="col-md-4" style="display:none" >
                                 <div><strong>{{$t("file_information")}}</strong></div>
                                 <div class="mt-2">
                                     <div>

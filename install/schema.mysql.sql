@@ -1513,22 +1513,28 @@ CREATE TABLE `editor_catalogs` (
 CREATE TABLE `editor_data_files` (
   `id` int NOT NULL AUTO_INCREMENT,
   `sid` int NOT NULL,
-  `file_id` varchar(100) DEFAULT NULL,
-  `file_name` varchar(255) DEFAULT NULL,
-  `file_uri` varchar(300) DEFAULT NULL,
-  `description` text CHARACTER SET utf8,
+  `file_id` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `file_name` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `description` text CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci,
   `case_count` int DEFAULT NULL,
   `var_count` int DEFAULT NULL,
-  `producer` varchar(255) DEFAULT NULL,
-  `data_checks` TEXT DEFAULT NULL,
-  `missing_data` TEXT DEFAULT NULL,
-  `version` varchar(255) DEFAULT NULL,
-  `notes` TEXT DEFAULT NULL,
-  `metadata` TEXT DEFAULT NULL,
+  `producer` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `data_checks` text,
+  `missing_data` text,
+  `version` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `notes` text,
+  `metadata` text,
+  `wght` int DEFAULT NULL,
+  `file_physical_name` varchar(500) DEFAULT NULL,
   `store_data` int DEFAULT NULL,
+  `created` int DEFAULT NULL,
+  `changed` int DEFAULT NULL,
+  `created_by` int DEFAULT NULL,
+  `changed_by` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
 ) AUTO_INCREMENT=1;
+
 
 
 CREATE TABLE `editor_projects` (

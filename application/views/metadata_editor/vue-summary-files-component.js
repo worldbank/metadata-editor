@@ -52,7 +52,7 @@ Vue.component('summary-files', {
         
         <div class="component-container">
 
-        <v-simple-table>
+        <v-simple-table v-if="resources && resources.length>0">
             <template v-slot:default>
                 <thead>
                     <tr>
@@ -71,6 +71,11 @@ Vue.component('summary-files', {
                 </tbody>
             </template>
         </v-simple-table>
+        <div v-else>
+            <div class="text-muted text-secondary">
+                None
+            </div>
+        </div>
 
         
 <!--

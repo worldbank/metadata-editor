@@ -11,6 +11,7 @@ class Files extends MY_REST_Controller
 		$this->load->model("Editor_model");
 		$this->load->model("Editor_datafile_model");
 		$this->load->model("Editor_resource_model");
+		$this->load->model("Editor_files_model");
 		
 		$this->load->library("Editor_acl");
 		$this->is_authenticated_or_die();
@@ -44,13 +45,7 @@ class Files extends MY_REST_Controller
 			}
 
 			$this->editor_acl->user_has_project_access($sid,$permission='view');
-
-			$result=$this->Editor_resource_model->files_summary($sid);
-
-			$output=array(
-				'files'=>$result
-			);
-
+			$output=$this->Editor_files_model->get_files($sid);
 			$this->set_response($output, REST_Controller::HTTP_OK);			
 		}
 		catch(Exception $e){
@@ -90,6 +85,7 @@ class Files extends MY_REST_Controller
 				$output=array(
 					'status'=>'success',
 					'uploaded_file_name'=>$uploaded_file_name,
+					'uploaded_path'=>$uploaded_path,
 					'base64'=>base64_encode($uploaded_file_name)				
 				);
 			}
@@ -400,8 +396,55 @@ class Files extends MY_REST_Controller
 	}
 
 	//alieas for thumbnail_delete
-	function delete_thumbnail_post($sid=null){
+	function delete_thumbnail_post($sid=null)
+	{
 		return $this->thumbnail_delete($sid);
 	}
+
+
+	/**
+	 * 
+	 * Delete file
+	 * 
+	 */
+	function index_delete($sid=null)
+	{
+		try{
+			$sid=$this->get_sid($sid);
+			$user=$this->api_user();
+			$file_path=$this->input->post('file_path');
+
+			if (!$file_path){
+				throw new Exception("Missing parameter: file_path");
+			}
+
+			$this->editor_acl->user_has_project_access($sid,$permission='edit',$user);
+			$result=$this->Editor_files_model->delete_by_path($sid, $file_path);
+			
+			
+			$response=array(
+				'result'=>$result
+			);
+
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	function delete_post($sid=null)
+	{
+		return $this->index_delete($sid);
+	}
+
+
+	
+
+
 
 }

@@ -1317,4 +1317,57 @@ class Editor extends MY_REST_Controller
 		}
 	}	
 
+
+	/**
+	 * 
+	 * Transfer project ownership
+	 * 
+	 */
+	function transfer_ownership_post()
+	{
+		try{
+			$options=$this->raw_json_input();
+			$user_id=$this->get_api_user_id();
+
+			if (!isset($options['owner_id'])){
+				throw new Exception("Parameter `owner_id` is required");
+			}
+
+			if (!isset($options['projects'])
+				|| !is_array($options['projects'])
+				|| count($options['projects'])==0){
+				throw new Exception("Parameter `projects` is required");
+			}
+
+			$new_user_id=$options['owner_id'];
+			
+			foreach($options['projects'] as $project_id){
+
+				$sid=$this->get_sid($project_id);
+				$this->editor_acl->user_has_project_access($sid,$permission='admin',$this->api_user);
+
+				$result=$this->Editor_model->transfer_ownership($project_id,$new_user_id);
+				$this->audit_log->log_event(
+					$obj_type='project',
+					$obj_id=$project_id,
+					$action='ownership', 
+					$metadata=array('new_owner_id'=>$new_user_id)
+				);
+			}
+
+			$response=array(
+				'status'=>'success'
+			);
+
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
 }

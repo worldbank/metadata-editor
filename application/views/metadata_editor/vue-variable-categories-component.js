@@ -8,7 +8,8 @@ Vue.component('variable-categories', {
                 {
                     "key": "value",
                     "title": "Value",
-                    "type": "text"
+                    "type": "text",
+                    "is_unique": true
                 },
                 {
                     "key": "labl",
@@ -144,7 +145,7 @@ Vue.component('variable-categories', {
                             >
                         </table-grid-component>
                     </div>
-                    <div v-else class="m-3 border text-align-center p-3 text-secondary">{{$t("only_for_discrete_variables")}}</div>
+                    <v-alert outlined v-else class="m-3 border text-center p-3 text-secondary">{{$t("only_for_discrete_variables")}}</v-alert>
                 </div>
             </div>
             

@@ -300,6 +300,8 @@
 
     </div>
 
+    <vue-transfer-ownership v-model="dialog_transfer_ownership" v-bind="dialog_transfer_ownership_options" v-on:transfer-ownership="search">
+    </vue-transfer-ownership>
     
     <vue-project-access-dialog v-model="dialog_access_project" v-bind="dialog_access_options">
     </vue-project-access-dialog>
@@ -459,6 +461,10 @@
           <v-list-item>
             <v-list-item-title @click="viewAccessPermissions(menu_active_project_id)"><v-btn text>{{$t('View access')}}</v-btn></v-list-item-title>
           </v-list-item>
+
+          <v-list-item>
+            <v-list-item-title @click="transferOwnership(menu_active_project_id)" ><v-btn text>{{$t('Transfer ownership')}}</v-btn></v-list-item-title>
+          </v-list-item>
           
           <v-list-item>
             <v-list-item-title @click="DeleteProject(menu_active_project_id)"><v-btn text>{{$t('delete')}}</v-btn></v-list-item-title>
@@ -521,6 +527,7 @@
     echo $this->load->view("project/vue-project-share-component.js", null, true);
     echo $this->load->view("project/vue-collection-share-component.js", null, true);
     echo $this->load->view("project/vue-project-access-component.js", null, true);
+    echo $this->load->view("project/vue-transfer-ownership-component.js", null, true);
     ?>
 
     const translation_messages = {
@@ -610,6 +617,8 @@
         dialog_access_options:[],
         dialog_share_collection: false,
         dialog_share_collection_options: [],
+        dialog_transfer_ownership: false,
+        dialog_transfer_ownership_options: [],
         users_list: null,
         errors:[],
         projects_shared: [],
@@ -622,14 +631,14 @@
         menu_active_project_id: null,
         data_types: {
           "survey": "Microdata",
+          "timeseries": "Timeseries",
+          "timeseries-db": "Timeseries (Database)",
+          "script": "Script",
+          "geospatial": "Geospatial",
           "document": "Document",
           "table": "Table",
-          "geospatial": "Geospatial",
           "image": "Image",
-          "script": "Script",
           "video": "Video",
-          "timeseries": "Timeseries",
-          "timeseries-db": "Timeseries DB",
         },
         project_types_icons: {
           "document": "fas fa-file-alt",
@@ -1023,6 +1032,12 @@
               'project_access':ProjectAccessPermissions,
             };
             this.dialog_access_project = true;
+        },
+        transferOwnership: function(id) {
+          this.dialog_transfer_ownership_options = {
+            'projects': [id]
+          };
+          this.dialog_transfer_ownership = true;
         },
         ExportProjectPackage: function(id) {
           let url = CI.base_url + '/api/packager/download_zip/' + id + '/1';

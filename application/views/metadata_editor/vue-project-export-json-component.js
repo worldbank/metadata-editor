@@ -42,10 +42,10 @@ Vue.component('project-export-json-component', {
             <div class="project-export-json-component">
 
             <!-- dialog -->
-            <v-dialog v-model="dialog" max-width="400" scrollable persistent style="z-index:5000">
+            <v-dialog v-model="dialog" max-width="600" scrollable persistent style="z-index:5000">
                 <v-card>
                     <v-card-title class="text-h5 grey lighten-2">
-                        {{$t('Export project metadata as JSON')}}
+                        {{$t('export_project_json')}}
                     </v-card-title>
                     <v-card-subtitle>
                         
@@ -56,12 +56,12 @@ Vue.component('project-export-json-component', {
                             mandatory
                             >
                             <v-radio
-                                label="Export all fields"
+                                :label="$t('export_all_fields')"
                                 value="all"
                                 class="font-weigh-normal"
                             ></v-radio>
                             <v-radio
-                                label="Exclude fields marked as 'private'"
+                                :label="$t('exclude_private_fields')"
                                 value="public"
                                 class="font-weigh-normal"
                             ></v-radio>
@@ -71,10 +71,10 @@ Vue.component('project-export-json-component', {
                     <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn color="primary" text @click="exportJson" >
-                        Export
+                        {{$t('Export')}}
                     </v-btn>
                     <v-btn color="primary" text @click="dialog=false;" >
-                        Close
+                        {{$t('Close')}}
                     </v-btn>
                     </v-card-actions>
                 </v-card>

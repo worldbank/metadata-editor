@@ -106,7 +106,7 @@ class Datafiles extends MY_REST_Controller
 			$user_id=$this->get_api_user_id();
 			$options['created_by']=$user_id;
 			$options['changed_by']=$user_id;
-			$options['sid']=$sid;
+			$options['sid']=$sid;			
 
 			/*$required_fields=array("file_id","file_name");
 

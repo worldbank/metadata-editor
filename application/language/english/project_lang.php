@@ -181,14 +181,14 @@ $lang['items_updated']="Items updated";
 $lang['no_items_updated']="No items updated";
 $lang['Change log']="Change log";
 
-$lang['']="";
-$lang['']="";
-$lang['']="";
-$lang['']="";
-$lang['']="";
-$lang['']="";
-$lang['']="";
-$lang['']="";
+$lang['exclude_private_fields']="Exclude fields marked as 'private' in the template";
+$lang['export_all_fields']="Export all fields";
+$lang['export_project_json']="Export project metadata as JSON";
+$lang['file_information']="Data file information";
+$lang['physical_name']="File name";
+$lang['rows']="Rows";
+$lang['no_data_available']="No data is available";
+$lang['note_data_stored_on_server']="Data is stored on the server for summary statistics, data exports and other operations.";
 $lang['']="";
 
 

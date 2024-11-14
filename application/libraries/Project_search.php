@@ -321,14 +321,14 @@ class Project_search
 		//data types
 		$facets['type']=array(
 			array("id"=>"survey","title"=>"Microdata"),
-			array("id"=>"document","title"=>"Document"),
-			array("id"=>"table","title"=>"Table"),
-			array("id"=>"geospatial","title"=>"Geospatial"),
-			array("id"=>"image","title"=>"Image"),
-			array("id"=>"script", "title"=>"Script"),
-			array("id"=>"video","title"=>"Video"),
 			array("id"=>"timeseries","title"=>"Timeseries"),
-			array("id"=>"timeseries-db","title"=>"Timeseries DB"),
+			array("id"=>"timeseries-db","title"=>"Timeseries (database)"),
+			array("id"=>"script", "title"=>"Script"),
+			array("id"=>"geospatial","title"=>"Geospatial"),
+			array("id"=>"document","title"=>"Document"),
+			array("id"=>"table","title"=>"Table"),			
+			array("id"=>"image","title"=>"Image"),			
+			array("id"=>"video","title"=>"Video"),			
 		);
 
 		//collections
