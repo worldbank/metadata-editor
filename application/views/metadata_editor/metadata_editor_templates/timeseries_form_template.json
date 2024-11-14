@@ -77,7 +77,6 @@
                             "is_recommended": true,
                             "display_type": "text"
                         }
-                        
                     ],
                     "help_text": ""
                 },
@@ -114,10 +113,8 @@
                             "help_text": "",
                             "display_type": "text"
                         }
-
                     ]
                 }
-
             ]
         },
         {
@@ -209,7 +206,7 @@
                             "key": "series_description.display_name",
                             "type": "string",
                             "title": "display name",
-                            "help_text": "",                            
+                            "help_text": "",
                             "display_type": "text"
                         },
                         {
@@ -247,14 +244,14 @@
                             "key": "series_description.date_last_update",
                             "type": "string",
                             "title": "Last update date",
-                            "help_text": "",                            
+                            "help_text": "",
                             "display_type": "text"
                         },
                         {
                             "key": "series_description.date_released",
                             "type": "string",
                             "title": "Date released",
-                            "help_text": "",                            
+                            "help_text": "",
                             "display_type": "text"
                         }
                     ],
@@ -329,67 +326,65 @@
                         {
                             "key": "series_description_mandate",
                             "title": "Mandate",
-                            "help_text":"Mandate",
+                            "help_text": "Mandate",
                             "type": "section",
                             "items": [
                                 {
                                     "key": "series_description.mandate.mandate",
-                                    "type": "string",                                    
+                                    "type": "string",
                                     "title": "Mandate",
                                     "display_type": "text"
-                                },                                
+                                },
                                 {
                                     "key": "series_description.mandate.uri",
-                                    "type": "string",                                    
+                                    "type": "string",
                                     "title": "Mandate URL",
                                     "help_text": "Mandate URL",
                                     "display_type": "text"
                                 }
-
                             ]
                         },
                         {
                             "key": "series_description_data_collection",
                             "title": "Data collection",
-                            "help_text":"This description should include, when applicable, the sample frame used, the questions used to collect the data, the type of interview, the dates/duration of fieldwork, the sample size and the response rate. Some additional information on questionnaire design and testing, interviewer training, methods used to monitor non-response etc.",
+                            "help_text": "This description should include, when applicable, the sample frame used, the questions used to collect the data, the type of interview, the dates/duration of fieldwork, the sample size and the response rate. Some additional information on questionnaire design and testing, interviewer training, methods used to monitor non-response etc.",
                             "type": "section",
                             "items": [
                                 {
                                     "key": "series_description.data_collection.data_source",
-                                    "type": "string",                                    
+                                    "type": "string",
                                     "title": "Data source",
                                     "help_text": "Data source",
                                     "display_type": "text"
                                 },
                                 {
                                     "key": "series_description.data_collection.method",
-                                    "type": "string",                                    
+                                    "type": "string",
                                     "title": "Data collection method",
                                     "help_text": "Method",
                                     "display_type": "text"
                                 },
                                 {
                                     "key": "series_description.data_collection.period",
-                                    "type": "string",                                    
+                                    "type": "string",
                                     "title": "Data collection period",
                                     "help_text": "Period",
                                     "display_type": "text"
                                 },
                                 {
                                     "key": "series_description.data_collection.note",
-                                    "type": "string",                                    
+                                    "type": "string",
                                     "title": "Data collection note",
                                     "help_text": "Note",
                                     "display_type": "textarea"
                                 },
                                 {
                                     "key": "series_description.data_collection.uri",
-                                    "type": "string",                                    
+                                    "type": "string",
                                     "title": "Data collection URL",
                                     "help_text": "Data collection URL",
                                     "display_type": "text"
                                 }
-
                             ]
                         },
                         {
@@ -661,7 +656,7 @@
                                     "key": "idno",
                                     "title": "Identifier (IDNO)",
                                     "type": "string",
-                                    "prop_key": "series_description.sources.id",
+                                    "prop_key": "series_description.sources.idno",
                                     "help_text": "This element records the Primary ID (unique identifier) of a source. If the source does not have a specific unique identifier, a sequential number can be used. If the source is a dataset or database that has its own unique identifier (possibly a DOI), this identifier should be used.",
                                     "display_type": "text"
                                 },
@@ -674,7 +669,7 @@
                                         {
                                             "key": "type",
                                             "title": "Type",
-                                            "type": "string",                                            
+                                            "type": "string",
                                             "prop_key": "series_description.sources.other_identifiers.type",
                                             "help_text": "The type of identifier. For example: “DOI”, or \"ISBN\". ",
                                             "display_type": "text"
@@ -688,7 +683,7 @@
                                             "help_text": "The identifier itself. ",
                                             "display_type": "text"
                                         }
-                                    ]                                    
+                                    ]
                                 },
                                 {
                                     "key": "type",
@@ -702,7 +697,7 @@
                                 {
                                     "key": "name",
                                     "title": "Name",
-                                    "type": "string",                                    
+                                    "type": "string",
                                     "rules_": "required",
                                     "prop_key": "series_description.sources.name",
                                     "help_text": "The title (name, or label) of the source.",
@@ -745,11 +740,11 @@
                                             "prop_key": "series_description.sources.authors.last_name",
                                             "help_text": "",
                                             "display_type": "text"
-                                        },                                        
+                                        },
                                         {
                                             "key": "affiliation",
                                             "title": "Affiliation",
-                                            "type": "string",                                            
+                                            "type": "string",
                                             "prop_key": "series_description.sources.authors.affiliation",
                                             "help_text": "",
                                             "display_type": "text"
@@ -757,10 +752,10 @@
                                         {
                                             "key": "author_id",
                                             "title": "Author ID",
-                                            "type": "array",                                            
+                                            "type": "array",
                                             "prop_key": "series_description.sources.authors.author_id",
                                             "help_text": "",
-                                            "props":[
+                                            "props": [
                                                 {
                                                     "key": "type",
                                                     "title": "Type",
@@ -776,17 +771,18 @@
                                                     "prop_key": "series_description.sources.authors.author_id.id",
                                                     "help_text": "",
                                                     "display_type": "text"
-                                                }]                                            
+                                                }
+                                            ]
                                         },
                                         {
                                             "key": "full_name",
                                             "title": "Full name",
-                                            "type": "string",                                            
+                                            "type": "string",
                                             "prop_key": "series_description.sources.authors.full_name",
                                             "help_text": "",
                                             "display_type": "text"
                                         }
-                                    ]                                    
+                                    ]
                                 },
                                 {
                                     "key": "datasets",
@@ -797,7 +793,7 @@
                                         {
                                             "key": "idno",
                                             "title": "Identifier (IDNO)",
-                                            "type": "string",                                            
+                                            "type": "string",
                                             "prop_key": "series_description.sources.datasets.idno",
                                             "help_text": "",
                                             "display_type": "text"
@@ -805,7 +801,7 @@
                                         {
                                             "key": "title",
                                             "title": "Title",
-                                            "type": "string",                                            
+                                            "type": "string",
                                             "prop_key": "series_description.sources.datasets.title",
                                             "help_text": "",
                                             "display_type": "text"
@@ -813,17 +809,17 @@
                                         {
                                             "key": "uri",
                                             "title": "URL",
-                                            "type": "string",                                            
+                                            "type": "string",
                                             "prop_key": "series_description.sources.datasets.uri",
                                             "help_text": "Link to the dataset",
                                             "display_type": "text"
                                         }
-                                    ]                                    
+                                    ]
                                 },
                                 {
                                     "key": "publisher",
                                     "title": "Publisher",
-                                    "type": "string",                                            
+                                    "type": "string",
                                     "prop_key": "series_description.sources.publisher",
                                     "help_text": "",
                                     "display_type": "text"
@@ -831,7 +827,7 @@
                                 {
                                     "key": "publication_date",
                                     "title": "Publication date",
-                                    "type": "string",                                            
+                                    "type": "string",
                                     "prop_key": "series_description.sources.publication_date",
                                     "help_text": "",
                                     "display_type": "text"
@@ -839,7 +835,7 @@
                                 {
                                     "key": "uri",
                                     "title": "URL",
-                                    "type": "string",                                            
+                                    "type": "string",
                                     "prop_key": "series_description.sources.uri",
                                     "help_text": "",
                                     "display_type": "text"
@@ -847,12 +843,11 @@
                                 {
                                     "key": "access_date",
                                     "title": "Date accessed",
-                                    "type": "string",                                            
+                                    "type": "string",
                                     "prop_key": "series_description.sources.access_date",
                                     "help_text": "",
                                     "display_type": "text"
                                 },
-                                
                                 {
                                     "key": "note",
                                     "title": "Notes",
@@ -1117,10 +1112,10 @@
                             "title": "Errata",
                             "props": [
                                 {
-                                    "key": "type",
+                                    "key": "date",
                                     "title": "Date",
                                     "type": "string",
-                                    "prop_key": "series_description.errata.type",
+                                    "prop_key": "series_description.errata.date",
                                     "help_text": "The date the erratum was published, preferably in ISO format (YYYY-MM-DD).",
                                     "display_type": "text"
                                 },
@@ -1140,7 +1135,6 @@
                                     "help_text": "",
                                     "display_type": "text"
                                 }
-
                             ],
                             "help_text": "A list of errata for the indicator."
                         },
@@ -1173,7 +1167,6 @@
                                     "help_text": "",
                                     "display_type": "text"
                                 }
-
                             ],
                             "help_text": ""
                         },
@@ -1430,7 +1423,7 @@
                         {
                             "key": "series_description.release_calendar",
                             "title": "Release calendar",
-                            "type": "string",                            
+                            "type": "string",
                             "help_text": "Release calendar",
                             "display_type": "textarea"
                         },
@@ -1748,10 +1741,10 @@
                                     "display_type": "text"
                                 },
                                 {
-                                    "key": "occurence",
-                                    "title": "Occurence",
+                                    "key": "occurrence",
+                                    "title": "Occurrence",
                                     "type": "integer",
-                                    "prop_key": "series_description.acronyms.occurence",
+                                    "prop_key": "series_description.acronyms.occurrence",
                                     "help_text": "This numeric element can be used to indicate the number of times the acronym is mentioned in the metadata. The element will rarely be used.",
                                     "display_type": "text"
                                 }
@@ -1803,7 +1796,7 @@
                                     "title": "Relationship",
                                     "type": "string",
                                     "prop_key": "series_description.related_indicators.relationship",
-                                    "help_text": "",                                    
+                                    "help_text": "",
                                     "display_type": "text"
                                 },
                                 {
@@ -1811,7 +1804,7 @@
                                     "title": "Type",
                                     "type": "string",
                                     "prop_key": "series_description.related_indicators.type",
-                                    "help_text": "",                                    
+                                    "help_text": "",
                                     "display_type": "text"
                                 }
                             ],
@@ -1985,11 +1978,11 @@
                             "display_type": "textarea"
                         },
                         {
-                            "key":"series_description.citation_requirement",
-                            "type":"string",
-                            "title":"Citation requirement",
-                            "help_text":"This element is used to provide information on how the data should be cited. This can include the preferred citation format, the name of the author, the title of the data, the date of publication, the version of the data, and the URL of the data.",
-                            "display_type":"textarea"
+                            "key": "series_description.citation_requirement",
+                            "type": "string",
+                            "title": "Citation requirement",
+                            "help_text": "This element is used to provide information on how the data should be cited. This can include the preferred citation format, the name of the author, the title of the data, the date of publication, the version of the data, and the URL of the data.",
+                            "display_type": "textarea"
                         },
                         {
                             "key": "series_description.links",
@@ -2069,7 +2062,7 @@
                                     "key": "email",
                                     "title": "Email",
                                     "type": "string",
-                                    "prop_key": "database_description.contacts.email",
+                                    "prop_key": "series_description.contacts.email",
                                     "help_text": "The email address of the person or organization mentioned in \"Name\". Avoid using personal email accounts; the use of an anonymous email is recommended (e.g., “helpdesk@….org”)",
                                     "display_type": "text"
                                 },
@@ -2094,7 +2087,7 @@
                                 }
                             ],
                             "help_text": "Contacts"
-                        },                        
+                        },
                         {
                             "key": "series_description.api_documentation",
                             "title": "API documentation",
@@ -2159,7 +2152,6 @@
                             "help_text": "",
                             "display_type": "text"
                         }
-
                     ]
                 }
             ]
@@ -2178,35 +2170,35 @@
                         {
                             "key": "datacite.doi",
                             "title": "DOI",
-                            "type": "string",                            
+                            "type": "string",
                             "help_text": "DOI handle",
                             "display_type": "text"
                         },
                         {
                             "key": "datacite.prefix",
                             "title": "Prefix",
-                            "type": "string",                            
+                            "type": "string",
                             "help_text": "DOI prefix",
                             "display_type": "text"
                         },
                         {
                             "key": "datacite.suffix",
                             "title": "Suffix",
-                            "type": "string",                            
+                            "type": "string",
                             "help_text": "DOI suffix",
                             "display_type": "text"
                         },
                         {
                             "key": "datacite.creators",
                             "title": "Creators",
-                            "type": "array",                            
+                            "type": "array",
                             "help_text": "Creators",
                             "props": [
                                 {
                                     "key": "name",
                                     "prop_key": "datacite.creators.name",
                                     "title": "Name",
-                                    "type": "string",                                    
+                                    "type": "string",
                                     "help_text": "Name",
                                     "display_type": "text"
                                 },
@@ -2214,7 +2206,7 @@
                                     "key": "nameType",
                                     "prop_key": "datacite.creators.nameType",
                                     "title": "Name type",
-                                    "type": "string",                                    
+                                    "type": "string",
                                     "help_text": "Name type. valid values: 'Personal', 'Organizational'",
                                     "display_type": "text"
                                 },
@@ -2222,7 +2214,7 @@
                                     "key": "givenName",
                                     "prop_key": "datacite.creators.givenName",
                                     "title": "Given name",
-                                    "type": "string",                                    
+                                    "type": "string",
                                     "help_text": "Given name",
                                     "display_type": "text"
                                 },
@@ -2230,7 +2222,7 @@
                                     "key": "familyName",
                                     "prop_key": "datacite.creators.familyName",
                                     "title": "Family name",
-                                    "type": "string",                                    
+                                    "type": "string",
                                     "help_text": "Family name",
                                     "display_type": "text"
                                 }
@@ -2239,14 +2231,14 @@
                         {
                             "key": "datacite.titles",
                             "title": "Titles",
-                            "type": "array",                            
+                            "type": "array",
                             "help_text": "Titles",
                             "props": [
                                 {
                                     "key": "title",
                                     "prop_key": "datacite.titles.title",
                                     "title": "Title",
-                                    "type": "string",                                    
+                                    "type": "string",
                                     "help_text": "Title",
                                     "display_type": "text"
                                 },
@@ -2254,7 +2246,7 @@
                                     "key": "titleType",
                                     "prop_key": "datacite.titles.titleType",
                                     "title": "Title type",
-                                    "type": "string",                                    
+                                    "type": "string",
                                     "help_text": "Title type. valid values: 'MainTitle', 'Subtitle', 'TranslatedTitle', 'AlternativeTitle'",
                                     "display_type": "text"
                                 },
@@ -2262,7 +2254,7 @@
                                     "key": "lang",
                                     "prop_key": "datacite.titles.lang",
                                     "title": "Language",
-                                    "type": "string",                                    
+                                    "type": "string",
                                     "help_text": "Language",
                                     "display_type": "text"
                                 }
@@ -2271,50 +2263,49 @@
                         {
                             "key": "datacite.publisher",
                             "title": "Publisher",
-                            "type": "string",                            
+                            "type": "string",
                             "help_text": "Publisher",
                             "display_type": "text"
                         },
                         {
                             "key": "datacite.publicationYear",
                             "title": "Publication year",
-                            "type": "string",                            
+                            "type": "string",
                             "help_text": "Publication year",
                             "display_type": "text"
                         },
                         {
                             "key": "datacite.types.resourceType",
                             "title": "Resource type",
-                            "type": "string",                            
+                            "type": "string",
                             "help_text": "Resource type",
                             "display_type": "text"
                         },
                         {
                             "key": "datacite.types.resourceTypeGeneral",
                             "title": "Resource type general",
-                            "type": "string",                            
+                            "type": "string",
                             "help_text": "Valid values: 'Audiovisual', 'Collection', 'DataPaper', 'Dataset', 'Event', 'Image', 'InteractiveResource', 'Model', 'PhysicalObject', 'Service', 'Software', 'Sound', 'Text', 'Workflow', 'Other'",
                             "display_type": "text"
                         },
                         {
                             "key": "datacite.url",
                             "title": "URL",
-                            "type": "string",                            
+                            "type": "string",
                             "help_text": "",
                             "display_type": "text"
                         },
                         {
                             "key": "datacite.language",
                             "title": "Language",
-                            "type": "string",                            
+                            "type": "string",
                             "help_text": "",
                             "display_type": "text"
                         }
-
                     ]
-        }
-    ]
-},
+                }
+            ]
+        },
         {
             "type": "section_container",
             "id": "tags",
@@ -2344,6 +2335,246 @@
                         }
                     ],
                     "help_text": "Tags, especially when organized in tag groups, provide a powerful and flexible solution to enable custom facets (filters) in data catalogs. "
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "id": "dsd_container",
+            "key": "dsd_container",
+            "title": "Data structure Definition",
+            "items": [
+                {
+                    "key": "data_structure",
+                    "title": "Data structure Definition",
+                    "type": "nested_array",
+                    "props": [
+                        {
+                            "key": "name",
+                            "title": "Name",
+                            "type": "string",
+                            "prop_key": "data_structure.name",
+                            "help_text": "Name",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "label",
+                            "title": "Label",
+                            "type": "string",
+                            "prop_key": "data_structure.label",
+                            "help_text": "Label",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "description",
+                            "title": "Description",
+                            "type": "string",
+                            "prop_key": "data_structure.description",
+                            "help_text": "Description",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "data_type",
+                            "title": "Data type",
+                            "type": "string",
+                            "prop_key": "data_structure.data_type",
+                            "help_text": "Data type",
+                            "display_type": "dropdown",
+                            "enum_store_column": "code",
+                            "enum": [
+                                {
+                                    "code": "string",
+                                    "label": "String"
+                                },
+                                {
+                                    "code": "integer",
+                                    "label": "Integer"
+                                },
+                                {
+                                    "code": "float",
+                                    "label": "Float"
+                                },
+                                {
+                                    "code": "date",
+                                    "label": "Date"
+                                },
+                                {
+                                    "code": "boolean",
+                                    "label": "Boolean"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "column_type",
+                            "title": "Column type",
+                            "type": "string",
+                            "prop_key": "data_structure.column_type",
+                            "help_text": "Column type",
+                            "display_type": "dropdown",
+                            "enum_store_column": "code",
+                            "enum": [
+                                {
+                                    "code": "dimension",
+                                    "label": "Dimension"
+                                },
+                                {
+                                    "code": "time_period",
+                                    "label": "Time period"
+                                },
+                                {
+                                    "code": "measure",
+                                    "label": "Measure"
+                                },
+                                {
+                                    "code": "attribute",
+                                    "label": "Attribute"
+                                },
+                                {
+                                    "code": "indicator_id",
+                                    "label": "Indicator ID"
+                                },
+                                {
+                                    "code": "indicator_name",
+                                    "label": "Indicator name"
+                                },
+                                {
+                                    "code": "annotation",
+                                    "label": "Annotation"
+                                },
+                                {
+                                    "code": "geography",
+                                    "label": "Geography"
+                                },
+                                {
+                                    "code": "observation_value",
+                                    "label": "Observation value"
+                                },
+                                {
+                                    "code": "periodicity",
+                                    "label": "Periodicity"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "time_period_format",
+                            "title": "Time period format",
+                            "type": "string",
+                            "prop_key": "data_structure.time_period_format",
+                            "help_text": "Time period format for column type 'time_period'",
+                            "display_type": "dropdown",
+                            "enum_store_column": "code",
+                            "enum": [
+                                {
+                                    "code": "YYYY",
+                                    "label": "YYYY"
+                                },
+                                {
+                                    "code": "YYYY-MM",
+                                    "label": "YYYY-MM"
+                                },
+                                {
+                                    "code": "YYYY-MM-DD",
+                                    "label": "YYYY-MM-DD"
+                                },
+                                {
+                                    "code": "YYYY-MM-DDTHH:MM:SS",
+                                    "label": "YYYY-MM-DDTHH:MM:SS"
+                                },
+                                {
+                                    "code": "YYYY-MM-DDTHH:MM:SSZ",
+                                    "label": "YYYY-MM-DDTHH:MM:SSZ"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "code_list",
+                            "title": "Codelist",
+                            "type": "array",
+                            "prop_key": "data_structure.code_list",
+                            "help_text": "Codelist",
+                            "props": [
+                                {
+                                    "key": "code",
+                                    "title": "Code",
+                                    "type": "string",
+                                    "prop_key": "data_structure.code_list.code",
+                                    "help_text": "Code",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "label",
+                                    "title": "Label",
+                                    "type": "string",
+                                    "prop_key": "data_structure.code_list.label",
+                                    "help_text": "Label",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "string",
+                                    "prop_key": "data_structure.code_list.description",
+                                    "help_text": "Description",
+                                    "display_type": "textarea"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "code_list_reference_section",
+                            "title": "Codelist reference",
+                            "type": "section",
+                            "prop_key": "data_structure.code_list_reference_section",
+                            "help_text": "Codelist reference",
+                            "display_type": "text",
+                            "props": [
+                                {
+                                    "key": "code_list_reference.id",
+                                    "title": "ID",
+                                    "type": "string",
+                                    "prop_key": "data_structure.code_list_reference.id",
+                                    "help_text": "Codelist ID",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "code_list_reference.name",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "prop_key": "data_structure.code_list_reference.name",
+                                    "help_text": "Codelist name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "code_list_reference.version",
+                                    "title": "Version",
+                                    "type": "string",
+                                    "prop_key": "data_structure.code_list_reference.version",
+                                    "help_text": "Code list version",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "code_list_reference.uri",
+                                    "title": "URI",
+                                    "type": "string",
+                                    "prop_key": "data_structure.code_list_reference.uri",
+                                    "help_text": "Codelist URI",
+                                    "display_type": "text",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "is_required": true
+                                },
+                                {
+                                    "key": "code_list_reference.note",
+                                    "title": "Notes",
+                                    "type": "string",
+                                    "prop_key": "data_structure.code_list_reference.note",
+                                    "help_text": "Codelist notes",
+                                    "display_type": "textarea"
+                                }
+                            ]
+                        }
+                    ],
+                    "help_text": "Data structure Definition"
                 }
             ]
         }
