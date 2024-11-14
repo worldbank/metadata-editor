@@ -1400,7 +1400,10 @@
 						"name": {
 							"title": "Name",
 							"description": "Name (required)",
-							"type": "string"
+							"type": "string",
+							"minLength": 1,
+							"maxLength": 100,
+							"pattern": "^[a-zA-Z0-9_]*$"
 						},
 						"label": {
 							"title": "Label",
@@ -1417,6 +1420,7 @@
 								"string",
 								"integer",
 								"float",
+								"double",
 								"date",
 								"boolean"
 							]
@@ -1433,7 +1437,8 @@
 								"indicator_name",
 								"annotation",
 								"geography",
-								"observation_value"
+								"observation_value",
+								"periodicity"
 							]
 						},	
 						"time_period_format": 
@@ -1456,17 +1461,22 @@
 								"properties": {
 									"code": {
 										"title": "Code",
-										"type": "string"
+										"type": ["string", "number"],
+										"minLength": 1
 									},
 									"label": {
 										"title": "Label",
-										"type": "string"
+										"type": ["string", "number"]
 									},
 									"description": {
 										"title": "Description",
 										"type": "string"
 									}
-								}
+								},
+								"required": [
+									"code"
+								],
+								"additionalProperties": false
 							}
 						},
 						"code_list_reference": {
@@ -1500,7 +1510,13 @@
 									"uri"
 								]
 						}
-					}
+					},
+					"required": [
+						"name",
+						"data_type",
+						"column_type"
+					],
+					"additionalProperties": false
 				}
 		},
 		"data_notes":{

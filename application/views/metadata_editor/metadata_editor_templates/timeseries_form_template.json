@@ -2355,7 +2355,11 @@
                             "type": "string",
                             "prop_key": "data_structure.name",
                             "help_text": "Name",
-                            "display_type": "text"
+                            "display_type": "text",
+                            "is_required": true,
+                            "rules": {
+                                "alpha_num": true
+                            }
                         },
                         {
                             "key": "label",
