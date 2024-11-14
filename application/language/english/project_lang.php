@@ -189,7 +189,8 @@ $lang['physical_name']="File name";
 $lang['rows']="Rows";
 $lang['no_data_available']="No data is available";
 $lang['note_data_stored_on_server']="Data is stored on the server for summary statistics, data exports and other operations.";
-$lang['']="";
+$lang['file_generated_success']="File has been generated successfully";
+$lang['download_file']="Download file";
 
 
 

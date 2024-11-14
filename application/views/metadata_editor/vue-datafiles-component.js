@@ -18,6 +18,8 @@ Vue.component('datafiles', {
                 title:'',
                 loading_message:'',
                 message_success:'',
+                message_success_html:'',
+                download_links:[],
                 message_error:'',
                 is_loading:false
             },
@@ -184,8 +186,10 @@ Vue.component('datafiles', {
                     }else if (result.data.job_status==='done'){
                         this.dialog.is_loading=false;                        
                         let download_url=CI.base_url + '/api/datafiles/download_tmp_file/'+this.dataset_id + '/' + file_id + '/' + format;
-                        this.dialog.message_success=this.$t('finished_processing') + " <a href='"+download_url+"'>Download file</a>";
-                        window.open(download_url, '_blank').focus();
+                        this.dialog.message_success=this.$t('file_generated_success');
+                        this.dialog.download_links=[];
+                        this.dialog.download_links.push({url:download_url,title:this.$t('download_file') + ' [' + format + ']'});
+                        //window.open(download_url, '_blank').focus();
                     }
                     
                 }catch(e){
@@ -631,6 +635,14 @@ Vue.component('datafiles', {
 
                         <div class="alert alert-success" v-if="dialog.message_success" type="success">
                             {{dialog.message_success}}
+                        </div>
+
+                        <div v-html="dialog.message_success_html" v-if="dialog.message_success_html"></div>
+
+                        <div v-if="dialog.download_links">
+                            <div v-for="link in dialog.download_links">
+                                <v-btn color="primary" outlined block text><a :href="link.url">{{link.title}}</a></v-btn>                                
+                            </div>
                         </div>
 
                         <div class="alert alert-danger" v-if="dialog.message_error" type="error">
