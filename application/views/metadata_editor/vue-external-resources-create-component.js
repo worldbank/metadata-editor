@@ -1,5 +1,5 @@
 //external resources
-const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
+const VueExternalResourcesCreate= Vue.component('external-resources-create', {
     props: ['index'],
     data() {
         return {
@@ -7,6 +7,7 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
             errors:[],
             is_dirty:false,
             attachment_type:'',
+            resource:{},
             attachment_url:'',
             resource_template:'',
             resource_template_custom_fields:[ "filename" ], //fields not to render
@@ -62,11 +63,7 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
         next();
     },
     methods: {
-        localValue: function(key)
-        {
-            console.log("searching for local value path",key,this.Resource, _.get(this.Resource,key));
-            //remove 'variable_groups.' from key
-            //key=key.replace('variable_groups.','');
+        localValue: function(key){
             return _.get(this.Resource,key);
         },
         showUnsavedMessage: function(){
@@ -76,15 +73,7 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
                 }
             }
             return true;
-        },
-        getResourceByID: function(){
-            this.ExternalResources.forEach((resource, index) => {                
-                if (resource.id==this.ActiveResourceIndex){
-                    console.log(":resource",resource, this.ActiveResourceIndex);
-                    return this.ExternalResources[index];
-                }
-            });
-        },
+        },        
         loadResourceTemplate: function(){
             vm=this;
             let url=CI.base_url + '/api/templates/default/resource';
@@ -96,6 +85,32 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
             .catch(function(response){
                 console.log("loadResourceTemplate",response);
                 alert("Failed to load template");
+            });
+        },
+        addResource:function(){
+
+            vm=this;
+            let url=CI.base_url + '/api/resources/'+ this.ProjectID;
+
+            formData={
+                "title": "untitled",
+                "dctype" :"doc/oth"
+            }
+
+            axios.post( url,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
+            ).then(function(response){
+                vm.$store.dispatch('loadExternalResources',{dataset_id:vm.ProjectID});
+                router.push('/external-resources/'+response.data.resource.id);
+            })
+            .catch(function(response){
+                vm.errors=response;
+                alert("Failed: " + vm.erorrMessageToText(response));
             });
         },
         saveResource: function()
@@ -115,7 +130,7 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
             }            
 
             vm=this;
-            let url=CI.base_url + '/api/resources/'+ this.ProjectID + '/' + this.Resource['id'];
+            let url=CI.base_url + '/api/resources/'+ this.ProjectID;
 
             axios.post( url,
                 formData,
@@ -278,9 +293,7 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
             return this.$route.params.index;
         },
         Resource(){
-            return this.$store.state.external_resources.find(resource => {
-                return resource.id == this.ActiveResourceIndex
-            });
+            return this.resource;
         },        
         ResourceAttachmentType()
         {
@@ -295,7 +308,7 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
         },
         ResourceFileExists(){
             return this.resourceFileExists();
-        },
+        }    ,
         ResourceTemplate(){
             let key='resource_container';                
             //let items=this.$store.state.formTemplate.template.items;
@@ -306,7 +319,7 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
             
             let item=this.findTemplateByItemKey(items,key);
             return item;        
-        },
+        },    
 
     },
     template: `
@@ -316,10 +329,10 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
 
             <v-card class="mt-4 mb-2">                    
                     <v-card-title class="d-flex justify-space-between">
-                        <div style="font-weight:normal">{{$t("Edit resource")}}</div>
+                        <div style="font-weight:normal">{{$t("Create new resource")}}</div>
 
                         <div>
-                            <v-btn color="primary" small @click="uploadFile" :disabled="file_exists==true || !isProjectEditable">{{$t("Save")}} <span v-if="is_dirty">*</span></v-btn>
+                            <v-btn color="primary" small @click="uploadFile" :disabled="!isProjectEditable">{{$t("Save")}} <span v-if="is_dirty">*</span></v-btn>
                             <v-btn @click="cancelSave" small>Cancel</v-btn>
                         </div>
                     </v-card-title>

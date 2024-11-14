@@ -14,30 +14,7 @@ const VueExternalResources = Vue.component('external-resources', {
             router.push('/external-resources/'+id);
         },
         addResource:function(){
-
-            vm=this;
-            let url=CI.base_url + '/api/resources/'+ this.ProjectID;
-
-            formData={
-                "title": "untitled",
-                "dctype" :"doc/oth"
-            }
-
-            axios.post( url,
-                formData,
-                {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                }
-            ).then(function(response){
-                vm.$store.dispatch('loadExternalResources',{dataset_id:vm.ProjectID});
-                router.push('/external-resources/'+response.data.resource.id);
-            })
-            .catch(function(response){
-                vm.errors=response;
-                alert("Failed: " + vm.erorrMessageToText(response));
-            });
+            router.push('/external-resources/create');
         },
         importResource:function(){
             router.push('/external-resources/import');

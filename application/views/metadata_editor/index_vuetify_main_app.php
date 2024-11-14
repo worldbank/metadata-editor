@@ -152,6 +152,7 @@
             echo $this->load->view("metadata_editor/vue-files-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-external-resources-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-external-resources-edit-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-external-resources-create-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-datafiles-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-datafile-edit-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-datafile-component.js",null,true);
@@ -254,6 +255,7 @@
         const ResourcesImport ={template: '<div> <external-resources-import /></div>'}
         //const ResourcesEditComp ={props: ['index'],template: '<div><external-resources-edit /></div>'}
         const ResourcesEditComp =VueExternalResourcesEdit;
+        const ResourcesCreateComp =VueExternalResourcesCreate;
         const GeoFeatures ={props: ['index'],template: '<div>Geo-features</div>'}
         const GeoFeature ={props: ['feature_name'],template: '<div><geospatial-feature/></div>'}
         const PagePreview ={template: '<div><page-preview/></div>'}
@@ -277,8 +279,9 @@
             { path: '/variables/:file_id', component: Variables, props: true },
             { path: '/variable-groups', component: VariableGroups},
             { path: '/external-resources', component: ResourcesComp, props: true, name: 'external-resources'},
+            { path: '/external-resources/create', component: ResourcesCreateComp, props: true, name: 'external-resources-create'},
             { path: '/external-resources/import', component: ResourcesImport},
-            { path: '/external-resources/:index', component: ResourcesEditComp, props: true, name: 'external-resources-edit'},
+            { path: '/external-resources/:index', component: ResourcesEditComp, props: true, name: 'external-resources-edit'},            
             { path: '/files', component: FileManager, props: true},
             { path: '/geospatial-features', component: GeoFeatures, props: true},
             { path: '/geospatial-feature/:feature_name', component: GeoFeature, props: true },

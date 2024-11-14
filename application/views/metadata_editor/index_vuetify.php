@@ -569,12 +569,13 @@
 
           //expand datafile
           if(path_arr[0]=='variables'){
+            this.initiallyOpen.push("datasets");
             this.initiallyOpen.push("datafile/"+path_arr[1]);
           }
 
           if (path==""){
             this.tree_active_items.push("home");
-          }else{          
+          }else{
             this.initiallyOpen.push(path);
           }          
         },
@@ -721,9 +722,9 @@
           if (this.dataset_type=='survey'){
             tree_data.push({
               title: this.$t('data-files'),
-              type:'datasets',
+              type:'datafiles',
               file: 'database',
-              key: 'datasets',
+              key: 'datafiles',
               items:this.DataFilesTreeNodes
             });
 
@@ -771,8 +772,17 @@
           
 
           this.items=tree_data;
-
-          if (this.$route.path.startsWith("/external-resources")){
+          if (this.$route.path.startsWith("/datafile/")){
+            this.initiallyOpen=["datafiles"];
+            this.initiallyOpen.push(this.$route.path.substr(1,this.$route.path.length));
+            this.setTreeActiveNode(this.$route.path);
+          }
+          else if (this.$route.path.startsWith("/variables/")){
+            this.initiallyOpen=["datafiles"];
+            this.initiallyOpen.push(this.$route.path.substr(1,this.$route.path.length));
+            this.setTreeActiveNode(this.$route.path);
+          }
+          else if (this.$route.path.startsWith("/external-resources")){
             this.initiallyOpen=["external-resources"];
             this.setTreeActiveNode("external-resources");
           }
@@ -802,7 +812,7 @@
               continue;
             }
 
-            if (this.items[k]["key"]=="datasets"){
+            if (this.items[k]["key"]=="datafiles"){
               this.items[k]["items"]=this.DataFilesTreeNodes
             }
 
@@ -817,7 +827,7 @@
         },
         treeOnUpdate: function(node_key)
         {
-          console.log("clicked on",node_key);
+          //console.log("clicked on",node_key);
         },
         treeClick: function (node){
           store.commit('tree_active_node_data',node);
@@ -835,7 +845,7 @@
             return;
           }
 
-          if (node.type=='datasets'){
+          if (node.type=='datafiles'){
             router.push('/datafiles');
             return;
           }
