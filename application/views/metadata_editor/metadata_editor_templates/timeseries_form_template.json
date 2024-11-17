@@ -2342,11 +2342,11 @@
             "type": "section_container",
             "id": "dsd_container",
             "key": "dsd_container",
-            "title": "Data structure Definition",
+            "title": "Data structure definition",
             "items": [
                 {
                     "key": "data_structure",
-                    "title": "Data structure Definition",
+                    "title": "Data structure definition",
                     "type": "nested_array",
                     "props": [
                         {
