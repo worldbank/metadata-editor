@@ -2,7 +2,6 @@
 	
 	$test_folders=array(
 				'datafiles'=>'Catalog',
-				$this->config->item('cache_path')=>'Cache',
 				$this->config->item('log_path')=>'Log',
 	);
 ?>
