@@ -126,7 +126,7 @@ Vue.component('variable-categories', {
                 <div class="section-title section-list-header p-1 bg-variable">
                     <div class="row">
                         <div class="col">
-                        <strong>{{GetFieldTitle('variable.var_catgry',$t("xcategories"))}}</strong> <span v-if="variable.var_catgry && variable.var_catgry.length>0"><span class="badge badge-light">{{variable.var_catgry.length}}</span></span>
+                        <strong>{{GetFieldTitle('variable.var_catgry',$t("categories"))}}</strong> <span v-if="variable.var_catgry && variable.var_catgry.length>0"><span class="badge badge-light">{{variable.var_catgry.length}}</span></span>
 
                         <div class="float-right">                           
                             <span title="Create categories" @click="refreshCategories"><v-icon aria-hidden="false" class="var-icon">mdi-update</v-icon></span>
