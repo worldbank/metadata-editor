@@ -40,6 +40,9 @@
       if (isset($item['items'])){
         get_template_keys($item['items'],$output);
       }
+      if (!isset($item['type'])){
+        $item['type']='string';
+      }
       if (isset($item['key']) && $item['type']!='section' ){
         $output[]=$item['key'];
       }
