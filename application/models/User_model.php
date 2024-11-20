@@ -15,7 +15,7 @@ class User_model extends CI_Model {
     {
 		//$this->output->enable_profiler(TRUE);
 		$this->db->flush_cache();
-		$this->db->start_cache();
+		//$this->db->start_cache();
 
 		//columns
 		$columns=sprintf('%s.id,username,email,active,created_on,last_login,country,company',
@@ -61,7 +61,7 @@ class User_model extends CI_Model {
 		
 		$this->db->join($this->tables['meta'], sprintf('%s.user_id = %s.id',$this->tables['meta'],$this->tables['users']));
 		//$this->db->join($this->tables['groups'], sprintf('%s.id = %s.group_id',$this->tables['groups'],$this->tables['users']),'left');
-		$this->db->stop_cache();
+		//$this->db->stop_cache();
 
 		//set order by
 		if ($sort_by!='' && $sort_order!='')

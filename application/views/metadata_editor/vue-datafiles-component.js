@@ -48,15 +48,15 @@ Vue.component('datafiles', {
             }
 
             //save file, set store_data to 0
+            data_file.store_data=0;
             let result=await this.saveFile(data_file);
 
             vm=this;
             let url=CI.base_url + '/api/datafiles/cleanup/'+ vm.dataset_id;
             let formData=new FormData();            
 
-            axios.post( url, formData,
-            ).then(function(response){
-                
+            await axios.post( url, formData,
+            ).then(function(response){                
             })
             .catch(function(response){
                 console.log(response);
@@ -258,7 +258,7 @@ Vue.component('datafiles', {
             this.page_action="list";
             this.edit_item=null;
         },
-        hasCsvFile: function (file_id){
+        hasCsvFile: function (file_id){            
             for (let i=0;i<this.data_files.length;i++){
                 if (this.data_files[i].file_id==file_id){
                     let file_=this.data_files[i];
@@ -477,10 +477,9 @@ Vue.component('datafiles', {
                         <td><v-icon color="primary" >mdi-file-document</v-icon> {{data_file.file_id}}</td>
                         <td>
                             <div>
-                                <div style="cursor:pointer;color:#0D47A1"  @click="editFile(index)">{{data_file.file_name}}</div>
-                                <v-icon style="color:red;margin-top:-4px;" title="Physical file not found" v-if="!data_file.file_info.original">mdi-alert-circle</v-icon></div>
+                                <div style="cursor:pointer;color:#0D47A1"  @click="editFile(index)">{{data_file.file_name}}</div>                                
                                 <div class="text-secondary text-small" v-if="data_file.file_info.original">                                                                
-                                    <span v-if="data_file.file_info.csv.file_exists" >
+                                    <span v-if="hasCsvFile(data_file.file_id)" >
                                     <v-chip small outlined>{{data_file.file_info.csv.filename}} {{data_file.file_info.csv.file_size}}</v-chip>
                                     </span>
                                 </div>
@@ -501,7 +500,7 @@ Vue.component('datafiles', {
                         <td>{{momentDate(data_file.changed)}}</td>
                         <td>
                             <v-btn 
-                                v-if="data_file.file_info.csv.file_exists || data_file.store_data==1" 
+                                v-if="hasCsvFile(data_file.file_id) || data_file.store_data==1" 
                                 small text color="primary" 
                                 @click="removeData(data_file)" 
                                 >
@@ -516,7 +515,7 @@ Vue.component('datafiles', {
                                     :to="'/variables/' + data_file.file_id">
                                         <v-btn small text><v-icon>mdi-table</v-icon> </v-btn>
                                 </router-link>
-                                <router-link v-if="data_file.file_info.csv.file_exists || data_file.store_data==1" 
+                                <router-link v-if="hasCsvFile(data_file.file_id) || data_file.store_data==1" 
                                     :to="'/data-explorer/' + data_file.file_id"
                                     :title="$t('data')"
                                     ><v-btn small text><v-icon>mdi-table-eye</v-icon> </v-btn>
@@ -531,7 +530,7 @@ Vue.component('datafiles', {
                                     ><v-icon>mdi-delete-outline</v-icon> 
                                 </v-btn>
                                 
-                                <v-menu offset-y v-if="data_file.file_info.csv.file_exists || data_file.store_data==1"  >
+                                <v-menu offset-y v-if="hasCsvFile(data_file.file_id) || data_file.store_data==1"  >
                                     <template v-slot:activator="{ on, attrs }">
                                         <v-btn small text  v-bind="attrs" v-on="on">
                                             <v-icon title="More options">mdi-database-export</v-icon> {{$t("export")}}
