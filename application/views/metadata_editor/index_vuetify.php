@@ -254,6 +254,9 @@
         form_template(){
           return this.$store.state.formTemplate;
         },
+        projectTemplateUID(){
+            return this.$store.state.formTemplate.uid;
+        },
         UserHasEditAccess(){
           return this.$store.state.user_has_edit_access;
         },

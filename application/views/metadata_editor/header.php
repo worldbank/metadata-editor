@@ -140,6 +140,27 @@
                                     <?php echo t("export_json"); ?>
                                 </v-list-item-title>
                             </v-list-item>
+
+                            <v-list-item v-if="dataset_type=='timeseries'" @click="onLinkClick(base_url + '/api/sdmx/msd/?template_uid=' + projectTemplateUID)">
+                                <v-list-item-icon>
+                                    <v-icon>mdi-file</v-icon>
+                                </v-list-item-icon>
+                                <v-list-item-title>                                    
+                                    <?php echo t("Export MSD (SDMX/XML 3.0)"); ?>
+                                </v-list-item-title>
+                            </v-list-item>
+
+                            <v-list-item v-if="dataset_type=='timeseries'" @click="onLinkClick(base_url + '/api/sdmx/metadatasetreport/' + dataset_id)">
+                                <v-list-item-icon>
+                                    <v-icon>mdi-file</v-icon>
+                                </v-list-item-icon>
+                                <v-list-item-title>                                    
+                                    <?php echo t("Export MetadataSet (SDMX/JSON 3.0)"); ?>
+                                </v-list-item-title>
+                            </v-list-item>
+
+
+
                             <v-list-item @click="onRouterLinkClick('/publish')">
                             <v-list-item-icon>
                                 <v-icon>mdi-arrow-top-right-thick</v-icon>
