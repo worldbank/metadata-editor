@@ -44,10 +44,10 @@ abstract class MY_REST_Controller extends REST_Controller {
     {
         if(!$this->get_api_user_id()){
             $response=array(
-                'status'=>'ACCESS-DENIED',
-                'message'=>'Access denied'
+                'status'=>'failed',
+                'message'=>'401 Unauthorized'
             );
-            $this->response($response, REST_Controller::HTTP_FORBIDDEN,false);
+            $this->response($response, REST_Controller::HTTP_UNAUTHORIZED,false);
             die();
         }
     }
