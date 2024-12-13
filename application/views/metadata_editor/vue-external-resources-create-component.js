@@ -5,6 +5,7 @@ const VueExternalResourcesCreate= Vue.component('external-resources-create', {
         return {
             file:'',
             errors:[],
+            errors_file_upload:[],
             is_dirty:false,
             attachment_type:'',
             resource:{},
@@ -83,7 +84,6 @@ const VueExternalResourcesCreate= Vue.component('external-resources-create', {
                 vm.resource_template=response.data.result;
             })
             .catch(function(response){
-                console.log("loadResourceTemplate",response);
                 alert("Failed to load template");
             });
         },
@@ -115,6 +115,7 @@ const VueExternalResourcesCreate= Vue.component('external-resources-create', {
         },
         saveResource: function()
         {
+            this.errors='';
             let formData = new FormData();
 
             if (this.attachment_type=='url'){
@@ -124,10 +125,6 @@ const VueExternalResourcesCreate= Vue.component('external-resources-create', {
             }
 
             formData=this.Resource;
-
-            if (this.errors!=''){
-                return false;
-            }            
 
             vm=this;
             let url=CI.base_url + '/api/resources/'+ this.ProjectID;
@@ -145,7 +142,7 @@ const VueExternalResourcesCreate= Vue.component('external-resources-create', {
                 router.push('/external-resources/');
             })
             .catch(function(response){
-                vm.errors=response;
+                vm.errors=response;                
             });    
         },
         cancelSave: function(){
@@ -179,7 +176,7 @@ const VueExternalResourcesCreate= Vue.component('external-resources-create', {
                 vm.saveResource();                
             })
             .catch(function(response){
-                vm.errors=response;
+                vm.errors_file_upload=response;
                 alert("Failed to upload file");
             });            
         }, 
@@ -249,7 +246,8 @@ const VueExternalResourcesCreate= Vue.component('external-resources-create', {
                 vm.Resource.filename='';
             })
             .catch(function(response){
-                console.log("resourceFileDeleted",response);
+                vm.errors=response;
+                alert("Failed to delete file");
             });    
         },
         findTemplateByItemKey: function (items,key){
@@ -258,7 +256,6 @@ const VueExternalResourcesCreate= Vue.component('external-resources-create', {
             let i=0;
 
             while(!found && i<items.length){
-                console.log("searching", items[i].key, key);
                 if (items[i].key==key){
                     item=items[i];
                     found=true;
@@ -273,6 +270,19 @@ const VueExternalResourcesCreate= Vue.component('external-resources-create', {
                 i++;                        
             }
             return item;
+        },
+        excludeRecursiveResourceTemplateFields: function (items, keys_remove){
+            let new_items=[];
+            let vm=this;
+            items.forEach(function(item){
+                if (!keys_remove.includes(item.key)){
+                    if (item.items){
+                        item.items=vm.excludeRecursiveResourceTemplateFields(item.items,keys_remove);
+                    }
+                    new_items.push(item);
+                }
+            });
+            return new_items;
         },
         updateSection: function (obj)
         {            
@@ -308,16 +318,26 @@ const VueExternalResourcesCreate= Vue.component('external-resources-create', {
         },
         ResourceFileExists(){
             return this.resourceFileExists();
-        }    ,
+        },
         ResourceTemplate(){
-            let key='resource_container';                
-            //let items=this.$store.state.formTemplate.template.items;
+            let vm=this;
+            let key='resource_container';
+            let excluded_field_keys=[
+                "filename"
+            ];
+            
             let items=[]
             if (this.resource_template && this.resource_template.template && this.resource_template.template.items){
                 items= this.resource_template.template.items;
             }
             
             let item=this.findTemplateByItemKey(items,key);
+
+            if (item && item.items){
+                //remove excluded fields
+                item.items=vm.excludeRecursiveResourceTemplateFields(item.items,excluded_field_keys);
+            }
+
             return item;        
         },    
 
@@ -336,11 +356,18 @@ const VueExternalResourcesCreate= Vue.component('external-resources-create', {
                             <v-btn @click="cancelSave" small>Cancel</v-btn>
                         </div>
                     </v-card-title>
+
+                    <v-card-text v-if="errors && errors.response">
+                        <v-alert type="error" v-if="errors.response.data && errors.response.data.errors">{{errors.response.data.errors}}</v-alert>
+                        <v-alert type="error" v-else>{{errors.response}}</v-alert>
+                    </v-card-text>
+
                 </v-card>
 
 
             <v-card style="flex: 1;overflow:auto;">
             <v-card-text class="mb-5" v-if="ResourceTemplate && ResourceTemplate.items">
+
 
             <div  v-for="(column,idx_col) in ResourceTemplate.items" scope="row" :key="column.key"  >
             
@@ -358,18 +385,14 @@ const VueExternalResourcesCreate= Vue.component('external-resources-create', {
                     
                 </template>
                 <template v-else>
-                                          {{column.key}}      
                     <form-input
                         :value="localValue(column.key)"
                         :field="column"
                         @input="update(column.key, $event)"
-                    ></form-input>                              
-                    
+                    ></form-input>                    
                 </template>
             </div>
-            
-            
-
+                        
             <v-card class="mt-2">
                 <v-card-title class="d-flex justify-space-between">
                     <div style="font-weight:normal">Resource attachment</div>
@@ -386,7 +409,9 @@ const VueExternalResourcesCreate= Vue.component('external-resources-create', {
                     </span>
                     <span v-else>No file attached</span>
 
-                    <div v-if="file_exists && file" class="border bg-danger text-light p-2 m-2"><strong>{{file.name}}</strong> File already exists, use a different file!</div>
+                    <!-- 
+                        <div v-if="file_exists && file" class="border bg-danger text-light p-2 m-2"><strong>{{file.name}}</strong> File already exists, use a different file!</div>
+                        -->
                 </div>
 
                 <div class="form-check mt-2" >
