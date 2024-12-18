@@ -72,7 +72,7 @@ CREATE TABLE `edit_history` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb3;
 
 
-ALTER TABLE .`editor_data_files` 
+ALTER TABLE `editor_data_files` 
 ADD COLUMN `store_data` INT NULL;
 
 
