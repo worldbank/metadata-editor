@@ -14,6 +14,7 @@ class Datafiles extends MY_REST_Controller
 		
 		$this->load->library("Editor_acl");
 		$this->is_authenticated_or_die();
+		$this->api_user=$this->api_user();
 	}
 
 	//override authentication to support both session authentication + api keys
@@ -44,8 +45,7 @@ class Datafiles extends MY_REST_Controller
 				return;
 			}
 
-
-			$this->editor_acl->user_has_project_access($id,$permission='view');
+			$this->editor_acl->user_has_project_access($id,$permission='view', $this->api_user);
 			
 			$user_id=$this->get_api_user_id();
 			$survey_datafiles=$this->Editor_datafile_model->select_all($id,true);
@@ -70,7 +70,7 @@ class Datafiles extends MY_REST_Controller
 	{
 		try{
 			$sid=$this->get_sid($sid);
-			$this->editor_acl->user_has_project_access($sid,$permission='view');
+			$this->editor_acl->user_has_project_access($sid,$permission='view', $this->api_user);
 			
 			$user_id=$this->get_api_user_id();
 			$survey_datafiles=$this->Editor_datafile_model->data_file_by_id($sid,$file_id);
@@ -100,7 +100,7 @@ class Datafiles extends MY_REST_Controller
 	{
 		try{
 			$sid=$this->get_sid($sid);
-			$this->editor_acl->user_has_project_access($sid,$permission='edit');
+			$this->editor_acl->user_has_project_access($sid,$permission='edit',$this->api_user);
 
 			$options=$this->raw_json_input();
 			$user_id=$this->get_api_user_id();
@@ -183,7 +183,7 @@ class Datafiles extends MY_REST_Controller
 	{
 		try{
 			$sid=$this->get_sid($sid);
-			$this->editor_acl->user_has_project_access($sid,$permission='edit');
+			$this->editor_acl->user_has_project_access($sid,$permission='edit', $this->api_user);
 
 			$options=$this->raw_json_input();
 			$user_id=$this->get_api_user_id();			
@@ -200,8 +200,6 @@ class Datafiles extends MY_REST_Controller
 			for($i=0;$i<count($options);$i++){			
 				$row=$options[$i];
 
-				//var_dump($row);
-				
 				if (!isset($row['id'])){
 					throw new Exception("Required field is missing: id");
 				}
@@ -252,7 +250,7 @@ class Datafiles extends MY_REST_Controller
 	{
 		try{
 			$sid=$this->get_sid($sid);
-			$this->editor_acl->user_has_project_access($sid,$permission='edit');
+			$this->editor_acl->user_has_project_access($sid,$permission='edit',$this->api_user);
 			//$this->Editor_datafile_model->cleanup($sid,$file_id);
 			$this->Editor_datafile_model->delete_physical_file($sid,$file_id);
 			$this->Editor_datafile_model->delete($sid,$file_id);
@@ -284,7 +282,7 @@ class Datafiles extends MY_REST_Controller
 			$this->load->helper("download");
 			$valid_types=array('original','csv');
 
-			$this->editor_acl->user_has_project_access($sid,$permission='edit');
+			$this->editor_acl->user_has_project_access($sid,$permission='edit', $this->api_user);
 			$files=$this->Editor_datafile_model->get_files_info($sid,$fid);
 
 			if (!$type || !in_array($type,$valid_types)){
@@ -334,7 +332,7 @@ class Datafiles extends MY_REST_Controller
 				throw new Exception("Invalid file type");
 			}
 
-			$this->editor_acl->user_has_project_access($sid,$permission='edit');
+			$this->editor_acl->user_has_project_access($sid,$permission='edit',$this->api_user);
 			$tmp_file_info=$this->Editor_datafile_model->get_tmp_file_info($sid,$fid,$type);
 
 			if (file_exists($tmp_file_info['filepath'])){
@@ -363,7 +361,7 @@ class Datafiles extends MY_REST_Controller
 	{
 		try{
 			$sid=$this->get_sid($sid);
-			$this->editor_acl->user_has_project_access($sid,$permission='view');
+			$this->editor_acl->user_has_project_access($sid,$permission='view', $this->api_user);
 			$filename=$this->input->get("filename");
 
 			if(!$filename){
@@ -403,7 +401,7 @@ class Datafiles extends MY_REST_Controller
 	{
 		try{
 			$sid=$this->get_sid($sid);
-			$this->editor_acl->user_has_project_access($sid,$permission='view');
+			$this->editor_acl->user_has_project_access($sid,$permission='view',$this->api_user);
 			
 			$user_id=$this->get_api_user_id();
 			$file_id=$this->Editor_model->data_file_generate_fileid($sid);
@@ -438,7 +436,7 @@ class Datafiles extends MY_REST_Controller
 			$sid=$this->get_sid($sid);
 			$user_id=$this->get_api_user_id();
 
-			$this->editor_acl->user_has_project_access($sid,$permission='edit');
+			$this->editor_acl->user_has_project_access($sid,$permission='edit', $this->api_user);
 			$result=$this->Editor_datafile_model->cleanup($sid, $file_id);
 
 			$response=array(
