@@ -27,6 +27,14 @@
 
 // ------------------------------------------------------------------------
 
+if (! function_exists('json_validate')){
+  function json_validate($string) {
+    json_decode($string);
+    return json_last_error() === JSON_ERROR_NONE;
+ }
+}
+
+
 // PHP5.2+ these funcs are built in
 if(function_exists('json_encode')) {
   return;
