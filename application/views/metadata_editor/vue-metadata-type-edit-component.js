@@ -97,7 +97,7 @@ const VueMetadataTypeEdit = Vue.component('metadata-types-edit', {
 
        loadMetadataTypeSchema: function(){
             vm=this;
-            let url=CI.base_url + '/api/metadata/type/'+ this.MetadataTypeNameParam;
+            let url=CI.base_url + '/api/admin-metadata/type/'+ this.MetadataTypeNameParam;
             axios.get( url
             ).then(function(response){
                 console.log("MetadataType",response.data);
@@ -113,7 +113,7 @@ const VueMetadataTypeEdit = Vue.component('metadata-types-edit', {
         loadMetadata: function(){
             vm=this;
             this.is_metadata_loading=true;
-            let url=CI.base_url + '/api/metadata/data/'+ this.ProjectID + '/'+this.MetadataType.name;
+            let url=CI.base_url + '/api/admin-metadata/data/'+ this.ProjectID + '/'+this.MetadataType.name;
             axios.get( url
             ).then(function(response){
                 if (response.data && response.data.metadata){
@@ -146,7 +146,7 @@ const VueMetadataTypeEdit = Vue.component('metadata-types-edit', {
                 'metadata_type_name': this.MetadataType.name
             };
 
-            let url=CI.base_url + '/api/metadata/data_remove/';
+            let url=CI.base_url + '/api/admin-metadata/data_remove/';
             axios.post( url, json_data
             ).then(function(response){
                 vm.metadata_model={};
@@ -160,7 +160,7 @@ const VueMetadataTypeEdit = Vue.component('metadata-types-edit', {
         },
         saveMetadata:function(){
             vm=this;
-            let url=CI.base_url + '/api/metadata/data/';
+            let url=CI.base_url + '/api/admin-metadata/data/';
 
             let json_data={
                 'metadata': this.removeEmptyValues(this.metadata_model),
