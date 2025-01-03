@@ -52,6 +52,12 @@ tags:
   - name: Templates
     description: Templates
 
+  - name: SDMX
+    description: SDMX
+
+  - name: Admin Metadata
+    description: Admin Metadata
+
 
 x-tagGroups:  
   - name: Projects
@@ -60,6 +66,7 @@ x-tagGroups:
   - name: Microdata
     tags:
       - Microdata
+      - data file
   - name: Timeseries
     tags:
       - Timeseries
@@ -90,6 +97,15 @@ x-tagGroups:
   - name: Templates
     tags:
       - Templates   
+  - name: SDMX
+    tags:
+      - SDMX
+  - name: Admin metadata types
+    tags:
+      - Admin metadata
+      - Admin metadata types
+      - Admin metadata schemas      
+
 schemes:
   - http
 paths:
@@ -272,6 +288,58 @@ paths:
           description: successful operation
           schema:
 
+  /editor/sdmx/{id}:
+      post:
+        tags:
+          - SDMX          
+        summary: SDMX Metadata report set
+        description: Create a new SDMX metadata report set
+        operationId: getMetadatasetSDMX
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: 'sdmx-json-metadata-schema.json'
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: 'sdmx-json-metadata-schema.json'
+        security:
+          - ApiKeyAuth: []
+
+  /importproject/:
+      post:
+        tags:
+          - Projects
+        summary: Import project
+        description: Create a project by importing metadata (XML/JSON) or project zip package
+        operationId: importProject
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "formData"
+            name: "type"
+            type: string
+            description: "Project type e.g. microdata, document, table, timeseries, etc "
+            required: true
+          - in: "formData"
+            name: "file"
+            type: file
+            description: "Project file (XML, JSON or package zip)"
+            required: true
+        responses:
+          '200':
+            description: successful operation
+        security:
+          - ApiKeyAuth: []
 
   /editor/create/survey:
       post:
@@ -561,6 +629,42 @@ paths:
         security:
           - ApiKeyAuth: []
 
+  /data/datafile//{id}:
+        post:
+          tags:
+            - Microdata
+            - Data file
+          summary: Upload data file
+          description: Upload a data file
+          operationId: uploadDatafile
+          consumes:
+            - application/json
+          produces:
+            - application/json
+          parameters:
+            - in: "path"
+              name: "id"
+              description: Project ID
+              type: string
+              format: string
+              required: true
+            - in: "formData"
+              name: "overwrite"
+              description: "Valid values: `0`, `1`"
+              type: string
+              required: false
+            - in: "formData"
+              name: "store_data"
+              enum:
+                - store
+                - remove
+              type: string
+              required: true              
+          responses:
+            '200':
+              description: successful operation
+          security:
+            - ApiKeyAuth: []
 
   /editor/collections/{id}:
     get:
@@ -1283,6 +1387,322 @@ paths:
             description: successful operation            
         security:
           - ApiKeyAuth: []
+
+  /admin-metadata/:
+      get:
+        tags:
+          - Admin metadata types
+        summary: List admin metadata types
+        description: List all admin metadata types
+        operationId: listAdminMetadata
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        responses:
+          '200':
+            description: successful operation
+        security:
+          - ApiKeyAuth: []
+      post:
+        tags:
+          - Admin metadata types
+        summary: Create admin metadata type
+        description: Create a new admin metadata type
+        operationId: createAdminMetadataType
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/CreateAdminMetadataType"
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+  /admin-metadata/{typeId}:
+      get:
+        tags:
+          - Admin metadata types
+        summary: Get single by ID/Name
+        description: Get single admin metadata type
+        operationId: singleAdminMetadata
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "typeId"
+            type: string
+            description: Admin metadata type ID or Name
+            required: true
+        responses:
+          '200':
+            description: successful operation
+        security:
+          - ApiKeyAuth: []
+      post:
+        tags:
+          - Admin metadata types
+        summary: Update admin metadata type
+        description: Update admin metadata type
+        operationId: updateAdminMetadataType
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "typeId"
+            type: string
+            description: Admin metadata type ID or Name
+            required: true
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/UpdateAdminMetadataType"
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+  /admin-metadata/type_delete{typeId}:
+      post:
+        tags:
+          - Admin metadata types
+        summary: Delete admin metadata by ID/Name
+        description: Delete admin metadata type by ID or name
+        operationId: deleteAdminMetadata
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "typeId"
+            type: string
+            description: Admin metadata type ID or Name
+            required: true
+        responses:
+          '200':
+            description: successful operation
+        security:
+          - ApiKeyAuth: []
+
+  /admin-metadata/schemas:
+      get:
+        tags:
+          - Admin metadata schemas
+        summary: List schemas
+        description: List all admin metadata schemas
+        operationId: listAdminMetadataSchemas
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        responses:
+          '200':
+            description: successful operation
+        security:
+          - ApiKeyAuth: []
+      post:
+        tags:
+          - Admin metadata schemas
+        summary: Create schema
+        description: Create schema for admin metadata type
+        operationId: createAdminMetadataSchema
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/createAdminMetadataSchema"
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+  /admin-metadata/schema/{schemaUrn}:
+      get:
+        tags:
+          - Admin metadata schemas
+        summary: Get schema by URN
+        description: Get metadata schema by URN - use format `Agency:ID:Version`
+        operationId: getAdminMetadataSchema
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "schemaUrn"
+            type: string
+            description: Admin metadata schema URN
+            required: true
+        responses:
+          '200':
+            description: successful operation
+        security:
+          - ApiKeyAuth: []
+  /admin-metadata/schema/{schemaId}:
+      get:
+        tags:
+          - Admin metadata schemas
+        summary: Get schema by ID
+        description: Get metadata schema by ID
+        operationId: getAdminMetadataSchemaByID
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "schemaId"
+            type: string
+            description: Admin metadata schema ID
+            required: true
+        responses:
+          '200':
+            description: successful operation
+        security:
+          - ApiKeyAuth: []
+  /admin-metadata/schema_update/{schemaId}:
+      post:
+        tags:
+          - Admin metadata schemas
+        summary: Update schema
+        description: Update schema for admin metadata type
+        operationId: updateAdminMetadataSchema
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "schemaId"
+            type: string
+            description: Admin metadata schema ID
+            required: true
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/createAdminMetadataSchema"
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+  /admin-metadata/schema_delete/{schemaId}:
+      post:
+        tags:
+          - Admin metadata schemas
+        summary: Delete schema
+        description: Delete schema for admin metadata type
+        operationId: deleteAdminMetadataSchema
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "schemaId"
+            type: string
+            description: Admin metadata schema ID
+            required: true          
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+  
+  /admin-metadata/data/{projectId}/{metadataTypeId}:
+      get:
+        tags:
+          - Admin metadata
+        summary: Get data by project
+        description: Get metadata data by project ID and/or Metadata type
+        operationId: getAdminMetadataData
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "projectId"
+            type: string
+            description: Project ID or IDNO
+            required: true
+          - in: "path"
+            name: "metadataTypeId"
+            type: string
+            description: Metadata type ID
+            required: false
+        responses:
+          '200':
+            description: successful operation
+        security:
+          - ApiKeyAuth: []
+  /admin-metadata/data/:
+      post:
+        tags:
+          - Admin metadata
+        summary: Add/update data
+        description: Add or update metadata (data) for a project
+        operationId: createAdminMetadataData
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/CreateAdminMetadataData"
+        responses:
+          '200':
+            description: successful operation
+        security:
+          - ApiKeyAuth: []
+  /admin-metadata/data_remove/:
+      post:
+        tags:
+          - Admin metadata
+        summary: Delete data
+        description: Delete metadata (data) for a project
+        operationId: deleteAdminMetadataData
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/removeAdminMetadataData"
+        responses:
+          '200':
+            description: successful operation
+        security:
+          - ApiKeyAuth: []
+  
+
+
+
+  
 ###############################################################
 definitions:
   Template:
@@ -1443,7 +1863,141 @@ definitions:
     xml:
       name: Resource
   
+  CreateAdminMetadataType:
+    type: object
+    required:
+      - name
+      - title
+      - schema_id
+      - schema_urn
+    properties:
+      name:
+        type: string
+        required: true
+        title: "Unique name for the metadata type"
+        description: "Unique name for the metadata type with no spaces or special characters"
+      title:
+        type: string
+        required: true
+        title: "Title of the metadata type"
+      description:
+        type: string
+        title: "Description of the metadata type"
+      schema_id:
+        type: string
+        required: true
+        title: "Schema ID"
+      schema_urn:
+        type: string
+        required: true
+        title: "Schema URN (only when schema_id is not provided)"
+    
+  UpdateAdminMetadataType:
+    type: object
+    required:
+      - name
+      - title
+      - schema_id
+      - schema_urn
+    properties:
+      name:
+        type: string
+        required: true
+        title: "Unique name for the metadata type"
+        description: "Unique name for the metadata type with no spaces or special characters"
+      title:
+        type: string
+        required: true
+        title: "Title of the metadata type"
+      description:
+        type: string
+        title: "Description of the metadata type"
+      schema_id:
+        type: string
+        required: true
+        title: "Schema ID"
+      schema_urn:
+        type: string
+        required: true
+        title: "Schema URN (only when schema_id is not provided)"
+
+  createAdminMetadataSchema:
+    type: object
+    required:
+      - name
+      - agency
+      - version      
+      - title
+      - schema
+    properties:
+      name:
+        type: string
+        required: true
+        title: "Unique name for the metadata schema"
+        description: "Unique name for the metadata schema with no spaces or special characters"
+      agency:
+        type: string
+        required: true
+        title: "Agency"
+        description: "Agency/Organization responsible for the schema. Use acronym e.g. IHSN, WBG, etc."
+      version:
+        type: string
+        required: true
+        title: "Version"
+        description: "Version of the schema. Use symantic versioning e.g. 1.0.0" 
+      title:
+        type: string
+        required: true
+        title: "Title of the metadata schema"
+      description:
+        type: string
+        title: "Description of the metadata schema"
+      schema:
+        type: object
+        required: true
+        title: "Schema"
+        description: "JSON schema for the metadata type"
   
+  CreateAdminMetadataData:
+    type: object
+    required:
+      - project_id
+      - metadata_type_id
+      - metadata
+    properties:
+      project_id:
+        type: string
+        required: true
+        title: "Project ID/IDNO"
+        description: "Project ID or IDNO"
+      metadata_type_id:
+        type: integer
+        required: true
+        title: "Metadata type ID"
+        description: "Metadata type ID"
+      metadata:
+        type: object
+        required: true
+        title: "Metadata data"
+        description: "Metadata data"
+  removeAdminMetadataData:
+    type: object
+    required:
+      - project_id
+      - metadata_type_id
+    properties:
+      project_id:
+        type: string
+        required: true
+        title: "Project ID/IDNO"
+        description: "Project ID or IDNO"
+      metadata_type_id:
+        type: integer
+        required: true
+        title: "Metadata type ID"
+        description: "Metadata type ID"
+      
+
   
   
   ApiResponse:
