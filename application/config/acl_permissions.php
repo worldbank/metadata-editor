@@ -142,6 +142,27 @@ $config['acl_permissions'] = [
         ]
     ],
 
+    "admin_metadata"=>[ 
+        "title" => "Admin metadata",
+        "description"=> "Manage admin metadata (e.g. Business, Application or other metadata)",
+        "permissions"=>[
+            [
+                "permission" => "view"
+            ],
+            [
+                "permission" => "edit",
+                "sub_permissions"=>["view"]
+            ],
+            [
+                "permission" => "delete"
+            ],
+            [
+                "permission" => "admin",
+                "sub_permissions"=>["view","edit","delete", "duplicate"]
+            ]
+        ]
+    ],
+
 ];
 
 //permissions by collections

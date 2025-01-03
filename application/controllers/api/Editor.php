@@ -683,12 +683,36 @@ class Editor extends MY_REST_Controller
 				throw new Exception("Project not found");
 			}
 
+			$exclude_private_fields=0;
+			$inc_ext_resources=0;
+			$inc_adm_meta=0;
+
 			if ((int)$this->input->get("exclude_private_fields")===1){
 				$exclude_private_fields=1;
 			}
+			else{
+				if ((int)$this->input->get("exc_private")===1){
+					$exclude_private_fields=1;
+				}
+			}
+
+			if ((int)$this->input->get("external_resources")===1){
+				$inc_ext_resources=1;
+			}
+
+			if ((int)$this->input->get("admin_metadata")===1){
+				$inc_adm_meta=1;
+			}
+
+			$options=array(
+				'exclude_private_fields'=>$exclude_private_fields,
+				'external_resources'=>$inc_ext_resources,
+				'admin_metadata'=>$inc_adm_meta,
+				'user_id'=>$this->get_api_user_id()
+			);
 
 			$this->editor_acl->user_has_project_access($sid,$permission='view',$this->api_user);			
-			$this->project_json_writer->download_project_json($sid,$exclude_private_fields);
+			$this->project_json_writer->download_project_json($sid,$options);
 			die();
 		}
 		catch(Exception $e){

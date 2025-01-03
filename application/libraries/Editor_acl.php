@@ -663,7 +663,7 @@ class Editor_acl
 
 	/**
 	 * 
-	 * 
+	 * Test user has access to a template
 	 * 
 	 */
 	function user_has_template_access($template_uid,$permission=null,$user=null)
@@ -812,6 +812,90 @@ class Editor_acl
 
 	}
 
-	
+
+	/**
+	 * 
+	 * Test user has access admin metadata
+	 * 
+	 */
+	function user_has_metadata_type_access($metadata_type_id,$permission=null,$user=null)
+	{
+		if (!$user){
+			$user=(object)$this->current_user();
+		}
+
+		if (!$user){
+			throw new Exception("User not set");
+		}
+
+		//get acl for metadata type
+		$this->ci->load->model("Metadata_type_acl_model");
+
+		$result=$this->ci->Metadata_type_acl_model->get_user_permissions($metadata_type_id,$user->id);
+
+		if (!$result){
+			throw new Exception("Access denied, you don't have permissions");
+		}
+
+		$user_permissions=[];
+		foreach($result as $row)
+		{
+			$user_permissions[]=$row['permissions'];
+		}
+
+		//test access
+		$has_access=$this->user_has_metadata_type_access_acl($user_permissions, $permission);
+
+		if (!$has_access){
+			//throw new AclAccessDeniedException("Access denied, you don't have permissions");
+			throw new Exception("Access denied, you don't have permissions");
+		}
+	}
+
+
+	/**
+	 * 
+	 * Check if user has access to the Metadata Type
+	 * 
+	 * @privilege - array - view, edit, admin
+	 * @permission - permission - view, edit, admin
+	 * 
+	 */
+	private function user_has_metadata_type_access_acl($privileges,$permission)
+	{
+		$acl = new Acl();
+
+		//base role/user
+		$acl->addRole(new Role('user'));
+
+		$permissions_list=array('view','edit','admin');
+
+		//for each permission add a role
+		$acl->addRole(new Role('user-view'), 'user');
+		$acl->addRole(new Role('user-edit'), 'user-view');
+		$acl->addRole(new Role('user-admin'), 'user-edit');
+
+		//add resources
+		$acl->addResource(new Resource('metadata_type'));
+
+		//allow access
+		$acl->allow('user-view','metadata_type',array('view'));
+		$acl->allow('user-edit','metadata_type',array('edit'));
+		$acl->allow('user-admin','metadata_type',array('admin'));
+		
+		//add access
+		foreach($privileges as $priv)
+		{
+			$role='user-'.$priv;
+			$acl->allow($role,'metadata_type',$privileges);
+		}
+
+		if ($acl->isAllowed($role,'metadata_type',$permission) ){
+			return true;
+		}
+
+		return false;	
+
+	}
 }
 

@@ -20,12 +20,16 @@ class Project_json_writer
 	 * 
 	 * Export project metadata as JSON
 	 * 
-	 * @output_file (optional) path to output file
+	 * @param int $sid - Survey ID
+	 * @param array options - Options
+	 * 	- exclude_private_fields - Exclude private fields
+	 *  - inc_ext_resources - include external resources
+	 *  - inc_adm_meta -include admin metadata
 	 * 
 	 */
-	function download_project_json($sid, $exclude_private_fields=0)
-	{
-		$json_path=$this->generate_project_json($sid, $exclude_private_fields);
+	function download_project_json($sid, $options=array())
+	{		
+		$json_path=$this->generate_project_json($sid, $options);
 
 		//download json
 		if(file_exists($json_path)){
@@ -105,9 +109,20 @@ class Project_json_writer
 	/**
 	 * 
 	 * Generete project JSON
+	 * 
+	 * @param int $sid - Survey ID
+	 * @param array options - Options
+	 * 	- exclude_private_fields - Exclude private fields
+	 *  - external_resources - include external resources
+	 *  - admin_metadata -include admin metadata
+	 * 
 	 */
-	function generate_project_json($sid, $exclude_private_fields=0)
+	function generate_project_json($sid, $options=array())
 	{
+		$exclude_private_fields=isset($options['exclude_private_fields']) ? $options['exclude_private_fields'] : 0;
+		$external_resources=[];
+		$admin_metadata=[];
+
 		$project=$this->ci->Editor_model->get_row($sid);
 		$project_folder=$this->ci->Editor_model->get_project_folder($sid);
 
@@ -124,6 +139,26 @@ class Project_json_writer
 
 		if ($exclude_private_fields==1){
 			$this->json_remove_private_fields($sid,$metadata);
+		}
+		
+		//external resources
+		if (isset($options['external_resources']) && $options['external_resources']==1){
+			$this->ci->load->model('Editor_resource_model');
+			$metadata['external_resources']=$this->ci->Editor_resource_model->select_all($sid);
+		}
+
+		if (isset($options['admin_metadata']) && $options['admin_metadata']==1){
+			$this->ci->load->model("Metadata_type_data_model");
+			
+			$user_id=null;
+			if(isset($options['user_id'])){
+				$user_id=$options['user_id'];
+			}
+			else{
+				$user_id=-1;				
+			}
+
+			$metadata['admin_metadata']=$this->ci->Metadata_type_data_model->get_project_metadata($sid, $metadata_type_id=null, $output_format='', $user_id);
 		}
 
 		array_remove_empty($metadata);

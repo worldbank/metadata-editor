@@ -190,6 +190,43 @@ class MY_Form_validation extends CI_Form_validation {
 		return TRUE;
 	}
 
+
+    /**
+     * 
+     * Validate Semantic Versioning
+     * 
+     * format: Major.Minor.Patch
+     * 
+     */
+    function validate_semantic_version($version)
+    {
+        $pattern='/^\d+\.\d+\.\d+$/';
+        if (preg_match($pattern,$version))
+        {
+            return TRUE;
+        }
+
+        $this->set_message('validate_semantic_version', t('Invalid version format. Must be in the format Major.Minor.Patch. e.g. 1.0.0'));
+        return FALSE;
+    }
+
+    /**
+     * 
+     * Validate json value
+     * 
+     */
+    function validate_json_value($value)
+    {
+        if (json_validate($value))
+        {
+            return TRUE;
+        }
+
+        $this->set_message('validate_json_value', t('Invalid JSON value'));
+        return FALSE;
+    }
+
+
 }//end class
 
 
@@ -233,3 +270,4 @@ class AclAccessDeniedException extends \Exception
         return $this->options; 
     }
 }
+

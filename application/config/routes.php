@@ -62,5 +62,9 @@ $route['editor/(.*)'] = "projects/$1";
 $route['admin'] = "admin/admin";
 $route['admin/permissions/(:num)'] = "admin/permissions/index/$1";
 
+$route['api/admin-metadata'] = "api/admin_metadata";
+//$route['api/admin-metadata/type'] = "api/metadata/type";
+$route['api/admin-metadata/(.*)'] = "api/admin_metadata/$1";
+
 /* End of file routes.php */
 /* Location: ./system/application/config/routes.php */

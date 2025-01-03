@@ -1,6 +1,6 @@
 //vue repeated field - simple_array
 Vue.component('repeated-field', {
-    props:['value', 'field'],
+    props:['value', 'field','is_readonly'],
     data: function () {    
         return {
         }
@@ -23,6 +23,14 @@ Vue.component('repeated-field', {
     },
     methods:{
         isReadOnly(){
+            if (this.is_readonly && this.is_readonly==true){
+                return true;
+            }
+
+            if (!this.field.is_readonly){
+                return false;
+            }
+
             return this.field.is_readonly;
         },
         update: function (index, value)
@@ -66,7 +74,7 @@ Vue.component('repeated-field', {
                             :value="local[index]"
                             @input="update(index,$event.target.value)"
                             class="form-control form-control-sm"
-                            :disabled="field.is_readonly"
+                            :disabled="isReadOnly()"
                         >
 
                         <span v-if="errors[0]" class="error">{{ errors[0] }}</span>
@@ -76,7 +84,7 @@ Vue.component('repeated-field', {
                 </td>
                 <td scope="row">
                     <div class="mr-1">
-                        <v-icon class="v-delete-icon"  v-on:click="remove(index)">mdi-close-circle-outline</v-icon>
+                        <v-icon class="v-delete-icon"  :disabled="isReadOnly()" v-on:click="remove(index)">mdi-close-circle-outline</v-icon>
                     </div>                    
                 </td>
             </tr>
@@ -84,8 +92,7 @@ Vue.component('repeated-field', {
             </tbody>
         </table>
 
-
-        <div class="d-flex justify-content-center" v-if="!isReadOnly">                
+        <div class="d-flex justify-content-center" v-if="!isReadOnly()">                
             <v-btn @click="addRow" class="m-2" text small ><v-icon>mdi-plus</v-icon>{{ $t("add_row") }}</v-btn>
         </div>
 

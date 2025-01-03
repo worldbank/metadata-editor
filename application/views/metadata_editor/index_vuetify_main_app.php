@@ -214,6 +214,12 @@
             echo $this->load->view("metadata_editor/vue-summary-collections-component.js", null, true);
             echo $this->load->view("metadata_editor/vue-textarea-latex-component.js", null, true);
             echo $this->load->view("metadata_editor/vue-project-history-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-metadata-type-edit-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-metadata-types-component.js",null,true);
+
+            echo $this->load->view("metadata_editor/vue-schema-array-field-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-schema-object-field-component.js",null,true);
+
         ?>
 
         <?php if (empty($metadata)):?>
@@ -261,6 +267,8 @@
         const PagePreview ={template: '<div><page-preview/></div>'}
         const GeoGallery ={template: '<div><geospatial-gallery/></div>'}
         const ProjectHistory ={template: '<div><project-history/></div>'}
+        const MetadataTypeEditComp=VueMetadataTypeEdit;
+        const MetadataTypesComp =VueMetadataTypes;
 
         //routes
         const routes = [
@@ -287,6 +295,9 @@
             { path: '/geospatial-feature/:feature_name', component: GeoFeature, props: true },
             { path: '/geospatial-gallery', component: GeoGallery, props: true },
             { path: '/change-log', component: ProjectHistory },
+            { path: '/metadata-types', component: MetadataTypesComp, name:'metadata-types', props: true },
+            { path: '/metadata-types/:type_id', component: MetadataTypeEditComp, name:'metadata-type', props: true }
+
         ]
 
         const router = new VueRouter({
@@ -326,6 +337,7 @@
                     id: 'table_description.title_statement.table_number'
                 },
                 external_resources:[],
+                metadata_types:[],//business/application/other metadata
                 data_files:[],
                 variable_groups:[],
                 variables:{
@@ -391,6 +403,9 @@
                 },
                 getProjectType(state){
                     return state.project_type;
+                },
+                getMetadataTypes(state){
+                    return state.metadata_types;
                 },
                 getProjectTemplate(state){
                     return state.formTemplate;
@@ -499,6 +514,7 @@
                     await store.dispatch('loadAllVariables',{dataset_id:options.dataset_id});
                     await store.dispatch('loadExternalResources',{dataset_id:options.dataset_id});
                     await store.dispatch('loadVariableGroups',{dataset_id:options.dataset_id});
+                    await store.dispatch('loadMetadataTypesList',{});
                     store.state.variables_loaded=true;
                     store.state.variables_isloading=false;
                     store.state.project_isloading=false;
@@ -604,6 +620,17 @@
                     })
                     .catch(function (error) {
                         console.log("external resource loading error",error);
+                    });
+                },
+                async loadMetadataTypesList({commit},options) {
+                    let url=CI.base_url + '/api/metadata/type_by_user';//+store.state.project_type;
+                    return axios
+                    .get(url)
+                    .then(function (response) {
+                        store.state.metadata_types=response.data.result;
+                    })
+                    .catch(function (error) {
+                        console.log(error);
                     });
                 },
                 async loadVariableGroups({commit},options) {

@@ -329,6 +329,34 @@
         DataFiles(){
           return this.$store.state.data_files;
         },
+        MetadataTypes(){
+          return this.$store.state.metadata_types;
+        },
+        MetadataTypesTreeNodes(){
+          let metadata_types=this.MetadataTypes;
+          if (metadata_types.length==0){
+            return [];
+          }
+
+          let metadata_types_nodes=[];
+
+          i=0;
+          for (let metadata_type of metadata_types) {
+            metadata_types_nodes.push(
+              {
+                title: metadata_type.title,
+                type:'metadata-type',
+                index:metadata_type.id,
+                file: 'file',
+                key:'metadata-types/'+metadata_type.name,
+                metadata_type:  metadata_type
+              }
+            );
+            i++;
+          }
+          console.log("metadata types nodes:",metadata_types_nodes);
+          return metadata_types_nodes;
+        },
         DataFilesTreeNodes(){
           if (this.DataFiles.length==0){
             return [];
@@ -775,7 +803,17 @@
             });
 
           }
-          
+
+          if (this.MetadataTypesTreeNodes.length>0){
+            //metadata types
+            tree_data.push({
+                title: this.$t('Admin metadata'),
+                type: 'metadata-types',
+                file: 'database',
+                key:'metadata-types',
+                items:this.MetadataTypesTreeNodes
+            });
+        }          
 
           this.items=tree_data;
           if (this.$route.path.startsWith("/datafile/")){
@@ -874,6 +912,16 @@
 
           if (node.type=='resources'){
             router.push('/external-resources');
+            return;
+          }
+
+          if (node.type=='metadata-types'){
+            router.push('/metadata-types');
+            return;
+          }
+
+          if (node.type=='metadata-type'){
+            router.push('/metadata-types/'+node.metadata_type.name);
             return;
           }
 
