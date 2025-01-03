@@ -623,7 +623,7 @@
                     });
                 },
                 async loadMetadataTypesList({commit},options) {
-                    let url=CI.base_url + '/api/metadata/type_by_user';//+store.state.project_type;
+                    let url=CI.base_url + '/api/admin-metadata/type_by_user';//+store.state.project_type;
                     return axios
                     .get(url)
                     .then(function (response) {

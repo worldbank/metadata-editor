@@ -22,7 +22,7 @@ const VueMetadataTypes = Vue.component('metadata-types', {
 
        loadMetadataTypes: function(){
             vm=this;
-            let url=CI.base_url + '/api/metadata/type_by_user/';
+            let url=CI.base_url + '/api/admin-metadata/type_by_user/';
             axios.get( url
             ).then(function(response){
                 console.log("MetadataType",response.data);
