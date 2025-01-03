@@ -285,6 +285,12 @@
           </v-list-item>
           <v-list-item>
             <v-list-item-icon>
+              <v-icon>mdi-database-eye-outline</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title @click="previewTableTemplate(menu_active_template_id)"><v-btn text> {{$t('table')}}</v-btn></v-list-item-title>
+          </v-list-item>
+          <v-list-item>
+            <v-list-item-icon>
               <v-icon>mdi-file-pdf-box</v-icon>
             </v-list-item-icon>
             <v-list-item-title @click="pdfTemplate(menu_active_template_id)"><v-btn text> {{$t('pdf')}}</v-btn></v-list-item-title>
@@ -599,6 +605,9 @@
         },
         previewTemplate: function(uid) {
           window.open(CI.base_url + '/templates/preview/' + uid);
+        },
+        previewTableTemplate: function(uid) {
+          window.open(CI.base_url + '/templates/table/' + uid);
         },
         pdfTemplate: function(uid) {
           window.open(CI.base_url + '/templates/pdf/' + uid);

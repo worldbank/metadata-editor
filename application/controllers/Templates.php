@@ -80,6 +80,22 @@ class Templates extends MY_Controller {
 		echo $this->load->view('templates/preview',array("template"=>$user_template),true);
 	}
 
+	function table($uid)
+	{
+		$this->load->library("Templates/Template_table");
+		$this->editor_acl->has_access_or_die($resource_='template_manager',$privilege='view');
+		$this->template->set_template('blank');		
+		$user_template=$this->Editor_template_model->get_template_by_uid($uid);
+
+		if(!$user_template){
+			show_error("Template not found");
+		}
+
+		$result=$this->template_table->template_to_array($uid);
+		echo $this->load->view('templates/table_output',array("data"=>$result),true);
+		die();
+	}
+
 
 	function pdf($uid)
 	{
