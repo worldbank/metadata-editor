@@ -287,7 +287,7 @@
                                     "key": "abbr",
                                     "title": "Abbreviation",
                                     "type": "string",
-                                    "prop_key": "study_desc.production_statement.producers.abbreviation",
+                                    "prop_key": "study_desc.production_statement.producers.abbr",
                                     "help_text": "The official abbreviation of the organization mentioned in \"Name\".",
                                     "display_type": "text"
                                 },

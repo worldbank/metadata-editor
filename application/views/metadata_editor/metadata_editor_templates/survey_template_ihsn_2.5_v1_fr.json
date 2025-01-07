@@ -1982,10 +1982,10 @@
                                     "display_type": "text"
                                 },
                                 {
-                                    "key": "abbreviation",
+                                    "key": "abbr",
                                     "title": "Abbréviation",
                                     "type": "string",
-                                    "prop_key": "study_desc.production_statement.producers.abbreviation",
+                                    "prop_key": "study_desc.production_statement.producers.abbr",
                                     "help_text": "L'abréviation officielle de l'organisation mentionnée dans le champ 'Nom'.",
                                     "display_type": "text"
                                 },
@@ -2836,7 +2836,7 @@
                     "type": "section",
                     "items": [
                         {
-                            "key": "study_desc.method.data_collection.analysis_info.sampling_error_estimates",
+                            "key": "study_desc.method.analysis_info.sampling_error_estimates",
                             "title": "Erreurs de sondage",
                             "type": "string",
                             "help_text": "Les erreurs d'échantillonnage sont destinées à mesurer la précision avec laquelle on peut estimer une valeur de population à partir d'un échantillon donné. Pour les enquêtes par sondage, il est recommandé de calculer et de publier les erreurs d'échantillonnage. Ce champ est utilisé pour fournir des informations sur ces calculs (et non pour fournir les erreurs d'échantillonnage elles-mêmes, qui devraient être disponibles dans des publications ou des rapports). Des informations peuvent être fournies sur les ratios\/indicateurs ayant fait l'objet du calcul des erreurs d'échantillonnage, ainsi que sur le logiciel utilisé pour calculer l'erreur d'échantillonnage. Une référence à un rapport ou à un autre document où les résultats peuvent être consultés peut également être fournie.",
