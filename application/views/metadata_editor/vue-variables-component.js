@@ -844,35 +844,21 @@ Vue.component('variables', {
                                         </span>
 
                                         <span v-show="edit_items.length>0">
-
-                                        
-
-                                        <span @click="refreshSummaryStats" :title="$t('refresh_stats')">
-                                            <v-icon aria-hidden="false" class="var-icon">mdi-database-sync</v-icon>
-                                        </span>
-
-                                        <span @click="changeCaseDialog=true" :title="$t('change_case')">
-                                            <v-icon aria-hidden="false" class="var-icon">mdi-format-letter-case</v-icon>
-                                        </span>
-
-                                        <span @click="spreadMetadata" :title="$t('spread_metadata')">
-                                            <v-icon aria-hidden="false" class="var-icon">mdi-content-copy</v-icon>
-                                        </span>
-
-                                        <span @click="deleteVariable" :title="$t('delete_selection')">
-                                            <v-icon aria-hidden="false" class="var-icon">mdi-trash-can-outline</v-icon>
-                                        </span>
-                                        
-                                        <span class="dropdown dropleft">
-                                            <span id="dropdownMenuButton" data-toggle="dropdown" aria-expanded="false">
-                                                <v-icon aria-hidden="false" class="var-icon">mdi-dots-vertical</v-icon>    
+                                            <span @click="refreshSummaryStats" :title="$t('refresh_stats')">
+                                                <v-icon aria-hidden="false" class="var-icon">mdi-database-sync</v-icon>
                                             </span>
-                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="font-size:small;">
-                                                <a class="dropdown-item" href="#"><i class="fas fa-spell-check"></i> {{$t('change_case')}}</a>
-                                                <a class="dropdown-item" href="#"><i class="fas fa-clone"></i> {{$t('spread_metadata')}}</a>                                                
-                                            </div>
-                                        </span>
 
+                                            <span @click="changeCaseDialog=true" :title="$t('change_case')">
+                                                <v-icon aria-hidden="false" class="var-icon">mdi-format-letter-case</v-icon>
+                                            </span>
+
+                                            <span @click="spreadMetadata" :title="$t('spread_metadata')">
+                                                <v-icon aria-hidden="false" class="var-icon">mdi-content-copy</v-icon>
+                                            </span>
+
+                                            <span @click="deleteVariable" :title="$t('delete_selection')">
+                                                <v-icon aria-hidden="false" class="var-icon">mdi-trash-can-outline</v-icon>
+                                            </span>
                                         </span>
                                     </div>
                                 </div>
