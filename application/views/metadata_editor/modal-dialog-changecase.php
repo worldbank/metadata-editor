@@ -11,16 +11,13 @@
         <v-divider></v-divider>
         <v-card-text>
 
-        {{changeCaseFields}} - {{variables.length}}
-
         <div class="form-group">
             <label for="ChangeCaseType">Type</label>
             <select class="form-control" id="ChangeCaseType" v-model="changeCaseType">
                 <option value="title">Title Case</option>
                 <option value="upper">UPPERCASE</option>
                 <option value="lower">lowercase</option>      
-            </select>
-            {{changeCaseType}}
+            </select>            
         </div>
 
         <div>
@@ -43,7 +40,8 @@
         <v-card-actions  style="flex-direction:column;align-items: stretch;">
             <div style="text-align:center;margin-bottom:10px;">{{changeCaseUpdateStatus}}</div>
             <div>
-                <button :disabled="changeCaseFields.length==0" type="button" @click="changeCase" class="btn btn-block btn-primary btn-sm mb-2">Apply</button>
+                <v-btn :disabled="changeCaseFields.length==0" color="primary" block small  @click="changeCase" >Apply</v-btn>
+                <v-btn :disabled="changeCaseFields.length==0"  block small @click="changeCaseDialog=false" class="mt-2" >Cancel</v-btn>
             </div>
         </v-card-actions>
       </v-card>
