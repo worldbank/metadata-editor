@@ -44,6 +44,7 @@ Vue.component('variables', {
                 "var_concept": [],
                 "var_txt": "",
                 "var_universe": "",
+                "var_std_catgry": [],
                 "sum_stats_options":{
                     "wgt": true,
                     "freq": true,
@@ -74,6 +75,7 @@ Vue.component('variables', {
                 "sum_stats_options",
                 "var_wgt_id",
                 "var_wgt",
+                "var_std_catgry",
                 "update_required"
             ],
             showSpreadMetadataDialog: false,
