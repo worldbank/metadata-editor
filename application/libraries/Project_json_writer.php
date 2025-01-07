@@ -283,7 +283,14 @@ class Project_json_writer
 				}
 			}
 		}
+		
 
+		//var_std_catgry field - array to object + use first row only
+		if (isset($variable['metadata']['var_std_catgry']) && is_array($variable['metadata']['var_std_catgry']) ){
+			if (isset($variable['metadata']['var_std_catgry'][0])){
+				$variable['metadata']['var_std_catgry']=$variable['metadata']['var_std_catgry'][0];
+			}
+		}
 
 		//var_wgt_id field - replace UID with VID
 		if (isset($variable['metadata']['var_wgt_id']) && $variable['metadata']['var_wgt_id']!==''){

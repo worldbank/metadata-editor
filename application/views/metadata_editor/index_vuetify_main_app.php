@@ -362,7 +362,8 @@
                     "variable.var_txt",
                     "variable.var_codinstr",
                     "variable.var_concept",
-                    "variable.var_notes"
+                    "variable.var_notes",
+                    "variable.var_std_catgry"
                 ],
                 variable_template_items_enabled:[
                     "variable.var_imputation",
@@ -379,7 +380,8 @@
                     "variable.var_txt",
                     "variable.var_codinstr",
                     "variable.var_concept",
-                    "variable.var_notes"
+                    "variable.var_notes",
+                    "variable.var_std_catgry"
                 ],                                    
                 formTextFieldStyle:
                 { 
