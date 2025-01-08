@@ -10,6 +10,7 @@ class Sdmx extends MY_REST_Controller
 		$this->load->helper("date");
 		$this->load->model("Editor_model");
 		$this->load->library("SDMX/MsdWriter");
+		$this->load->library("SDMX/MsdWriter21");
 		$this->load->library("Editor_acl");
 		$this->is_authenticated_or_die();
 		$this->api_user=$this->api_user();
@@ -70,8 +71,21 @@ class Sdmx extends MY_REST_Controller
 	function template_msd_get($template_uid=null)
 	{
 		try{
-			$data = $this->msdwriter->template_to_array($template_uid);			
-			$xml = $this->msdwriter->build_msd($data, 'test.xml');
+			$sdmx_version=$this->input->get('version');
+
+			if (!in_array($sdmx_version, array('3.0','2.1'))){
+				$sdmx_version='3.0';
+			}
+
+			if ($sdmx_version=='2.1'){
+				$this->load->library("SDMX/MsdWriter21");
+				$data = $this->msdwriter21->template_to_array($template_uid);
+				$xml = $this->msdwriter21->build_msd($data);
+			}
+			else{
+				$data = $this->msdwriter->template_to_array($template_uid);			
+				$xml = $this->msdwriter->build_msd($data, 'test.xml');
+			}
 
 			header("Content-type: text/xml");
 			echo $xml;
