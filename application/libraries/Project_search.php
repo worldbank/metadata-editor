@@ -227,7 +227,7 @@ class Project_search
 			$keywords_query=$this->build_keywords_fulltext_query($search_options['keywords']);
 
 			$escaped_keywords=$this->ci->db->escape('%'.trim($search_options['keywords']).'%');
-			$where = sprintf('(title like %s OR idno like %s OR study_idno like %s) OR %s',
+			$where = sprintf('(title like %s OR idno like %s OR study_idno like %s OR %s)',
                         $escaped_keywords,
                         $escaped_keywords,
 						$escaped_keywords,
