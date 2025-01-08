@@ -15,6 +15,49 @@ class Editor_DDI_Writer
     }
 
 
+    /**
+     * 
+     * Create xml tag and return as string
+     * 
+     * @attributes - array of attributes ['name'=>'value']
+     */
+    function create_xml_tag($tag_name, $data, $attributes=array(), $cdata=false)
+    {
+        if (empty($data)){
+            return false;
+        }
+
+        $writer = new XMLWriter;
+        $writer->openMemory();
+        $writer->setIndent(true);
+        $writer->setIndentString(' ');
+
+        $writer->startElement($tag_name);
+        if (!empty($attributes)){
+            foreach($attributes as $attribute=>$att_value){
+                $writer->writeAttribute($attribute, $att_value);
+            }
+        }
+
+        if ($cdata){
+            $writer->writeCData($data);
+        }else{
+            $writer->text($data);
+        }        
+        $writer->endElement();
+        return $writer->outputMemory();        
+    }
+
+    function print_xml_tag($tag_name, $data, $attributes=array(), $cdata=false)
+    {
+        $result= $this->create_xml_tag($tag_name, $data, $attributes, $cdata);
+
+        if ($result){
+            echo (string)$result;
+        }
+    }
+    
+
     function set_data($data)
     {
         $this->data=$data;
@@ -171,8 +214,8 @@ class Editor_DDI_Writer
         foreach($this->ci->Editor_variable_model->chunk_reader_generator($id) as $variable){
             $writer->writeRaw($this->get_var_desc_xml($variable['metadata']));
             $writer->writeRaw("\n");
-        }        
-
+        }     
+        
         $writer->endElement();//end-dataDscr
         $writer->endElement();//end-codebook
         $writer->endDocument();        
@@ -201,7 +244,7 @@ class Editor_DDI_Writer
             'citation.verStmt.notes'=>$dataset_metadata['doc_desc.version_statement.version_notes'],
             'citation.verStmt.verResp'=>$dataset_metadata['doc_desc.version_statement.version_resp']
         ]);
-
+        
         //doc_desc/producers
         $producers=new \Adbar\Dot($dataset_metadata->get('doc_desc.producers'));
         foreach($producers->all() as $idx=>$producer){
@@ -215,14 +258,31 @@ class Editor_DDI_Writer
             ]);
         }
 
+        //remove nulls
+        $doc_desc = $this->remove_empty($doc_desc->all());
 
-        //$x=$doc_desc->all();
-        //var_dump($x);
-        
-        $result = new Spatie\ArrayToXml\ArrayToXml($doc_desc->all(),'docDscr');
+        $result = new Spatie\ArrayToXml\ArrayToXml($doc_desc,'docDscr');
         $result=$result->prettify()->toDom();
         //$result->formatOutput = true;
-        return ($result->saveXML($result->documentElement));
+        //$result=$this->remove_empty_xml($result);
+        return $result->saveXML($result->documentElement);
+    }
+
+    function remove_empty_xml($xmlDoc)
+    {        
+        $xmlDoc->preserveWhiteSpace = false;        
+        $xpath = new DOMXPath($xmlDoc);
+
+        while (($notNodes = $xpath->query('//*[not(node())]')) && ($notNodes->length)) {
+            foreach($notNodes as $node) {
+                $node->parentNode->removeChild($node);
+            }
+        }
+
+        return $xmlDoc;
+
+        //$doc->formatOutput = true;
+        return $xmlDoc->saveXML();
     }
 
     function get_study_desc_xml($data)
@@ -349,7 +409,7 @@ class Editor_DDI_Writer
             '_attributes'=>[
                 'ID'=>$var['vid'],
                 'name'=>$var['name'],
-                'files'=>$var['file_id'],
+                'files'=>$var['fid'],
                 'dcml'=>$var['var_dcml'],
                 'intrvl'=>$var['var_intrvl'],
                 'wgt'=> $this->get_is_var_wgt($var),
@@ -390,6 +450,7 @@ class Editor_DDI_Writer
             'catgry'=>[],
             'notes'=>$var['var_notes'],
             'txt'=>$var['var_txt'],
+            'stdCatgry'=>$this->transform_std_catgry($var['var_std_catgry']),
             'codInstr'=>$var['var_codinstr'],
             'concept'=>$var['var_concept']            
         ]);
@@ -444,5 +505,26 @@ class Editor_DDI_Writer
             $result->{$label['value']}=isset($label['labl']) ? $label['labl'] : '';
         }        
         return $result;        
+    }
+
+    /**
+     * 
+     * Variable stdCatgry
+     * 
+     * If array, use the first row only and convert to object
+     * 
+     * @std_catgry - array or object
+     * 
+     *  
+     * 
+     */
+    function transform_std_catgry($std_catgry)
+    {
+        if (is_array($std_catgry) && count($std_catgry)>0){
+            $std_catgry=$std_catgry[0];
+            return $std_catgry;
+        }
+
+        return $std_catgry;
     }
 }

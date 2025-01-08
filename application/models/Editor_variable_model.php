@@ -37,6 +37,11 @@ class Editor_variable_model extends ci_model {
 
         do {
             $variables=$this->chunk_read($sid,$last_row_uid,$limit);
+
+            if (!$variables){
+                break;
+            }
+
             $k++;
 
             if( ($k*$limit) > $max_vars){
