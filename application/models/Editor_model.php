@@ -340,6 +340,8 @@ class Editor_model extends CI_Model {
 	}
 
 
+	
+
 	/**
 	 * 
 	 * Create a new project
@@ -351,6 +353,7 @@ class Editor_model extends CI_Model {
 			throw new Exception("INVALID_TYPE: ".$type);
 		}
 
+		$template_uid=isset($options['template_uid']) ? $options['template_uid'] : null;
 		$default_template=$this->Editor_template_model->get_default_template($type);
 
 		$options['type']=$type;
@@ -361,13 +364,26 @@ class Editor_model extends CI_Model {
 		}
 
 		$this->db->insert('editor_projects',$options);
-		return $this->db->insert_id();
+		$new_id=$this->db->insert_id();
+
+		if ($template_uid){
+			$this->update_project_template($new_id,$type,$template_uid);
+		}
+
+		return $new_id;
 	}
 
 	function update_project($type,$id,$options=array(),$validate=false)
 	{
 		if (!array_key_exists($type,$this->types)){
 			throw new Exception("INVALID_TYPE: ".$type);
+		}
+
+		$template_uid=null;
+
+		//template
+		if (isset($options['template_uid'])){
+			$this->update_project_template($id,$type,$options['template_uid']);
 		}
 
 		if ($validate){
@@ -384,7 +400,7 @@ class Editor_model extends CI_Model {
 				$options=$this->apply_partial_update($id,$options);
 			}
 			unset($options['partial_update']);
-		}
+		}		
 
 		$options=array(
 			'changed'=>isset($options['changed']) ? $options['changed'] : date("U"),
@@ -393,6 +409,10 @@ class Editor_model extends CI_Model {
 			'title'=>$this->get_project_metadata_field($type,'title',$options),
 			'metadata'=>$this->encode_metadata($options)
 		);
+
+		if ($template_uid){
+			$options['template_uid']=$template_uid;
+		}
 
 		//idno
 		if (isset($options['idno']) && !$this->idno_exists($options['idno'])){
@@ -489,6 +509,23 @@ class Editor_model extends CI_Model {
 
 		$this->db->where('id',$id);
 		$this->db->update('editor_projects',$db_options);
+	}
+
+	function update_project_template($sid,$type,$template_uid)
+	{
+		$template_data_type=$this->Editor_template_model->get_template_data_type($template_uid);
+
+		if (!$template_data_type){
+			var_dump("throw exception1");
+			throw new Exception("TEMPLATE_NOT_FOUND: ".$template_uid);
+		}
+
+		if ($template_data_type!=$type){
+			var_dump("throw exception");
+			throw new Exception("TEMPLATE_TYPE_MISMATCHED: ".$template_data_type . '!='. $type);
+		}
+
+		return $this->set_project_options($sid,array('template_uid'=>$template_uid));		
 	}
 
 	/**
@@ -1462,6 +1499,33 @@ class Editor_model extends CI_Model {
 		if (is_numeric($idno)){
 			throw new Exception("IDNO cannot be numeric");
 		}
+	}
+
+	/**
+	 * 
+	 * 
+	 * Validate IDNO format
+	 * 
+	 * only allow alphanumeric characters, dashes, underscores, and periods
+	 * cannot be numeric only
+	 * max length = 200
+	 * 
+	 */
+	function validate_idno_format($idno)
+	{
+		if (!preg_match('/^[a-zA-Z0-9\-\_\.]+$/', $idno)){
+			throw new Exception("IDNO_INVALID_FORMAT: Only alphanumeric characters, dashes, underscores, and periods are allowed");
+		}
+
+		if (is_numeric($idno)){
+			throw new Exception("IDNO_INVALID_FORMAT: IDNO cannot be numeric only");
+		}
+
+		if (strlen($idno)>200){
+			throw new Exception("IDNO_INVALID_FORMAT: IDNO cannot be longer than 200 characters");
+		}
+
+		return true;		
 	}
 
 	

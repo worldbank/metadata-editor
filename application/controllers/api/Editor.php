@@ -178,6 +178,8 @@ class Editor extends MY_REST_Controller
 		return $collections;
 	}
 
+	
+
 
 	/**
 	 * 
@@ -216,14 +218,14 @@ class Editor extends MY_REST_Controller
 			$options=array(
 				'title'=> 'untitled',
 				'type'=> $type,
-				'idno'=> $idno
+				'idno'=> $idno,
+				'created_by'=> $user_id,
+				'changed_by'=> $user_id,
+				'created'=> date("U"),
+				'changed'=> date("U"),
+				'template_uid' => isset($project_options['template_uid']) ? $project_options['template_uid'] : null
 			);
  
-			$options['created_by']=$user_id;
-			$options['changed_by']=$user_id;
-			$options['created']=date("U");
-			$options['changed']=date("U");
-			
 			//$this->has_dataset_access('edit',null,$options['repositoryid']);			
 
 			//validate & create dataset
@@ -284,7 +286,7 @@ class Editor extends MY_REST_Controller
 			$user_id=$this->get_api_user_id();
 			$id=$this->get_sid($id);
 			$collections=$this->get_collection_options($options);
-
+						
 			//check project exists and is of correct type
 			$exists=$this->Editor_model->check_id_exists($id,$type);
 
@@ -409,6 +411,12 @@ class Editor extends MY_REST_Controller
 	 * Update project options
 	 * set:
 	 * 	- template
+	 * 	- thumbnail
+	 * 	- created_by
+	 * 	- changed_by
+	 * 	- created
+	 * 	- changed
+	 * 	- idno
 	 * 
 	 */
 	function options_post($sid=null)
@@ -1189,7 +1197,7 @@ class Editor extends MY_REST_Controller
 	private function validate_project_idno($idno,$sid=null)
 	{
 		//validate idno format
-		$this->Editor_model->validate_idno($idno);
+		$this->Editor_model->validate_idno_format($idno);
 
 		$idno_exists=$this->Editor_model->idno_exists($idno,$sid);
 				

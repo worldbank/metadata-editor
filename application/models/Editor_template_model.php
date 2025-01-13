@@ -131,6 +131,24 @@ class Editor_template_model extends ci_model {
 		return $template;
 	}
 
+	
+	/**
+	 * 
+	 * Return the data type of a template by UID
+	 * 
+	 */
+	function get_template_data_type($uid)
+	{
+		$template=$this->get_template_by_uid($uid);
+
+		if ($template){
+			return $template['data_type'];
+		}
+
+		return false;
+	}
+
+
 	function get_templates_by_type($type)
 	{
 		$fields=array_diff($this->fields,["template"]);

@@ -382,7 +382,7 @@ paths:
         parameters:
           - in: "path"
             name: "id"
-            description: Project ID
+            description: Project ID or IDNO
             type: string
             format: string
             required: true
@@ -423,7 +423,7 @@ paths:
         parameters:
           - in: "path"
             name: "id"
-            description: Project ID
+            description: Project ID or IDNO
             type: string
             format: string
             required: true
@@ -1387,6 +1387,62 @@ paths:
             description: successful operation            
         security:
           - ApiKeyAuth: []
+  /editor/options/{id}:
+      post:
+        tags:
+          - Templates
+          - Project
+        summary: Set project template
+        description: Set project template
+        operationId: setProjectTemplate
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "id"
+            type: string
+            description: Project ID or IDNO
+            required: true
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/ProjectTemplate"
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+
+  /editor/options/{projectId}:
+      post:
+        tags:
+          - Project
+        summary: Change project IDNO
+        description: Change project IDNO
+        operationId: setProjectIDNO
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "id"
+            type: string
+            description: Project ID or IDNO
+            required: true
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/ProjectTemplate"
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
 
   /admin-metadata/:
       get:
@@ -1692,7 +1748,7 @@ paths:
             name: "body"
             required: true
             schema:
-              $ref: "#/definitions/removeAdminMetadataData"
+              $ref: "#/definitions/RemoveAdminMetadataData"
         responses:
           '200':
             description: successful operation
@@ -1980,7 +2036,7 @@ definitions:
         required: true
         title: "Metadata data"
         description: "Metadata data"
-  removeAdminMetadataData:
+  RemoveAdminMetadataData:
     type: object
     required:
       - project_id
@@ -1996,6 +2052,24 @@ definitions:
         required: true
         title: "Metadata type ID"
         description: "Metadata type ID"
+  ProjectTemplate:
+    type: object
+    properties:
+      template_uid:
+        type: string
+        required: true
+        description: Template UID     
+    xml:
+      name: ProjectTemplate
+  ProjectOptionsIDNO:
+    type: object
+    properties:
+      idno:
+        type: string
+        required: true
+        description: New IDNO for the project      
+    xml:
+      name: ProjectOptionsIDNO
       
 
   
