@@ -189,8 +189,6 @@ Vue.component('vue-dialog-edit-schema-component', {
                         </v-container>
                         
                     
-                        {{dialog.data}}
-
                         <v-alert color="red" dense outlined v-if="errors" style="color:red;">                            
                             <div>Errors: <span v-if="errors.message">{{errors.message}}</span></div>
                             <ul v-if="errors.errors">
