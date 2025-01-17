@@ -95,7 +95,7 @@ Vue.component('project-export-json-component', {
 
                             <v-checkbox
                                 v-model="options.include_admin_metadata"
-                                label="Include admin metadata"
+                                label="Include administrative metadata"
                                 class="font-weigh-normal ma-1 pa-1" hide-details="true"
                                 style="margin-top: 0px; padding:0px;"
                             ></v-checkbox>

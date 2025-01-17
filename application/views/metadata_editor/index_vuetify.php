@@ -807,7 +807,7 @@
           if (this.MetadataTypesTreeNodes.length>0){
             //metadata types
             tree_data.push({
-                title: this.$t('Admin metadata'),
+                title: this.$t('Administrative metadata'),
                 type: 'metadata-types',
                 file: 'database',
                 key:'metadata-types',

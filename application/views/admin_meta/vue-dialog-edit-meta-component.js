@@ -86,7 +86,7 @@ Vue.component('vue-dialog-edit-meta-component', {
             return [
                 {
                     key: 'name',
-                    label: 'Admin metadata name',
+                    label: 'Administrative metadata name',
                     hint: 'Unique name for the metadata type',
                     type: 'text',
                     required: true,

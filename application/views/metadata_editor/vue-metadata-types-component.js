@@ -90,7 +90,7 @@ const VueMetadataTypes = Vue.component('metadata-types', {
 
             <v-card class="mt-4 mb-2" v-if="MetadataTypes">                    
                     <v-card-title>                    
-                        <div style="font-weight:normal">{{$t("Admin metadata")}}</div>
+                        <div style="font-weight:normal">{{$t("Administrative metadata")}}</div>
                     </v-card-title>
                 
             <v-card-text class="mb-5" >
