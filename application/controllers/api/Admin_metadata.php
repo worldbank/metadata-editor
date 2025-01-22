@@ -42,7 +42,7 @@ class Admin_metadata extends MY_REST_Controller
     function type_get($name_or_id=null)
     {
         try{
-                    
+            $this->has_access($resource_='admin_metadata',$privilege='view');                    
             $offset=(int)$this->input->get("offset");
 			$limit=(int)$this->input->get("limit");
 
@@ -92,7 +92,7 @@ class Admin_metadata extends MY_REST_Controller
     function type_by_user_get($type_id=null)
     {
         try{
-        
+            $this->has_access($resource_='admin_metadata',$privilege='view');
             if ($type_id){
                 if (is_numeric($type_id)){
                     $meta_type_id=$type_id;
@@ -145,6 +145,7 @@ class Admin_metadata extends MY_REST_Controller
     function type_post()
     {
         try{
+            $this->has_access($resource_='admin_metadata',$privilege='edit');
 			$options=$this->raw_json_input();
             $options['user_id']=$this->api_user->id;
 
@@ -189,6 +190,7 @@ class Admin_metadata extends MY_REST_Controller
     function type_update_post($metadata_type_id=null)
     {
         try{
+            $this->has_access($resource_='admin_metadata',$privilege='edit');
 			$options=$this->raw_json_input();
             $options['user_id']=$this->api_user->id;
 
@@ -227,6 +229,7 @@ class Admin_metadata extends MY_REST_Controller
     function type_delete_post($type_id)
     {
         try{
+            $this->has_access($resource_='admin_metadata',$privilege='delete');
 			$options=$this->raw_json_input();
             $options['user_id']=$this->api_user->id;
 
@@ -266,6 +269,7 @@ class Admin_metadata extends MY_REST_Controller
     function schema_post()
     {
         try{
+            $this->has_access($resource_='admin_metadata',$privilege='edit');
 			$options=$this->raw_json_input();
             $options['user_id']=$this->api_user->id;
 
@@ -308,6 +312,7 @@ class Admin_metadata extends MY_REST_Controller
     function schema_update_post($schema_id)
     {
         try{
+            $this->has_access($resource_='admin_metadata',$privilege='edit');
 			$options=$this->raw_json_input();
             $options['user_id']=$this->api_user->id;
 
@@ -352,6 +357,7 @@ class Admin_metadata extends MY_REST_Controller
     function schema_delete_post($schema_id)
     {
         try{
+            $this->has_access($resource_='admin_metadata',$privilege='delete');
 			$options=$this->raw_json_input();
             $options['user_id']=$this->api_user->id;
 
@@ -384,6 +390,7 @@ class Admin_metadata extends MY_REST_Controller
     function schemas_get($schema_idno=null)
     {
         try{
+            $this->has_access($resource_='admin_metadata',$privilege='view');
             if ($schema_idno){                
                 return $this->schema_get($schema_idno);
             }
@@ -415,6 +422,7 @@ class Admin_metadata extends MY_REST_Controller
     function schema_get($schema_idno=null)
     {
         try{
+            $this->has_access($resource_='admin_metadata',$privilege='view');
             $result=$this->Metadata_schema_model->select_single_by_urn($schema_idno);
             
             if (!$result){
@@ -440,6 +448,7 @@ class Admin_metadata extends MY_REST_Controller
     function schema_by_id_get($schema_id)
     {
         try{
+            $this->has_access($resource_='admin_metadata',$privilege='view');
             $result=$this->Metadata_schema_model->select_single_by_id($schema_id);
             
             if (!$result){

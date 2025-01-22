@@ -1,12 +1,6 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-
 $config['acl_system_roles'] = ['user','admin'];
-
-
-
-//$acl->allow('lsms_collection_reviewer', 'lsms', array('unpublish','publish','view'));
-//$acl->allow('admin');
 
 //give full access to admin to everything
 $config['acl_system_role_permissions'] = [
@@ -22,7 +16,6 @@ $config['acl_system_role_permissions'] = [
     ],
     
 ];
-
 
 
 $config['acl_permissions'] = [
@@ -143,8 +136,8 @@ $config['acl_permissions'] = [
     ],
 
     "admin_metadata"=>[ 
-        "title" => "Admin metadata",
-        "description"=> "Manage admin metadata (e.g. Business, Application or other metadata)",
+        "title" => "Administrative metadata",
+        "description"=> "Manage administrative metadata (e.g. Business, Application or other metadata)",
         "permissions"=>[
             [
                 "permission" => "view"
@@ -161,10 +154,7 @@ $config['acl_permissions'] = [
                 "sub_permissions"=>["view","edit","delete", "duplicate"]
             ]
         ]
-    ],
+    ]
 
 ];
-
-//permissions by collections
-//$config['acl_permissions_collections'] = ['study','licensed_request'];
 

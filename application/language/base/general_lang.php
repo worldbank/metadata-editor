@@ -85,5 +85,7 @@ $lang['failed']="Failed";
 $lang['confirm_delete']="Delete";
 $lang['confirm_delete_records']="Are you sure you want to delete the following records?";
 
+$lang['administrative_metadata']="Administrative metadata";
+
 /* End of file general_lang.php */
 /* Location: ./application/language/base/general_lang.php */

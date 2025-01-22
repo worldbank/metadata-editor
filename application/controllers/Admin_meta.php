@@ -19,7 +19,7 @@ class Admin_meta extends MY_Controller {
 
 	function index()
 	{
-		$this->editor_acl->has_access_or_die($resource_='editor',$privilege='view');
+		$this->editor_acl->has_access_or_die($resource_='admin_metadata',$privilege='view');
 		$this->lang->load("project");
 		$this->template->set_template('default');
 		$options['translations']=$this->lang->language;

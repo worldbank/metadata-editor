@@ -127,5 +127,7 @@ $lang['Refresh summary statistics']="Refresh summary statistics";
 $lang['Replace file']="Replace file";
 $lang['File manager']="File manager";
 
+$lang['administrative_metadata']="Administrative metadata";
+
 /* End of file general_lang.php */
 /* Location: ./application/language/base/general_lang.php */

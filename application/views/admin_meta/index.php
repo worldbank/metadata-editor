@@ -43,7 +43,34 @@
     
     <?php echo $this->load->view('editor_common/global-header', null, true); ?>
     <div class="container-fluid mt-5">
-        <vue-main-app></vue-main-app>
+        <div class="row">
+          <!-- <div class="" style="width:300px">
+            left side bar
+          </div> -->
+          <div class="col" style="overflow:auto;">
+
+                <div class="mt-5 mb-5 ml-3">
+                  <h3>{{$t('administrative_metadata')}}</h3>
+
+                  <div class="d-flex">
+
+                    <v-tabs background-color="transparent" v-model="nav_tabs_model">
+                        <v-tab @click="pageLink('projects')"><v-icon>mdi-text-box</v-icon> <a :href="site_base_url + '/editor'">{{$t("projects")}}</a></v-tab>
+                        <v-tab @click="pageLink('collections')" ><v-icon>mdi-folder-text</v-icon> <a :href="site_base_url + '/collections'">{{$t("collections")}}</a> </v-tab>
+                        <!--<v-tab>Archives</v-tab>-->
+                        <v-tab @click="pageLink('templates')"><v-icon>mdi-alpha-t-box</v-icon> <a :href="site_base_url + '/templates'">{{$t("templates")}}</a></v-tab>
+                        <v-tab @click="pageLink('templates')" active><v-icon>mdi-table-column</v-icon> <a :href="site_base_url + '/templates'">{{$t("administrative_metadata")}}</a></v-tab>
+                    </v-tabs>
+
+                  </div>
+                  
+                </div>
+
+
+            <confirm-dialog></confirm-dialog>
+            <vue-main-app></vue-main-app>
+          </div>
+      </div>
     </div>
 
     </v-app>
@@ -57,7 +84,6 @@
     <?php include_once("vue-main.js"); ?>
     <?php include_once("vue-dialog-edit-schema-component.js"); ?>
     <?php include_once("vue-dialog-edit-meta-component.js"); ?>
-    
 
     const translation_messages = {
       default: <?php echo json_encode($translations,JSON_HEX_APOS);?>
@@ -81,22 +107,38 @@
     })
 
 
+    <?php echo $this->load->view("vue/vue-global-eventbus.js",null,true); ?>
+    <?php echo $this->load->view("vue/vue-confirm-dialog-component.js",null,true); ?>
+
+
+    const vuetify = new Vuetify({
+            theme: {
+            themes: {
+                light: {
+                    primary: '#526bc7',
+                    secondary: '#b0bec5',
+                    accent: '#8c9eff',
+                    error: '#b71c1c',
+                },
+            },
+            },
+        });
+
     new Vue({
       el: "#app",
       i18n,
-      vuetify: new Vuetify(),
+      vuetify: vuetify,
       data() {
-        return {
-            message: 'Hello Vue!'
+        return {      
+          nav_tabs_model: 3,
+          site_base_url: CI.base_url      
         }
       },
-      created: function() {
-      },
       methods: {
-        
-
+        pageLink(page) {
+          window.location.href = this.site_base_url + page;
+        }
       }
-     
     });
   </script>
 

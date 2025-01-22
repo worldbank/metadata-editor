@@ -6,6 +6,14 @@ Vue.component('vue-main-app', {
             metadata_types:[],
             schemas:[],
             activeMetaId:null,
+            menu_model:false,
+            menu_x:0,
+            menu_y:0,
+            menu_id:null,
+            menu_schema_model:false,
+            menu_schema_x:0,
+            menu_schema_y:0,
+            menu_schema_id:null,
             dialog_json_viewer:{
                 show:false,
                 title:'',
@@ -65,7 +73,27 @@ Vue.component('vue-main-app', {
           }
       },
     },
-    methods:{     
+    methods:{
+      showMenu (e, metaTypeId) {
+        e.preventDefault()
+        this.menu_model = false
+        this.menu_x = e.clientX
+        this.menu_y = e.clientY
+        this.menu_id = metaTypeId
+        this.$nextTick(() => {
+          this.menu_model = true
+        })
+      },
+      showMenuSchema (e, schemaId) {
+        e.preventDefault()
+        this.menu_schema_model = false
+        this.menu_schema_x = e.clientX
+        this.menu_schema_y = e.clientY
+        this.menu_schema_id = schemaId
+        this.$nextTick(() => {
+          this.menu_schema_model = true
+        })
+      },
       showMessageDialog: function(message, type){
           if (type=='error'){
               this.dialog.title='Error';
@@ -135,9 +163,11 @@ Vue.component('vue-main-app', {
             console.log("failed", response);
         });  
       },
-      deleteSchema: function(schemaID)
+      deleteSchema: async function(schemaID)
       {
-          if (!confirm("Are you sure you want to delete this schema?")){
+          let confirmed= await this.$confirm("Are you sure you want to delete?");
+
+          if (!confirmed){
               return;
           }
 
@@ -195,8 +225,11 @@ Vue.component('vue-main-app', {
           this.dialog_share_meta.show=true;
           this.dialog_share_meta.meta_type_id=metaID;
       },
-      deleteMetadataType: function(metaTypeID){
-          if (!confirm("Are you sure you want to delete this metadata type?")){
+      deleteMetadataType: async function(metaTypeID)
+      {
+        let confirmed= await this.$confirm("Are you sure you want to delete?");
+
+          if (!confirmed){
               return;
           }
 
@@ -218,13 +251,8 @@ Vue.component('vue-main-app', {
 
             <div class="container-fluid">
                 <v-card>
-                  <v-card-title>
-                    <span class="headline">Admin Metadata</span>
-                  </v-card-title>
                   <v-card-text>
                     
-
-
                     <v-tabs>
                       <v-tab href="#metadata-types">Metadata types</v-tab>
                       <v-tab-item id="metadata-types" key="metadata-types">
@@ -259,11 +287,8 @@ Vue.component('vue-main-app', {
                                   <td>{{metadata_type.ch_username}}</td>
                                   <td>{{momentDateUnix(metadata_type.changed)}}</td>
                                   <td>
-                                    <v-btn small text primary @click="editMetaDialog(metadata_type.id)">Edit</v-btn>
-                                    <v-btn small text primary @click="shareMetaDialog(metadata_type.id)">Share</v-btn>
-                                    <v-btn small text @click="deleteMetadataType(metadata_type.id)">Delete</v-btn>
-                                  </td>
-                                  
+                                    <v-icon @click="showMenu($event, metadata_type.id)">mdi-dots-vertical</v-icon>
+                                  </td>                                  
                                   
                                 </tr>
                               </tbody>
@@ -285,7 +310,7 @@ Vue.component('vue-main-app', {
                                 <tr>
                                   <th class="text-left">Schema name</th>
                                   <th class="text-left">Title</th>
-                                  <th class="text-left">Description</th>
+                                  <th class="text-left">Version</th>
                                   <th class="text-left">Created by</th>
                                   <th class="text-left">Created on</th>
                                   <th class="text-left">Last updated by</th>
@@ -296,16 +321,17 @@ Vue.component('vue-main-app', {
                               <tbody>
                                 <tr v-for="schema in Schemas">
                                   <td>{{schema.name}}</td>                            
-                                  <td>{{schema.title}}</td>
-                                  <td>{{schema.description}}</td>
+                                  <td>
+                                    {{schema.title}}
+                                    <div class="text-muted">{{schema.description}}</div>
+                                  </td>
+                                  <td>{{schema.version}}</td>
                                   <td>{{schema.cr_username}}</td>
                                   <td>{{momentDateUnix(schema.created)}}</td>
                                   <td>{{schema.ch_username}}</td>
                                   <td>{{momentDateUnix(schema.changed)}}</td>
                                   <td>
-                                    <v-btn text small primary @click="viewSchema(schema.id)">View</v-btn>
-                                    <v-btn text small primary @click="editSchemaDialog(schema.id)">Edit</v-btn>
-                                    <v-btn text small @click="deleteSchema(schema.id)">Delete</v-btn>
+                                    <v-icon @click="showMenuSchema($event, schema.id)">mdi-dots-vertical</v-icon>                                    
                                   </td>
                                 </tr>
                               </tbody>
@@ -325,6 +351,82 @@ Vue.component('vue-main-app', {
               <vue-dialog-edit-meta-component v-model="dialog_edit_meta" v-on:meta-updated="onMetaUpdated" v-on:meta-created="onMetaUpdated" :key="activeMetaId" ></vue-dialog-edit-meta-component>
               <vue-dialog-component v-model="dialog"></vue-dialog-component>
               <vue-meta-type-share v-model="dialog_share_meta" :meta_type_id="activeMetaId" :key="'meta-' + activeMetaId"></vue-meta-type-share>
+
+
+              <!-- menu options -->
+              <template>
+                <v-menu
+                  v-model="menu_model"
+                  :position-x="menu_x"
+                  :position-y="menu_y"
+                  absolute
+                  offset-y
+                >                
+
+                  <v-list>
+                    <v-list-item>
+                      <v-list-item-icon>
+                        <v-icon>mdi-edit</v-icon>
+                      </v-list-item-icon>
+                      <v-list-item-title @click="editMetaDialog(menu_id)"><v-btn text> {{$t('edit')}}</v-btn></v-list-item-title>
+                    </v-list-item>
+
+                    <v-list-item>
+                      <v-list-item-icon>
+                        <v-icon>mdi-lock</v-icon>
+                      </v-list-item-icon>
+                      <v-list-item-title @click="shareMetaDialog(menu_id)"><v-btn text> {{$t('permissions')}}</v-btn></v-list-item-title>
+                    </v-list-item>
+
+                    <v-list-item>
+                      <v-list-item-icon>
+                        <v-icon>mdi-trash</v-icon>
+                      </v-list-item-icon>
+                      <v-list-item-title @click="deleteMetadataType(menu_id)"><v-btn text> {{$t('delete')}}</v-btn></v-list-item-title>
+                    </v-list-item>
+
+                  </v-list>
+                </v-menu>
+              </template>
+              <!-- end menu options -->
+
+
+              <!-- schema menu options -->
+              <template>
+                <v-menu
+                  v-model="menu_schema_model"
+                  :position-x="menu_schema_x"
+                  :position-y="menu_schema_y"
+                  absolute
+                  offset-y
+                >                
+                
+                  <v-list>
+                    <v-list-item>
+                      <v-list-item-icon>
+                        <v-icon>mdi-edit</v-icon>
+                      </v-list-item-icon>
+                      <v-list-item-title @click="editSchemaDialog(menu_schema_id)"><v-btn text> {{$t('edit')}}</v-btn></v-list-item-title>
+                    </v-list-item>
+
+                    <v-list-item>
+                      <v-list-item-icon>
+                        <v-icon>mdi-preview</v-icon>
+                      </v-list-item-icon>
+                      <v-list-item-title @click="viewSchema(menu_schema_id)"><v-btn text> {{$t('view')}}</v-btn></v-list-item-title>
+                    </v-list-item>
+
+                    <v-list-item>
+                      <v-list-item-icon>
+                        <v-icon>mdi-trash</v-icon>
+                      </v-list-item-icon>
+                      <v-list-item-title @click="deleteSchema(menu_schema_id)"><v-btn text> {{$t('delete')}}</v-btn></v-list-item-title>
+                    </v-list-item>
+
+                  </v-list>
+                </v-menu>
+              </template>
+              <!-- end menu options -->
 
             </div>          
             `    
