@@ -104,7 +104,7 @@ class Collection_tree_model extends CI_Model {
                 
                 ) and c.pid is null    
         )
-        order by ect.child_id,ect.parent_id,ect.id,ect.depth;';
+        order by c.title,ect.child_id,ect.parent_id,ect.id,ect.depth;';
         
 
         $items=$this->db->query($sql)->result_array();
