@@ -121,9 +121,9 @@
                       <div class="mb-5">
                         <v-tabs background-color="transparent">
                           <v-tab @click="pageLink('projects')"><v-icon>mdi-text-box</v-icon> Projects</v-tab>
-                          <v-tab @click="pageLink('collections')"><v-icon>mdi-folder-text</v-icon> <a href="<?php echo site_url('collections');?>">{{$t("collections")}}</a> </v-tab>
-                          <!--<v-tab>Archives</v-tab>-->
+                          <v-tab @click="pageLink('collections')"><v-icon>mdi-folder-text</v-icon> <a href="<?php echo site_url('collections');?>">{{$t("collections")}}</a> </v-tab>                          
                           <v-tab @click="pageLink('templates')"><v-icon>mdi-alpha-t-box</v-icon> <a href="<?php echo site_url('templates');?>">{{$t("templates")}}</a></v-tab>
+                          <v-tab @click="pageLink('admin_meta')"><v-icon>mdi-table-column</v-icon> <a href="<?php echo site_url('admin_meta');?>">{{$t("administrative_metadata")}}</a></v-tab>
                         </v-tabs>
                       </div>
                     </div>

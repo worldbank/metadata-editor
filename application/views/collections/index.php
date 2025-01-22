@@ -155,18 +155,13 @@
             routes // short for `routes: routes`
         })
 
-
-        <?php 
-        $translations="";
-        ?>
-
         const translation_messages = {
-        default: <?php echo json_encode($translations,JSON_HEX_APOS);?>
+            default: <?php echo json_encode($translations,JSON_HEX_APOS);?>
         }
 
         const i18n = new VueI18n({
-        locale: 'default', // set locale
-        messages: translation_messages, // set locale messages
+            locale: 'default', // set locale
+            messages: translation_messages, // set locale messages
         })
 
         const vuetify = new Vuetify({

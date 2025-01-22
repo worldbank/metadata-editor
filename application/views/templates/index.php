@@ -110,9 +110,9 @@
 
                     <v-tabs background-color="transparent" v-model="nav_tabs_model">
                         <v-tab @click="pageLink('projects')"><v-icon>mdi-text-box</v-icon> <a :href="site_base_url + '/editor'">{{$t("projects")}}</a></v-tab>
-                        <v-tab @click="pageLink('collections')" active><v-icon>mdi-folder-text</v-icon> <a :href="site_base_url + '/collections'">{{$t("collections")}}</a> </v-tab>
-                        <!--<v-tab>Archives</v-tab>-->
+                        <v-tab @click="pageLink('collections')" active><v-icon>mdi-folder-text</v-icon> <a :href="site_base_url + '/collections'">{{$t("collections")}}</a> </v-tab>                        
                         <v-tab @click="pageLink('templates')"><v-icon>mdi-alpha-t-box</v-icon> <a :href="site_base_url + '/templates'">{{$t("templates")}}</a></v-tab>
+                        <v-tab @click="pageLink('admin_meta')"><v-icon>mdi-table-column</v-icon> <a :href="site_base_url + '/admin_meta'">{{$t("administrative_metadata")}}</a></v-tab>
                     </v-tabs>
 
                     <div class="justify-content-end">
