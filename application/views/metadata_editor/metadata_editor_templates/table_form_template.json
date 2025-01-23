@@ -43,10 +43,10 @@
                                     "display_type": "text"
                                 },
                                 {
-                                    "key": "abbreviation",
+                                    "key": "abbr",
                                     "title": "Abbreviation",
                                     "type": "string",
-                                    "prop_key": "metadata_information.producers.abbreviation",
+                                    "prop_key": "metadata_information.producers.abbr",
                                     "help_text": "The abbreviation (or acronym) of the organization that is referenced in \"Name\".",
                                     "display_type": "text"
                                 },
@@ -170,8 +170,8 @@
                             "display_type": "text"
                         },
                         {
-                            "key": "table_description.title_statement.abbreviated_title",
-                            "title": "Abbreviated title",
+                            "key": "table_description.title_statement.alternate_title",
+                            "title": "Alternate title",
                             "help_text": "An abbreviated title, which can for example be an acronym (but not the table number, which should be captured in \"Table number\") by which the table may be referred to. This element will rarely be used.",
                             "type": "string",
                             "display_type": "text"
@@ -1379,13 +1379,13 @@
             ]
         },
         {
-            "type": "section",
-            "key": "tags",
+            "type": "section_container",
+            "id": "tags",
+            "key": "tags_container",
             "title": "Tags",
-            "class": "recommended",
             "items": [
                 {
-                    "key": "table_description.tags",
+                    "key": "tags",
                     "title": "Tags",
                     "type": "array",
                     "props": [
@@ -1393,7 +1393,7 @@
                             "key": "tag",
                             "title": "Tag",
                             "type": "string",
-                            "prop_key": "table_description.tags.tag",
+                            "prop_key": "tags.tag",
                             "help_text": "A user-defined tag.",
                             "display_type": "text"
                         },
@@ -1401,8 +1401,8 @@
                             "key": "tag_group",
                             "title": "Tag group",
                             "type": "string",
-                            "prop_key": "table_description.tags.tag_group",
-                            "help_text": "The name of a tag group. ",
+                            "prop_key": "tags.tag_group",
+                            "help_text": "A user-defined group (optional) to which the tag belongs. Grouping tags allows implementation of controlled facets in data catalogs.",
                             "display_type": "text"
                         }
                     ],

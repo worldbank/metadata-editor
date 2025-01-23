@@ -43,10 +43,10 @@
                                     "display_type": "text"
                                 },
                                 {
-                                    "key": "abbreviation",
+                                    "key": "abbr",
                                     "title": "Abbréviation",
                                     "type": "string",
-                                    "prop_key": "metadata_information.producers.abbreviation",
+                                    "prop_key": "metadata_information.producers.abbr",
                                     "help_text": "L'abréviation (ou l'acronyme) de l'organisation référencée dans \"Nom\".",
                                     "display_type": "text"
                                 },
@@ -169,7 +169,7 @@
                             "display_type": "text"
                         },
                         {
-                            "key": "table_description.title_statement.abbreviated_title",
+                            "key": "table_description.title_statement.alternate_title",
                             "title": "Titre abrégé",
                             "help_text": "Un titre abrégé, qui peut par exemple être un acronyme (mais pas le numéro de table, qui doit être saisi dans \"Numéro de table\") par lequel la table peut être référencée. Cet élément sera rarement utilisé.",
                             "type": "string",
@@ -2574,13 +2574,13 @@
             ]
         },
         {
-            "type": "section",
-            "key": "tags",
+            "type": "section_container",
+            "id": "tags",
+            "key": "tags_container",
             "title": "Tags",
-            "class": "recommended",
             "items": [
                 {
-                    "key": "table_description.tags",
+                    "key": "tags",
                     "title": "Tags",
                     "type": "array",
                     "props": [
@@ -2588,20 +2588,20 @@
                             "key": "tag",
                             "title": "Tag",
                             "type": "string",
-                            "prop_key": "table_description.tags.tag",
-                            "help_text": "Un tag défini par l'utilisateur.",
+                            "prop_key": "tags.tag",
+                            "help_text": "A user-defined tag.",
                             "display_type": "text"
                         },
                         {
                             "key": "tag_group",
-                            "title": "Groupe de tags",
+                            "title": "Tag group",
                             "type": "string",
-                            "prop_key": "table_description.tags.tag_group",
-                            "help_text": "Le nom d'un groupe de tags",
+                            "prop_key": "tags.tag_group",
+                            "help_text": "A user-defined group (optional) to which the tag belongs. Grouping tags allows implementation of controlled facets in data catalogs.",
                             "display_type": "text"
                         }
                     ],
-                    "help_text": "Les tags, en particulier lorsqu'ils sont organisées en groupes, offrent une solution puissante et flexible pour activer les facettes personnalisées (filtres) dans les catalogues de données."
+                    "help_text": "Tags, especially when organized in tag groups, provide a powerful and flexible solution to enable custom facets (filters) in data catalogs. "
                 }
             ]
         }
