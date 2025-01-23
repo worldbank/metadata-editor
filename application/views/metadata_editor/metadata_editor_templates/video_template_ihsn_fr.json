@@ -686,7 +686,7 @@
                             ]
                         },
                         {
-                            "key": "video_description.languages",
+                            "key": "video_description.language",
                             "title": "Langues",
                             "help_text": "La langue fait référence à la langue dans laquelle la vidéo est publiée. La plupart des vidéos ne seront fournies que dans une seule langue. Il s'agit cependant d'un champ répétable, pour permettre à plus d'une langue d'être listée. Pour les codes et noms de langues, l'utilisation de la norme ISO 639-2 est recommandée.",
                             "type": "array",
@@ -696,7 +696,7 @@
                                     "title": "Nom",
                                     "type": "string",
                                     "help_text": "The name of the language.",
-                                    "prop_key": "video_description.languages.name",
+                                    "prop_key": "video_description.language.name",
                                     "display_type": "text"
                                 },
                                 {
@@ -704,7 +704,7 @@
                                     "title": "Code",
                                     "type": "string",
                                     "help_text": "The code of the language.",
-                                    "prop_key": "video_description.languages.code",
+                                    "prop_key": "video_description.language.code",
                                     "display_type": "text"
                                 }
                             ]

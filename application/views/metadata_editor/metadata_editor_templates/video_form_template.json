@@ -686,7 +686,7 @@
                             ]
                         },
                         {
-                            "key": "video_description.languages",
+                            "key": "video_description.language",
                             "title": "Languages",
                             "help_text": "The language refers to the language in which the video is published. Most videos will only be provided in one language. This is however a repeatable field, to allow for more than one language to be listed. For the language codes and names, the use of the ISO 639-2 standard is recommended.",
                             "type": "array",
@@ -696,7 +696,7 @@
                                     "title": "Name",
                                     "type": "string",
                                     "help_text": "The name of the language.",
-                                    "prop_key": "video_description.languages.name",
+                                    "prop_key": "video_description.language.name",
                                     "display_type": "text"
                                 },
                                 {
@@ -704,7 +704,7 @@
                                     "title": "Code",
                                     "type": "string",
                                     "help_text": "The code of the language.",
-                                    "prop_key": "video_description.languages.code",
+                                    "prop_key": "video_description.language.code",
                                     "display_type": "text"
                                 }
                             ]
