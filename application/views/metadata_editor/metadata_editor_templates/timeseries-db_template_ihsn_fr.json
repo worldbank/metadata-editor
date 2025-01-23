@@ -111,7 +111,7 @@
                             "display_type": "text"
                         },
                         {
-                            "key": "database_description.identifiers",
+                            "key": "database_description.title_statement.identifiers",
                             "title": "Autres identifiants",
                             "type": "array",
                             "help_text": "Cet élément répétable est utilisé pour saisir des identifiants (ID) autres que l'\"ID principal\" (IDNO). Il peut s'agir par exemple d'un Digital Object Identifier (DOI). L'\"ID principal\" peut être répété ici (l'\"ID principal\" ne fournit pas de paramètre \"Type\", donc si un DOI ou un autre type d'ID standard est utilisé comme identifiant principal, il est recommandé de répéter ici avec l'identification du type).",
@@ -121,14 +121,14 @@
                                     "title": "Type",
                                     "type": "string",
                                     "help_text": "Le type d'identifiant. Par exemple : \"DOI\" ou \"ISBN\".",
-                                    "prop_key": "database_description.identifiers.type",
+                                    "prop_key": "database_description.title_statement.identifiers.type",
                                     "display_type": "text"
                                 },
                                 {
                                     "key": "identifier",
                                     "title": "Identifiant",
                                     "type": "string",
-                                    "prop_key": "database_description.identifiers.identifier",
+                                    "prop_key": "database_description.title_statement.identifiers.identifier",
                                     "help_text": "L'identifiant lui-même.",
                                     "display_type": "text"
                                 }

@@ -111,7 +111,7 @@
                             "display_type": "text"
                         },
                         {
-                            "key": "database_description.identifiers",
+                            "key": "database_description.title_statement.identifiers",
                             "title": "Other identifiers",
                             "type": "array",
                             "help_text": "This repeatable element is used to enter identifiers (IDs) other than the \"Primary ID\" (IDNO). It can for example be a Digital Object Identifier (DOI). The \"Primary ID\" can be repeated here (the \"Primary ID\" does not provide a \"Type\" parameter, so if a DOI or other standard ID type is used as main identifier, it is recommended to repeat it here with the identification of the type).",
@@ -121,14 +121,14 @@
                                     "title": "Type",
                                     "type": "string",
                                     "help_text": "The type of identifier. For example: “DOI”, or \"ISBN\". ",
-                                    "prop_key": "database_description.identifiers.type",
+                                    "prop_key": "database_description.title_statement.identifiers.type",
                                     "display_type": "text"
                                 },
                                 {
                                     "key": "identifier",
                                     "title": "Identifier",
                                     "type": "string",
-                                    "prop_key": "database_description.identifiers.identifier",
+                                    "prop_key": "database_description.title_statement.identifiers.identifier",
                                     "help_text": "The identifier itself. ",
                                     "display_type": "text"
                                 }
