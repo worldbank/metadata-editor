@@ -78,11 +78,40 @@
                             "display_type": "text"
                         },
                         {
-                            "key": "metadata_information.version",
-                            "title": "Version",
-                            "type": "string",
-                            "help_text": "The version of the metadata document (not the version of the indicator/time series itself).",
-                            "display_type": "text"
+                            "key": "version-statement-section",
+                            "title": "Version statement",
+                            "type": "section",
+                            "items": [
+                                {
+                                    "key": "metadata_information.version_statement.version",
+                                    "title": "Version",
+                                    "type": "string",
+                                    "help_text": "Version",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "metadata_information.version_statement.version_date",
+                                    "title": "Date",
+                                    "type": "string",
+                                    "help_text": "Date",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "metadata_information.version_statement.version_notes",
+                                    "title": "Version notes",
+                                    "type": "string",
+                                    "help_text": "Notes",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "metadata_information.version_statement.version_resp",
+                                    "title": "Version responsibility",
+                                    "type": "string",
+                                    "help_text": "",
+                                    "display_type": "text"
+                                }
+        
+                            ]
                         }
                     ],
                     "help_text": ""
@@ -348,10 +377,10 @@
                             "type": "array",
                             "props": [
                                 {
-                                    "key": "id",
-                                    "title": "ID",
+                                    "key": "idno",
+                                    "title": "IDNO",
                                     "type": "string",
-                                    "prop_key": "series_description.sources.id",
+                                    "prop_key": "series_description.sources.idno",
                                     "help_text": "This element records the Primary ID (unique identifier) of a source of data. If the source does not have a specific unique identifier, a sequential number can be used. If the source is a dataset or database that has its own unique identifier (possibly a DOI), this identifier should be used.",
                                     "display_type": "text"
                                 },
@@ -692,10 +721,10 @@
                             "title": "Errata",
                             "props": [
                                 {
-                                    "key": "type",
+                                    "key": "date",
                                     "title": "Date",
                                     "type": "string",
-                                    "prop_key": "series_description.errata.type",
+                                    "prop_key": "series_description.errata.date",
                                     "help_text": "The date the erratum was published, preferably in ISO format (YYYY-MM-DD).",
                                     "display_type": "text"
                                 },
@@ -2490,10 +2519,10 @@
                                     "display_type": "text"
                                 },
                                 {
-                                    "key": "occurence",
-                                    "title": "Occurence",
+                                    "key": "occurrence",
+                                    "title": "Occurrence",
                                     "type": "integer",
-                                    "prop_key": "series_description.acronyms.occurence",
+                                    "prop_key": "series_description.acronyms.occurrence",
                                     "help_text": "This numeric element can be used to indicate the number of times the acronym is mentioned in the metadata. The element will rarely be used.",
                                     "display_type": "text"
                                 }

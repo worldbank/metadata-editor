@@ -78,11 +78,40 @@
                             "display_type": "text"
                         },
                         {
-                            "key": "metadata_information.version",
-                            "title": "Version",
-                            "type": "string",
-                            "help_text": "La version du document de métadonnées (et non la version de l'indicateur/de la série temporelle elle-même).",
-                            "display_type": "text"
+                            "key": "version-statement-section",
+                            "title": "Version statement",
+                            "type": "section",
+                            "items": [
+                                {
+                                    "key": "metadata_information.version_statement.version",
+                                    "title": "Version",
+                                    "type": "string",
+                                    "help_text": "Version",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "metadata_information.version_statement.version_date",
+                                    "title": "Date",
+                                    "type": "string",
+                                    "help_text": "Date",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "metadata_information.version_statement.version_notes",
+                                    "title": "Version notes",
+                                    "type": "string",
+                                    "help_text": "Notes",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "metadata_information.version_statement.version_resp",
+                                    "title": "Version responsibility",
+                                    "type": "string",
+                                    "help_text": "",
+                                    "display_type": "text"
+                                }
+        
+                            ]
                         }
                     ],
                     "help_text": ""
@@ -344,10 +373,10 @@
                             "type": "array",
                             "props": [
                                 {
-                                    "key": "id",
-                                    "title": "ID",
+                                    "key": "idno",
+                                    "title": "IDNO",
                                     "type": "string",
-                                    "prop_key": "series_description.sources.id",
+                                    "prop_key": "series_description.sources.idno",
                                     "help_text": "Cet élément enregistre l'ID principal (identifiant unique) d'une source de données. Si la source n'a pas d'identifiant unique spécifique, un numéro séquentiel peut être utilisé. Si la source est un ensemble de données ou une base de données qui a son propre identifiant unique (éventuellement un DOI), cet identifiant doit être utilisé.",
                                     "display_type": "text"
                                 },
@@ -686,10 +715,10 @@
                             "title": "Errata",
                             "props": [
                                 {
-                                    "key": "type",
+                                    "key": "date",
                                     "title": "Date",
                                     "type": "string",
-                                    "prop_key": "series_description.errata.type",
+                                    "prop_key": "series_description.errata.date",
                                     "help_text": "La date à laquelle l'erratum a été publié, de préférence au format ISO (AAAA-MM-JJ).",
                                     "display_type": "text"
                                 },
@@ -2475,10 +2504,10 @@
                                     "display_type": "text"
                                 },
                                 {
-                                    "key": "occurence",
-                                    "title": "Occurence",
+                                    "key": "occurrence",
+                                    "title": "Occurrence",
                                     "type": "integer",
-                                    "prop_key": "series_description.acronyms.occurence",
+                                    "prop_key": "series_description.acronyms.occurrence",
                                     "help_text": "Cet élément numérique peut être utilisé pour indiquer le nombre de fois que l'acronyme est mentionné dans les métadonnées. L'élément sera rarement utilisé.",
                                     "display_type": "text"
                                 }
