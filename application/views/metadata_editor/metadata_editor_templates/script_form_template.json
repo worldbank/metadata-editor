@@ -125,14 +125,14 @@
                                     "title": "Type",
                                     "type": "string",
                                     "help_text": "The type of identifier. For example: “DOI”, or \"ISBN\". ",
-                                    "prop_key": "project_desc.identifiers.type",
+                                    "prop_key": "project_desc.title_statement.identifiers.type",
                                     "display_type": "text"
                                 },
                                 {
                                     "key": "identifier",
                                     "title": "Identifier",
                                     "type": "string",
-                                    "prop_key": "project_desc.identifiers.identifier",
+                                    "prop_key": "project_desc.title_statement.identifiers.identifier",
                                     "help_text": "The identifier itself.",
                                     "display_type": "text"
                                 }
@@ -443,7 +443,7 @@
                             "help_text": "A list of persons and/or organizations in charge of curating the resources associated with the project."
                         },
                         {
-                            "key": "project_desc.acknowledgments",
+                            "key": "project_desc.acknowledgements",
                             "title": "Acknowledgments",
                             "type": "array",
                             "props": [
@@ -451,7 +451,7 @@
                                     "key": "name",
                                     "title": "Name",
                                     "type": "string",
-                                    "prop_key": "project_desc.acknowledgments.name",
+                                    "prop_key": "project_desc.acknowledgements.name",
                                     "help_text": "The name of the person or agency being recognized for supporting the project.",
                                     "display_type": "text"
                                 },
@@ -459,7 +459,7 @@
                                     "key": "affiliation",
                                     "title": "Affiliation",
                                     "type": "string",
-                                    "prop_key": "project_desc.acknowledgments.affiliation",
+                                    "prop_key": "project_desc.acknowledgements.affiliation",
                                     "help_text": "The affiliation of the person or agency being acknowledged.",
                                     "display_type": "text"
                                 },
@@ -467,7 +467,7 @@
                                     "key": "role",
                                     "title": "Role",
                                     "type": "string",
-                                    "prop_key": "project_desc.acknowledgments.role",
+                                    "prop_key": "project_desc.acknowledgements.role",
                                     "help_text": "A brief description of the role of the person or agency that is being recognized or acknowledged for supporting the project.",
                                     "display_type": "textarea"
                                 }
@@ -475,8 +475,8 @@
                             "help_text": "This repeatable block of elements is used to provide an itemized list of persons and organizations whose contribution to the project must be acknowledged. Note that specific metadata elements are available for listing financial sponsors and main contributors to the study. An alternative to this field is the \"Acknowledgment statement\" field (see below) which can be used to provide the acknowledgment in the form of an unstructured text."
                         },
                         {
-                            "key": "project_desc.acknowledgment_statement",
-                            "title": "Acknowledgment statement",
+                            "key": "project_desc.acknowledgement_statement",
+                            "title": "Acknowledgement statement",
                             "type": "string",
                             "help_text": "This field is used to provide acknowledgments in the form of an unstructured text. It is an alternative to the element \"Acknowledgments\" which provides a solution to itemize the acknowledgments.",
                             "display_type": "textarea"
