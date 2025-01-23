@@ -317,7 +317,7 @@
                             "is_recommended": true
                         },
                         {
-                            "key": "image_description.creatorContactInfo",
+                            "key": "image_description.iptc.photoVideoMetadataIPTC.creatorContactInfo",
                             "title": "Contact information ",
                             "class": "required",
                             "type": "array",
@@ -326,49 +326,49 @@
                                     "key": "country",
                                     "title": "Country",
                                     "type": "text",
-                                    "prop_key": "image_description.creatorContactInfo.country"
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.creatorContactInfo.country"
                                 },
                                 {
                                     "key": "emailwork",
                                     "title": "Email (work)",
                                     "type": "text",
-                                    "prop_key": "image_description.creatorContactInfo.emailwork"
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.creatorContactInfo.emailwork"
                                 },
                                 {
                                     "key": "region",
                                     "title": "Region (State/ province)",
                                     "type": "text",
-                                    "prop_key": "image_description.creatorContactInfo.region"
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.creatorContactInfo.region"
                                 },
                                 {
                                     "key": "phonework",
                                     "title": "Phone (work)",
                                     "type": "text",
-                                    "prop_key": "image_description.creatorContactInfo.phonework"
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.creatorContactInfo.phonework"
                                 },
                                 {
                                     "key": "weburlwork",
                                     "title": "URL",
                                     "type": "text",
-                                    "prop_key": "image_description.creatorContactInfo.weburlwork"
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.creatorContactInfo.weburlwork"
                                 },
                                 {
                                     "key": "address",
                                     "title": "Address",
                                     "type": "text",
-                                    "prop_key": "image_description.creatorContactInfo.address"
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.creatorContactInfo.address"
                                 },
                                 {
                                     "key": "city",
                                     "title": "City",
                                     "type": "text",
-                                    "prop_key": "image_description.creatorContactInfo.city"
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.creatorContactInfo.city"
                                 },
                                 {
                                     "key": "postalCode",
                                     "title": "Postal code",
                                     "type": "text",
-                                    "prop_key": "image_description.creatorContactInfo.postalCode"
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.creatorContactInfo.postalCode"
                                 }
                             ],
                             "help_text": "The creator’s contact information provides all necessary information to get in contact with the creator of this image and comprises a set of elements for proper addressing. Note that if the creator is also the licensor, his or her contact information should be provided in the licensor fields.\n\n- Country: The country name for the address of the person that created this image.\n- Email work: The work email address(es) for the creator of the image. Multiple email addresses can be given, in which case they should be separated by a comma.\n- Region: The state or province for the address of the creator of the image.\n- Phone work: The work phone number(s) for the creator of the image. Use the international format including the country code, such as +1 (123) 456789. Multiple numbers can be given, in which case they should be separated by a comma.\n- URL work: The work web address for the creator of the image. Multiple addresses can be given, in which case they should be separated by a comma.\n- Address: The address of the creator of the image. This may comprise a company name.\n- City: The city for the address of the person that created the image.\n- Postal code: Enter the local postal code for the address of the person who created the image."
@@ -900,7 +900,7 @@
                                             "prop_key": "image_description.iptc.photoVideoMetadataIPTC.personsShown.characteristics.cvId"
                                         },
                                         {
-                                            "key": "description",
+                                            "key": "cvTermName",
                                             "title": "CV-Term Name",
                                             "type": "text",
                                             "help_text": "The natural language name of the term from a Controlled Vocabulary.",
@@ -1105,13 +1105,13 @@
                             "type": "array",
                             "props": [
                                 {
-                                    "key": "cvld",
+                                    "key": "cvid",
                                     "title": "ID",
                                     "class": "required",
                                     "required": true,
                                     "type": "text",
                                     "help_text": "The globally unique identifier of the Controlled Vocabulary the term is from",
-                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.aboutCvTerms.cvld"
+                                    "prop_key": "image_description.iptc.photoVideoMetadataIPTC.aboutCvTerms.cvid"
                                 },
                                 {
                                     "key": "cvTermName",
@@ -1480,9 +1480,9 @@
         },
         {
             "type": "section_container",
-            "key": "document_tags",
+            "id": "tags",
+            "key": "tags_container",
             "title": "Tags",
-            "class": "recommended",
             "items": [
                 {
                     "key": "tags",
@@ -1490,16 +1490,23 @@
                     "type": "array",
                     "props": [
                         {
-                            "key": "tag_group",
-                            "title": "Tag group",
-                            "type": "string"
-                        },
-                        {
                             "key": "tag",
                             "title": "Tag",
-                            "type": "string"
+                            "type": "string",
+                            "prop_key": "tags.tag",
+                            "help_text": "A user-defined tag.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "tag_group",
+                            "title": "Tag group",
+                            "type": "string",
+                            "prop_key": "tags.tag_group",
+                            "display_type": "text",
+                            "help_text": "The name of a tag group. "
                         }
-                    ]
+                    ],
+                    "help_text": "Tags, especially when organized in tag groups, provide a powerful and flexible solution to enable custom facets (filters) in data catalogs. "
                 }
             ]
         }

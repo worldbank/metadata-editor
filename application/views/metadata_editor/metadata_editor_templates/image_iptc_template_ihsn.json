@@ -488,13 +488,13 @@
                                     "type": "array",
                                     "props": [
                                         {
-                                            "key": "cvld",
+                                            "key": "cvid",
                                             "title": "Vocabulary ID",
                                             "class": "required",
                                             "required": true,
                                             "type": "string",
                                             "help_text": "The globally unique identifier of the controlled vocabulary the term is from.",
-                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.aboutCvTerms.cvld",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.aboutCvTerms.cvid",
                                             "display_type": "text"
                                         },
                                         {
@@ -1512,10 +1512,10 @@
             ]
         },
         {
-            "type": "section",
-            "key": "document_tags",
+            "type": "section_container",
+            "id": "tags",
+            "key": "tags_container",
             "title": "Tags",
-            "class": "recommended",
             "items": [
                 {
                     "key": "tags",
@@ -1535,8 +1535,8 @@
                             "title": "Tag group",
                             "type": "string",
                             "prop_key": "tags.tag_group",
-                            "help_text": "A user-defined group (optional) to which the tag belongs. Grouping tags allows implementation of controlled facets in data catalogs.",
-                            "display_type": "text"
+                            "display_type": "text",
+                            "help_text": "The name of a tag group. "
                         }
                     ],
                     "help_text": "Tags, especially when organized in tag groups, provide a powerful and flexible solution to enable custom facets (filters) in data catalogs. "

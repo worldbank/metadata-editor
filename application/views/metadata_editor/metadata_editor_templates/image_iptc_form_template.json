@@ -296,80 +296,61 @@
                                     "display_type": "text"
                                 },
                                 {
-                                    "key": "image_description.creatorContactInfo",
-                                    "title": "Contact",
+                                    "key": "image_description.iptc.photoVideoMetadataIPTC.creatorContactInfo",
+                                    "title": "Contact information ",
                                     "class": "required",
-                                    "type": "textarea",
+                                    "type": "array",
                                     "props": [
                                         {
                                             "key": "country",
                                             "title": "Country",
-                                            "type": "string",
-                                            "prop_key": "image_description.creatorContactInfo.country",
-                                            "help_text": "The country name for the address of the person that created this image.",
-                                            "display_type": "text"
+                                            "type": "text",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.creatorContactInfo.country"
                                         },
                                         {
                                             "key": "emailwork",
-                                            "title": "Email",
-                                            "type": "string",
-                                            "prop_key": "image_description.creatorContactInfo.emailwork",
-                                            "help_text": "The work email address(es) for the creator of the image. Multiple email addresses can be given, in which case they should be separated by a comma.",
-                                            "display_type": "text"
+                                            "title": "Email (work)",
+                                            "type": "text",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.creatorContactInfo.emailwork"
                                         },
                                         {
                                             "key": "region",
-                                            "title": "Region",
-                                            "type": "string",
-                                            "prop_key": "image_description.creatorContactInfo.region",
-                                            "help_text": "The state or province for the address of the creator of the image.",
-                                            "display_type": "text"
+                                            "title": "Region (State/ province)",
+                                            "type": "text",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.creatorContactInfo.region"
                                         },
                                         {
                                             "key": "phonework",
-                                            "title": "Phone",
-                                            "type": "string",
-                                            "prop_key": "image_description.creatorContactInfo.phonework",
-                                            "help_text": "The work phone number(s) for the creator of the image. Use the international format including the country code, such as +1 (123) 456789. Multiple numbers can be given, in which case they should be separated by a comma.",
-                                            "display_type": "text"
+                                            "title": "Phone (work)",
+                                            "type": "text",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.creatorContactInfo.phonework"
                                         },
                                         {
                                             "key": "weburlwork",
                                             "title": "URL",
-                                            "type": "string",
-                                            "prop_key": "image_description.creatorContactInfo.weburlwork",
-                                            "help_text": "The work web address for the creator of the image. Multiple addresses can be given, in which case they should be separated by a comma.",
-                                            "rules": {
-                                                "is_uri": true
-                                            },
-                                            "display_type": "text"
+                                            "type": "text",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.creatorContactInfo.weburlwork"
                                         },
                                         {
                                             "key": "address",
                                             "title": "Address",
-                                            "type": "string",
-                                            "prop_key": "image_description.creatorContactInfo.address",
-                                            "help_text": "The address of the creator of the image. This may comprise a company name.",
-                                            "display_type": "text"
+                                            "type": "text",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.creatorContactInfo.address"
                                         },
                                         {
                                             "key": "city",
                                             "title": "City",
-                                            "type": "string",
-                                            "prop_key": "image_description.creatorContactInfo.city",
-                                            "help_text": "The city for the address of the person that created the image.",
-                                            "display_type": "text"
+                                            "type": "text",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.creatorContactInfo.city"
                                         },
                                         {
                                             "key": "postalCode",
                                             "title": "Postal code",
-                                            "type": "string",
-                                            "prop_key": "image_description.creatorContactInfo.postalCode",
-                                            "help_text": "Enter the local postal code for the address of the person who created the image.",
-                                            "display_type": "text"
+                                            "type": "text",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.creatorContactInfo.postalCode"
                                         }
                                     ],
-                                    "help_text": "The creator’s contact information provides all necessary information to get in contact with the creator of this image and comprises a set of elements for proper addressing. Note that if the creator is also the licensor, his or her contact information should be provided in the licensor fields."
+                                    "help_text": "The creator’s contact information provides all necessary information to get in contact with the creator of this image and comprises a set of elements for proper addressing. Note that if the creator is also the licensor, his or her contact information should be provided in the licensor fields.\n\n- Country: The country name for the address of the person that created this image.\n- Email work: The work email address(es) for the creator of the image. Multiple email addresses can be given, in which case they should be separated by a comma.\n- Region: The state or province for the address of the creator of the image.\n- Phone work: The work phone number(s) for the creator of the image. Use the international format including the country code, such as +1 (123) 456789. Multiple numbers can be given, in which case they should be separated by a comma.\n- URL work: The work web address for the creator of the image. Multiple addresses can be given, in which case they should be separated by a comma.\n- Address: The address of the creator of the image. This may comprise a company name.\n- City: The city for the address of the person that created the image.\n- Postal code: Enter the local postal code for the address of the person who created the image."
                                 }
                             ],
                             "help_text": ""
@@ -488,13 +469,13 @@
                                     "type": "array",
                                     "props": [
                                         {
-                                            "key": "cvld",
+                                            "key": "cvid",
                                             "title": "Vocabulary ID",
                                             "class": "required",
                                             "required": true,
                                             "type": "string",
                                             "help_text": "The globally unique identifier of the controlled vocabulary the term is from.",
-                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.aboutCvTerms.cvld",
+                                            "prop_key": "image_description.iptc.photoVideoMetadataIPTC.aboutCvTerms.cvid",
                                             "display_type": "text"
                                         },
                                         {
@@ -1512,10 +1493,10 @@
             ]
         },
         {
-            "type": "section",
-            "key": "document_tags",
+            "type": "section_container",
+            "id": "tags",
+            "key": "tags_container",
             "title": "Tags",
-            "class": "recommended",
             "items": [
                 {
                     "key": "tags",
@@ -1535,8 +1516,8 @@
                             "title": "Tag group",
                             "type": "string",
                             "prop_key": "tags.tag_group",
-                            "help_text": "A user-defined group (optional) to which the tag belongs. Grouping tags allows implementation of controlled facets in data catalogs.",
-                            "display_type": "text"
+                            "display_type": "text",
+                            "help_text": "The name of a tag group. "
                         }
                     ],
                     "help_text": "Tags, especially when organized in tag groups, provide a powerful and flexible solution to enable custom facets (filters) in data catalogs. "
