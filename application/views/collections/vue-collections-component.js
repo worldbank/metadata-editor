@@ -231,13 +231,13 @@ Vue.component('vue-collection', {
                                             </template>
                                             <v-list>
                                                 <v-list-item>
-                                                    <v-list-item-title @click="dialog_copy_collection=true">Copy collection</v-list-item-title>
+                                                    <v-list-item-title @click="dialog_copy_collection=true"><v-btn text>{{$t('Copy collection')}}</v-btn></v-list-item-title>
                                                 </v-list-item>
                                                 <v-list-item>
-                                                    <v-list-item-title @click="dialog_move_collection=true">Move collection</v-list-item-title>
+                                                    <v-list-item-title @click="dialog_move_collection=true"><v-btn text>{{$t('Move collection')}}</v-btn></v-list-item-title>
                                                 </v-list-item>
                                                 <v-list-item>
-                                                    <v-list-item-title @click="refreshCollectionsTree">Refresh tree</v-list-item-title>
+                                                    <v-list-item-title @click="refreshCollectionsTree"><v-btn text>{{$t('Refresh tree')}}</v-btn></v-list-item-title>
                                                 </v-list-item>
                                             </v-list>
                                         </v-menu>
