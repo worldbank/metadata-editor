@@ -12,6 +12,16 @@
                 >
             </vue-key-field>
         </template>
+        <template v-else-if="TemplateIsAdminMeta">
+
+            <vue-custom-key-field
+                :field="ActiveNode" 
+                :key="ActiveNode.key"
+                :value="ActiveNode.key"
+                @input="UpdateActiveNodeKey"
+                >
+            </vue-custom-key-field>
+        </template>
         <template v-else>
             <div><label>{{$t("key")}}:</label></div>
             <div class="border p-1 text-secondary">{{ActiveNode.key}}</div>

@@ -528,5 +528,75 @@ class Templates extends MY_REST_Controller
 			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
+
+	/**
+	 * 
+	 * 
+	 * Check template UUID exists
+	 * 
+	 */
+	function uid_get($uid=null)
+	{
+		try{
+			if(!$uid){
+				throw new Exception("Missing parameter for `UID`");
+			}
+			
+			$result=$this->Editor_template_model->check_uid_exists($uid);
+			$response=array(
+				'status'=>'success',
+				'found'=>$result
+			);
+						
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	/**
+	 * 
+	 * 
+	 * Replace template UUID
+	 * 
+	 * params - json object with `old_uid` and `new_uid`
+	 * 
+	 */
+	function uid_post()
+	{
+		try{
+			$options=$this->raw_json_input();
+
+			if (!isset($options['old_uid'])){
+				throw new Exception("Missing parameter for `old_uid`");
+			}
+
+			if (!isset($options['new_uid'])){
+				throw new Exception("Missing parameter for `new_uid`");
+			}
+			
+			$result=$this->Editor_template_model->replace_uid($options['old_uid'], $options['new_uid']);
+
+			$response=array(
+				'status'=>'success',
+				'updated'=>$result
+			);
+
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
 	
 }

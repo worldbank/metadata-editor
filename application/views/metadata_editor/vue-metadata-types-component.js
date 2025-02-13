@@ -22,7 +22,7 @@ const VueMetadataTypes = Vue.component('metadata-types', {
 
        loadMetadataTypes: function(){
             vm=this;
-            let url=CI.base_url + '/api/admin-metadata/type_by_user/';
+            let url=CI.base_url + '/api/admin-metadata/templates/';
             axios.get( url
             ).then(function(response){
                 console.log("MetadataType",response.data);
@@ -99,19 +99,19 @@ const VueMetadataTypes = Vue.component('metadata-types', {
                 <template v-slot:default>
                     <thead>
                         <tr>
+                            <th class="text-left">{{$t("UID")}}</th>
                             <th class="text-left">{{$t("Name")}}</th>
-                            <th class="text-left">{{$t("Title")}}</th>
                             <th class="text-left">{{$t("Description")}}</th>
                             <th class="text-left">{{$t("Actions")}}</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-for="metadata_type in MetadataTypes">
-                            <td><router-link :to="'/metadata-types/' + metadata_type.name" >{{metadata_type.name}}</router-link></td>
-                            <td>{{metadata_type.title}}</td>
+                            <td><router-link :to="'/metadata-types/' + metadata_type.uid" >{{metadata_type.uid}}</router-link></td>
+                            <td>{{metadata_type.name}}</td>
                             <td>{{metadata_type.description}}</td>
                             <td>
-                                <router-link :to="'/metadata-types/' + metadata_type.name" >{{$t("Edit")}}</router-link>                                
+                                <router-link :to="'/metadata-types/' + metadata_type.uid" >{{$t("Edit")}}</router-link>                                
                             </td>
                         </tr>
                     </tbody>

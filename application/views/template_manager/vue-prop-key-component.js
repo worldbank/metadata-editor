@@ -86,7 +86,7 @@ Vue.component('vue-prop-key-field', {
         }
     },
     template: `
-        <div class="vue-key-field">
+        <div class="vue-prop-key-field">
 
             <input type="text" class="form-control" id="key" placeholder="Key" v-model="local_value" v-on:blur="UpdateKeyValue">
                 

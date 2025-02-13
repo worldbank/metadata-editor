@@ -213,7 +213,7 @@
                   </div>
 
                   <!--additional -->
-                  <div class="mt-5" v-if="ActiveNode.type=='section'">
+                  <div class="mt-5" v-if="ActiveNode.type=='section' || TemplateIsAdminMeta">
                     <v-icon title="Add custom field" v-if="ActiveNode.type=='section_container' || ActiveNode.type=='section'" class="additional-item" @click="addAdditionalField()">mdi-text-box-plus-outline</v-icon>
                     <v-icon title="Add custom field" v-else class="disabled-button-color">mdi-text-box-plus-outline</v-icon>
                   </div>
@@ -321,6 +321,7 @@
     }
 
     <?php echo include_once("vue-field-key-component.js"); ?>
+    <?php echo include_once("vue-field-custom-key-component.js"); ?>
     <?php echo include_once("vue-prop-key-component.js"); ?>
     <?php echo include_once("vue-tree-component.js"); ?>
     <?php echo include_once("vue-tree-field-component.js"); ?>
@@ -466,6 +467,8 @@
         //keys only
         core_tree_keys: [], //default system template keys
         user_tree_keys: [], //custom user defined template keys
+
+        user_template_info: user_template_info
 
       },
       mutations: {
@@ -804,13 +807,22 @@
           this.initiallyOpen.push(new_node_key);
           this.initiallyOpen.push(parentNode.key);          
         },
+        generateNewFieldKey: function() {
+          if (this.TemplateDataType=='admin_meta'){
+            new_node_key = "options." + Date.now();
+          }else{
+            new_node_key = "additional." + Date.now();
+          }
+          return new_node_key;
+        },
         addAdditionalField: function() {
           /*if (this.ActiveNodeContainerKey != 'additional_container') {
             return false;
           }*/
 
           parentNode = this.ActiveNode;
-          new_node_key = "additional." + Date.now();
+          new_node_key = this.generateNewFieldKey();
+
           parentNode.items.push({
             "key": new_node_key,
             "title": "Untitled",
@@ -831,11 +843,12 @@
           }*/
 
           parentNode = this.ActiveNode;
-          new_node_key = "additional." + Date.now();
+          new_node_key = this.generateNewFieldKey();
+          
           parentNode.items.push({
             "key": new_node_key,
             "title": "Untitled",
-            "type": "array",            
+            "type": "array",
             "help_text": "",
             "props": [                           
             ]
@@ -851,8 +864,8 @@
           //store.commit('activeCoreNode', {});
         },
         addAdditionalFieldNestedArray: function() {
-          parentNode = this.ActiveNode;
-          new_node_key = "additional." + Date.now();
+          parentNode = this.ActiveNode;          
+          new_node_key = this.generateNewFieldKey();
           parentNode.items.push({
             "key": new_node_key,
             "title": "Untitled",
@@ -1037,6 +1050,12 @@
 
       },
       computed: {
+        TemplateIsAdminMeta(){
+          return this.user_template_info.data_type=='admin_meta';
+        },
+        TemplateDataType() {
+          return this.user_template_info.data_type;
+        },
         UserTemplateClone(){
           return JSON.parse(JSON.stringify(this.UserTemplate));
         },

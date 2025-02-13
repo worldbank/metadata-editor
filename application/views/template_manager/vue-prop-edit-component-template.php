@@ -1,7 +1,7 @@
 <div class="prop-edit-component">
     <div v-if="prop.key">
 
-        <div class="form-group" v-if="HasAdditionalPrefix(parent.key)">
+        <div class="form-group" v-if="HasAdditionalPrefix(parent.key) || isAdminMetaTemplate">
             <label for="name">{{$t('key')}}:</label>
             <vue-prop-key-field                
                 :parent="parent"

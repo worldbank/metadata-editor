@@ -15,10 +15,10 @@ class Admin_metadata extends MY_REST_Controller
 		$this->load->helper("date");
 		
 		$this->load->model("Editor_model");
-        $this->load->model("Metadata_type_model");
-        $this->load->model("Metadata_schema_model");
-        $this->load->model("Metadata_type_data_model");
-        $this->load->model("Metadata_type_acl_model");
+        $this->load->model("Editor_template_model");
+        $this->load->model('Admin_metadata_acl_model');
+        $this->load->model('Admin_metadata_model');
+
 		$this->load->library("Editor_acl");		
 		$this->is_authenticated_or_die();
 		$this->api_user=$this->api_user();
@@ -26,53 +26,31 @@ class Admin_metadata extends MY_REST_Controller
 
     /**
      * 
-     * Get all metadata types
+     * Get all admin metadata templates logged in user has access to
      * 
      */
-    function index_get($name_or_id=null)
-    {
-        return $this->type_get($name_or_id);
-    }
-
-    /**
-     * 
-     * Metadata types
-     * 
-     */
-    function type_get($name_or_id=null)
+    function templates_get($template_uid=null)
     {
         try{
-            $this->has_access($resource_='admin_metadata',$privilege='view');                    
-            $offset=(int)$this->input->get("offset");
-			$limit=(int)$this->input->get("limit");
 
-            if (!$offset){
-                $offset=0;
+            if ($template_uid){
+                return $this->template_get($template_uid);
             }
 
-            if (!$limit){
-                $limit=10;
+            $this->has_access($resource_='template_manager',$privilege='view');
+            $result= $this->Admin_metadata_model->get_admin_metadata_templates_by_acl($this->api_user->id);
+            array_walk($result, 'unix_date_to_gmt',array('created','changed'));
+
+            foreach($result as $key=>$row){
+                $result[$key]['permissions']=$this->Admin_metadata_acl_model->get_user_permissions($row['id'],$this->api_user->id);
             }
 
-            if ($name_or_id){
-                if (is_numeric($name_or_id)){
-                    $result=$this->Metadata_type_model->select_single_by_id($name_or_id);
-                }else{
-                    $result=$this->Metadata_type_model->select_single_by_name($name_or_id);
-                }
+            $response=array(
+				'status'=>'success',
+				'result'=>$result
+			);	
 
-                if (!$result){
-                    throw new Exception("NOT FOUND");
-                }
-
-                //get permissions
-                $result['permissions']=$this->Metadata_type_model->get_user_permissions($result['id'],$this->api_user->id);
-
-            }else{
-                $result=$this->Metadata_type_model->select_all($offset,$limit);
-            }
-
-            $this->set_response($result, REST_Controller::HTTP_OK);
+            $this->set_response($response, REST_Controller::HTTP_OK);
         }
         catch(Exception $e){
             $error_response=array(
@@ -83,408 +61,61 @@ class Admin_metadata extends MY_REST_Controller
         }
     }
 
-
     /**
      * 
-     * Get metadata types by user and/or type id/name
      * 
-     */
-    function type_by_user_get($type_id=null)
-    {
-        try{
-            $this->has_access($resource_='admin_metadata',$privilege='view');
-            if ($type_id){
-                if (is_numeric($type_id)){
-                    $meta_type_id=$type_id;
-                }else{
-                    $meta_type_id=$this->Metadata_type_model->get_id_by_name($type_id);
-                }
-
-                $this->editor_acl->user_has_metadata_type_access($meta_type_id,$permission='view',$this->api_user);
-                $result=$this->Metadata_type_model->select_single_by_id($meta_type_id);
-
-                if (!$result){
-                    throw new Exception("NOT FOUND");
-                }
-
-                $result['permissions']=$this->Metadata_type_model->get_user_permissions($result['id'],$this->api_user->id);
-            }
-            else{
-                $result=$this->Metadata_type_model->select_all_by_user($this->api_user->id);
-
-                if (isset($result['result']) && is_array($result['result'])){
-                    foreach($result['result'] as $key=>$row){
-                        $result['result'][$key]['permissions']=$this->Metadata_type_model->get_user_permissions($row['id'],$this->api_user->id);
-                    }
-                }
-            }
-
-            $this->set_response($result, REST_Controller::HTTP_OK);
-        }
-        catch(Exception $e){
-            $error_response=array(
-                'status'=>'error',
-                'message'=>$e->getMessage()
-            );
-            $this->set_response($error_response, REST_Controller::HTTP_BAD_REQUEST);
-        }
-    }
-
-
-    /**
-     * 
-     * Create a new metadata type
+     * Return admin template by UID
      * 
      * 
      */
-    function index_post()
+    function template_get($uid=null)
+	{
+		try{
+			$this->has_access($resource_='template_manager',$privilege='view');
+
+			if(!$uid){
+				throw new Exception("Missing parameter for `UID`");
+			}
+
+			$result=$this->Admin_metadata_model->get_admin_metadata_template_by_acl($this->api_user->id,$uid);
+				
+			if(!$result){
+				throw new Exception("TEMPLATE_NOT_FOUND");
+			}
+
+            //template acl
+            $result['permissions']=$this->Admin_metadata_acl_model->list_users($result['id'],$this->api_user->id);
+
+			$response=array(
+				'status'=>'success',
+				'result'=>$result
+			);			
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+    function templates_by_user_get()
     {
-        return $this->type_post();
+        return $this->templates_get();
     }
+
     
-    function type_post()
-    {
-        try{
-            $this->has_access($resource_='admin_metadata',$privilege='edit');
-			$options=$this->raw_json_input();
-            $options['user_id']=$this->api_user->id;
-
-			$result=$this->Metadata_type_model->create($options);
-
-            if (!$result){
-                throw new Exception("Error creating metadata type");
-            }
-
-            $metadata_type=$this->Metadata_type_model->select_single_by_id($result);
-
-			$output=array(
-				'status'=>'success',
-                'metadata_type'=>$metadata_type,
-                '_links'=>array(
-                    'metadata_type'=>site_url('api/metadata/type/'.$metadata_type['name'])
-                ),
-                'result'=>$result
-			);
-
-			$this->set_response($output, REST_Controller::HTTP_OK);			
-		}
-        catch(ValidationException $e){
-			$error_output=array(
-				'status'=>'failed',
-				'message'=>$e->getMessage(),
-				'errors'=>(array)$e->GetValidationErrors()
-			);
-			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
-		}
-		catch(Exception $e){
-			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
-		} 
-    }
-
-    /**
-     * 
-     * Create a new metadata type
-     * 
-     * 
-     */
-    function type_update_post($metadata_type_id=null)
-    {
-        try{
-            $this->has_access($resource_='admin_metadata',$privilege='edit');
-			$options=$this->raw_json_input();
-            $options['user_id']=$this->api_user->id;
-
-			$result=$this->Metadata_type_model->update($metadata_type_id,$options);
-
-            if (!$result){
-                throw new Exception("Error creating metadata type");
-            }
-
-			$output=array(
-				'status'=>'success',
-                'result'=>$result
-			);
-
-			$this->set_response($output, REST_Controller::HTTP_OK);			
-		}
-        catch(ValidationException $e){
-			$error_output=array(
-				'status'=>'failed',
-				'message'=>$e->getMessage(),
-				'errors'=>(array)$e->GetValidationErrors()
-			);
-			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
-		}
-		catch(Exception $e){
-			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
-		} 
-    }
-
-
-     /**
-     * 
-     * Delete type
-     * 
-     */
-    function type_delete_post($type_id)
-    {
-        try{
-            $this->has_access($resource_='admin_metadata',$privilege='delete');
-			$options=$this->raw_json_input();
-            $options['user_id']=$this->api_user->id;
-
-			$result=$this->Metadata_type_model->delete_by_id($type_id);            
-
-			$output=array(
-				'status'=>'success',                
-                'result'=>$result
-			);
-
-			$this->set_response($output, REST_Controller::HTTP_OK);			
-		}
-        catch(ValidationException $e){
-			$error_output=array(
-				'status'=>'failed',
-				'message'=>$e->getMessage(),
-				'errors'=>(array)$e->GetValidationErrors()
-			);
-			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
-		}
-		catch(Exception $e){
-			$error_output=array(
-				'status'=>'failed',
-				'message'=>$e->getMessage(),				
-			);
-			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
-		}        
-    }
     
-
-
-    /**
-     * 
-     * Create new schema
-     * 
-     */
-    function schema_post()
-    {
-        try{
-            $this->has_access($resource_='admin_metadata',$privilege='edit');
-			$options=$this->raw_json_input();
-            $options['user_id']=$this->api_user->id;
-
-			$result=$this->Metadata_schema_model->create($options);
-            $schema_idno=$this->Metadata_schema_model->get_urn_by_id($result);
-
-			$output=array(
-				'status'=>'success',
-                'schema_idno'=>$schema_idno,
-                '_links'=>array(
-                    'schema'=>site_url('api/metadata/schema/'.$schema_idno)
-                ),
-                'result'=>$result
-			);
-
-			$this->set_response($output, REST_Controller::HTTP_OK);			
-		}
-        catch(ValidationException $e){
-			$error_output=array(
-				'status'=>'failed',
-				'message'=>$e->getMessage(),
-				'errors'=>(array)$e->GetValidationErrors()
-			);
-			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
-		}
-		catch(Exception $e){
-			$error_output=array(
-				'status'=>'failed',
-				'message'=>$e->getMessage(),				
-			);
-			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
-		}        
-    }
-
-    /**
-     * 
-     * Update schema
-     * 
-     */
-    function schema_update_post($schema_id)
-    {
-        try{
-            $this->has_access($resource_='admin_metadata',$privilege='edit');
-			$options=$this->raw_json_input();
-            $options['user_id']=$this->api_user->id;
-
-			$result=$this->Metadata_schema_model->update($schema_id,$options);
-            $schema_idno=$this->Metadata_schema_model->get_urn_by_id($result);
-
-			$output=array(
-				'status'=>'success',
-                'schema_idno'=>$schema_idno,
-                '_links'=>array(
-                    'schema'=>site_url('api/metadata/schema/'.$schema_idno)
-                ),
-                'result'=>$result
-			);
-
-			$this->set_response($output, REST_Controller::HTTP_OK);			
-		}
-        catch(ValidationException $e){
-			$error_output=array(
-				'status'=>'failed',
-				'message'=>$e->getMessage(),
-				'errors'=>(array)$e->GetValidationErrors()
-			);
-			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
-		}
-		catch(Exception $e){
-			$error_output=array(
-				'status'=>'failed',
-				'message'=>$e->getMessage(),				
-			);
-			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
-		}        
-    }
-
-
-
-    /**
-     * 
-     * Delete schema
-     * 
-     */
-    function schema_delete_post($schema_id)
-    {
-        try{
-            $this->has_access($resource_='admin_metadata',$privilege='delete');
-			$options=$this->raw_json_input();
-            $options['user_id']=$this->api_user->id;
-
-			$result=$this->Metadata_schema_model->delete_by_id($schema_id);            
-
-			$output=array(
-				'status'=>'success',                
-                'result'=>$result
-			);
-
-			$this->set_response($output, REST_Controller::HTTP_OK);			
-		}
-		catch(Exception $e){
-			$error_output=array(
-				'status'=>'failed',
-				'message'=>$e->getMessage(),				
-			);
-			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
-		}        
-    }
-
-
     /**
      * 
      * 
-     * Return all schemas
+     * Get metadata (data) by project id and/or admin metadata template uid
      * 
      * 
      */
-    function schemas_get($schema_idno=null)
-    {
-        try{
-            $this->has_access($resource_='admin_metadata',$privilege='view');
-            if ($schema_idno){                
-                return $this->schema_get($schema_idno);
-            }
-
-            $result=$this->Metadata_schema_model->select_all();
-            
-            if (!$result){
-                throw new Exception("NOT FOUND");
-            }
-
-            $this->set_response($result, REST_Controller::HTTP_OK);		
-        }
-        catch(Exception $e){
-            $error_response=array(
-                'status'=>'error',
-                'message'=>$e->getMessage()
-            );
-            $this->set_response($error_response, REST_Controller::HTTP_BAD_REQUEST);
-        }
-    }
-
-    /**
-     * 
-     * 
-     * Return Metadata type schema definition
-     * 
-     * 
-     */
-    function schema_get($schema_idno=null)
-    {
-        try{
-            $this->has_access($resource_='admin_metadata',$privilege='view');
-            $result=$this->Metadata_schema_model->select_single_by_urn($schema_idno);
-            
-            if (!$result){
-                throw new Exception("NOT FOUND");
-            }
-
-            if (!isset($result['schema'])){
-                throw new Exception("Schema definition is missing!");
-            }            
-
-            $this->set_response($result['schema'], REST_Controller::HTTP_OK);		
-        }
-        catch(Exception $e){
-            $error_response=array(
-                'status'=>'error',
-                'message'=>$e->getMessage()
-            );
-            $this->set_response($error_response, REST_Controller::HTTP_BAD_REQUEST);
-        }
-    }
-
-
-    function schema_by_id_get($schema_id)
-    {
-        try{
-            $this->has_access($resource_='admin_metadata',$privilege='view');
-            $result=$this->Metadata_schema_model->select_single_by_id($schema_id);
-            
-            if (!$result){
-                throw new Exception("NOT FOUND");
-            }
-
-            if (!isset($result['schema'])){
-                throw new Exception("Schema definition is missing!");
-            }
-            
-            $output=array(
-				'status'=>'success',
-                'result'=>$result
-			);
-
-            $this->set_response($result, REST_Controller::HTTP_OK);		
-        }
-        catch(Exception $e){
-            $error_response=array(
-                'status'=>'error',
-                'message'=>$e->getMessage()
-            );
-            $this->set_response($error_response, REST_Controller::HTTP_BAD_REQUEST);
-        }
-    }
-
-
-
-    /**
-     * 
-     * 
-     * Get metadata (data) by project id and/or metadata type name
-     * 
-     * 
-     */
-    function data_get($project_id, $metadata_type_name=null)
+    function data_get($project_id, $admin_template_uid=null)
     {
         try{
             $project_id=$this->get_sid($project_id);
@@ -499,21 +130,38 @@ class Admin_metadata extends MY_REST_Controller
                 $output_format='raw';
             }
 
-            $metadata_type_id=null;
+            $template_id=null;
 
-            if ($metadata_type_name){
-                $metadata_type_id=$this->Metadata_type_model->get_id_by_name($metadata_type_name);
-                $this->editor_acl->user_has_metadata_type_access($metadata_type_id,$permission='view',$this->api_user);
-                $result=$this->Metadata_type_data_model->select_single($metadata_type_id,$project_id);
+            if ($admin_template_uid){
+                $template_id=$this->Editor_template_model->get_id_by_uid($admin_template_uid);
+
+                if (!$template_id){
+                    throw new Exception("Template not found: " . $template_uid);
+                }
+                
+                $this->editor_acl->user_has_admin_metadata_access($template_id,$permission='view',$this->api_user);
+                $result=$this->Admin_metadata_model->select_single($template_id,$project_id);
+                
+                if ($output_format=='metadata'){
+                    if (isset($result['metadata'])){
+                        $result=$result['metadata'];
+                    }
+                }
+
             }else{
-                $result=$this->Metadata_type_data_model->get_project_metadata($project_id, $metadata_type_id, $output_format, $this->api_user->id);
+                $result=$this->Admin_metadata_model->get_project_metadata($project_id, $template_id, $output_format, $this->api_user->id);
             }
             
             if (!$result){
-                throw new Exception("NO Metadata found");
+                throw new Exception("NO_METADATA_FOUND");
             }
 
-            $this->set_response($result, REST_Controller::HTTP_OK);
+            $response=array(
+                'status'=>'success',
+                'data'=>$result
+            );
+
+            $this->set_response($response, REST_Controller::HTTP_OK);
         }
         catch(Exception $e){
             $error_response=array(
@@ -536,8 +184,8 @@ class Admin_metadata extends MY_REST_Controller
                 throw new Exception("Project ID is required");
             }
 
-            if (!isset($options['metadata_type_name'])){
-                throw new Exception("Metadata type name 'metadata_type_name'  is required");
+            if (!isset($options['template_uid'])){
+                throw new Exception("Template UID is required");
             }
 
             $project_id=$this->get_sid($options['project_id']);
@@ -546,15 +194,20 @@ class Admin_metadata extends MY_REST_Controller
                 throw new Exception("Project not found");
             }
 
-            $metadata_type_id=$this->Metadata_type_model->get_id_by_name($options['metadata_type_name']);
-            $this->editor_acl->user_has_metadata_type_access($metadata_type_id,$permission='edit',$this->api_user);
+            $template_id=$this->Editor_template_model->get_id_by_uid($options['template_uid']);
+
+            if (!$template_id){
+                throw new Exception("Template not found: " . $template_uid);
+            }
+
+            //$this->editor_acl->user_has_metadata_type_access($metadata_type_id,$permission='edit',$this->api_user);
 
             //metadata
             if (!isset($options['metadata'])){
                 throw new Exception("Metadata is missing!");
             }
 
-			$result=$this->Metadata_type_data_model->upsert($metadata_type_id, $project_id,$options);
+			$result=$this->Admin_metadata_model->upsert($template_id, $project_id,$options);
 
 			$output=array(
 				'status'=>'success',
@@ -583,8 +236,8 @@ class Admin_metadata extends MY_REST_Controller
                 throw new Exception("Project ID is required");
             }
 
-            if (!isset($options['metadata_type_name'])){
-                throw new Exception("Metadata type name 'metadata_type_name'  is required");
+            if (!isset($options['template_uid'])){
+                throw new Exception("Template UID is required");
             }
 
             $project_id=$this->get_sid($options['project_id']);
@@ -593,9 +246,13 @@ class Admin_metadata extends MY_REST_Controller
                 throw new Exception("Project not found");
             }
 
-            $metadata_type_id=$this->Metadata_type_model->get_id_by_name($options['metadata_type_name']);
+            $template_id=$this->Editor_template_model->get_id_by_uid($options['template_uid']);
 
-			$result=$this->Metadata_type_data_model->delete($metadata_type_id, $project_id);            
+            if (!$template_id){
+                throw new Exception("Template not found: " . $template_uid);
+            }
+
+			$result=$this->Admin_metadata_model->delete($template_id, $project_id);            
 
 			$output=array(
 				'status'=>'success',
@@ -623,17 +280,17 @@ class Admin_metadata extends MY_REST_Controller
 	 * @options JSON array
 	 * [
 	 * 	{
-	 * 		"metadata_type_id": "metadata_type_id",
+	 * 		"template_uid": "template uid",
 	 * 		"user_id": "user id",
 	 * 		"permissions": "view|edit|admin"
 	 * 	}
 	 * ]
 	 * 
 	 */
-	function share_post()
+	function acl_post()
 	{		
 		try{
-			$this->has_access($resource_='admin_metadata',$privilege='admin');
+			$this->has_access($resource_='templates',$privilege='admin');
 			$options=$this->raw_json_input();
 
 			if (!is_array($options)){
@@ -641,12 +298,18 @@ class Admin_metadata extends MY_REST_Controller
 			}
 
 			foreach($options as $option){
-				if (!isset($option['metadata_type_id'])){
-					throw new Exception("Missing parameter: metadata_type_id");
+				if (!isset($option['template_uid'])){
+					throw new Exception("Missing parameter: template_uid");
 				}
 
+                $template_id=$this->Editor_template_model->get_id_by_uid($option['template_uid']);
+
+                if (!$template_id){
+                    throw new Exception("Template not found: " . $option['template_uid']);
+                }
+
 				//$this->editor_acl->user_has_metadata_type_access($option['metadata_type_id'],$permission='admin',$this->api_user);
-                $this->Metadata_type_acl_model->add_user($option['metadata_type_id'],$option['user_id'],$option['permissions']);
+                $this->Admin_metadata_acl_model->add_user($template_id,$option['user_id'],$option['permissions']);
 			}
 
 			$output=array(
@@ -665,16 +328,27 @@ class Admin_metadata extends MY_REST_Controller
 	}
 
 
-	function share_get($metadata_type_id=null)
+    /**
+     * 
+     * Return ACL for an admin template
+     * 
+     */
+	function acl_get($template_uid=null)
 	{
 		try{
-			$this->has_access($resource_='admin_metadata',$privilege='view');
+			$this->has_access($resource_='templates',$privilege='view');
 
-            if (!$metadata_type_id){
-                throw new Exception("Missing parameter: metadata_type_id");
+            if (!$template_uid){
+                throw new Exception("Missing parameter: template_uid");
             }
 
-			$result=$this->Metadata_type_acl_model->list_users($metadata_type_id);
+            $template_id=$this->Editor_template_model->get_id_by_uid($template_uid);
+
+            if (!$template_id){
+                throw new Exception("Template not found: " . $template_uid);
+            }
+
+			$result=$this->Admin_metadata_acl_model->list_users($template_id);
 				
 			$response=array(
 				'status'=>'success',
@@ -692,21 +366,33 @@ class Admin_metadata extends MY_REST_Controller
 	}
 
 
-	function remove_access_post()
+    /**
+     * 
+     * Remove user from ACL
+     * 
+     * 
+     */
+	function acl_remove_post()
 	{
 		try{
-            $this->has_access($resource_='admin_metadata',$privilege='admin');
+            $this->has_access($resource_='templates',$privilege='admin');
 			$options=$this->raw_json_input();
 
-			if (!isset($options['metadata_type_id'])){
-				throw new Exception("Missing parameter: metadata_type_id");
+			if (!isset($options['template_uid'])){
+				throw new Exception("Missing parameter: template_uid");
 			}
 
 			if (!isset($options['user_id'])){
 				throw new Exception("Missing parameter: user_id");
 			}
 
-            $result=$this->Metadata_type_acl_model->remove_user($options['metadata_type_id'],$options['user_id']);
+            $template_id=$this->Editor_template_model->get_id_by_uid($options['template_uid']);
+
+            if (!$template_id){
+                throw new Exception("Template not found: " . $template_uid);
+            }
+
+            $result=$this->Admin_metadata_acl_model->remove_user($template_id,$options['user_id']);
 
 			$output=array(
 				'status'=>'success',

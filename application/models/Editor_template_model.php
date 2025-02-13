@@ -289,6 +289,18 @@ class Editor_template_model extends ci_model {
 		if (isset($result['uid'])){
 			return true;
 		}
+
+		//check core templates
+		return $this->check_core_uid_exists($uid);
+	}
+
+	function check_core_uid_exists($uid)
+	{
+		foreach($this->core_templates as $template){
+			if ($template['uid']==$uid){
+				return true;
+			}
+		}
 		return false;
 	}
 
@@ -783,6 +795,86 @@ class Editor_template_model extends ci_model {
 			return $result['count'];
 		}
 		return 0;
+	}
+
+
+
+	function replace_uid($old_uid, $new_uid)
+	{
+		//check if old uid exists
+		if (!$this->check_uid_exists($old_uid)){
+			throw new Exception("Old UID not found: " .$old_uid);
+		}
+
+		//validate new uid
+		$this->validate_uid_format($new_uid);
+
+		//check if new uid exists
+		if ($this->check_uid_exists($new_uid)){
+			throw new Exception("New UID already exists: " .$new_uid);
+		}
+
+		$options=array(
+			'uid'=>$new_uid
+		);
+
+		$this->db->where('uid',$old_uid);
+		return $this->db->update('editor_templates',$options);
+	}
+
+
+	/**
+	 * 
+	 * 
+	 * Validate uid format
+	 * 
+	 *  - alphanumeric
+	 *  - between 3 and 32 characters
+	 *  - can contain dashes
+	 * 
+	 */
+	function validate_uid_format($uid)
+	{
+		if (!preg_match('/^[a-zA-Z0-9-]{3,32}$/', $uid)){
+			throw new Exception("Invalid UID format. Must be alphanumeric and between 3 and 32 characters");
+		}
+	}
+
+
+
+	/**
+	 * 
+	 * 
+	 * Get admin metadata templates [custom only]
+	 * 
+	 * 
+	 */
+	function get_admin_metadata_templates($template_uid=null)
+	{
+		$fields=array_diff($this->fields,["template"]);
+		$fields[]="'custom' as template_type";
+		$this->db->select($fields);
+		$this->db->order_by('name','ASC');
+		$this->db->order_by('changed','DESC');
+		$this->db->where("data_type","admin_meta");
+
+		if ($template_uid){
+			$this->db->where("uid",$template_uid);
+		}
+
+		$result= $this->db->get('editor_templates')->result_array();
+		return $result;
+	}
+
+	function get_admin_metadata_template($uid)
+	{
+		$template=$this->get_admin_metadata_templates($uid);
+
+		if (!$template){
+			throw new Exception("Template not found: " .$uid);
+		}
+
+		return $this->get_template_by_uid($uid);
 	}
     
 }

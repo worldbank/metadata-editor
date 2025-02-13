@@ -815,10 +815,10 @@ class Editor_acl
 
 	/**
 	 * 
-	 * Test user has access admin metadata
+	 * Test user has access to admin metadata
 	 * 
 	 */
-	function user_has_metadata_type_access($metadata_type_id,$permission=null,$user=null)
+	function user_has_admin_metadata_access($template_id,$permission=null,$user=null)
 	{
 		if (!$user){
 			$user=(object)$this->current_user();
@@ -828,23 +828,17 @@ class Editor_acl
 			throw new Exception("User not set");
 		}
 
-		//get acl for metadata type
-		$this->ci->load->model("Metadata_type_acl_model");
+		$this->ci->load->model("Admin_metadata_acl_model");
 
-		$result=$this->ci->Metadata_type_acl_model->get_user_permissions($metadata_type_id,$user->id);
+		//get permissions list [view, edit, admin]
+		$permissions=$this->ci->Admin_metadata_acl_model->get_user_permissions($template_id,$user->id);
 
-		if (!$result){
+		if (!$permissions){
 			throw new Exception("Access denied, you don't have permissions");
 		}
 
-		$user_permissions=[];
-		foreach($result as $row)
-		{
-			$user_permissions[]=$row['permissions'];
-		}
-
 		//test access
-		$has_access=$this->user_has_metadata_type_access_acl($user_permissions, $permission);
+		$has_access=$this->user_has_admin_metadata_access_acl($permissions, $permission);
 
 		if (!$has_access){
 			//throw new AclAccessDeniedException("Access denied, you don't have permissions");
@@ -861,7 +855,7 @@ class Editor_acl
 	 * @permission - permission - view, edit, admin
 	 * 
 	 */
-	private function user_has_metadata_type_access_acl($privileges,$permission)
+	private function user_has_admin_metadata_access_acl($privileges,$permission)
 	{
 		$acl = new Acl();
 
@@ -876,21 +870,21 @@ class Editor_acl
 		$acl->addRole(new Role('user-admin'), 'user-edit');
 
 		//add resources
-		$acl->addResource(new Resource('metadata_type'));
+		$acl->addResource(new Resource('admin_metadata'));
 
 		//allow access
-		$acl->allow('user-view','metadata_type',array('view'));
-		$acl->allow('user-edit','metadata_type',array('edit'));
-		$acl->allow('user-admin','metadata_type',array('admin'));
+		$acl->allow('user-view','admin_metadata',array('view'));
+		$acl->allow('user-edit','admin_metadata',array('edit'));
+		$acl->allow('user-admin','admin_metadata',array('admin'));
 		
 		//add access
 		foreach($privileges as $priv)
 		{
 			$role='user-'.$priv;
-			$acl->allow($role,'metadata_type',$privileges);
+			$acl->allow($role,'admin_metadata',$privileges);
 		}
 
-		if ($acl->isAllowed($role,'metadata_type',$permission) ){
+		if ($acl->isAllowed($role,'admin_metadata',$permission) ){
 			return true;
 		}
 

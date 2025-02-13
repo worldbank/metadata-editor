@@ -214,11 +214,14 @@
             echo $this->load->view("metadata_editor/vue-summary-collections-component.js", null, true);
             echo $this->load->view("metadata_editor/vue-textarea-latex-component.js", null, true);
             echo $this->load->view("metadata_editor/vue-project-history-component.js",null,true);
+
             echo $this->load->view("metadata_editor/vue-metadata-type-edit-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-metadata-types-component.js",null,true);
 
             echo $this->load->view("metadata_editor/vue-schema-array-field-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-schema-object-field-component.js",null,true);
+
+            echo $this->load->view("metadata_editor/vue-admin-metadata-edit-component.js",null,true);
 
         ?>
 
@@ -267,7 +270,9 @@
         const PagePreview ={template: '<div><page-preview/></div>'}
         const GeoGallery ={template: '<div><geospatial-gallery/></div>'}
         const ProjectHistory ={template: '<div><project-history/></div>'}
-        const MetadataTypeEditComp=VueMetadataTypeEdit;
+        
+        const AdminMetadataEdit= VueAdminMetadataEdit;
+        //const MetadataTypeEditComp=VueMetadataTypeEdit;
         const MetadataTypesComp =VueMetadataTypes;
 
         //routes
@@ -296,7 +301,8 @@
             { path: '/geospatial-gallery', component: GeoGallery, props: true },
             { path: '/change-log', component: ProjectHistory },
             { path: '/metadata-types', component: MetadataTypesComp, name:'metadata-types', props: true },
-            { path: '/metadata-types/:type_id', component: MetadataTypeEditComp, name:'metadata-type', props: true }
+            //{ path: '/metadata-types/:type_id', component: MetadataTypeEditComp, name:'metadata-type', props: true }
+            { path: '/metadata-types/:type_id', component: AdminMetadataEdit, name:'metadata-type', props: true }
 
         ]
 
@@ -625,7 +631,7 @@
                     });
                 },
                 async loadMetadataTypesList({commit},options) {
-                    let url=CI.base_url + '/api/admin-metadata/type_by_user';//+store.state.project_type;
+                    let url=CI.base_url + '/api/admin-metadata/templates';
                     return axios
                     .get(url)
                     .then(function (response) {

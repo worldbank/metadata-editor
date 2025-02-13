@@ -69,10 +69,17 @@ Vue.component('prop-edit', {
         },
     },
     methods:{
+      TemplateDataType(){
+        return this.$store.state.user_template_info.data_type;
+      },
+      isAdminMetaTemplate(){
+        return this.$store.state.user_template_info.data_type=='admin_meta';
+      },
       updatePropKey: function(e)
       {
         console.log("updating prop key", e);
         this.prop.key=e;
+        this.prop.prop_key=this.parent.key + '.' + e;
       },    
       isField: function(field_type){
         let field_types= [

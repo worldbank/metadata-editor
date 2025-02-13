@@ -409,3 +409,16 @@ $config['resource'][]=array(
     "description"=> "Modèle utilisé pour documenter les ressources externes. Ce modèle est utilisé en combinaison avec tous les autres standards\/schémas.",
 ); 
 
+
+$config['admin_meta'][]=array(
+    'template' => 'metadata_editor/metadata_editor_templates/admin_metadata_template.json',
+    "uid"=> "system-core-admin-meta",
+    "data_type"=> "admin_meta",
+    "lang"=> "EN",
+    "name"=> "Core administrative metadata template",
+    "version"=> "1.0.0",
+    "organization"=> "",
+    "author"=> "",
+    "description"=> "Base template for the documentation of administrative metadata.",
+); 
+

@@ -111,8 +111,7 @@
                     <v-tabs background-color="transparent" v-model="nav_tabs_model">
                         <v-tab @click="pageLink('projects')"><v-icon>mdi-text-box</v-icon> <a :href="site_base_url + '/editor'">{{$t("projects")}}</a></v-tab>
                         <v-tab @click="pageLink('collections')" active><v-icon>mdi-folder-text</v-icon> <a :href="site_base_url + '/collections'">{{$t("collections")}}</a> </v-tab>                        
-                        <v-tab @click="pageLink('templates')"><v-icon>mdi-alpha-t-box</v-icon> <a :href="site_base_url + '/templates'">{{$t("templates")}}</a></v-tab>
-                        <v-tab @click="pageLink('admin_meta')"><v-icon>mdi-table-column</v-icon> <a :href="site_base_url + '/admin_meta'">{{$t("administrative_metadata")}}</a></v-tab>
+                        <v-tab @click="pageLink('templates')"><v-icon>mdi-alpha-t-box</v-icon> <a :href="site_base_url + '/templates'">{{$t("templates")}}</a></v-tab>                        
                     </v-tabs>
 
                     <div class="justify-content-end">
@@ -161,7 +160,7 @@
                         </span>                        
                       </template>
                       <template v-slot:item.actions="{ item }">
-                        <v-icon @click="showMenu($event, item.uid, item.template_type=='core')">mdi-dots-vertical</v-icon>
+                        <v-icon @click="showMenu($event, item.uid, item.template_type=='core', item.data_type)">mdi-dots-vertical</v-icon>
                       </template>
                       <template v-slot:item.changed="{ item }">
                         <span  v-if="item.changed">{{momentDate(item.changed)}}</span>
@@ -295,26 +294,62 @@
             </v-list-item-icon>
             <v-list-item-title @click="pdfTemplate(menu_active_template_id)"><v-btn text> {{$t('pdf')}}</v-btn></v-list-item-title>
           </v-list-item>  
+          
           <v-list-item>
             <v-list-item-icon>
                 <v-icon>mdi-content-copy</v-icon>
             </v-list-item-icon>
             <v-list-item-title @click="viewTemplateRevisions(menu_active_template_id)"><v-btn text> {{$t('revisions')}}</v-btn></v-list-item-title>        
+          </v-list-item>
+
+          <v-list-item>
+            <v-list-item-icon>
+                <v-icon>mdi-key</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title @click="updateTemplateUUID(menu_active_template_id)"><v-btn text> {{$t('UUID')}}</v-btn></v-list-item-title>        
+          </v-list-item>
+
         </v-list>
       </v-menu>
     </template>
 
-    <vue-template-share :key="menu_active_template_id" v-if="menu_active_template_id && !isCoreTemplate(menu_active_template_id)" v-model="dialog_share_template" :template_id="menu_active_template_id"></vue-template-share>
-    <vue-template-revision-history :key="'r' +menu_active_template_id" v-if="menu_active_template_id && !isCoreTemplate(menu_active_template_id)" v-model="dialog_template_revision" :template_id="menu_active_template_id"></vue-template-revision-history>
+    <vue-template-share :key="menu_active_template_id" 
+        v-if="menu_active_template_id && !isCoreTemplate(menu_active_template_id)" 
+        v-model="dialog_share_template" 
+        :template_id="menu_active_template_id">
+      </vue-template-share>
+    <vue-template-acl :key="menu_active_template_id + Math.random()"
+        v-if="menu_active_template_id && !isCoreTemplate(menu_active_template_id)" 
+        v-model="dialog_acl_template" 
+        :template_id="menu_active_template_id">
+    </vue-template-acl>
+    <vue-template-revision-history 
+        :key="'r' +menu_active_template_id" 
+        v-if="menu_active_template_id && !isCoreTemplate(menu_active_template_id)" 
+        v-model="dialog_template_revision" 
+        :template_id="menu_active_template_id"
+      ></vue-template-revision-history>
+
+    <vue-template-uuid :key="'uuid' + menu_active_template_id" 
+        v-if="menu_active_template_id && !isCoreTemplate(menu_active_template_id)" 
+        v-model="dialog_uuid_template" 
+        :template_id="menu_active_template_id"
+        v-on:update-uuid="loadTemplates"
+      ></vue-template-uuid>
 
   </div>
 
   <script>
   
     
-    <?php echo include_once("vue-template-revision-history.js"); ?>
+    <?php include_once("vue-template-revision-history.js"); ?>
 
-    <?php echo include_once("vue-template-share-component.js"); ?>
+    <?php include_once("vue-template-share-component.js"); ?>
+    <?php include_once("vue-template-share-common-component.js"); ?>
+    <?php include_once("vue-template-acl-common-component.js"); ?>
+    <?php include_once("vue-template-acl-component.js"); ?>
+    <?php include_once("vue-template-uuid-component.js"); ?>
+    
   
 
     const translation_messages = {
@@ -369,7 +404,9 @@
         pagination_page: 1,
         dialog_create_project: false,
         dialog_share_template:false,
+        dialog_acl_template:false,
         dialog_template_revision:false,
+        dialog_uuid_template:false,
         search_keywords: '',
         project_types_icons: {
           "document": "fa fa-file-code",
@@ -381,7 +418,8 @@
           "image": "fa fa-image",
           "video": "fa fa-video",
           "script": "fa fa-file-code",
-          "resource": "fas fa-th-large"
+          "resource": "fas fa-th-large",
+          "admin_meta": "fa fa-table"
         },
         dialog_import_template: false,
         template_import_errors:[],
@@ -393,6 +431,7 @@
         menu_y: 0,
         menu_active_template_id: null,
         menu_active_template_core: false,
+        menu_active_template_data_type:'',
         nav_tabs_active:2,
         nav_tabs_model:2,
         sidebar_data_types: [
@@ -435,6 +474,10 @@
           {
             title: 'External Resources',
             data_type: 'resource'
+          },
+          {
+            title: 'Administrative Metadata',
+            data_type: 'admin_meta'
           }
         ],
         sidebar_selected: ''
@@ -457,10 +500,18 @@
       },
       watch: {},
       methods: {
+        updateTemplateUUID(uid){
+          this.dialog_uuid_template=true;
+        },
         viewTemplateRevisions(uid){
           this.dialog_template_revision=true;
         },
-        shareTemplate(uid){          
+        shareTemplate(uid){
+          if (this.menu_active_template_data_type=='admin_meta'){
+            this.dialog_acl_template=true;
+            return;
+          }
+
           this.dialog_share_template=true;
         },        
         getTemplateEditLink: function(template) {
@@ -476,14 +527,15 @@
         pageLink: function(page){
           window.location.href = CI.base_url + '/'+page;
         },
-        showMenu (e, templateId, isCore=false) {
+        showMenu (e, templateId, isCore=false, templateDataType='') {
           e.preventDefault()
           this.showTemplateMenu = false
           this.menu_x = e.clientX
           this.menu_y = e.clientY
           this.menu_active_template_id = templateId
           this.menu_active_template_core = isCore
-          console.log("showMenu", e.clientX, e.clientY, templateId, isCore);
+          this.menu_active_template_data_type=templateDataType
+          console.log("showMenu", e.clientX, e.clientY, templateId, isCore, templateDataType);
           this.$nextTick(() => {
             this.showTemplateMenu = true
           })
@@ -500,7 +552,8 @@
             "table": this.$t("table"),
             "image": this.$t("image"),
             "video": this.$t("video"),
-            "resource": this.$t("external-resources")
+            "resource": this.$t("external-resources"),
+            "admin_meta": this.$t("administrative_metadata")
           }
         },
         momentDate(date) {

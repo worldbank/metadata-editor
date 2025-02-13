@@ -24,6 +24,12 @@ Vue.component('props-treeview', {
       this.active_prop={};
     },    
     computed: {
+        TemplateDataType(){
+          return this.$store.state.user_template_info.data_type;
+        },
+        isAdminMetaTemplate(){
+          return this.$store.state.user_template_info.data_type=='admin_meta';
+        },
         Items:{           
             get(){
               return this.value;
@@ -578,7 +584,7 @@ Vue.component('props-treeview', {
                     </div>
 
                     <!--additional -->
-                    <div class="mt-5" v-if="IsAdditonalField">
+                    <div class="mt-5" v-if="IsAdditonalField || isAdminMetaTemplate">
                       <v-icon title="Add custom field" class="additional-item" @click="addAdditionalField()">mdi-text-box-plus-outline</v-icon>
                       <v-icon title="Add custom field" class="additional-item" @click="addAdditionalFieldArray()">mdi-table-large-plus</v-icon>
                       <v-icon title="Add custom NestedArray field" class="additional-item" @click="addAdditionalFieldNestedArray()">mdi-file-tree</v-icon>

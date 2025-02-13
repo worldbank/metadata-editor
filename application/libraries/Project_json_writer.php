@@ -148,7 +148,7 @@ class Project_json_writer
 		}
 
 		if (isset($options['admin_metadata']) && $options['admin_metadata']==1){
-			$this->ci->load->model("Metadata_type_data_model");
+			$this->ci->load->model("Admin_metadata_model");
 			
 			$user_id=null;
 			if(isset($options['user_id'])){
@@ -158,7 +158,7 @@ class Project_json_writer
 				$user_id=-1;				
 			}
 
-			$metadata['admin_metadata']=$this->ci->Metadata_type_data_model->get_project_metadata($sid, $metadata_type_id=null, $output_format='', $user_id);
+			$metadata['admin_metadata']=$this->ci->Admin_metadata_model->get_project_metadata($sid, $metadata_type_id=null, $output_format='', $user_id);
 		}
 
 		array_remove_empty($metadata);

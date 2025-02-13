@@ -64,7 +64,6 @@
         let sid='<?php echo $sid;?>';
         let form_template=<?php echo $metadata_template;?>;
         let form_template_parts= <?php echo json_encode($template_parts,JSON_PRETTY_PRINT); ?>;
-        //let metadata_schema=<?php //echo $metadata_schema;?>;        
     </script>
 
   <div id="app" data-app>
@@ -167,7 +166,6 @@
           dataset_idno:project_idno,
           dataset_type:project_type,
           //form_template: form_template,
-          //metadata_schema: metadata_schema,
           is_loading:false,
           is_dirty:false,//form data has been modified
           vuex_is_loaded:false,
@@ -344,11 +342,11 @@
           for (let metadata_type of metadata_types) {
             metadata_types_nodes.push(
               {
-                title: metadata_type.title,
+                title: metadata_type.name,
                 type:'metadata-type',
                 index:metadata_type.id,
                 file: 'file',
-                key:'metadata-types/'+metadata_type.name,
+                key:'metadata-types/'+metadata_type.id,
                 metadata_type:  metadata_type
               }
             );
@@ -921,7 +919,7 @@
           }
 
           if (node.type=='metadata-type'){
-            router.push('/metadata-types/'+node.metadata_type.name);
+            router.push('/metadata-types/'+node.metadata_type.uid);
             return;
           }
 

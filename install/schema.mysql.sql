@@ -1836,52 +1836,9 @@ CREATE TABLE `editor_collections_tree` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1;
 
 
-CREATE TABLE `metadata_schemas` (
+CREATE TABLE `admin_metadata` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `agency` varchar(200) DEFAULT NULL,
-  `name` varchar(200) DEFAULT NULL,
-  `version` varchar(100) DEFAULT NULL,
-  `title` varchar(100) DEFAULT NULL,
-  `description` varchar(300) DEFAULT NULL,
-  `schema` json DEFAULT NULL,
-  `created_by` int DEFAULT NULL,
-  `changed_by` int DEFAULT NULL,
-  `created` int DEFAULT NULL,
-  `changed` int DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `unq_id` (`agency`,`name`,`version`)
-) ENGINE=InnoDB AUTO_INCREMENT=1;
-
-
-CREATE TABLE `metadata_types` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(200) DEFAULT NULL,
-  `type` varchar(100) DEFAULT NULL,
-  `title` varchar(300) DEFAULT NULL,
-  `description` varchar(500) DEFAULT NULL,
-  `schema_id` int NOT NULL,
-  `created_by` int DEFAULT NULL,
-  `changed_by` int DEFAULT NULL,
-  `created` int DEFAULT NULL,
-  `changed` int DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1;
-
-CREATE TABLE `metadata_types_acl` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `metadata_type_id` int NOT NULL,
-  `permissions` varchar(100) DEFAULT NULL,
-  `user_id` int NOT NULL,
-  `created` int DEFAULT NULL,
-  `changed` int DEFAULT NULL,
-  `created_by` int DEFAULT NULL,
-  `changed_by` int DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1;
-
-CREATE TABLE `metadata_types_data` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `metadata_type_id` int DEFAULT NULL,
+  `template_uid` int DEFAULT NULL,
   `sid` int DEFAULT NULL,
   `metadata` json DEFAULT NULL,
   `created_by` int DEFAULT NULL,
@@ -1889,8 +1846,8 @@ CREATE TABLE `metadata_types_data` (
   `created` int DEFAULT NULL,
   `changed` int DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `meta_unq` (`metadata_type_id`,`sid`)
-) ENGINE=InnoDB AUTO_INCREMENT=1;
+  UNIQUE KEY `meta_unq` (`template_uid`,`sid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
 
