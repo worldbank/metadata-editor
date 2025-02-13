@@ -1838,7 +1838,7 @@ CREATE TABLE `editor_collections_tree` (
 
 CREATE TABLE `admin_metadata` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `template_uid` int DEFAULT NULL,
+  `template_id` int DEFAULT NULL,
   `sid` int DEFAULT NULL,
   `metadata` json DEFAULT NULL,
   `created_by` int DEFAULT NULL,
@@ -1846,10 +1846,14 @@ CREATE TABLE `admin_metadata` (
   `created` int DEFAULT NULL,
   `changed` int DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `meta_unq` (`template_uid`,`sid`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  UNIQUE KEY `meta_unq` (`template_id`,`sid`)
+) ENGINE=InnoDB AUTO_INCREMENT=1;
 
-
-
-
-
+CREATE TABLE `admin_metadata_acl` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `template_id` int NOT NULL,
+  `permissions` varchar(100) DEFAULT NULL,
+  `user_id` int NOT NULL,
+  `created` int DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1;
