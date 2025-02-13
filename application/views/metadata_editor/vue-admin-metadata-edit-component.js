@@ -27,24 +27,20 @@ const VueAdminMetadataEdit = Vue.component('admin-metadata-edit', {
             deep: true
         }
     },
-    methods: {
-        localValue: function(key)
-        {
-            return _.get(this.metadata_model,key);            
+    methods: {        
+        localValue: function(key){
+            return _.get(this.metadata_model,key);
         },
-        updateSection: function (obj)
-        {
-            if (obj.key.indexOf(".") !== -1 && this.metadata_model[obj.key]){
-                delete this.metadata_model[obj.key];
-            }
-            Vue.set(this.metadata_model,obj.key,obj.value);
-        },
-        update: function (key, value)
-        {
+        update: function (key, value){
             if (key.indexOf(".") !== -1 && this.metadata_model[key]){
                 delete this.metadata_model[key];
             }
-            Vue.set(this.metadata_model,key,value);            
+
+            _.set(this.metadata_model,key,value);
+            this.metadata_model= _.cloneDeep(this.metadata_model);//need this to trigger reactivity
+        },
+        updateSection: function (obj){
+            this.update(obj.key,obj.value);
         },
         findTemplateByItemKey: function (items,key){
             let item=null;
