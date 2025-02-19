@@ -174,7 +174,7 @@ Vue.component('vue-template-share-common', {
         <div class="vue-project-share-common">
 
         <template>        
-            <div class="text-center">
+            <div>
 
                 <v-card>
                     <v-card-title class="text-h5 grey lighten-2">
