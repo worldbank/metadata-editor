@@ -121,10 +121,17 @@ Vue.component('table-grid-component', {
             }
             this.$emit('input', JSON.parse(JSON.stringify(this.local))); 
         },
-        update: function (index, key, value)
+        update: function (index, key, value, column_data_type='text')
         {
             if (Array.isArray(this.local[index])){
                 this.local[index] = {};
+            }
+
+            if (column_data_type=='number' || column_data_type=='integer'){
+                let value_=Number(value);
+                if (String(value_)==value){
+                    value=value_;
+                }
             }
 
             this.local[index][key] = value;
@@ -152,6 +159,18 @@ Vue.component('table-grid-component', {
             }else{
                 return column.name
             }
+        },
+        columnDataType: function(column)
+        {
+            if (!column.type){
+                return 'text';
+            }
+
+            if (column.type=='integer' || column.type=='number'){
+                return 'number';
+            }
+
+            return 'text';
         },
         copyTsv: function()
         {
@@ -415,7 +434,7 @@ Vue.component('table-grid-component', {
                         <div v-else>
                             <input type="text"
                                 :value="local[index][column.key]"
-                                @input="update(index,column.key, $event.target.value)"
+                                @input="update(index,column.key, $event.target.value, column.type)"
                                 class="form-control form-control-sm"
                                 :disabled="isFieldReadOnly"
                             >
