@@ -3,31 +3,10 @@ Vue.component('vue-dialog-admin-metadata-component', {
     props:['value'],
     data() {
         return {            
-            //admin_metadata_templates:[],
             errors: '',
         }
     }, 
-    mounted: function () {
-        //this.loadAdminMetadataTemplates();
-    },      
     methods: {
-        /*loadAdminMetadataTemplates: async function(){
-            await store.dispatch('loadAdminMetadataTemplates',{});
-        },*/
-        /*loadAdminMetadataTemplates: function(){
-            vm=this;
-            let url=CI.base_url + '/api/admin-metadata/templates_by_project/' + this.ProjectID;
-            axios.get( url
-            ).then(function(response){
-                console.log("MetadataType",response.data);
-                vm.admin_metadata_templates=response.data;
-            })
-            .catch(function(response){
-                vm.errors=response;
-                //alert("Failed: " + vm.erorrMessageToText(response));
-                console.log("failed", response);
-            });            
-        },*/
         enableAdminMetadata: function(template_uid){
             vm=this;            
             let url=CI.base_url + '/api/admin-metadata/attach/';
@@ -38,7 +17,7 @@ Vue.component('vue-dialog-admin-metadata-component', {
             
             axios.post( url, json_data
             ).then(function(response){
-                alert("Metadata enabled");
+                
             })
             .catch(function(response){
                 vm.errors=response;
@@ -54,7 +33,7 @@ Vue.component('vue-dialog-admin-metadata-component', {
             };
             axios.post( url, json_data
             ).then(function(response){
-                alert("Metadata removed");
+                
             })
             .catch(function(response){
                 vm.errors=response;

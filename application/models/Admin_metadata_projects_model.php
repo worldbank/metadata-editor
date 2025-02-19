@@ -101,6 +101,7 @@ CREATE TABLE `admin_metadata_projects` (
     {
         $this->db->select('sid');
         $this->db->where('sid',$sid);
+        $this->db->where('template_id',$template_id);
         $result=$this->db->get('admin_metadata_projects')->result_array();
         return count($result)>0;
     }

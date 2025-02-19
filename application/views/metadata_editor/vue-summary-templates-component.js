@@ -139,9 +139,7 @@ Vue.component('summary-templates-component', {
                             </div>
                         </div>
                         
-                       
-                        
-                        <vue-dialog-admin-metadata-component :key="Math.random()" v-model="dialog_admin_metadata" v-on:dialog-close="loadAdminMetadataTemplates" ></vue-dialog-admin-metadata-component>
+                        <vue-dialog-admin-metadata-component v-model="dialog_admin_metadata" v-on:dialog-close="loadAdminMetadataTemplates" ></vue-dialog-admin-metadata-component>
                         <!--end admin metadata-->
 
                     </v-card-text>
