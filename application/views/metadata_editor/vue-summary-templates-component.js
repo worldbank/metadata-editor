@@ -6,8 +6,7 @@ Vue.component('summary-templates-component', {
           dialog_template:false,
           template_idx:-1,
           template_updating:false,
-          dialog_admin_metadata:false,
-          admin_metadata_templates:[],
+          dialog_admin_metadata:false
         }
       },
     mounted: function(){
@@ -61,11 +60,8 @@ Vue.component('summary-templates-component', {
             return this.$store.state.formData;
         },
         AdminMetadataTemplates(){
-            if (this.admin_metadata_templates && this.admin_metadata_templates.result){
-                return this.admin_metadata_templates.result;
-            }
-            return [];
-        },        
+            return this.$store.getters.getAdminMetadataTemplates;   
+        }
     },
     methods:{        
         momentDate(date) {
@@ -104,19 +100,8 @@ Vue.component('summary-templates-component', {
         loadTemplates: async function(){
             await store.dispatch('loadTemplatesList',{});
         },
-        loadAdminMetadataTemplates: function(){
-            vm=this;                        
-            let url=CI.base_url + '/api/admin-metadata/templates_by_project/' + this.ProjectID;
-            axios.get( url
-            ).then(function(response){
-                console.log("loadAdminMetadataTemplates",response.data);
-                vm.admin_metadata_templates=response.data;
-            })
-            .catch(function(response){
-                vm.errors=response;
-                //alert("Failed: " + vm.erorrMessageToText(response));
-                console.log("failed", response);
-            });            
+        loadAdminMetadataTemplates: async function(){
+            await store.dispatch('loadAdminMetadataTemplates',{});
         },
     },     
     template: `

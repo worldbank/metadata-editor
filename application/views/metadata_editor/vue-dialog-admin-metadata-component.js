@@ -3,15 +3,18 @@ Vue.component('vue-dialog-admin-metadata-component', {
     props:['value'],
     data() {
         return {            
-            admin_metadata_templates:[],
+            //admin_metadata_templates:[],
             errors: '',
         }
     }, 
     mounted: function () {
-        this.loadAdminMetadataTemplates();
+        //this.loadAdminMetadataTemplates();
     },      
     methods: {
-        loadAdminMetadataTemplates: function(){
+        /*loadAdminMetadataTemplates: async function(){
+            await store.dispatch('loadAdminMetadataTemplates',{});
+        },*/
+        /*loadAdminMetadataTemplates: function(){
             vm=this;
             let url=CI.base_url + '/api/admin-metadata/templates_by_project/' + this.ProjectID;
             axios.get( url
@@ -24,7 +27,7 @@ Vue.component('vue-dialog-admin-metadata-component', {
                 //alert("Failed: " + vm.erorrMessageToText(response));
                 console.log("failed", response);
             });            
-        },
+        },*/
         enableAdminMetadata: function(template_uid){
             vm=this;            
             let url=CI.base_url + '/api/admin-metadata/attach/';
@@ -67,7 +70,6 @@ Vue.component('vue-dialog-admin-metadata-component', {
             }
         },
         dialogClose: function(){
-            //emit
             this.$emit('dialog-close', true);
             this.dialog=false;
         },
@@ -88,20 +90,8 @@ Vue.component('vue-dialog-admin-metadata-component', {
             return this.$store.state.idno;
         },
         AdminMetadataTemplates(){
-            if (this.admin_metadata_templates && this.admin_metadata_templates.result){
-                //loop result and add field 'is_active' if `is_enabled` or 'has_data' is true
-                let result=this.admin_metadata_templates.result;
-                for (let i=0; i<result.length; i++){
-                    let template=result[i];
-                    if (template.is_enabled || template.has_data){
-                        template.is_active=true;
-                    }
-                }
-                return result;
-            }
-
-            return [];
-        },
+            return this.$store.getters.getAdminMetadataTemplates;
+        }        
     },
     template: `
         <div class="vue-dialog-component">

@@ -414,7 +414,10 @@
                 getProjectType(state){
                     return state.project_type;
                 },
-                getMetadataTypes(state){
+                getMetadataTypes(state){//todo remove
+                    return state.metadata_types;
+                },
+                getAdminMetadataTemplates(state){
                     return state.metadata_types;
                 },
                 getProjectTemplate(state){
@@ -631,6 +634,9 @@
                     .catch(function (error) {
                         console.log("external resource loading error",error);
                     });
+                },
+                async loadAdminMetadataTemplates({commit}, options){
+                    store.dispatch('loadMetadataTypesList');
                 },
                 async loadMetadataTypesList({commit},options) {
                     let url=CI.base_url + '/api/admin-metadata/templates_by_project/'+store.state.project_id;

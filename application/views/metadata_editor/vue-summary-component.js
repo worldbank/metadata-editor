@@ -10,15 +10,12 @@ Vue.component('summary-component', {
           project_disk_usage:{},
           project_validation:[],
           dialog_admin_metadata:false,
-          //admin_metadata_templates:[],
+          admin_metadata_templates:[],
         }
       },
     created: function(){      
         this.getProjectEditStats();
         this.getProjectDiskUsage();        
-    },
-    mounted: function(){
-        //this.loadAdminMetadataTemplates();
     },
     computed: {
         isProjectEditable(){
@@ -124,21 +121,7 @@ Vue.component('summary-component', {
                 });
 
             });
-        },
-        loadAdminMetadataTemplates: function(){
-            vm=this;                        
-            let url=CI.base_url + '/api/admin-metadata/templates_by_project/' + this.ProjectID;
-            axios.get( url
-            ).then(function(response){
-                console.log("MetadataType",response.data);
-                vm.admin_metadata_templates=response.data;
-            })
-            .catch(function(response){
-                vm.errors=response;
-                //alert("Failed: " + vm.erorrMessageToText(response));
-                console.log("failed", response);
-            });            
-        },
+        }
     },     
     template: `
             <div class="summary-component mt-3 container-fluid">
@@ -203,7 +186,7 @@ Vue.component('summary-component', {
                     </div>
 
                     <div class="col-6">
-                        <div>
+                        <div>                        
                             <summary-templates-component :key="Math.random()" ></summary-templates-component>
                         </div>
 
