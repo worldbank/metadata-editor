@@ -115,4 +115,12 @@ CREATE TABLE `admin_metadata_acl` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1;
 
+# 2025/02/15
+CREATE TABLE `admin_metadata_projects` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `sid` int DEFAULT NULL,
+  `template_id` int DEFAULT NULL,
+  PRIMARY KEY (`id`)
+);
+
 

@@ -225,11 +225,15 @@ Vue.component('template-validation-component', {
     template: `
             <div class="summary-template-validation-component">
 
-                    <div class="d-flex justify-space-between">
-                        <h5>{{$t("project_validation")}}</h5>
-                        <v-btn title="Re-run validation" icon @click="projectValidationReport"><v-icon small>mdi-refresh</v-icon></v-btn>        
-                    </div>
+                <v-card>
+                    <v-card-title class="d-flex justify-space-between">
+                        <h6>{{$t("project_validation")}}</h6>
+                        <v-btn title="Re-run validation" icon @click="projectValidationReport">
+                            <v-icon small>mdi-refresh</v-icon>
+                        </v-btn>
+                    </v-card-title>
                     
+                    <v-card-text>
                     <div style="overflow:auto;max-height:400px;">
 
                     <div>{{$t("Schema validation")}} <v-icon small :title="$t('Requires project to be saved')" >mdi-information-outline</v-icon></div>
@@ -285,6 +289,8 @@ Vue.component('template-validation-component', {
                     <div v-if="TemplateValidationErrors.length==0" class="p-2 border" style="color:green">{{$t("no_validation_errors")}}</div>
 
                     </div>
+                    </v-card-text>
+                </v-card>
             </div>          
             `    
 });

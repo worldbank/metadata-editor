@@ -128,6 +128,8 @@ $lang['Replace file']="Replace file";
 $lang['File manager']="File manager";
 
 $lang['administrative_metadata']="Administrative metadata";
+$lang['administrative_metadata_templates']="Administrative metadata templates";
+
 
 /* End of file general_lang.php */
 /* Location: ./application/language/base/general_lang.php */

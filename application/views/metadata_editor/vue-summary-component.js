@@ -8,12 +8,17 @@ Vue.component('summary-component', {
           template_updating:false,
           project_edit_stats:{},
           project_disk_usage:{},
-          project_validation:[]
+          project_validation:[],
+          dialog_admin_metadata:false,
+          //admin_metadata_templates:[],
         }
       },
     created: function(){      
         this.getProjectEditStats();
         this.getProjectDiskUsage();        
+    },
+    mounted: function(){
+        //this.loadAdminMetadataTemplates();
     },
     computed: {
         isProjectEditable(){
@@ -61,13 +66,10 @@ Vue.component('summary-component', {
         },
         ProjectMetadata(){
             return this.$store.state.formData;
-        }
+        }        
     },
     methods:{        
         momentDate(date) {
-            //gmt to utc
-            //let utc_date = moment(date, "YYYY-MM-DD HH:mm:ss").toDate();
-            //return moment.utc(utc_date).local().format("YYYY-MM-DD HH:mm:ss");
             return moment.utc(date).local().format("YYYY-MM-DD HH:mm:ss");
           },
         getProjectEditStats: function() {
@@ -123,9 +125,20 @@ Vue.component('summary-component', {
 
             });
         },
-        loadTemplates: async function(){
-            await store.dispatch('loadTemplatesList',{});
-        }
+        loadAdminMetadataTemplates: function(){
+            vm=this;                        
+            let url=CI.base_url + '/api/admin-metadata/templates_by_project/' + this.ProjectID;
+            axios.get( url
+            ).then(function(response){
+                console.log("MetadataType",response.data);
+                vm.admin_metadata_templates=response.data;
+            })
+            .catch(function(response){
+                vm.errors=response;
+                //alert("Failed: " + vm.erorrMessageToText(response));
+                console.log("failed", response);
+            });            
+        },
     },     
     template: `
             <div class="summary-component mt-3 container-fluid">
@@ -143,17 +156,6 @@ Vue.component('summary-component', {
                             <div class="col-9" >
                             
                             <!-- project info -->
-
-                            <div class="col-12 bg-light mb-3" >
-                                <div>
-                                    <div class="mt-1">
-                                        <v-btn text color="primary" @click="loadTemplates();dialog_template=true" :disabled="!isProjectEditable">
-                                            {{ProjectTemplate.name}} - {{ProjectTemplate.version}}
-                                        </v-btn>
-                                    </div>
-                                </div>
-                            </div>
-
                             <div class="project-info-container row">
                                 <div class="col-6">
 
@@ -201,11 +203,13 @@ Vue.component('summary-component', {
                     </div>
 
                     <div class="col-6">
-                        <v-card class="project-validation-container">
-                            <v-card-text>
-                                <template-validation-component></template-validation-component>
-                            </v-card-text>
-                        </v-card>                        
+                        <div>
+                            <summary-templates-component :key="Math.random()" ></summary-templates-component>
+                        </div>
+
+                        <div class="project-validation-container">                            
+                            <template-validation-component></template-validation-component>                            
+                        </div>
                     </div>
 
                     <div class="col-6" >
@@ -221,9 +225,11 @@ Vue.component('summary-component', {
                         </div>
                 
                         <v-card>
+                            <v-card-title>
+                                <h6>{{$t("Data and Documentation")}}</h6>
+                            </v-card-title>
                             <v-card-text>
-                                <div class="d-flex justify-content-between">
-                                    <h6>{{$t("Data and Documentation")}}</h6>
+                                <div class="d-flex justify-content-between">                                    
                                     <div v-if="project_disk_usage.size_formatted">
                                         <span>{{$t("Disk usage")}} </span>
                                         <span class="success--text ml-2">{{project_disk_usage.size_formatted}}</span>
@@ -234,6 +240,7 @@ Vue.component('summary-component', {
                                 </div>
                             </v-card-text>
                         </v-card>
+                        
                     </div>
 
                 </div>

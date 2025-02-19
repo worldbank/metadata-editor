@@ -222,6 +222,8 @@
             echo $this->load->view("metadata_editor/vue-schema-object-field-component.js",null,true);
 
             echo $this->load->view("metadata_editor/vue-admin-metadata-edit-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-dialog-admin-metadata-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-summary-templates-component.js",null,true);
 
         ?>
 
@@ -260,7 +262,7 @@
         const VariableGroups ={template: '<div><variable-groups /> </div>'}
         //const ResourcesComp ={props: ['index'],template: '<div><external-resources /></div>'}
         const ResourcesComp =VueExternalResources;
-        const FileManager ={props: ['index'],template: '<div><file-manager /></div>'}
+        const FileManager ={props: ['index'],template: '<div class="m-2 mt-5 pt-5 "><file-manager /></div>'}
         const ResourcesImport ={template: '<div> <external-resources-import /></div>'}
         //const ResourcesEditComp ={props: ['index'],template: '<div><external-resources-edit /></div>'}
         const ResourcesEditComp =VueExternalResourcesEdit;
@@ -631,7 +633,7 @@
                     });
                 },
                 async loadMetadataTypesList({commit},options) {
-                    let url=CI.base_url + '/api/admin-metadata/templates';
+                    let url=CI.base_url + '/api/admin-metadata/templates_by_project/'+store.state.project_id;
                     return axios
                     .get(url)
                     .then(function (response) {

@@ -114,16 +114,15 @@ Vue.component('vue-summary-collections', {
         
         <div class="component-container">
 
-            <v-card>                        
-            <v-card-text>
-
-                <div class="d-flex justify-space-between">
-
+            <v-card>
+                <v-card-title class="d-flex justify-space-between">
                     <h6>{{$t("Collections")}}</h6>
                     <v-btn icon @click="addProjectToCollection">
                         <v-icon>mdi-folder-plus</v-icon>
                     </v-btn>
-                </div>
+                </v-card-title>
+
+            <v-card-text>
 
                 <div v-if="project_collections.length==0" class="text-muted text-secondary">
                     {{$t("None")}}

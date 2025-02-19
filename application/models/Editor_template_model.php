@@ -427,18 +427,28 @@ class Editor_template_model extends ci_model {
 	{
 		$template_options=array();
 
+		$remove_fields=array(
+			"id",
+			"owner_id",
+			"is_private",
+			"is_published",
+			"is_deleted",
+			"deleted_by",
+			"deleted_at"
+		);
+
 		if (isset($options['result']['template'])){
 			$options=$options['result'];
 		}
 
 		foreach($options as $key=>$value){
-			if (in_array($key,$this->fields)){
+			if (in_array($key,$this->fields) && !in_array($key,$remove_fields)){
 				$template_options[$key]=$value;
 			}
 		}
 
-		if (isset($template_options['id'])){
-			unset($template_options["id"]);
+		if (!isset($template_options['owner_id'])){
+			$template_options['owner_id']=$template_options['created_by'];
 		}
 
 		if (!isset($template_options['data_type'])){

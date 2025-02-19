@@ -22,7 +22,8 @@ const VueMetadataTypes = Vue.component('metadata-types', {
 
        loadMetadataTypes: function(){
             vm=this;
-            let url=CI.base_url + '/api/admin-metadata/templates/';
+            //let url=CI.base_url + '/api/admin-metadata/templates/';
+            let url=CI.base_url + '/api/admin-metadata/templates_by_project/' + this.ProjectID;
             axios.get( url
             ).then(function(response){
                 console.log("MetadataType",response.data);
@@ -106,7 +107,7 @@ const VueMetadataTypes = Vue.component('metadata-types', {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="metadata_type in MetadataTypes">
+                        <tr v-for="metadata_type in MetadataTypes" v-if="metadata_type.is_active">
                             <td><router-link :to="'/metadata-types/' + metadata_type.uid" >{{metadata_type.uid}}</router-link></td>
                             <td>{{metadata_type.name}}</td>
                             <td>{{metadata_type.description}}</td>
@@ -116,6 +117,7 @@ const VueMetadataTypes = Vue.component('metadata-types', {
                         </tr>
                     </tbody>
                 </template>
+            </v-simple-table>
             
             </v-card-text>
             </v-card>

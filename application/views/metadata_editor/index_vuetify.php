@@ -331,6 +331,7 @@
           return this.$store.state.metadata_types;
         },
         MetadataTypesTreeNodes(){
+          
           let metadata_types=this.MetadataTypes;
           if (metadata_types.length==0){
             return [];
@@ -340,6 +341,9 @@
 
           i=0;
           for (let metadata_type of metadata_types) {
+            if (!metadata_type.is_active){
+              continue;
+            }
             metadata_types_nodes.push(
               {
                 title: metadata_type.name,

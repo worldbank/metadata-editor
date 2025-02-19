@@ -18,6 +18,7 @@ class Admin_metadata extends MY_REST_Controller
         $this->load->model("Editor_template_model");
         $this->load->model('Admin_metadata_acl_model');
         $this->load->model('Admin_metadata_model');
+        $this->load->model('Admin_metadata_projects_model');
 
 		$this->load->library("Editor_acl");		
 		$this->is_authenticated_or_die();
@@ -104,6 +105,50 @@ class Admin_metadata extends MY_REST_Controller
     function templates_by_user_get()
     {
         return $this->templates_get();
+    }
+
+    /**
+     * 
+     * Get all admin metadata templates logged in user has access to
+     * 
+     */
+    function templates_by_project_get($project_id=null)
+    {
+        try{
+
+            if (!$project_id){
+                throw new Exception("Missing parameter: project_id");
+            }
+
+            $this->has_access($resource_='template_manager',$privilege='view');
+            $result= $this->Admin_metadata_model->get_admin_metadata_templates_by_acl($this->api_user->id);
+            array_walk($result, 'unix_date_to_gmt',array('created','changed'));
+
+            foreach($result as $key=>$row){
+                $result[$key]['permissions']=$this->Admin_metadata_acl_model->get_user_permissions($row['id'],$this->api_user->id);
+                $result[$key]['is_enabled']=$this->Admin_metadata_projects_model->is_attached($project_id,$row['id']);
+                $result[$key]['has_data']=$this->Admin_metadata_model->exists($row['id'],$project_id);
+
+                if ($result[$key]['is_enabled'] || $result[$key]['has_data']){
+                    $result[$key]['is_active']=true;    
+                }
+                
+            }
+
+            $response=array(
+				'status'=>'success',
+				'result'=>$result
+			);	
+
+            $this->set_response($response, REST_Controller::HTTP_OK);
+        }
+        catch(Exception $e){
+            $error_response=array(
+                'status'=>'error',
+                'message'=>$e->getMessage()
+            );
+            $this->set_response($error_response, REST_Controller::HTTP_BAD_REQUEST);
+        }
     }
 
     
@@ -409,6 +454,111 @@ class Admin_metadata extends MY_REST_Controller
 			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
+
+
+    /**
+     * 
+     * 
+     * Enable/attach metadata to a project
+     * 
+     * post params: {project_id, template_uid}
+     * 
+     */
+    function attach_post()
+    {
+        try{
+            $this->has_access($resource_='templates',$privilege='admin');
+            $options=$this->raw_json_input();
+
+            if (!isset($options['project_id'])){
+                throw new Exception("Missing parameter: project_id");
+            }
+
+            if (!isset($options['template_uid'])){
+                throw new Exception("Missing parameter: template_uid");
+            }
+
+            $project_id=$this->get_sid($options['project_id']);
+
+            if (!$project_id){
+                throw new Exception("Project not found");
+            }
+
+            $template_id=$this->Editor_template_model->get_id_by_uid($options['template_uid']);
+
+            if (!$template_id){
+                throw new Exception("Template not found: " . $template_uid);
+            }
+
+            $result=$this->Admin_metadata_projects_model->attach($project_id, $template_id);
+
+            $output=array(
+                'status'=>'success',
+                'result'=>$result
+            );
+
+            $this->set_response($output, REST_Controller::HTTP_OK);			
+        }
+        catch(Exception $e){
+            $error_output=array(
+                'status'=>'failed',
+                'message'=>$e->getMessage()
+            );
+            $this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+        }
+    }
+
+    /**
+     * 
+     * 
+     * Remove metadata template from a project
+     * 
+     * post params: {project_id, template_uid}
+     * 
+     */
+    function detach_post()
+    {
+        try{
+            $this->has_access($resource_='templates',$privilege='admin');
+            $options=$this->raw_json_input();
+
+            if (!isset($options['project_id'])){
+                throw new Exception("Missing parameter: project_id");
+            }
+
+            if (!isset($options['template_uid'])){
+                throw new Exception("Missing parameter: template_uid");
+            }
+
+            $project_id=$this->get_sid($options['project_id']);
+
+            if (!$project_id){
+                throw new Exception("Project not found");
+            }
+
+            $template_id=$this->Editor_template_model->get_id_by_uid($options['template_uid']);
+
+            if (!$template_id){
+                throw new Exception("Template not found: " . $template_uid);
+            }
+
+            $result=$this->Admin_metadata_projects_model->delete($project_id, $template_id);
+
+            $output=array(
+                'status'=>'success',
+                'result'=>$result
+            );
+
+            $this->set_response($output, REST_Controller::HTTP_OK);			
+        }
+        catch(Exception $e){
+            $error_output=array(
+                'status'=>'failed',
+                'message'=>$e->getMessage()
+            );
+            $this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+        }
+    }
 
 	
     

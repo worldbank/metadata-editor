@@ -546,11 +546,16 @@ class Editor_acl
 		}		
 
 		//check roles has access to resource
-		foreach($permissions as $perm){
+		foreach($permissions as $perm){			
 			if (!$acl->hasResource($perm['resource'])){
-				$acl->addResource(new Resource($perm['resource']));						
+				$acl->addResource(new Resource($perm['resource']));
 			}
-			$acl->allow($perm['role_id'],$perm['resource'], $perm['permissions']);
+			//admin role has access to all permissions
+			if (in_array('admin',$perm['permissions'])){
+				$acl->allow($perm['role_id'],$perm['resource'], array('view','edit','admin'));				
+			}else{
+				$acl->allow($perm['role_id'],$perm['resource'], $perm['permissions']);
+			}
 		}
 
 		//resources by repository
@@ -565,7 +570,7 @@ class Editor_acl
 
 		try{
 			//test role as permissions
-			foreach($user_roles as $role_id=>$role){				
+			foreach($user_roles as $role_id=>$role){							
 				if(!empty($repositoryid)){
 					if ($acl->isAllowed($role_id, $repositoryid.'-'.$resource, $privilege)){
 						return true;
@@ -674,6 +679,11 @@ class Editor_acl
 
 		if (!$user){
 			throw new Exception("User not set");
+		}
+
+		//check if user has global template admin access
+		if ($this->has_access('template_manager','admin', $user)){
+			return true;
 		}
 
 		//check if user is template owner
