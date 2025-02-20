@@ -133,6 +133,15 @@ Vue.component('table-grid-component', {
                     value=value_;
                 }
             }
+            else if (column_data_type=='boolean'){
+                let value_=String(value).toLowerCase();
+                if (value_=='true'){
+                    value=true;
+                }
+                else if (value_=='false'){
+                    value=false;
+                }
+            }
 
             this.local[index][key] = value;
             this.$emit('input', JSON.parse(JSON.stringify(this.local)));

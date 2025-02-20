@@ -8,27 +8,7 @@ Vue.component('form-section', {
     },
     watch: { 
     },
-    mounted: function () {     
-        /*console.log("local value beforex",JSON.stringify(this.parentElement));
-        let value= this.parentElement ? this.parentElement : {};
-
-        this.local_data= value;*/
-    },
     computed: {
-        /*local(){
-            //return this.value;
-            console.log("local value before",JSON.stringify(this.value));
-            let value= this.value ? this.value : {};
-
-            return value;
-
-            if (value.length<1){
-                value= [{}];
-            }
-            console.log("local value after",JSON.stringify(value));
-            //console.log("local value",JSON.stringify(value));
-            return value;
-        },*/
         localColumns(){
             return this.columns;
         },
@@ -49,8 +29,24 @@ Vue.component('form-section', {
         parentValue: function(key){
             return _.get(this.parentElement,key);
         },
-        update: function (key, value)
-        {            
+        update: function (key, value, column_data_type)
+        {
+            if (column_data_type=='number' || column_data_type=='integer'){
+                let value_=Number(value);
+                if (String(value_)==value){
+                    value=value_;
+                }
+            }
+            else if (column_data_type=='boolean'){
+                let value_=String(value).toLowerCase();
+                if (value_=='true'){
+                    value=true;
+                }
+                else if (value_=='false'){
+                    value=false;
+                }
+            }
+            
             this.$emit('sectionUpdate', {
                 'key': key,
                 'value': JSON.parse(JSON.stringify(value))
@@ -99,7 +95,7 @@ Vue.component('form-section', {
                                             <form-input
                                                 :value=" localValue(column.key)"
                                                 :field="column"
-                                                @input="update(column.key, $event)"
+                                                @input="update(column.key, $event, column.type)"
                                             ></form-input>
                                     </div>
                                 </div>  
