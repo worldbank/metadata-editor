@@ -224,6 +224,7 @@
             echo $this->load->view("metadata_editor/vue-admin-metadata-edit-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-dialog-admin-metadata-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-summary-templates-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-json-edit-component.js",null,true);
 
         ?>
 

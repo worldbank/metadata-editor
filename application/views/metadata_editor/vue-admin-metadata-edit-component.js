@@ -31,6 +31,9 @@ const VueAdminMetadataEdit = Vue.component('admin-metadata-edit', {
         localValue: function(key){
             return _.get(this.metadata_model,key);
         },
+        updateModelJson: function(val){
+            this.$set(this,'metadata_model',val);
+        },
         update: function (key, value){
             if (key.indexOf(".") !== -1 && this.metadata_model[key]){
                 delete this.metadata_model[key];
@@ -316,15 +319,12 @@ const VueAdminMetadataEdit = Vue.component('admin-metadata-edit', {
                             <strong>Name:</strong> {{MetadataTemplateRaw.name}} <br/>                            
                             <strong>Created:</strong> {{momentDateUnix(metadata_info.created)}}<br/>
                             <span v-if="metadata_info.changed"> 
-                            <strong>Updated:</strong> {{momentDateUnix(metadata_info.changed)}}
+                                <strong>Updated:</strong> {{momentDateUnix(metadata_info.changed)}}<br/>
                             </span>
-
-                            <br/>
                             <span v-if="metadata_info.cr_username">
-                            <strong>Created By:</strong> {{metadata_info.cr_username}}
+                            <strong>Created By:</strong> {{metadata_info.cr_username}}<br/>
                             </span>
 
-                            <br/>
                             <span v-if="metadata_info.ch_username">
                             <strong>Updated By:</strong> {{metadata_info.ch_username}}
                             </span>
@@ -332,7 +332,7 @@ const VueAdminMetadataEdit = Vue.component('admin-metadata-edit', {
                         </div>
 
                         <div>Metadata</div>
-                        <pre style="max-height:400px;overflow:auto;">{{removeEmptyValues(metadata_model)}}</pre>
+                        <json-edit :value="metadata_model" @input="updateModelJson($event)" ></json-edit>                        
                     </div>
                 </v-col>
             </v-row>

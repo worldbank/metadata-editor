@@ -132,7 +132,6 @@ class Admin_metadata extends MY_REST_Controller
                 if ($result[$key]['is_enabled'] || $result[$key]['has_data']){
                     $result[$key]['is_active']=true;    
                 }
-                
             }
 
             $response=array(
@@ -153,6 +152,76 @@ class Admin_metadata extends MY_REST_Controller
 
     
     
+    /**
+     * 
+     * 
+     * Get metadata data
+     * 
+     * @querystring params (optional):
+     *  - offset
+     *  - limit
+     *  - template - comma separated list of template uids
+     *  - project_id
+     * 
+     * - returns metadata from multiple projects
+     * 
+     */
+    function data_query_get()
+    {
+        try{
+            $template_id=null;
+
+            $offset=(int)$this->input->get('offset') ? (int)$this->input->get('offset') : 0;
+            $limit=(int)$this->input->get('limit') ? (int)$this->input->get('limit') : 50;
+            $template=$this->input->get('template');
+            $project_id=$this->input->get('project_id');
+
+            $template_uid_list=array();
+            if (!empty($template)){
+                $template_uid_list=explode(',',$template);
+            }
+
+            if (!empty($project_id)){
+                $project_id=$this->get_sid($project_id);
+            }
+
+            //get templates for active user
+            $templates_id_list=$this->Admin_metadata_acl_model->get_templates_id_by_user($this->api_user->id, $template_uid_list);
+
+            if (empty($templates_id_list)){
+                throw new Exception("One or more templates not found");
+            }
+
+            $search_options=array(
+                'offset'=>$offset,
+                'limit'=>$limit,
+                'templates'=>$templates_id_list,
+                'project_id'=>$project_id
+            );
+            
+            $result=$this->Admin_metadata_model->search($search_options);
+
+            $response=array(
+                'status'=>'success',
+                //'total'=>$result['total'],
+                'found'=>count($result['data']),
+                'offset'=>$offset,
+                'limit'=>$limit,
+                'data'=>$result['data']
+            );
+
+            $this->set_response($response, REST_Controller::HTTP_OK);
+        }
+        catch(Exception $e){
+            $error_response=array(
+                'status'=>'error',
+                'message'=>$e->getMessage()
+            );
+            $this->set_response($error_response, REST_Controller::HTTP_BAD_REQUEST);
+        }
+
+    }
+
     /**
      * 
      * 
@@ -242,7 +311,7 @@ class Admin_metadata extends MY_REST_Controller
             $template_id=$this->Editor_template_model->get_id_by_uid($options['template_uid']);
 
             if (!$template_id){
-                throw new Exception("Template not found: " . $template_uid);
+                throw new Exception("Template not found: " . $options['template_uid']);
             }
 
             //$this->editor_acl->user_has_metadata_type_access($metadata_type_id,$permission='edit',$this->api_user);

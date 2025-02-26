@@ -145,6 +145,34 @@ class Admin_metadata_acl_model extends ci_model {
         return count($result)>0;
     }
 
+    /**
+     * 
+     * Get all templates that a user has access to
+     * 
+     *  @template_uid_list: list of template uids to filter (optional)
+     * 
+     * 
+     */
+    function get_templates_id_by_user($user_id, $template_uid_list=null)
+    {
+        $this->db->select('admin_metadata_acl.template_id');
+        $this->db->where('user_id',$user_id);
+
+        if (is_array($template_uid_list) && count($template_uid_list)>0){
+            $this->db->join('editor_templates','editor_templates.id=admin_metadata_acl.template_id');
+            $this->db->where_in('uid',$template_uid_list);
+        }
+
+        $result=$this->db->get('admin_metadata_acl')->result_array();
+
+        $templates=array();
+        foreach ($result as $row){
+            $templates[]=$row['template_id'];
+        }
+
+        return $templates;
+    }
+
     
 
 

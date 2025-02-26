@@ -94,6 +94,68 @@ CCREATE TABLE `admin_metadata` (
 
     }
 
+    /**
+     * 
+     * 
+     * Search 
+     * 
+     * - returns multiple admin metadata
+     * - @template_id - template id
+     * - @options {
+     *      offset: 0,
+     *      limit: 10,
+     *      templates: [1,2,3]
+     *      project_id:1 or IDNO
+     * }
+     * 
+     * 
+     */
+    function search($options=array())
+    {
+        $offset=isset($options['offset']) ? $options['offset'] : 0;
+        $limit=isset($options['limit']) ? $options['limit'] : 50;
+        $templates_id_list=isset($options['templates']) ? $options['templates'] : null;
+
+        $this->db->select('editor_templates.uid as template_uid, editor_templates.name as template_name, admin_metadata.sid, admin_metadata.metadata, admin_metadata.created, admin_metadata.changed, users1.username as cr_username, users2.username as ch_username');
+        $this->db->join('editor_templates','editor_templates.id=admin_metadata.template_id');
+        $this->db->join('users as users1','users1.id=admin_metadata.created_by','left');
+        $this->db->join('users as users2','users2.id=admin_metadata.changed_by','left');
+        
+        if (is_array($templates_id_list) && count($templates_id_list)>0){
+            $this->db->where_in('template_id',$templates_id_list);
+        }
+
+        if (isset($options['project_id'])){
+            $this->db->where('admin_metadata.sid',$options['project_id']);
+        }
+                
+        $this->db->limit($limit,$offset);
+        $result=$this->db->get('admin_metadata')->result_array();
+
+        if (isset($result))
+        {
+            foreach($result as $key=>$row){
+                if (isset($row['metadata'])){
+                    $result[$key]['metadata']=json_decode($row['metadata'],true);
+                }
+            }
+        }
+
+        return [
+            'total'=>0,//$this->total_count($template_id),
+            'data'=>$result
+        ];
+    }
+
+    function total_count($template_id)
+    {
+        $this->db->select('count(*) as total');
+        $this->db->where('template_id',$template_id);
+        $result=$this->db->get('admin_metadata')->row_array();
+        return $result['total'];
+    }
+
+
     function select_single($template_id,$sid)
     {
         $this->db->select('editor_templates.uid as template_uid, editor_templates.name as template_name, admin_metadata.*, users1.username as cr_username, users2.username as ch_username');
