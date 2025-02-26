@@ -80,14 +80,16 @@ Vue.component('json-edit', {
                     </div>
                 </v-tab-item>
                 <v-tab-item>
+                    <div class="bg-light p-2">
                     <v-textarea
                         v-model="localValue"
-                        style="font-size: small;"
+                        style="font-size: small;max-height:400px;overflow:auto;"
                         label=""
-                        outlined
-                        rows="20"
+                        filled
+                        auto-grow
                         @input="validateJSON(localValue)"
                     ></v-textarea>
+                    </div>
                     <v-btn @click="update" small outlined color="primary">Update</v-btn>
                     <v-btn @click="resetValue" small outlined color="default">Reset</v-btn>
                     <div v-if="errorMessage" class="error text-white p-1">{{ errorMessage }}</div>
