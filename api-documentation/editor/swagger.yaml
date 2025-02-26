@@ -55,8 +55,11 @@ tags:
   - name: SDMX
     description: SDMX
 
-  - name: Admin Metadata
-    description: Admin Metadata
+  - name: Admin metadata
+    description: Administrative Metadata
+  
+  - name: Admin metadata templates
+    description: Administrative Metadata templates
 
 
 x-tagGroups:  
@@ -100,11 +103,10 @@ x-tagGroups:
   - name: SDMX
     tags:
       - SDMX
-  - name: Admin metadata types
+  - name: Admin metadata
     tags:
       - Admin metadata
-      - Admin metadata types
-      - Admin metadata schemas      
+      - Admin metadata templates
 
 schemes:
   - http
@@ -1444,13 +1446,13 @@ paths:
         security:
           - ApiKeyAuth: []
 
-  /admin-metadata/:
+  /admin-metadata/templates:
       get:
         tags:
-          - Admin metadata types
-        summary: List admin metadata types
-        description: List all admin metadata types
-        operationId: listAdminMetadata
+          - Admin metadata templates
+        summary: List templates
+        description: List all administrative metadata templates
+        operationId: listAdminMetadataTemplates
         consumes:
           - application/json
         produces:
@@ -1460,235 +1462,34 @@ paths:
             description: successful operation
         security:
           - ApiKeyAuth: []
-      post:
-        tags:
-          - Admin metadata types
-        summary: Create admin metadata type
-        description: Create a new admin metadata type
-        operationId: createAdminMetadataType
-        consumes:
-          - application/json
-        produces:
-          - application/json
-        parameters:
-          - in: "body"
-            name: "body"
-            required: true
-            schema:
-              $ref: "#/definitions/CreateAdminMetadataType"
-        responses:
-          '200':
-            description: successful operation            
-        security:
-          - ApiKeyAuth: []
-  /admin-metadata/{typeId}:
+  /admin-metadata/templates/{templateUid}:
       get:
         tags:
-          - Admin metadata types
-        summary: Get single by ID/Name
-        description: Get single admin metadata type
-        operationId: singleAdminMetadata
+          - Admin metadata templates
+        summary: Get single template
+        description: Get single administrative metadata template
+        operationId: singleAdminMetadataTemplate
         consumes:
           - application/json
         produces:
           - application/json
         parameters:
           - in: "path"
-            name: "typeId"
+            name: "templateUid"
             type: string
-            description: Admin metadata type ID or Name
+            description: Admin metadata template UID
             required: true
         responses:
           '200':
             description: successful operation
         security:
           - ApiKeyAuth: []
-      post:
-        tags:
-          - Admin metadata types
-        summary: Update admin metadata type
-        description: Update admin metadata type
-        operationId: updateAdminMetadataType
-        consumes:
-          - application/json
-        produces:
-          - application/json
-        parameters:
-          - in: "path"
-            name: "typeId"
-            type: string
-            description: Admin metadata type ID or Name
-            required: true
-          - in: "body"
-            name: "body"
-            required: true
-            schema:
-              $ref: "#/definitions/UpdateAdminMetadataType"
-        responses:
-          '200':
-            description: successful operation            
-        security:
-          - ApiKeyAuth: []
-  /admin-metadata/type_delete{typeId}:
-      post:
-        tags:
-          - Admin metadata types
-        summary: Delete admin metadata by ID/Name
-        description: Delete admin metadata type by ID or name
-        operationId: deleteAdminMetadata
-        consumes:
-          - application/json
-        produces:
-          - application/json
-        parameters:
-          - in: "path"
-            name: "typeId"
-            type: string
-            description: Admin metadata type ID or Name
-            required: true
-        responses:
-          '200':
-            description: successful operation
-        security:
-          - ApiKeyAuth: []
-
-  /admin-metadata/schemas:
-      get:
-        tags:
-          - Admin metadata schemas
-        summary: List schemas
-        description: List all admin metadata schemas
-        operationId: listAdminMetadataSchemas
-        consumes:
-          - application/json
-        produces:
-          - application/json
-        responses:
-          '200':
-            description: successful operation
-        security:
-          - ApiKeyAuth: []
-      post:
-        tags:
-          - Admin metadata schemas
-        summary: Create schema
-        description: Create schema for admin metadata type
-        operationId: createAdminMetadataSchema
-        consumes:
-          - application/json
-        produces:
-          - application/json
-        parameters:
-          - in: "body"
-            name: "body"
-            required: true
-            schema:
-              $ref: "#/definitions/createAdminMetadataSchema"
-        responses:
-          '200':
-            description: successful operation            
-        security:
-          - ApiKeyAuth: []
-  /admin-metadata/schema/{schemaUrn}:
-      get:
-        tags:
-          - Admin metadata schemas
-        summary: Get schema by URN
-        description: Get metadata schema by URN - use format `Agency:ID:Version`
-        operationId: getAdminMetadataSchema
-        consumes:
-          - application/json
-        produces:
-          - application/json
-        parameters:
-          - in: "path"
-            name: "schemaUrn"
-            type: string
-            description: Admin metadata schema URN
-            required: true
-        responses:
-          '200':
-            description: successful operation
-        security:
-          - ApiKeyAuth: []
-  /admin-metadata/schema/{schemaId}:
-      get:
-        tags:
-          - Admin metadata schemas
-        summary: Get schema by ID
-        description: Get metadata schema by ID
-        operationId: getAdminMetadataSchemaByID
-        consumes:
-          - application/json
-        produces:
-          - application/json
-        parameters:
-          - in: "path"
-            name: "schemaId"
-            type: string
-            description: Admin metadata schema ID
-            required: true
-        responses:
-          '200':
-            description: successful operation
-        security:
-          - ApiKeyAuth: []
-  /admin-metadata/schema_update/{schemaId}:
-      post:
-        tags:
-          - Admin metadata schemas
-        summary: Update schema
-        description: Update schema for admin metadata type
-        operationId: updateAdminMetadataSchema
-        consumes:
-          - application/json
-        produces:
-          - application/json
-        parameters:
-          - in: "path"
-            name: "schemaId"
-            type: string
-            description: Admin metadata schema ID
-            required: true
-          - in: "body"
-            name: "body"
-            required: true
-            schema:
-              $ref: "#/definitions/createAdminMetadataSchema"
-        responses:
-          '200':
-            description: successful operation            
-        security:
-          - ApiKeyAuth: []
-  /admin-metadata/schema_delete/{schemaId}:
-      post:
-        tags:
-          - Admin metadata schemas
-        summary: Delete schema
-        description: Delete schema for admin metadata type
-        operationId: deleteAdminMetadataSchema
-        consumes:
-          - application/json
-        produces:
-          - application/json
-        parameters:
-          - in: "path"
-            name: "schemaId"
-            type: string
-            description: Admin metadata schema ID
-            required: true          
-        responses:
-          '200':
-            description: successful operation            
-        security:
-          - ApiKeyAuth: []
-  
-  /admin-metadata/data/{projectId}/{metadataTypeId}:
+  /admin-metadata/data/{projectId}/{templateUid}:
       get:
         tags:
           - Admin metadata
-        summary: Get data by project
-        description: Get metadata data by project ID and/or Metadata type
+        summary: Get data
+        description: Get admin metadata associated with a project
         operationId: getAdminMetadataData
         consumes:
           - application/json
@@ -1701,10 +1502,43 @@ paths:
             description: Project ID or IDNO
             required: true
           - in: "path"
-            name: "metadataTypeId"
+            name: "templateUid"
             type: string
-            description: Metadata type ID
+            description: (Optional) Admin metadata template UID. If not provided, all data will be returned for the project
             required: false
+        responses:
+          '200':
+            description: successful operation
+        security:
+          - ApiKeyAuth: []
+  /admin-metadata/data_query:
+      get:
+        tags:
+          - Admin metadata
+        summary: Query admin metadata
+        description: Query administrative metadata across projects. By default, returns all admin metadata for all projects and templates that the user has access to. To filter by project, template or limit the number of results, use the query parameters.
+        operationId: queryAdminMetadataData
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "project_id"
+            type: string
+            description: "(optional) Project ID or IDNO"
+          - in: "path"
+            name: "template"
+            type: string
+            description: "(optional) Admin metadata template UID. For multiple templates, separate with comma"
+          - in: "path"
+            name: "limit"
+            type: integer
+            description: "(optional) Limit number of results"
+          - in: "path"
+            name: "offset"
+            type: integer
+            description: "(optional) Offset number of results"
         responses:
           '200':
             description: successful operation
@@ -1715,7 +1549,7 @@ paths:
         tags:
           - Admin metadata
         summary: Add/update data
-        description: Add or update metadata (data) for a project
+        description: Add or update admin metadata (data) for a project
         operationId: createAdminMetadataData
         consumes:
           - application/json
@@ -1736,8 +1570,8 @@ paths:
       post:
         tags:
           - Admin metadata
-        summary: Delete data
-        description: Delete metadata (data) for a project
+        summary: Delete
+        description: Delete admin metadata for a project
         operationId: deleteAdminMetadataData
         consumes:
           - application/json
@@ -2018,7 +1852,7 @@ definitions:
     type: object
     required:
       - project_id
-      - metadata_type_id
+      - template_uid
       - metadata
     properties:
       project_id:
@@ -2026,32 +1860,51 @@ definitions:
         required: true
         title: "Project ID/IDNO"
         description: "Project ID or IDNO"
-      metadata_type_id:
-        type: integer
+      template_uid:
+        type: string
         required: true
-        title: "Metadata type ID"
-        description: "Metadata type ID"
+        title: "Metadata template UID"
+        description: "Admin metadata template UID"
       metadata:
         type: object
         required: true
-        title: "Metadata data"
-        description: "Metadata data"
+        title: "Metadata"
+        description: "Administrative metadata"
+  QuerydminMetadataData:
+    type: object
+    properties:
+      project_id:
+        type: string
+        title: "Project ID/IDNO"
+        description: "(Optional) Filter by project ID or IDNO"
+      template_uid:
+        type: string
+        title: "Metadata template UID"
+        description: "(Optional) Filter by metadata template UID. For multiple templates, use comma separated values"
+      offset:
+        type: integer
+        title: "Offset"
+        description: "Offset for pagination"
+      limit:
+        type: integer
+        title: "Limit"
+        description: "Limit for pagination"
   RemoveAdminMetadataData:
     type: object
     required:
       - project_id
-      - metadata_type_id
+      - template_uid
     properties:
       project_id:
         type: string
         required: true
         title: "Project ID/IDNO"
         description: "Project ID or IDNO"
-      metadata_type_id:
-        type: integer
+      template_uid:
+        type: string
         required: true
-        title: "Metadata type ID"
-        description: "Metadata type ID"
+        title: "Template UID"
+        description: "Admin metadata template UID"
   ProjectTemplate:
     type: object
     properties:
