@@ -116,8 +116,8 @@ paths:
     get:
       tags:
         - Projects
-      summary: List projects
-      description: List and find projects
+      summary: Search
+      description: Search and browse projects
       operationId: EditorProjects
       consumes:
         - application/json
@@ -144,7 +144,19 @@ paths:
           - image
           - script
           - video
-          
+
+        - name: date_start
+          in: path
+          title: Start date
+          description: Search for projects changed on or after this date. Use the date format `YYYY-MM-DD` e.g. 2020-01-01
+          type: string
+          format: date
+        - name: date_end
+          in: path
+          title: End date
+          description: Search for projects changed on or before this date. Use the date format `YYYY-MM-DD` e.g. 2020-01-20
+          type: string
+          format: date
         - name: offset
           in: path
           title: Offset

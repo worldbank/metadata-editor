@@ -201,6 +201,35 @@ class Project_search
 			$applied_filters['changed_by']=$changed_by;
 		}
 
+		//filter by date start and end range [must be in format YYYY-MM-DD]
+		$date_start=$this->get_search_filter($search_options,'date_start');
+		$date_end=$this->get_search_filter($search_options,'date_end');
+
+		//if date start is set and has a valid format, convert to unix timestamp
+		if ($date_start && !$date_end){
+			$date_start=$this->get_unix_date($date_start[0]);
+			
+			$this->ci->db->where('editor_projects.changed >=', $date_start);
+			$applied_filters['date_start']=$date_start;
+		}
+
+		//if date end is set and has a valid format, convert to unix timestamp
+		if ($date_end && !$date_start){
+			$date_end=$this->get_unix_date($date_end[0],true);			
+			
+			$this->ci->db->where('editor_projects.changed <=', $date_end);			
+			$applied_filters['date_end']=$date_end;
+		}
+
+		//if both date start and end are set, filter by range
+		if ($date_start && $date_end){
+			$date_start=$this->get_unix_date($date_start[0]);
+			$date_end=$this->get_unix_date($date_end[0],true);
+
+			$this->ci->db->where('(editor_projects.changed >='. $this->ci->db->escape($date_start).' AND editor_projects.changed <='.$this->ci->db->escape($date_end). ')',null, false);
+			$applied_filters['date_start']=$date_start;
+			$applied_filters['date_end']=$date_end;
+		}
 
 		//filter by collection
 		$collection_filters=$this->parse_filter_values_as_int($this->get_search_filter($search_options,'collection'));
@@ -341,6 +370,35 @@ class Project_search
 		);
 		
 		return $facets;
+	}
+
+
+	/**
+	 * 
+	 * Validate date in format YYYY-MM-DD
+	 * 
+	 */
+	function validate_date($date)
+	{
+		$format = 'Y-m-d';
+		$d = DateTime::createFromFormat($format, $date);
+		return $d && $d->format($format) === $date;		
+	}
+
+
+	function get_unix_date($date_iso, $is_end=false)
+	{
+		if (!$this->validate_date($date_iso)){
+			throw new Exception("Invalid date format. Use date format YYYY-MM-DD");
+		}
+
+		$date=strtotime($date_iso);
+
+		if ($is_end){
+			$date+=86400;
+		}
+
+		return $date;		
 	}
 
 
