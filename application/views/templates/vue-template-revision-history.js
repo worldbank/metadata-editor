@@ -13,7 +13,7 @@ Vue.component('vue-template-revision-history', {
     methods: {     
         loadRevisions: function(){
             let vm = this;
-            let url = CI.base_url + '/api/templates/revisions/' + this.template_id;
+            let url = CI.site_url + '/api/templates/revisions/' + this.template_id;
             console.log(url);
             axios.get(url)
             .then(response => {

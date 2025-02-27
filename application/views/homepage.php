@@ -6,7 +6,7 @@
 <div class="col-sm-12x">
 
 <div>
-<h1>Metadata editor <span class="text-secondary" style="font-weight:normal;"></span></h1>
+<h1>Metadata Editor <span class="text-secondary" style="font-weight:normal;font-size:small"><?php echo APP_VERSION;?></span></h1>
 <p></p>
 
 <div class="row home-page mb-5">

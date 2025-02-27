@@ -26,7 +26,7 @@ Vue.component('vue-collection', {
     },
     methods: {
         pageLink: function(page) {
-            window.location.href = CI.base_url + '/' + page;
+            window.location.href = CI.site_url + '/' + page;
         },
         showMenu: function(data) {
             console.log("showMenu", data);
@@ -45,7 +45,7 @@ Vue.component('vue-collection', {
         },
         refreshCollectionsTree: function() {
             vm = this;
-            let url = CI.base_url + '/api/collections/tree_refresh/';
+            let url = CI.site_url + '/api/collections/tree_refresh/';
 
             axios.get(url)
                 .then(function(response) {
@@ -58,7 +58,7 @@ Vue.component('vue-collection', {
         },
         loadCollections: function() {
             vm = this;
-            let url = CI.base_url + '/api/collections/tree';
+            let url = CI.site_url + '/api/collections/tree';
             console.log("loading collections");
             return axios
                 .get(url)
@@ -177,17 +177,16 @@ Vue.component('vue-collection', {
 
                         <div class="projects col " >
 
-                            <h3 class="mt-3 mb-1">Collections</h3>
+                            <v-tabs background-color="transparent" v-model="active_tab">
+                                <v-tab @click="pageLink('projects')"><v-icon>mdi-text-box</v-icon> <a :href="site_base_url + '/editor'">{{$t("projects")}}</a></v-tab>
+                                <v-tab @click="pageLink('collections')" active><v-icon>mdi-folder-text</v-icon> <a :href="site_base_url + '/collections'">{{$t("collections")}}</a> </v-tab>
+                                <v-tab @click="pageLink('templates')"><v-icon>mdi-alpha-t-box</v-icon> <a :href="site_base_url + '/templates'">{{$t("templates")}}</a></v-tab>                                    
+                            </v-tabs>
 
                             <div class="d-flex">                            
-
-                                <v-tabs background-color="transparent" v-model="active_tab">
-                                    <v-tab @click="pageLink('projects')"><v-icon>mdi-text-box</v-icon> <a :href="site_base_url + '/editor'">{{$t("projects")}}</a></v-tab>
-                                    <v-tab @click="pageLink('collections')" active><v-icon>mdi-folder-text</v-icon> <a :href="site_base_url + '/collections'">{{$t("collections")}}</a> </v-tab>
-                                    <v-tab @click="pageLink('templates')"><v-icon>mdi-alpha-t-box</v-icon> <a :href="site_base_url + '/templates'">{{$t("templates")}}</a></v-tab>                                    
-                                </v-tabs>
-
-
+                                <div class="flex-grow-1 flex-shrink-0 mr-auto">
+                                    <h3 class="mt-3 mb-1">Collections</h3>                                
+                                </div>
                                 <div class="justify-content-end">
                                     <v-btn color="primary"  @click="createCollection">Create new collection</v-btn>
                                 </div>

@@ -3,23 +3,34 @@
 
 <head>
   <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+  <link href="<?php echo base_url();?>vue-app/assets/mdi.min.css" rel="stylesheet">
+  <link href="<?php echo base_url();?>vue-app/assets/vuetify.min.css" rel="stylesheet">
+  <link href="<?php echo base_url();?>vue-app/assets/bootstrap.min.css" rel="stylesheet" >
 
-  <script src="https://adminlte.io/themes/v3/plugins/jquery/jquery.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment-with-locales.min.js"></script>
-  <script src="https://unpkg.com/vue-i18n@8"></script>
+  <script src="<?php echo base_url();?>vue-app/assets/jquery.min.js"></script>
+  <script src="<?php echo base_url();?>vue-app/assets/bootstrap.bundle.min.js"></script>
+  <script src="<?php echo base_url();?>vue-app/assets/moment-with-locales.min.js"></script>
+  <script src="<?php echo base_url();?>vue-app/assets/vue-i18n.min.js"></script>
 
+  <link href="<?php echo base_url();?>vue-app/assets/styles.css" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
+
+
+<?php
+  $user=$this->session->userdata('username');
+
+  $user_info=[
+    'username'=> $user,
+    'is_logged_in'=> !empty($user),
+    'is_admin'=> $this->ion_auth->is_admin(),
+  ];
+  
+?>
+
+
 </head>
 
 <style>
-  <?php //echo $this->load->view('metadata_editor/bootstrap-forms.css',null,true); 
-  ?>
-  <?php echo $this->load->view('metadata_editor/styles.css', null, true); ?>
-  
   .text-xs {
     font-size: small;
     color: gray;
@@ -54,7 +65,9 @@
 
   <script>
     var CI = {
-      'base_url': '<?php echo site_url(); ?>'
+      'site_url': '<?php echo site_url(); ?>',
+      'base_url': '<?php echo base_url(); ?>',
+      'user_info': <?php echo json_encode($user_info); ?>
     };
   </script>
 
@@ -63,7 +76,9 @@
 
     <div class="wrapper">
 
-      <?php echo $this->load->view('editor_common/global-header', null, true); ?>
+      <?php //echo $this->load->view('editor_common/global-header', null, true); ?>
+
+      <vue-global-site-header></vue-global-site-header>
 
 
       <div class="content-wrapperx" v-cloak>
@@ -79,7 +94,7 @@
                 <div class="mr-4 mt-5">
                   <v-expansion-panels v-model="facet_panel" multiple class="">
 
-                    <v-expansion-panel v-for="(facet_values,facet_key) in facets">
+                    <v-expansion-panel v-for="(facet_values,facet_key) in facets" :key="facet_key">
                       <v-expansion-panel-header class="capitalize">
                         {{$t(facet_key)}}
                       </v-expansion-panel-header>
@@ -113,25 +128,23 @@
               <!-- end sidebar -->
 
               <div class="projects col">
-                <div class="mt-5 mb-5">
-                  <h3>{{$t("my_projects")}}</h3>
+                <div class="mt-5 mb-5">                  
+
+                      <div class="mb-5">
+                        <vue-navigation-tabs></vue-navigation-tabs>
+                      </div>
 
                   <div class="d-flex">
                     <div class="flex-grow-1 flex-shrink-0 mr-auto">
-                      <div class="mb-5">
-                        <v-tabs background-color="transparent">
-                          <v-tab @click="pageLink('projects')"><v-icon>mdi-text-box</v-icon> Projects</v-tab>
-                          <v-tab @click="pageLink('collections')"><v-icon>mdi-folder-text</v-icon> <a href="<?php echo site_url('collections');?>">{{$t("collections")}}</a> </v-tab>                          
-                          <v-tab @click="pageLink('templates')"><v-icon>mdi-alpha-t-box</v-icon> <a href="<?php echo site_url('templates');?>">{{$t("templates")}}</a></v-tab>                          
-                        </v-tabs>
-                      </div>
+                    <h3 class="mt-3">{{$t("my_projects")}}</h3>                      
                     </div>
                     <div class="">
-                      <v-btn color="primary" @click="dialog_create_project=true">{{$t("create_project")}}</v-btn>        
-                      <v-btn color="primary" @click="dialog_import_project=true">{{$t("import")}}</v-btn>
+                      <v-btn color="primary"  @click="dialog_create_project=true">{{$t("create_project")}}</v-btn>        
+                      <v-btn color="primary"  @click="dialog_import_project=true">{{$t("import")}}</v-btn>
                     </div>
                   </div>
 
+                  
                 </div>
 
                 <div>
@@ -182,7 +195,7 @@
                   </div>
 
                   <div class="mt-5 p-3 border  text-danger" v-if="errors && errors.length>0"> 
-                    <div><strong>Error:</strong> <a href="<?php echo site_url('editor');?>">Refresh page</a></div>
+                    <div><strong>{{$t('error')}}:</strong> <a href="<?php echo site_url('editor');?>">{{$t('refresh_page')}}</a></div>
                     <div v-for="error in errors">{{error}}</div>
                   </div>
 
@@ -192,7 +205,7 @@
 
                   <div class="bg-white shadow rounded p-3 pt-1 mt-2" elevation="10">
 
-                      <div class="mt-5 mb-3 p-3 border text-center text-danger" v-if="!errors && !Projects || projects.found<1"> No projects found!</div>
+                      <div class="mt-5 mb-3 p-3 border text-center text-danger" v-if="!errors && !Projects || projects.found<1"> {{$t('no_projects_found')}}</div>
 
                       <div v-if="!Projects || projects.found>0" class="row mb-2 mt-3">
                         <div class="col-md-5">
@@ -213,7 +226,7 @@
 
 
                     <table class="table table-hover border-bottom table-projects" v-if="projects && projects.found>0">
-                      <thead>
+                      <thead style="font-size:small;">
                         <tr>
                           <th style="width:30px;">
                             <div v-if="ProjectsCount>0">
@@ -228,16 +241,16 @@
                                 </v-btn>
                               </template>
                               <v-list>
-                                <v-list-item @click="addProjectsToCollection">Add to collection</v-list-item>                                
+                                <v-list-item @click="addProjectsToCollection">{{$t('add_to_collection')}}</v-list-item>                                
                               </v-list>
                             </v-menu>
                           </th>
                           <th style="width:17px;"></th>
-                          <th class="project-title-col">Title</th>
-                          <th>Owner</th>
-                          <th>Last modified</th>
-                          <th style="width:120px;">Modified</th>                          
-                          <th>Actions</th>
+                          <th class="project-title-col">{{$t('title')}}</th>
+                          <th>{{$t('owner')}}</th>
+                          <th>{{$t('last_modified_by')}}</th>
+                          <th style="width:120px;">{{$t('modified')}}</th>                          
+                          <th>{{$t('actions')}}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -452,17 +465,17 @@
 
         <v-list>          
           <v-list-item>
-            <v-list-item-title @click="ShareProject(menu_active_project_id)"><v-btn text>{{$t('Share')}}</v-btn></v-list-item-title>
+            <v-list-item-title @click="ShareProject(menu_active_project_id)"><v-btn text>{{$t('share')}}</v-btn></v-list-item-title>
           </v-list-item>          
           <v-list-item>
-            <v-list-item-title @click="addProjectToCollection(menu_active_project_id)"><v-btn text>Add to collection</v-btn></v-list-item-title>
+            <v-list-item-title @click="addProjectToCollection(menu_active_project_id)"><v-btn text>{{$t('add_to_collection')}}</v-btn></v-list-item-title>
           </v-list-item>
           <v-list-item>
-            <v-list-item-title @click="viewAccessPermissions(menu_active_project_id)"><v-btn text>{{$t('View access')}}</v-btn></v-list-item-title>
+            <v-list-item-title @click="viewAccessPermissions(menu_active_project_id)"><v-btn text>{{$t('view_access')}}</v-btn></v-list-item-title>
           </v-list-item>
 
           <v-list-item>
-            <v-list-item-title @click="transferOwnership(menu_active_project_id)" ><v-btn text>{{$t('Transfer ownership')}}</v-btn></v-list-item-title>
+            <v-list-item-title @click="transferOwnership(menu_active_project_id)" ><v-btn text>{{$t('transfer_ownership')}}</v-btn></v-list-item-title>
           </v-list-item>
           
           <v-list-item>
@@ -472,20 +485,13 @@
           <v-divider></v-divider>
           
           <v-list-item>
-            <v-list-item-title @click="ExportProjectJSON(menu_active_project_id)"><v-btn text>{{$t('Export JSON')}}</v-btn></v-list-item-title>
+            <v-list-item-title @click="ExportProjectJSON(menu_active_project_id)"><v-btn text>{{$t('export_json')}}</v-btn></v-list-item-title>
           </v-list-item>
 
           <v-list-item>
-            <v-list-item-title @click="ExportProjectPackage(menu_active_project_id)"><v-btn text>{{$t('Export package (ZIP)')}}</v-btn></v-list-item-title>
+            <v-list-item-title @click="ExportProjectPackage(menu_active_project_id)"><v-btn text>{{$t('export_package_zip')}}</v-btn></v-list-item-title>
           </v-list-item>
-        <!--
-          <v-list-item>
-            <v-list-item-title @click="previewTemplate(menu_active_project_id)"><v-btn text>{{$t('preview')}}</v-btn></v-list-item-title>
-          </v-list-item>
-          <v-list-item>
-            <v-list-item-title @click="pdfTemplate(menu_active_project_id)"><v-btn text>{{$t('pdf')}}</v-btn></v-list-item-title>
-          </v-list-item>          
-  -->
+
         </v-list>
       </v-menu>
     </template>
@@ -494,23 +500,16 @@
     </v-app>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+  <script src="<?php echo base_url();?>vue-app/assets/vue.min.js"></script>
+  <script src="<?php echo base_url(); ?>vue-app/assets/vue-router.min.js"></script>
+  <script src="<?php echo base_url(); ?>vue-app/assets/vuex.min.js"></script>
+  <script src="<?php echo base_url(); ?>vue-app/assets/axios.min.js"></script>
+  <script src="<?php echo base_url();?>vue-app/assets/vuetify.min.js"></script>
+  <script src="<?php echo base_url(); ?>vue-app/assets/lodash.min.js"></script>
   <!--
-  <script src="https://unpkg.com/vue-router@3"></script>
-  <script src="https://unpkg.com/vuex@3.4.0/dist/vuex.js"></script>
--->
-
-  <script src="<?php echo base_url(); ?>javascript/vue-router.min.js"></script>
-  <script src="<?php echo base_url(); ?>javascript/vuex.min.js"></script>
-  <script src="<?php echo base_url(); ?>javascript/axios.min.js"></script>
-
-  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
-  <!--<script src="https://unpkg.com/axios/dist/axios.min.js"></script>-->
-  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.20/lodash.min.js"></script>
-
   <script src="https://cdn.jsdelivr.net/npm/vue-deepset@0.6.3/vue-deepset.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ajv/6.12.2/ajv.bundle.js" integrity="sha256-u9xr+ZJ5hmZtcwoxwW8oqA5+MIkBpIp3M2a4AgRNH1o=" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/deepdash/browser/deepdash.standalone.min.js"></script>
+  -->
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.13.0/css/all.min.css" crossorigin="anonymous" />
 
@@ -527,6 +526,8 @@
     echo $this->load->view("project/vue-collection-share-component.js", null, true);
     echo $this->load->view("project/vue-project-access-component.js", null, true);
     echo $this->load->view("project/vue-transfer-ownership-component.js", null, true);
+    echo $this->load->view("editor_common/navigation-tabs-component.js", null, true);
+    echo $this->load->view("editor_common/global-site-header-component.js", null, true);
     ?>
 
     const translation_messages = {
@@ -554,7 +555,6 @@
         component: Home,
         name: 'home'
       },
-      //{ path: '/editor/trash/vue-search.php', component: SearchComp, name:"search" },
       {
         path: '/share',
         component: ShareProject,
@@ -572,6 +572,7 @@
       themes: {
         light: {
           primary: '#526bc7',
+          "primary-dark": '#0c1a4d',
           secondary: '#b0bec5',
           accent: '#8c9eff',
           error: '#b71c1c',
@@ -580,10 +581,6 @@
     },
   })
 
-
-    /*router.beforeEach((to, from, next) => {
-      console.log("router beforeEach", to, from);
-    })*/
 
     vue_app = new Vue({
       el: '#app',
@@ -737,7 +734,6 @@
         },
         $route: {
           handler: function(newRouteValue){
-            console.log("route changed",newRouteValue);
             this.ReadFilterQS();            
           },
           deep: true
@@ -745,7 +741,7 @@
       },
       methods: {
         pageLink: function(page) {
-          window.location.href = CI.base_url + '/' + page;
+          window.location.href = CI.site_url + '/' + page;
         },
         showProjectMenu (e, projectId) {
           e.preventDefault()
@@ -759,7 +755,6 @@
         },
         onProjectPanelClick: function (projectIndex)
         {
-          console.log(this.Projects[projectIndex]);
           if (!this.Projects[projectIndex].size){
             this.getProjectSize(this.Projects[projectIndex].id, projectIndex);
           }
@@ -815,7 +810,7 @@
           for(i=0;i<Object.keys(this.search_filters).length;i++){
             let filter_name=Object.keys(this.search_filters)[i];
             let values=urlParams.get(filter_name);
-            console.log("filter_name",filter_name,"values",values);
+            
             if (values && values.length>0){
               search_filters[filter_name]=values.split(",");
             }
@@ -842,7 +837,7 @@
           this.search();
         },
         projectEditUrl: function(project_id) {
-          return CI.base_url + '/editor/edit/' + project_id;
+          return CI.site_url + '/editor/edit/' + project_id;
         },
         momentDate(date) {
           //gmt to utc
@@ -920,7 +915,7 @@
         },
         loadFacets: function() {
           vm = this;
-          let url = CI.base_url + '/api/editor/facets';
+          let url = CI.site_url + '/api/editor/facets';
           return axios
             .get(url)
             .then(function(response) {
@@ -930,11 +925,6 @@
               for (i = 0; i < facet_types.length; i++) {
                 let facet_name = facet_types[i];
                 Vue.set(vm.search_filters, facet_name, []);
-
-                /*if (facet_name=='collection'){
-                  vm.loadFlatCollectionsList(vm.facets[facet_name]);
-                }*/
-
               }
               vm.ReadFilterQS();
             })
@@ -944,12 +934,11 @@
         },        
         getProjectSize: function(projectId,projectIndex) {
           vm = this;
-          let url = CI.base_url + '/api/files/size/' + projectId;
+          let url = CI.site_url + '/api/files/size/' + projectId;
           return axios
             .get(url)
             .then(function(response) {
               Vue.set(vm.projects.projects[projectIndex], 'size', response.data.result);
-              console.log("project size",response.data.result);
               
             })
             .catch(function(error) {
@@ -963,8 +952,7 @@
           let keywords= urlParams.get('keywords');
           urlParams.delete('keywords');
           
-
-          let url = CI.base_url + '/api/editor/?offset=' + this.PaginationOffset +
+          let url = CI.site_url + '/api/editor/?offset=' + this.PaginationOffset +
             '&' + urlParams.toString();
 
           if (keywords && keywords.length>0){
@@ -996,7 +984,7 @@
         createProject: function(type) {
           vm = this;
           let form_data = {};
-          let url = CI.base_url + '/api/editor/create/' + type;
+          let url = CI.site_url + '/api/editor/create/' + type;
           this.loading_status = this.$t("processing_please_wait");
           this.dialog_create_project = false;
 
@@ -1019,7 +1007,7 @@
         },
         EditProject: function(id) 
         {
-          let window_ = window.open(CI.base_url + '/editor/edit/' + id, 'project-' + id);
+          let window_ = window.open(CI.site_url + '/editor/edit/' + id, 'project-' + id);
           if (window_){
             window_.focus();
           }
@@ -1039,11 +1027,11 @@
           this.dialog_transfer_ownership = true;
         },
         ExportProjectPackage: function(id) {
-          let url = CI.base_url + '/api/packager/download_zip/' + id + '/1';
+          let url = CI.site_url + '/api/packager/download_zip/' + id + '/1';
           window.open(url, '_blank');
         },
         ExportProjectJSON: function(id) {
-          let url = CI.base_url + '/api/editor/json/' + id;
+          let url = CI.site_url + '/api/editor/json/' + id;
           window.open(url, '_blank');
         },
         ShareProject: async function(id) { 
@@ -1051,7 +1039,7 @@
             let hasPermissionsToShare = await this.hasProjectAdminAccess(id);
 
             if (!hasPermissionsToShare){
-              alert("You don't have permissions to share this project");
+              alert($t("no_permissions_to_share"));
               return false;
             }
 
@@ -1078,7 +1066,7 @@
           }
 
           vm = this;
-          let url = CI.base_url + '/api/editor/delete/' + id;
+          let url = CI.site_url + '/api/editor/delete/' + id;
 
           axios.post(url)
             .then(function(response) {
@@ -1101,7 +1089,7 @@
         },
         getUsersList: async function() {
           vm = this;
-          let url = CI.base_url + '/api/share/users';
+          let url = CI.site_url + '/api/share/users';
           let response = await axios.get(url);
 
           if (response.status == 200) {
@@ -1112,7 +1100,7 @@
         },
         getProjectSharedUsers: async function(project_id) {
           let vm = this;
-          let url = CI.base_url + '/api/share/list/' + project_id;
+          let url = CI.site_url + '/api/share/list/' + project_id;
 
           let response = await axios.get(url);
 
@@ -1124,7 +1112,7 @@
         },
         hasProjectAdminAccess: async function(project_id) {
           let vm = this;
-          let url = CI.base_url + '/api/editor/has_admin_access/' + project_id;
+          let url = CI.site_url + '/api/editor/has_admin_access/' + project_id;
 
           try{
             let response = await axios.get(url);
@@ -1140,7 +1128,7 @@
         },
         getProjectAccessPermissions: async function(project_id) {
           let vm = this;
-          let url = CI.base_url + '/api/editor/access_permissions/' + project_id;
+          let url = CI.site_url + '/api/editor/access_permissions/' + project_id;
 
           let response = await axios.get(url);
 
@@ -1189,7 +1177,7 @@
         addProjectsToCollection: async function() {
           try {
             if (this.selected_projects.length == 0) {
-              alert("Please select at least one project");
+              alert($t("select_atleast_one_project"));
               return false;
             }
 
@@ -1210,7 +1198,7 @@
         },
         getCollectionsList: async function() {
           vm = this;
-          let url = CI.base_url + '/api/collections/tree';
+          let url = CI.site_url + '/api/collections/tree';
           let response = await axios.get(url);
 
           if (response.status == 200) {
@@ -1222,16 +1210,14 @@
         OnAddProjectsToCollection: async function(obj) {
           try {
             let vm = this;
-            console.log("add projects to collection", obj);
 
             let form_data = obj;
-            let url = CI.base_url + '/api/collections/add_projects';
+            let url = CI.site_url + '/api/collections/add_projects';
 
             let response = await axios.post(url,
               form_data
             );
-
-            console.log("completed addprojectstocollections", response);
+            
             this.dialog_share_collection = false;
             this.loadProjects();
           } catch (e) {
@@ -1246,19 +1232,18 @@
           }
         },
         removeFromCollection: async function(project_id, collection_id) {
-          if (!confirm("Are you sure you want to remove this collection from the project?")) {
+          if (!confirm($t("confirm_remove_project_from_collection"))) {
             return false;
           }
 
           try {
             let vm = this;
-            console.log("remove collection", project_id, collection_id);
 
             let form_data = {
               'projects': project_id,
               'collections': collection_id
             };
-            let url = CI.base_url + '/api/collections/remove_projects/';
+            let url = CI.site_url + '/api/collections/remove_projects/';
 
             let response = await axios.post(url,
               form_data
@@ -1279,20 +1264,20 @@
               formData.append('type', this.import_project_type.value);
             }
             else{
-              alert("Please select a project type");
+              alert($t("select_project_type"));
               return false;
             }
 
             if (!this.import_file)
             {
-                alert("Please select a file to import");
+                alert($t("select_file_to_import"));
                 return false;
             }
 
             vm=this;
             this.import_file_errors=null;
             this.import_project_loading=true;
-            let url=CI.base_url + '/api/importproject/';
+            let url=CI.site_url + '/api/importproject/';
 
             axios.post( url,
                 formData,

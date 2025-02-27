@@ -3,39 +3,33 @@
 
 <head>
   <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
-  
+  <link href="<?php echo base_url();?>vue-app/assets/mdi.min.css" rel="stylesheet">
+  <link href="<?php echo base_url();?>vue-app/assets/vuetify.min.css" rel="stylesheet">
   <link href="<?php echo base_url()?>themes/nada52/fontawesome/css/all.css" rel="stylesheet">
   <link rel="stylesheet" href="<?php echo base_url(); ?>themes/nada52/css/bootstrap.min.css">
+  <link href="<?php echo base_url();?>vue-app/assets/styles.css" rel="stylesheet">
 
-  <script src="https://adminlte.io/themes/v3/plugins/jquery/jquery.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/moment@2.26.0/moment.js"></script>
-  <script src="https://unpkg.com/vue-i18n@8"></script>
+  <script src="<?php echo base_url();?>vue-app/assets/jquery.min.js"></script>
+  <script src="<?php echo base_url();?>vue-app/assets/bootstrap.bundle.min.js"></script>
+  <script src="<?php echo base_url();?>vue-app/assets/moment-with-locales.min.js"></script>
+  <script src="<?php echo base_url();?>vue-app/assets/vue-i18n.min.js"></script>
 
-
-  <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
-  <script src="<?php echo base_url(); ?>javascript/vue-router.min.js"></script>
-  <script src="<?php echo base_url(); ?>javascript/vuex.min.js"></script>
-  <script src="<?php echo base_url(); ?>javascript/axios.min.js"></script>
-
-  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.20/lodash.min.js"></script>
-
-  <script src="https://cdn.jsdelivr.net/npm/vue-deepset@0.6.3/vue-deepset.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/ajv/6.12.2/ajv.bundle.js" integrity="sha256-u9xr+ZJ5hmZtcwoxwW8oqA5+MIkBpIp3M2a4AgRNH1o=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/deepdash/browser/deepdash.standalone.min.js"></script>
-
-  <script src="https://cdn.jsdelivr.net/npm/vue-json-pretty@1.9.5/lib/vue-json-pretty.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vue-json-pretty@1.9.5/lib/styles.min.css">
-
+  <script src="<?php echo base_url();?>vue-app/assets/vue.min.js"></script>
+  <script src="<?php echo base_url(); ?>vue-app/assets/vue-router.min.js"></script>
+  <script src="<?php echo base_url(); ?>vue-app/assets/vuex.min.js"></script>
+  <script src="<?php echo base_url(); ?>vue-app/assets/axios.min.js"></script>
+  <script src="<?php echo base_url();?>vue-app/assets/vuetify.min.js"></script>
+  <script src="<?php echo base_url(); ?>vue-app/assets/lodash.min.js"></script>
+  <script src="<?php echo base_url(); ?>vue-app/assets/vue-deepset.min.js"></script>
+  <script src="<?php echo base_url(); ?>vue-app/assets/ajv.min.js"></script>
+  <script src="<?php echo base_url(); ?>vue-app/assets/deepdash.min.js"></script>
+  <script src="<?php echo base_url(); ?>vue-app/assets/vue-json-pretty.min.js"></script>
+  <link href="<?php echo base_url();?>vue-app/assets/vue-json-pretty.min.css" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
 </head>
 
 <style>
-  <?php //echo $this->load->view('metadata_editor/bootstrap-forms.css',null,true); 
-  ?><?php echo $this->load->view('metadata_editor/styles.css', null, true); ?>
+  <?php //echo $this->load->view('metadata_editor/styles.css', null, true); ?>
 
   .navigation-tabs .v-tabs-bar{
     background-color: transparent!important;    
@@ -43,10 +37,22 @@
 </style>
 
 <body class="layout-top-nav">
+    <?php
+      $user=$this->session->userdata('username');
+
+      $user_info=[
+        'username'=> $user,
+        'is_logged_in'=> !empty($user),
+        'is_admin'=> $this->ion_auth->is_admin(),
+      ];
+      
+    ?>
 
   <script>
     var CI = {
-      'base_url': '<?php echo site_url(); ?>'
+      'site_url': '<?php echo site_url(); ?>',
+      'base_url': '<?php echo base_url(); ?>',
+      'user_info': <?php echo json_encode($user_info); ?>
     };
   </script>
 
@@ -55,7 +61,8 @@
 
     <div class="wrapper">
 
-      <?php echo $this->load->view('editor_common/global-header', null, true); ?>
+      <?php //echo $this->load->view('editor_common/global-header', null, true); ?>
+      <vue-global-site-header></vue-global-site-header>
 
       <div class="content-wrapper" xstyle="overflow:auto;height:100vh">
         <section class="content">
@@ -104,15 +111,17 @@
               <div class="projects col" style="overflow:auto;" >
 
                 <div class="mt-5 mb-5">
-                  <h3>{{$t('template_manager')}}</h3>
-
-                  <div class="d-flex">
 
                     <v-tabs background-color="transparent" v-model="nav_tabs_model">
                         <v-tab @click="pageLink('projects')"><v-icon>mdi-text-box</v-icon> <a :href="site_base_url + '/editor'">{{$t("projects")}}</a></v-tab>
                         <v-tab @click="pageLink('collections')" active><v-icon>mdi-folder-text</v-icon> <a :href="site_base_url + '/collections'">{{$t("collections")}}</a> </v-tab>                        
                         <v-tab @click="pageLink('templates')"><v-icon>mdi-alpha-t-box</v-icon> <a :href="site_base_url + '/templates'">{{$t("templates")}}</a></v-tab>                        
                     </v-tabs>
+
+                  <div class="d-flex">
+                    <div class="flex-grow-1 flex-shrink-0 mr-auto">
+                      <h3 class="mt-5">{{$t('template_manager')}}</h3>
+                    </div>
 
                     <div class="justify-content-end">
                       <v-btn class="primary" @click="showImportTemplateDialog">{{$t('import_template')}}</v-btn>
@@ -349,7 +358,7 @@
     <?php include_once("vue-template-acl-common-component.js"); ?>
     <?php include_once("vue-template-acl-component.js"); ?>
     <?php include_once("vue-template-uuid-component.js"); ?>
-    
+    <?php echo $this->load->view("editor_common/global-site-header-component.js", null, true);?>
   
 
     const translation_messages = {
@@ -380,6 +389,7 @@
             themes: {
                 light: {
                     primary: '#526bc7',
+                    "primary-dark": '#0c1a4d',
                     secondary: '#b0bec5',
                     accent: '#8c9eff',
                     error: '#b71c1c',
@@ -394,7 +404,7 @@
       vuetify: vuetify,
       router: router,
       data: {
-        site_base_url: CI.base_url,
+        site_base_url: CI.site_url,
         templates: [],
         data_types: {},
         is_loading: false,
@@ -515,7 +525,7 @@
           this.dialog_share_template=true;
         },        
         getTemplateEditLink: function(template) {
-          return CI.base_url + '/templates/edit/' + template.uid;
+          return CI.site_url + '/templates/edit/' + template.uid;
         },
         getTemplatesByType: function(type) {
           if (!this.templates.core || !this.templates.custom){
@@ -525,7 +535,7 @@
           return this.templates.core.filter(template => template.data_type == type).concat(this.templates.custom.filter(template => template.data_type == type));
         },
         pageLink: function(page){
-          window.location.href = CI.base_url + '/'+page;
+          window.location.href = CI.site_url + '/'+page;
         },
         showMenu (e, templateId, isCore=false, templateDataType='') {
           e.preventDefault()
@@ -562,7 +572,7 @@
         loadTemplates: function() {
           vm = this;
 
-          let url = CI.base_url + '/api/templates/';
+          let url = CI.site_url + '/api/templates/';
           this.loading_status = "Loading templates...";
 
           return axios
@@ -588,7 +598,7 @@
         setDefaultTemplate: function(template_type, uid) {
           vm = this;
           let form_data = {};
-          let url = CI.base_url + '/api/templates/default/' + template_type + '/' + uid;
+          let url = CI.site_url + '/api/templates/default/' + template_type + '/' + uid;
 
           axios.post(url,
               form_data
@@ -632,7 +642,7 @@
 
           vm = this;
           let form_data = {};
-          let url = CI.base_url + '/api/templates/delete/' + uid;
+          let url = CI.site_url + '/api/templates/delete/' + uid;
 
           axios.post(url,
               form_data
@@ -654,21 +664,21 @@
             });
         },
         exportTemplate: function(uid) {
-          window.open(CI.base_url + '/api/templates/' + uid);
+          window.open(CI.site_url + '/api/templates/' + uid);
         },
         previewTemplate: function(uid) {
-          window.open(CI.base_url + '/templates/preview/' + uid);
+          window.open(CI.site_url + '/templates/preview/' + uid);
         },
         previewTableTemplate: function(uid) {
-          window.open(CI.base_url + '/templates/table/' + uid);
+          window.open(CI.site_url + '/templates/table/' + uid);
         },
         pdfTemplate: function(uid) {
-          window.open(CI.base_url + '/templates/pdf/' + uid);
+          window.open(CI.site_url + '/templates/pdf/' + uid);
         },
         duplicateTemplate: function(uid) {
           vm = this;
           let form_data = {};
-          let url = CI.base_url + '/api/templates/duplicate/' + uid;
+          let url = CI.site_url + '/api/templates/duplicate/' + uid;
           this.loading_status = "Creating template...";
 
           axios.post(url,
@@ -681,7 +691,7 @@
               console.log(response);
               vm.loadTemplates();
               if (response.data.template.uid) {
-                window.open(CI.base_url + '/templates/edit/' + response.data.template.uid);
+                window.open(CI.site_url + '/templates/edit/' + response.data.template.uid);
               }
             })
             .catch(function(error) {
@@ -698,7 +708,7 @@
             });
         },
         editTemplate: function(uid) {
-          window.open(CI.base_url + '/templates/edit/' + uid);
+          window.open(CI.site_url + '/templates/edit/' + uid);
         },
         getProjectIcon: function(type) {
           projectIcon = this.project_types_icons[type];
@@ -713,7 +723,7 @@
 
           vm = this;
           this.template_import_errors = [];
-          let url = CI.base_url + '/api/templates/create'
+          let url = CI.site_url + '/api/templates/create'
 
           axios.post(url,
               formData, {}

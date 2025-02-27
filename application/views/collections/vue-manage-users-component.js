@@ -52,7 +52,7 @@ Vue.component('vue-manage-users', {
         let vm=this;
         this.searchUsers(val);
         return;
-        axios.get(CI.base_url + '/api/users/search?keywords='+val)
+        axios.get(CI.site_url + '/api/users/search?keywords='+val)
         .then(response => {
             vm.users = response.data.users;
             console.log("users",vm.users);
@@ -82,7 +82,7 @@ Vue.component('vue-manage-users', {
         },
         loadCollection: function() {
             let vm=this;
-            let url = CI.base_url + '/api/collections/' + this.collection_id;
+            let url = CI.site_url + '/api/collections/' + this.collection_id;
             axios.get(url)
             .then(response => {
                 vm.collection = response.data.collection;
@@ -100,7 +100,7 @@ Vue.component('vue-manage-users', {
             }
 
             let vm=this;
-            let url = CI.base_url + '/api/collections/remove_user_access';
+            let url = CI.site_url + '/api/collections/remove_user_access';
             let collection=this.collection_users[index];
             let form_data = {
                 'collection_id':collection.collection_id,
@@ -120,7 +120,7 @@ Vue.component('vue-manage-users', {
         },
         getUsers: function() {
             let vm=this;
-            axios.get(CI.base_url + '/api/users')
+            axios.get(CI.site_url + '/api/users')
             .then(response => {
                 vm.users = response.data.users;
                 console.log("users",vm.users);
@@ -131,7 +131,7 @@ Vue.component('vue-manage-users', {
         },
         searchUsers: _.debounce(function(val) {
             let vm=this;
-            axios.get(CI.base_url + '/api/users/search?keywords='+val)
+            axios.get(CI.site_url + '/api/users/search?keywords='+val)
             .then(response => {
                 vm.users = response.data.users;
                 console.log("users",vm.users);
@@ -144,7 +144,7 @@ Vue.component('vue-manage-users', {
         //get collection users
         getCollectionAccess: function() {
             let vm=this;
-            axios.get(CI.base_url + '/api/collections/user_access/' + this.collection_id)
+            axios.get(CI.site_url + '/api/collections/user_access/' + this.collection_id)
             .then(response => {
                 vm.collection_users = response.data.users;
                 console.log("users",vm.users);
@@ -164,7 +164,7 @@ Vue.component('vue-manage-users', {
         },
         AddUserCollectionAccess: async function(collection_id,user_id,permissions) {
             let vm=this;
-            let url = CI.base_url + '/api/collections/user_access';
+            let url = CI.site_url + '/api/collections/user_access';
             let form_data = {
                 'collection_id':collection_id,
                 'user_id':user_id,

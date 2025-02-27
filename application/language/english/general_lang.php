@@ -9,6 +9,9 @@ $lang['title']="Title";
 $lang['language']="Language";
 $lang['version']="Version";
 $lang['last_updated']="Last updated";
+$lang['share']="Share";
+$lang['view_access']="View access";
+
 
 $lang['description']="Description";
 $lang['name']="Name";
@@ -129,7 +132,11 @@ $lang['File manager']="File manager";
 
 $lang['administrative_metadata']="Administrative metadata";
 $lang['administrative_metadata_templates']="Administrative metadata templates";
-
+$lang['password']='Password';
+$lang['profile']='Profile';
+$lang['logout']='Logout';
+$lang['translate']="Translate";
+$lang['site_configurations']="Site configurations";
 
 /* End of file general_lang.php */
 /* Location: ./application/language/base/general_lang.php */

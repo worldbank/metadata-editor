@@ -3,6 +3,15 @@ html {
     background-color: #f3f5fb;
  } 
 
+
+.site-logo-svg{
+    background-image: url('images/logo.svg'); /* Replace with the actual path to your SVG file */
+    background-size: cover;
+    background-repeat: no-repeat;
+    width: 305px; /* Set the width of the element */
+    height: 176px; /* Set the height of the element */
+} 
+
 #app ,
 .theme--light.v-application{
     font-family: Roboto,sans-serif;

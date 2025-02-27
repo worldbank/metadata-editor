@@ -34,18 +34,18 @@ Vue.component('vue-project-access-dialog', {
 
                 <v-card>
                     <v-card-title class="text-h5 grey lighten-2">
-                        Project permissions
+                        {{ $t('project_permissions') }}
                     </v-card-title>
                     <v-card-text>
                         <div v-if="project_access">
 
-                            <strong>Project owner</strong>: {{project_access.owner.username}}
+                            <strong>{{ $t('project_owner') }}</strong>: {{project_access.owner.username}}
                             
                             <table class="table table-sm table-striped mt-3">
                                 <tr>                                    
                                     <td>
                                         <div>
-                                        <strong>Collaborators <span v-if="project_access.collaborators && project_access.collaborators.length > 0">({{project_access.collaborators.length}})</span> </strong>
+                                        <strong>{{ $t('collaborators') }} <span v-if="project_access.collaborators && project_access.collaborators.length > 0">({{project_access.collaborators.length}})</span> </strong>
                                         </div>
                                     </td>
                                     <td>
@@ -63,7 +63,7 @@ Vue.component('vue-project-access-dialog', {
                                 <tr  class="pt-2">                                    
                                     <td>
                                         <div>
-                                            <strong>Access by Collections <span v-if="project_access.collections && project_access.collections.length > 0">({{project_access.collections.length}})</span></strong>
+                                            <strong>{{$t('access_by_collections')}} <span v-if="project_access.collections && project_access.collections.length > 0">({{project_access.collections.length}})</span></strong>
                                         </div>
                                     </td>                                        
                                     <td>
@@ -96,7 +96,7 @@ Vue.component('vue-project-access-dialog', {
                         small
                         @click="selected=[];dialog = false"
                     >
-                        Close
+                        {{ $t('close') }}
                     </v-btn>
                     </v-card-actions>
                     

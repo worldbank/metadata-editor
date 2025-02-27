@@ -52,8 +52,8 @@ Vue.component('vue-collection-share', {
                 
                 <v-card>
                     <v-card-title class="text-h5 lighten-2">
-                        Add to collection 
-                        <v-chip v-if="projects.length>0" color="indigo" text-color="white" class="ml-2">{{projects.length}} project(s)</v-chip>
+                        {{ $t('add_to_collection') }}
+                        <v-chip v-if="projects.length>0" color="indigo" text-color="white" class="ml-2">{{projects.length}} {{ $t('selected') }}</v-chip>
                     </v-card-title>
 
                     <v-card-text style="height: 300px;">
@@ -80,14 +80,14 @@ Vue.component('vue-collection-share', {
                             color="indigo"
                             small                         
                             @click="shareWithCollection"
-                        >Share
+                        >{{ $t('share') }}
                         </v-btn>
                         <v-btn                            
                             class=""
                             color="grey"
                             small
                             @click="dialog=false"
-                        >Close
+                        >{{ $t('close') }}
                         </v-btn>
 
                     

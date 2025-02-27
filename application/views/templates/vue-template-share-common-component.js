@@ -58,7 +58,7 @@ Vue.component('vue-template-share-common', {
         },
         loadTemplateUsers: function(){
             let vm = this;
-            let url = CI.base_url + '/api/templates/share/' + this.template_id;
+            let url = CI.site_url + '/api/templates/share/' + this.template_id;
             axios.get(url)
             .then(response => {
                 vm.shared_users = response.data.users;
@@ -80,7 +80,7 @@ Vue.component('vue-template-share-common', {
                 });
             }
 
-            let url = CI.base_url + '/api/templates/share/' + this.template_id;
+            let url = CI.site_url + '/api/templates/share/' + this.template_id;
 
             axios.post(url,
                 form_data
@@ -106,7 +106,7 @@ Vue.component('vue-template-share-common', {
                 'template_uid':this.template_id
             });
 
-            let url = CI.base_url + '/api/templates/share/' + this.template_id + '?update=1';
+            let url = CI.site_url + '/api/templates/share/' + this.template_id + '?update=1';
             axios.post(url,
                 form_data
             )
@@ -134,7 +134,7 @@ Vue.component('vue-template-share-common', {
             let user_id = this.shared_users[index]['user_id'];
 
             let vm=this;
-            let url = CI.base_url + '/api/templates/remove_access';
+            let url = CI.site_url + '/api/templates/remove_access';
 
             axios.post(url, form_data)
             .then(response => {
@@ -149,7 +149,7 @@ Vue.component('vue-template-share-common', {
         
         searchUsers: _.debounce(function(val) {
             let vm=this;
-            axios.get(CI.base_url + '/api/users/search?keywords='+val)
+            axios.get(CI.site_url + '/api/users/search?keywords='+val)
             .then(response => {
                 vm.users = response.data.users;
                 console.log("users",vm.users);

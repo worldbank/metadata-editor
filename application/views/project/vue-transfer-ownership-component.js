@@ -88,10 +88,10 @@ Vue.component('vue-transfer-ownership', {
                 
                 <v-card>
                     <v-card-title class="text-h5 lighten-2">
-                        {{ $t('Transfer ownership') }}
+                        {{ $t('transfer_ownership') }}
                     </v-card-title>
                     <v-card-subtitle>
-                        {{ $t('Select a user to transfer ownership of the project') }}
+                        {{ $t('select_user_to_transfer_ownership') }}
                     </v-card-subtitle>
                     
                     <v-card-text>
@@ -104,12 +104,12 @@ Vue.component('vue-transfer-ownership', {
                         solo
                         chips
                         color="blue-grey lighten-2"
-                        :label="$t('Search user')"
+                        :label="$t('search_user')"
                         item-text="username"
                         item-value="id"                        
                         cache-items
                         return-object
-                        :no-data-text="$t('Type user name or email to search for a user')"
+                        :no-data-text="$t('type_user_name_or_email')"
                     >
                         <template v-slot:selection="data">
                             <v-chip
@@ -148,14 +148,14 @@ Vue.component('vue-transfer-ownership', {
                             color="primary"
                             small                         
                             @click="transferOwnership"
-                        >Transfer ownership
+                        >{{ $t('transfer_ownership') }}
                         </v-btn>
                         <v-btn                            
                             class=""
                             color="grey"
                             small
                             @click="dialog=false"
-                        >Close
+                        >{{ $t('close') }}
                         </v-btn>
                     
                     </v-card-actions>

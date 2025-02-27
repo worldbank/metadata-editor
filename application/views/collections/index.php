@@ -3,21 +3,32 @@
 
 <head>
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/@mdi/font@6.x/css/materialdesignicons.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link href="<?php echo base_url();?>vue-app/assets/mdi.min.css" rel="stylesheet">
+    <link href="<?php echo base_url();?>vue-app/assets/vuetify.min.css" rel="stylesheet">
+    <link href="<?php echo base_url();?>vue-app/assets/bootstrap.min.css" rel="stylesheet" >
+    <link href="<?php echo base_url();?>vue-app/assets/styles.css" rel="stylesheet">
 
-    <script src="https://adminlte.io/themes/v3/plugins/jquery/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.20/lodash.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/moment@2.26.0/moment.js"></script>
-    <script src="https://unpkg.com/vue-i18n@8"></script>
+    <script src="<?php echo base_url();?>vue-app/assets/jquery.min.js"></script>
+    <script src="<?php echo base_url(); ?>vue-app/assets/lodash.min.js"></script>
+
+    <script src="<?php echo base_url();?>vue-app/assets/bootstrap.bundle.min.js"></script>
+    <script src="<?php echo base_url(); ?>vue-app/assets/moment-with-locales.min.js"></script>
+    <script src="<?php echo base_url(); ?>vue-app/assets/vue-i18n.js"></script>
 
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
 
+    <?php
+        $user=$this->session->userdata('username');
+
+        $user_info=[
+            'username'=> $user,
+            'is_logged_in'=> !empty($user),
+            'is_admin'=> $this->ion_auth->is_admin(),
+        ];
+        
+        ?>
     
     <style>
-        <?php echo $this->load->view('metadata_editor/styles.css', null, true); ?>
         .capitalize {
             text-transform: capitalize;
         }
@@ -80,8 +91,10 @@
 <body class="layout-top-nav">
 
     <script>
-        var CI = {
-            'base_url': '<?php echo site_url(); ?>'
+       var CI = {
+        'site_url': '<?php echo site_url(); ?>',
+        'base_url': '<?php echo base_url(); ?>',
+        'user_info': <?php echo json_encode($user_info); ?>
         };
     </script>
 
@@ -94,7 +107,8 @@
 
         <div class="wrapper">
             <v-app>
-            <?php echo $this->load->view('editor_common/global-header', null, true); ?>
+            <?php //echo $this->load->view('editor_common/global-header', null, true); ?>
+            <vue-global-site-header></vue-global-site-header>
             <router-view :key="$route.fullPath"></router-view>
             </v-app>
         </div>
@@ -102,11 +116,11 @@
 
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
-    <script src="<?php echo base_url(); ?>javascript/vue-router.min.js"></script>
-    <script src="<?php echo base_url(); ?>javascript/axios.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
-
+    <script src="<?php echo base_url();?>vue-app/assets/vue.min.js"></script>
+    <script src="<?php echo base_url(); ?>vue-app/assets/vue-router.min.js"></script>
+    <script src="<?php echo base_url(); ?>vue-app/assets/axios.min.js"></script>
+    <script src="<?php echo base_url();?>vue-app/assets/vuetify.min.js"></script>
+  
 
     <script>
         <?php
@@ -116,6 +130,7 @@
             echo $this->load->view("collections/vue-manage-users-component.js", null, true);
             echo $this->load->view("collections/vue-copy-collection-component.js", null, true);
             echo $this->load->view("collections/vue-move-collection-component.js", null, true);
+            echo $this->load->view("editor_common/global-site-header-component.js", null, true);
         ?>
 
 
@@ -169,6 +184,7 @@
             themes: {
                 light: {
                     primary: '#526bc7',
+                    "primary-dark": '#0c1a4d',
                     secondary: '#b0bec5',
                     accent: '#8c9eff',
                     error: '#b71c1c',

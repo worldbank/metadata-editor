@@ -9,6 +9,9 @@ $lang['title']="Title";
 $lang['language']="Language";
 $lang['version']="Version";
 $lang['last_updated']="Last updated";
+$lang['share']="Share";
+$lang['view_access']="View access";
+
 
 $lang['description']="Description";
 $lang['name']="Name";
@@ -44,7 +47,8 @@ $lang['label']="Label";
 
 $lang['required']="Required";
 $lang['recommended']="Recommended";
-$lang['required']="Required";
+$lang['private']="Private";
+$lang['readonly']="Read-only";
 
 $lang['na']="N/A";
 $lang['json']="JSON";
@@ -74,6 +78,7 @@ $lang['delete_selection']="Delete selection";
 
 $lang['search']="Search";
 
+
 $lang['recent']=" Recent ↑";
 $lang['oldest']=" Oldest ↓";
 $lang['title_az']="Title (A-Z)";
@@ -85,8 +90,53 @@ $lang['failed']="Failed";
 $lang['confirm_delete']="Delete";
 $lang['confirm_delete_records']="Are you sure you want to delete the following records?";
 
+
+$lang['copy']="Copy";
+$lang['paste_replace']="Paste (replace)";
+$lang['paste_append']="Paste (append)";
+$lang['undo_paste']="Undo paste";
+
+$lang['confirm_delete_selected']="Are you sure you want to delete the selected items?";
+
+
+$lang['Save']="Save";
+$lang['Export project metadata as JSON']="Export project metadata as JSON";
+$lang['Cancel changes']="Cancel changes";
+$lang['unsaved_changed']="Unsaved changes";
+
+
+$lang['field_content_format']="Input format";
+$lang['field_content_format_help']="Text, Markdown, LaTex, HTML. Default is Text";
+
+
+$lang['enum_store_options_label']="Select column to use as value";
+
+$lang['export_file']="Export file";
+$lang['finished_processing']="Finished processing";
+
+
+$lang['change_password']="Change password";
+
+$lang['data_upload_notice']="<p>The uploaded files will be processed on the server to extract variable-level 
+                                    information such as names, labels, categories, and to generate summary statistics.
+                                    </p> 
+                                    <p>Select whether to store the data on the server or have it removed after processing. 
+                                    If the data is not stored, certain features will be unavailable — such as data preview,
+                                     weighting, and data export. Any data stored on the server can be removed at any time.
+                                     </p>";
+
+$lang['History']="History";
+$lang['Refresh summary statistics']="Refresh summary statistics";
+$lang['Replace file']="Replace file";
+$lang['File manager']="File manager";
+
 $lang['administrative_metadata']="Administrative metadata";
 $lang['administrative_metadata_templates']="Administrative metadata templates";
+$lang['password']='Password';
+$lang['profile']='Profile';
+$lang['logout']='Logout';
+$lang['translate']="Translate";
+$lang['site_configurations']="Site configurations";
 
 /* End of file general_lang.php */
 /* Location: ./application/language/base/general_lang.php */

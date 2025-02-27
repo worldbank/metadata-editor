@@ -106,7 +106,7 @@ Vue.component('vue-project-share', {
         },
         removeAccess: function(index) {
             
-            if (!confirm("Are you sure you want to remove access for this user?")) {
+            if (!confirm(this.$t('confirm_remove_user_access'))){
                 return;
             }
 
@@ -167,7 +167,7 @@ Vue.component('vue-project-share', {
 
                 <v-card>
                     <v-card-title class="text-h5 grey lighten-2">
-                    Share project
+                    {{$t('share_project')}}
                     </v-card-title>
                     <v-card-text>
                         <v-row>
@@ -183,13 +183,13 @@ Vue.component('vue-project-share', {
                         solo
                         chips
                         color="blue-grey lighten-2"
-                        label="Search users to select"
+                        :label="$t('search_user')"
                         item-text="username"
                         item-value="id"
                         multiple
                         cache-items
                         return-object
-                        no-data-text="Type user name or email to search for a user"                        
+                        :no-data-text="$t('type_user_name_or_email')"
                     >
                         <template v-slot:selection="data">
                             <v-chip
@@ -249,8 +249,8 @@ Vue.component('vue-project-share', {
                         <v-simple-table style="font-size:small;">
                             <thead>
                             <tr>
-                                <th>Username</th>
-                                <th>Role</th>
+                                <th>{{$t('username')}}</th>
+                                <th>{{$t('role')}}</th>
                                 <th></th>
                             </tr>
                             </thead>
@@ -266,9 +266,9 @@ Vue.component('vue-project-share', {
                                         v-model="user.permissions" 
                                         @change="updateAccess(index)"
                                     >
-                                        <option value="view">View</option>
-                                        <option value="edit">Edit</option>
-                                        <option value="admin">Admin</option>
+                                        <option value="view">{{$t('view')}}</option>
+                                        <option value="edit">{{$t('edit')}}</option>
+                                        <option value="admin">{{$t('admin')}}</option>
                                     </select>
                                 </td>
                                 <td>
@@ -297,7 +297,7 @@ Vue.component('vue-project-share', {
                         small
                         @click="selected=[];dialog = false"
                     >
-                        Close
+                        {{ $t('close') }}
                     </v-btn>
                     </v-card-actions>
                     

@@ -58,7 +58,7 @@ Vue.component('vue-template-acl-common', {
         },
         loadTemplateAclUsers: function(){
             let vm = this;
-            let url = CI.base_url + '/api/admin-metadata/acl/' + this.template_id;
+            let url = CI.site_url + '/api/admin-metadata/acl/' + this.template_id;
             axios.get(url)
             .then(response => {
                 vm.shared_users = response.data.users;
@@ -80,7 +80,7 @@ Vue.component('vue-template-acl-common', {
                 });
             }
 
-            let url = CI.base_url + '/api/admin-metadata/acl/';
+            let url = CI.site_url + '/api/admin-metadata/acl/';
 
             axios.post(url,
                 form_data
@@ -106,7 +106,7 @@ Vue.component('vue-template-acl-common', {
                 'template_uid':this.template_id
             });
 
-            let url = CI.base_url + '/api/admin-metadata/acl/';
+            let url = CI.site_url + '/api/admin-metadata/acl/';
             axios.post(url,
                 form_data
             )
@@ -134,7 +134,7 @@ Vue.component('vue-template-acl-common', {
             let user_id = this.shared_users[index]['user_id'];
 
             let vm=this;
-            let url = CI.base_url + '/api/admin-metadata/acl_remove';
+            let url = CI.site_url + '/api/admin-metadata/acl_remove';
 
             axios.post(url, form_data)
             .then(response => {
@@ -149,7 +149,7 @@ Vue.component('vue-template-acl-common', {
         
         searchUsers: _.debounce(function(val) {
             let vm=this;
-            axios.get(CI.base_url + '/api/users/search?keywords='+val)
+            axios.get(CI.site_url + '/api/users/search?keywords='+val)
             .then(response => {
                 vm.users = response.data.users;
                 console.log("users",vm.users);

@@ -208,18 +208,17 @@ Vue.component('summary-component', {
                         </div>
                 
                         <v-card>
-                            <v-card-title>
+                            <v-card-title class="d-flex justify-space-between">
                                 <h6>{{$t("Data and Documentation")}}</h6>
+
+                                <div v-if="project_disk_usage.size_formatted">
+                                    <v-chip color="light" small style="font-size:small">{{$t("Disk usage")}}: {{project_disk_usage.size_formatted}}</v-chip>
+                                </div>
+
                             </v-card-title>
                             <v-card-text>
-                                <div class="d-flex justify-content-between">                                    
-                                    <div v-if="project_disk_usage.size_formatted">
-                                        <span>{{$t("Disk usage")}} </span>
-                                        <span class="success--text ml-2">{{project_disk_usage.size_formatted}}</span>
-                                    </div>
-                                </div>
-                                <div class="files-container " v-if="ProjectType!=='timeseries-db'" style="max-height:400px;overflow:auto;">
-                                <summary-files></summary-files>
+                                <div class="files-container" v-if="ProjectType!=='timeseries-db'" style="max-height:400px;overflow:auto;">
+                                <summary-files v-on:file-deleted="getProjectDiskUsage" ></summary-files>
                                 </div>
                             </v-card-text>
                         </v-card>

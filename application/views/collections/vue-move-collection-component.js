@@ -15,7 +15,7 @@ Vue.component('vue-move-collection', {
     methods: {        
         loadCollections: function() {
             let vm=this;
-            let url = CI.base_url + '/api/collections/tree_flatten';
+            let url = CI.site_url + '/api/collections/tree_flatten';
             axios.get(url)
             .then(response => {
                 vm.collections = response.data.collections;
@@ -27,7 +27,7 @@ Vue.component('vue-move-collection', {
         },
         moveCollection: function() {
             let vm=this;
-            let url = CI.base_url + '/api/collections/move';
+            let url = CI.site_url + '/api/collections/move';
             
             let form_data = {
                 'source_id':vm.source_collection_id,                
