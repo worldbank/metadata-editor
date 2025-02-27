@@ -5,11 +5,11 @@ html {
 
 
 .site-logo-svg{
-    background-image: url('images/logo.svg'); /* Replace with the actual path to your SVG file */
+    background-image: url('images/logo.svg');
     background-size: cover;
     background-repeat: no-repeat;
-    width: 305px; /* Set the width of the element */
-    height: 176px; /* Set the height of the element */
+    width: 305px;
+    height: 176px;
 } 
 
 #app ,
@@ -88,12 +88,6 @@ html {
      min-height: 60px;
  }
 
- /*.grid-button-delete,
-.section-toggle-icon
-{
-    margin-top:4px;
-}*/
-
  .form-field-table {
      margin-top: 20px;
      margin-bottom: 20px;
@@ -110,10 +104,6 @@ html {
      margin-bottom: 30px;
  }
 
- /*.metadata-form-container .field-type-section .field-type-section{
-    margin-left:15px;
-    margin-right:15px;
-}*/
 
  .form-node .form-node,
  .form-tree .form-tree,
@@ -430,29 +420,6 @@ html {
      color: #fff !important;
  }
 
- /*
-.sidebar-menu-bar .btn{
-    background:none;
-    color:black;
-    border:0px;
-}
-
-.sidebar-menu-bar .btn:hover{
-    background-color:rgb(174, 173, 173);
-}
-
-.sidebar-menu-bar .btn.active .icon,
-.sidebar-menu-bar .btn:hover .icon{
-    color:rgb(251, 251, 251)!important;
-}
-
-.sidebar-menu-bar .btn{
-    background:rgb(0 0 0 / 12%);
-    color:black;
-    border:0px;
-}
-*/
-
  .help-text {
      white-space: pre-wrap;
  }
@@ -546,10 +513,6 @@ html {
      margin-left: -5px;
  }
 
- /*.editor-sidebar {
-     background: #00060c !important;
- }*/
-
  .bg-variable {
      background: #526cc742;
  }
@@ -560,15 +523,12 @@ html {
  }
 
  .var-icon:hover {
-     /*color:rgb(251, 251, 251)!important;*/
      background-color: rgb(208, 205, 205);
      cursor: pointer;
  }
 
 
  .section-list-container {
-     /*height:100%;
-    background:white;*/
      height: 100%;
      display: flex;
      flex-flow: column nowrap;
@@ -579,7 +539,6 @@ html {
  }
 
  .section-list-container .section-list-body {
-     /*position:relative;padding-bottom:50px;height:inherit;overflow-y: scroll;background:white;font-size:small*/
      display: flex;
      flex-direction: column;
      height: 100%;
@@ -671,6 +630,7 @@ html {
  .variable-frequencies .progress-text {
      font-size: 10px;
      padding-left: 3px;
+     margin-top:8px;
  }
 
 
@@ -686,25 +646,6 @@ html {
      display: none;
  }
 
-/*
- .v-treeview-node__content, .v-treeview-node__label {
-     flex-shrink: 1;
- }
-
- .v-treeview-node__root {
-     height: auto;
- }
-
-
- .v-treeview
-{
-    color: #bfc3c6 !important;
- }
-
- .v-treeview .v-icon{
-    color: #6c757d !important
- }
-*/
 
  .editor-sidebar::-webkit-scrollbar{
     width:8px;
