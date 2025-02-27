@@ -8,7 +8,7 @@ Vue.component('vue-collection', {
             dialog_copy_collection: false,
             dialog_move_collection: false,
             active_tab:1,
-            site_base_url: CI.base_url,
+            site_base_url: CI.site_url,
             action_menu: false,        
             action_menu_x: 0,
             action_menu_y: 0,
