@@ -21,17 +21,21 @@ class Audit_log
 	 * 
 	 * 
 	 */
-	function log_event($obj_type,$obj_id,$action, $metadata=NULL)
+	function log_event($obj_type,$obj_id,$action, $metadata=NULL, $user_id=NULL)
 	{
 		//validate metadata is json
 		if($metadata != NULL){
 			$metadata=json_encode($metadata);
 		}
 
+		if ($user_id == NULL){
+			$user_id = $this->ci->session->userdata('user_id');
+		}
+
 		$data=array(
 			"obj_type"=>$obj_type,
 			"obj_id"=>$obj_id,
-			"user_id"=>$this->ci->session->userdata('user_id'),
+			"user_id"=>$user_id,
 			"action_type"=>$action,
 			"metadata"=>$metadata
 		);

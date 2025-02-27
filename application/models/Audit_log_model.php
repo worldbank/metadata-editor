@@ -77,7 +77,7 @@ class Audit_log_model extends CI_Model {
 		$this->db->select('audit_logs.*, users.username, users.email');
 		$this->db->where('obj_type',$obj_type);
 		$this->db->where('obj_id',$obj_id);
-		$this->db->join('users', 'users.id = audit_logs.user_id');
+		$this->db->join('users', 'users.id = audit_logs.user_id', 'left');
 		$this->db->order_by('created','desc');
 		$this->db->limit($limit);
 

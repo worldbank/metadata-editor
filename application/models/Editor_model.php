@@ -392,7 +392,7 @@ class Editor_model extends CI_Model {
 
 		//generate/log diff
 		$diff=$this->get_metadata_diff($this->get_metadata($id),$options);
-		$this->audit_log->log_event($obj_type='project',$obj_id=$id,$action='update', $metadata=$diff);
+		$this->audit_log->log_event($obj_type='project',$obj_id=$id,$action='update', $metadata=$diff, isset($options['changed_by']) ? $options['changed_by'] : null);
 
 		//partial update metadata
 		if (isset($options['partial_update'])){

@@ -242,7 +242,7 @@ class Editor extends MY_REST_Controller
 				$this->update_post($type,$dataset_id);
 			}
 
-			$this->audit_log->log_event($obj_type='project',$obj_id=$dataset_id,$action='create');			
+			$this->audit_log->log_event($obj_type='project',$obj_id=$dataset_id,$action='create', $user_id);			
 
 			$response=array(
 				'status'=>'success',
@@ -368,7 +368,7 @@ class Editor extends MY_REST_Controller
 			}
 
 			$this->editor_acl->user_has_project_access($id,$permission='edit',$user);
-			$this->audit_log->log_event($obj_type='project',$obj_id=$id,$action='patch', $metadata=$options['patches']);
+			$this->audit_log->log_event($obj_type='project',$obj_id=$id,$action='patch', $metadata=$options['patches'], $user_id);
 			
 			$options['changed_by']=$user_id;
 			$options['changed']=date("U");
@@ -432,8 +432,15 @@ class Editor extends MY_REST_Controller
 			$options['changed_by']=$user_id;
 			$options['sid']=$sid;
 
-			$this->editor_acl->user_has_project_access($sid,$permission='edit', $this->api_user());			
+			$this->editor_acl->user_has_project_access($sid,$permission='edit', $this->api_user());
 			$this->Editor_model->set_project_options($sid,$options);
+			$this->audit_log->log_event(
+				$obj_type='project',
+				$obj_id=$sid,
+				$action='options', 
+				$metadata=array($options),
+				$user_id
+			);
 
 			$response=array(
 					'status'=>'success'
@@ -1383,7 +1390,8 @@ class Editor extends MY_REST_Controller
 					$obj_type='project',
 					$obj_id=$project_id,
 					$action='ownership', 
-					$metadata=array('new_owner_id'=>$new_user_id)
+					$metadata=array('new_owner_id'=>$new_user_id),
+					$user_id
 				);
 			}
 
