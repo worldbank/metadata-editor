@@ -154,7 +154,6 @@
                                 {
                                     "key": "type",
                                     "title": "Type",
-                                    "hlep_text": "Type of identifier e.g. `doi`, `handle`, `other`",
                                     "type": "string",
                                     "prop_key": "study_desc.title_statement.identifiers.type",
                                     "help_text": "The type of identifier. For example: “DOI”. ",
@@ -2918,6 +2917,70 @@
                         }
                     ],
                     "help_text": "Tags, especially when organized in tag groups, provide a powerful and flexible solution to enable custom facets (filters) in data catalogs. Note that tags and tag groups are not element from the DDI Codebook standard."
+                }
+            ]
+        },       
+        {
+            "type": "section_container",
+            "id": "provenance",
+            "key": "provenance_container",
+            "title": "Provenance",
+            "items": [
+                {
+                    "key": "provenance",
+                    "title": "Provenance",
+                    "type": "nested_array",
+                    "props": [
+                        {
+                            "key":"origin_description",
+                            "title":"Origin description",
+                            "type":"section",
+                            "props":[
+                                {
+                                    "key": "origin_description.harvest_date",
+                                    "title": "Harvest date",
+                                    "type": "string",
+                                    "prop_key": "provenance.origin_description.harvest_date",
+                                    "help_text": "Date when the metadata was harvested from the source.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "origin_description.altered",
+                                    "title": "Altered",
+                                    "type": "string",
+                                    "prop_key": "provenance.origin_description.altered",
+                                    "help_text": "Indicates whether the metadata has been altered from the original source.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "origin_description.base_url",
+                                    "title": "Base URL",
+                                    "type": "string",
+                                    "prop_key": "provenance.origin_description.base_url",
+                                    "help_text": "The base URL of the source.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key":"origin_description.identifier",
+                                    "title":"Identifier",
+                                    "type":"string",
+                                    "prop_key":"provenance.origin_description.identifier",
+                                    "help_text":"The unique identifier of the source.",
+                                    "display_type":"text"
+                                },
+                                {
+                                    "key": "origin_description.date_stamp",
+                                    "title": "Date stamp",
+                                    "type": "string",
+                                    "prop_key": "provenance.origin_description.date_stamp",
+                                    "help_text": "The date when the metadata was created.",
+                                    "display_type": "text"
+                                }
+                            ]
+                        }                        
+
+                    ],
+                    "help_text": "Provenance information is used to document the origin of the metadata."
                 }
             ]
         }
