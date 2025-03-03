@@ -47,11 +47,7 @@
       "type": "object",
       "properties": {
         "provenance": {
-          "type": "array",
-          "description": "Provenance",
-          "items": {
-            "$ref": "provenance-schema.json"
-          }
+          "$ref": "provenance-schema.json"
         },
         "tags": {
           "type": "array",
