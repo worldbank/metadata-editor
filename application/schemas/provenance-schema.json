@@ -2,36 +2,77 @@
     "$id": "http://ihsn.org/schemas/provenance",
     "$schema": "http://json-schema.org/draft-07/schema#",
     "type": "object",
-    "description": "Provenance of metadata based on the OAI provenance schema (http://www.openarchives.org/OAI/2.0/provenance.xsd)",
+    "description": "Provenance of metadata records",
     "properties": {
-        "origin_description": {
+        "original_repository": {
             "type": "object",
-            "title": "Origin description",
+            "title": "Original repository",
             "properties": {
-                "harvest_date": {
+                "repository_name": {
                     "type": "string",
-                    "description": "Harvest date using UTC date format"
+                    "description": "Name of the original repository where the metadata was first published"
                 },
-                "altered": {
-                    "type": "boolean",
-                    "title": "Metadata altered",
-                    "description": "If the metadata was altered before dissemination"
-                },
-                "base_url": {
+                "url": {
                     "type": "string",
-                    "description": "Base URL of the originating repository"
+                    "description": "URL of the original repository or dataset"
                 },
-                "identifier": {
+                "dataset_identifier": {
                     "type": "string",
-                    "description": "Unique idenifiter of the item from the originating repository"
+                    "description": "Unique identifier of the dataset in the original repository"
                 },
-                "date_stamp": {
+                "doi": {
                     "type": "string",
-                    "description": "Datestamp (UTC date format) of the metadata record disseminated by the originating repository"
+                    "description": "Digital Object Identifier (DOI) of the dataset"
                 },
-                "metadata_namespace": {
+                "dataset_title": {
                     "type": "string",
-                    "description": "Metadata namespace URI of the metadata format of the record harvested from the originating repository"
+                    "description": "Title of the dataset in the original repository"
+                },
+                "date_published": {
+                    "type": "string",
+                    "description": "Date and time when the dataset was first published"
+                },
+                "notes": {
+                    "type": "string",
+                    "description": "Additional notes on the dataset publication process"
+                }
+            }
+        },
+        "source_repository": {
+            "type": "array",
+            "title": "Source repository",
+            "description": "Information on the source repositories from which the metadata was harvested",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "repository_name": {
+                        "type": "string",
+                        "description": "Name of the source repository where the metadata was harvested"
+                    },
+                    "url": {
+                        "type": "string",
+                        "description": "URL of the source repository or dataset"
+                    },
+                    "dataset_identifier": {
+                        "type": "string",
+                        "description": "Unique identifier of the dataset in the source repository"
+                    },
+                    "dataset_title": {
+                        "type": "string",
+                        "description": "Title of the dataset in the source repository"
+                    },
+                    "date_acquired": {
+                        "type": "string",
+                        "description": "Date and time when the metadata was acquired from the source repository"
+                    },
+                    "acquisition_mode": {
+                        "type": "string",
+                        "description": "Method used to acquire the metadata from the source repository"
+                    },
+                    "notes": {
+                        "type": "string",
+                        "description": "Additional notes on the metadata acquisition process"
+                    }
                 }
             }
         }

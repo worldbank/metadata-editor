@@ -87,7 +87,12 @@
               "_ddi_xpath": "docDscr/citation/verStmt/notes"
             }
           }
-        }
+        },
+        "checksum":{
+					"title":"Checksum",
+					"description":"Checksum value for the document using SHA-256",
+					"type":"string"
+				}
       },
       "additionalProperties": false
     },
@@ -687,10 +692,7 @@
                     "description": "Country ISO code",
                     "type": "string"
                   }
-                },
-                "required": [
-                  "name"
-                ]
+                }                
               }
             },
             "bbox": {
@@ -1579,7 +1581,7 @@
         }
       },
       "required": [
-        "title_statement"        
+        "title_statement"
       ],
       "additionalProperties": false
     }

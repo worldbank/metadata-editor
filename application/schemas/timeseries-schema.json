@@ -5,11 +5,12 @@
 	"description": "Schema for timeseries data type",
 	"type": "object",
 	"properties": {
-		"idno": {
-			"type": "string",
-			"title": "Project unique identifier",
-			"description": "Project unique identifier"
-		},		
+		"idno":{
+          "type": "string",
+          "title": "Unique Identifier",
+          "description": "Unique identifier for the project. Leave it empty to auto-generate.",
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },       
 		"metadata_information": {
 			"type": "object",
 			"title": "Metadata creation",
@@ -84,8 +85,14 @@
 						"type": "string"
 					  }
 					}
-				  }
-			}			
+				},
+				"checksum":{
+					"title":"Checksum",
+					"description":"Checksum value for the document using SHA-256",
+					"type":"string"
+				}
+			},
+			"additionalProperties": false
 		},
 		"series_description": {
 			"description": "Series information",
@@ -1561,12 +1568,8 @@
 			"$ref": "datacite-schema.json"			
 		},
 		"provenance": {
-			"type": "array",
-			"description": "Provenance",
-			"items": {
-				"$ref": "provenance-schema.json"
-			}
-		},
+          "$ref": "provenance-schema.json"
+        },
 		"tags": {
 			"type": "array",
 			"title": "Tags (user-defined)",

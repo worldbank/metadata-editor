@@ -108,7 +108,12 @@
 						"type": "string"
 					  }
 					}
-				  }
+				},
+				"checksum":{
+					"title":"Checksum",
+					"description":"Checksum value for the document using SHA-256",
+					"type":"string"
+				}
 			},
 			"additionalProperties": false
 		},
