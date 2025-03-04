@@ -137,6 +137,12 @@ class Project_json_writer
 
 		$metadata=(array)$project['metadata'];
 
+		//remove fields
+		$remove_fields=array('created','changed','created_by','changed_by');
+		foreach($remove_fields as $field){
+			unset($metadata[$field]);
+		}
+
 		if ($exclude_private_fields==1){
 			$this->json_remove_private_fields($sid,$metadata);
 		}
@@ -166,6 +172,12 @@ class Project_json_writer
 		$basic_info=array(
 			'type'=>$project['type'],
 			'idno'=>$project['idno'],
+			'changed'=>$project['changed'],
+			'changed_utc'=> $project['changed'] != '' ? date('c', ($project['changed'])) : '',
+			'created'=>$project['created'],			
+			'created_utc'=> date('c', ($project['created'])),
+			'created_by'=>$project['created_by'],			
+			'changed_by'=>$project['changed_by']
 		);
 		
 		$output=array_merge($basic_info, $metadata );
