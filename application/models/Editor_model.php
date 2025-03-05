@@ -90,6 +90,7 @@ class Editor_model extends CI_Model {
 		$this->load->helper("Array");
 		$this->load->library("form_validation");
 		$this->load->library("Audit_log");
+		$this->load->library("Metadata_helper");
 		$this->load->model("Editor_variable_model");
 		$this->load->model("Editor_datafile_model");		
 		$this->load->model("Collection_model");
@@ -407,6 +408,9 @@ class Editor_model extends CI_Model {
 			'changed_by'=>isset($options['changed_by']) ? $options['changed_by'] : '',			
 			'study_idno'=>$this->get_project_metadata_field($type,'idno',$options),
 			'title'=>$this->get_project_metadata_field($type,'title',$options),
+			'nation'=>$this->metadata_helper->extract_country_names_str($type,$options),
+			'year_start'=>$this->metadata_helper->extract_year_start($type,$options),
+			'year_end'=>$this->metadata_helper->extract_year_end($type,$options),
 			'metadata'=>$this->encode_metadata($options)
 		);
 
@@ -516,12 +520,10 @@ class Editor_model extends CI_Model {
 		$template_data_type=$this->Editor_template_model->get_template_data_type($template_uid);
 
 		if (!$template_data_type){
-			var_dump("throw exception1");
 			throw new Exception("TEMPLATE_NOT_FOUND: ".$template_uid);
 		}
 
 		if ($template_data_type!=$type){
-			var_dump("throw exception");
 			throw new Exception("TEMPLATE_TYPE_MISMATCHED: ".$template_data_type . '!='. $type);
 		}
 
