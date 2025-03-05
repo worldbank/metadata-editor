@@ -266,24 +266,33 @@
                           <td style="vertical-align:top"><i :title="project.type" :class="project_types_icons[project.type]"></i></td>
                           <td>
                             <div class="project-title">
-                              <a href="#" :title="project.title" class="d-flex" @click="EditProject(project.id)">                                
+                              <a :href="'editor/edit/' + project.id" :title="project.title" class="d-flex xtext-title" @click="EditProject(project.id)">                                
                                 <span v-if="project.title.length>1">{{project.title}}</span>
                                 <span v-else>Untitled</span>
                               </a>
                             </div>
                             <div class="text-secondary text-small">
-                              {{project.idno}} <!-- | <span :title="project.template_uid">{{project.template_uid}} --></span>
+                                <span v-if="projectSubInfo(project)">{{projectSubInfo(project)}} </span>
+                               <!-- {{project.idno}} | <span :title="project.template_uid">{{project.template_uid}} </span>-->
                             </div>
-                            <template v-for="collection in project.collections">
-                                <v-chip small color="#dce3f7" class="mr-1" close @click:close="removeFromCollection(collection.sid,collection.id)">
+                            
+                            <div class="text-small mt-2" v-if="project.collections && project.collections.length>0">
+                              <template v-for="(collection,idx) in project.collections" v-if="idx<3">
+                                <v-chip outlined small color="primary"  @click.stop="manageProjectCollections(project.id)" class="mr-1" >
                                   {{collection.title}}                                      
                                 </v-chip>
                               </template>
+                              <template v-if="project.collections.length>3">
+                                <v-chip outlined small color="primary" class="mr-1" @click.stop="manageProjectCollections(project.id)">
+                                  +{{project.collections.length-3}} more
+                                </v-chip>
+                              </template>
+                            </div>
 
                           </td>
-                          <td class="capitalize">{{project.username_cr}}</td>
-                          <td class="capitalize">{{project.username}}</td>
-                          <td>{{momentDate(project.changed)}}</td>                          
+                          <td class="capitalize text-small">{{project.username_cr}}</td>
+                          <td class="capitalize text-small">{{project.username}}</td>
+                          <td class="text-small">{{momentDate(project.changed)}}</td>                          
                           <td class="text-right">
                             
                           <v-icon @click.stop.prevent="showProjectMenu($event, project.id, true)">mdi-dots-vertical</v-icon> 
@@ -323,6 +332,10 @@
 
     <vue-collection-share v-model="dialog_share_collection" v-bind="dialog_share_collection_options" v-on:share-with-collection="OnAddProjectsToCollection">
     </vue-collection-share>
+
+    <vue-collection-remove-dialog v-model="dialog_manage_collections" v-bind="dialog_manage_collections_options" v-on:collection-removed="search">
+    </vue-collection-remove-dialog>
+    
 
     <template class="create-new-project">
       <div class="text-center">
@@ -523,6 +536,7 @@
 
     <?php
     echo $this->load->view("project/vue-project-share-component.js", null, true);
+    echo $this->load->view("project/vue-collection-remove-component.js", null, true);
     echo $this->load->view("project/vue-collection-share-component.js", null, true);
     echo $this->load->view("project/vue-project-access-component.js", null, true);
     echo $this->load->view("project/vue-transfer-ownership-component.js", null, true);
@@ -615,6 +629,8 @@
         dialog_share_collection_options: [],
         dialog_transfer_ownership: false,
         dialog_transfer_ownership_options: [],
+        dialog_manage_collections: false,
+        dialog_manage_collections_options: {},
         users_list: null,
         errors:[],
         projects_shared: [],
@@ -692,7 +708,7 @@
             );
           }
           return types;
-        },
+        },        
         
         Projects() {
           return this.projects.projects;
@@ -1174,6 +1190,25 @@
             alert("Failed", JSON.stringify(e));
           }
         },
+        manageProjectCollections: function(project_id) 
+        {
+          //get collections for the project
+          let project = this.Projects.find(x => x.id == project_id);
+          if (!project){
+            return false;
+          }
+
+          if (!project.collections){
+            alert("No collections found for this project");
+            return false;
+          }
+
+          this.dialog_manage_collections_options = {
+            'project_id': project_id,
+            'collections': project.collections
+          };
+          this.dialog_manage_collections = true;
+        },
         addProjectsToCollection: async function() {
           try {
             if (this.selected_projects.length == 0) {
@@ -1300,6 +1335,26 @@
                 console.log("error", response);
             }); 
         },
+        projectSubInfo: function(project){
+          let info=[];
+          if (project.nation){
+            info.push(project.nation);
+          }
+          
+          if (project.year_start && project.year_end && 
+              project.year_start!=project.year_end && 
+              project.year_start!=0 && project.year_end!=0
+            ){
+            info.push(project.year_start + "-" + project.year_end);
+          }
+          else if (project.year_start && project.year_start!=0){
+            info.push(project.year_start);
+          }
+          else if (project.year_end && project.year_end!=0){
+            info.push(project.year_end);
+          }
+          return info.join(", ");
+        }
 
       }
     })
