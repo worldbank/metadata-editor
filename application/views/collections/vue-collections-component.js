@@ -115,10 +115,10 @@ Vue.component('vue-collection', {
             this.dialog_edit = true;
         },
         updateCollection: function(collection) {            
-            let url = CI.base_url + '/api/collections';
+            let url = CI.site_url + '/api/collections';
 
             if (collection.id) {
-                url = CI.base_url + '/api/collections/update/' + collection.id;
+                url = CI.site_url + '/api/collections/update/' + collection.id;
             }
 
             let form_data = collection;
@@ -154,7 +154,7 @@ Vue.component('vue-collection', {
             }
 
             vm = this;
-            let url = CI.base_url + '/api/collections/delete/' + id;
+            let url = CI.site_url + '/api/collections/delete/' + id;
 
             axios.post(url)
                 .then(function(response) {
