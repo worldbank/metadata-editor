@@ -185,6 +185,7 @@ $lang['no_items_updated']="No items updated";
 $lang['Change log']="Change log";
 
 $lang['exclude_private_fields']="Exclude fields marked as 'private' in the template";
+$lang['export']="Export";
 $lang['export_all_fields']="Export all fields";
 $lang['export_project_json']="Export project metadata as JSON";
 $lang['file_information']="Data file information";
@@ -216,8 +217,23 @@ $lang['edit']='Edit';
 $lang['admin']='Admin';
 $lang['role']='Role';
 $lang['share_project']='Share project';
+$lang['Link to remote repository']='Link to remote repository';
+$lang['Data and Documentation']="Data and Documentation";
+$lang['No metadata templates available']="No metadata templates available";
 
+$lang['Create new collection']="Create new collection";
+$lang['Add sub-collection']="Add sub-collection";
+$lang['Manage access']="Manage access";
+$lang['Collection']="Collection";
+$lang['Users']="Users";
+$lang['Projects']="Projects";
+$lang['Copy collection']="Copy collection";
+$lang['Move collection']="Move collection";
+$lang['Refresh tree']="Refresh tree";
+$lang['Edit collection']="Edit collection";
 
+$lang['Search users']="Search users";
+$lang['Return to collections']="Return to collections";
 
-/* End of file template_manager_lang.php */
-/* Location: ./application/language/base/template_manager_lang.php */
+/* End of file project_lang.php */
+/* Location: ./application/language/base/project_lang.php */

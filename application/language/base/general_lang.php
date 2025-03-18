@@ -137,6 +137,13 @@ $lang['profile']='Profile';
 $lang['logout']='Logout';
 $lang['translate']="Translate";
 $lang['site_configurations']="Site configurations";
+$lang['apply']="Apply";
+$lang['None']="None";
+
+$lang['add']="Add";
+$lang['changed_by']="Changed by";
+$lang['changed_at']="Changed at";
+$lang['owner']="Owner";
 
 /* End of file general_lang.php */
 /* Location: ./application/language/base/general_lang.php */

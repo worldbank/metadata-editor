@@ -13,6 +13,7 @@ class Collections extends MY_Controller {
 		$this->load->library("Editor_acl");
 		$this->lang->load("users");
 		$this->lang->load("general");
+		$this->lang->load("project");
 	}
 
 	function index()

@@ -83,7 +83,7 @@
     
   <script src="<?php echo base_url(); ?>vue-app/assets/vue-scrollto.js"></script>
   <script src="<?php echo base_url(); ?>vue-app/assets/vee-validate.full.min.js"></script>
-  <script src="<?php echo base_url();?>javascript/splitpanes.umd.min.js"></script>
+  <script src="<?php echo base_url(); ?>vue-app/assets/splitpanes.umd.min.js"></script>
     
 
 <script src="<?php echo base_url(); ?>vue-app/assets/sortable.min.js"></script>
@@ -531,12 +531,22 @@
         {
             deep:true,
             handler(val, oldVal){
+              
+
               if (JSON.stringify(oldVal) == '{}') {
                 this.is_dirty=false;
                 return;
               }
+              /*else if (JSON.stringify(val) == JSON.stringify(oldVal)){
+                this.is_dirty=false;
+                return;
+              }*/
+
+              console.log("projectMEtadaa changed val:", JSON.stringify(val));
+              console.log("projectMEtadaa changed oldVal", JSON.stringify(oldVal));
+              
               //this.saveProjectDebounce(val);              
-                this.is_dirty=true;                            
+                this.is_dirty=true;
             }
         }
       },

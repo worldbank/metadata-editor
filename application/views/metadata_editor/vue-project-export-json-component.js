@@ -106,10 +106,10 @@ Vue.component('project-export-json-component', {
                     <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn color="primary" text @click="exportJson" >
-                        {{$t('Export')}}
+                        {{$t('export')}}
                     </v-btn>
                     <v-btn color="primary" text @click="dialog=false;" >
-                        {{$t('Close')}}
+                        {{$t('close')}}
                     </v-btn>
                     </v-card-actions>
                 </v-card>

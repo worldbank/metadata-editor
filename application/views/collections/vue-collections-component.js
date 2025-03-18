@@ -185,20 +185,20 @@ Vue.component('vue-collection', {
 
                             <div class="d-flex">                            
                                 <div class="flex-grow-1 flex-shrink-0 mr-auto">
-                                    <h3 class="mt-3 mb-1">Collections</h3>                                
+                                    <h3 class="mt-3 mb-1">{{$t('Collections')}}</h3>                                
                                 </div>
                                 <div class="justify-content-end">
-                                    <v-btn color="primary"  @click="createCollection">Create new collection</v-btn>
+                                    <v-btn color="primary"  @click="createCollection">{{$t('Create new collection')}}</v-btn>
                                 </div>
                             </div>
 
                             <div class="bg-light p-3 shadow mt-2" >
-                                <div class="p-3 border text-center text-danger" v-if="!Collections || Collections.found<1"> No projects found!</div>
+                                <div class="p-3 border text-center text-danger" v-if="!Collections || Collections.found<1"> {{$t('No projects found')}}!</div>
 
                                 <div v-if="!Collections || Collections.found>0" class="row mb-2 border-bottom  mt-3">
                                     <div class="col-md-6">
                                         <div class="p-2" v-if="Collections">
-                                            <strong>{{parseInt(collections.found)}}</strong> collections
+                                            <strong>{{parseInt(collections.found)}}</strong> {{$t('collections')}}
                                         </div>
                                     </div>
                                 </div>
@@ -209,10 +209,10 @@ Vue.component('vue-collection', {
                                         #
                                     </div>
                                     <div class="col">
-                                        <strong>Collection</strong>
+                                        <strong>{{$t('Collection')}}</strong>
                                     </div>
-                                    <div class="col-1"><strong>Users</strong></div>
-                                    <div class="col-1"><strong>Projects</strong></div>
+                                    <div class="col-1"><strong>{{$t('Users')}}</strong></div>
+                                    <div class="col-1"><strong>{{$t('Projects')}}</strong></div>
                                     <div class="col-1">
                                     <!-- collection actions -->
                                         <v-menu offset-y>
@@ -270,7 +270,7 @@ Vue.component('vue-collection', {
                 >
                     <v-list>
                         <v-list-item>
-                            <v-list-item-title @click="editCollectionById(action_menu_id)"><v-btn text>{{$t('Edit')}}</v-btn></v-list-item-title>
+                            <v-list-item-title @click="editCollectionById(action_menu_id)"><v-btn text>{{$t('edit')}}</v-btn></v-list-item-title>
                         </v-list-item>
                         <v-list-item>    
                             <v-list-item-title @click="addChildCollectionById(action_menu_id)"><v-btn text>{{$t('Add sub-collection')}}</v-btn></v-list-item-title>
@@ -279,7 +279,7 @@ Vue.component('vue-collection', {
                             <v-list-item-title @click="ManageCollectionAccess(action_menu_id)"><v-btn text>{{$t('Manage access')}}</v-btn></v-list-item-title>
                         </v-list-item>
                         <v-list-item>
-                            <v-list-item-title @click="DeleteCollection(action_menu_id)"><v-btn text>{{$t('Delete')}}</v-btn></v-list-item-title>
+                            <v-list-item-title @click="DeleteCollection(action_menu_id)"><v-btn text>{{$t('delete')}}</v-btn></v-list-item-title>
                         </v-list-item>          
                     </v-list>
                 </v-menu>

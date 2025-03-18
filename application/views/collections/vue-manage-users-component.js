@@ -201,13 +201,13 @@ Vue.component('vue-manage-users', {
         <div class="vue-edit-collection container">
         
         <div class="mt-5 mb-5">
-        <router-link to="/" >Return to collections</router-link>
+        <router-link to="/" >{{$t('Return to collections')}}</router-link>
         </div>
         
-        <h3>{{collection.title}}</h3>
+        <h3>{{$t('Collection')}}: {{collection.title}}</h3>
 
         <div class="border-round border-light p-3 mb-5 shadow bg-light">
-            <h5>Add user</h5>
+            <h5>{{$t('Manage users')}}</h5>
             <div class="row">
                 <div class="col-6">
                 
@@ -220,7 +220,7 @@ Vue.component('vue-manage-users', {
                         solo
                         chips
                         color="blue-grey lighten-2"
-                        label="Search users to select"
+                        :label="$t('Search users')"
                         item-text="username"
                         item-value="id"
                         multiple
@@ -265,7 +265,7 @@ Vue.component('vue-manage-users', {
                     ></v-select>                    
                 </div>
                 <div class="col-auto">
-                    <v-btn large @click="addCollectionAccess" :loading="is_updating" color="primary">Add</v-btn>                    
+                    <v-btn large @click="addCollectionAccess" :loading="is_updating" color="primary">{{$t('add')}}</v-btn>                    
                 </div>
             </div>
         </div>
@@ -274,9 +274,9 @@ Vue.component('vue-manage-users', {
             <v-simple-table v-if="collection_users.length>0">
                 <thead>
                 <tr>
-                    <th>User</th>
-                    <th style="width:150px;padding-left:32px;">Role</th>
-                    <th>Actions</th>
+                    <th>{{$t('user')}}</th>
+                    <th style="width:150px;padding-left:32px;">{{$t('role')}}</th>
+                    <th>{{$t('actions')}}</th>
                 </tr>  
                 </thead>
                 <tbody>          

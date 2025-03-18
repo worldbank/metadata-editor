@@ -12,7 +12,7 @@
   <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
   <script src="https://unpkg.com/vuex@2.0.0"></script>
-  <script src="<?php echo base_url(); ?>javascript/axios.min.js"></script>
+  <script src="<?php echo base_url(); ?>vue-app/assets/axios.min.js"></script>
   <script src="https://unpkg.com/vue-i18n@8"></script>
 
   <script src="//cdn.jsdelivr.net/npm/sortablejs@1.8.4/Sortable.min.js"></script>

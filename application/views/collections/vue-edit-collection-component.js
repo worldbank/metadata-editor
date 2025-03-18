@@ -38,17 +38,17 @@ Vue.component('vue-edit-collection', {
 
                 <v-card>
                     <v-card-title class="text-h5 grey lighten-2">
-                    Edit collection 
+                    {{$t('Edit collection')}}
                     </v-card-title>
 
                     <v-card-text>                        
                         <div class="form-group">
-                            <label>Title</label>
+                            <label>{{$t('title')}}</label>
                             <input type="text" class="form-control" v-model="collection.title" maxlength="150">
                         </div>
 
                         <div class="form-group">
-                            <label>Description</label>
+                            <label>{{$t('description')}}</label>
                             <textarea v-model="collection.description" class="form-control" maxlength="500"></textarea>
                         </div>
                     </v-card-text>
@@ -63,7 +63,7 @@ Vue.component('vue-edit-collection', {
                             color="primary"
                             small
                             @click="saveCollection"
-                        >Save</v-btn>
+                        >{{$t('save')}}</v-btn>
                         <v-btn
                             class="ma-2"
                             outlined
@@ -71,7 +71,7 @@ Vue.component('vue-edit-collection', {
                             small
                             @click="dialog = false"
                         >
-                            Close
+                            {{$t('close')}}
                         </v-btn>
                     </v-card-actions>
                     

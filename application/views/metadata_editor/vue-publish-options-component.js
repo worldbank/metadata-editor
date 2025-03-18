@@ -362,6 +362,16 @@ Vue.component('publish-options', {
                 console.log("request completed");
             });
         },
+        getConnectionInfo: function(id)
+        {
+            for (i=0;i<this.catalog_connections.length;i++){
+                if (this.catalog_connections[i].id==id){
+                    return this.catalog_connections[i];
+                }
+            }
+
+            return false
+        },
         onCatalogSelection: function(){
             this.getCollections();
             this.getDataAccessList();
@@ -374,13 +384,13 @@ Vue.component('publish-options', {
                 return;
             }
 
-            let collection=this.catalog_connections[this.catalog];
+            let connection=this.getConnectionInfo(this.catalog);
 
-            if(!collection){
+            if(!connection){
                 return;
             }
 
-            let url=collection.url + '/index.php/api/catalog/collections';
+            let url=connection.url + '/index.php/api/catalog/collections';
 
             axios.get(url)
             .then(function (response) {
@@ -394,6 +404,7 @@ Vue.component('publish-options', {
             });
         },
         getDataAccessList: function() {
+            console.log("getting data access list", this.catalog);
             vm=this;
             this.data_access_list=[];
 
@@ -401,8 +412,8 @@ Vue.component('publish-options', {
                 return;
             }
 
-            let nada_catalog=this.catalog_connections[this.catalog];            
-
+            let nada_catalog=this.getConnectionInfo(this.catalog);
+            
             if(!nada_catalog){
                 return;
             }
@@ -419,17 +430,7 @@ Vue.component('publish-options', {
             .catch(function (error) {
                 console.log("failed loading data access codes", error);
             });
-        },
-        getCollectionByID:function(id)
-        {
-            for (i=0;i<this.catalog_connections.length;i++){
-                if (this.catalog_connections[i].id==id){
-                    return this.catalog_connections[i];
-                }
-            }
-
-            return [];
-        }
+        }        
     },
     
     computed: {        
@@ -460,6 +461,18 @@ Vue.component('publish-options', {
             });
 
             return items;
+        },
+        CatalogConnections()
+        {
+            //add a new field connection_title [title + url]
+            let connections=[];
+            for (i=0;i<this.catalog_connections.length;i++){
+                let connection=this.catalog_connections[i];
+                connection.connection_title=connection.title + ' - ' + connection.url;
+                connections.push(connection);
+            }
+
+            return connections;
         }
     },  
     template: `
@@ -472,16 +485,20 @@ Vue.component('publish-options', {
                     <v-card-text>
                     
                     <v-card elevation="2" class="p-3 mb-3">
-                            <div class="form-group" elevation="10">
+                            <div class="form-group-x" elevation="10">
                                 <label for="catalog_id">{{$t("catalog")}} <router-link class="btn btn-sm btn-link" to="/configure-catalog">{{$t("configure_catalog")}}</router-link></label>
-                                <select class="form-control" id="catalog_id" v-model="catalog" @change="onCatalogSelection">
-                                    <option :value="false">-Select-</option>
-                                    <option v-for="(option,index) in catalog_connections" v-bind:value="index">
-                                        {{ option.title }} - {{option.url}}
-                                    </option>                            
-                                </select>
-                                
-                                <div v-if="catalog" class="text-muted">{{catalog_connections[catalog]}}</div>                            
+
+                                <v-select
+                                    v-model="catalog"
+                                    :items="CatalogConnections"
+                                    item-text="connection_title"
+                                    :return-object="false"
+                                    item-value="id"
+                                    label=""
+                                    @change="onCatalogSelection"
+                                    outlined
+                                    dense
+                                ></v-select>                                                                
                             </div>
                     </v-card>
 
@@ -525,7 +542,7 @@ Vue.component('publish-options', {
                                             </select>
 
                                             <div v-if="publish_options.access_policy.value=='remote'" class="p-2">
-                                                <label>Link to remote repository</label>
+                                                <label>{{$t("Link to remote repository")}}</label>
                                                 <input class="form-control" type="text" v-model="publish_options.data_remote_url.value">
                                             </div>
 
