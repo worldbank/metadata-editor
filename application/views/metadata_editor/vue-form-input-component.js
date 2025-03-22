@@ -291,7 +291,7 @@ Vue.component("form-input", {
     },
     getEnumCodeFromLabel: function (label) {
       //code is enclosed in [] e.g. label [code]
-      if (!label) {
+      if (!label || label.length == 0) {
         return "";
       }
 

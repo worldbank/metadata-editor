@@ -541,9 +541,6 @@
                 this.is_dirty=false;
                 return;
               }*/
-
-              console.log("projectMEtadaa changed val:", JSON.stringify(val));
-              console.log("projectMEtadaa changed oldVal", JSON.stringify(oldVal));
               
               //this.saveProjectDebounce(val);              
                 this.is_dirty=true;
