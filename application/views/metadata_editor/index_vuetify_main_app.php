@@ -334,7 +334,8 @@
                 user_has_edit_access:user_has_edit_access,
                 active_section: "not set",
                 project_type:project_type,
-                idno:project_idno,
+                idno:project_idno, //project unique ID
+                metadata_idno:'',//study idno
                 project_id:project_sid,
                 formData: project_metadata,
                 formTemplate:form_template,
@@ -570,9 +571,13 @@
                     .then(function (response) {                        
                         if (response.data.project && response.data.project.metadata){
                             if (response.data.project.metadata.constructor.name == 'Object'){
-                                store.state.formData=response.data.project.metadata;                                
+                                store.state.formData=response.data.project.metadata;
+                                if (response.data.project.study_idno){
+                                    store.state.metadata_idno=response.data.project.study_idno;
+                                }
                             }else{
                                 alert("Error reading project metadata");
+                                console.log("Error reading project metadata",response.data);
                                 store.state.formData={};
                             }
                         }                        

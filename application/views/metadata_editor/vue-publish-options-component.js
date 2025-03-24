@@ -4,6 +4,7 @@ Vue.component('publish-options', {
     data: function () {    
         return {
             field_data: this.value,
+            project_info: {},//study_metadata_idno
             resources_selected:[],
             toggle_resources_selected:false,
             resources_overwrite:"no",
@@ -74,10 +75,32 @@ Vue.component('publish-options', {
             publish_responses:{}//all publish responses                        
         }
     },
-    created: async function(){
+    mounted: async function(){
         this.loadCatalogConnections();
+        this.getProjectBasicInfo();
     },
     methods:{
+        getProjectBasicInfo: function(){
+            //make ajax call to get project basic info
+            let url=CI.base_url + '/api/editor/basic_info/'+this.ProjectID;
+            let vm=this;
+
+            axios.get(url)
+            .then(function (response) {
+                if (response.data.project){                    
+                    vm.project_info=response.data.project;
+                }
+                else{
+                    alert("Project metadata not found");
+                    console.log("Project metadata not found", response);
+                }
+            })
+            .catch(function (error) {
+                alert("Failed to load project metadata");
+                console.log(error);
+            })
+        },
+
         initPublishResponses: function(){
             this.publish_responses={
                 "export":[],
@@ -160,8 +183,8 @@ Vue.component('publish-options', {
             let formData=this.PublishOptions;
             vm=this;
 
-            let nada_catalog=this.catalog_connections[this.catalog];            
-
+            let nada_catalog=this.getConnectionInfo(this.catalog);
+            
             if(!nada_catalog){
                 alert("Catalog was not found");
                 return false;
@@ -214,7 +237,8 @@ Vue.component('publish-options', {
         publishSingleResource: async function(resource)
         {
 
-            let nada_catalog=this.catalog_connections[this.catalog];            
+            //let nada_catalog=this.catalog_connections[this.catalog];      
+            let nada_catalog=this.getConnectionInfo(this.catalog);      
 
             if(!nada_catalog){
                 alert("Catalog was not found");
@@ -241,7 +265,8 @@ Vue.component('publish-options', {
             let formData={
             }
 
-            let nada_catalog=this.catalog_connections[this.catalog];            
+            //let nada_catalog=this.catalog_connections[this.catalog];          
+            let nada_catalog=this.getConnectionInfo(this.catalog);  
 
             if(!nada_catalog){
                 alert("Catalog was not found");
@@ -373,6 +398,7 @@ Vue.component('publish-options', {
             return false
         },
         onCatalogSelection: function(){
+            this.getProjectBasicInfo();
             this.getCollections();
             this.getDataAccessList();
         },
@@ -437,6 +463,9 @@ Vue.component('publish-options', {
         ProjectID(){
             return this.$store.state.project_id;
         },
+        StudyIDNO(){
+            return this.project_info.study_idno;
+        },
         ProjectMetadata(){
             return this.$store.state.formData;
         },
@@ -473,6 +502,14 @@ Vue.component('publish-options', {
             }
 
             return connections;
+        },
+        TargetCatalogPublishedUrl(){
+            let nada_catalog=this.getConnectionInfo(this.catalog);
+            if(!nada_catalog){
+                return '';
+            }
+
+            return nada_catalog.url + '/index.php/catalog/study/'+this.StudyIDNO;
         }
     },  
     template: `
@@ -498,7 +535,8 @@ Vue.component('publish-options', {
                                     @change="onCatalogSelection"
                                     outlined
                                     dense
-                                ></v-select>                                                                
+                                ></v-select>                                
+
                             </div>
                     </v-card>
 
@@ -617,7 +655,7 @@ Vue.component('publish-options', {
                     </v-expansion-panels>
 
                                             
-                    <div class=" mb-3 mt-5 switch-control">
+                    <div class=" mb-3 mt-5 switch-control elevation-2 p-4">
                         <div><strong>{{$t("options")}}</strong></div>
                         
                             <v-switch
@@ -639,7 +677,16 @@ Vue.component('publish-options', {
                             ></v-switch>                            
                     </div>
 
-                    <v-btn :disabled="is_publishing==true" color="primary" @click="publishToCatalog()">{{$t("publish")}}</v-btn>
+                    
+                    <div v-if="catalog!=false" class="mt-5 p-4 elevation-2 mb-5 bg-light" >
+                        <div :title="$t('URL for the published project in NADA')"  ><strong>{{$t("Publish to URL")}} <v-icon color="primary">mdi-help-circle</v-icon></strong></div>
+                        <div><a :href="TargetCatalogPublishedUrl" target="_blank">{{TargetCatalogPublishedUrl}} <v-icon color="primary">mdi-open-in-new</v-icon></a></div>
+                    </div>
+
+
+                    <v-btn :disabled="is_publishing==true || !catalog" color="primary" @click="publishToCatalog()">{{$t("publish")}}</v-btn>
+
+                    
                 
 
                 </v-card-text>
@@ -674,7 +721,6 @@ Vue.component('publish-options', {
                             <!-- end show-status --> 
                             
                             <div v-if="is_publishing_completed" class="p-2">
-
                                 <div v-if="publish_metadata==true">
                                     <strong>{{$t('metadata')}}</strong>
                                     <div v-if="publish_responses.metadata.errors.length>0">

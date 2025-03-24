@@ -150,7 +150,44 @@ class Editor extends MY_REST_Controller
 			);
 			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}
-	}	
+	}
+
+
+	/**
+	 * 
+	 * Get basic project info
+	 * 
+	 */
+	function basic_info_get($sid=null)
+	{
+		try{
+			$sid=$this->get_sid($sid);
+			$this->editor_acl->user_has_project_access($sid,$permission='view',$this->api_user);
+
+			$result=$this->Editor_model->get_basic_info($sid);
+			array_walk($result, 'unix_date_to_gmt_row',array('created','changed'));
+				
+			if(!$result){
+				throw new Exception("DATASET_NOT_FOUND");
+			}
+
+			$response=array(
+				'status'=>'success',
+				'project'=>$result
+			);			
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+
 
 
 	private function get_collection_options(&$options)
