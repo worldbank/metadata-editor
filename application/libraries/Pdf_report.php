@@ -33,15 +33,20 @@ class PDF_Report{
 		$this->ci->load->library("Pagepreview");
 		$this->ci->load->helper("pdf_html_helper");
 		$this->ci->load->model("Editor_datafile_model"); 
+		$this->ci->load->helper('metadata_view_helper');
 		
     }
 
-	function initialize($sid)
+	function initialize($sid, $options=array())
 	{
 		$this->project=$this->ci->Editor_model->get_row($sid);
 
 		if (!$this->project){
 			throw new Exception("Project not found");
+		}
+
+		if (isset($options['exclude_private_fields']) && $options['exclude_private_fields']==1){
+			$this->ci->project_json_writer->json_remove_private_fields($sid,$this->project['metadata']);
 		}
 	}
 	

@@ -6,7 +6,7 @@
     }
 ?>
 <?php if ( (isset($data) && $data !='') || $show_empty==true ):?>
-<div class="field field-<?php echo $template['title'];?>">
+<div class="field field-<?php echo $template['title'];?>" id="<?php echo escape_html_attribute($template['key']);?>">
     <h4 class="xfield-caption"><?php echo t($template['title']);?></h4>
     <div class="field-value">
         <?php if (is_array($data)):?>
@@ -14,11 +14,11 @@
             <?php if (is_array($value)){
                 $value=implode(" ",$value);
             }?>
-            <span><?php echo nl2br(html_escape(trim($value)));?></span>
+            <span id="<?php echo escape_html_attribute($template['key']);?>_value"><?php echo nl2br(html_escape(trim($value)));?></span>
         <?php endforeach;?>
         <?php else:?>
             <?php if(!empty($data)):?>
-                <span><?php echo nl2br(html_escape(trim($data)));?></span>
+                <span id="<?php echo escape_html_attribute($template['key']);?>_value"><?php echo nl2br(html_escape(trim($data)));?></span>
             <?php else: //for empt values when show_empty is true ?>
                 -
             <?php endif;?>

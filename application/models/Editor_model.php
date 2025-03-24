@@ -1339,12 +1339,12 @@ class Editor_model extends CI_Model {
 		return $ddi_path;
 	}
 
-	function generate_project_pdf($sid)
+	function generate_project_pdf($sid, $options=array())
 	{
 		$this->load->library("Pdf_report");
         $pdf_path=$this->get_pdf_path($sid);
 
-		$this->pdf_report->initialize($sid);
+		$this->pdf_report->initialize($sid, $options);
 		$this->pdf_report->generate($pdf_path);		
 		return $pdf_path;
 	}

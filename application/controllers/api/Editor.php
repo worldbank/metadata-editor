@@ -940,8 +940,14 @@ class Editor extends MY_REST_Controller
 				throw new Exception("Project not found");
 			}
 
+			if ((int)$this->input->get("exclude_private_fields")===1){
+				$exclude_private_fields=1;
+			}
+
 			$this->editor_acl->user_has_project_access($sid,$permission='view', $user=$this->api_user());
-			$result=$this->Editor_model->generate_project_pdf($sid);
+			$result=$this->Editor_model->generate_project_pdf($sid, $pdf_options=array(
+				'exclude_private_fields'=>$exclude_private_fields
+			));
 
 			$output=array(
 				'status'=>'success',
