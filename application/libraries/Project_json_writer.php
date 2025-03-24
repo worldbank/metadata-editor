@@ -10,9 +10,10 @@ class Project_json_writer
 	{
 		$this->ci =& get_instance();
 		$this->ci->load->model('Editor_model');
-		$this->ci->load->model('Editor_template_model');		
+		$this->ci->load->model('Editor_template_model');
 		$this->ci->load->model('Editor_datafile_model');
-		$this->ci->load->model('Editor_variable_model');		
+		$this->ci->load->model('Editor_variable_model');
+		$this->ci->load->library('schema_util');
 	}
 
 
@@ -169,7 +170,16 @@ class Project_json_writer
 
 		array_remove_empty($metadata);
 
+		//get schema version and ID
+		$schema_info=$this->ci->schema_util->get_schema_version_info($project['type']);
+
+		if (!$schema_info){
+			throw new Exception("download_project_json::Schema info not found");
+		}
+
 		$basic_info=array(
+			'schema'=>$schema_info['$id'],
+			'schema_version'=>$schema_info['version'],
 			'type'=>$project['type'],
 			'idno'=>$project['idno'],
 			'changed'=>$project['changed'],
