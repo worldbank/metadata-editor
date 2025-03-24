@@ -72,8 +72,8 @@ class Pagepreview{
 
     private function render_section_container($item){
         $output=array();
-        $output[]='<div>';
-        $output[]='<h1 class="field-section-container mt-3">'.$item['title'].'</h1>';
+        $output[]='<div id="'.$item['key'].'">';
+        $output[]='<h1 class="field-section-container mt-3" >'.$item['title'].'</h1>';
 
         if (isset($item['items'])){
             $el_html=$this->render_element($item['items']);
@@ -90,7 +90,8 @@ class Pagepreview{
     private function render_section($item)
     {
         $output=array();
-        $output[]='<div>';
+        $item_key=isset($item['prop_key']) ? $item['prop_key'] : $item['key'];
+        $output[]='<div id="'.$item_key.'">';
         $output[]='<h2 class="field-section mt-3">'.$item['title'].'</h2>';
 
         if (isset($item['items'])){
@@ -176,7 +177,7 @@ class Pagepreview{
 		$core_templates=$this->ci->Editor_template_model->get_core_templates_by_type($type);
 
 		if (!$core_templates){
-			throw new Exception("No system templates found for type: ");
+			throw new Exception("No system templates found for type: "); 
 		}
 
 		//var_dump($core_templates);

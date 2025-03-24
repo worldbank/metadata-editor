@@ -864,10 +864,15 @@ class Editor extends MY_REST_Controller
 		try{
 			$sid=$this->get_sid($sid);
 			$exists=$this->Editor_model->check_id_exists($sid);
+			$exclude_private_fields=0;
 
 			$download=false;
 			if ($this->input->get("download")==1 || $this->input->get("download")=='true'){
 				$download=true;
+			}
+
+			if ((int)$this->input->get("exclude_private_fields")===1){
+				$exclude_private_fields=1;
 			}
 
 			if(!$exists){
@@ -876,7 +881,9 @@ class Editor extends MY_REST_Controller
 
 			$this->editor_acl->user_has_project_access($sid,$permission='view',$this->api_user);
 			$this->load->library("html_report");
-			$html=$this->html_report->generate($sid);
+			$html=$this->html_report->generate($sid, $html_options=array(
+				'exclude_private_fields'=>$exclude_private_fields
+			));
 			
 			if ($download){
 				$this->load->helper('download');

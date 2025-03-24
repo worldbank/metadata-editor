@@ -269,5 +269,16 @@ if ( ! function_exists('authors_to_string'))
     }
 }
 
+
+if ( ! function_exists('escape_html_attribute'))
+{
+	function escape_html_attribute($value)
+	{
+		//convert . to _
+		$value=str_replace('.','_',$value);
+		return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+	}
+}
+
 /* End of file metadata_view_helper.php */
 /* Location: ./application/helpers/metadata_view_helper.php */

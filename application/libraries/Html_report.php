@@ -8,7 +8,8 @@
  */
 class Html_Report{
 	
-	var $ci;
+	private $ci;
+	private $project;
 	
     //constructor
 	function __construct($params=NULL)
@@ -17,14 +18,20 @@ class Html_Report{
 		
 		$this->ci->load->model("Editor_model");
 		$this->ci->load->library("Pagepreview");
+		$this->ci->load->library("Project_json_writer");
+		$this->ci->load->helper('metadata_view_helper');
     }
 
-	function generate($sid)
+	function generate($sid, $options=array())
     {
 		$this->project=$this->ci->Editor_model->get_row($sid);
 
 		if (!$this->project){
 			throw new Exception("Project not found");
+		}
+
+		if (isset($options['exclude_private_fields']) && $options['exclude_private_fields']==1){
+			$this->ci->project_json_writer->json_remove_private_fields($sid,$this->project['metadata']);
 		}
 		
 		return $this->project_metadata_html();
