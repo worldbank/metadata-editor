@@ -2919,7 +2919,157 @@
                     "help_text": "Tags, especially when organized in tag groups, provide a powerful and flexible solution to enable custom facets (filters) in data catalogs. Note that tags and tag groups are not element from the DDI Codebook standard."
                 }
             ]
-        },       
+        },
+        {
+            "type": "section_container",
+            "id": "datacite",
+            "key": "datacite_container",
+            "title": "DataCite",
+            "items": [
+                {
+                    "key": "datacite_section",
+                    "title": "DataCite",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "datacite.doi",
+                            "title": "DOI",
+                            "type": "string",
+                            "help_text": "DOI handle",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.prefix",
+                            "title": "Prefix",
+                            "type": "string",
+                            "help_text": "DOI prefix",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.suffix",
+                            "title": "Suffix",
+                            "type": "string",
+                            "help_text": "DOI suffix",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.creators",
+                            "title": "Creators",
+                            "type": "array",
+                            "help_text": "Creators",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "prop_key": "datacite.creators.name",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "help_text": "Name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "nameType",
+                                    "prop_key": "datacite.creators.nameType",
+                                    "title": "Name type",
+                                    "type": "string",
+                                    "help_text": "Name type. valid values: 'Personal', 'Organizational'",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "givenName",
+                                    "prop_key": "datacite.creators.givenName",
+                                    "title": "Given name",
+                                    "type": "string",
+                                    "help_text": "Given name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "familyName",
+                                    "prop_key": "datacite.creators.familyName",
+                                    "title": "Family name",
+                                    "type": "string",
+                                    "help_text": "Family name",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "datacite.titles",
+                            "title": "Titles",
+                            "type": "array",
+                            "help_text": "Titles",
+                            "props": [
+                                {
+                                    "key": "title",
+                                    "prop_key": "datacite.titles.title",
+                                    "title": "Title",
+                                    "type": "string",
+                                    "help_text": "Title",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "titleType",
+                                    "prop_key": "datacite.titles.titleType",
+                                    "title": "Title type",
+                                    "type": "string",
+                                    "help_text": "Title type. valid values: 'MainTitle', 'Subtitle', 'TranslatedTitle', 'AlternativeTitle'",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "lang",
+                                    "prop_key": "datacite.titles.lang",
+                                    "title": "Language",
+                                    "type": "string",
+                                    "help_text": "Language",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "datacite.publisher",
+                            "title": "Publisher",
+                            "type": "string",
+                            "help_text": "Publisher",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.publicationYear",
+                            "title": "Publication year",
+                            "type": "string",
+                            "help_text": "Publication year",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.types.resourceType",
+                            "title": "Resource type",
+                            "type": "string",
+                            "help_text": "Resource type",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.types.resourceTypeGeneral",
+                            "title": "Resource type general",
+                            "type": "string",
+                            "help_text": "Valid values: 'Audiovisual', 'Collection', 'DataPaper', 'Dataset', 'Event', 'Image', 'InteractiveResource', 'Model', 'PhysicalObject', 'Service', 'Software', 'Sound', 'Text', 'Workflow', 'Other'",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.url",
+                            "title": "URL",
+                            "type": "string",
+                            "help_text": "",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "datacite.language",
+                            "title": "Language",
+                            "type": "string",
+                            "help_text": "",
+                            "display_type": "text"
+                        }
+                    ]
+                }
+            ]
+        },
         {
             "type": "section_container",
             "id": "provenance",
