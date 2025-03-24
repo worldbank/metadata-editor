@@ -1,44 +1,14 @@
 {
-  "$id": "http://ihsn.org/schemas/microdata",
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Survey Microdata Schema",
+  "$id": "https://ihsn.org/schemas/microdata/1.0.0",
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "Microdata schema",
   "id": "survey-schema.json",
-  "version": "0.0",
-  "description": "Schema for Survey data type based on DDI 2.5",
+  "version": "1.0.0",
+  "description": "Microdata schema based on DDI CodeBook 2.5",
+  "type": "object",
   "allOf": [
     {
-      "type": "object",
-      "properties": {
-        "idno":{
-          "type": "string",
-          "title": "Unique Identifier",
-          "description": "Unique identifier for the project. Leave it empty to auto-generate.",
-          "pattern": "^[a-zA-Z0-9_\\-]+$"
-        },
-
-        "collection_ids": {
-          "type": "array",          
-          "title": "Collection IDs",
-          "description": "Collections to which the project belongs. e.g. [1, 2]",
-          "items": {
-            "type": "integer"
-          }
-        },
-        "template_uid": {
-          "type": "string",
-          "title": "Template UID (Unique Identifier)",
-          "description": "Template to be used for the project. If not provided, the default template will be used."
-        },
-        "overwrite": {
-          "type": "string",
-          "description": "Overwrite project if already exists?",
-          "enum": [
-            "yes",
-            "no"
-          ],
-          "default": "no"
-        }
-      }
+      "$ref": "project-schema.json"
     },
     {
       "$ref": "ddi-schema.json"
@@ -46,6 +16,11 @@
     {
       "type": "object",
       "properties": {
+        "datacite": {
+          "type": "object",
+          "description": "DataCite metadata for generating DOI",
+          "$ref": "datacite-schema.json"
+        },
         "provenance": {
           "$ref": "provenance-schema.json"
         },
