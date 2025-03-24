@@ -679,7 +679,7 @@ Vue.component('publish-options', {
 
                     
                     <div v-if="catalog!=false" class="mt-5 p-4 elevation-2 mb-5 bg-light" >
-                        <div :title="$t('URL for the published project in NADA')"  ><strong>{{$t("Publish to URL")}} <v-icon color="primary">mdi-help-circle</v-icon></strong></div>
+                        <div><strong>{{$t('Published project link')}}:</div>
                         <div><a :href="TargetCatalogPublishedUrl" target="_blank">{{TargetCatalogPublishedUrl}} <v-icon color="primary">mdi-open-in-new</v-icon></a></div>
                     </div>
 
