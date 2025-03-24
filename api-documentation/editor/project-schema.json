@@ -1,0 +1,38 @@
+{
+  "$id": "http://ihsn.org/schemas/editor/project",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Editor project parameters",
+  "description": "Common parameters for creating or updating a project",
+  "type": "object",
+  "properties": {
+    "idno":{
+      "type": "string",
+      "title": "Unique Identifier",
+      "description": "Unique identifier for the project. Leave it empty to auto-generate.",
+      "pattern": "^[a-zA-Z0-9_\\-]+$"
+    },
+
+    "collection_ids": {
+      "type": "array",
+      "title": "Collection IDs",
+      "description": "Collections to which the project belongs. e.g. [1, 2]",
+      "items": {
+        "type": "integer"
+      }
+    },
+    "template_uid": {
+      "type": "string",
+      "title": "Template UID (Unique Identifier)",
+      "description": "Template to be used for the project. If not provided, the default template will be used."
+    },
+    "overwrite": {
+      "type": "string",
+      "description": "Overwrite project if already exists?",
+      "enum": [
+        "yes",
+        "no"
+      ],
+      "default": "no"
+    }
+  }
+}
