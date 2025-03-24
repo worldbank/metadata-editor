@@ -1,16 +1,11 @@
 {
-	"$id": "http://ihsn.org/schemas/timeseries",
-	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://ihsn.org/schemas/timeseries/1.0.0",
+	"$schema": "https://json-schema.org/draft-07/schema#",
 	"title": "Timeseries Schema",
 	"description": "Schema for timeseries data type",
+	"version": "1.0.0",
 	"type": "object",
 	"properties": {
-		"idno":{
-          "type": "string",
-          "title": "Unique Identifier",
-          "description": "Unique identifier for the project. Leave it empty to auto-generate.",
-          "pattern": "^[a-zA-Z0-9_\\-]+$"
-        },       
 		"metadata_information": {
 			"type": "object",
 			"title": "Metadata creation",
@@ -1014,12 +1009,8 @@
 							"note": {
 								"title": "Note",
 								"type": "string"
-							}
-							
-						},
-						"required": [
-							"name"
-						]
+							}							
+						}
 					}
 				},
 				"sources_note": {
