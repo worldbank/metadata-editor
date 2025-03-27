@@ -205,7 +205,7 @@
                         {
                             "key": "series_description.display_name",
                             "type": "string",
-                            "title": "display name",
+                            "title": "Display name",
                             "help_text": "",
                             "display_type": "text"
                         },
@@ -2158,6 +2158,428 @@
         },
         {
             "type": "section_container",
+            "id": "dsd_container",
+            "key": "dsd_container",
+            "title": "Data structure definition",
+            "items": [
+                {
+                    "key": "data_structure",
+                    "title": "Data structure definition",
+                    "type": "nested_array",
+                    "props": [
+                        {
+                            "key": "name",
+                            "title": "Name of the column",
+                            "type": "string",
+                            "prop_key": "data_structure.name",
+                            "help_text": "The name of the column in the data structure.",
+                            "display_type": "text",
+                            "is_required": true
+                        },
+                        {
+                            "key": "label",
+                            "title": "Label ",
+                            "type": "string",
+                            "prop_key": "data_structure.label",
+                            "help_text": "A short label for the column",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "description",
+                            "title": "Description of the column",
+                            "type": "string",
+                            "prop_key": "data_structure.description",
+                            "help_text": "Description",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "data_type",
+                            "title": "Data type",
+                            "type": "string",
+                            "prop_key": "data_structure.data_type",
+                            "help_text": "The type of data contained in the column, in the data file. ",
+                            "display_type": "dropdown",
+                            "enum_store_column": "code",
+                            "enum": [
+                                {
+                                    "code": "string",
+                                    "label": "String"
+                                },
+                                {
+                                    "code": "integer",
+                                    "label": "Integer"
+                                },
+                                {
+                                    "code": "float",
+                                    "label": "Float"
+                                },
+                                {
+                                    "code": "date",
+                                    "label": "Date"
+                                },
+                                {
+                                    "code": "boolean",
+                                    "label": "Boolean"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "column_type",
+                            "title": "Column type (SDMX)",
+                            "type": "string",
+                            "prop_key": "data_structure.column_type",
+                            "help_text": "The SDMX type of the column. This indicates the role of the column in the data structure definition. The controlled vocabulary must be used.",
+                            "display_type": "dropdown",
+                            "enum_store_column": "code",
+                            "enum": [
+                                {
+                                    "code": "dimension",
+                                    "label": "Dimension"
+                                },
+                                {
+                                    "code": "time_period",
+                                    "label": "Time period"
+                                },
+                                {
+                                    "code": "measure",
+                                    "label": "Measure"
+                                },
+                                {
+                                    "code": "attribute",
+                                    "label": "Attribute"
+                                },
+                                {
+                                    "code": "indicator_id",
+                                    "label": "Indicator ID"
+                                },
+                                {
+                                    "code": "indicator_name",
+                                    "label": "Indicator name"
+                                },
+                                {
+                                    "code": "annotation",
+                                    "label": "Annotation"
+                                },
+                                {
+                                    "code": "geography",
+                                    "label": "Geography"
+                                },
+                                {
+                                    "code": "observation_value",
+                                    "label": "Observation value"
+                                },
+                                {
+                                    "code": "periodicity",
+                                    "label": "Periodicity"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "time_period_format",
+                            "title": "Time period format",
+                            "type": "string",
+                            "prop_key": "data_structure.time_period_format",
+                            "help_text": "Time period format for column type 'time_period'. This corresponds to an ISO time format. Use the controlled vocabulary.",
+                            "display_type": "dropdown",
+                            "enum_store_column": "code",
+                            "enum": [
+                                {
+                                    "code": "YYYY",
+                                    "label": "YYYY"
+                                },
+                                {
+                                    "code": "YYYY-MM",
+                                    "label": "YYYY-MM"
+                                },
+                                {
+                                    "code": "YYYY-MM-DD",
+                                    "label": "YYYY-MM-DD"
+                                },
+                                {
+                                    "code": "YYYY-MM-DDTHH:MM:SS",
+                                    "label": "YYYY-MM-DDTHH:MM:SS"
+                                },
+                                {
+                                    "code": "YYYY-MM-DDTHH:MM:SSZ",
+                                    "label": "YYYY-MM-DDTHH:MM:SSZ"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "code_list",
+                            "title": "Codelist",
+                            "type": "array",
+                            "prop_key": "data_structure.code_list",
+                            "help_text": "If the column contains coded data, a code list must be provided. For each value in the dataset, the code, label, and optional description should be entered.",
+                            "props": [
+                                {
+                                    "key": "code",
+                                    "title": "Code",
+                                    "type": "string",
+                                    "prop_key": "data_structure.code_list.code",
+                                    "help_text": "The code of the categorical variable. ",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "label",
+                                    "title": "Label",
+                                    "type": "string",
+                                    "prop_key": "data_structure.code_list.label",
+                                    "help_text": "The label of the categorical variable corresponding to the code. ",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "string",
+                                    "prop_key": "data_structure.code_list.description",
+                                    "help_text": "A description of the code of the categorical variable (a more detailed description than provided in the label, if any). ",
+                                    "display_type": "textarea"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "code_list_reference_section",
+                            "title": "Codelist reference",
+                            "type": "section",
+                            "prop_key": "data_structure.code_list_reference_section",
+                            "help_text": "If the code list is a standard code list, this set of elements is used to document the code list used for the column. ",
+                            "display_type": "text",
+                            "props": [
+                                {
+                                    "key": "code_list_reference.id",
+                                    "title": "ID",
+                                    "type": "string",
+                                    "prop_key": "data_structure.code_list_reference.id",
+                                    "help_text": "Identifier of the code list",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "code_list_reference.name",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "prop_key": "data_structure.code_list_reference.name",
+                                    "help_text": "Name of the code list",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "code_list_reference.version",
+                                    "title": "Version",
+                                    "type": "string",
+                                    "prop_key": "data_structure.code_list_reference.version",
+                                    "help_text": "Version of the code list",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "code_list_reference.uri",
+                                    "title": "URI",
+                                    "type": "string",
+                                    "prop_key": "data_structure.code_list_reference.uri",
+                                    "help_text": "URL to the code list",
+                                    "display_type": "text",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "is_required": true
+                                },
+                                {
+                                    "key": "code_list_reference.note",
+                                    "title": "Notes",
+                                    "type": "string",
+                                    "prop_key": "data_structure.code_list_reference.note",
+                                    "help_text": "Additional information on the code list.",
+                                    "display_type": "textarea"
+                                }
+                            ]
+                        }
+                    ],
+                    "help_text": "Data structure definition. This field is a nested array. Each column in the data structure must be defined, with information on its content, type, and code lists if relevant."
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "id": "tags",
+            "key": "tags_container",
+            "title": "Tags",
+            "items": [
+                {
+                    "key": "tags",
+                    "title": "Tags",
+                    "type": "array",
+                    "props": [
+                        {
+                            "key": "tag",
+                            "title": "Tag",
+                            "type": "string",
+                            "prop_key": "tags.tag",
+                            "help_text": "A user-defined tag.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "tag_group",
+                            "title": "Tag group",
+                            "type": "string",
+                            "prop_key": "tags.tag_group",
+                            "help_text": "A user-defined group (optional) to which the tag belongs. Grouping tags allows implementation of controlled facets in data catalogs.",
+                            "display_type": "text"
+                        }
+                    ],
+                    "help_text": "Tags, especially when organized in tag groups, provide a powerful and flexible solution to enable custom facets (filters) in data catalogs. "
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "id": "provenance",
+            "key": "provenance_container",
+            "title": "Provenance",
+            "items": [
+                {
+                    "key": "provenance",
+                    "title": "Provenance",
+                    "type": "section",
+                    "help_text": "Provenance information is used to document the origin of the metadata.",
+                    "items": [
+                        {
+                            "key": "provenance.original_repository",
+                            "title": "Original repository",
+                            "type": "section",
+                            "help_text": "Information about the original repository where the metadata was first created.",
+                            "items": [
+                                {
+                                    "key": "provenance.original_repository.repository_name",
+                                    "title": "Repository name",
+                                    "type": "string",
+                                    "help_text": "The name of the original repository.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.url",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "help_text": "The URL of the original repository or dataset.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.dataset_identifier",
+                                    "title": "Dataset identifier",
+                                    "type": "string",
+                                    "help_text": "The identifier of the dataset in the original repository.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.doi",
+                                    "title": "DOI",
+                                    "type": "string",
+                                    "help_text": "The Digital Object Identifier (DOI) of the dataset in the original repository.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.dataset_title",
+                                    "title": "Dataset title",
+                                    "type": "string",
+                                    "help_text": "The title of the dataset in the original repository.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.date_published",
+                                    "title": "Dataset published date (YYYY-MM-DD)",
+                                    "type": "string",
+                                    "help_text": "The date when the dataset was published in the original repository.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "provenance.original_repository.notes",
+                                    "title": "Notes",
+                                    "type": "string",
+                                    "help_text": "Additional information about the original repository.",
+                                    "display_type": "textarea"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "provenance.source_repository_section",
+                            "title": "Source repository",
+                            "type": "section",
+                            "help_text": "Information about the source repository from which the metadata was harvested.",
+                            "items": [
+                                {
+                                    "key": "provenance.source_repository",
+                                    "title": "Source repositories",
+                                    "type": "nested_array",
+                                    "help_text": "Information about the source repository from which the metadata was harvested.",
+                                    "props": [
+                                        {
+                                            "key": "repository_name",
+                                            "prop_key": "provenance.source_repository.repository_name",
+                                            "title": "Repository name",
+                                            "type": "string",
+                                            "help_text": "The name of the source repository.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "url",
+                                            "prop_key": "provenance.source_repository.url",
+                                            "title": "URL",
+                                            "type": "string",
+                                            "help_text": "The URL of the source repository or dataset.",
+                                            "rules": {
+                                                "is_uri": true
+                                            },
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "dataset_identifier",
+                                            "prop_key": "provenance.source_repository.dataset_identifier",
+                                            "title": "Dataset identifier",
+                                            "type": "string",
+                                            "help_text": "The identifier of the dataset in the source repository.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "dataset_title",
+                                            "prop_key": "provenance.source_repository.dataset_title",
+                                            "title": "Dataset title",
+                                            "type": "string",
+                                            "help_text": "The title of the dataset in the source repository.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "date_acquired",
+                                            "prop_key": "provenance.source_repository.date_acquired",
+                                            "title": "Date acquired (YYYY-MM-DD)",
+                                            "type": "string",
+                                            "help_text": "The date when the metadata was acquired from the source repository.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "acquisition_mode",
+                                            "prop_key": "provenance.source_repository.acquisition_mode",
+                                            "title": "Acquisition mode",
+                                            "type": "string",
+                                            "help_text": "The mode of acquisition of the metadata from the source repository. e.g. OAI-PMH, API, manual entry, etc."
+                                        },
+                                        {
+                                            "key": "notes",
+                                            "prop_key": "provenance.source_repository.notes",
+                                            "title": "Notes",
+                                            "type": "string",
+                                            "help_text": "Additional information about the source repository."
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "section_container",
             "id": "datacite",
             "key": "datacite_container",
             "title": "DataCite",
@@ -2305,430 +2727,6 @@
                     ]
                 }
             ]
-        },
-        {
-            "type": "section_container",
-            "id": "tags",
-            "key": "tags_container",
-            "title": "Tags",
-            "items": [
-                {
-                    "key": "tags",
-                    "title": "Tags",
-                    "type": "array",
-                    "props": [
-                        {
-                            "key": "tag",
-                            "title": "Tag",
-                            "type": "string",
-                            "prop_key": "tags.tag",
-                            "help_text": "A user-defined tag.",
-                            "display_type": "text"
-                        },
-                        {
-                            "key": "tag_group",
-                            "title": "Tag group",
-                            "type": "string",
-                            "prop_key": "tags.tag_group",
-                            "help_text": "A user-defined group (optional) to which the tag belongs. Grouping tags allows implementation of controlled facets in data catalogs.",
-                            "display_type": "text"
-                        }
-                    ],
-                    "help_text": "Tags, especially when organized in tag groups, provide a powerful and flexible solution to enable custom facets (filters) in data catalogs. "
-                }
-            ]
-        },
-        {
-            "type": "section_container",
-            "id": "dsd_container",
-            "key": "dsd_container",
-            "title": "Data structure definition",
-            "items": [
-                {
-                    "key": "data_structure",
-                    "title": "Data structure definition",
-                    "type": "nested_array",
-                    "props": [
-                        {
-                            "key": "name",
-                            "title": "Name",
-                            "type": "string",
-                            "prop_key": "data_structure.name",
-                            "help_text": "Name",
-                            "display_type": "text",
-                            "is_required": true
-                        },
-                        {
-                            "key": "label",
-                            "title": "Label",
-                            "type": "string",
-                            "prop_key": "data_structure.label",
-                            "help_text": "Label",
-                            "display_type": "text"
-                        },
-                        {
-                            "key": "description",
-                            "title": "Description",
-                            "type": "string",
-                            "prop_key": "data_structure.description",
-                            "help_text": "Description",
-                            "display_type": "textarea"
-                        },
-                        {
-                            "key": "data_type",
-                            "title": "Data type",
-                            "type": "string",
-                            "prop_key": "data_structure.data_type",
-                            "help_text": "Data type",
-                            "display_type": "dropdown",
-                            "enum_store_column": "code",
-                            "enum": [
-                                {
-                                    "code": "string",
-                                    "label": "String"
-                                },
-                                {
-                                    "code": "integer",
-                                    "label": "Integer"
-                                },
-                                {
-                                    "code": "float",
-                                    "label": "Float"
-                                },
-                                {
-                                    "code": "date",
-                                    "label": "Date"
-                                },
-                                {
-                                    "code": "boolean",
-                                    "label": "Boolean"
-                                }
-                            ]
-                        },
-                        {
-                            "key": "column_type",
-                            "title": "Column type",
-                            "type": "string",
-                            "prop_key": "data_structure.column_type",
-                            "help_text": "Column type",
-                            "display_type": "dropdown",
-                            "enum_store_column": "code",
-                            "enum": [
-                                {
-                                    "code": "dimension",
-                                    "label": "Dimension"
-                                },
-                                {
-                                    "code": "time_period",
-                                    "label": "Time period"
-                                },
-                                {
-                                    "code": "measure",
-                                    "label": "Measure"
-                                },
-                                {
-                                    "code": "attribute",
-                                    "label": "Attribute"
-                                },
-                                {
-                                    "code": "indicator_id",
-                                    "label": "Indicator ID"
-                                },
-                                {
-                                    "code": "indicator_name",
-                                    "label": "Indicator name"
-                                },
-                                {
-                                    "code": "annotation",
-                                    "label": "Annotation"
-                                },
-                                {
-                                    "code": "geography",
-                                    "label": "Geography"
-                                },
-                                {
-                                    "code": "observation_value",
-                                    "label": "Observation value"
-                                },
-                                {
-                                    "code": "periodicity",
-                                    "label": "Periodicity"
-                                }
-                            ]
-                        },
-                        {
-                            "key": "time_period_format",
-                            "title": "Time period format",
-                            "type": "string",
-                            "prop_key": "data_structure.time_period_format",
-                            "help_text": "Time period format for column type 'time_period'",
-                            "display_type": "dropdown",
-                            "enum_store_column": "code",
-                            "enum": [
-                                {
-                                    "code": "YYYY",
-                                    "label": "YYYY"
-                                },
-                                {
-                                    "code": "YYYY-MM",
-                                    "label": "YYYY-MM"
-                                },
-                                {
-                                    "code": "YYYY-MM-DD",
-                                    "label": "YYYY-MM-DD"
-                                },
-                                {
-                                    "code": "YYYY-MM-DDTHH:MM:SS",
-                                    "label": "YYYY-MM-DDTHH:MM:SS"
-                                },
-                                {
-                                    "code": "YYYY-MM-DDTHH:MM:SSZ",
-                                    "label": "YYYY-MM-DDTHH:MM:SSZ"
-                                }
-                            ]
-                        },
-                        {
-                            "key": "code_list",
-                            "title": "Codelist",
-                            "type": "array",
-                            "prop_key": "data_structure.code_list",
-                            "help_text": "Codelist",
-                            "props": [
-                                {
-                                    "key": "code",
-                                    "title": "Code",
-                                    "type": "string",
-                                    "prop_key": "data_structure.code_list.code",
-                                    "help_text": "Code",
-                                    "display_type": "text"
-                                },
-                                {
-                                    "key": "label",
-                                    "title": "Label",
-                                    "type": "string",
-                                    "prop_key": "data_structure.code_list.label",
-                                    "help_text": "Label",
-                                    "display_type": "text"
-                                },
-                                {
-                                    "key": "description",
-                                    "title": "Description",
-                                    "type": "string",
-                                    "prop_key": "data_structure.code_list.description",
-                                    "help_text": "Description",
-                                    "display_type": "textarea"
-                                }
-                            ]
-                        },
-                        {
-                            "key": "code_list_reference_section",
-                            "title": "Codelist reference",
-                            "type": "section",
-                            "prop_key": "data_structure.code_list_reference_section",
-                            "help_text": "Codelist reference",
-                            "display_type": "text",
-                            "props": [
-                                {
-                                    "key": "code_list_reference.id",
-                                    "title": "ID",
-                                    "type": "string",
-                                    "prop_key": "data_structure.code_list_reference.id",
-                                    "help_text": "Codelist ID",
-                                    "display_type": "text"
-                                },
-                                {
-                                    "key": "code_list_reference.name",
-                                    "title": "Name",
-                                    "type": "string",
-                                    "prop_key": "data_structure.code_list_reference.name",
-                                    "help_text": "Codelist name",
-                                    "display_type": "text"
-                                },
-                                {
-                                    "key": "code_list_reference.version",
-                                    "title": "Version",
-                                    "type": "string",
-                                    "prop_key": "data_structure.code_list_reference.version",
-                                    "help_text": "Code list version",
-                                    "display_type": "text"
-                                },
-                                {
-                                    "key": "code_list_reference.uri",
-                                    "title": "URI",
-                                    "type": "string",
-                                    "prop_key": "data_structure.code_list_reference.uri",
-                                    "help_text": "Codelist URI",
-                                    "display_type": "text",
-                                    "rules": {
-                                        "is_uri": true
-                                    },
-                                    "is_required": true
-                                },
-                                {
-                                    "key": "code_list_reference.note",
-                                    "title": "Notes",
-                                    "type": "string",
-                                    "prop_key": "data_structure.code_list_reference.note",
-                                    "help_text": "Codelist notes",
-                                    "display_type": "textarea"
-                                }
-                            ]
-                        }
-                    ],
-                    "help_text": "Data structure Definition"
-                }
-            ]
-        },
-        {
-            "type": "section_container",
-            "id": "provenance",
-            "key": "provenance_container",
-            "title": "Provenance",
-            "items": [
-                {
-                    "key": "provenance",
-                    "title": "Provenance",
-                    "type": "section",                   
-                    "help_text": "Provenance information is used to document the origin of the metadata.",
-                    "items": [                        
-                        {
-                            "key": "provenance.original_repository",
-                            "title": "Original repository",
-                            "type": "section",                            
-                            "help_text": "Information about the original repository where the metadata was first created.",
-                            "items": [
-                                {
-                                    "key": "provenance.original_repository.repository_name",
-                                    "title": "Repository name",
-                                    "type": "string",
-                                    "help_text": "The name of the original repository.",
-                                    "display_type": "text"
-                                },
-                                {
-                                    "key": "provenance.original_repository.url",
-                                    "title": "URL",
-                                    "type": "string",
-                                    "help_text": "The URL of the original repository or dataset.",
-                                    "rules": {
-                                        "is_uri": true
-                                    },
-                                    "display_type": "text"
-                                },
-                                {
-                                    "key": "provenance.original_repository.dataset_identifier",
-                                    "title": "Dataset identifier",
-                                    "type": "string",
-                                    "help_text": "The identifier of the dataset in the original repository.",
-                                    "display_type": "text"
-                                },
-                                {
-                                    "key": "provenance.original_repository.doi",
-                                    "title": "DOI",
-                                    "type": "string",
-                                    "help_text": "The Digital Object Identifier (DOI) of the dataset in the original repository.",
-                                    "display_type": "text"
-                                },
-                                {
-                                    "key": "provenance.original_repository.dataset_title",
-                                    "title": "Dataset title",
-                                    "type": "string",
-                                    "help_text": "The title of the dataset in the original repository.",
-                                    "display_type": "text"
-                                },
-                                {
-                                    "key": "provenance.original_repository.date_published",
-                                    "title": "Dataset published date (YYYY-MM-DD)",
-                                    "type": "string",
-                                    "help_text": "The date when the dataset was published in the original repository.",
-                                    "display_type": "text"
-                                },
-                                {
-                                    "key": "provenance.original_repository.notes",
-                                    "title": "Notes",
-                                    "type": "string",
-                                    "help_text": "Additional information about the original repository.",
-                                    "display_type": "textarea"
-                                }
-                            ]
-                        },
-                        {
-                            "key": "provenance.source_repository_section",
-                            "title": "Source repository",
-                            "type": "section",
-                            "help_text": "Information about the source repository from which the metadata was harvested.",
-                            "items":[
-                                {
-                                    "key": "provenance.source_repository",
-                                    "title": "Source repositories",
-                                    "type": "nested_array",
-                                    "help_text": "Information about the source repository from which the metadata was harvested.",
-                                    "props":[
-                                        {
-                                            "key": "repository_name",
-                                            "prop_key": "provenance.source_repository.repository_name",
-                                            "title": "Repository name",
-                                            "type": "string",
-                                            "help_text": "The name of the source repository.",
-                                            "display_type": "text"
-                                        },
-                                        {
-                                            "key": "url",
-                                            "prop_key": "provenance.source_repository.url",
-                                            "title": "URL",
-                                            "type": "string",
-                                            "help_text": "The URL of the source repository or dataset.",
-                                            "rules": {
-                                                "is_uri": true
-                                            },
-                                            "display_type": "text"
-                                        },
-                                        {
-                                            "key": "dataset_identifier",
-                                            "prop_key": "provenance.source_repository.dataset_identifier",
-                                            "title": "Dataset identifier",
-                                            "type": "string",
-                                            "help_text": "The identifier of the dataset in the source repository.",
-                                            "display_type": "text"
-                                        },
-                                        {
-                                            "key": "dataset_title",
-                                            "prop_key": "provenance.source_repository.dataset_title",
-                                            "title": "Dataset title",
-                                            "type": "string",
-                                            "help_text": "The title of the dataset in the source repository.",
-                                            "display_type": "text"
-                                        },
-                                        {
-                                            "key": "date_acquired",
-                                            "prop_key": "provenance.source_repository.date_acquired",
-                                            "title": "Date acquired (YYYY-MM-DD)",
-                                            "type": "string",
-                                            "help_text": "The date when the metadata was acquired from the source repository.",
-                                            "display_type": "text"
-                                        },
-                                        {
-                                            "key": "acquisition_mode",
-                                            "prop_key": "provenance.source_repository.acquisition_mode",
-                                            "title": "Acquisition mode",
-                                            "type": "string",
-                                            "help_text": "The mode of acquisition of the metadata from the source repository. e.g. OAI-PMH, API, manual entry, etc."
-                                        },
-                                        {
-                                            "key": "notes",
-                                            "prop_key": "provenance.source_repository.notes",
-                                            "title": "Notes",
-                                            "type": "string",
-                                            "help_text": "Additional information about the source repository."
-                                        }
-
-                                    ]
-                                }
-                            ]
-                        }
-
-                    ]
-                }
-            ]
-        }
+        }        
     ]
 }
