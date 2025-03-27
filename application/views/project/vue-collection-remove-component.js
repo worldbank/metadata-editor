@@ -5,9 +5,6 @@ Vue.component('vue-collection-remove-dialog', {
             is_processing: false
         }
     },
-    created:function(){
-        
-    },
     methods: {            
         removeCollectionFromList: function(collection_id){
             let index = this.collections.findIndex(x => x.id === collection_id);
@@ -78,7 +75,7 @@ Vue.component('vue-collection-remove-dialog', {
 
                 <v-card>
                     <v-card-title class="text-h5 grey lighten-2">
-                        {{$('Collections')}}
+                        {{$t('Collections')}}
                     </v-card-title>
                     <v-card-text>
                         
@@ -105,7 +102,7 @@ Vue.component('vue-collection-remove-dialog', {
                         v-if="!is_processing"
                         @click="selected=[];dialog = false"
                     >
-                        {{$('Close')}}
+                        {{$t('Close')}}
                     </v-btn>
                     
                     </v-card-actions>
