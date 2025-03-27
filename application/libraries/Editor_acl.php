@@ -27,6 +27,11 @@ class Editor_acl
 			$user=(object)$this->current_user();
 		}
 
+		//global admin role
+		if ($this->user_is_admin($user)){
+			return true;
+		}
+
 		//check if user is project owner
 		if ($this->is_user_project_owner($project_id,$user)){
 			return true;

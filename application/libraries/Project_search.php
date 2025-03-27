@@ -54,6 +54,11 @@ class Project_search
 			$fields[$idx]="editor_projects.".$field;
 		}
 
+		//System Admin?		
+		if ($this->ci->editor_acl->user_is_admin()){
+			$search_options['is_admin']=1;
+		}
+
 		$fields[]="users.username, users_cr.username as username_cr";
 
 		//sort [sort_by sort_order]
@@ -61,7 +66,7 @@ class Project_search
 				
 		$this->ci->db->select(implode(",",$fields));
 		$this->ci->db->order_by($sort_['sort_by'],$sort_['sort_order']);
-		$this->ci->db->join("users", "users.id=editor_projects.changed_by");
+		$this->ci->db->join("users", "users.id=editor_projects.changed_by", "left");
 		$this->ci->db->join("users as users_cr", "users_cr.id=editor_projects.created_by","left");
 
 		if ($limit>0){
@@ -92,8 +97,13 @@ class Project_search
 	//returns the total 
 	function get_total_count($search_options=array())
 	{
+		//System Admin?		
+		if ($this->ci->editor_acl->user_is_admin()){
+			$search_options['is_admin']=1;
+		}
+
 		$this->apply_search_filters(($search_options));
-		$this->ci->db->join("users", "users.id=editor_projects.changed_by");
+		$this->ci->db->join("users", "users.id=editor_projects.changed_by", "left");
 		$result=$this->ci->db->count_all_results('editor_projects');
 
 		return $result;
@@ -139,11 +149,18 @@ class Project_search
 		$applied_filters=array();
 		$ownership_types=array(
 			"self",
-			"shared"
+			"shared",
+			"self,shared",
+			"shared,self"
 		);
 
 		//filter by ownership
 		$project_owners=$this->parse_filter_values_as_int($this->get_search_filter($search_options,'user_id'));
+
+		//System Admins can see all projects
+		$is_admin =$this->parse_filter_values_as_int($this->get_search_filter($search_options,'is_admin'));
+
+		$query=null;
 
 		if ($project_owners){
 			
@@ -156,8 +173,9 @@ class Project_search
 					where editor_collection_access.user_id='.(int)$project_owners[0];
 			
 			$query='(editor_projects.created_by='.(int)$project_owners[0]
-				 .' OR editor_projects.id in( '. $subquery.') OR editor_projects.id in ('.$collection_query.')) ';
+				.' OR editor_projects.id in( '. $subquery.') OR editor_projects.id in ('.$collection_query.')) ';
 			
+
 			//ownership
 			if (isset($search_options['ownership']) && in_array($search_options['ownership'],$ownership_types)) {
 				switch($search_options['ownership']){
@@ -175,14 +193,30 @@ class Project_search
 							.' OR editor_projects.id in ('.$collection_query.') )';
 						$this->ci->db->where($query_shared_only);
 						break;
+
+					case 'self,shared':
+					case 'shared,self':						
+						$this->ci->db->where('editor_projects.created_by',(int)$project_owners[0]);
+
+						//direct shared
+						$direct_shared='editor_projects.id in (select sid from editor_project_owners where user_id='.(int)$project_owners[0].')';
+						$this->ci->db->or_where($direct_shared);
+
+						//collections
+						$query_shared_only='(editor_projects.created_by!='.(int)$project_owners[0]
+							.' OR editor_projects.id in ('.$collection_query.') )';
+						$this->ci->db->where($query_shared_only);
+
 				}		
 				$applied_filters['user_id']=$project_owners;
 				$applied_filters['ownerships']=$search_options['ownership'];
 			}
 			else{
-				//show all shared and owned projects
-				$this->ci->db->where($query,null, false);
-				$applied_filters['user_id']=$project_owners;
+				if (!$is_admin){
+					//show all shared and owned projects
+					$this->ci->db->where($query,null, false);
+					$applied_filters['user_id']=$project_owners;
+				}
 			}
 		}
 
