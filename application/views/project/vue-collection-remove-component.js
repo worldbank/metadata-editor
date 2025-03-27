@@ -13,7 +13,7 @@ Vue.component('vue-collection-remove-dialog', {
             }
         },
         removeFromCollection: async function(project_id, collection_id) {
-            if (!confirm($t("Are you sure you want to remove this collection from the project?"))) {
+            if (!confirm(this.$t("Are you sure you want to remove this collection from the project?"))) {
               return false;
             }
   

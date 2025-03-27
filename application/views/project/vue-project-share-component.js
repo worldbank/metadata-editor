@@ -53,7 +53,7 @@ Vue.component('vue-project-share', {
         },
         loadProjectUsers: function(){
             let vm = this;
-            let url = CI.base_url + '/api/share/list/' + this.project_id;
+            let url = CI.site_url + '/api/share/list/' + this.project_id;
             axios.get(url)
             .then(response => {
                 vm.shared_users = response.data.users;
@@ -70,7 +70,7 @@ Vue.component('vue-project-share', {
                 'permissions': this.user_access,
                 'users': this.getSelectedUsersList()
             };
-            let url = CI.base_url + '/api/share/' + this.project_id;
+            let url = CI.site_url + '/api/share/' + this.project_id;
 
             axios.post(url,
                 form_data
@@ -91,7 +91,7 @@ Vue.component('vue-project-share', {
                 'permissions':this.shared_users[index]['permissions']
             }
 
-            let url = CI.base_url + '/api/share/' + this.project_id;
+            let url = CI.site_url + '/api/share/' + this.project_id;
             axios.post(url,
                 form_data
             )
@@ -118,7 +118,7 @@ Vue.component('vue-project-share', {
             let user_id = this.shared_users[index]['user_id'];
 
             let vm=this;
-            let url = CI.base_url + '/api/share/delete/' + this.project_id + '/' + user_id;
+            let url = CI.site_url + '/api/share/delete/' + this.project_id + '/' + user_id;
 
             axios.post(url)
             .then(response => {
@@ -133,7 +133,7 @@ Vue.component('vue-project-share', {
         
         searchUsers: _.debounce(function(val) {
             let vm=this;
-            axios.get(CI.base_url + '/api/users/search?keywords='+val)
+            axios.get(CI.site_url + '/api/users/search?keywords='+val)
             .then(response => {
                 vm.users = response.data.users;
                 console.log("users",vm.users);
