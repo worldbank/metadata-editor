@@ -8,31 +8,7 @@ Vue.component('vue-collection-remove-dialog', {
     created:function(){
         
     },
-    methods: {    
-        CreateRevision: function(){
-            this.is_processing = true;
-            vm=this;
-            let url=CI.base_url + '/api/revisions/create';
-            let options={
-                "sid": vm.project_id,
-                "version_type": vm.revision.version_type,
-                "version_notes": vm.revision.version_notes
-            }
-
-            axios.post( url,
-                options
-            ).then(function(response){                
-                vm.is_processing = false;
-                vm.dialog=false;
-                alert('Revision created successfully');
-                vm.$emit('revision-created',1);
-            })
-            .catch(function(response){
-                vm.errors=response;
-                alert(vm.errorResponseMessage(response));
-                vm.is_processing = false;
-            }); 
-        },
+    methods: {            
         removeCollectionFromList: function(collection_id){
             let index = this.collections.findIndex(x => x.id === collection_id);
             if (index > -1) {
@@ -40,7 +16,7 @@ Vue.component('vue-collection-remove-dialog', {
             }
         },
         removeFromCollection: async function(project_id, collection_id) {
-            if (!confirm("Are you sure you want to remove this collection from the project?")) {
+            if (!confirm($t("Are you sure you want to remove this collection from the project?"))) {
               return false;
             }
   
@@ -52,7 +28,7 @@ Vue.component('vue-collection-remove-dialog', {
                 'projects': project_id,
                 'collections': collection_id
               };
-              let url = CI.base_url + '/api/collections/remove_projects/';
+              let url = CI.site_url + '/api/collections/remove_projects/';
   
               let response = await axios.post(url,
                 form_data
@@ -102,7 +78,7 @@ Vue.component('vue-collection-remove-dialog', {
 
                 <v-card>
                     <v-card-title class="text-h5 grey lighten-2">
-                        Collections
+                        {{$('Collections')}}
                     </v-card-title>
                     <v-card-text>
                         
@@ -129,7 +105,7 @@ Vue.component('vue-collection-remove-dialog', {
                         v-if="!is_processing"
                         @click="selected=[];dialog = false"
                     >
-                        Close
+                        {{$('Close')}}
                     </v-btn>
                     
                     </v-card-actions>
