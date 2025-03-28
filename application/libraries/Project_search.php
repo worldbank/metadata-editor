@@ -44,7 +44,7 @@ class Project_search
 	 * @fields - (optional) list of fields
 	 * 
 	 */
-	function search($limit=10,$offset=0, $fields=array(), $search_options=array())
+	function search($limit=10,$offset=0, $fields=array(), $search_options=array(), $user=null)
 	{
 		if (empty($fields)){
 			$fields=$this->listing_fields;
@@ -55,7 +55,7 @@ class Project_search
 		}
 
 		//System Admin?		
-		if ($this->ci->editor_acl->user_is_admin()){
+		if ($this->ci->editor_acl->user_is_admin($user)){
 			$search_options['is_admin']=1;
 		}
 
@@ -95,10 +95,10 @@ class Project_search
 	}
 
 	//returns the total 
-	function get_total_count($search_options=array())
+	function get_total_count($search_options=array(), $user=null)
 	{
 		//System Admin?		
-		if ($this->ci->editor_acl->user_is_admin()){
+		if ($this->ci->editor_acl->user_is_admin($user)){
 			$search_options['is_admin']=1;
 		}
 

@@ -76,7 +76,7 @@ class Editor extends MY_REST_Controller
 				$limit=100;
 			}
 			
-			$result=$this->project_search->search($limit,$offset,null,$search_options);
+			$result=$this->project_search->search($limit,$offset,null,$search_options, $this->api_user);
 			array_walk($result['result'], 'unix_date_to_gmt',array('created','changed'));
 
 			//add collections and tags to each study
@@ -98,7 +98,7 @@ class Editor extends MY_REST_Controller
 			
 			$response=array(
 				'status'=>'success',
-				'total'=>$this->project_search->get_total_count($search_options),
+				'total'=>$this->project_search->get_total_count($search_options, $this->api_user),
 				'found'=>is_array($result['result']) ? count($result['result']) : 0,
 				'offset'=>$offset,
 				'limit'=>$limit,
