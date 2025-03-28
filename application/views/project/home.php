@@ -1055,7 +1055,7 @@
             let hasPermissionsToShare = await this.hasProjectAdminAccess(id);
 
             if (!hasPermissionsToShare){
-              alert($t("no_permissions_to_share"));
+              alert(this.$t("no_permissions_to_share"));
               return false;
             }
 
@@ -1212,7 +1212,7 @@
         addProjectsToCollection: async function() {
           try {
             if (this.selected_projects.length == 0) {
-              alert($t("select_atleast_one_project"));
+              alert(this.$t("select_atleast_one_project"));
               return false;
             }
 
@@ -1267,7 +1267,7 @@
           }
         },
         removeFromCollection: async function(project_id, collection_id) {
-          if (!confirm($t("confirm_remove_project_from_collection"))) {
+          if (!confirm(this.$t("confirm_remove_project_from_collection"))) {
             return false;
           }
 
@@ -1299,13 +1299,13 @@
               formData.append('type', this.import_project_type.value);
             }
             else{
-              alert($t("select_project_type"));
+              alert(this.$t("select_project_type"));
               return false;
             }
 
             if (!this.import_file)
             {
-                alert($t("select_file_to_import"));
+                alert(this.$t("select_file_to_import"));
                 return false;
             }
 
