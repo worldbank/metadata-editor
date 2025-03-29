@@ -85,7 +85,11 @@ class Template_table
                     'parent'=>str_replace(".", "/", $this->extract_parent_key($item['key']))
                 ];
                 
-                //$array=array_merge($array, $this->template_to_array_recursive($item['props']));
+                //array with no props 
+                if (!isset($item['props'])){
+                    continue;
+                }
+
                 $tmp_=$this->template_to_array_recursive($item['props']);
                 foreach($tmp_ as $k=>$v){
                     if (!isset($array[$k])){
@@ -95,34 +99,22 @@ class Template_table
                 continue;
             }
 
-            /*
-            if (!isset($item['key']) && !isset($item['prop_key'])){
-                echo "<pre>";
-                var_dump($item);
-                die();
-            }
-            */
-            
             $new_key=isset($item['prop_key']) ? $item['prop_key'] : $item['key'];
             $parent_key=str_replace(".", "/", $this->extract_parent_key($new_key));
 
             //check if parent item exists
             if (!isset($array[$parent_key])){
-                //var_dump($parent_key);
-                //break;
                 //get parent info from schema
                 if (isset($this->schema_items[$parent_key])){                    
                     $array[$this->convert_key($parent_key)]=$this->schema_items[$parent_key];
                 }
                 else{
-/**/
                     $array[$this->convert_key($parent_key)]=[
                         'type'=>'object',
                         'title'=>$parent_key,
                         'description'=>'NOT-AVAILABLE',
                         'parent'=>''
                     ];
-                    /**/
                 }
             }
 
