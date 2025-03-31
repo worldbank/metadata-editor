@@ -4,6 +4,9 @@ require(APPPATH.'/libraries/MY_REST_Controller.php');
 
 class Collections extends MY_REST_Controller
 {
+	private $api_user;
+	private $user_id;
+
 	public function __construct()
 	{
 		parent::__construct();
@@ -16,6 +19,7 @@ class Collections extends MY_REST_Controller
 		
 		$this->is_authenticated_or_die();
 		$this->api_user=$this->api_user();
+		$this->user_id=$this->get_api_user_id();
 	}
 
 	function _auth_override_check()
@@ -98,21 +102,29 @@ class Collections extends MY_REST_Controller
 	 */	
 	function index_post()
 	{		
-		try{
-			$user_id=$this->get_api_user_id();
+		try{			
 			$this->has_access($resource_='collection',$privilege='edit');
 			$options=$this->raw_json_input();
-			$options['created_by']=$user_id;
-			$options['changed_by']=$user_id;
+			$options['created_by']=$this->user_id;
+			$options['changed_by']=$this->user_id;
 			$options['created']=time();
 			$options['changed']=time();
 			$new_collection_id=$this->Collection_model->insert($options);
+
+			$this->audit_log->log_event(
+				$obj_type='collection',
+				$obj_id=$new_collection_id,
+				$action='create', 
+				$metadata=array(
+					'collection'=>$options['title']
+				),
+				$this->user_id);
 
 			//Add user as owner
 			if ($new_collection_id){
 				$options=array(
 					'collection_id'=>$new_collection_id,
-					'user_id'=>$user_id,
+					'user_id'=>$this->user_id,
 					'permissions'=>'admin'
 				);				
 				$this->Collection_access_model->upsert($options);
@@ -144,9 +156,18 @@ class Collections extends MY_REST_Controller
 
 			$this->has_access($resource_='collection',$privilege='edit');
 			$options=$this->raw_json_input();			
-			$options['changed_by']=$this->session->userdata('user_id');
+			$options['changed_by']=$this->user_id;
 			$options['changed']=time();
 			$result=$this->Collection_model->update($id,$options);
+
+			$this->audit_log->log_event(
+				$obj_type='collection',
+				$obj_id=$id,
+				$action='update', 
+				$metadata=array(
+					'collection'=> isset($options['title']) ? $options['title'] : ''
+					),
+				$this->user_id);
 
 			$output=array(
 				'status'=>'success',
@@ -180,6 +201,13 @@ class Collections extends MY_REST_Controller
 			
 			$this->has_access($resource_='collection',$privilege='delete');
 			$result=$this->Collection_model->delete_nested($id);
+
+			$this->audit_log->log_event(
+				$obj_type='collection',
+				$obj_id=$id,
+				$action='delete', 
+				$metadata=null,
+				$this->user_id);
 
 			$output=array(
 				'status'=>'success'
@@ -279,6 +307,19 @@ class Collections extends MY_REST_Controller
 			
 			$result=$this->Collection_model->add_batch_projects($options['collections'], $options['projects']);
 
+			foreach($options['collections'] as $collection_id){			
+				foreach($options['projects'] as $sid){
+					$this->audit_log->log_event(
+						$obj_type='collection',
+						$obj_id=$collection_id,
+						$action='add-project', 
+						$metadata=array(
+							'project'=>$sid
+						),
+						$this->user_id);
+				}
+			}
+
 			$output=array(
 				'status'=>'success'
 			);
@@ -323,6 +364,19 @@ class Collections extends MY_REST_Controller
 			}
 
 			$this->Collection_model->remove_batch_projects($options['collections'], $sid_arr);
+
+			foreach((array)$options['collections'] as $collection_id){			
+				foreach($sid_arr as $sid){
+					$this->audit_log->log_event(
+						$obj_type='collection',
+						$obj_id=$collection_id,
+						$action='remove-project', 
+						$metadata=array(
+							'project'=>$sid
+						),
+						$this->user_id);
+				}
+			}
 
 			$output=array(
 				'status'=>'success'
@@ -396,6 +450,18 @@ class Collections extends MY_REST_Controller
 
 			$result=$this->Collection_access_model->upsert($options);
 
+			//audit log
+			$this->audit_log->log_event(
+				$obj_type='collection',
+				$obj_id=$options['collection_id'],
+				$action='user-access', 
+				$metadata=array(
+					'user'=>$options['user_id'],
+					'permissions'=>$options['permissions']
+				),
+				$this->user_id);
+
+
 			$output=array(
 				'status'=>'success'
 			);
@@ -428,6 +494,16 @@ class Collections extends MY_REST_Controller
 			}
 
 			$result=$this->Collection_access_model->delete_user($options['collection_id'],$options['user_id']);
+
+			//audit log
+			$this->audit_log->log_event(
+				$obj_type='collection',
+				$obj_id=$options['collection_id'],
+				$action='remove-user', 
+				$metadata=array(
+					'user'=>$options['user_id']
+				),
+				$this->user_id);
 
 			$output=array(
 				'status'=>'success'
@@ -665,6 +741,16 @@ class Collections extends MY_REST_Controller
 
 			$result=$this->Collection_model->copy($source_id,$target_id);
 
+			//audit log
+			$this->audit_log->log_event(
+				$obj_type='collection',
+				$obj_id=$source_id,
+				$action='copy', 
+				$metadata=array(
+					'target'=>$target_id
+				),
+				$this->user_id);				
+
 			$response=array(
 				'status'=>'success',
 				'collection_id'=>$result
@@ -709,6 +795,16 @@ class Collections extends MY_REST_Controller
 			$target_id=(int)$options['target_id'];
 
 			$result=$this->Collection_model->move($source_id,$target_id);
+
+			//audit log
+			$this->audit_log->log_event(
+				$obj_type='collection',
+				$obj_id=$source_id,
+				$action='move', 
+				$metadata=array(
+					'target'=>$target_id
+				),
+				$this->user_id);
 
 			$response=array(
 				'status'=>'success',

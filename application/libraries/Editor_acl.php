@@ -452,7 +452,7 @@ class Editor_acl
 		}
 
 		if(!$user){
-			throw new Exception("acl_manager::User not set");
+			throw new Exception("editor_acl::User not set");
 		}
 
 		//get user roles

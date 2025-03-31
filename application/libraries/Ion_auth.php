@@ -567,7 +567,35 @@ class Ion_auth
 	 **/
 	public function current_user()
 	{
+		//check for API key
+		$user_id=$this->get_api_user_id();
+
+		if ($user_id){
+			return $this->get_user($user_id);
+		}
+
 		return $this->get_user($this->ci->session->userdata('user_id'));
+	}
+
+	function get_api_user_id()
+	{
+		//check for API KEY
+		$api_key=$this->ci->input->get_request_header('X-API-KEY', true);
+
+		if (!$api_key){
+			return false;
+		}
+
+		//get user id from db
+		$this->ci->db->select("user_id");
+		$this->ci->db->where('api_key',$api_key);
+		$user=$this->ci->db->get('api_keys')->row_array();
+
+		if (!$user){
+			return false;
+		}
+
+		return $user['user_id'];
 	}
 
 	/**
