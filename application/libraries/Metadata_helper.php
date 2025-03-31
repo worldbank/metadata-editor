@@ -50,6 +50,35 @@ class Metadata_helper
 		}
 	}
 
+
+	/**
+	 * 
+	 * Extract attributes from metadata
+	 * 
+	 * 
+	 * - timeseries:
+	 * 	- database_id
+	 * 
+	 * 
+	 */
+	function extract_attributes($type, $metadata, $encoded=false)
+	{
+		if ($type=='timeseries'){
+			$database_id=get_array_nested_value($metadata,'series_description/database_id');
+			
+			$output=array(
+				'database_id'=>$database_id
+			);
+
+			if ($encoded){
+				$output=json_encode($output);
+			}
+
+			return $output;
+		}
+
+	}
+
 	/**
      * 
      * get data collection years from a ddi data collection element

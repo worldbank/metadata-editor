@@ -75,7 +75,8 @@ class Editor_model extends CI_Model {
 		'created_by',
 		'changed_by',
 		'is_shared',
-		"thumbnail"
+		"thumbnail",
+		"attributes",
 		);
 	
 
@@ -283,11 +284,14 @@ class Editor_model extends CI_Model {
 			);
 		}
 
-
 		if (isset($survey['metadata'])){
 			if (isset($survey['idno'])){			
 				$survey['metadata']['idno']=$survey['idno'];
 			}			
+		}
+
+		if (isset($survey['attributes']) && !empty($survey['attributes'])){
+			$survey['attributes']=json_decode($survey['attributes'],true);
 		}
 
         return $survey;
@@ -401,7 +405,7 @@ class Editor_model extends CI_Model {
 				$options=$this->apply_partial_update($id,$options);
 			}
 			unset($options['partial_update']);
-		}		
+		}
 
 		$options=array(
 			'changed'=>isset($options['changed']) ? $options['changed'] : date("U"),
@@ -411,7 +415,8 @@ class Editor_model extends CI_Model {
 			'nation'=>$this->metadata_helper->extract_country_names_str($type,$options),
 			'year_start'=>$this->metadata_helper->extract_year_start($type,$options),
 			'year_end'=>$this->metadata_helper->extract_year_end($type,$options),
-			'metadata'=>$this->encode_metadata($options)
+			'metadata'=>$this->encode_metadata($options),
+			'attributes'=>$this->metadata_helper->extract_attributes($type,$options, $encode_json=true),
 		);
 
 		if ($template_uid){
@@ -631,7 +636,7 @@ class Editor_model extends CI_Model {
 			),
 			'timeseries'=>array(
 				'idno'=>'series_description.idno',
-				'title'=>'series_description.name'
+				'title'=>'series_description.name',
 			),
 			'timeseries-db'=>array(
 				'idno'=>'database_description.title_statement.idno',

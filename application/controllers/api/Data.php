@@ -164,9 +164,16 @@ class Data extends MY_REST_Controller
 
 	
 
+	function generate_summary_stats_queue_post($sid, $file_id)
+	{
+		return $this->generate_summary_stats_queue_get($sid,$file_id);
+	}
+
 	/**
 	 * 
 	 * Generate summary statistics for a data file and import into database
+	 * 
+	 * TODO: replace with generate_summary_stats_queue_post
 	 * 
 	 */
 	function generate_summary_stats_queue_get($sid,$file_id)

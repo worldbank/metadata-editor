@@ -123,4 +123,12 @@ CREATE TABLE `admin_metadata_projects` (
   PRIMARY KEY (`id`)
 );
 
+# 2025/03/31
+ALTER TABLE `audit_logs` 
+CHANGE COLUMN `obj_type` `obj_type` VARCHAR(25) NOT NULL ;
 
+ALTER TABLE `audit_logs` 
+CHANGE COLUMN `action_type` `action_type` VARCHAR(25) NOT NULL ;
+
+ALTER TABLE `nada_editor`.`editor_projects` 
+ADD COLUMN `attributes` JSON NULL;
