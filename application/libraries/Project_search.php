@@ -20,7 +20,8 @@ class Project_search
 		'changed_by',
 		'is_shared',
 		"thumbnail",
-		'template_uid'
+		'template_uid',
+		'attributes'
 		);
 		
 	/**
@@ -85,7 +86,15 @@ class Project_search
 
 		if ($result){
 			$result=$this->ci->Editor_model->decode_encoded_fields_rows($result);
+
+			//attributes
+			foreach($result as $idx=>$row){
+				if (isset($row['attributes'])){
+					$result[$idx]['attributes']=json_decode($row['attributes'],true);
+				}
+			}
 		}
+		
 
 		return array(
 			'result'=>$result,
