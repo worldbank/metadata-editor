@@ -282,7 +282,7 @@ class Project_search
 			$subquery='select sid from editor_collection_projects where collection_id in ('.implode(",",$collection_filters).')';			
 			$query='(editor_projects.id in( '. $subquery.')) ';
 			$this->ci->db->where($query,null, false);
-			$applied_filters['collection']=$project_owners;
+			$applied_filters['collection']=$collection_filters;
 		}
 
 
