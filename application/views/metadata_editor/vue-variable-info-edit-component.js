@@ -94,13 +94,24 @@ Vue.component('variable-info', {
 
                 <div class="p-2" v-if="variable">
 
-                <div class="form-group form-field switch-field" >
+                <div class="form-group form-field switch-field">
+                    <v-switch class="ma-0 pa-0"
+                    hide-details="true"
+                    v-model="variable.is_key"
+                    :label="GetFieldTitle('variable.is_key',$t('is_key_variable'))"
+                    true-value="1"
+                    false-value="0"
+                    ></v-switch>
+                </div>
+
+                <div class="form-group form-field switch-field">
                     <v-switch
+                    class="ma-0 pa-0"
                     v-model="variable.var_wgt"
                     :label="GetFieldTitle('variable.var_wgt',$t('is_weight_variable'))"
                     true-value="1"
                     false-value="0"
-                    ></v-switch>                    
+                    ></v-switch>
                 </div>
 
 

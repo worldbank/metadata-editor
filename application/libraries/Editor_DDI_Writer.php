@@ -188,11 +188,15 @@ class Editor_DDI_Writer
 
         //file description
         $files=$this->ci->Editor_datafile_model->select_all($id,$include_file_info=false);
+
         $writer->writeRaw("\n");
         
         if (!empty($files)){
             foreach($files as $file){
-                $writer->writeRaw($this->get_file_desc_xml($file));
+                //get key variables for file
+                $key_vars=$this->ci->Editor_variable_model->get_key_variable_names($id,$file_id=$file['file_id'], $use_vid=true);
+
+                $writer->writeRaw($this->get_file_desc_xml($file, $key_vars));
                 $writer->writeRaw("\n");
             }
         }
@@ -299,15 +303,36 @@ class Editor_DDI_Writer
     }
 
     
-    function get_file_desc_xml($data)
+    function get_file_desc_xml($data, $key_vars=null)
     {
         $file = new \Adbar\Dot($data);
         $output = new \Adbar\Dot();
+
+        /*
+        <fileStrc type="relational">
+            <recGrp keyvar="V2 V3"/>
+        </fileStrc>
+        */
+        
 
         //document description
         $output->set([
             '_attributes'=>['ID'=>$file['file_id']],
             'fileTxt.fileName'=>$file['file_name'],
+        ]);
+
+        if ($key_vars){
+            $output->set([
+                'fileTxt.fileStrc._attributes'=>[
+                    'type'=>'relational'
+                ],
+                'fileTxt.fileStrc.recGrp._attributes'=>[
+                    'keyvar'=> implode(" ", $key_vars)
+                ]
+            ]);
+        }
+
+        $output->set([
             'fileTxt.fileCont'=>$file['description'],
             'fileTxt.dimensns.caseQnty'=>$file['case_count'],
             'fileTxt.dimensns.varQnty'=>$file['var_count'],            
@@ -316,6 +341,8 @@ class Editor_DDI_Writer
             'fileTxt.verStmt.version'=>$file['version'],
             'notes'=>$file['notes']
         ]);
+
+        
         
         $result = new Spatie\ArrayToXml\ArrayToXml($output->all(),'fileDscr');
         $result=$result->prettify()->toDom();
@@ -502,6 +529,9 @@ class Editor_DDI_Writer
     {
         $result=new stdClass();
         foreach($var_catgry_labels as $label){
+            if (!isset($label['value'])){
+                continue;
+            }
             $result->{$label['value']}=isset($label['labl']) ? $label['labl'] : '';
         }        
         return $result;        

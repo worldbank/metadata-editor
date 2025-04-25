@@ -130,5 +130,9 @@ CHANGE COLUMN `obj_type` `obj_type` VARCHAR(25) NOT NULL ;
 ALTER TABLE `audit_logs` 
 CHANGE COLUMN `action_type` `action_type` VARCHAR(25) NOT NULL ;
 
-ALTER TABLE `nada_editor`.`editor_projects` 
+ALTER TABLE `editor_projects` 
 ADD COLUMN `attributes` JSON NULL;
+
+ALTER TABLE `editor_variables`
+ADD COLUMN 'is_key' INT NULL;
+

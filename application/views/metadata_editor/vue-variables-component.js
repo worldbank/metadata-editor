@@ -39,6 +39,7 @@ Vue.component('variables', {
                 },
                 "var_wgt_id":"",
                 "var_wgt":false,
+                "is_key":false,
                 "update_required":false,
                 "var_type": "",
                 "var_concept": [],
@@ -880,9 +881,9 @@ Vue.component('variables', {
                                         @click.exact="editVariable(index)"                                         
                                         
                                         :class="variableActiveClass(index,variable.name)"                                         
-                                        :id="'v-'+index"                                        
+                                        :id="'v-'+index"
                                     >
-                                        <td class="var-vid-td bg-secondary handle">V{{index+1}}</td>                                        
+                                        <td class="var-vid-td bg-secondary handle">V{{index+1}}</td>
 
                                         <td class="var-name-edit">
                                             <!-- <div><input vonkeydown="onVariableKeydown($event,index,'var_name')" class="var-labl-edit" type="text" v-model="variable.name" ref="var_name" /></div> -->
@@ -907,6 +908,7 @@ Vue.component('variables', {
                                             <v-icon :title="$t('weight_variable')" v-if="variable.var_wgt==1" aria-hidden="false" class="vdar-icon">mdi-alpha-w</v-icon>
                                             <v-icon :title="$t('weighted')" v-if="variable.var_wgt_id && variable.var_wgt_id.length>0" aria-hidden="false" class="vdar-icon">mdi-scale-balance</v-icon>
                                             <v-icon :title="$t('require_stats_update')" v-if="variable.update_required" aria-hidden="false" class="vdar-icon text-danger">mdi-sync-alert</v-icon>
+                                            <v-icon :title="$t('variable_is_a_key')" class="vdar-cion" v-if="variable.is_key && variable.is_key==1">mdi-key-outline</v-icon>
                                         </td>                                        
                                     </tr>
                                     </tbody>

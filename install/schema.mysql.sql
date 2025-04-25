@@ -204,19 +204,12 @@ CREATE TABLE `configurations` (
 
 LOCK TABLES `configurations` WRITE;
 /*!40000 ALTER TABLE `configurations` DISABLE KEYS */;
-INSERT INTO `configurations` VALUES ('app_version','5.0.0','Application version',NULL,NULL);
+INSERT INTO `configurations` VALUES ('app_version','1.0.0','Application version',NULL,NULL);
 INSERT INTO `configurations` VALUES ('cache_default_expires','7200','Cache expiry (in mili seconds)',NULL,NULL);
 INSERT INTO `configurations` VALUES ('cache_disabled','1','Enable/disable site caching',NULL,NULL);
 INSERT INTO `configurations` VALUES ('cache_path','cache/','Site cache folder',NULL,NULL);
 INSERT INTO `configurations` VALUES ('catalog_records_per_page','15','Catalog search page - records per page',NULL,NULL);
 INSERT INTO `configurations` VALUES ('catalog_root','datafiles','Survey catalog folder',NULL,NULL);
-INSERT INTO `configurations` VALUES ('collections_vocab','2','survey collections vocabulary',NULL,NULL);
-INSERT INTO `configurations` VALUES ('collection_search','no',NULL,NULL,NULL);
-INSERT INTO `configurations` VALUES ('collection_search_weight','5',NULL,NULL,NULL);
-INSERT INTO `configurations` VALUES ('da_search','no',NULL,NULL,NULL);
-INSERT INTO `configurations` VALUES ('da_search_weight','2',NULL,NULL,NULL);
-INSERT INTO `configurations` VALUES ('db_version','5.0.0','Database version',NULL,NULL);
-INSERT INTO `configurations` VALUES ('ddi_import_folder','imports','Survey catalog import folder',NULL,NULL);
 INSERT INTO `configurations` VALUES ('default_home_page','home','Default home page','Default home page',NULL);
 INSERT INTO `configurations` VALUES ('html_folder','/pages',NULL,NULL,NULL);
 INSERT INTO `configurations` VALUES ('lang','en-us','Site Language','Site Language code',NULL);
@@ -224,10 +217,6 @@ INSERT INTO `configurations` VALUES ('language','english',NULL,NULL,NULL);
 INSERT INTO `configurations` VALUES ('login_timeout','40','Login timeout (minutes)',NULL,NULL);
 INSERT INTO `configurations` VALUES ('mail_protocol','smtp','Select method for sending emails','Supported protocols: MAIL, SMTP, SENDMAIL',NULL);
 INSERT INTO `configurations` VALUES ('min_password_length','5','Minimum password length',NULL,NULL);
-INSERT INTO `configurations` VALUES ('news_feed_url','http://ihsn.org/nada/index.php?q=news/feed','','','');
-INSERT INTO `configurations` VALUES ('regional_search','no','Enable regional search',NULL,NULL);
-INSERT INTO `configurations` VALUES ('regional_search_weight','3',NULL,NULL,NULL);
-INSERT INTO `configurations` VALUES ('repository_identifier','default','Repository Identifier',NULL,NULL);
 INSERT INTO `configurations` VALUES ('site_password_protect','no','Password protect website',NULL,NULL);
 INSERT INTO `configurations` VALUES ('smtp_host','','SMTP Host name',NULL,NULL);
 INSERT INTO `configurations` VALUES ('smtp_pass','','SMTP password',NULL,NULL);
@@ -240,13 +229,9 @@ INSERT INTO `configurations` VALUES ('topic_search_weight','6',NULL,NULL,NULL);
 INSERT INTO `configurations` VALUES ('use_html_editor','yes','Use HTML editor for entering HTML for static pages',NULL,NULL);
 INSERT INTO `configurations` VALUES ('website_footer','Powered by NADA 4.0 and DDI','Website footer text',NULL,NULL);
 INSERT INTO `configurations` VALUES ('website_title','National Data Archive','Website title','Provide the title of the website','website');
-INSERT INTO `configurations` VALUES ('website_url','http://localhost/nada','Website URL','URL of the website','website');
+INSERT INTO `configurations` VALUES ('website_url','','Website URL','URL of the website','website');
 INSERT INTO `configurations` VALUES ('website_webmaster_email','','Site webmaster email address','-','website');
 INSERT INTO `configurations` VALUES ('website_webmaster_name','noreply','Webmaster name','-','website');
-INSERT INTO `configurations` VALUES ('year_search','no',NULL,NULL,NULL);
-INSERT INTO `configurations` VALUES ('year_search_weight','1',NULL,NULL,NULL);
-INSERT INTO `configurations` VALUES ('facets_all','["year","data_class","dtype","country"]',NULL,NULL,NULL);
-INSERT INTO `configurations` VALUES ('facets_microdata','["year","data_class","dtype","country"]',NULL,NULL,NULL);
 /*!40000 ALTER TABLE `configurations` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -443,17 +428,23 @@ CREATE TABLE `editor_resources` (
 CREATE TABLE `editor_variables` (
   `uid` int NOT NULL AUTO_INCREMENT,
   `sid` int NOT NULL,
-  `fid` varchar(45) DEFAULT NULL,
-  `vid` varchar(45) DEFAULT '',
-  `name` varchar(100) DEFAULT '',
-  `labl` varchar(255) DEFAULT '',
-  `qstn` text CHARACTER SET utf8,
-  `catgry` text CHARACTER SET utf8,
-  `metadata` mediumtext CHARACTER SET utf8,
-  `keywords` text CHARACTER SET utf8,
+  `fid` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `vid` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT '',
+  `name` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT '',
+  `labl` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT '',
+  `metadata` mediumtext CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci,
+  `sort_order` int DEFAULT '0',
+  `user_missings` varchar(300) DEFAULT NULL,
+  `is_weight` int DEFAULT '0',
+  `field_dtype` varchar(30) DEFAULT NULL,
+  `field_format` varchar(50) DEFAULT NULL,
+  `var_wgt_id` int DEFAULT NULL,
+  `is_key` int DEFAULT NULL,
   PRIMARY KEY (`uid`)
 ) AUTO_INCREMENT=1;
 
+
+select * from editor_data_files;
 
 CREATE TABLE `editor_templates` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -586,25 +577,6 @@ CREATE TABLE `editor_variable_groups` (
   `metadata` MEDIUMTEXT,
   PRIMARY KEY (`id`)
 ) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
-
-
-
-alter table editor_variables drop column keywords;
-
-alter table editor_variables drop column wght;
-
-alter table editor_variables drop column catgry;
-alter table editor_variables drop column qstn;
-
-alter table editor_variables add column sort_order int(11) default 0;
-alter table editor_variables add column user_missings varchar(300);
-alter table editor_variables add column is_weight int default 0;
-alter table editor_variables add column field_dtype varchar(30);
-alter table editor_variables add column field_format varchar(50);
-
-
-alter table editor_variables add column var_wgt_id int default null;
 
 
 

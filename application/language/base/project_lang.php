@@ -234,6 +234,7 @@ $lang['Edit collection']="Edit collection";
 
 $lang['Search users']="Search users";
 $lang['Return to collections']="Return to collections";
+$lang['variable_is_a_key']="Key variable";
 
 /* End of file project_lang.php */
 /* Location: ./application/language/base/project_lang.php */

@@ -16,6 +16,7 @@ class Editor_variable_model extends ci_model {
         'vid',
         'sort_order',
         'is_weight',
+        'is_key',
         'user_missings',
         'field_dtype',
         'var_wgt_id',
@@ -271,7 +272,7 @@ class Editor_variable_model extends ci_model {
         if ($metadata_detailed==true){
             $fields="uid,sid,fid,vid,name,labl,sort_order,metadata";
         }else{
-            $fields="uid,sid,fid,vid,name,labl,sort_order";
+            $fields="uid,sid,fid,vid,name,labl,field_dtype,sort_order";
         }
         
         $this->db->select($fields);
@@ -543,7 +544,8 @@ class Editor_variable_model extends ci_model {
             'labl'=>$variable['labl'],
             'user_missings'=>$missings,
             'is_weight'=> isset($variable['var_wgt']) ? (int)$variable['var_wgt'] : 0,
-            'field_dtype'=>$dtype            
+            'is_key'=> isset($variable['is_key']) ? (int)$variable['is_key'] : 0,
+            'field_dtype'=>$dtype
             //'field_format'=>$variable['field_format'],
         );
 
@@ -701,6 +703,58 @@ class Editor_variable_model extends ci_model {
 
         return $variable;
     }
+
+
+    /**
+     * 
+     * Get key variables
+     *  
+     * 
+     **/
+    function key_variables($sid,$file_id=null)
+    {
+        $this->db->select("uid,sid,fid,vid,name,labl,field_dtype,sort_order,is_key");
+        $this->db->where("sid",$sid);
+        $this->db->where("is_key",1);
+        $this->db->order_by("sort_order,uid","asc");
+
+        if($file_id){
+            $this->db->where("fid",$file_id);
+        }
+
+        $variables=$this->db->get("editor_variables")->result_array();
+
+        return $variables;
+    }
+
+
+
+    /**
+     * 
+     * 
+     * Get key variable names or VIDs
+     * 
+     * @param $use_vid - true|false - use vid or name
+     * 
+     */
+    function get_key_variable_names($sid,$file_id=null, $use_vid=true)
+    {
+       $key_variables=$this->key_variables($sid,$file_id);
+
+        $names=array();
+        foreach($key_variables as $row){
+            if ($use_vid){
+                $names[]=$row['vid'];
+            }
+            else{
+                $names[]=$row['name'];
+            }
+        }
+
+        return $names;
+    }
+
+
     
 
 }    

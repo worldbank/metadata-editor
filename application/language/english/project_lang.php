@@ -72,6 +72,7 @@ $lang['value']="Value";
 $lang['missing']="Missing";
 $lang['categories']="Catagories";
 $lang['is_weight_variable']="Is weight variable?";
+$lang['variable_is_a_key']="Key variable";
 $lang['interval_type']="Interval type";
 $lang['format']="Format";
 $lang['decimals']="Decimals";

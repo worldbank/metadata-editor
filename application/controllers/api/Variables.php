@@ -14,6 +14,7 @@ class Variables extends MY_REST_Controller
 		
 		$this->load->library("Editor_acl");
 		$this->is_authenticated_or_die();
+		$this->api_user=$this->api_user();
 	}
 
 	//override authentication to support both session authentication + api keys
@@ -34,9 +35,10 @@ class Variables extends MY_REST_Controller
 	function index_get($sid=null,$file_id=null)
 	{
 		try{
-			$this->editor_acl->user_has_project_access($sid,$permission='view');
+			$this->editor_acl->user_has_project_access($sid,$permission='view', $this->api_user);
 			$user_id=$this->get_api_user_id();        			
 			$variable_detailed=(int)$this->input->get("detailed");
+
 			$survey_variables=$this->Editor_variable_model->select_all($sid,$file_id,$variable_detailed);
 			$this->update_variable_weight_info($sid,$survey_variables);
 			
@@ -55,6 +57,92 @@ class Variables extends MY_REST_Controller
 		}
 	}
 
+
+	/**
+	 * 
+	 * Get single variable by UID or variable name
+	 * 
+	 * @uid - variable UID
+	 * @name - variable name
+	 * @file_id - file ID [required for name]
+	 * 
+	 */
+	function single_get($sid=null)
+	{
+		try{
+			$this->editor_acl->user_has_project_access($sid,$permission='view',$this->api_user);
+			$user_id=$this->get_api_user_id();
+
+			$uid=(int)$this->input->get("uid");
+			$name=$this->input->get("name");
+			$file_id=$this->input->get("file_id");
+
+			if (!$uid && !$name){
+				throw new Exception("Invalid `uid` or `name` parameter");
+			}
+
+			if ($uid){
+				$variable=$this->Editor_variable_model->variable($sid,$uid, $variable_detailed=true);
+			}
+			else{
+				if (!$file_id){
+					throw new Exception("Invalid `file_id` parameter");
+				}
+
+				$variable=$this->Editor_variable_model->variable_by_name($sid,$file_id,$name, $variable_detailed=true);
+			}
+						
+			$response=array(
+				'variable'=>$variable
+			);
+
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	/**
+	 * 
+	 * Get all key variables by project or data file
+	 * 
+	 * @sid - project ID
+	 * @file_id - (optional) file ID
+	 * 
+	 * 
+	 * 
+	 */
+	function key_get($sid=null,$file_id=null)
+	{
+		try{
+			$this->editor_acl->user_has_project_access($sid,$permission='view',$this->api_user);			
+
+			$survey_variables=$this->Editor_variable_model->key_variables($sid,$file_id);
+			$this->update_variable_weight_info($sid,$survey_variables);
+			
+			$response=array(
+				'variables'=>$survey_variables
+			);
+
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+	
+
+
 	function by_name_post($sid=null,$file_id=null)
 	{
 		try{
@@ -65,7 +153,7 @@ class Variables extends MY_REST_Controller
 				throw new Exception("Invalid var_names parameter");
 			}
 
-			$this->editor_acl->user_has_project_access($sid,$permission='view');
+			$this->editor_acl->user_has_project_access($sid,$permission='view',$this->api_user);
 			$user_id=$this->get_api_user_id();
 			
 			$variable_detailed=1;//(int)$this->input->get("detailed");
@@ -99,7 +187,7 @@ class Variables extends MY_REST_Controller
 	function index_post($sid=null)
 	{
 		try{
-			$this->editor_acl->user_has_project_access($sid,$permission='edit');
+			$this->editor_acl->user_has_project_access($sid,$permission='edit',$this->api_user);
 			$options=(array)$this->raw_json_input();
 			$user_id=$this->get_api_user_id();
 
@@ -131,18 +219,17 @@ class Variables extends MY_REST_Controller
 					throw new Exception("`vid` is required");
 				}
 
-				$variable['file_id']=$variable['fid'];
-
-				if (isset($variable['uid'])){					
-					//check if variable already exists
-					$variable_info=$this->Editor_variable_model->variable($sid,$variable['uid']);
+				if (!isset($variable['name']) || empty($variable['name'])){
+					throw new Exception("`name` is required");
 				}
 
-				//$this->Editor_model->validate_variable($variable);
+				$variable['file_id']=$variable['fid'];
+				$variable_info=$this->Editor_variable_model->variable_by_name($sid,$variable['file_id'],$variable['name'],false);
+				$this->Editor_model->validate_variable($variable);
 				$variable['metadata']=$variable;
 		
 				if($variable_info){	
-					$this->Editor_variable_model->update($sid,$variable['uid'],$variable);
+					$this->Editor_variable_model->update($sid,$variable_info['uid'],$variable);
 				}
 				else{						
 					$this->Editor_variable_model->insert($sid,$variable);
@@ -180,7 +267,7 @@ class Variables extends MY_REST_Controller
 	function create_post($sid=null)
 	{
 		try{
-			$this->editor_acl->user_has_project_access($sid,$permission='edit');
+			$this->editor_acl->user_has_project_access($sid,$permission='edit',$this->api_user);
 			$options=$this->raw_json_input();
 			$user_id=$this->get_api_user_id();
 
@@ -350,6 +437,44 @@ class Variables extends MY_REST_Controller
             }
         }
     }
+
+
+	/**
+	 * 
+	 * Export variables as CSV
+	 * 
+	 * @sid - project ID
+	 * @fid - file ID
+	 * 
+	 * Note: Exports only a selective list of variable fields
+	 * 
+	 */
+	function export_csv_get($sid=null, $fid=null)
+	{
+		try{
+			$this->editor_acl->user_has_project_access($sid,$permission='view', $this->api_user);
+			$user_id=$this->get_api_user_id();        						
+
+			//$survey_variables=$this->Editor_variable_model->select_all($sid,$file_id,$variable_detailed=true);
+			//$this->update_variable_weight_info($sid,$survey_variables);
+
+			$this->load->library("Variables_transform");
+			$response=$this->variables_transform->variables_to_csv($sid,$fid);
+			
+			/*$response=array(
+				'variables'=>$survey_variables
+			);*/
+
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
 
 	
 }
