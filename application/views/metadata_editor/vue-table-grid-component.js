@@ -35,6 +35,13 @@ Vue.component('table-grid-component', {
                 value= [{}];
             }
 
+            //if dictionary object, convert to array
+            if (typeof value=='object'){
+                //do nothing
+                return value;                
+            }
+
+
             if (!Array.isArray(value)){
                 value=[{}];
             }
@@ -325,8 +332,6 @@ Vue.component('table-grid-component', {
             <div v-if="validation_errors.length>0" class="sticky-top">
                 <v-alert dense type="error" v-for="error in validation_errors">{{error}}</v-alert>
             </div>
-
-
 
             <table class="table table-striped table-sm border-bottom">
                 <thead class="thead-light">
