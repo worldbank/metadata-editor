@@ -567,6 +567,9 @@
           
           field_types: [
             "string",
+            "number",
+            "date",
+            "boolean",
             "array",
             "nested_array",
             "simple_array"
