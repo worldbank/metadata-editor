@@ -1,7 +1,7 @@
 <div class="prop-edit-component">
     <div v-if="prop.key">
 
-        <div class="form-group" v-if="HasAdditionalPrefix(parent.key) || isAdminMetaTemplate">
+        <div class="form-group" v-if="HasAdditionalPrefix(parent.key) || isAdminMetaTemplate()">
             <label for="name">{{$t('key')}}:</label>
             <vue-prop-key-field                
                 :parent="parent"
@@ -9,7 +9,7 @@
                 @input="updatePropKey"
                 >
             </vue-prop-key-field>
-            <div class="text-secondary font-small mb-3" >Unique name for the field</div>
+            <div class="text-secondary font-small mb-3" >{{$t('Unique name for the field')}}</div>
                
         </div>
 
