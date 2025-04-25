@@ -2537,6 +2537,24 @@
                             "display_type": "text"
                         },
                         {
+                            "key": "variable.is_key",
+                            "title": "Key variable",
+                            "type": "integer",
+                            "help_text": "This element indicates whether the variable is a key variable (value \"1\") or not (value \"0\"). Key variables are used to identify records in a data file. They are typically unique identifiers such as ID numbers, or other variables that can be used to uniquely identify a record.",
+                            "default": 0,
+                            "enum": [
+                                {
+                                    "code": "0",
+                                    "label": "Not a key variable"
+                                },
+                                {
+                                    "code": "1",
+                                    "label": "Key variable"
+                                }
+                            ],
+                            "display_type": "dropdown"
+                        },
+                        {
                             "key": "variable.var_wgt",
                             "title": "Is weight",
                             "type": "integer",
