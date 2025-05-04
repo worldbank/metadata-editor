@@ -85,14 +85,13 @@
   <script src="<?php echo base_url(); ?>vue-app/assets/vee-validate.full.min.js"></script>
   <script src="<?php echo base_url(); ?>vue-app/assets/splitpanes.umd.min.js"></script>
     
+  <script src="<?php echo base_url(); ?>vue-app/assets/sortable.min.js"></script>
+  <script src="<?php echo base_url(); ?>vue-app/assets/vuedraggable.umd.min.js"></script>
 
-<script src="<?php echo base_url(); ?>vue-app/assets/sortable.min.js"></script>
-<script src="<?php echo base_url(); ?>vue-app/assets/vuedraggable.umd.min.js"></script>
-
-
-<script src="<?php echo base_url(); ?>vue-app/assets/vue-json-pretty.min.js"></script>
+  <script src="<?php echo base_url(); ?>vue-app/assets/vue-json-pretty.min.js"></script>
   <link rel="stylesheet" href="<?php echo base_url(); ?>vue-app/assets/vue-json-pretty.min.css">
   <link href="<?php echo base_url();?>vue-app/assets/styles.css" rel="stylesheet">
+
 
 
   <?php echo $this->load->view("metadata_editor/index_vuetify_main_app",null,true);?>
@@ -719,6 +718,16 @@
         {
           return JSON.parse(JSON.stringify(obj));
         },
+        //function to move item to the end of the array
+        move_item_to_end: function(arr, item_key) {          
+          let _index=_.findIndex(arr, {key: item_key});
+
+          if (_index>=0){
+            let _item=arr[_index];
+            arr.splice(_index,1);
+            arr.push(_item);
+          }
+        },
         init_tree_data: function() {
           this.is_loading=true;
           this.items=[];
@@ -778,6 +787,15 @@
               key:'external-resources',
               items:this.ExternalResourcesTreeNodes
           });
+
+          //move tags after datafiles
+          this.move_item_to_end(tree_data, 'tags_container');
+
+          //move dataCite at the end
+          this.move_item_to_end(tree_data, 'datacite_container');
+
+          //move provenance at the end
+          this.move_item_to_end(tree_data, 'provenance_container');
 
           /*tree_data.push({
               title: this.$t('File manager'),
