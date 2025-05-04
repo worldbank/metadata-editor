@@ -884,8 +884,12 @@ html {
     color: #fff
 }
 
-#app .side-navigation .v-treeview-node__level {
+/*#app .side-navigation .v-treeview-node__level {
     border: 1px solid #a2b0e1
+}*/
+
+#app .v-treeview-node__children .v-treeview-node__level{
+    border: 1px solid #a2b0e1;
 }
 
 #app .side-navigation .v-treeview-node__level::after {
