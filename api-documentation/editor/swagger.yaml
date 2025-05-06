@@ -769,6 +769,56 @@ paths:
               $ref: "#/definitions/Collection"
         security:
           - ApiKeyAuth: []
+  /collections/copy:
+      post:
+        tags:
+          - Collections
+        summary: Copy collection
+        description: Copy collection
+        operationId: copyCollection
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/CopyCollection"
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: "#/definitions/CopyCollection"
+        security:
+          - ApiKeyAuth: []
+
+  /collections/move:
+      post:
+        tags:
+          - Collections
+        summary: Move collection
+        description: Move collection
+        operationId: moveCollection
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/MoveCollection"
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: "#/definitions/MoveCollection"
+        security:
+          - ApiKeyAuth: []
+
   /collections/{id}:
       get:
         tags:
@@ -1715,6 +1765,30 @@ definitions:
         type: integer
         format: int64   
         required: true
+
+  CopyCollection:
+    type: object
+    properties:
+      source_id:
+        type: integer
+        required: true
+        description: "Source collection ID"
+      target_id:
+        type: integer
+        required: true
+        description: "Target collection ID"
+  
+  MoveCollection:
+    type: object
+    properties:
+      source_id:
+        type: integer
+        required: true
+        description: "Source collection ID"
+      target_id:
+        type: integer
+        required: true
+        description: "Target collection ID"
 
   AuthenticationResponse:
     type: object
