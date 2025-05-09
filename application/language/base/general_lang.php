@@ -20,7 +20,7 @@ $lang['author']="Author";
 
 
 $lang['microdata']="Microdata";
-$lang['timeseries']="Timeseries";
+$lang['timeseries']="Indicator";
 $lang['geospatial']="Geospatial";
 $lang['script']="Script";
 $lang['document']="Document";
@@ -28,7 +28,7 @@ $lang['table']="Table";
 $lang['image']="Image";
 $lang['video']="Video";
 $lang['external-resources']="External resources";
-$lang['timeseries-db']="Timeseries database";
+$lang['timeseries-db']="Indicators database";
 
 $lang['core']="Core";
 $lang['custom']="Custom";
