@@ -77,11 +77,17 @@ class ImportProject extends MY_REST_Controller
 
 			$this->Editor_model->create_project_folder($sid);
 			
-
 			try{
 				if ($file_ext=='xml'){
 					if ($options['type']=='survey'){
 						$result=$this->Editor_model->importDDI($sid, $parseOnly=false,$options);
+					}
+					else if ($options['type']=='geospatial'){
+						$this->load->library('Geospatial_import');
+						$result=$this->geospatial_import->import($sid,$uploaded_filepath);
+					}
+					else{
+						throw new Exception("Unsupported file type");
 					}
 				}else if ($file_ext=='json'){
 					$this->load->library('ImportJsonMetadata');
