@@ -30,7 +30,7 @@ Vue.component('vue-template-uuid', {
                 'new_uid': this.new_value
             };
             let vm=this;
-            let url = CI.base_url + '/api/templates/uid/';
+            let url = CI.site_url + '/api/templates/uid/';
             axios.post(url,
                 form_data
             )

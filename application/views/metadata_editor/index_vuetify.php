@@ -55,6 +55,7 @@
 
     <script>
         var CI = {
+          'site_url': '<?php echo site_url();?>',
           'base_url': '<?php echo site_url();?>',
           'base_asset_url': '<?php echo base_url();?>',
         }; 
