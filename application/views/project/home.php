@@ -376,7 +376,7 @@
 
     <template class="import-project">
       <div class="text-center">
-        <v-dialog v-model="dialog_import_project" width="500">
+        <v-dialog v-model="dialog_import_project" width="500" :key="dialog_import_project_key">
 
           <v-card>
             <v-card-title class="text-h5 grey lighten-2">
@@ -615,6 +615,7 @@
         pagination_page: 0,
         dialog_create_project: false,
         dialog_import_project: false,
+        dialog_import_project_key: 0,
         import_file: null,
         import_url:null,
         import_project_type: null,
@@ -1328,6 +1329,8 @@
                 }
                 vm.dialog_import_project=false;
                 vm.loadProjects();
+                vm.dialog_import_project_key++;
+                vm.import_file=null;
             })
             .catch(function(response){
                 vm.import_file_errors=response;
