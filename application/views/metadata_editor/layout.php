@@ -1,7 +1,7 @@
 <v-app style="position:relative;height: 100vh">
 
     <!--header-->
-    <?php echo $this->load->view('editor_common/global-header', array(), true); ?>
+    <vue-global-site-header></vue-global-site-header>
     <!--end-header-->
 
     <?php /* <div class="row no-gutters">

@@ -8,21 +8,31 @@ Vue.component('vue-global-site-header', {
         },
     },
     computed:{
+
+        BaseUrl(){
+            //remove index.php
+            let base_url = CI.base_url;
+            if (base_url.endsWith('/index.php')) {
+                base_url = base_url.slice(0, -10);
+            }
+            return base_url;
+        }
+
     },
     template: `
         <div class="vue-global-site-header">
             <v-app-bar color="primary-dark" dark>
                 <v-toolbar-title>
-                <a :href="CI.base_url" style="color: white;text-decoration: none;">
-                <img :src="CI.base_url + '/vue-app/assets/images/logo-white.svg'" style="height: 20px;margin-right: 1px;">
+                <a :href="BaseUrl" style="color: white;text-decoration: none;">
+                <img :src="BaseUrl + '/vue-app/assets/images/logo-white.svg'" style="height: 20px;margin-right: 1px;">
                 Metadata Editor
                 </a>
                 </v-toolbar-title>
                 <v-spacer></v-spacer>
                 
-                <v-btn text @click="pageLink('about')">About</v-btn>
+                <v-btn text @click="pageLink('about')">{{$t('About')}}</v-btn>
                 
-                <v-menu offset-y>
+                <v-menu offset-y style="z-index: 2000;" >
                 <template v-slot:activator="{ on, attrs }">
                     <v-btn
                      text

@@ -53,11 +53,24 @@
 
 <body class="hold-transition sidebar-mini layout-fixed">
 
+
+  <?php
+      $user=$this->session->userdata('username');
+
+      $user_info=[
+        'username'=> $user,
+        'is_logged_in'=> !empty($user),
+        'is_admin'=> $this->ion_auth->is_admin(),
+      ];
+      
+    ?>
+
     <script>
         var CI = {
           'site_url': '<?php echo site_url();?>',
           'base_url': '<?php echo site_url();?>',
           'base_asset_url': '<?php echo base_url();?>',
+          'user_info': <?php echo json_encode($user_info); ?>
         }; 
         let sid='<?php echo $sid;?>';
         let form_template=<?php echo $metadata_template;?>;
@@ -131,17 +144,18 @@
     });
 
     const vuetify = new Vuetify({
-    theme: {
-        themes: {
-          light: {
-            primary: '#526bc7',
-            secondary: '#b0bec5',
-            accent: '#8c9eff',
-            error: '#b71c1c',
-          },
-        },
-      },
-    })
+            theme: {
+            themes: {
+                light: {
+                    primary: '#526bc7',
+                    "primary-dark": '#0c1a4d',
+                    secondary: '#b0bec5',
+                    accent: '#8c9eff',
+                    error: '#b71c1c',
+                },
+            },
+            },
+        })
 
     vue_app=new Vue({
       el: '#app',
