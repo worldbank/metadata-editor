@@ -212,11 +212,6 @@ html {
      font-size: smaller;
  }
 
- .text-link {
-     color: blue;
-     cursor: pointer;
- }
-
  .v-icon.v-icon {
      font-size: 18px;
  }
@@ -1113,4 +1108,13 @@ tr .action-buttons-hover {
 
 .v-overlay{
     z-index: 1100!important;
+}
+
+.text-link{
+    color:#3f51b5;cursor:pointer;
+}
+
+.text-link:hover{
+    color:#526cc7;
+    background:#e9edf8;
 }
