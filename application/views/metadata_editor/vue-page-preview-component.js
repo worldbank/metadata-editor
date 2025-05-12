@@ -7,7 +7,6 @@ Vue.component('page-preview', {
         }
     },
     mounted:function(){      
-        //this.loadHtml();  
     },
     methods: {
         downloadHtml: async function()
@@ -24,9 +23,8 @@ Vue.component('page-preview', {
             
             let resp = await axios.get(url);
             vm.html=resp.data;
-            vm.is_loading=false;                         
-        },
-                
+            vm.is_loading=false;
+        }                     
     },
     computed: {    
         ProjectID(){
@@ -38,8 +36,7 @@ Vue.component('page-preview', {
         TemplateItems()
         {
             return this.ProjectTemplate.template.items;
-        }
-        
+        }        
     },
     template: `
         <div class="vue-page-preview-component m-3 mt-5 ">

@@ -3,10 +3,21 @@ Vue.component('v-form-preview', {
     props: ['title', 'items', 'depth', 'css_class','path', 'value'],
     data() {
         return {
+            mathjax_loaded: false
         }
     },
-    created() {
+    mounted() {
         this.field= this.$store.state.treeActiveNode;
+
+        //mathjax
+        setTimeout(() => {
+            if (document.querySelector('.content-format-latex') && !this.mathjax_loaded) {
+                this.loadMathJax();
+                this.mathjax_loaded = true;                
+            }
+        }
+        , 2000);  
+        
     },    
     methods:{
         isEmpty: function(data){
@@ -32,7 +43,42 @@ Vue.component('v-form-preview', {
             }catch (error) {
                 console.error(error);
             }
-        }
+        },
+        isScriptLoaded: function(src) {
+            return document.querySelectorAll(`script[src="${src}"]`).length > 0;
+          },        
+        loadMathJax: function () {
+            if (this.isScriptLoaded(this.MathJaxJSLibPath)) {
+                if (typeof MathJax !== 'undefined' && MathJax.startup && MathJax.startup.typeset) {
+                    MathJax.typeset();
+                } else {
+                    if (typeof MathJax !== 'undefined' && MathJax.typeset) {
+                        MathJax.typeset();
+                    }                    
+                }
+                return;
+            }
+
+            //MathJax configuration
+            window.MathJax = {
+                tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+                svg: { scale: 1 }, // Optional: Adjust scaling for SVG output
+                startup: {
+                    ready: function () {
+                        MathJax.startup.defaultReady();
+                        console.log('MathJax is ready with SVG output.');
+                    }
+                }
+            };
+
+            // Dynamically load the MathJax script
+            let script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.async = true;
+            //script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js'; // Use the SVG output processor
+            script.src = this.MathJaxJSLibPath; // Use the SVG output processor
+            document.head.appendChild(script);
+        }      
     },
     computed: {       
         formData () {
@@ -41,6 +87,13 @@ Vue.component('v-form-preview', {
         
         ProjectType(){
             return this.$store.state.project_type;
+        },
+        MathJaxJSLibPath(){
+            return this.BaseUrl + '/vue-app/assets/mathjax-tex-svg-full.min.js';
+        },
+        BaseUrl(){
+            //remove index.php
+            return CI.base_url.replace('/index.php', '');
         }
         
     },
@@ -98,12 +151,11 @@ Vue.component('v-form-preview', {
                 <div v-if="item.type=='text' || item.type=='string' || item.type=='textarea' || item.type=='dropdown'">
                     <div v-if="formData[item.key]" class="form-group form-field" :class="['field-' + item.key, item.class] ">
                         <label :for="'field-' + normalizeClassID(item.key)">
-                            {{item.title}} 
-                            <span class="small" v-if="item.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(item.key)" ><i class="far fa-question-circle"></i></span>
-                            <span v-if="item.required==true" class="required-label"> * </span>
+                            {{item.title}}
                         </label>
-
-                        <div class="text-block">{{formData[item.key]}}</div>
+                        <div :class="(item.content_format) ? 'content-format-' + item.content_format : 'content-format-text'">
+                            <div class="text-block" style="white-space: pre-wrap;">{{formData[item.key]}}</div>
+                        </div>
                    
                     </div>
 
@@ -127,8 +179,12 @@ Vue.component('v-form-preview', {
         <div v-if="item.type=='simple_array'">
             <div class="form-group form-field form-field-table">
                 <label :for="'field-' + normalizeClassID(item.key)">{{item.title}}</label>
-                {{formData[item.key]}}
-                {{item.props}}
+
+                <ul>
+                    <li v-for="(value, idx) in formData[item.key]" :key="idx">
+                        {{value}}
+                    </li>
+                </ul>
             </div>    
         </div>
 
