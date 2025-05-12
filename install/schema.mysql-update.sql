@@ -134,5 +134,5 @@ ALTER TABLE `editor_projects`
 ADD COLUMN `attributes` JSON NULL;
 
 ALTER TABLE `editor_variables`
-ADD COLUMN 'is_key' INT NULL;
+ADD COLUMN `is_key` INT NULL;
 
