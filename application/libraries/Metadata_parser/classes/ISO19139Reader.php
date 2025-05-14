@@ -153,11 +153,9 @@ class ISO19139Reader
         
             // Iterate over referenceSystemIdentifier and extract sub-elements
             foreach ($referenceSystemIdentifier as $row) {
-                $result[] = [
-                    "referenceSystemInfo" => [
+                $result[]=[
                         "code" => (string) $this->xpath_query('gmd:RS_Identifier/gmd:code/gco:CharacterString', $row),
                         "codeSpace" => (string) $this->xpath_query('gmd:RS_Identifier/gmd:codeSpace/gco:CharacterString', $row),
-                    ],
                 ];
             }
         }
@@ -182,12 +180,13 @@ class ISO19139Reader
             'citation' =>[
                 "title" => (string) $this->xpath_query('gmd:citation/gmd:CI_Citation/gmd:title/gco:CharacterString', $node),
                 "alternateTitle" => (array) $this->xpath_query('gmd:citation/gmd:CI_Citation/gmd:alternateTitle/gco:CharacterString', $node, true),
+                "collectiveTitle" => (string) $this->xpath_query('gmd:citation/gmd:CI_Citation/gmd:collectiveTitle/gco:CharacterString', $node),
                 "date" => (array) $this->getDateArray($node->xpath('gmd:citation/gmd:CI_Citation/gmd:date/gmd:CI_Date')),
                 "edition" => (string) $this->xpath_query('gmd:citation/gmd:CI_Citation/gmd:edition/gco:CharacterString', $node),
                 "editionDate" => (string) $this->xpath_query('gmd:citation/gmd:CI_Citation/gmd:editionDate/gco:Date', $node),
-                "identifier" => (array) $this->xpath_query('gmd:citation/gmd:CI_Citation/gmd:identifier/gmd:RS_Identifier', $node, true),
+                "identifier" => (array) $this->getIdentifiers($node->xpath('gmd:citation/gmd:CI_Citation/gmd:identifier/gmd:RS_Identifier')),
                 "citedResponsibleParty" => (array) $this->parseContacts($node->xpath('gmd:citation/gmd:CI_Citation/gmd:citedResponsibleParty/gmd:CI_ResponsibleParty')),
-                "presentationForm" => (array) $this->xpath_query('gmd:citation/gmd:CI_Citation/gmd:presentationForm/gmd:MD_DigitalTransferOptions', $node, true),
+                "presentationForm" => (array) $this->getPresentationForm($node->xpath('gmd:citation/gmd:CI_Citation/gmd:presentationForm')),
                 //series
                 //otherCitationDetails
                 "collectiveTitle" => (string) $this->xpath_query('gmd:citation/gmd:CI_Citation/gmd:collectiveTitle/gco:CharacterString', $node),
@@ -222,6 +221,42 @@ class ISO19139Reader
             'supplementalInformation' => (string) $this->xpath_query('gmd:supplementalInformation/gco:CharacterString', $node),
             //'serviceIdentification'
         ];
+        
+        return $result;
+    }
+
+
+    function getPresentationForm($presentationForm)
+    {
+        $result = array();
+
+        if (empty($presentationForm)){
+            return null;
+        }
+
+        foreach ($presentationForm as $form) {
+            $result[] = (string) $this->xpath_query('gmd:MD_PresentationFormCode/@codeListValue', $form);
+        }
+        
+        return $result;
+    }
+
+
+
+    function getIdentifiers($identifiers)
+    {
+        $result = array();
+
+        if (empty($identifiers)){
+            return null;
+        }
+
+        foreach ($identifiers as $identifier) {
+            $result[] = [
+                "code" => (string) $this->xpath_query('gmd:code/gco:CharacterString', $identifier),
+                "authority" => (string) $this->xpath_query('gmd:codeSpace/gco:CharacterString', $identifier),                
+            ];
+        }
         
         return $result;
     }
@@ -384,11 +419,11 @@ class ISO19139Reader
             $result = [
                 "useLimitation" => (array) $this->xpath_query('gmd:useLimitation/gco:CharacterString', $node,true),
                 "otherConstraints" => (array) $this->xpath_query('gmd:otherConstraints/gco:CharacterString', $node, true),
-                "accessConstraints" => (array) $this->xpath_query('gmd:accessConstraints/gmd:MD_RestrictionCode/@codeListValue', $node, true),
-                "useConstraints" => (array) $this->xpath_query('gmd:useConstraints/gmd:MD_RestrictionCode/@codeListValue', $node, true),
+                'accessConstraints' => (array) $this->xpath_query('gmd:accessConstraints/gmd:MD_RestrictionCode/@codeListValue', $node, true),
+                'useConstraints' => (array) $this->xpath_query('gmd:useConstraints/gmd:MD_RestrictionCode/@codeListValue', $node, true),           
             ];
         }
-        
+
         return $result;
     }
 
@@ -498,8 +533,10 @@ class ISO19139Reader
 
             //temporalElementExtent
             $temporalElementExtent = (array) $node->xpath('gmd:temporalElement');
+
             $temporalElementExtentArray = [];
             foreach ($temporalElementExtent as $temporalElement) {
+
                 $temporalElementExtentArray[] = [
                     "description" => (string) $this->xpath_query('gmd:EX_TemporalExtent/gmd:extent/gml:TimePeriod/gml:description', $temporalElement),
                     "beginPosition" => (string) $this->xpath_query('gmd:EX_TemporalExtent/gmd:extent/gml:TimePeriod/gml:beginPosition', $temporalElement),
@@ -512,11 +549,10 @@ class ISO19139Reader
             
         }
 
-        if (isset($result[0])){
-            return $result[0];
-        }
-        
-        return $result;
+        return [
+            "geographicElement" => $result[0]['geographicElement'],
+            "temporalElementExtent" => $result[1]['temporalElementExtent'],
+        ];
     }
 
     function getSpatialResolution($spatialResolution)

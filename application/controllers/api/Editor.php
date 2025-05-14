@@ -1460,4 +1460,34 @@ class Editor extends MY_REST_Controller
 		}
 	}
 
+
+	/**
+	 * 
+	 * Export project metadata to ISO19139/XML
+	 * 
+	 */
+	function iso19139_get($sid=null)
+	{		
+		try{
+			$sid=$this->get_sid($sid);
+			$exists=$this->Editor_model->check_id_exists($sid, $type='geospatial');
+			
+
+			if(!$exists){
+				throw new Exception("Project not found");
+			}
+
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
+			$this->load->library('ISO19139Writer');
+			$metadata=$this->Editor_model->get_metadata($sid);
+
+			$xml=$this->iso19139writer->generate($metadata['description']);
+			echo $xml;
+			die();
+		}
+		catch(Exception $e){
+			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
 }
