@@ -144,6 +144,8 @@ $lang['add']="Add";
 $lang['changed_by']="Changed by";
 $lang['changed_at']="Changed at";
 $lang['owner']="Owner";
+$lang['export_iso19139']="Export XML";
+
 
 /* End of file general_lang.php */
 /* Location: ./application/language/base/general_lang.php */

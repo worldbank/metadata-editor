@@ -132,6 +132,14 @@
                                     <?php echo t("export_ddi"); ?>
                                 </v-list-item-title>
                             </v-list-item>
+                            <v-list-item v-if="dataset_type=='geospatial'" @click="onLinkClick(base_url + '/api/editor/iso19139/' + dataset_id+'?download=true')">
+                                <v-list-item-icon>
+                                    <v-icon>mdi-file-xml-box</v-icon>
+                                </v-list-item-icon>
+                                <v-list-item-title>                                    
+                                    <?php echo t("export_iso19139"); ?>
+                                </v-list-item-title>
+                            </v-list-item>
                             <v-list-item @click="export_json_dialog=true">
                                 <v-list-item-icon>
                                     <v-icon>mdi-file</v-icon>
