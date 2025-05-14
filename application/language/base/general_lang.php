@@ -28,6 +28,7 @@ $lang['table']="Table";
 $lang['image']="Image";
 $lang['video']="Video";
 $lang['external-resources']="External resources";
+$lang['external-resource']="External resource";
 $lang['timeseries-db']="Indicators database";
 
 $lang['core']="Core";

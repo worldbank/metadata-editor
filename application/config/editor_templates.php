@@ -166,21 +166,6 @@ $config['geospatial'][]=array(
 );
 
 
-$config['geospatial'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/geospatial_template_ihsn.json',
-    "uid"=> "2b34355583ac3ee8505c29977c074cf4en",
-    "data_type"=> "geospatial",
-    "lang"=> "en",
-    "name"=> "IHSN ISO 19139-Datasets Template v01 EN ",
-    "version"=> "1.0",
-    "organization"=> "IHSN",
-    "author"=> "MA OD",
-    "description"=> "A template based on the ISO 19139\/19115\/19110 metadata standard, for the documentation of geographic data and services. \n\nThis template includes metadata elements recommended by the INSPIRE directive for the documentation of geographic datasets, and additional elements used by the World Bank Geospatial Operations Support team (GOST). Another template is available for the documentation of geographic data services. \n\nFor information on INSPIRE, see \"INSPIRE Metadata Implementing Rules: Technical Guidelines based on EN ISO 19115 and EN ISO 19119\" available at:\nhttps:\/\/inspire.ec.europa.eu\/documents\/inspire-metadata-implementing-rules-technical-guidelines-based-en-iso-19115-and-en-iso-1\n\nNOTE: The section \"Resource locator\" in the ISO 19139 is not included in the schema; the transfer options are replaced with the use of EXERNAL RESOURCES. ",    
-);
-
-
-
-
 //document
 $config['document'][]=array(
     'template' => 'metadata_editor/metadata_editor_templates/document_form_template.json',
