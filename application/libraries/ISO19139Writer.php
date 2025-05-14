@@ -195,6 +195,7 @@ class ISO19139Writer
         $metadata_arr=new \Adbar\Dot($spatialRepresentationInfoArray);
 
         foreach($metadata_arr as $metadata){
+            $metadata=new \Adbar\Dot($metadata);
             $spatialRepresentationInfo = $xmlNode->addChild('gmd:spatialRepresentationInfo');
             
             //vectorSpatialRepresentation
@@ -202,9 +203,9 @@ class ISO19139Writer
             
             //topologyLevel
             $topologyLevel = $vectorSpatialRepresentation->addChild('gmd:topologyLevel');
-            $topologyLevelCode = $topologyLevel->addChild('gmd:MD_TopologyLevelCode', $metadata['vectorSpatialRepresentation']['topologyLevel']);
+            $topologyLevelCode = $topologyLevel->addChild('gmd:MD_TopologyLevelCode', $metadata['vectorSpatialRepresentation.topologyLevel']);
             $topologyLevelCode->addAttribute('codeList', 'http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_TopologyLevelCode');
-            $topologyLevelCode->addAttribute('codeListValue', $metadata['vectorSpatialRepresentation']['topologyLevel']);
+            $topologyLevelCode->addAttribute('codeListValue', $metadata['vectorSpatialRepresentation.topologyLevel']);
             
             //geometricObjects
             $geometricObjects = $vectorSpatialRepresentation->addChild('gmd:geometricObjects');
@@ -222,33 +223,36 @@ class ISO19139Writer
             //gridSpatialRepresentation
             $gridSpatialRepresentation = $spatialRepresentationInfo->addChild('gmd:MD_GridSpatialRepresentation');
             $numberOfDimensions = $gridSpatialRepresentation->addChild('gmd:numberOfDimensions');
-            $numberOfDimensions->addChild('gco:Integer', $metadata['gridSpatialRepresentation']['numberOfDimensions'], 'http://www.isotc211.org/2005/gco');
+            $numberOfDimensions->addChild('gco:Integer', $metadata['gridSpatialRepresentation.numberOfDimensions'], 'http://www.isotc211.org/2005/gco');
 
             //axisDimensionProperties
             $axisDimensionProperties = $gridSpatialRepresentation->addChild('gmd:axisDimensionProperties');
-            foreach ($metadata['gridSpatialRepresentation']['axisDimensionProperties'] as $dimension) {
-                $mdDimension = $axisDimensionProperties->addChild('gmd:MD_Dimension');
-                $dimensionName = $mdDimension->addChild('gmd:dimensionName');
-                $dimensionNameCode = $dimensionName->addChild('gmd:MD_DimensionNameTypeCode', $dimension['dimensionName'], 'http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_DimensionNameTypeCode');
-                $dimensionNameCode->addAttribute('codeList', 'http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_DimensionNameTypeCode');
-                $dimensionNameCode->addAttribute('codeListValue', $dimension['dimensionName']);
 
-                $dimensionSize = $mdDimension->addChild('gmd:dimensionSize');
-                $dimensionSize->addChild('gco:Integer', $dimension['dimensionSize'], 'http://www.isotc211.org/2005/gco');
+            if (!empty($metadata['gridSpatialRepresentation.axisDimensionProperties'])){
+                foreach ($metadata['gridSpatialRepresentation.axisDimensionProperties'] as $dimension) {
+                    $mdDimension = $axisDimensionProperties->addChild('gmd:MD_Dimension');
+                    $dimensionName = $mdDimension->addChild('gmd:dimensionName');
+                    $dimensionNameCode = $dimensionName->addChild('gmd:MD_DimensionNameTypeCode', $dimension['dimensionName'], 'http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_DimensionNameTypeCode');
+                    $dimensionNameCode->addAttribute('codeList', 'http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_DimensionNameTypeCode');
+                    $dimensionNameCode->addAttribute('codeListValue', $dimension['dimensionName']);
 
-                $resolution = $mdDimension->addChild('gmd:resolution');
-                $resolution->addChild('gco:Measure', $dimension['resolution'], 'http://www.isotc211.org/2005/gco')->addAttribute('uom', 'm');
+                    $dimensionSize = $mdDimension->addChild('gmd:dimensionSize');
+                    $dimensionSize->addChild('gco:Integer', $dimension['dimensionSize'], 'http://www.isotc211.org/2005/gco');
+
+                    $resolution = $mdDimension->addChild('gmd:resolution');
+                    $resolution->addChild('gco:Measure', $dimension['resolution'], 'http://www.isotc211.org/2005/gco')->addAttribute('uom', 'm');
+                }
             }
 
             //cellGeometry
             $cellGeometry = $gridSpatialRepresentation->addChild('gmd:cellGeometry');
-            $cellGeometryCode = $cellGeometry->addChild('gmd:MD_CellGeometryCode', $metadata['gridSpatialRepresentation']['cellGeometry']);
+            $cellGeometryCode = $cellGeometry->addChild('gmd:MD_CellGeometryCode', $metadata['gridSpatialRepresentation.cellGeometry']);
             $cellGeometryCode->addAttribute('codeList', 'http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_CellGeometryCode');
-            $cellGeometryCode->addAttribute('codeListValue', $metadata['gridSpatialRepresentation']['cellGeometry']);
+            $cellGeometryCode->addAttribute('codeListValue', $metadata['gridSpatialRepresentation.cellGeometry']);
 
             //transformationParameterAvailability
             $transformationParameterAvailability = $gridSpatialRepresentation->addChild('gmd:transformationParameterAvailability');
-            $transformationParameterAvailability->addChild('gco:Boolean', $metadata['gridSpatialRepresentation']['transformationParameterAvailability'], 'http://www.isotc211.org/2005/gco');
+            $transformationParameterAvailability->addChild('gco:Boolean', $metadata['gridSpatialRepresentation.transformationParameterAvailability'], 'http://www.isotc211.org/2005/gco');
         }
     }
 
@@ -259,6 +263,7 @@ class ISO19139Writer
 
         foreach($metadata_arr as $metadata)
         {
+            $metadata=new \Adbar\Dot($metadata);
             $referenceSystemInfo = $xmlNode->addChild('gmd:referenceSystemInfo');
             $referenceSystem = $referenceSystemInfo->addChild('gmd:MD_ReferenceSystem');
             $referenceSystemIdentifier = $referenceSystem->addChild('gmd:referenceSystemIdentifier');
