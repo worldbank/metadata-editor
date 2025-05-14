@@ -1471,7 +1471,7 @@ class Editor extends MY_REST_Controller
 		try{
 			$sid=$this->get_sid($sid);
 			$exists=$this->Editor_model->check_id_exists($sid, $type='geospatial');
-			
+			$download=$this->input->get("download");
 
 			if(!$exists){
 				throw new Exception("Project not found");
@@ -1479,9 +1479,17 @@ class Editor extends MY_REST_Controller
 
 			$this->editor_acl->user_has_project_access($sid,$permission='view');
 			$this->load->library('ISO19139Writer');
-			$metadata=$this->Editor_model->get_metadata($sid);
+			$metadata=$this->Editor_model->get_row($sid);
 
-			$xml=$this->iso19139writer->generate($metadata['description']);
+			$xml=$this->iso19139writer->generate($metadata['metadata']['description']);
+
+			if ($download=='true' || $download==1){
+				$this->load->helper('download');
+				$filename=$metadata['idno'].'.xml';
+				force_download($filename, $xml);
+				die();
+			}
+
 			echo $xml;
 			die();
 		}
