@@ -210,16 +210,19 @@
         show_fields_nonempty:false,
         show_fields_validation_errors:false,
         project_types_icons: {
-          "document": "fas fa-file-alt",
-          "survey": "fa fa-database",
-          "geospatial": "fa fa-globe-americas",
-          "table": "fa fa-database",
-          "timeseries": "fa fa-chart-line",
-          "timeseries-db": "fas fa-project-diagram",
-          "image": "fa fa-image",
-          "video": "fa fa-video",
-          "script": "fa fa-file-code"
+          "document": "mdi-file-document",
+          "survey": "mdi-database", 
+          "geospatial": "mdi-earth",
+          "table": "mdi-table",
+          "timeseries": "mdi-chart-line",
+          "timeseries-db": "mdi-resistor-nodes",
+          "image": "mdi-file-image",
+          "video": "mdi-video",
+          "script": "mdi-file-code",
+          "resource": "mdi-file-link-outline",
+          "admin_meta": "mdi-file-outline"
         },
+
         apply_defaults_dialog:false,
         apply_defaults_dialog_key:0
       },

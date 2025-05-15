@@ -113,7 +113,7 @@ Vue.component('summary-templates-component', {
                     </v-card-title>
 
                     <v-card-text>
-                        <div class="font-weight-bold">{{$t('Project template')}}:</div>
+                        <div class="font-weight-bold">{{$t('project_template')}}:</div>
                                                 
                         <div class="m-0 p-1 rounded text-link" text  color="primary" @click="selectProjectTemplate" :disabled="!isProjectEditable" >
                              <span class="plx-2">  {{ProjectTemplate.name}} - {{ProjectTemplate.version}}</span>

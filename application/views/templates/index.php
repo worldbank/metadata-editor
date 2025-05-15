@@ -77,7 +77,7 @@
                   <v-card rounded class="v-card--app-filter pa-3 mt-5 ml-2 elevation-3" style="position:sticky; top:50px;">
                     <!-- header -->
                     <section class="d-flex justify-space-between align-center py-3 px-5 v-card--app-filter__title">
-                        Types
+                        {{$t('Types')}}
                     </section>
 
                     <!-- content -->
@@ -89,12 +89,12 @@
                                         <i class="fa fa-filter"></i>
                                     </v-list-item-icon>
                                     <v-list-item-content>
-                                        <v-list-item-title>All</v-list-item-title>
+                                        <v-list-item-title>{{$t('All')}}</v-list-item-title>
                                     </v-list-item-content>
                                 </v-list-item>
                                 <v-list-item v-for="(item, i) in sidebar_data_types" :key="i" :class="{'v-list-item-active' : sidebar_selected === item.to}" @click="sidebar_selected=item.data_type">
                                     <v-list-item-icon>                                        
-                                        <i :class="getProjectIcon(item.data_type)"></i>
+                                        <v-icon>{{getProjectIcon(item.data_type)}}</v-icon>
                                     </v-list-item-icon>
                                     <v-list-item-content>
                                         <v-list-item-title v-text="item.title"></v-list-item-title>
@@ -185,7 +185,7 @@
                           <span :title="'UID: ' + item.uid" href="#">{{item.name}}</span>                          
                         </div>
                         <div v-else>
-                          <a :title="'UID: ' + item.uid"  target="_blank" :href="getTemplateEditLink(item)" @click="editTemplate(item.uid)">{{item.name}}</a>
+                          <a :title="'UID: ' + item.uid"  target="_blank" :href="getTemplateEditLink(item)" @xclick="editTemplate(item.uid)">{{item.name}}</a>
                         </div>
                       </template>
                       
@@ -419,17 +419,17 @@
         dialog_uuid_template:false,
         search_keywords: '',
         project_types_icons: {
-          "document": "fa fa-file-code",
-          "survey": "fa fa-database",
-          "geospatial": "fa fa-globe-americas",
-          "table": "fa fa-database",
-          "timeseries": "fa fa-chart-line",
-          "timeseries-db": "fa fa-chart-line",
-          "image": "fa fa-image",
-          "video": "fa fa-video",
-          "script": "fa fa-file-code",
-          "resource": "fas fa-th-large",
-          "admin_meta": "fa fa-table"
+          "document": "mdi-file-document",
+          "survey": "mdi-database", 
+          "geospatial": "mdi-earth",
+          "table": "mdi-table",
+          "timeseries": "mdi-chart-line",
+          "timeseries-db": "mdi-resistor-nodes",
+          "image": "mdi-file-image",
+          "video": "mdi-video",
+          "script": "mdi-file-code",
+          "resource": "mdi-file-link-outline",
+          "admin_meta": "mdi-file-outline"
         },
         dialog_import_template: false,
         template_import_errors:[],
@@ -444,52 +444,7 @@
         menu_active_template_data_type:'',
         nav_tabs_active:2,
         nav_tabs_model:2,
-        sidebar_data_types: [
-          {
-            title: 'Microdata',
-            data_type: 'survey'
-          },
-          {
-            title: 'Timeseries',
-            data_type: 'timeseries'
-          },
-          {
-            title: 'Timeseries DB',
-            data_type: 'timeseries-db'
-          },
-          {
-            title: 'Script',
-            data_type: 'script'
-          },
-          {
-            title: 'Geospatial',
-            data_type: 'geospatial'
-          },
-          {
-            title: 'Document',
-            data_type: 'document'
-          },
-          {
-            title: 'Table',
-            data_type: 'table'
-          },
-          {
-            title: 'Image',
-            data_type: 'image'
-          },
-          {
-            title: 'Video',
-            data_type: 'video'
-          },
-          {
-            title: 'External Resources',
-            data_type: 'resource'
-          },
-          {
-            title: 'Administrative Metadata',
-            data_type: 'admin_meta'
-          }
-        ],
+        sidebar_data_types: [],
         sidebar_selected: ''
       },
       created: async function() {
@@ -497,6 +452,7 @@
         //this.init_tree_data();
       },
       mounted: function() {
+        this.init_data_types();
         this.loadTemplates();
         this.loadDataTypes();
       },
@@ -510,6 +466,55 @@
       },
       watch: {},
       methods: {
+        init_data_types(){
+          
+          this.sidebar_data_types=[
+          {
+            title: this.$t('microdata'),
+            data_type: 'survey'
+          },
+          {
+            title: this.$t('timeseries'),
+            data_type: 'timeseries'
+          },
+          {
+            title: this.$t('timeseries-db'),
+            data_type: 'timeseries-db'
+          },
+          {
+            title: this.$t('script'),
+            data_type: 'script'
+          },
+          {
+            title: this.$t('geospatial'),
+            data_type: 'geospatial'
+          },
+          {
+            title: this.$t('document'),
+            data_type: 'document'
+          },
+          {
+            title: this.$t('table'),
+            data_type: 'table'
+          },
+          {
+            title: this.$t('image'),
+            data_type: 'image'
+          },
+          {
+            title: this.$t('video'),
+            data_type: 'video'
+          },
+          {
+            title: this.$t('external-resource'),
+            data_type: 'resource'
+          },
+          {
+            title: this.$t('administrative_metadata'),
+            data_type: 'admin_meta'
+          }
+        ]
+        },
         updateTemplateUUID(uid){
           this.dialog_uuid_template=true;
         },
@@ -562,7 +567,7 @@
             "table": this.$t("table"),
             "image": this.$t("image"),
             "video": this.$t("video"),
-            "resource": this.$t("external-resources"),
+            "resource": this.$t("external-resource"),
             "admin_meta": this.$t("administrative_metadata")
           }
         },

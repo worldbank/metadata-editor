@@ -117,7 +117,7 @@
                         </div>
                         <div v-else class="form-check" v-for="facet in facet_values">
                           <input class="form-check-input" @click="onFilterClick(facet_key,facet)" type="checkbox" v-model="search_filters[facet_key]" :value="facet.id" :id="facet_key+facet.id">
-                          <label class="form-check-label" :for="facet_key+facet.id">{{facet.title}}</label>
+                          <label class="form-check-label" :for="facet_key+facet.id">{{$t(facet.title)}}</label>
                         </div>
                       </v-expansion-panel-content>
                     </v-expansion-panel>
@@ -263,7 +263,7 @@
                                 <img style="width:60px;height:60px;" src="<?php echo base_url(); ?>files/icon-blank.png" alt="" class=" border img-fluid img-thumbnail rounded shadow-sm project-card-thumbnail">
                               </template>
                             </td>
-                          <td style="vertical-align:top"><i :title="project.type" :class="project_types_icons[project.type]"></i></td>
+                          <td style="vertical-align:top"><v-icon :title="project.type">{{project_types_icons[project.type]}}</v-icon></td>
                           <td>
                             <div class="project-title">
                               <a :href="'editor/edit/' + project.id" :title="project.title" class="d-flex xtext-title" @click="EditProject(project.id)">                                
@@ -348,15 +348,15 @@
 
             <v-card-text>
               <div>
-                <a class="dropdown-item" href="#" @click="createProject('survey')"><i :class="project_types_icons['survey']"></i> {{$t("microdata")}}</a>
-                <a class="dropdown-item" href="#" @click="createProject('timeseries')"><i :class="project_types_icons['timeseries']"></i> {{$t("timeseries")}}</a>
-                <a class="dropdown-item" href="#" @click="createProject('timeseries-db')"><i :class="project_types_icons['timeseries-db']"></i> {{$t("timeseries-db")}}</a>
-                <a class="dropdown-item" href="#" @click="createProject('document')"><i :class="project_types_icons['document']"></i> {{$t("document")}}</a>
-                <a class="dropdown-item" href="#" @click="createProject('table')"><i :class="project_types_icons['table']"></i> {{$t("table")}}</a>
-                <a class="dropdown-item" href="#" @click="createProject('image')"><i :class="project_types_icons['image']"></i> {{$t("image")}}</a>
-                <a class="dropdown-item" href="#" @click="createProject('script')"><i :class="project_types_icons['script']"></i> {{$t("script")}}</a>
-                <a class="dropdown-item" href="#" @click="createProject('video')"><i :class="project_types_icons['video']"></i> {{$t("video")}}</a>
-                <a class="dropdown-item" href="#" @click="createProject('geospatial')"><i :class="project_types_icons['geospatial']"></i> {{$t("geospatial")}}</a>
+                <a class="dropdown-item" href="#" @click="createProject('survey')"><v-icon>{{project_types_icons['survey']}}</v-icon> {{$t("microdata")}}</a>
+                <a class="dropdown-item" href="#" @click="createProject('timeseries')"><v-icon>{{project_types_icons['timeseries']}}</v-icon> {{$t("timeseries")}}</a>
+                <a class="dropdown-item" href="#" @click="createProject('timeseries-db')"><v-icon>{{project_types_icons['timeseries-db']}}</v-icon> {{$t("timeseries-db")}}</a>
+                <a class="dropdown-item" href="#" @click="createProject('document')"><v-icon>{{project_types_icons['document']}}</v-icon> {{$t("document")}}</a>
+                <a class="dropdown-item" href="#" @click="createProject('table')"><v-icon>{{project_types_icons['table']}}</v-icon> {{$t("table")}}</a>
+                <a class="dropdown-item" href="#" @click="createProject('image')"><v-icon>{{project_types_icons['image']}}</v-icon> {{$t("image")}}</a>
+                <a class="dropdown-item" href="#" @click="createProject('script')"><v-icon>{{project_types_icons['script']}}</v-icon> {{$t("script")}}</a>
+                <a class="dropdown-item" href="#" @click="createProject('video')"><v-icon>{{project_types_icons['video']}}</v-icon> {{$t("video")}}</a>
+                <a class="dropdown-item" href="#" @click="createProject('geospatial')"><v-icon>{{project_types_icons['geospatial']}}</v-icon> {{$t("geospatial")}}</a>
               </div>
             </v-card-text>
 
@@ -654,15 +654,15 @@
           "video": "Video",
         },
         project_types_icons: {
-          "document": "fas fa-file-alt",
-          "survey": "fa fa-database",
-          "geospatial": "fa fa-globe-americas",
-          "table": "fa fa-database",
-          "timeseries": "fa fa-chart-line",
-          "timeseries-db": "fas fa-project-diagram",
-          "image": "fa fa-image",
-          "video": "fa fa-video",
-          "script": "fa fa-file-code"
+          "document": "mdi-file-document",
+          "survey": "mdi-database", 
+          "geospatial": "mdi-earth",
+          "table": "mdi-table",
+          "timeseries": "mdi-chart-line",
+          "timeseries-db": "mdi-resistor-nodes",
+          "image": "mdi-file-image",
+          "video": "mdi-video",
+          "script": "mdi-file-code",
         },        
         sort_by_options:[],            
         sort_by:"updated_desc",
@@ -791,7 +791,7 @@
             "document": this.$t("document"),
             "table": this.$t("table"),
             "image": this.$t("image"),
-            "video": this.$t("video")
+            
           }
         },
         initSortOptions: function(){

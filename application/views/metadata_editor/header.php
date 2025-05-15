@@ -2,29 +2,10 @@
 
     <div class="pl-2" style="overflow:hidden;min-height:35px;margin-right:40px;">
         <div style="font-size:20px;" :title="Title" class="wrap-text">
-            <i style="font-size:x-large;" :class="project_types_icons[dataset_type]"></i> <strong>{{Title}}</strong>
+            <v-icon style="font-size:x-large;">{{project_types_icons[dataset_type]}}</v-icon>
+            <strong>{{Title}}</strong>
         </div>
-        <!--<div>{{ProjectMetadata.idno}} </div>-->
-        <?php /*
-        <div class="pl-5 ml-3" v-if="is_dirty">
-
-            <v-btn
-              x-small
-              color="green"
-              dark
-              @click="saveProject"
-            >
-              {{$t('Save project')}}
-            </v-btn>
-            <v-btn
-              x-small
-              dark
-                @click="cancelProject"
-            >
-              {{$t('Cancel')}}
-            </v-btn>  
-        </div>
-        */?>
+        <!--<div>{{ProjectMetadata.idno}} </div>-->        
     </div>
 
     <ul class="navbar-nav ml-5 ml-auto" id="projectMenuBar" ref="projectMenuBar" v-show="!hideProjectSaveOnRoute">         
@@ -111,7 +92,7 @@
             <v-row>
                 <v-col cols="6">
                     <v-list dense>
-                    <v-subheader>Project</v-subheader>
+                    <v-subheader>{{$t('Project')}}</v-subheader>
                         <v-list-item-group       
                             color="primary"
                         >
@@ -199,7 +180,7 @@
                 <v-col cols="6">
                     
                     <v-list dense>
-                        <v-subheader>Metadata</v-subheader>
+                        <v-subheader>{{$t('Metadata')}}</v-subheader>
                         <v-list-item-group color="primary">
                         
                         <v-list-item @click="templateApplyDefaults">
@@ -237,7 +218,7 @@
                                 <v-icon>mdi-file</v-icon>
                             </v-list-item-icon>
                             <v-list-item-title>
-                                Export RDF/XML
+                                {{$t('export_rdf_xml')}}
                             </v-list-item-title>
                         </v-list-item>
                         <v-list-item @click="onLinkClick(base_url + '/api/resources/' + dataset_id)">
@@ -245,7 +226,7 @@
                                 <v-icon>mdi-file</v-icon>
                             </v-list-item-icon>
                             <v-list-item-title>
-                                Export RDF/JSON
+                                {{$t('export_rdf_json')}}
                             </v-list-item-title>
                         </v-list-item>
                         </v-list-item-group>
