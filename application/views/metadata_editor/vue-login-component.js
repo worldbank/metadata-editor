@@ -3,51 +3,55 @@ Vue.component('v-login', {
     props: ['value'],
     data() {
         return {
-            email:'',
-            password:'',
-            login_error:''
+            is_logged_in: false,
+            is_loading: false,
+            login_error: {}
         }
     },
     mounted:function(){
+        this.isLoggedIn();
+        document.addEventListener("visibilitychange", this.isLoggedIn);
     },
     methods: {
-        login: function() {
+        loginRedirect: function() {
+            let url = CI.site_url + '/auth/login';
+            window.open(url, '_blank');
+        },
+        closeDialog: function() {
+            this.$emit('input', false);
+        },
+        isLoggedIn: function() {
+            if (this.is_loading) {
+                return;
+            }
+
+            this.is_loading = true;
+            let url = CI.site_url + '/api/editor/is_connected';
             vm = this;
-            let url = CI.base_url + '/auth/login?isajax=1';
-            vm.login_error='';
-
-            formData =new FormData();
-            formData.append('email',this.email);
-            formData.append('password',this.password);
-
-            axios.post(url,
-                formData, {
-                    /*headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }*/
-                }
-                ).then(function(response) {
-                    vm.$emit('input', false);
+            console.log("checking isLoggedIn");
+            axios.get(url)
+                .then(function(response) {
+                    vm.is_logged_in = true;
+                    vm.is_loading = false;
                 })
                 .catch(function(response) {
-                    vm.login_error = response.response;
-                    console.log("error",response);
+                    vm.is_logged_in = false;
+                    vm.is_loading = false;
                 });
         }
+    },    
+    watch: {
+        /*is_logged_in: function() {
+            if (this.is_logged_in) {
+                this.$emit('input', false);
+            }
+        }*/
     },
-    created() {
-      },
-
-    computed: {        
-    },
-    /*watch: {
-        '$store.state.active_section': function() {
-        }
-    },*/
     template: `
         <div class="v-login"   >
 
         <template>
+            
             <v-row justify="center">
             <v-dialog
                 v-model="value"
@@ -60,24 +64,18 @@ Vue.component('v-login', {
                     </button>
 
                     <v-card-title class="text-h5">Login</v-card-title>
-                    <v-card-text>
+                    <v-card-text v-if="is_logged_in">
+                        <div class="alert alert-success">You are logged in!</div>
+                        <v-btn block color="primary" @click="closeDialog">Close</v-btn>
+                    </v-card-text>
+                    <v-card-text v-else>
+
                         <div class="alert alert-warning mb-3">Your session has expired. Do not refresh the page, you will lose all unsaved changes!</div>
 
                         <div v-if="login_error.data" class="alert alert-danger mt-2">{{login_error.data.message}}</div>
 
-                        <div class="form-group form-field">
-                            <label for="email">Email</label>
-                            <input type="text" v-model="email" class="form-control">
-                        </div>
+                        <v-btn block color="primary" @click="loginRedirect">Login (Opens a new tab)</v-btn>
 
-                        <div class="form-group form-field">
-                            <label for="password">Password</label>
-                            <input type="password" v-model="password"  class="form-control">
-                        </div>
-
-                        <div class="form-grou form-field">
-                            <button type="button" class="btn btn-primary btn-block" @click="login">Login</button>
-                        </div>
                     </v-card-text>
                 </v-card>
 
