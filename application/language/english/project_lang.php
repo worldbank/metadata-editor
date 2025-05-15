@@ -236,5 +236,9 @@ $lang['Edit collection']="Edit collection";
 $lang['Search users']="Search users";
 $lang['Return to collections']="Return to collections";
 
+$lang['export_rdf_xml']="Export RDF/XML";
+$lang['export_rdf_json']="Export RDF/JSON";
+$lang['project_template']="Project template";
+
 /* End of file project_lang.php */
 /* Location: ./application/language/base/project_lang.php */

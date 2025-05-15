@@ -147,5 +147,9 @@ $lang['changed_at']="Changed at";
 $lang['owner']="Owner";
 $lang['export_iso19139']="Export XML";
 
+$lang['Project']="Project";
+$lang['Metadata']="Metadata";
+$lang['shared']="Shared";
+
 /* End of file general_lang.php */
 /* Location: ./application/language/base/general_lang.php */

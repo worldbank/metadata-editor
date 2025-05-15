@@ -392,15 +392,15 @@ class Project_search
 
 		//data types
 		$facets['type']=array(
-			array("id"=>"survey","title"=>"Microdata"),
-			array("id"=>"timeseries","title"=>"Timeseries"),
-			array("id"=>"timeseries-db","title"=>"Timeseries (database)"),
-			array("id"=>"script", "title"=>"Script"),
-			array("id"=>"geospatial","title"=>"Geospatial"),
-			array("id"=>"document","title"=>"Document"),
-			array("id"=>"table","title"=>"Table"),			
-			array("id"=>"image","title"=>"Image"),			
-			array("id"=>"video","title"=>"Video"),			
+			array("id"=>"survey","title"=>"microdata"),
+			array("id"=>"timeseries","title"=>"timeseries"),
+			array("id"=>"timeseries-db","title"=>"timeseries-db"),
+			array("id"=>"script", "title"=>"script"),
+			array("id"=>"geospatial","title"=>"geospatial"),
+			array("id"=>"document","title"=>"document"),
+			array("id"=>"table","title"=>"table"),
+			array("id"=>"image","title"=>"image"),
+			array("id"=>"video","title"=>"video"),
 		);
 
 		//collections
@@ -408,8 +408,8 @@ class Project_search
 
 		//ownership type
 		$facets['ownership']=array(
-			array("id"=>"shared","title"=>"Shared"),
-			array("id"=>"self","title"=>"My projects"),
+			array("id"=>"shared","title"=>"shared"),
+			array("id"=>"self","title"=>"my_projects"),
 		);
 		
 		return $facets;
