@@ -1,2 +1,0 @@
-Author: Rotem Bloom
-Website: http://blogs.microsoft.co.il/blogs/rotemb/archive/2010/10/15/jquery-treeview-with-rtl-support.aspx
