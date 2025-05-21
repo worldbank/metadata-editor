@@ -49,21 +49,16 @@ Vue.component('nested-section-subsection', {
         },
         localValue: function(key)
         {
-            console.log("searching for local value path",key,this.local_data);
             return _.get(this.local_data,key);
         },
         parentValue: function(key){
-            console.log("searching for parent value path",key,this.parentElement);
             return _.get(this.parentElement,key);
         },
         update: function (key, value)
         {
-            console.log("updating sub-section value",key,value);
-            
             //this.local[key] = value;
             _.set(this.local_data,key,value);
-            this.$emit('input', JSON.parse(JSON.stringify(this.local_data)));
-            console.log("emitting from nested-section",JSON.stringify(this.local_data));
+            this.$emit('input', JSON.parse(JSON.stringify(this.local_data)));            
         },
         toggleChildren(index) {
             if (!this.active_sections.includes(index)) {
@@ -167,13 +162,13 @@ Vue.component('nested-section-subsection', {
                                                     <span class="small" v-if="column.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(column.key)" ><i class="far fa-question-circle"></i></span>
                                                     <small :id="'field-toggle-' + normalizeClassID(column.key)" class="collapse help-text form-text text-muted">{{column.help_text}}</small>
                                                     
-
                                                     <nested-array
                                                         :key="column.key" 
                                                         :value="localValue(column.key)"
                                                         @input="update(column.key, $event)"
                                                         :columns="column.props"                                                        
                                                         :path="column.key">
+                                                        :field="column"
                                                     </nested-array> 
                                                 </div>
                                             
