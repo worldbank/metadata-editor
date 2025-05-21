@@ -30,6 +30,9 @@ use Solarium\Exception\InvalidArgumentException;
 use Solarium\Exception\OutOfBoundsException;
 use Solarium\Exception\UnexpectedValueException;
 use Solarium\Plugin\BufferedAdd\BufferedAdd;
+use Solarium\Plugin\BufferedAdd\BufferedAddLite;
+use Solarium\Plugin\BufferedDelete\BufferedDelete;
+use Solarium\Plugin\BufferedDelete\BufferedDeleteLite;
 use Solarium\Plugin\CustomizeRequest\CustomizeRequest;
 use Solarium\Plugin\Loadbalancer\Loadbalancer;
 use Solarium\Plugin\MinimumScoreFilter\MinimumScoreFilter;
@@ -42,9 +45,11 @@ use Solarium\QueryType\Analysis\Query\Field as AnalysisQueryField;
 use Solarium\QueryType\Extract\Query as ExtractQuery;
 use Solarium\QueryType\Extract\Result as ExtractResult;
 use Solarium\QueryType\Graph\Query as GraphQuery;
-use Solarium\QueryType\ManagedResources\Query\Resources;
-use Solarium\QueryType\ManagedResources\Query\Stopwords;
-use Solarium\QueryType\ManagedResources\Query\Synonyms;
+use Solarium\QueryType\Luke\Query as LukeQuery;
+use Solarium\QueryType\Luke\Result\Result as LukeResult;
+use Solarium\QueryType\ManagedResources\Query\Resources as ManagedResourcesQuery;
+use Solarium\QueryType\ManagedResources\Query\Stopwords as ManagedStopwordsQuery;
+use Solarium\QueryType\ManagedResources\Query\Synonyms as ManagedSynonymsQuery;
 use Solarium\QueryType\MoreLikeThis\Query as MoreLikeThisQuery;
 use Solarium\QueryType\MoreLikeThis\Result as MoreLikeThisResult;
 use Solarium\QueryType\Ping\Query as PingQuery;
@@ -74,11 +79,12 @@ use Solarium\QueryType\Update\Result as UpdateResult;
  * The client is the main interface for usage of the Solarium library.
  * You can use it to get query instances and to execute them.
  * It also allows to register plugins and query types to customize Solarium.
+ * It gives access to the event dispatcher so that you can add listeners.
  * Finally, it also gives access to the adapter, which holds the Solr connection settings.
  *
  * Example usage with default settings:
  * <code>
- * $client = new Solarium\Client;
+ * $client = new Solarium\Client($adapter, $eventDispatcher);
  * $query = $client->createSelect();
  * $result = $client->select($query);
  * </code>
@@ -151,6 +157,11 @@ class Client extends Configurable implements ClientInterface
     const QUERY_REALTIME_GET = 'get';
 
     /**
+     * Querytype luke.
+     */
+    const QUERY_LUKE = 'luke';
+
+    /**
      * Querytype cores.
      */
     const QUERY_CORE_ADMIN = 'cores';
@@ -215,13 +226,14 @@ class Client extends Configurable implements ClientInterface
         self::QUERY_GRAPH => GraphQuery::class,
         self::QUERY_EXTRACT => ExtractQuery::class,
         self::QUERY_REALTIME_GET => RealtimeGetQuery::class,
+        self::QUERY_LUKE => LukeQuery::class,
         self::QUERY_CORE_ADMIN => CoreAdminQuery::class,
         self::QUERY_COLLECTIONS => CollectionsQuery::class,
         self::QUERY_CONFIGSETS => ConfigsetsQuery::class,
         self::QUERY_API => ApiQuery::class,
-        self::QUERY_MANAGED_RESOURCES => Resources::class,
-        self::QUERY_MANAGED_STOPWORDS => Stopwords::class,
-        self::QUERY_MANAGED_SYNONYMS => Synonyms::class,
+        self::QUERY_MANAGED_RESOURCES => ManagedResourcesQuery::class,
+        self::QUERY_MANAGED_STOPWORDS => ManagedStopwordsQuery::class,
+        self::QUERY_MANAGED_SYNONYMS => ManagedSynonymsQuery::class,
     ];
 
     /**
@@ -236,6 +248,9 @@ class Client extends Configurable implements ClientInterface
         'customizerequest' => CustomizeRequest::class,
         'parallelexecution' => ParallelExecution::class,
         'bufferedadd' => BufferedAdd::class,
+        'bufferedaddlite' => BufferedAddLite::class,
+        'buffereddelete' => BufferedDelete::class,
+        'buffereddeletelite' => BufferedDeleteLite::class,
         'prefetchiterator' => PrefetchIterator::class,
         'minimumscorefilter' => MinimumScoreFilter::class,
     ];
@@ -345,11 +360,11 @@ class Client extends Configurable implements ClientInterface
 
         $key = $endpoint->getKey();
 
-        if (0 === \strlen($key)) {
+        if (null === $key || 0 === \strlen($key)) {
             throw new InvalidArgumentException('An endpoint must have a key value');
         }
 
-        //double add calls for the same endpoint are ignored, but non-unique keys cause an exception
+        // double add calls for the same endpoint are ignored, but non-unique keys cause an exception
         if (\array_key_exists($key, $this->endpoints) && $this->endpoints[$key] !== $endpoint) {
             throw new InvalidArgumentException('An endpoint must have a unique key');
         }
@@ -706,12 +721,14 @@ class Client extends Configurable implements ClientInterface
         if (\is_object($plugin)) {
             foreach ($this->pluginInstances as $key => $instance) {
                 if ($instance === $plugin) {
+                    $plugin->deinitPlugin();
                     unset($this->pluginInstances[$key]);
                     break;
                 }
             }
         } else {
             if (isset($this->pluginInstances[$plugin])) {
+                $this->pluginInstances[$plugin]->deinitPlugin();
                 unset($this->pluginInstances[$plugin]);
             }
         }
@@ -824,7 +841,7 @@ class Client extends Configurable implements ClientInterface
         $event = new PreExecuteRequestEvent($request, $endpoint);
         $this->eventDispatcher->dispatch($event);
         if (null !== $event->getResponse()) {
-            $response = $event->getResponse(); //a plugin result overrules the standard execution result
+            $response = $event->getResponse(); // a plugin result overrules the standard execution result
         } else {
             $response = $this->getAdapter()->execute($request, $endpoint);
         }
@@ -1020,6 +1037,22 @@ class Client extends Configurable implements ClientInterface
      * @return ResultInterface|\Solarium\QueryType\RealtimeGet\Result
      */
     public function realtimeGet(QueryInterface $query, $endpoint = null): RealtimeGetResult
+    {
+        return $this->execute($query, $endpoint);
+    }
+
+    /**
+     * Execute a Luke query.
+     *
+     * This is a convenience method that forwards the query to the
+     * execute method, thus allowing for an easy to use and clean API.
+     *
+     * @param QueryInterface|\Solarium\QueryType\Luke\Query $query
+     * @param Endpoint|string|null                          $endpoint
+     *
+     * @return ResultInterface|\Solarium\QueryType\Luke\Result\Result
+     */
+    public function luke(QueryInterface $query, $endpoint = null): LukeResult
     {
         return $this->execute($query, $endpoint);
     }
@@ -1236,7 +1269,7 @@ class Client extends Configurable implements ClientInterface
      *
      * @return \Solarium\Core\Query\AbstractQuery|\Solarium\QueryType\Stream\Query
      */
-    public function createStream(array $options = null)
+    public function createStream(array $options = null): StreamQuery
     {
         // Streaming expressions tend to be very long. Therfore we use the 'postbigrequest' plugin. The plugin needs to
         // be loaded before the request is created.
@@ -1252,7 +1285,7 @@ class Client extends Configurable implements ClientInterface
      *
      * @return \Solarium\Core\Query\AbstractQuery|\Solarium\QueryType\Graph\Query
      */
-    public function createGraph(array $options = null)
+    public function createGraph(array $options = null): GraphQuery
     {
         // Streaming expressions tend to be very long. Therfore we use the 'postbigrequest' plugin. The plugin needs to
         // be loaded before the request is created.
@@ -1274,6 +1307,18 @@ class Client extends Configurable implements ClientInterface
     }
 
     /**
+     * Create a Luke query instance.
+     *
+     * @param mixed $options
+     *
+     * @return \Solarium\Core\Query\AbstractQuery|\Solarium\QueryType\Luke\Query
+     */
+    public function createLuke(array $options = null): LukeQuery
+    {
+        return $this->createQuery(self::QUERY_LUKE, $options);
+    }
+
+    /**
      * Create a CoreAdmin query instance.
      *
      * @param mixed $options
@@ -1283,42 +1328,6 @@ class Client extends Configurable implements ClientInterface
     public function createCoreAdmin(array $options = null): CoreAdminQuery
     {
         return $this->createQuery(self::QUERY_CORE_ADMIN, $options);
-    }
-
-    /**
-     * Create a managed resources query instance.
-     *
-     * @param mixed $options
-     *
-     * @return \Solarium\Core\Query\AbstractQuery|\Solarium\QueryType\ManagedResources\Query\Resources
-     */
-    public function createManagedResources(array $options = null)
-    {
-        return $this->createQuery(self::QUERY_MANAGED_RESOURCES, $options);
-    }
-
-    /**
-     * Create a managed stopwords query instance.
-     *
-     * @param mixed $options
-     *
-     * @return \Solarium\Core\Query\AbstractQuery|\Solarium\QueryType\ManagedResources\Query\Stopwords
-     */
-    public function createManagedStopwords(array $options = null)
-    {
-        return $this->createQuery(self::QUERY_MANAGED_STOPWORDS, $options);
-    }
-
-    /**
-     * Create a managed synonyms query instance.
-     *
-     * @param mixed $options
-     *
-     * @return \Solarium\Core\Query\AbstractQuery|\Solarium\QueryType\ManagedResources\Query\Synonyms
-     */
-    public function createManagedSynonyms(array $options = null)
-    {
-        return $this->createQuery(self::QUERY_MANAGED_SYNONYMS, $options);
     }
 
     /**
@@ -1355,6 +1364,42 @@ class Client extends Configurable implements ClientInterface
     public function createApi(array $options = null): ApiQuery
     {
         return $this->createQuery(self::QUERY_API, $options);
+    }
+
+    /**
+     * Create a managed resources query instance.
+     *
+     * @param mixed $options
+     *
+     * @return \Solarium\Core\Query\AbstractQuery|\Solarium\QueryType\ManagedResources\Query\Resources
+     */
+    public function createManagedResources(array $options = null): ManagedResourcesQuery
+    {
+        return $this->createQuery(self::QUERY_MANAGED_RESOURCES, $options);
+    }
+
+    /**
+     * Create a managed stopwords query instance.
+     *
+     * @param mixed $options
+     *
+     * @return \Solarium\Core\Query\AbstractQuery|\Solarium\QueryType\ManagedResources\Query\Stopwords
+     */
+    public function createManagedStopwords(array $options = null): ManagedStopwordsQuery
+    {
+        return $this->createQuery(self::QUERY_MANAGED_STOPWORDS, $options);
+    }
+
+    /**
+     * Create a managed synonyms query instance.
+     *
+     * @param mixed $options
+     *
+     * @return \Solarium\Core\Query\AbstractQuery|\Solarium\QueryType\ManagedResources\Query\Synonyms
+     */
+    public function createManagedSynonyms(array $options = null): ManagedSynonymsQuery
+    {
+        return $this->createQuery(self::QUERY_MANAGED_SYNONYMS, $options);
     }
 
     /**

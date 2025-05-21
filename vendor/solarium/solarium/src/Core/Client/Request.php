@@ -47,6 +47,36 @@ class Request extends Configurable implements RequestParamsInterface
     const METHOD_PUT = 'PUT';
 
     /**
+     * Content-Type for JSON payloads.
+     */
+    const CONTENT_TYPE_APPLICATION_JSON = 'application/json';
+
+    /**
+     * Content-Type for arbitrary binary data.
+     */
+    const CONTENT_TYPE_APPLICATION_OCTET_STREAM = 'application/octet-stream';
+
+    /**
+     * Content-Type for percent-encoded name-value pairs.
+     */
+    const CONTENT_TYPE_APPLICATION_X_WWW_FORM_URLENCODED = 'application/x-www-form-urlencoded';
+
+    /**
+     * Content-Type for XML payloads.
+     */
+    const CONTENT_TYPE_APPLICATION_XML = 'application/xml';
+
+    /**
+     * Content-Type for multipart data streams.
+     */
+    const CONTENT_TYPE_MULTIPART_FORM_DATA = 'multipart/form-data';
+
+    /**
+     * Content-Type for plaintext payloads.
+     */
+    const CONTENT_TYPE_TEXT_PLAIN = 'text/plain';
+
+    /**
      * V1 API.
      */
     const API_V1 = 'v1';
@@ -88,7 +118,16 @@ class Request extends Configurable implements RequestParamsInterface
      */
     public function __toString()
     {
-        $output = __CLASS__.'::__toString'."\n".'method: '.$this->getMethod()."\n".'header: '.print_r($this->getHeaders(), true).'authentication: '.print_r($this->getAuthentication(), true).'resource: '.$this->getUri()."\n".'resource urldecoded: '.urldecode($this->getUri())."\n".'raw data: '.$this->getRawData()."\n".'file upload: '.$this->getFileUpload()."\n";
+        $output =
+            __CLASS__.'::__toString'."\n"
+            .'method: '.$this->getMethod()."\n"
+            .'header: '.print_r($this->getHeaders(), true)
+            .'authentication: '.print_r($this->getAuthentication(), true)
+            .'resource: '.$this->getUri()."\n"
+            .'resource urldecoded: '.urldecode($this->getUri())."\n"
+            .'raw data: '.$this->getRawData()."\n"
+            .'file upload: '.$this->getFileUpload()."\n"
+        ;
 
         return $output;
     }
@@ -120,7 +159,7 @@ class Request extends Configurable implements RequestParamsInterface
     /**
      * Set request method.
      *
-     * Use one of the constants as value
+     * Use one of the METHOD_* constants as value.
      *
      * @param string $method
      *
@@ -141,6 +180,63 @@ class Request extends Configurable implements RequestParamsInterface
     public function getMethod(): ?string
     {
         return $this->getOption('method');
+    }
+
+    /**
+     * Set request Content-Type.
+     *
+     * Use one of the CONTENT_TYPE_* constants as value.
+     *
+     * Content-Type parameters can be passed in $params or set with {@see setContentTypeParams()}.
+     *
+     * @param string|null $contentType
+     * @param array|null  $params
+     *
+     * @return self Provides fluent interface
+     */
+    public function setContentType(?string $contentType, ?array $params = null): self
+    {
+        $this->setOption('contenttype', $contentType);
+
+        if (null !== $params) {
+            $this->setOption('contenttypeparams', $params);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get request Content-Type.
+     *
+     * @return string|null
+     */
+    public function getContentType(): ?string
+    {
+        return $this->getOption('contenttype');
+    }
+
+    /**
+     * Set Content-Type parameters.
+     *
+     * @param array|null $params
+     *
+     * @return self Provides fluent interface
+     */
+    public function setContentTypeParams(?array $params): self
+    {
+        $this->setOption('contenttypeparams', $params);
+
+        return $this;
+    }
+
+    /**
+     * Get Content-Type parameters.
+     *
+     * @return array|null
+     */
+    public function getContentTypeParams(): ?array
+    {
+        return $this->getOption('contenttypeparams');
     }
 
     /**
@@ -172,9 +268,9 @@ class Request extends Configurable implements RequestParamsInterface
     /**
      * Get the file to upload via "multipart/form-data" POST request.
      *
-     * @return string|null
+     * @return string|resource|null
      */
-    public function getFileUpload(): ?string
+    public function getFileUpload()
     {
         return $this->getOption('file');
     }
@@ -182,19 +278,25 @@ class Request extends Configurable implements RequestParamsInterface
     /**
      * Set the file to upload via "multipart/form-data" POST request.
      *
-     * @param string $filename Name of file to upload
+     * @param string|resource $file Name of file or file pointer resource to upload
      *
      * @throws RuntimeException
      *
      * @return self Provides fluent interface
      */
-    public function setFileUpload($filename): self
+    public function setFileUpload($file): self
     {
-        if (!is_file($filename) || !is_readable($filename)) {
-            throw new RuntimeException(sprintf("Unable to read file '%s' for upload", $filename));
+        if (\is_resource($file)) {
+            $meta = stream_get_meta_data($file);
+
+            if (false === strpos($meta['mode'], 'r') && false === strpos($meta['mode'], '+')) {
+                throw new RuntimeException(sprintf("Unable to read stream '%s' for upload", $meta['uri']));
+            }
+        } elseif (!is_file($file) || !is_readable($file)) {
+            throw new RuntimeException(sprintf("Unable to read file '%s' for upload", $file));
         }
 
-        $this->setOption('file', $filename);
+        $this->setOption('file', $file);
 
         return $this;
     }
@@ -206,7 +308,27 @@ class Request extends Configurable implements RequestParamsInterface
      */
     public function getHeaders(): array
     {
-        return array_unique($this->headers);
+        $headers = array_unique($this->headers);
+
+        if (
+            null === $this->getHeader('Content-Type')
+            && (null !== $contentType = $this->getContentType())
+        ) {
+            $contentTypeHeader = sprintf('Content-Type: %s', $contentType);
+
+            if (null !== $contentTypeParams = $this->getContentTypeParams()) {
+                foreach ($contentTypeParams as $param => $value) {
+                    $contentTypeHeader .= sprintf('; %s=%s', $param, $value);
+                }
+            } else {
+                $charset = $this->getParam('ie') ?? 'utf-8';
+                $contentTypeHeader .= sprintf('; charset=%s', $charset);
+            }
+
+            $headers[] = $contentTypeHeader;
+        }
+
+        return $headers;
     }
 
     /**
@@ -309,11 +431,16 @@ class Request extends Configurable implements RequestParamsInterface
     /**
      * Get an URI for this request.
      *
-     * @return string|null
+     * @return string
      */
-    public function getUri(): ?string
+    public function getUri(): string
     {
-        return $this->getHandler().'?'.$this->getQueryString();
+        $queryString = $this->getQueryString();
+        if ('' === $queryString) {
+            return $this->getHandler() ?? '';
+        }
+
+        return $this->getHandler().'?'.$queryString;
     }
 
     /**
@@ -326,8 +453,11 @@ class Request extends Configurable implements RequestParamsInterface
      *
      * @return self Provides fluent interface
      */
-    public function setAuthentication(string $username, string $password): self
-    {
+    public function setAuthentication(
+        string $username,
+        #[\SensitiveParameter]
+        string $password
+    ): self {
         $this->setOption('username', $username);
         $this->setOption('password', $password);
 
@@ -374,6 +504,8 @@ class Request extends Configurable implements RequestParamsInterface
 
     /**
      * Set Solr API version.
+     *
+     * Use one of the API_* constants as value.
      *
      * @param string $api
      *
@@ -427,6 +559,7 @@ class Request extends Configurable implements RequestParamsInterface
                     if (isset($value['username'], $value['password'])) {
                         $this->setAuthentication($value['username'], $value['password']);
                     }
+                    break;
             }
         }
     }

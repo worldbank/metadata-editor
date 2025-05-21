@@ -10,7 +10,8 @@
     }
   ],
   "require": {
-    "ext-json": "*"
+    "ext-json": "*",
+    "php": ">=7.1"
   },
   "require-dev": {
     "phperf/phpunit": "4.8.37"
@@ -27,7 +28,7 @@
   },
   "config": {
     "platform": {
-      "php": "5.4.45"
+      "php": "7.1.33"
     }
   }
 }

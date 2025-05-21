@@ -23,7 +23,7 @@ class PatchTestOperationFailedException extends Exception
         $operation,
         $actualValue,
         $code = 0,
-        Throwable $previous = null
+        ?Throwable $previous = null
     )
     {
         parent::__construct('Test operation ' . json_encode($operation, JSON_UNESCAPED_SLASHES)

@@ -313,11 +313,11 @@ class DisMax extends AbstractComponent
 
         $key = $boostQuery->getKey();
 
-        if (0 === \strlen($key)) {
+        if (null === $key || 0 === \strlen($key)) {
             throw new InvalidArgumentException('A boostquery must have a key value');
         }
 
-        //double add calls for the same BQ are ignored, but non-unique keys cause an exception
+        // double add calls for the same BQ are ignored, but non-unique keys cause an exception
         if (\array_key_exists($key, $this->boostQueries) && $this->boostQueries[$key] !== $boostQuery) {
             throw new InvalidArgumentException('A boostquery must have a unique key value within a query');
         }

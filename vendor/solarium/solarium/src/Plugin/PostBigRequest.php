@@ -69,18 +69,20 @@ class PostBigRequest extends AbstractPlugin
     public function preExecuteRequest($event): self
     {
         // We need to accept event proxies or decorators.
-        /* @var PreExecuteRequest $event */
+        /** @var PreExecuteRequest $event */
         $request = $event->getRequest();
         $queryString = $request->getQueryString();
 
-        if (Request::METHOD_GET === $request->getMethod() &&
-            \strlen($queryString) > $this->getMaxQueryStringLength()) {
+        if (
+            Request::METHOD_GET === $request->getMethod()
+            && \strlen($queryString) > $this->getMaxQueryStringLength()
+        ) {
             $charset = $request->getParam('ie') ?? 'utf-8';
 
             $request->setMethod(Request::METHOD_POST);
+            $request->setContentType(Request::CONTENT_TYPE_APPLICATION_X_WWW_FORM_URLENCODED, ['charset' => $charset]);
             $request->setRawData($queryString);
             $request->clearParams();
-            $request->addHeader('Content-Type: application/x-www-form-urlencoded; charset='.$charset);
         }
 
         return $this;
@@ -89,7 +91,7 @@ class PostBigRequest extends AbstractPlugin
     /**
      * Plugin init function.
      *
-     * Register event listeners
+     * Register event listeners.
      */
     protected function initPluginType()
     {
@@ -97,6 +99,19 @@ class PostBigRequest extends AbstractPlugin
         if (is_subclass_of($dispatcher, '\Symfony\Component\EventDispatcher\EventDispatcherInterface')) {
             // PostBigRequest has to act on PRE_EXECUTE_REQUEST before Loadbalancer (priority 0). Set priority to 10.
             $dispatcher->addListener(Events::PRE_EXECUTE_REQUEST, [$this, 'preExecuteRequest'], 10);
+        }
+    }
+
+    /**
+     * Plugin cleanup function.
+     *
+     * Unregister event listeners.
+     */
+    public function deinitPlugin()
+    {
+        $dispatcher = $this->client->getEventDispatcher();
+        if (is_subclass_of($dispatcher, '\Symfony\Component\EventDispatcher\EventDispatcherInterface')) {
+            $dispatcher->removeListener(Events::PRE_EXECUTE_REQUEST, [$this, 'preExecuteRequest']);
         }
     }
 }

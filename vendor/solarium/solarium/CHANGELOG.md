@@ -4,6 +4,132 @@ All notable changes to the Solarium library will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.3.1]
+### Added
+- Loadbalancer plugin can failover on an optional list of HTTP status codes
+- Solarium\QueryType\Extract\Query::setFile() now supports file pointer resources
+- Solarium\QueryType\Extract\Result::getFile() and getFileMetadata() to access the retrieved data for `extractOnly=true`
+
+### Fixed
+- Solarium\Core\Query\Helper::escapeTerm() has to quote reserved terms `AND`, `OR`, `TO`
+
+### Changed
+- Solarium\Core\Client\Endpoint::setAuthentication() marks $password as #[\SensitiveParameter] (PHP 8 >= 8.2.0)
+- Solarium\Core\Client\Endpoint::setAuthorizationToken() marks $token as #[\SensitiveParameter] (PHP 8 >= 8.2.0)
+- Solarium\Core\Client\Request::setAuthentication() marks $password as #[\SensitiveParameter] (PHP 8 >= 8.2.0)
+
+
+## [6.3.0]
+### Added
+- Support for Luke queries
+- Solarium\Component\QueryElevation::setExcludeTags()
+- Solarium\Core\Query\Result\QueryType::getStatus() and getQueryTime(), inherited by all Solarium\QueryType Results
+- Solarium\QueryType\CoreAdmin\Result\Result::getInitFailureResults()
+- Solarium\QueryType\Ping\Result::getPingStatus() and getZkConnected()
+- Fluent interface methods for adding/removing excludes in Solarium\Component\Facet\AbstractFacet
+- Fluent interface methods for adding/removing terms in Solarium\Component\Facet\Field
+
+### Fixed
+- JSON serialization of arrays with non-consecutive indices in multivalue fields
+- PHP 8.2 deprecations
+- Handling of escaped literal commas in local parameters for faceting
+
+### Changed
+- Update queries use the JSON request format by default
+- Ping queries set omitHeader=false by default
+
+### Removed
+- Removed deprecated class constant Client::Version. Use Client::getVersion() instead
+- Removed Core/Query/AbstractResponseParser::addHeaderInfo()
+
+### Deprecated
+- Solarium\QueryType\Server\Collections\Result\CreateResult::getStatus(), use getCreateStatus() instead
+- Solarium\QueryType\Server\Collections\Result\DeleteResult::getStatus(), use getDeleteStatus() instead
+- Solarium\QueryType\Server\Collections\Result\ReloadResult::getStatus(), use getReloadStatus() instead
+- LocalParameters::removeTerms(), use removeTerm() instead
+
+
+## [6.2.8]
+### Added
+- PHP 8.2 support
+- JSON formatted update requests
+- Solarium\Component\Highlighting\Highlighting::setQueryFieldPattern()
+
+
+## [6.2.7]
+### Added
+- Core\Client\Adapter\Curl::setProxy() to set proxy (instead of through options)
+- Proxy support for Http adapter with Core\Client\Adapter\Http::setProxy()
+- Authorization token support
+
+### Fixed
+- Plugins unregister event listeners when removed with Client::removePlugin()
+- Workaround for opcache.preload issue in deprecated code unless 6.3.0 will be released
+
+### Changed
+- `RequestBuilder`s must set a Content-Type on the `Request` for POST and PUT requests. `Adapter`s no longer set a default.
+
+### Deprecated
+- Setting proxy on the Curl adapter through options, use setProxy() instead
+
+
+## [6.2.6]
+### Fixed
+- An empty array for a multiValued field was wrongly interpreted as an empty child document by the Update request builder in 6.2.5
+
+
+## [6.2.5]
+### Added
+- Results and Documents implement [JsonSerializable](https://www.php.net/manual/en/class.jsonserializable)
+- ParallelExecution dispatches PreExecute, PreExecuteRequest, PostExecuteRequest, PostExecute events. It can be combined with plugins that hook into these events (e.g. PostBigRequest).
+- ParallelExecution support for Server queries
+- Solarium\Client::getVersion()
+
+### Fixed
+- Adding nested child documents through `Document::setField()` and `Document::addField()`
+
+### Changed
+- ParallelExecution doesn't replace an existing cURL adapter on the Client. Timeout and proxy settings are honoured on parallel requests.
+- ParallelExecution sets the 'timeout' and 'connectiontimeout' options from (Connection)TimeoutAware adapters when switching to a cURL adapter
+
+### Removed
+- Solarium\QueryType\Update\Query\Document::setFilterControlCharacters(), extend Update\Query\Query to use a custom request builder & helper if you don't want control characters filtered
+
+### Deprecated
+- Solarium\Client::VERSION
+
+
+## [6.2.4] 
+### Added
+- Symfony 6 support
+- Solr 9 support
+- Unified Highlighter support + improved support for other highlighters
+
+### Fixed
+- Solarium\QueryType\Server\Collections\Query\Action\ClusterStatus::getRoute() always returned NULL even if a route was set
+- Solarium\Component\Highlighting\Highlighting::setMethod() didn't set the correct request parameter
+
+### Changed
+- Solarium\QueryType\Select\Query\Query::setCursormark() and getCursormark() are now setCursorMark() and getCursorMark() with uppercase M
+- Managed resources execute GET requests for the Exists command by default to avoid SOLR-15116 and SOLR-16274. Set the 'useHeadRequest' option to `true` to execute HEAD requests instead.
+
+### Removed
+- Solarium\QueryType\Stream\Expression, use Solarium\QueryType\Stream\ExpressionBuilder instead
+
+
+## [6.2.3]
+### Added
+- Plugin\BufferedAddLite (BufferedAdd without event dispatching)
+- Plugin\BufferedDelete and Plugin\BufferedDeleteLite
+
+### Fixed
+- Local parameter values are now escaped automatically when necessary
+
+
+## [6.2.2]
+### Added
+- PHP 8.1 support
+
 
 ## [6.2.1]
 ### Added
@@ -225,7 +351,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `AdapterInterface` does not extend `ConfigurableInterface` anymore
 - `Http` Adapter does not implement `ConfigurableInterface` anymore
 - `Psr18Adapter` does not implement `ConfigurableInterface` anymore
-- Solarium Client now accepts any PSR-15 compatible event dispatcher (previously it had to be symfony's event dispatcher)
+- Solarium Client now accepts any PSR-14 compatible event dispatcher (previously it had to be the Symfony EventDispatcher)
 
 ### Removed
 - Zend2HttpAdapter

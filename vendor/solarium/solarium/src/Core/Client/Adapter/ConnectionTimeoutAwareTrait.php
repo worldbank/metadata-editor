@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Solarium package.
  *
@@ -22,9 +24,11 @@ trait ConnectionTimeoutAwareTrait
     /**
      * {@inheritdoc}
      */
-    public function setConnectionTimeout(?int $connectionTimeout): void
+    public function setConnectionTimeout(?int $timeoutInSeconds)
     {
-        $this->connectionTimeout = $connectionTimeout;
+        $this->connectionTimeout = $timeoutInSeconds;
+
+        return $this;
     }
 
     /**

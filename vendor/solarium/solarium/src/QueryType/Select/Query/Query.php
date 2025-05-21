@@ -556,11 +556,11 @@ class Query extends AbstractQuery implements ComponentAwareQueryInterface, Query
 
         $key = $filterQuery->getKey();
 
-        if (0 === \strlen($key)) {
+        if (null === $key || 0 === \strlen($key)) {
             throw new InvalidArgumentException('A filterquery must have a key value');
         }
 
-        //double add calls for the same FQ are ignored, but non-unique keys cause an exception
+        // double add calls for the same FQ are ignored, but non-unique keys cause an exception
         if (\array_key_exists($key, $this->filterQueries) && $this->filterQueries[$key] !== $filterQuery) {
             throw new InvalidArgumentException('A filterquery must have a unique key value within a query');
         }
@@ -786,7 +786,7 @@ class Query extends AbstractQuery implements ComponentAwareQueryInterface, Query
      *
      * @return self Provides fluent interface
      */
-    public function setCursormark(string $cursormark): self
+    public function setCursorMark(string $cursormark): self
     {
         $this->setOption('cursormark', $cursormark);
 
@@ -798,7 +798,7 @@ class Query extends AbstractQuery implements ComponentAwareQueryInterface, Query
      *
      * @return string|null
      */
-    public function getCursormark(): ?string
+    public function getCursorMark(): ?string
     {
         return $this->getOption('cursormark');
     }
@@ -808,7 +808,7 @@ class Query extends AbstractQuery implements ComponentAwareQueryInterface, Query
      *
      * @return self Provides fluent interface
      */
-    public function clearCursormark(): self
+    public function clearCursorMark(): self
     {
         $this->setOption('cursormark', null);
 
@@ -847,8 +847,8 @@ class Query extends AbstractQuery implements ComponentAwareQueryInterface, Query
     /**
      * Initialize options.
      *
-     * Several options need some extra checks or setup work, for these options
-     * the setters are called.
+     * {@internal Several options need some extra checks or setup work,
+     *            for these options the setters are called.}
      */
     protected function init()
     {
@@ -874,9 +874,6 @@ class Query extends AbstractQuery implements ComponentAwareQueryInterface, Query
                     break;
                 case 'component':
                     $this->createComponents($value);
-                    break;
-                case 'cursormark':
-                    $this->setCursormark($value);
                     break;
             }
         }

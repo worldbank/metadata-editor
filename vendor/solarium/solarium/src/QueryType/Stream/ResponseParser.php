@@ -11,7 +11,7 @@ namespace Solarium\QueryType\Stream;
 
 use Solarium\Core\Query\AbstractResponseParser as ResponseParserAbstract;
 use Solarium\Core\Query\DocumentInterface;
-use Solarium\Core\Query\ResponseParserInterface as ResponseParserInterface;
+use Solarium\Core\Query\ResponseParserInterface;
 use Solarium\Core\Query\Result\ResultInterface;
 use Solarium\Exception\RuntimeException;
 use Solarium\Exception\StreamException;
@@ -76,12 +76,9 @@ class ResponseParser extends ResponseParserAbstract implements ResponseParserInt
             throw $e;
         }
 
-        return $this->addHeaderInfo(
-            $data,
-            [
-                'numfound' => \count($documents),
-                'documents' => $documents,
-            ]
-        );
+        return [
+            'numfound' => \count($documents),
+            'documents' => $documents,
+        ];
     }
 }

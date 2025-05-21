@@ -32,6 +32,7 @@ class Document extends BaseRequestBuilder
         $request = parent::build($query);
         $request->setRawData($this->getRawData($query));
         $request->setMethod(Request::METHOD_POST);
+        $request->setContentType(Request::CONTENT_TYPE_APPLICATION_XML);
 
         return $request;
     }
@@ -78,6 +79,8 @@ class Document extends BaseRequestBuilder
      */
     protected function buildFieldXml(string $name, string $value): string
     {
-        return '<field name="'.$name.'">'.$this->getHelper()->escapeXMLCharacterData($value).'</field>';
+        $helper = $this->getHelper();
+
+        return '<field name="'.$name.'">'.$helper->escapeXMLCharacterData($helper->filterControlCharacters($value)).'</field>';
     }
 }

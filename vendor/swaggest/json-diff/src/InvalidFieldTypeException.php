@@ -27,7 +27,7 @@ class InvalidFieldTypeException extends Exception
         $expectedType,
         $operation,
         $code = 0,
-        Throwable $previous = null
+        ?Throwable $previous = null
     )
     {
         parent::__construct(

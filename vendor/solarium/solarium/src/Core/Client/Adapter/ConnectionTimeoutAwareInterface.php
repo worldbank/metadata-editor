@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /*
  * This file is part of the Solarium package.
  *
@@ -10,14 +12,16 @@
 namespace Solarium\Core\Client\Adapter;
 
 /**
- * Contract for Http Adapters that are aware of connection timeouts.
+ * Contract for Client Adapters that are aware of connection timeouts.
  */
 interface ConnectionTimeoutAwareInterface
 {
     /**
      * @param int|null $timeoutInSeconds
+     *
+     * @return self Provides fluent interface
      */
-    public function setConnectionTimeout(?int $timeoutInSeconds): void;
+    public function setConnectionTimeout(?int $timeoutInSeconds);
 
     /**
      * @return int|null

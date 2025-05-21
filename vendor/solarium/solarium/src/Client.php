@@ -9,6 +9,7 @@
 
 namespace Solarium;
 
+use Composer\InstalledVersions;
 use Solarium\Core\Client\Client as CoreClient;
 
 /**
@@ -18,7 +19,7 @@ use Solarium\Core\Client\Client as CoreClient;
 class Client extends CoreClient
 {
     /**
-     * Version number of the Solarium library.
+     * Returns the version string.
      *
      * The version is built up in this format: major.minor.mini
      *
@@ -39,9 +40,18 @@ class Client extends CoreClient
      * @see checkExact()
      * @see checkMinimal()
      *
-     * @var string
+     * @return string
      */
-    const VERSION = '6.2.1';
+    public static function getVersion(): string
+    {
+        static $version;
+
+        if (!$version) {
+            $version = InstalledVersions::getPrettyVersion('solarium/solarium');
+        }
+
+        return $version;
+    }
 
     /**
      * Check for an exact version.
@@ -73,7 +83,7 @@ class Client extends CoreClient
      */
     public static function checkExact(string $version): bool
     {
-        return 0 === strpos(self::VERSION, $version);
+        return 0 === strpos(self::getVersion(), $version);
     }
 
     /**
@@ -101,6 +111,6 @@ class Client extends CoreClient
      */
     public static function checkMinimal(string $version): bool
     {
-        return version_compare(self::VERSION, $version, '>=');
+        return version_compare(self::getVersion(), $version, '>=');
     }
 }

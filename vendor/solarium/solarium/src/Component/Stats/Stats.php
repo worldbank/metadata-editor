@@ -113,7 +113,7 @@ class Stats extends AbstractComponent
 
         $key = $field->getKey();
 
-        if (0 === \strlen($key)) {
+        if (null === $key || 0 === \strlen($key)) {
             throw new InvalidArgumentException('A field must have a key value');
         }
 
@@ -224,8 +224,8 @@ class Stats extends AbstractComponent
     /**
      * Initialize options.
      *
-     * Several options need some extra checks or setup work, for these options
-     * the setters are called.
+     * {@internal Options that set a list of field or facet names need additional setup work
+     *            because they can be an array or a comma separated string.}
      */
     protected function init()
     {

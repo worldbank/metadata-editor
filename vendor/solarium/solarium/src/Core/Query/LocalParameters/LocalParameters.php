@@ -329,10 +329,24 @@ class LocalParameters implements \ArrayAccess
      * @throws OutOfBoundsException
      *
      * @return $this
+     *
+     * @deprecated Will be removed in Solarium 8. Use {@see removeTerm()} instead.
      */
     public function removeTerms(string $terms): self
     {
-        return $this->removeValue(LocalParameter::TYPE_TERM, $terms);
+        return $this->removeTerm($terms);
+    }
+
+    /**
+     * @param string $term
+     *
+     * @throws OutOfBoundsException
+     *
+     * @return $this
+     */
+    public function removeTerm(string $term): self
+    {
+        return $this->removeValue(LocalParameter::TYPE_TERM, $term);
     }
 
     /**
@@ -885,7 +899,11 @@ class LocalParameters implements \ArrayAccess
 
     #[\ReturnTypeWillChange]
     /**
-     * {@inheritdoc}
+     * ArrayAccess implementation.
+     *
+     * @param mixed $offset
+     *
+     * @return mixed
      */
     public function offsetGet($offset)
     {
@@ -906,6 +924,23 @@ class LocalParameters implements \ArrayAccess
     public function offsetUnset($offset): void
     {
         unset($this->parameters[$offset]);
+    }
+
+    /**
+     * Get all local parameters in a key => value format.
+     *
+     * @return array
+     */
+    public function getParameters(): array
+    {
+        $params = [];
+
+        /** @var LocalParameterInterface $parameter */
+        foreach ($this->parameters as $parameter) {
+            $params[$parameter->getType()] = $parameter->getValues();
+        }
+
+        return $params;
     }
 
     /**
@@ -1012,22 +1047,5 @@ class LocalParameters implements \ArrayAccess
         }
 
         return $this->parameters[$type];
-    }
-
-    /**
-     * Get all local parameters in a key => value format.
-     *
-     * @return array
-     */
-    public function getParameters(): array
-    {
-        $params = [];
-
-        /** @var LocalParameterInterface $parameter */
-        foreach ($this->parameters as $parameter) {
-            $params[$parameter->getType()] = $parameter->getValues();
-        }
-
-        return $params;
     }
 }

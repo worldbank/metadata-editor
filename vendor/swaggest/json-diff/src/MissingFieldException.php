@@ -22,7 +22,7 @@ class MissingFieldException extends Exception
         $missingField,
         $operation,
         $code = 0,
-        Throwable $previous = null
+        ?Throwable $previous = null
     )
     {
         parent::__construct('Missing "' . $missingField . '" in operation data', $code, $previous);

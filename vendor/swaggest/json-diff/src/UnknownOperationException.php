@@ -19,7 +19,7 @@ class UnknownOperationException extends Exception
     public function __construct(
         $operation,
         $code = 0,
-        Throwable $previous = null
+        ?Throwable $previous = null
     )
     {
         // @phpstan-ignore-next-line MissingFieldOperation will be thrown if op is not set

@@ -36,6 +36,8 @@ trait RequestParamsTrait
         if (isset($this->params[$key])) {
             return $this->params[$key];
         }
+
+        return null;
     }
 
     /**
@@ -157,7 +159,7 @@ trait RequestParamsTrait
     {
         $queryString = '';
         if (\count($this->params) > 0) {
-            $queryString = http_build_query($this->params, null, $separator);
+            $queryString = http_build_query($this->params, '', $separator);
             $queryString = preg_replace(
                 '/%5B(?:\d|[1-9]\d+)%5D=/',
                 '=',

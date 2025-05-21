@@ -45,6 +45,11 @@ class JsonDiff
      */
     const COLLECT_MODIFIED_DIFF = 64;
 
+    /**
+     * SKIP_TEST_OPS is an option to skip the generation of test operations for JsonPatch.
+     */
+    const SKIP_TEST_OPS = 128;
+
 
     private $options = 0;
 
@@ -258,6 +263,8 @@ class JsonDiff
     private function process($original, $new)
     {
         $merge = !($this->options & self::SKIP_JSON_MERGE_PATCH);
+        
+        $addTestOps = !($this->options & self::SKIP_TEST_OPS);
 
         if ($this->options & self::TOLERATE_ASSOCIATIVE_ARRAYS) {
             if (is_array($original) && !empty($original) && !array_key_exists(0, $original)) {
@@ -281,7 +288,9 @@ class JsonDiff
                 $this->modifiedPaths [] = $this->path;
 
                 if ($this->jsonPatch !== null) {
-                    $this->jsonPatch->op(new Test($this->path, $original));
+                    if ($addTestOps) {
+                        $this->jsonPatch->op(new Test($this->path, $original));
+                    }
                     $this->jsonPatch->op(new Replace($this->path, $new));
                 }
 

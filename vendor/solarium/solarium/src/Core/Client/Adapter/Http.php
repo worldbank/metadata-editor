@@ -17,9 +17,10 @@ use Solarium\Exception\HttpException;
 /**
  * Basic HTTP adapter using a stream.
  */
-class Http implements AdapterInterface, TimeoutAwareInterface
+class Http implements AdapterInterface, TimeoutAwareInterface, ProxyAwareInterface
 {
     use TimeoutAwareTrait;
+    use ProxyAwareTrait;
 
     /**
      * Handle Solr communication.
@@ -68,17 +69,26 @@ class Http implements AdapterInterface, TimeoutAwareInterface
      *
      * @return resource
      */
-    public function createContext($request, $endpoint)
+    public function createContext(Request $request, Endpoint $endpoint)
     {
         $method = $request->getMethod();
+
+        $httpOptions = [
+            'method' => $method,
+            'timeout' => $this->timeout,
+            'protocol_version' => 1.0,
+            'user_agent' => 'Solarium Http Adapter',
+            'ignore_errors' => true,
+        ];
+
+        if (null !== $this->proxy) {
+            $httpOptions['proxy'] = $this->proxy;
+            $httpOptions['request_fulluri'] = true;
+        }
+
         $context = stream_context_create(
-            ['http' => [
-                    'method' => $method,
-                    'timeout' => $this->timeout,
-                    'protocol_version' => 1.0,
-                    'user_agent' => 'Solarium Http Adapter',
-                    'ignore_errors' => true,
-                ],
+            [
+                'http' => $httpOptions,
             ]
         );
 
@@ -92,6 +102,15 @@ class Http implements AdapterInterface, TimeoutAwareInterface
             $request->addHeader(
                 'Authorization: Basic '.base64_encode($authData['username'].':'.$authData['password'])
             );
+        } else {
+            // According to the specification, only one Authorization header is allowed.
+            // @see https://stackoverflow.com/questions/29282578/multiple-http-authorization-headers
+            $tokenData = $endpoint->getAuthorizationToken();
+            if (!empty($tokenData['tokenname']) && !empty($tokenData['token'])) {
+                $request->addHeader(
+                    'Authorization: '.$tokenData['tokenname'].' '.$tokenData['token']
+                );
+            }
         }
 
         if (Request::METHOD_POST === $method) {
@@ -99,7 +118,7 @@ class Http implements AdapterInterface, TimeoutAwareInterface
                 $data = AdapterHelper::buildUploadBodyFromRequest($request);
 
                 $contentLength = \strlen($data);
-                $request->addHeader("Content-Length: $contentLength\r\n");
+                $request->addHeader("Content-Length: $contentLength");
                 stream_context_set_option(
                     $context,
                     'http',
@@ -115,9 +134,6 @@ class Http implements AdapterInterface, TimeoutAwareInterface
                         'content',
                         $data
                     );
-
-                    $charset = $request->getParam('ie') ?? 'utf-8';
-                    $request->addHeader('Content-Type: text/xml; charset='.$charset);
                 }
             }
         } elseif (Request::METHOD_PUT === $method) {
@@ -129,7 +145,6 @@ class Http implements AdapterInterface, TimeoutAwareInterface
                     'content',
                     $data
                 );
-                $request->addHeader('Content-Type: application/json; charset=utf-8');
                 // The stream context automatically adds a "Connection: close" header which fails on Solr 8.5.0
                 $request->addHeader('Connection: Keep-Alive');
             }
@@ -160,7 +175,8 @@ class Http implements AdapterInterface, TimeoutAwareInterface
     {
         $data = @file_get_contents($uri, false, $context);
 
-        // @ see https://www.php.net/manual/en/reserved.variables.httpresponseheader.php
+        // @see https://www.php.net/manual/en/reserved.variables.httpresponseheader.php
+        // @phpstan-ignore-next-line https://github.com/phpstan/phpstan/issues/3213
         return [$data, $http_response_header ?? []];
     }
 }

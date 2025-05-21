@@ -18,7 +18,7 @@ use Solarium\QueryType\Select\Result\Document as SelectDocument;
  *
  * Decorates the original document with a filter indicator
  */
-class Document implements DocumentInterface, \IteratorAggregate, \Countable, \ArrayAccess
+class Document implements DocumentInterface, \IteratorAggregate, \Countable, \ArrayAccess, \JsonSerializable
 {
     /**
      * Original document.
@@ -60,7 +60,7 @@ class Document implements DocumentInterface, \IteratorAggregate, \Countable, \Ar
     }
 
     /**
-     * Forward all other calls to the original document.
+     * Forward get call to the original document.
      *
      * @param string $name
      *
@@ -183,5 +183,14 @@ class Document implements DocumentInterface, \IteratorAggregate, \Countable, \Ar
     public function getFields(): array
     {
         return $this->document->getFields();
+    }
+
+    #[\ReturnTypeWillChange]
+    /**
+     * {@inheritdoc}
+     */
+    public function jsonSerialize()
+    {
+        return $this->document;
     }
 }

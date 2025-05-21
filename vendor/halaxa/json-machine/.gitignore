@@ -1,0 +1,9 @@
+.idea
+/vendor/
+composer.lock
+*.cache
+phpunit.xml
+.php-cs-fixer.php
+clover.xml
+src/AutoloadStub.php
+.env

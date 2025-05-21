@@ -11,36 +11,11 @@ declare(strict_types=1);
 
 namespace Solarium\Plugin\BufferedAdd\Event;
 
-use Solarium\QueryType\Update\Result;
-use Symfony\Contracts\EventDispatcher\Event;
+use Solarium\Plugin\AbstractBufferedUpdate\Event\AbstractPostCommit;
 
 /**
- * PostCommit event, see Events for details.
+ * PostCommit event, see {@see Events} for details.
  */
-class PostCommit extends Event
+class PostCommit extends AbstractPostCommit
 {
-    /**
-     * @var Result
-     */
-    protected $result;
-
-    /**
-     * Event constructor.
-     *
-     * @param Result $result
-     */
-    public function __construct(Result $result)
-    {
-        $this->result = $result;
-    }
-
-    /**
-     * Get the result for this event.
-     *
-     * @return Result
-     */
-    public function getResult(): Result
-    {
-        return $this->result;
-    }
 }

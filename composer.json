@@ -11,9 +11,9 @@
         "laminas/laminas-permissions-acl": "^2.7",
         "phpmailer/phpmailer": "^6.5",
         "spatie/array-to-xml": "^2.15",
-        "guzzlehttp/guzzle": "^7.0",
+        "guzzlehttp/guzzle": "^7.4.5",
         "symfony/event-dispatcher": "^5.3",
-        "firebase/php-jwt": "^5.4",
+        "firebase/php-jwt": "^6.0.0",
         "ramsey/uuid": "^4.2",
         "nelexa/zip": "^3.3",
         "swaggest/json-diff": "^3.11"

@@ -30,6 +30,7 @@ return array(
     'JsonStreamingParser\\Test\\' => array($vendorDir . '/salsify/json-streaming-parser/tests'),
     'JsonStreamingParser\\' => array($vendorDir . '/salsify/json-streaming-parser/src'),
     'JsonSchema\\' => array($vendorDir . '/justinrainbow/json-schema/src/JsonSchema'),
+    'JsonMachine\\' => array($vendorDir . '/halaxa/json-machine/src'),
     'GuzzleHttp\\Psr7\\' => array($vendorDir . '/guzzlehttp/psr7/src'),
     'GuzzleHttp\\Promise\\' => array($vendorDir . '/guzzlehttp/promises/src'),
     'GuzzleHttp\\' => array($vendorDir . '/guzzlehttp/guzzle/src'),

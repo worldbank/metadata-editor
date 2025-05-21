@@ -62,7 +62,7 @@ class FacetSet extends RequestBuilder implements ComponentRequestBuilderInterfac
                 switch ($facet->getType()) {
                     case FacetSetInterface::FACET_FIELD:
                         /* @var FacetField $facet */
-                        $this->addFacetField($request, $facet, (1 < $facetFields[$facet->getField()]));
+                        $this->addFacetField($request, $facet, 1 < $facetFields[$facet->getField()]);
                         $nonJson = true;
                         break;
                     case FacetSetInterface::FACET_QUERY:
@@ -146,8 +146,10 @@ class FacetSet extends RequestBuilder implements ComponentRequestBuilderInterfac
         $field = $facet->getField();
 
         if ($useLocalParams) {
-            $localParams = ['key' => $facet->getKey(),
+            $localParams = [
+                'key' => $facet->getKey(),
                 'ex' => $facet->getLocalParameters()->getExcludes(),
+                'terms' => $facet->getLocalParameters()->getTerms(),
                 'facet.prefix' => $facet->getPrefix(),
                 'facet.contains' => $facet->getContains(),
                 'facet.contains.ignoreCase' => $facet->getContainsIgnoreCase(),
@@ -332,7 +334,7 @@ class FacetSet extends RequestBuilder implements ComponentRequestBuilderInterfac
 
         foreach ($facet->getSet() as $key => $setValue) {
             if (\is_string($key)) {
-                $setValue = $this->renderLocalParams($setValue, ['key' => '"'.$key.'"']);
+                $setValue = $this->renderLocalParams($setValue, ['key' => $key]);
             }
             $request->addParam("f.$field.facet.interval.set", $setValue);
         }
