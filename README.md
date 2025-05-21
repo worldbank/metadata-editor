@@ -1,6 +1,5 @@
-<p align="center"><img src="docs/img/metadata-editor.png" ></p>
-
 # Metadata Editor
+<p align="center"><img src="images/metadata-editor.png" ></p>
 
 Metadata Editor is an open-source web-based editor designed to help users document metadata using multiple standards. 
 
@@ -18,7 +17,6 @@ The supported data types are:
 
 ## Getting Started
 
-
 ### Server Requirements
 
 * PHP version 7 or later
@@ -27,19 +25,12 @@ The supported data types are:
 
 ### Installation
 
-See [Installation guide](https://ihsn.github.io/editor/#/installation)
+See [Installation guide](https://worldbank.github.io/metadata-editor-docs/tech_installation.html)
 
 
 ### Documentation
 
-see [Documentation](https://ihsn.github.io/editor/#/)
-
-
-
-## Authors
-
-* **IHSN** - [International Household Survey Network](http://ihsn.org)
-
+see [Documentation](https://worldbank.github.io/metadata-editor-docs)
 
 ## License
 
