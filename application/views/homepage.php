@@ -33,7 +33,7 @@
         <div class="border shadow m-3 p-3  text-center">
             <div class="text-center"><i style="font-size:50px;padding:15px;color:#28a745;" class="far fa-comments"></i> </div>
             <div class="text-center font-weight-bold"><a href="https://github.com/worldbank/metadata-editor/discussions" target="_blank">Community</a></div>
-            <div class="text-muted"><a target="_blank" href="https://github.com/worldbank/metadata-editor/discussions">Online community for Q&A</a> and <a target="_blank" href="https://github.com/ihsn/editor/issues">issue reporting</a></div>
+            <div class="text-muted"><a target="_blank" href="https://github.com/worldbank/metadata-editor/discussions">Online community for Q&A</a> and <a target="_blank" href="https://github.com/worldbank/metadata-editor/issues">issue reporting</a></div>
         </div>
     </div>
 
