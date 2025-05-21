@@ -137,7 +137,7 @@
 								"title": "Agency Name",
 								"type": "string",
 								"description": "Name of the person, corporate body, or agency responsible for the work's substantive and intellectual content. If a person, invert first and last name and use commas."
-							},							
+							},
 							"affiliation": {
 								"title": "Affiliation",
 								"type": "string"
@@ -286,40 +286,40 @@
 					"description": "Release calendar",
 					"type": "string"
 				},
-				"themes":{
-					"type":"array",
-					"description":"Themes",
+				"themes": {
+					"type": "array",
+					"description": "Themes",
 					"items": {
-					  "type": "object",
-					  "properties": {
-						"id": {
-						  "title": "Unique Identifier",
-						  "type": "string"
+						"type": "object",
+						"properties": {
+							"id": {
+								"title": "Unique Identifier",
+								"type": "string"
+							},
+							"name": {
+								"title": "Name",
+								"type": "string"
+							},
+							"parent_id": {
+								"title": "Parent Identifier",
+								"type": "string"
+							},
+							"vocabulary": {
+								"title": "Vocabulary",
+								"description": "Name of the controlled vocabulary",
+								"type": "string"
+							},
+							"uri": {
+								"title": "Vocabulary URI",
+								"description": "Link to the controlled vocabulary web page, if the theme is from a taxonomy.",
+								"type": "string"
+							}
 						},
-						"name": {
-						  "title": "Name",
-						  "type": "string"
-						},
-						"parent_id": {
-						  "title": "Parent Identifier",
-						  "type": "string"
-						},
-						"vocabulary": {
-						  "title": "Vocabulary",
-						  "description": "Name of the controlled vocabulary",
-						  "type": "string"
-						},
-						"uri": {
-						  "title": "Vocabulary URI",
-						  "description": "Link to the controlled vocabulary web page, if the theme is from a taxonomy.",
-						  "type": "string"
-						}
-					  },
-					  "required": [
-						"name"
-					  ]
+						"required": [
+							"name"
+						]
 					}
-				  },
+				},
 				"topics": {
 					"type": "array",
 					"title": "Topics",
@@ -373,6 +373,26 @@
 							},
 							"uri": {
 								"title": "URI",
+								"type": "string"
+							}
+						},
+						"required": [
+							"name"
+						]
+					}
+				},
+				"dimensions": {
+					"type": "array",
+					"description": "Dimensions",
+					"items": {
+						"type": "object",
+						"properties": {
+							"name": {
+								"title": "Name",
+								"type": "string"
+							},
+							"label": {
+								"title": "Label",
 								"type": "string"
 							}
 						},
@@ -644,6 +664,26 @@
 						]
 					}
 				},
+				"errata": {
+					"type": "array",
+					"title": "Errata",
+					"description": "List of corrected errors in data or metadata",
+					"items": {
+						"type": "object",
+						"properties": {
+							"date": {
+								"title": "Date of erratum",
+								"description": "Date when the erratum was reported or published",
+								"type": "string"
+							},
+							"description": {
+								"title": "Description of the erratum",
+								"description": "A description of the erratum, with information on which data or metadata were impacted",
+								"type": "string"
+							}
+						}
+					}
+				},
 				"license": {
 					"type": "array",
 					"title": "License",
@@ -700,6 +740,27 @@
 				"title_statement"
 			],
 			"additionalProperties": false
+		},
+		"tags": {
+			"type": "array",
+			"title": "Tags",
+			"description": "Tags",
+			"items": {
+				"type": "object",
+				"properties": {
+					"tag": {
+						"title": "Tag",
+						"type": "string"
+					},
+					"tag_group": {
+						"title": "Tag group",
+						"type": "string"
+					}
+				}
+			},
+			"required": [
+				"tag"
+			]
 		},
 		"provenance": {
 			"type": "array",
