@@ -484,6 +484,11 @@ CREATE TABLE `editor_templates_default` (
 ) DEFAULT CHARSET=utf8;
 
 
+insert into `editor_templates_default` (data_type, template_uid)
+values('resource','resource-system-en');
+
+
+
 CREATE TABLE `editor_template_acl` (
   `id` int NOT NULL AUTO_INCREMENT,
   `template_id` int NOT NULL,
