@@ -21,7 +21,7 @@
 
                         <?php /* text only */ ?>
                         <a href="<?php echo site_url();?>" style="color:white;padding-top:20px;" >
-                            Metadata Editor [beta]
+                            Metadata Editor
                         </a>                        
                         <?php /* */?>
                         </div>
