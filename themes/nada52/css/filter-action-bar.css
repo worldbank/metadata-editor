@@ -1,0 +1,16 @@
+.filter-action-bar {}
+
+.filter-action-bar .search-count {
+  padding: 2px 15px;
+  font-size: 16px;
+}
+
+.filter-action-bar #sort-by-select {
+  font-size: .8rem;
+}
+
+.filter-action-bar .wb-search-sort > div{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+}

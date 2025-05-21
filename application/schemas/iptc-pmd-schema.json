@@ -1,0 +1,387 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"id": "https://www.iptc.org/std/photometadata/specification/iptc-pmd-schema.json#",
+	"title": "IPTC Photo Metadata Standard JSON Schema",
+	"description": "Overall structure of photo metadata of a single media asset - sets of metadata for the whole asset and parts of the asset -- the properties comply with the IPTC Photo Metadata Standard 2017.1(IPTC/MS/2017-07-06)",	
+	"type": "object",
+	"properties": {		
+		"photoVideoMetadataIPTC": {
+			"description": "Container for IPTC photo/video metadata",
+			"type": "object",
+			"properties": {
+				"title": {
+					"$ref": "iptc-phovidmdshared-schema.json#/definitions/AltLang",
+					"description": "A shorthand reference for the digital image. Title provides a short human readable name which can be a text and/or numeric reference. It is not the same as Headline.",
+					"title": "Title"
+				},
+				"imageSupplierImageId": {
+					"title": "Image Supplier Image ID",
+					"description": "Optional identifier assigned by the Image Supplier to the image.",
+					"type": "string"
+				},
+				"registryEntries": {
+					"title": "Image Registry Entry",
+					"description": "Both a Registry Item Id and a Registry Organisation Id to record any registration of this digital image with a registry.",
+					"type": "array",
+					"items": {
+						"$ref": "iptc-phovidmdshared-schema.json#/definitions/RegistryEntry"
+					}
+				},
+				"digitalImageGuid": {
+					"title": "Digital Image GUID",
+					"description": "Globally unique identifier for this digital image. It is created and applied by the creator of the digital image  at the time of its creation . This value shall not be changed after that time.",
+					"type": "string"
+				},
+				"dateCreated": {
+					"title": "Date Created",
+					"description": "Designates the date and optionally the time the content of the image was created rather than the date of the creation of the digital representation.",
+					"type": "string",
+					"format": "date-time"
+				},
+				"headline": {
+					"$ref": "iptc-phovidmdshared-schema.json#/definitions/AltLang",
+					"description": "A brief synopsis of the caption. Headline is not the same as Title.",
+					"title": "Headline"
+				},
+				"eventName": {
+					"$ref": "iptc-phovidmdshared-schema.json#/definitions/AltLang",
+					"description": "Names or describes the specific event at which the photo was taken.",
+					"title": "Event"
+				},
+				"description": {
+					"$ref": "iptc-phovidmdshared-schema.json#/definitions/AltLang",
+					"description": "A textual description, including captions, of the image.",
+					"title": "Description"
+				},
+				"captionWriter": {
+					"title": "Description Writer",
+					"description": "Identifier or the name of the person involved in writing, editing or correcting the description of the image.",
+					"type": "string"
+				},
+				"keywords": {
+					"title": "Keywords",
+					"description": "Keywords to express the subject of the image. Keywords may be free text and don't have to be taken from a controlled vocabulary. Codes from the controlled vocabulary IPTC Subject NewsCodes must go to the \"Subject Code\" field.",
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"sceneCodes": {
+					"title": "Scene Code",
+					"description": "Describes the scene of a photo content. Specifies one ore more terms from the IPTC \"Scene-NewsCodes\". Each Scene is represented as a string of 6 digits in an unordered list.",
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+
+				"sceneCodesLabelled": {
+					"title": "Scene Codes",
+					"description": "Describes the scene of a photo content. Specifies one ore more terms from the IPTC \"Scene-NewsCodes\". Each Scene is represented as a string of 6 digits in an unordered list.",
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties":{
+							"code": {
+								"title": "Scene Code",
+								"description": "Scene code as a string of 6 digits",
+								"type": "string"
+							},
+							"label": {
+								"title": "Scene Label",
+								"description": "Label",
+								"type": "string"
+							},
+							"description": {
+								"title": "Scene Description",
+								"description": "Description of the scene",
+								"type": "string"
+							}
+						}
+					}
+				},
+
+				"subjectCodes": {
+					"title": "Subject Code",
+					"description": "Specifies one or more Subjects from the IPTC Subject-NewsCodes taxonomy to categorise the image. Each Subject is represented as a string of 8 digits in an unordered list.",
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+
+
+				"subjectCodesLabelled": {
+					"title": "Subject Codes",
+					"description": "Specifies one or more Subjects from the IPTC Subject-NewsCodes taxonomy to categorise the image. Each Subject is represented as a string of 8 digits in an unordered list.",
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties":{
+							"code": {
+								"title": "Subject Code",
+								"description": "Subject code as a string of 8 digits",
+								"type": "string"
+							},
+							"label": {
+								"title": "Subject Label",
+								"description": "Label",
+								"type": "string"
+							},
+							"description": {
+								"title": "Subject Description",
+								"description": "Description of the scene",
+								"type": "string"
+							}
+						}
+					}
+				},
+
+				"creatorNames": {
+					"title": "Creator",
+					"description": "Contains the name of the photographer, but in cases where the photographer should not be identified the name of a company or organisation may be appropriate.",
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"creatorContactInfo": {
+					"$ref": "iptc-phovidmdshared-schema.json#/definitions/CreatorContactInfo",
+					"description": "The creator's contact information provides all necessary information to get in contact with the creator of this image and comprises a set of sub-properties for proper addressing.",
+					"title": "Creator's Contact Info"
+				},
+				"creditLine": {
+					"title": "Credit Line",
+					"description": "The credit to person(s) and/or organisation(s) required by the supplier of the image to be used when published.  This is a free-text field.",
+					"type": "string"
+				},				
+				"digitalSourceType": {
+					"title": "Digital Source Type",
+					"description": "The type of the source of this digital image",
+					"type": "string",
+					"format": "uri"
+				},
+				"jobid": {
+					"title": "Job Id",
+					"description": "Number or identifier for the purpose of improved workflow handling. This is a user created identifier related to the job for which the image is supplied.",
+					"type": "string"
+				},
+				"jobtitle": {
+					"title": "Creator's jobtitle",
+					"description": "Contains the job title of the photographer. As this is sort of a qualifier the Creator element has to be filled in as mandatory prerequisite for using Creator's Jobtitle.",
+					"type": "string"
+				},
+				"source": {
+					"title": "Source",
+					"description": "The name of a person or party who has a role in the content supply chain. This could be an agency, a member of an agency, an individual or a combination. Source could be different from Creator and from the entities in the Copyright Notice.",
+					"type": "string"
+				},				
+				"locationsShown": {
+					"title": "Location created",
+					"description": "The location the photo was taken.",
+					"type": "array",
+					"items": {
+						"$ref": "iptc-phovidmdshared-schema.json#/definitions/Location"
+					}
+				},
+				"imageRating": {
+					"description": "Rating of the image by its user or supplier",
+					"type": "integer"
+				},
+				"supplier": {
+					"title": "Image Supplier",
+					"description": "Identifies the most recent supplier of the image, who is not necessarily its owner or creator.",
+					"type": "array",
+					"items": {
+						"$ref": "iptc-phovidmdshared-schema.json#/definitions/Entity"
+					}
+				},
+				"copyrightNotice": {
+					"$ref": "iptc-phovidmdshared-schema.json#/definitions/AltLang",
+					"description": "Contains any necessary copyright notice for claiming the intellectual property for this photograph and should identify the current owner of the copyright for the photograph. Other entities like the creator of the photograph may be added in the corresponding field. Notes on usage rights should be provided in \"Rights usage terms\".",
+					"title": "Copyright Notice"
+				},
+				"copyrightOwners": {
+					"title": "Copyright Owner",
+					"description": "Owner or owners of the copyright in the licensed image.",
+					"type": "array",
+					"items": {
+						"$ref": "iptc-phovidmdshared-schema.json#/definitions/EntityWRole"
+					}
+				},
+				"usageTerms": {
+					"$ref": "iptc-phovidmdshared-schema.json#/definitions/AltLang",
+					"description": "The licensing parameters of the image expressed in free-text.",
+					"title": "Rights Usage Terms"
+				},
+				"embdEncRightsExpr": {
+					"title": "Embedded Encoded Rights Expression",
+					"description": "An embedded rights expression using any rights expression language",
+					"type": "array",
+					"items": {
+						"$ref": "iptc-phovidmdshared-schema.json#/definitions/EmbdEncRightsExpr"
+					}
+				},
+				"linkedEncRightsExpr": {
+					"title": "Linked  Encoded Rights Expression",
+					"description": "A linked rights expression using any rights expression language.",
+					"type": "array",
+					"items": {
+						"$ref": "iptc-phovidmdshared-schema.json#/definitions/LinkedEncRightsExpr"
+					}
+				},
+				"webstatementRights": {
+					"description": "URL referencing a web resouce providing a statement of the copyright ownership and usage rights of the image.",
+					"type": "string",
+					"format": "uri"
+				},
+				"instructions": {
+					"title": "Instructions",
+					"description": "Any of a number of instructions from the provider or creator to the receiver of the image which might include any of the following: embargoes (NewsMagazines OUT) and other restrictions not covered by the \"Rights Usage Terms\" field; information regarding the original means of capture (scanning notes, colourspace info) or other specific text information that the user may need for accurate reproduction; additional permissions required when publishing; credits for publishing if they exceed the IIM length of the credit field",
+					"type": "string"
+				},
+				"genres": {
+					"title": "Genre",
+					"description": "Artistic, style, journalistic, product or other genre(s) of the image (expressed by a term from any Controlled Vocabulary)",
+					"type": "array",
+					"items": {
+						"$ref": "iptc-phovidmdshared-schema.json#/definitions/CvTerm"
+					}
+				},
+				"intellectualGenre": {
+					"title": "Intellectual Genre",
+					"description": "Describes the nature, intellectual, artistic or journalistic characteristic of an image.",
+					"type": "string"
+				},
+				"artworkOrObjects": {
+					"title": "Artwork or Object in the Image",
+					"description": "A set of metadata about artwork or an object in the image",
+					"type": "array",
+					"items": {
+						"$ref": "iptc-phovidmdshared-schema.json#/definitions/ArtworkOrObject"
+					}
+				},
+
+				"personInImageNames": {
+					"title": "Person Shown in the Image",
+					"description": "Name of a person shown in the image.",
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"personsShown": {
+					"title": "Person Shown in the Image with Details",
+					"description": "Details about a person the content is about.",
+					"type": "array",
+					"items": {
+						"$ref": "iptc-phovidmdshared-schema.json#/definitions/PersonWDetails"
+					}
+				},
+
+				"modelAges": {
+					"title": "Model Age",
+					"description": "Age of the human model(s) at the time this image was taken in a model released image.",
+					"type": "array",
+					"items": {
+						"type": "number",
+						"format": "integer"
+					}
+				},
+				"additionalModelInfo": {
+					"title": "Additional Model Information",
+					"description": "Information about the ethnicity and other facets of the model(s) in a model-released image.",
+					"type": "string"
+				},
+				"minorModelAgeDisclosure": {
+					"title": "Minor Model Age Disclosure",
+					"description": "Age of the youngest model pictured in the image, at the time that the image was made.",
+					"type": "string",
+					"format": "uri"
+				},
+				"modelReleaseDocuments": {
+					"title": "Model Release Id",
+					"description": "Optional identifier associated with each Model Release.",
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"modelReleaseStatus": {
+					"$ref": "iptc-phovidmdshared-schema.json#/definitions/CvTerm",
+					"description": "Summarises the availability and scope of model releases authorising usage of the likenesses of persons appearing in the photograph.",
+					"title": "Model Release Status"
+				},
+
+				"organisationInImageCodes": {
+					"title": "Code of Organisation Featured in the Image",
+					"description": "Code from a controlled vocabulary for identifying the organisation or company which is featured in the image.",
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"organisationInImageNames": {
+					"title": "Name of Organisation Featured in the Image",
+					"description": "Name of the organisation or company which is featured in the image.",
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"productsShown": {
+					"title": "Product Shown in the Image",
+					"description": "A product the content is about.",
+					"type": "array",
+					"items": {
+						"$ref": "iptc-phovidmdshared-schema.json#/definitions/Product"
+					}
+				},
+				"maxAvailHeight": {
+					"title": "Max Avail Height",
+					"description": "The maximum available height in pixels of the original photo from which this photo has been derived by downsizing.",
+					"type": "number",
+					"format": "integer"
+				},
+				"maxAvailWidth": {
+					"title": "Max Avail Width",
+					"description": "The maximum available width in pixels of the original photo from which this photo has been derived by downsizing.",
+					"type": "number",
+					"format": "integer"
+				},
+				"propertyReleaseStatus": {
+					"$ref": "iptc-phovidmdshared-schema.json#/definitions/CvTerm",
+					"description": "Summarises the availability and scope of property releases authorising usage of the properties appearing in the photograph.",
+					"title": "Property Release Status"
+				},
+				"propertyReleaseDocuments": {
+					"title": "Property Release Id",
+					"description": "Optional identifier associated with each Property Release.",
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"aboutCvTerms": {
+					"title": "CV-Term About Image",
+					"description": "One or more topics, themes or entities the content is about, each one expressed by a term from a Controlled Vocabulary.",
+					"type": "array",
+					"items": {
+						"$ref": "iptc-phovidmdshared-schema.json#/definitions/CvTerm"
+					}
+				}
+			},
+			"additionalProperties": false
+		}
+	},
+	"required": [
+		"photoVideoMetadataIPTC"
+	],
+	"patternProperties": {
+		"photoVideoMetadata_[a-zA-Z0-9_]+": {
+			"description": "Container for a set of metadata from a party other than IPTC",
+			"type": "object"
+		}
+	},
+	"additionalProperties": false
+}

@@ -1,0 +1,62 @@
+/* TODO: Move more facets related rules here. */
+.wb-ihsn-sidebar-filter .wb-card-footer .btn.clear {
+  color: var(--wbg-lightgray);
+  padding-left: 0;
+}
+
+.wb-ihsn-sidebar-filter .wb-card-footer .btn.clear:hover,
+.wb-filter-subtitle .btn:hover {
+  color: var(--action-color--hover) !important;
+}
+
+.wb-ihsn-sidebar-filter .wb-card-header .wb-search-control {
+  position: relative;
+}
+
+.wb-search-control.input-group > .custom-select:not(:last-child), 
+.wb-search-control.input-group > .form-control:not(:last-child) {
+  border-top-right-radius: 0.2rem;
+  border-bottom-right-radius: 0.2rem;
+}
+
+.wb-ihsn-sidebar-filter .wb-card-header .wb-search-control .input-group-append {
+  position: absolute;
+  right: 0;
+  z-index: 10;
+}
+
+.wb-ihsn-sidebar-filter .wb-card-header .wb-search-control .input-group-append .btn.btn-link{
+  color: var(--wbg-lightgray);
+}
+
+
+.wb-ihsn-sidebar-filter .wb-filter-subtitle {
+  color: var(--wbg-lightgray);
+  font-weight: normal;
+  margin-top: .5rem;
+  font-size: .8rem;
+}
+
+.wb-ihsn-sidebar-filter .wb-filter-subtitle > * {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.wb-filter-subtitle .btn {
+  padding: 0 1rem;
+  font-size: .8rem;
+}
+
+.wb-filter-subtitle .btn.clear::before {
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+  content: "\f00d";
+  margin-right: 0.5rem;
+}
+
+.sidebar-filter .togglable > i.fa,
+.sidebar-filter .togglable > i.fas,
+.sidebar-filter .togglable .wb-filter-title > i.fa,
+.sidebar-filter .togglable .wb-filter-title > i.fas {
+  display: none;
+}

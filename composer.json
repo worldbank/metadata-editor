@@ -1,0 +1,26 @@
+{
+    "require": {
+        "justinrainbow/json-schema": "^5.2",
+        "violet/streaming-json-encoder": "^1.1",
+        "salsify/json-streaming-parser": "^8.0",
+        "slim/csrf": "^0.8.3",
+        "solarium/solarium": "^6.1",
+        "league/event": "^2.2",
+        "league/csv": "^9.3",
+        "adbario/php-dot-notation": "^2.2",
+        "laminas/laminas-permissions-acl": "^2.7",
+        "phpmailer/phpmailer": "^6.5",
+        "spatie/array-to-xml": "^2.15",
+        "guzzlehttp/guzzle": "^7.0",
+        "symfony/event-dispatcher": "^5.3",
+        "firebase/php-jwt": "^5.4",
+        "ramsey/uuid": "^4.2",
+        "nelexa/zip": "^3.3",
+        "swaggest/json-diff": "^3.11"
+    },
+    "config": {
+        "platform": {
+            "php": "7.3"
+        }
+    }
+}

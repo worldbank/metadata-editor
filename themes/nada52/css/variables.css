@@ -1,0 +1,179 @@
+/* Inline style externalized from application/views/search/layout.php.php */
+
+
+/* @import "_variables.css"; */
+
+/*
+ * Selection Widget 
+ */
+.variable-comparison-popup {
+  background: var(--wbg-light);
+  color: white;
+  color: var(--color-button-primary);
+  border: 1px solid var(--action-color);
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
+  border-bottom: 0;
+  overflow: hidden;
+}
+
+.fixed-bottom.variable-comparison-popup {
+  width: 360px;
+  height: 380px;
+  right: 2rem;
+  left: auto;
+  display: flex;
+}
+
+/* TODO: Can we take out the utility classes from the markup (pt-2, mt-4, d-md-block) */
+.variable-comparison-popup>.container {
+  display: flex !important;
+  padding-top: 0 !important;
+  margin: 0 !important;
+}
+
+.variable-comparison-popup .wb-var-panel {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: unset;
+  flex: 1;
+}
+.variable-comparison-popup .wb-var-title {
+  cursor: pointer;
+  background: var(--action-color);
+  color: var(--wbg-light);
+  flex: 0 0 auto;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+}
+.variable-comparison-popup .wb-var-title > div {
+  margin: 0 !important; / *TODO: take the utility classes out */
+}
+.variable-comparison-popup .wb-var-body {
+  overflow: auto;
+  flex: 1;
+}
+.variable-comparison-popup .wb-var-actions {
+  flex: 0 0 auto;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1), 0px 4px 30px rgba(0, 0, 0, 0.15);
+}
+.variable-comparison-popup .wb-var-actions>div {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  margin: 1rem 0 !important; /*TODO: Remove the utility classes or adjust them.*/
+}
+
+.variable-comparison-popup .wb-var-actions .btn.clear-variables {
+  color: var(--wbg-gray);
+}
+.variable-comparison-popup .wb-var-actions .btn.clear-variables:hover {
+  text-decoration: none;
+  color: var(--action-color--hover);
+}
+.variable-comparison-popup .wb-var-actions .btn.clear-variables::before {
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+  content: "\f00d";
+  margin-right: 0.5rem;
+} 
+
+.variable-comparison-popup .wb-var-actions .btn-primary::after {
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+  content: "\f35d";
+  margin-left: 0.5rem;
+} 
+
+.var-box {
+  color: var(--wbg-gray);
+  border-bottom: 1px solid var(--wbg-lightbluegray);
+  padding: 1rem;
+  margin: 0;
+  position: relative;
+  font-size: 12px;
+  display: block;
+  float: left;
+  width: 100%;
+}
+/* TODO: take out the `text-white` from the markup*/
+.var-box a.var-name, .var-box a.var-name.text-white {
+  color: var(--wbg-gray) !important;
+}
+.var-box .var-description, .var-box .var-description.text-white {
+  color: var(--wbg-lightgray) !important;
+}
+.var-box .var-remove {
+  font-size: 18px;
+  color: var(--wbg-gray);
+  cursor: pointer;
+}
+
+.var-box .var-remove.fa:hover {
+  color: var(--action-color--hover);
+}
+.var-box .faclose {
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  font-size: 1rem;
+  transform: translateY(-50%);
+}
+.variable-comparison-popup .var-name {
+  text-transform: uppercase;
+}
+.variable-comparison-popup.wb-collapsed.wb-updating {
+  animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+.variable-comparison-popup {
+  transition: height 0.3s; 
+}
+.variable-comparison-popup.wb-collapsed {
+  height: 60px;
+}
+
+.variable-comparison-popup.wb-collapsed .wb-var-handler-down,
+.variable-comparison-popup:not(.wb-collapsed) .wb-var-handler-up {
+ display: none; 
+}
+
+
+@keyframes shake {
+  10%, 90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+  
+  20%, 80% {
+    transform: translate3d(2px, 0, 0);
+  }
+
+  30%, 50%, 70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+
+  40%, 60% {
+    transform: translate3d(4px, 0, 0);
+  }
+}
+
+.variable-comparison-popup-backdrop {
+  display: none;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  opacity: .65;
+  background-color: #111;
+  pointer-events: initial;
+}
+
+.variable-comparison-popup-backdrop.wb-active {
+  display: block;
+}
+
+/*
+ * Comparison Page
+ */

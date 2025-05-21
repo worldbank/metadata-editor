@@ -1,0 +1,2025 @@
+swagger: '2.0'
+info:
+  description: >-
+    Metadata Editor API
+    
+
+    Find out more about Editor at
+    [https://github.com/ihsn/editor](https://github.com/ihsn/editor).  
+
+    
+  version: 1.0.0
+  title: Metadata Editor API
+  x-logo:
+    url: ""
+    backgroundColor: "#FFFFFF"
+    altText: ""
+basePath: /index.php/api/
+tags:
+  - name: Projects
+    description: Create, update projects
+
+  - name: Microdata
+    description: Manage microdata projects
+
+  - name: Timeseries
+    description: Manage timeseries projects
+
+  - name: Geospatial
+    description: Manage geospatial projects
+
+  - name: Document
+    description: Manage document projects
+
+  - name: Table
+    description: Manage table projects
+
+  - name: Image
+    description: Manage image projects
+
+  - name: Script
+    description: Manage scripts
+
+  - name: Video
+    description: Manage video projects
+
+  - name: External resources
+    description: Manage external resources and files for projects
+
+  - name: Collections
+    description: Collections
+
+  - name: Templates
+    description: Templates
+
+  - name: SDMX
+    description: SDMX
+
+  - name: Admin metadata
+    description: Administrative Metadata
+  
+  - name: Admin metadata templates
+    description: Administrative Metadata templates
+
+
+x-tagGroups:  
+  - name: Projects
+    tags:
+      - Projects
+  - name: Microdata
+    tags:
+      - Microdata
+      - data file
+  - name: Timeseries
+    tags:
+      - Timeseries
+  - name: Geospatial    
+    tags:
+      - Geospatial
+  - name: Document
+    tags:
+      - Document
+  - name: Table
+    tags:
+      - Table
+  - name: Image
+    tags:
+      - Image
+  - name: Script
+    tags:
+      - Script
+  - name: Video
+    tags:
+      - Video
+  - name: External resources
+    tags:
+      - External resources      
+  - name: Collections
+    tags:
+      - Collections
+  - name: Templates
+    tags:
+      - Templates   
+  - name: SDMX
+    tags:
+      - SDMX
+  - name: Admin metadata
+    tags:
+      - Admin metadata
+      - Admin metadata templates
+
+schemes:
+  - http
+paths:
+
+  /editor:
+    get:
+      tags:
+        - Projects
+      summary: Search
+      description: Search and browse projects
+      operationId: EditorProjects
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: keywords
+          in: path
+          title: Project search keywords
+          description: Keywords for searching project by title and IDNO
+          type: string
+        - name: type
+          in: path
+          title: Project data type
+          description: Project data type e.g. Microdata, Document, Table, ...
+          type: string
+          enum:          
+          - microdata
+          - document
+          - table
+          - timeseries
+          - timeseries-db
+          - geospatial
+          - image
+          - script
+          - video
+
+        - name: date_start
+          in: path
+          title: Start date
+          description: Search for projects changed on or after this date. Use the date format `YYYY-MM-DD` e.g. 2020-01-01
+          type: string
+          format: date
+        - name: date_end
+          in: path
+          title: End date
+          description: Search for projects changed on or before this date. Use the date format `YYYY-MM-DD` e.g. 2020-01-20
+          type: string
+          format: date
+        - name: offset
+          in: path
+          title: Offset
+          description: Offset for pagination e.g. 10 to skip first 10 records
+          type: int
+
+        - name: limit
+          in: path
+          title: Page size
+          description: Page size e.g. 10 to show 10 records
+          type: int
+        
+        - name: sort_by
+          in: path
+          title: Sort results
+          description: Sort results
+          type: string
+          enum:
+          - title_asc
+          - title_desc
+          - updated_asc
+          - updated_desc
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: Bad input
+  
+    
+  /editor/{id}:
+    get:
+      tags:
+        - Projects
+      summary: Get project by ID
+      description: "Get study level metadata for a project"
+      operationId: singleProject
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          title: Study unique ID
+          description: Study unique ID number
+          type: string
+          required: true
+      responses:
+        '200':
+          description: successful operation
+
+  /editor/delete/{id}:
+    get:
+      tags:
+        - Projects
+      summary: Delete project by ID
+      description: Delete project
+      operationId: deleteProject
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          title: Project unique ID
+          description: Project unique ID number
+          type: string
+          required: true
+      responses:
+        '200':
+          description: successful operation
+
+  /editor/{id}/data_files:
+    get:
+      tags:
+        - Microdata
+      summary: List data files
+      description: List all data files for a Microdata type project
+      operationId: listDataFiles
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          title: Study unique ID
+          description: Study unique ID number
+          type: string
+          required: true
+      responses:
+        '200':
+          description: successful operation
+
+  /editor/{id}/variables:
+    get:
+      tags:
+        - Microdata
+      summary: List variables
+      description: List variables by a Microdata project 
+      operationId: listVariables
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          title: Study unique ID
+          description: Study unique ID number
+          type: string
+          required: true
+      responses:
+        '200':
+          description: successful operation
+  /editor/{id}/variables/{varId}:
+    get:
+      tags:
+        - Microdata
+      summary: Find variable
+      description: Get a single variable metadata
+      operationId: findSingleVariable
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          title: Study unique ID
+          description: Study unique ID number
+          type: string
+          required: true
+        - name: varId
+          in: path
+          title: Variable ID
+          description: Variable ID
+          type: string
+          required: true
+      responses:
+        '200':
+          description: successful operation
+          schema:
+
+  /editor/sdmx/{id}:
+      post:
+        tags:
+          - SDMX          
+        summary: SDMX Metadata report set
+        description: Create a new SDMX metadata report set
+        operationId: getMetadatasetSDMX
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: 'sdmx-json-metadata-schema.json'
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: 'sdmx-json-metadata-schema.json'
+        security:
+          - ApiKeyAuth: []
+
+  /importproject/:
+      post:
+        tags:
+          - Projects
+        summary: Import project
+        description: Create a project by importing metadata (XML/JSON) or project zip package
+        operationId: importProject
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "formData"
+            name: "type"
+            type: string
+            description: "Project type e.g. microdata, document, table, timeseries, etc "
+            required: true
+          - in: "formData"
+            name: "file"
+            type: file
+            description: "Project file (XML, JSON or package zip)"
+            required: true
+        responses:
+          '200':
+            description: successful operation
+        security:
+          - ApiKeyAuth: []
+
+  /editor/create/survey:
+      post:
+        tags:
+          - Projects
+          - Microdata
+        summary: Create Microdata
+        description: Create a new microdata project
+        operationId: createSurvey
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: 'survey-schema.json'
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: 'survey-schema.json'
+        security:
+          - ApiKeyAuth: []
+
+  /editor/update/survey/{id}:
+      post:
+        tags:
+          - Projects
+          - Microdata
+        summary: Update Microdata
+        description: Update Microdata project
+        operationId: updateSurvey
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "id"
+            description: Project ID or IDNO
+            type: string
+            format: string
+            required: true
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: 'survey-schema.json'
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: 'survey-schema.json'
+        security:
+          - ApiKeyAuth: []        
+
+  /editor/patch/{project-type}/{id}:
+      post:
+        tags:
+          - Projects
+          - Microdata
+          - Timeseries
+          - Timeseries-db
+          - Geospatial
+          - Document
+          - Table
+          - Image
+          - Script
+          - Video
+
+        summary: Partial Metadata update
+        description: Add, update, delete or replace parts of a project metadata
+        operationId: patchProject
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "id"
+            description: Project ID or IDNO
+            type: string
+            format: string
+            required: true
+          - in: "path"
+            name: "project-type"
+            description: Project type
+            type: string
+            format: string
+            required: true
+            enum:
+              - survey
+              - timeseries
+              - timeseries-db
+              - geospatial
+              - document
+              - table
+              - image
+              - script
+              - video
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: 'json-patch-schema.json'
+        responses:
+          '200':
+            description: successful operation
+            
+        security:
+          - ApiKeyAuth: []                  
+
+
+  /editor/create/timeseries:
+      post:
+        tags:
+          - Projects 
+          - Timeseries
+        summary: Create Timeseries
+        description: Create a new timeseries project
+        operationId: createTimeseries
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: 'timeseries-schema.json'
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: 'timeseries-schema.json'
+        security:
+          - ApiKeyAuth: []
+  /editor/update/timeseries/{id}:
+      post:
+        tags:
+          - Timeseries
+          - Projects
+        summary: Update Timeseries
+        description: Update Timeseries project
+        operationId: updateTimseries
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "id"
+            description: Project ID
+            type: string
+            format: string
+            required: true
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: 'timeseries-schema.json'
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: 'timeseries-schema.json'
+        security:
+          - ApiKeyAuth: []   
+
+  /editor/create/geospatial:
+      post:
+        tags:
+          - Projects 
+          - Geospatial
+        summary: Create Geospatial
+        description: Create a new geospatial project
+        operationId: createGeoSpatial
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: 'geospatial-schema.json'
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: 'geospatial-schema.json'
+        security:
+          - ApiKeyAuth: []
+
+  /editor/update/geospatial/{id}:
+      post:
+        tags:
+          - Geospatial
+          - Projects
+        summary: Update Geospatial
+        description: Update Geospatial project
+        operationId: updateGeospatial
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "id"
+            description: Project ID
+            type: string
+            format: string
+            required: true
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: 'geospatial-schema.json'
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: 'geospatial-schema.json'
+        security:
+          - ApiKeyAuth: []   
+
+  /editor/create/document:
+      post:
+        tags:
+          - Projects 
+          - Document
+        summary: Create Document
+        description: Create a new document project
+        operationId: createDocument
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: 'document-schema.json'
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: 'document-schema.json'
+        security:
+          - ApiKeyAuth: []
+
+  /editor/update/document/{id}:
+      post:
+        tags:
+          - Document
+          - Projects
+        summary: Update Document
+        description: Update document project
+        operationId: updateDocument
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "id"
+            description: Project ID
+            type: string
+            format: string
+            required: true
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: 'document-schema.json'
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: 'document-schema.json'
+        security:
+          - ApiKeyAuth: []
+
+  /data/datafile//{id}:
+        post:
+          tags:
+            - Microdata
+            - Data file
+          summary: Upload data file
+          description: Upload a data file
+          operationId: uploadDatafile
+          consumes:
+            - application/json
+          produces:
+            - application/json
+          parameters:
+            - in: "path"
+              name: "id"
+              description: Project ID
+              type: string
+              format: string
+              required: true
+            - in: "formData"
+              name: "overwrite"
+              description: "Valid values: `0`, `1`"
+              type: string
+              required: false
+            - in: "formData"
+              name: "store_data"
+              enum:
+                - store
+                - remove
+              type: string
+              required: true              
+          responses:
+            '200':
+              description: successful operation
+          security:
+            - ApiKeyAuth: []
+
+  /editor/collections/{id}:
+    get:
+      tags:
+        - Projects
+        - Collections
+      summary: Get collections by project
+      description: Get a list of collections by project ID
+      operationId: getCollectionsByProject
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          title: Project unique ID
+          description: Project unique ID number
+          type: string
+          required: true
+      responses:
+        '200':
+          description: successful operation
+
+
+  /collections:
+      get:
+        tags:
+          - Collections
+        summary: List collections
+        description: List collections
+        operationId: listCollections
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: "#/definitions/Collection"
+        security:
+          - ApiKeyAuth: []
+      post:
+        tags:
+          - Collections
+        summary: Create collection
+        description: Create a new collection
+        operationId: createCollection
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/Collection"
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: "#/definitions/Collection"
+        security:
+          - ApiKeyAuth: []
+  /collections/update/{collectionId}:      
+      post:
+        tags:
+          - Collections
+        summary: Update collection
+        description: Update a collection
+        operationId: updateCollection
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/Collection"
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: "#/definitions/Collection"
+        security:
+          - ApiKeyAuth: []
+  /collections/copy:
+      post:
+        tags:
+          - Collections
+        summary: Copy collection
+        description: Copy collection
+        operationId: copyCollection
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/CopyCollection"
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: "#/definitions/CopyCollection"
+        security:
+          - ApiKeyAuth: []
+
+  /collections/move:
+      post:
+        tags:
+          - Collections
+        summary: Move collection
+        description: Move collection
+        operationId: moveCollection
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/MoveCollection"
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: "#/definitions/MoveCollection"
+        security:
+          - ApiKeyAuth: []
+
+  /collections/{id}:
+      get:
+        tags:
+          - Collections
+        summary: Get collection by ID
+        description: Get collection by ID
+        operationId: getCollectionById
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - name: id
+            in: path
+            title: Collection ID
+            description: Collection ID
+            type: string
+            required: true
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: "#/definitions/CollectionList"
+        security:
+          - ApiKeyAuth: []
+      delete:
+        tags:
+          - Collections
+        summary: Delete collection
+        description: Delete a collection
+        operationId: deleteCollectionById
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - name: id
+            in: path
+            title: Collection ID
+            description: Collection ID
+            type: string
+            required: true
+        responses:
+          '200':
+            description: successful operation
+        security:
+          - ApiKeyAuth: []
+  /collections/projects:
+      post:
+        tags:
+          - Collections
+        summary: List projects by collection
+        description: List projects by collection
+        operationId: listProjectsByCollection
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "url"
+            name: "collection_id"
+            required: true
+            type: integer
+            description: "Collection ID"
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+  /collections/add_projects:
+      post:
+        tags:
+          - Collections
+        summary: Add projects to collection
+        description: Add projects to collection
+        operationId: addProjectsToCollection
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/AddProjectsToCollection"
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: "#/definitions/AddProjectsToCollection"
+        security:
+          - ApiKeyAuth: []
+  /collections/remove_projects:
+      post:
+        tags:
+          - Collections
+        summary: Remove projects from collections
+        description: Remove projects from collections
+        operationId: removeProjectsFromCollections
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/AddProjectsToCollection"       
+        responses:
+          '200':
+            description: successful operation
+        security:
+          - ApiKeyAuth: []
+
+  /collections/user_access/{collectionId}:
+      get:
+        tags:
+          - Collections
+        summary: List users by collection
+        description: List of users who have access to a collection
+        operationId: UsersByCollection
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "collectionId"
+            required: true
+            type: integer            
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+  /collections/user_access:
+      post:
+        tags:
+          - Collections
+        summary: Add users to collection
+        description: Grant user access to a collection
+        operationId: AddUsersToCollection
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/UserCollectionAccess"
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+  /collections/remove_user_access:
+      post:
+        tags:
+          - Collections
+        summary: Remove user from collection
+        description: Remove user access from a collection
+        operationId: RemoveUserFromCollection
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/RemoveUserCollectionAccess"
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+  /collections/template:
+      post:
+        tags:
+          - Collections
+          - Templates
+        summary: Set template for collection
+        description: Set template for all projects in a collection
+        operationId: SetTemplateForCollection
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/TemplateForCollection"
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+  /resources/{projectId}:
+      get:
+        tags:
+          - External resources
+        summary: List resources
+        description: List documentation (Reports, Questionnaires, Tables, etc.) for a project
+        operationId: ListResources
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "projectId"
+            type: integer
+            required: true            
+        responses:
+          '200':
+            description: successful operation            
+            schema:
+              $ref: "resource-schema.json"
+        security:
+          - ApiKeyAuth: []
+
+      post:
+        tags:
+          - External resources
+        summary: Create resource
+        description: Create a new resource for a project
+        operationId: CreateResource
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "projectId"
+            type: integer
+            required: true
+          - in: "formData"
+            name: "dctype"
+            type: string
+            required: true
+            description: "Resource type"
+          - in: "formData"
+            name: "title"
+            type: string
+            required: true
+            description: "Resource title"            
+          - in: "formData"
+            name: "author"
+            type: string
+            required: false
+          - in: "formData"
+            name: "dcdate"
+            type: string
+            required: false
+          - in: "formData"
+            name: "country"
+            type: string
+            required: false  
+          - in: "formData"
+            name: "language"
+            type: string
+            required: false
+          - in: "formData"
+            name: "contributor"
+            type: string
+            required: false
+          - in: "formData"
+            name: "publisher"
+            type: string
+            required: false
+          - in: "formData"
+            name: "rights"
+            type: string
+            required: false
+          - in: "formData"
+            name: "description"
+            type: string
+            required: false
+          - in: "formData"
+            name: "abstract"
+            type: string
+            required: false
+          - in: "formData"
+            name: "toc"
+            type: string
+            required: false
+          - in: "formData"
+            name: "filename"
+            type: file
+            description: "Upload file"
+            required: false
+        responses:
+          '200':
+            description: successful operation            
+            schema:
+              $ref: "resource-schema.json"
+        security:
+          - ApiKeyAuth: []
+  /resources/{projectId}/{resourceId}:
+      post:
+        tags:
+          - External resources
+        summary: Update resource
+        description: Update external resource for a project
+        operationId: UpdateResource
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "projectId"
+            type: integer
+            required: true
+          - in: "path"
+            name: "resourceId"
+            type: integer
+            required: true
+          - in: "formData"
+            name: "dctype"
+            type: string
+            required: true
+            description: "Resource type"
+          - in: "formData"
+            name: "title"
+            type: string
+            required: true
+            description: "Resource title"            
+          - in: "formData"
+            name: "author"
+            type: string
+            required: false
+          - in: "formData"
+            name: "dcdate"
+            type: string
+            required: false
+          - in: "formData"
+            name: "country"
+            type: string
+            required: false  
+          - in: "formData"
+            name: "language"
+            type: string
+            required: false
+          - in: "formData"
+            name: "contributor"
+            type: string
+            required: false
+          - in: "formData"
+            name: "publisher"
+            type: string
+            required: false
+          - in: "formData"
+            name: "rights"
+            type: string
+            required: false
+          - in: "formData"
+            name: "description"
+            type: string
+            required: false
+          - in: "formData"
+            name: "abstract"
+            type: string
+            required: false
+          - in: "formData"
+            name: "toc"
+            type: string
+            required: false
+          - in: "formData"
+            name: "filename"
+            type: file
+            description: "Upload file"
+            required: false
+        responses:
+          '200':
+            description: successful operation            
+            schema:
+              $ref: "resource-schema.json"
+        security:
+          - ApiKeyAuth: [] 
+  /resources/write_json{projectId}:
+      get:
+        tags:
+          - External resources
+        summary: Generate JSON
+        description: Generate JSON for external resources
+        operationId: ResourcesWriteJSON
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            type: integer
+            name: "projectId"
+            required: true
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+  /resources/write_rdf{projectId}:
+      get:
+        tags:
+          - External resources
+        summary: Generate RDF
+        description: Generate RDF for external resources
+        operationId: ResourcesRdfJSON
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "projectId"
+            type: integer
+            required: true
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+  /resources/rdf{projectId}:
+      get:
+        tags:
+          - External resources
+        summary: Download RDF
+        description: Download RDF for external resources
+        operationId: DownloadResourcesRdf
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "projectId"
+            type: integer
+            required: true
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+  /resources/import/{projectId}:
+      post:
+        tags:
+          - External resources
+        summary: Import RDF or JSON
+        description: Import external resources using RDF or JSON
+        operationId: importResources
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "projectId"
+            type: integer
+            required: true
+          - in: "formData"
+            name: "file"
+            type: file
+            description: "Upload RDF or JSON file"
+            required: true
+        responses:
+          '200':
+            description: successful operation            
+            schema:
+              $ref: "resource-schema.json"
+        security:
+          - ApiKeyAuth: []
+  /resources/delete/{projectId}/{resourceId}}:
+      post:
+        tags:
+          - External resources
+        summary: Delete resource
+        description: Delete external resource for a project
+        operationId: deleteResource
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "projectId"
+            type: integer
+            required: true
+          - in: "path"
+            name: "resourceId"
+            type: integer
+            required: true          
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+  /templates:
+      get:
+        tags:
+          - Templates
+        summary: List templates
+        description: Get a list of all templates
+        operationId: listTemplates
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+      post:
+        tags:
+          - Templates
+        summary: Create template
+        description: Create a new template
+        operationId: createTemplate
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "template-schema.json"
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+  /templates/{uid}:
+      get:
+        tags:
+          - Templates
+        summary: Get template by UID
+        description: Get template by UID
+        operationId: getTemplate
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "uid"
+            type: string
+            required: true
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+  /templates/duplicate/{uid}:
+      post:
+        tags:
+          - Templates
+        summary: Duplicate template
+        description: Create duplicate template
+        operationId: duplicateTemplate
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "uid"
+            type: string
+            description: Template UID to create a duplicate
+            required: true
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+  /templates/update/{uid}:
+      post:
+        tags:
+          - Templates
+        summary: Update template
+        description: Update template
+        operationId: updateTemplate
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "uid"
+            type: string
+            description: Template UID to update
+            required: true
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/Template"
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+  /templates/delete/{uid}:
+      post:
+        tags:
+          - Templates
+        summary: Delete template
+        description: Delete template
+        operationId: deleteTemplate
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "uid"
+            type: string
+            description: Template UID to delete
+            required: true
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+  /editor/options/{id}:
+      post:
+        tags:
+          - Templates
+          - Project
+        summary: Set project template
+        description: Set project template
+        operationId: setProjectTemplate
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "id"
+            type: string
+            description: Project ID or IDNO
+            required: true
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/ProjectTemplate"
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+
+  /editor/options/{projectId}:
+      post:
+        tags:
+          - Project
+        summary: Change project IDNO
+        description: Change project IDNO
+        operationId: setProjectIDNO
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "id"
+            type: string
+            description: Project ID or IDNO
+            required: true
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/ProjectTemplate"
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+
+  /admin-metadata/templates:
+      get:
+        tags:
+          - Admin metadata templates
+        summary: List templates
+        description: List all administrative metadata templates
+        operationId: listAdminMetadataTemplates
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        responses:
+          '200':
+            description: successful operation
+        security:
+          - ApiKeyAuth: []
+  /admin-metadata/templates/{templateUid}:
+      get:
+        tags:
+          - Admin metadata templates
+        summary: Get single template
+        description: Get single administrative metadata template
+        operationId: singleAdminMetadataTemplate
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "templateUid"
+            type: string
+            description: Admin metadata template UID
+            required: true
+        responses:
+          '200':
+            description: successful operation
+        security:
+          - ApiKeyAuth: []
+  /admin-metadata/data/{projectId}/{templateUid}:
+      get:
+        tags:
+          - Admin metadata
+        summary: Get data
+        description: Get admin metadata associated with a project
+        operationId: getAdminMetadataData
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "projectId"
+            type: string
+            description: Project ID or IDNO
+            required: true
+          - in: "path"
+            name: "templateUid"
+            type: string
+            description: (Optional) Admin metadata template UID. If not provided, all data will be returned for the project
+            required: false
+        responses:
+          '200':
+            description: successful operation
+        security:
+          - ApiKeyAuth: []
+  /admin-metadata/data_query:
+      get:
+        tags:
+          - Admin metadata
+        summary: Query admin metadata
+        description: Query administrative metadata across projects. By default, returns all admin metadata for all projects and templates that the user has access to. To filter by project, template or limit the number of results, use the query parameters.
+        operationId: queryAdminMetadataData
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "project_id"
+            type: string
+            description: "(optional) Project ID or IDNO"
+          - in: "path"
+            name: "template"
+            type: string
+            description: "(optional) Admin metadata template UID. For multiple templates, separate with comma"
+          - in: "path"
+            name: "limit"
+            type: integer
+            description: "(optional) Limit number of results"
+          - in: "path"
+            name: "offset"
+            type: integer
+            description: "(optional) Offset number of results"
+        responses:
+          '200':
+            description: successful operation
+        security:
+          - ApiKeyAuth: []
+  /admin-metadata/data/:
+      post:
+        tags:
+          - Admin metadata
+        summary: Add/update data
+        description: Add or update admin metadata (data) for a project
+        operationId: createAdminMetadataData
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/CreateAdminMetadataData"
+        responses:
+          '200':
+            description: successful operation
+        security:
+          - ApiKeyAuth: []
+  /admin-metadata/data_remove/:
+      post:
+        tags:
+          - Admin metadata
+        summary: Delete
+        description: Delete admin metadata for a project
+        operationId: deleteAdminMetadataData
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/RemoveAdminMetadataData"
+        responses:
+          '200':
+            description: successful operation
+        security:
+          - ApiKeyAuth: []
+  
+
+
+
+  
+###############################################################
+definitions:
+  Template:
+    type: object
+    properties:
+      type:
+        type: string
+        required: true
+      template:
+        type: object
+    xml:
+      name: template
+  TemplateForCollection:
+    type: object
+    properties:
+      collection_id:
+        type: integer
+        required: true
+      template_uid:
+        type: string
+        required: true
+      project_type:
+        type: string
+        required: true
+        description: survey, timeseries, table, document, geospatial, ...
+    xml:
+      name: TemplateForCollection
+  Collection:
+    type: object
+    properties:
+      title:
+        type: string
+        required: true
+      description:
+        type: string
+    xml:
+      name: collection
+  CollectionList:
+    type: object
+    properties:
+      id:
+        type: integer        
+      title:
+        type: string
+      description:
+        type: string
+      created:
+        type: string
+        format: date-time
+      changed:
+        type: string
+        format: date-time
+      created_by:
+        type: integer
+        format: int64
+      changed_by:
+        type: integer
+        format: int64
+      username:
+        type: string
+    xml:
+      name: CollectionList
+  AddProjectsToCollection:
+    type: object
+    properties:
+      collections:
+        type: array
+        required: true
+        items:
+          type: integer
+      id_format:
+        type: string
+        default: "id"
+        enum:
+          - id
+          - idno                
+      projects:
+        type: array
+        items:
+          type: string        
+    xml:
+      name: AddProjectsToCollection
+  UserCollectionAccess:
+    type: object
+    properties:
+      collection_id:
+        type: integer
+        required: true
+      user_id:        
+        type: integer
+        format: int64   
+        required: true
+      permissions:
+        type: array
+        items:
+          type: string
+          enum:
+            - view
+            - edit
+            - admin
+  RemoveUserCollectionAccess:
+    type: object
+    properties:
+      collection_id:
+        type: integer
+        required: true
+      user_id:        
+        type: integer
+        format: int64   
+        required: true
+
+  CopyCollection:
+    type: object
+    properties:
+      source_id:
+        type: integer
+        required: true
+        description: "Source collection ID"
+      target_id:
+        type: integer
+        required: true
+        description: "Target collection ID"
+  
+  MoveCollection:
+    type: object
+    properties:
+      source_id:
+        type: integer
+        required: true
+        description: "Source collection ID"
+      target_id:
+        type: integer
+        required: true
+        description: "Target collection ID"
+
+  AuthenticationResponse:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+        readOnly: true
+      user_id:
+        type: int      
+      username:
+        type: string
+      api-keys:
+        type: object  
+    xml:
+      name: AuthenticationResponse    
+  Resource:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+        readOnly: true
+      pid:
+        type: integer
+        format: int64
+        description: Project ID
+      resource_type:
+        type: string
+        enum:
+          - microdata
+          - questionnaire
+          - report
+          - table
+          - other
+      title:
+        type: string
+      description:
+        type: string
+      filename:
+        type: string
+      created:
+        type: string
+        format: date-time
+      changed:
+        type: string
+        format: date-time
+    xml:
+      name: Resource
+  
+  CreateAdminMetadataType:
+    type: object
+    required:
+      - name
+      - title
+      - schema_id
+      - schema_urn
+    properties:
+      name:
+        type: string
+        required: true
+        title: "Unique name for the metadata type"
+        description: "Unique name for the metadata type with no spaces or special characters"
+      title:
+        type: string
+        required: true
+        title: "Title of the metadata type"
+      description:
+        type: string
+        title: "Description of the metadata type"
+      schema_id:
+        type: string
+        required: true
+        title: "Schema ID"
+      schema_urn:
+        type: string
+        required: true
+        title: "Schema URN (only when schema_id is not provided)"
+    
+  UpdateAdminMetadataType:
+    type: object
+    required:
+      - name
+      - title
+      - schema_id
+      - schema_urn
+    properties:
+      name:
+        type: string
+        required: true
+        title: "Unique name for the metadata type"
+        description: "Unique name for the metadata type with no spaces or special characters"
+      title:
+        type: string
+        required: true
+        title: "Title of the metadata type"
+      description:
+        type: string
+        title: "Description of the metadata type"
+      schema_id:
+        type: string
+        required: true
+        title: "Schema ID"
+      schema_urn:
+        type: string
+        required: true
+        title: "Schema URN (only when schema_id is not provided)"
+
+  createAdminMetadataSchema:
+    type: object
+    required:
+      - name
+      - agency
+      - version      
+      - title
+      - schema
+    properties:
+      name:
+        type: string
+        required: true
+        title: "Unique name for the metadata schema"
+        description: "Unique name for the metadata schema with no spaces or special characters"
+      agency:
+        type: string
+        required: true
+        title: "Agency"
+        description: "Agency/Organization responsible for the schema. Use acronym e.g. IHSN, WBG, etc."
+      version:
+        type: string
+        required: true
+        title: "Version"
+        description: "Version of the schema. Use symantic versioning e.g. 1.0.0" 
+      title:
+        type: string
+        required: true
+        title: "Title of the metadata schema"
+      description:
+        type: string
+        title: "Description of the metadata schema"
+      schema:
+        type: object
+        required: true
+        title: "Schema"
+        description: "JSON schema for the metadata type"
+  
+  CreateAdminMetadataData:
+    type: object
+    required:
+      - project_id
+      - template_uid
+      - metadata
+    properties:
+      project_id:
+        type: string
+        required: true
+        title: "Project ID/IDNO"
+        description: "Project ID or IDNO"
+      template_uid:
+        type: string
+        required: true
+        title: "Metadata template UID"
+        description: "Admin metadata template UID"
+      metadata:
+        type: object
+        required: true
+        title: "Metadata"
+        description: "Administrative metadata"
+  QuerydminMetadataData:
+    type: object
+    properties:
+      project_id:
+        type: string
+        title: "Project ID/IDNO"
+        description: "(Optional) Filter by project ID or IDNO"
+      template_uid:
+        type: string
+        title: "Metadata template UID"
+        description: "(Optional) Filter by metadata template UID. For multiple templates, use comma separated values"
+      offset:
+        type: integer
+        title: "Offset"
+        description: "Offset for pagination"
+      limit:
+        type: integer
+        title: "Limit"
+        description: "Limit for pagination"
+  RemoveAdminMetadataData:
+    type: object
+    required:
+      - project_id
+      - template_uid
+    properties:
+      project_id:
+        type: string
+        required: true
+        title: "Project ID/IDNO"
+        description: "Project ID or IDNO"
+      template_uid:
+        type: string
+        required: true
+        title: "Template UID"
+        description: "Admin metadata template UID"
+  ProjectTemplate:
+    type: object
+    properties:
+      template_uid:
+        type: string
+        required: true
+        description: Template UID     
+    xml:
+      name: ProjectTemplate
+  ProjectOptionsIDNO:
+    type: object
+    properties:
+      idno:
+        type: string
+        required: true
+        description: New IDNO for the project      
+    xml:
+      name: ProjectOptionsIDNO
+      
+
+  
+  
+  ApiResponse:
+    type: object
+    properties:
+      code:
+        type: integer
+        format: int32
+      type:
+        type: string
+      message:
+        type: string

@@ -1,0 +1,25 @@
+.nav-tabs .type-count, 
+.nav-tabs .type-count-all{
+  font-size: 0.8rem; 
+  color: var(--wbg-lightgray);
+  margin-left: 1.5rem;
+}
+.nav-tabs .type-count-all{
+  margin-left: 0;
+}
+.nav-tabs a.dataset-type-tab {
+  color: var(--action-color);
+  border-width: 0 0 4px 0;
+  padding-bottom: .5rem;
+}
+.nav-tabs a.dataset-type-tab .fa {
+  min-width: 1rem;
+}
+.nav-tabs a.dataset-type-tab:hover {
+  color: var(--action-color--hover);
+  border-color: transparent transparent var(--action-color--hover) transparent;
+}
+
+.nav-tabs.search-nav-tabs .nav-item .active {
+  border-bottom: 3px solid var(--action-color);
+}

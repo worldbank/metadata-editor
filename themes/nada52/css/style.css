@@ -1,0 +1,225 @@
+@charset "UTF-8";
+
+
+/*
+* ======== FOOTER ========
+*/
+
+footer {
+    margin-top: 60px;
+}
+
+footer .full-row-footer-components {
+    padding-top: 32px;
+    padding-bottom: 16px;
+    background-color: #262626;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+footer .full-row-footer-black-components {
+    padding-top: 16px;
+    padding-bottom: 6px;
+    background-color: #000;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+footer .footer hr {
+    border-top: 1px solid #787878;
+}
+
+footer .footer .footer-menu-item {
+    margin-bottom: 2rem;
+}
+
+footer .footer .footer-menu-item ul {
+    padding: 0;
+    list-style: none;
+}
+
+footer .footer .footer-menu-item ul li {
+    font-size: 14px;
+    line-height: 22px;
+    margin: 0 0 8px 0;
+}
+
+footer .footer .footer-menu-item ul li a {
+    color: #fff;
+}
+
+footer .footer .footer-menu-item ul li a:hover {
+    color: #fff;
+    text-decoration: underline;
+}
+
+footer .footer h4,
+footer .footer .footer .ombc-section .ombc-description,
+footer .footer .ombc-section .footer .ombc-description,
+footer .footer .footer .news-hero-section .news-hero-img-overlay .news-hero-description,
+footer .footer .news-hero-section .news-hero-img-overlay .footer .news-hero-description,
+footer .footer .footer .highlight_component .highlights-card .highlights-card-block h3,
+footer .footer .highlight_component .highlights-card .highlights-card-block .footer h3,
+footer .footer .footer .latest-v1-section h3,
+footer .footer .latest-v1-section .footer h3 {
+    color: #fff;
+    margin: 0 0 16px 0;
+    text-transform: uppercase;
+}
+
+footer .footer .footer-bottom {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #787878;
+    display: block;
+    width: 100%;
+}
+
+footer .footer .list-inline {
+    margin-left: 0;
+}
+
+footer .footer .list-inline ul {
+    padding: 0;
+    list-style: none;
+}
+
+footer .footer .list-inline ul>li {
+    padding: 0;
+    line-height: 16px;
+    margin: 0 0 8px 0;
+}
+
+footer .footer a.disclaimer {
+    font-size: 12px;
+    line-height: 16px;
+    color: #fff;
+    border-right: 1px solid #fff;
+    margin-right: 8px;
+    padding-right: 8px;
+}
+
+footer .footer a.disclaimer:hover {
+    text-decoration: underline;
+}
+
+footer .footer a.disclaimer:last-child {
+    border-right: 0 solid #d4d4d4;
+    margin-right: 0;
+    padding-right: 0;
+}
+
+footer .footer .footer-copy-right {
+    opacity: .5;
+}
+
+footer .footer .footer-copy-right p {
+    color: #fff;
+}
+
+footer .footer .footer-bottom-left ul {
+    padding: 0;
+    list-style: none;
+}
+
+footer .footer .footer-bottom-left ul li {
+    align-self: center;
+}
+
+footer .footer .footer-bottom-left ul li a.wbg-partnership {
+    font-size: 12px;
+    line-height: 16px;
+    color: #fff;
+    font-weight: bold;
+    text-transform: uppercase;
+    opacity: .5;
+    margin-left: 8px;
+    padding-left: 8px;
+}
+
+footer .footer .footer-bottom-left ul li a.wbg-partnership:hover {
+    text-decoration: underline;
+}
+
+footer .footer .wb-fraud-report {
+    color: #fff;
+    text-transform: uppercase;
+}
+
+footer .footer .wb-fraud-report a {
+    color: #fff;
+    transition: all .35s;
+}
+
+footer .footer .wb-fraud-report a:hover {
+    opacity: .8;
+}
+
+footer .footer .search-submit-icon {
+    position: absolute;
+    right: 10px;
+    top: 9px;
+    height: 20px;
+    border-radius: 0;
+    z-index: 10000;
+}
+
+footer .footer .search-submit-icon {
+    position: absolute;
+    right: 10px;
+    top: 9px;
+    height: 20px;
+    border-radius: 0;
+    z-index: 10000;
+}
+
+footer .footer .footer-newsletter {
+    margin-bottom: 2rem;
+}
+
+footer .footer .social-icon {
+    margin-bottom: 2rem;
+}
+
+footer .footer .social-icon ul {
+    display: flex;
+    justify-content: space-between;
+    list-style: none;
+    padding: 0px;
+}
+
+footer .footer .social-icon ul li a {
+    color: #ffffff;
+    background-color: #0275d8;
+    display: flex;
+    width: 40px;
+    height: 40px;
+    border-radius: 100% !important;
+    justify-content: center;
+    align-items: center;
+    transition: opacity .25s;
+}
+
+footer .footer .social-icon ul li a:hover {
+    text-decoration: none;
+    opacity: .5;
+}
+
+.main-header{
+    background-color: #0c1a4d;
+}
+
+/* override colors */
+.btn-primary{
+    background-color: #526bc7;
+    border-color: #526bc7;
+}
+
+.btn-primary:hover{
+    background-color: #283564;
+    border-color: #283564;
+}
+
+.btn-link,a {
+    color: #526bc7;
+}

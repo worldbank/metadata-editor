@@ -1,0 +1,133 @@
+{
+  "$id": "http://ihsn.org/schemas/datacite",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Datacite schema for creating DOIs",
+  "description": "Schema based on Datacite elements",
+  "type": "object",
+  "properties": {
+    "doi": {
+      "type": "string",
+      "title": "DOI"
+    },
+    "prefix": {
+      "type": "string",
+      "title": "Prefix"
+    },
+    "suffix": {
+      "type": "string",
+      "title": "Suffix"
+    },
+    "creators": {
+      "type": "array",
+      "title": "Creators",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "nameType": {
+            "type": "string",
+            "title": "Name type",
+            "enum": [
+              "Personal",
+              "Organizational"
+            ]
+          },
+          "givenName": {
+            "type": "string",
+            "title": "Given name"
+          },
+          "familyName": {
+            "type": "string",
+            "title": "Family name"
+          }          
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    "titles": {
+      "type": "array",
+      "title": "Titles",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "titleType": {
+            "type": "string",
+            "title": "Title type",
+            "enum": [
+              "AlternativeTitle",
+              "Subtitle",
+              "TranslatedTitle",
+              "Other"
+            ]
+          },
+          "lang": {
+            "type": "string",
+            "title": "Language"            
+        }
+      },
+        "required": [
+          "title"
+        ]
+      }
+    },
+    "publisher": {
+      "type": "string",
+      "title": "Publisher"
+    },
+    "publicationYear": {
+      "type": "string",
+      "title": "Publication year"
+    },
+    "types": {
+      "type": "object",
+      "title": "Types",
+      "properties": {
+        "resourceType": {
+          "type": "string",
+          "title": "Resource type"
+        },
+        "resourceTypeGeneral": {
+          "type": "string",
+          "title": "Resource type general",
+          "enum": [
+            "Audiovisual",
+            "Collection",
+            "DataPaper",
+            "Dataset",
+            "Event",
+            "Image",
+            "InteractiveResource",
+            "Model",
+            "PhysicalObject",
+            "Service",
+            "Software",
+            "Sound",
+            "Text",
+            "Workflow",
+            "Other"
+          ]
+        }
+      },
+      "required": [
+        "resourceType"
+      ]
+    },
+    "url": {
+      "type": "string",
+      "title": "URL"
+    },
+    "language": {
+      "type": "string",
+      "title": "Language"
+    }
+  }
+}

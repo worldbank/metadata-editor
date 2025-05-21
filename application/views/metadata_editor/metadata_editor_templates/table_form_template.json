@@ -1,0 +1,1414 @@
+{
+    "type": "template",
+    "title": "Table Schema",
+    "items": [
+        {
+            "type": "section_container",
+            "key": "metadata_information_container",
+            "title": "Metadata Information",
+            "class": "mandatory recommended",
+            "expanded": true,
+            "items": [
+                {
+                    "type": "section",
+                    "key": "metadata_information",
+                    "title": "Information on metadata",
+                    "items": [
+                        {
+                            "key": "metadata_information.title",
+                            "type": "string",
+                            "title": "Document title",
+                            "help_text": "The title of the metadata document (which will usually be the same as the element \"Title\" in the \"Table description / Title statement\" section). The metadata document is the metadata file (XML or JSON file) that is being generated.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "metadata_information.idno",
+                            "type": "string",
+                            "title": "Document ID",
+                            "help_text": "A unique identifier for the table's metadata document. This identifier must be unique in the catalog where the metadata are intended to be published. Ideally, the identifier should also be unique globally. This is different from the \"Primary ID\" in section \"Table description / Title statement\", although it is good practice to generate identifiers that establish a clear connection between these two identifiers. The Document ID could also include the metadata document version identifier. For example, if the \"Primary ID\" of the table is “TBL_0001”, the Document ID could be “IHSN_TBL_001_v1.0” if the metadata are produced by the IHSN and if this is version 1.0 of the metadata. Each organization should establish systematic rules to generate such IDs. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. The identifier may not contain blank spaces.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "metadata_information.producers",
+                            "title": "Metadata producers",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "help_text": "The name of the person or organization who produced the metadata or contributed to its production.",
+                                    "class": "required",
+                                    "prop_key": "metadata_information.producers.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbr",
+                                    "title": "Abbreviation",
+                                    "type": "string",
+                                    "prop_key": "metadata_information.producers.abbr",
+                                    "help_text": "The abbreviation (or acronym) of the organization that is referenced in \"Name\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "type": "string",
+                                    "title": "Affiliation",
+                                    "prop_key": "metadata_information.producers.affiliation",
+                                    "help_text": "The affiliation of the person or organization mentioned in \"Name\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Role",
+                                    "type": "string",
+                                    "prop_key": "metadata_information.producers.role",
+                                    "help_text": "The specific role of the person or organization mentioned in \"Name\" in the production of the metadata.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "is_recommended": true,
+                            "help_text": "The metadata producer is the person or organization with the financial and/or administrative responsibility for the processes whereby the metadata document was created. This is a \"Recommended\" element. For catalog administration purposes, information on the producer and on the date of metadata production is useful."
+                        },
+                        {
+                            "key": "metadata_information.production_date",
+                            "type": "string",
+                            "class": "required",
+                            "title": "Production date",
+                            "help_text": "The date the metadata on this table was produced (not distributed or archived), preferably entered in ISO 8601 format (YYYY-MM-DD or YYYY-MM). A validation rule can be set in user templates to enforce a date format. This is a \"Recommended\" element, as information on the producer and on the date of metadata production is useful for catalog administration purposes.",
+                            "is_recommended": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "metadata_information.version",
+                            "type": "string",
+                            "class": "required",
+                            "title": "Version",
+                            "help_text": "The version of the metadata document (not the version of the table itself).",
+                            "display_type": "text"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "key": "table_description_container",
+            "title": "Table description",
+            "items": [
+                {
+                    "type": "section",
+                    "key": "table_title_statement",
+                    "title": "Title statement",
+                    "class": "recommended",
+                    "items": [
+                        {
+                            "key": "table_description.title_statement.idno",
+                            "title": "Primary ID",
+                            "help_text": "A unique identifier of the table. The \"Primary ID\" (also referred to as IDNO) is a unique identification number used to identify the table. A unique identifier is required for cataloguing purpose, so this element is declared as \"Required\". The identifier will allow users to cite the table properly. The identifier must be unique within the catalog. Ideally, it should also be globally unique. A Digital Object Identifier (DOI) can be used. for the study. Alternatively, the \"Primary ID\" can be constructed by an organization using a consistent scheme. Note that the schema allows you to provide more than one identifier for a same table (in element \"Other identifiers\"); a catalog-specific identifier is thus not incompatible with a globally unique identifier like a DOI. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. A validation rule can be set (using a regular expression) in user templates to enforce a specific ID format. The identifier may not contain blank spaces.",
+                            "type": "string",
+                            "rules": [],
+                            "required": true,
+                            "name": "idno",
+                            "is_required": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "table_description.identifiers",
+                            "title": "Other identifiers",
+                            "type": "array",
+                            "help_text": "This repeatable element is used to enter identifiers (IDs) other than the \"Primary ID\" (IDNO). It can for example be a Digital Object Identifier (DOI). The \"Primary ID\" can be repeated here (the \"Primary ID\" does not provide a \"Type\" parameter, so if a DOI or other standard ID type is used as main identifier, it is recommended to repeat it here with the identification of the type). ",
+                            "props": [
+                                {
+                                    "key": "type",
+                                    "title": "Type",
+                                    "type": "string",
+                                    "help_text": "The type of identifier. For example: “DOI”, or \"ISBN\". ",
+                                    "prop_key": "table_description.identifiers.type",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "identifier",
+                                    "title": "Identifier",
+                                    "type": "string",
+                                    "prop_key": "table_description.identifiers.identifier",
+                                    "help_text": "The identifier itself.",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "table_description.title_statement.table_number",
+                            "title": "Table number",
+                            "type": "string",
+                            "help_text": "The table number will usually begin with the word “Table” followed by a numeric identifier such as: Table 1 or Table 2.1 etc. Different publications may use different ways to reference a table. ",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "table_description.title_statement.title",
+                            "title": "Title",
+                            "type": "string",
+                            "rules": [],
+                            "required": true,
+                            "name": "title",
+                            "is_required": true,
+                            "help_text": "The title of the table. The title provides a brief description of the content of the table. It should be concise and include the key elements shown in the table. There are varying styles for writing a table title. A consistent style should be applied to all tables published in a catalog. Pay attention to the consistent use of capitalization in the title. ",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "table_description.title_statement.sub_title",
+                            "title": "Subtitle",
+                            "type": "string",
+                            "help_text": "The table subtitle can be used when there is a need to distinguish characteristics of the table. A subtitle can provide further descriptive or explanatory content to the table. Pay attention to the consistent use of capitalization in the subtitle. ",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "table_description.title_statement.alternate_title",
+                            "title": "Alternate title",
+                            "type": "string",
+                            "help_text": "A title that may be given to the table, other than the main title entered in \"Title\". This element will rarely be used. ",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "table_description.title_statement.alternate_title",
+                            "title": "Alternate title",
+                            "help_text": "An abbreviated title, which can for example be an acronym (but not the table number, which should be captured in \"Table number\") by which the table may be referred to. This element will rarely be used.",
+                            "type": "string",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "table_description.title_statement.translated_title",
+                            "title": "Translated title",
+                            "type": "string",
+                            "help_text": "The translated title element is usually used to provide a translation of the title in cases where more than one official language is used or if a publication is widely disseminated in two languages. Special characters should be properly displayed, such as accents and other stress marks or different alphabets.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "table_description.table_series",
+                            "type": "array",
+                            "title": "Series",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "prop_key": "table_description.table_series.name",
+                                    "help_text": "The name (label) of the series.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "maintainer",
+                                    "title": "Maintainer",
+                                    "type": "string",
+                                    "prop_key": "table_description.table_series.maintainer",
+                                    "help_text": "The person or organization in charge of maintaining the series. This will often be the same person/organization that produce and publish the table. This optional element will often be ignored.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "table_description.table_series.uri",
+                                    "help_text": "A URL to the series information. ",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "string",
+                                    "prop_key": "table_description.table_series.description",
+                                    "help_text": "A description of the series.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "Tables may be organized into series."
+                        }
+                    ]
+                },
+                {
+                    "type": "section",
+                    "key": "table_description_auth_contributors",
+                    "title": "Authors and contributors",
+                    "class": "recommended",
+                    "items": [
+                        {
+                            "key": "table_description.authoring_entity",
+                            "title": "Authoring entity",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "prop_key": "table_description.authoring_entity.name",
+                                    "help_text": "The name of person(s) or organization responsible for the production and content of the table.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "string",
+                                    "prop_key": "table_description.authoring_entity.affiliation",
+                                    "help_text": "The affiliation of the person(s) or organization(s) mentioned in \"Name\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbreviation",
+                                    "title": "Abbreviation",
+                                    "type": "string",
+                                    "prop_key": "table_description.authoring_entity.abbreviation",
+                                    "help_text": "The abbreviation (acronym) of the organization mentioned in \"Name\".",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URI",
+                                    "type": "string",
+                                    "prop_key": "table_description.authoring_entity.uri",
+                                    "help_text": "The URI can be a link to the website, or the email address, of the authoring entity mentioned in name.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "author_id",
+                                    "type": "array",
+                                    "title": "Author ID",
+                                    "help_text": "The author identifier in a registry of academic researchers such as the Open Researcher and Contributor ID (ORCID).",
+                                    "props": [
+                                        {
+                                            "key": "type",
+                                            "type": "string",
+                                            "title": "Type",
+                                            "prop_key": "table_description.authoring_entity.author_id.type",
+                                            "help_text": "The type of identifier, i.e. the identification of the registry that assigned the author’s identifier, e.g. “ORCID”.",
+                                            "display_type": "text"
+                                        },
+                                        {
+                                            "key": "id",
+                                            "type": "string",
+                                            "title": "ID",
+                                            "prop_key": "table_description.authoring_entity.author_id.id",
+                                            "help_text": "The identifier of the author in the registry mentioned in type.",
+                                            "display_type": "text"
+                                        }
+                                    ],
+                                    "prop_key": "table_description.authoring_entity.author_id"
+                                }
+                            ],
+                            "help_text": "The authoring entity identifies the person(s) or organization(s) responsible for the production of the table. An authoring entity is identified by its name, affiliation, abbreviation, URI, and author’s identifiers (if any).",
+                            "is_recommended": true
+                        },
+                        {
+                            "key": "table_description.contributors",
+                            "title": "Contributors",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "help_text": "The name of the contributor (person or organization).",
+                                    "prop_key": "table_description.contributors.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "string",
+                                    "prop_key": "table_description.contributors.affiliation",
+                                    "help_text": "The affiliation of the contributor mentioned in name. This could be a government agency, a university or a department in a university, etc.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbreviation",
+                                    "title": "Abbreviation",
+                                    "help_text": "The abbreviation for the institution which has been listed as the affiliation of the contributor.",
+                                    "type": "string",
+                                    "prop_key": "table_description.contributors.abbreviation",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Role",
+                                    "type": "string",
+                                    "help_text": "The specific role of the contributor mentioned in name. This could for example be \"Research assistant”, “Technical specialist”, “Programmer”, or “Reviewer”.",
+                                    "prop_key": "table_description.contributors.role",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "uri",
+                                    "type": "string",
+                                    "title": "URL",
+                                    "help_text": "A URL (link to a website, or email address) for the contributor mentioned in name.",
+                                    "prop_key": "table_description.contributors.uri",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "This set of elements identifies the person(s) and/or organization(s), other than the authoring entity, who contributed to the production of the table."
+                        },
+                        {
+                            "key": "table_description.publisher",
+                            "title": "Publisher",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "help_text": "The name of the publisher (person or organization).",
+                                    "prop_key": "table_description.publisher.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "string",
+                                    "prop_key": "table_description.publisher.affiliation",
+                                    "help_text": "The affiliation of the publisher. This could be a government agency, a university or a department in a university, etc.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbreviation",
+                                    "title": "Abbreviation",
+                                    "help_text": "The abbreviation for the institution which has been listed as the affiliation of the publisher.",
+                                    "type": "string",
+                                    "prop_key": "table_description.publisher.abbreviation",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Role",
+                                    "type": "string",
+                                    "help_text": "The specific role of the publisher (this element is unlikely to be used as the role is obvious).",
+                                    "prop_key": "table_description.publisher.role",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "uri",
+                                    "type": "string",
+                                    "title": "URI",
+                                    "help_text": "A URI (link to a website, or email address) of the publisher.",
+                                    "prop_key": "table_description.publisher.uri",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "The entity responsible for publishing the table."
+                        }
+                    ]
+                },
+                {
+                    "type": "section",
+                    "key": "table_description_date",
+                    "title": "Dates and version",
+                    "items": [
+                        {
+                            "key": "table_description.date_created",
+                            "type": "string",
+                            "title": "Date created",
+                            "help_text": "The date the table was created. It is recommended to enter the date in ISO 8601 format (YYYY-MM-DD or YYYY-MM or YYYY). The date the table is created refers to the date that the output was produced and considered ready for publication.",
+                            "is_recommended": true,
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "table_description.date_published",
+                            "type": "string",
+                            "title": "Date published",
+                            "help_text": "The date the table was published. It is recommended to enter the date in ISO 8601 format (YYYY-MM-DD or YYYY-MM or YYYY). If the table is contained in a document (report, paper, book, etc.), the date the table is published is associated with the publication date of that document. If the table is found in a statistics yearbook for example, then the publication date will be the date the yearbook was published.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "table_description.date_modified",
+                            "type": "string",
+                            "title": "Date last modified",
+                            "help_text": "The date the table was last modified. It is recommended to enter the date in ISO 8601 format (YYYY-MM-DD or YYYY-MM or YYYY). Modifications, revisions, or re-publications of the table are recorded in this element.",
+                            "enum": [],
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "table_description.version",
+                            "title": "Version",
+                            "type": "string",
+                            "enum": [],
+                            "help_text": "The version of the table refers to the published version of the table. If for some reason, data in a published table are revised, then the version of the table is captured in this element.",
+                            "display_type": "text"
+                        }
+                    ]
+                },
+                {
+                    "key": "table_description_container1674846809398",
+                    "title": "Time and geographic coverage",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "table_description.time_periods",
+                            "type": "array",
+                            "title": "Time periods",
+                            "props": [
+                                {
+                                    "key": "from",
+                                    "title": "Date from",
+                                    "help_text": "The start date of the time period covered by the table, preferably entered in ISO 8601 format (YYYY, or YYYY-MM, or YYYY-MM-DD).",
+                                    "type": "string",
+                                    "prop_key": "table_description.time_periods.from",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "to",
+                                    "title": "Date to",
+                                    "help_text": "The end date of the time period covered by the table, preferably entered in ISO 8601 format (YYYY, or YYYY-MM, or YYYY-MM-DD).",
+                                    "type": "string",
+                                    "prop_key": "table_description.time_periods.to",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "The time periods consists of a list or periods (range of years / quarters / months / days) that the data relate to, preferably entered in ISO 8601 format (YYYY, or YYYY-MM, or YYYY-MM-DD). If the data are by quarter, convert them into ISO 8601 format (e.g., first quarter of 2020 would be \"from 2020-01 to 2020-03). This is a repeatable field. If the time periods are for example 1990, 2000 to 2004, and 2014 to June 2019, do not enter the time period as a single range 1990-2019 as this would include irrelevant periods. It should be entered as three separate ranges as in the example below. For data that are related to a specific date (for example, the population of a country as of the census day), enter the date in both the from and to fields."
+                        },
+                        {
+                            "key": "table_description.ref_country",
+                            "type": "array",
+                            "title": "Countries",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "prop_key": "table_description.ref_country.name",
+                                    "help_text": "The name of a country for which data are in the table.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "code",
+                                    "title": "Code",
+                                    "type": "string",
+                                    "prop_key": "table_description.ref_country.code",
+                                    "help_text": "The code of the country mentioned in name, preferably an ISO 3166 country code.",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "is_recommended": true,
+                            "help_text": "This element is used to document the list of countries for which data are in the table. This element serves to assure that the country name and code are easily discoverable and contribute to a virtual national catalog. If the table only refers to part of a country (for example a city), the \"Countries\" field should still be filled. Another element called \"Geographic areas\" is provided to capture more detailed information on the table’s geographic coverage.\n\nNOTE: This field refers to the country or countries that the table provides data about. If a table contains for example data on the population of Belgium by country or birth, only \"Belgium\" will be entered in this element, not the list of countries of birth."
+                        },
+                        {
+                            "key": "table_description.geographic_units",
+                            "type": "array",
+                            "title": "Geographic areas",
+                            "help_text": "An itemized list of geographic areas covered by the data in the table, other than the country/countries that must be entered in \"Countries\".\n",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "help_text": "The name of the geographic unit, for example \"World\", or \"Atlantic ocean\".",
+                                    "type": "string",
+                                    "prop_key": "table_description.geographic_units.name",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "code",
+                                    "title": "Code",
+                                    "help_text": "The code of the geographic unit.",
+                                    "type": "string",
+                                    "prop_key": "table_description.geographic_units.code",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "type",
+                                    "title": "Type",
+                                    "help_text": "Type of geographic unit e.g. country, state, region, province etc",
+                                    "type": "string",
+                                    "prop_key": "table_description.geographic_units.type",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "table_description.geographic_granularity",
+                            "type": "string",
+                            "title": "Geographic granularity",
+                            "help_text": "A description of the geographic levels for which data are presented in the table. This is not a list of specific geographic areas, but a list of the administrative level(s) that correspond to these geographic areas.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "table_description.bbox",
+                            "title": "Bounding boxes",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "west",
+                                    "title": "West",
+                                    "type": "string",
+                                    "prop_key": "table_description.bbox.west",
+                                    "help_text": "West longitude of the bounding box.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "east",
+                                    "title": "East",
+                                    "type": "string",
+                                    "prop_key": "table_description.bbox.east",
+                                    "help_text": "East longitude of the bounding box.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "south",
+                                    "title": "South",
+                                    "type": "string",
+                                    "prop_key": "table_description.bbox.south",
+                                    "help_text": "South latitude of the bounding box.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "north",
+                                    "title": "North",
+                                    "type": "string",
+                                    "prop_key": "table_description.bbox.north",
+                                    "help_text": "North latitude of the bounding box.",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "This element is used to define one or multiple geographic bounding box(es), which are the rectangular fundamental geometric description of the geographic coverage of the data. A bounding box is defined by west and east longitudes and north and south latitudes, and includes the largest geographic extent of the dataset’s geographic coverage. The bounding box provides the geographic coordinates of the top left (north/west) and bottom-right (south/east) corners of a rectangular area. This element can be used in catalogs as the first pass of a coordinate-based search. The valid range of latitude in degrees is -90 and +90 for the southern and northern hemisphere, respectively. Longitude is in the range -180 and +180 specifying coordinates west and east of the Prime Meridian, respectively."
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "table_description_container1674846846185",
+                    "title": "Scope and universe",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "table_description.description",
+                            "title": "Description",
+                            "type": "string",
+                            "help_text": "A brief  description of the table. The description can contain information on the content, purpose, production process, or other relevant information.",
+                            "enum": [],
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "table_description.table_columns",
+                            "type": "array",
+                            "title": "Table columns",
+                            "help_text": "The columns description is composed of the column spanner and the column heads. Columns spanners group the column heads together in a logical fashion to present the data to the user. Not all columns presented in a table will have a column spanner. The column spanners can become quite complicated; when a table is documented, the information found in the column spanner and heads can be merged and edited. What matters is not to document the exact structure of the table, but to ensure that the text of the spanners and heads is included in the metadata as this text will be used by search engines to find tables in data catalogs.",
+                            "props": [
+                                {
+                                    "key": "label",
+                                    "title": "Label",
+                                    "type": "string",
+                                    "prop_key": "table_description.table_columns.label",
+                                    "help_text": "The labels of the table columns (or column captions) are vital for discoverability. The column labels will include both column spanners and column headers. Columns spanners are captions that join various column headers together.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "dataset",
+                                    "title": "Dataset",
+                                    "type": "string",
+                                    "prop_key": "table_description.table_columns.dataset",
+                                    "help_text": "This refers to the dataset (typically microdata) used to produce the table. If the dataset is available in a catalog and has a unique identifier (DOI or other), this identifier can be entered here. Alternatively, the title of the dataset or a permanent URI can be provided.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "var_name",
+                                    "title": "Variable name",
+                                    "help_text": "This refers to the name of the variables found in the dataset (typically microdata) used to produce the table. The objective of this optional field is to help establish a link between the source dataset and the table, to foster reproducibility.",
+                                    "type": "string",
+                                    "prop_key": "table_description.table_columns.var_name",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "is_recommended": false
+                        },
+                        {
+                            "key": "table_description.table_rows",
+                            "type": "array",
+                            "title": "Table rows",
+                            "help_text": "Like the column spanner and column heads, the \"Table rows\" section is composed of the stub head and stubs (row captions). The stubs are the captions of the rows of data and the stub head is the label that groups the rows together in a logical fashion. As for \"Table columns\" , the information found in the stubs can be merged and edited to be optimized for clarity and discoverability.",
+                            "props": [
+                                {
+                                    "key": "label",
+                                    "title": "Label",
+                                    "type": "string",
+                                    "is_required": true,
+                                    "prop_key": "table_description.table_rows.label",
+                                    "help_text": "As with the column labels, the content in \"Label\" is designed to include the stub head, stubs and any captions included.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "dataset",
+                                    "title": "Dataset",
+                                    "type": "string",
+                                    "help_text": "This refers to the dataset (typically microdata) used to produce the table. If the dataset is available in a catalog and has a unique identifier (DOI or other), this identifier can be entered here. Alternatively, the title of the dataset or a permanent URI can be provided. Note also that the schema provides a \"Data sources\" element (see below) to describe in more detail the sources of data. The content of the dataset element must be compatible with the information provided in that other element.",
+                                    "prop_key": "table_description.table_rows.dataset",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "var_name",
+                                    "title": "Variable name",
+                                    "help_text": "As with the column variables, this optional element is reserved to identify those variables found in the source dataset that are associated with the row of data.",
+                                    "type": "string",
+                                    "prop_key": "table_description.table_rows.var_name",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "table_description.table_footnotes",
+                            "type": "array",
+                            "title": "Table footnotes",
+                            "help_text": "Table footnotes",
+                            "props": [
+                                {
+                                    "key": "number",
+                                    "title": "Number",
+                                    "type": "string",
+                                    "prop_key": "table_description.table_footnotes.number",
+                                    "help_text": "The number of the footnote. Footnotes will usually be numbered sequentially.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "text",
+                                    "title": "Text",
+                                    "type": "string",
+                                    "prop_key": "table_description.table_footnotes.text",
+                                    "help_text": "The text of the footnote.",
+                                    "display_type": "textarea"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "table_description.statistics",
+                            "type": "array",
+                            "title": "Statistics",
+                            "props": [
+                                {
+                                    "key": "value",
+                                    "title": "Type of statistics",
+                                    "type": "string",
+                                    "prop_key": "table_description.statistics.value",
+                                    "enum": [],
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "The table metadata will not contain data. What the statistics element refers to is the type of statistics included in the table. Some tables may only contain counts, such as a table of population by age group and sex (which shows counts of persons; other tables could be counts of households, facilities, or any other observation unit). But statistical tables can contain many other types of summary statistics. This element is used to list these types of statistics.\n\nThe use of a controlled vocabulary is recommended. This list could contain (but does not have to be limited to):\nCount (frequencies) | Number of missing values | Mean (average) | Median | Mode | Minimum value | Maximum value | Range | Standard deviation | Variance | Confidence interval (95%) - Lower limit | Confidence interval (95%) - Upper limit | Standard error | Sum | Inter-quartile Range (IQR) | Percentile (possibly with specification, e.g., “10th percentile”) | Mean Absolute Deviation | Mean Absolute Deviation from the Median (MADM) | Coefficient of Variation (COV) | Coefficient of Dispersion (COD) | Skewness | Kurtosis | Entropy | Regression coefficient | R-squared | Adjusted R-squared | Z-score | Accuracy | Precision | Mean squared logarithmic error (MSLE)"
+                        },
+                        {
+                            "key": "table_description.unit_observation",
+                            "type": "array",
+                            "title": "Units of observations",
+                            "props": [
+                                {
+                                    "key": "value",
+                                    "title": "Type of unit ",
+                                    "type": "string",
+                                    "prop_key": "table_description.unit_observation.value",
+                                    "help_text": "A label describing the observation unit type, e.g., “individual” or “person”, “household”, “dwelling”, enterprise, “country”, etc.",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "The element provides information on the unit(s) of observations that correspond to the values shown in the table."
+                        },
+                        {
+                            "key": "table_description.universe",
+                            "type": "array",
+                            "title": "Universe",
+                            "props": [
+                                {
+                                    "key": "value",
+                                    "title": "Universe",
+                                    "type": "string",
+                                    "prop_key": "table_description.universe.value",
+                                    "help_text": "A textual description of the universe covered by the data.",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "The universe of a table refers to the population (or respondents) covered in the data. It does not have to be a population of individuals; it can for example be a population of households, facilities, firms, groups of persons, or even objects. The description of the universe should clearly inform the data users of inclusions and exclusions that they may not expect."
+                        },
+                        {
+                            "key": "table_description.keywords",
+                            "type": "array",
+                            "title": "Keywords",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Keyword",
+                                    "type": "string",
+                                    "prop_key": "table_description.keywords.name",
+                                    "help_text": "The keyword itself.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulary",
+                                    "type": "string",
+                                    "prop_key": "table_description.keywords.vocabulary",
+                                    "help_text": "The controlled vocabulary (including version number or date) from which the keyword is extracted, if any.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "table_description.keywords.uri",
+                                    "help_text": "The URL of the controlled vocabulary from which the keyword is extracted, if any.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "A list of keywords that provide information on the core content of the table. Keywords provide a convenient solution to improve the discoverability of the table, as it allows terms and phrases not found in the table itself to be indexed and to make a table discoverable by text-based search engines. A controlled vocabulary will preferably be used (although not required), such as the UNESCO Thesaurus. The list provided here can combine keywords from multiple controlled vocabularies, and user-defined keywords.",
+                            "is_recommended": true
+                        },
+                        {
+                            "key": "table_description.topics",
+                            "type": "array",
+                            "title": "Topics",
+                            "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "string",
+                                    "prop_key": "table_description.topics.id",
+                                    "help_text": "The identifier of the topic, taken from a controlled vocabulary.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "name",
+                                    "title": "Topic",
+                                    "type": "string",
+                                    "prop_key": "table_description.topics.name",
+                                    "help_text": "The name (label) of the topic, preferably taken from a controlled vocabulary.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "title": "Parent ID",
+                                    "help_text": "The parent identifier of the topic (identifier of the item one level up in the hierarchy), if a hierarchical controlled vocabulary is used.",
+                                    "type": "string",
+                                    "prop_key": "table_description.topics.parent_id",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulary",
+                                    "type": "string",
+                                    "prop_key": "table_description.topics.vocabulary",
+                                    "help_text": "The name (including version number) of the controlled vocabulary used, if any.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "table_description.topics.uri",
+                                    "help_text": "The URL to the controlled vocabulary used, if any.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Information on the topics covered in the table. A controlled vocabulary will preferably be used, for example the CESSDA Topics classification, a typology of topics available in 11 languages; or the Journal of Economic Literature (JEL) Classification System, or the World Bank topics classification. Note that you may use more than one controlled vocabulary. "
+                        },
+                        {
+                            "key": "table_description.themes",
+                            "type": "array",
+                            "title": "Themes",
+                            "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "string",
+                                    "prop_key": "table_description.themes.id",
+                                    "help_text": "The ID of the theme, taken from a controlled vocabulary.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "name",
+                                    "title": "Theme",
+                                    "type": "string",
+                                    "prop_key": "table_description.themes.name",
+                                    "help_text": "The name (label) of the theme, preferably taken from a controlled vocabulary.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "title": "Parent ID",
+                                    "help_text": "The parent ID of the theme (ID of the item one level up in the hierarchy), if a hierarchical controlled vocabulary is used.",
+                                    "type": "string",
+                                    "prop_key": "table_description.themes.parent_id",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulary",
+                                    "type": "string",
+                                    "prop_key": "table_description.themes.vocabulary",
+                                    "help_text": "The name (including version number) of the controlled vocabulary used, if any.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "table_description.themes.uri",
+                                    "help_text": "The URL to the controlled vocabulary used, if any.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "A list of themes covered by the table. A controlled vocabulary will preferably be used. Note that themes will rarely be used as the element \"Topics\" is often more appropriate. "
+                        },
+                        {
+                            "key": "table_description.disciplines",
+                            "type": "array",
+                            "title": "Disciplines",
+                            "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "string",
+                                    "prop_key": "table_description.disciplines.id",
+                                    "help_text": "The identifier of the discipline, taken from a controlled vocabulary.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "prop_key": "table_description.disciplines.name",
+                                    "help_text": "The name (label) of the discipline, preferably taken from a controlled vocabulary.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "parent_id",
+                                    "title": "Parent ID",
+                                    "help_text": "The parent identifier of the discipline (identifier of the item one level up in the hierarchy), if a hierarchical controlled vocabulary is used.",
+                                    "type": "string",
+                                    "prop_key": "table_description.disciplines.parent_id",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "vocabulary",
+                                    "title": "Vocabulary",
+                                    "type": "string",
+                                    "prop_key": "table_description.disciplines.vocabulary",
+                                    "help_text": "The name (including version number) of the controlled vocabulary used, if any.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "table_description.disciplines.uri",
+                                    "help_text": "The URL to the controlled vocabulary used, if any.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Information on the academic disciplines related to the content of the table. A controlled vocabulary will preferably be used, for example the one provided by the list of academic fields in Wikipedia. "
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "key": "table_description_container1674846984679",
+                    "title": "Access and rights",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "table_description.publications",
+                            "type": "array",
+                            "title": "Publications",
+                            "props": [
+                                {
+                                    "key": "title",
+                                    "title": "Title",
+                                    "type": "string",
+                                    "prop_key": "table_description.publications.title",
+                                    "help_text": "The title of the publication (including the producer and the year).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "table_description.publications.uri",
+                                    "help_text": "A link to the publication.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "This element identifies the publication(s) where the table is published. This could for example be a Statistics Yearbook, a report, a paper, etc."
+                        },
+                        {
+                            "key": "table_description.links",
+                            "type": "array",
+                            "title": "Links",
+                            "props": [
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "table_description.links.uri",
+                                    "help_text": "The URL to an external resource.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "string",
+                                    "prop_key": "table_description.links.description",
+                                    "help_text": "A brief description of the resource.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "A list of associated links related to the table."
+                        },
+                        {
+                            "key": "table_description.api_documentation",
+                            "type": "array",
+                            "title": "API documentation",
+                            "props": [
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "table_description.api_documentation.uri",
+                                    "help_text": "The URL of the API documentation.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "description",
+                                    "title": "Description",
+                                    "type": "string",
+                                    "prop_key": "table_description.api_documentation.description",
+                                    "help_text": "This element will not contain the API documentation itself, but information on what documentation is available.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "Increasingly, data are made accessible via Application Programming Interfaces (APIs). The API associated with a series must be documented."
+                        },
+                        {
+                            "key": "table_description.rights",
+                            "title": "Rights",
+                            "type": "string",
+                            "help_text": "Information on the rights or copyright that applies to the table.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "table_description.license",
+                            "title": "License",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "prop_key": "table_description.license.name",
+                                    "help_text": "The name of the license, for example “Creative Commons Attribution 4.0 International license (CC-BY 4.0)”.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "table_description.license.uri",
+                                    "help_text": "A URL to a description of the license, for example “https://creativecommons.org/licenses/by/4.0/”.",
+                                    "display_type": "text",
+                                    "rules": {
+                                        "is_uri": true
+                                    }
+                                }
+                            ],
+                            "help_text": "A table may require a license to use or reproduce. This is done to protect the intellectual content of the research product. The licensing entity may be different from the researcher or the publisher. It is the entity which has the intellectual rights to the table (s) and would grant rights or restrictions on the reuse of the table."
+                        },
+                        {
+                            "key": "table_description.citation",
+                            "title": "Citation requirement",
+                            "type": "string",
+                            "help_text": "A citation requirement for the table (i.e. an indication of how the table should be cited in publications).",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "table_description.confidentiality",
+                            "title": "Confidentiality",
+                            "type": "string",
+                            "help_text": "A published table may be protected through a confidentiality agreement between the publisher and the researcher. It may also determine certain rights regarding the use of the research and the data presented to the table. The data may also present confidential information that is produced for selective audiences. This element is used to provide a statement on any limitations ore restrictions on use of the table based on confidential data or agreements.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "table_description.sdc",
+                            "title": "Statistical disclosure control",
+                            "type": "string",
+                            "help_text": "Information on statistical disclosure control (SDC) measures applied to the table. This can include cell suppression, or other techniques. Specialized packages have been developed for this purpose, like sdcTable: Methods for Statistical Disclosure Control in Tabular Data and https://cran.r-project.org/web/packages/sdcTable/sdcTable.pdf\n\nThe information provided here should be such that it does not provide intruders with useful information for reverse-engineering the protection measures applied to the table.",
+                            "display_type": "textarea"
+                        }
+                    ],
+                    "help_text": ""
+                },
+                {
+                    "type": "section",
+                    "key": "table_description_section",
+                    "title": "Other information",
+                    "class": "recommended",
+                    "items": [
+                        {
+                            "key": "table_description.data_sources",
+                            "type": "array",
+                            "title": "Data sources",
+                            "help_text": "The data sources are often cited in the footnote section of a table. The name, Source ID, and URL elements are optional, but at least one of them must be provided.",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "prop_key": "table_description.data_sources.name",
+                                    "help_text": "The name (title) of the data source. For example, a table data may be extracted from the “Population Census 2020”.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "abbreviation",
+                                    "title": "Abbreviation",
+                                    "type": "string",
+                                    "prop_key": "table_description.data_sources.abbreviation",
+                                    "help_text": "The abbreviation (acronym) of the data source.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "source_id",
+                                    "title": "Source ID",
+                                    "type": "string",
+                                    "prop_key": "table_description.data_sources.source_id",
+                                    "help_text": "A unique identifier for the source, such as a Digital Object Identifier (DOI).",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "note",
+                                    "title": "Note",
+                                    "type": "string",
+                                    "prop_key": "table_description.data_sources.note",
+                                    "help_text": "A note that describes how the source was used, possibly mentioning issues in the use of the source.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "table_description.data_sources.uri",
+                                    "help_text": "A link (URL) to the source dataset.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "table_description.languages",
+                            "type": "array",
+                            "title": "Languages",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "prop_key": "table_description.languages.name",
+                                    "help_text": "The name of the language(s) in which the table is published, preferably extracted from the ISO 639 standardized nomenclature of languages.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "code",
+                                    "title": "Code",
+                                    "type": "string",
+                                    "prop_key": "table_description.languages.code",
+                                    "help_text": "The code of the language, preferably from the ISO 639 code list.",
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Most tables will only be provided in one language. This is however a repeatable field, to allow for more than one language to be listed."
+                        },
+                        {
+                            "key": "table_description.definitions",
+                            "type": "array",
+                            "title": "Definitions",
+                            "help_text": "Definitions or concepts covered by the table.",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "prop_key": "table_description.definitions.name",
+                                    "help_text": "The name (or label) of the term, indicator, or concept being defined.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "definition",
+                                    "title": "Definition",
+                                    "type": "string",
+                                    "prop_key": "table_description.definitions.definition",
+                                    "help_text": "The definition of the term, indicator, or concept.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "table_description.definitions.uri",
+                                    "help_text": "A link to the source of the definition, or to a site providing a more detailed definition.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "table_description.classifications",
+                            "type": "array",
+                            "title": "Classifications",
+                            "help_text": "The element is used to document the use of standard classifications (or “ontologies”, or “taxonomies”) in the table.",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "prop_key": "table_description.classifications.name",
+                                    "help_text": "Name (label) of the classification, ontology, or taxonomy.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "version",
+                                    "title": "Version",
+                                    "type": "string",
+                                    "prop_key": "table_description.classifications.version",
+                                    "help_text": "Version of the classification, ontology, or taxonomy used in the table.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "organization",
+                                    "title": "Organization",
+                                    "help_text": "Organization that is the custodian of the classification, ontology, or taxonomy.",
+                                    "type": "string",
+                                    "prop_key": "table_description.classifications.organization",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "table_description.classifications.uri",
+                                    "help_text": "Link to an external resource where detailed information on the classification, ontology, or taxonomy can be obtained.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "table_description.relations",
+                            "title": "Relations",
+                            "help_text": "If the table has a relation to other resources (e.g., it is a subset of another resource, or a translation of another resource), the relation(s) and associated resources can be listed in this element.",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "prop_key": "table_description.relations.name",
+                                    "help_text": "The related resource. Recommended practice is to identify the related resource by means of a URI. If this is not possible or feasible, a string conforming to a formal identification system may be provided.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "type",
+                                    "title": "Type",
+                                    "type": "string",
+                                    "enum": [
+                                        {
+                                            "code": "isPartOf",
+                                            "label": "Is part of"
+                                        },
+                                        {
+                                            "code": "hasPart",
+                                            "label": "Has part"
+                                        },
+                                        {
+                                            "code": "isVersionOf",
+                                            "label": "Is version of"
+                                        },
+                                        {
+                                            "code": "isFormatOf",
+                                            "label": "Is format of"
+                                        },
+                                        {
+                                            "code": "hasFormat",
+                                            "label": "Has format"
+                                        },
+                                        {
+                                            "code": "references",
+                                            "label": "References"
+                                        },
+                                        {
+                                            "code": "isReferencedBy",
+                                            "label": "Is referenced by"
+                                        },
+                                        {
+                                            "code": "isBasedOn",
+                                            "label": "Is based on"
+                                        },
+                                        {
+                                            "code": "isBasisFor",
+                                            "label": "Is basis for"
+                                        },
+                                        {
+                                            "code": "requires",
+                                            "label": "Requires"
+                                        },
+                                        {
+                                            "code": "isRequiredBy",
+                                            "label": "Is required by"
+                                        }
+                                    ],
+                                    "prop_key": "table_description.relations.type",
+                                    "help_text": "The type of relationship. The use of a controlled vocabulary is recommended. The Dublin Core proposes the following vocabulary: isPartOf, hasPart, isVersionOf, isFormatOf, hasFormat, references, isReferencedBy, isBasedOn, isBasisFor, replaces, isReplacedBy, requires, isRequiredBy.",
+                                    "display_type": "text"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "table_description.notes",
+                            "title": "Notes",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "note",
+                                    "title": "Note",
+                                    "type": "string",
+                                    "prop_key": "table_description.notes.note",
+                                    "help_text": "The note itself.",
+                                    "display_type": "textarea"
+                                }
+                            ],
+                            "help_text": "The notes provide a space to include observations or open-ended content that may be material in understanding the table, which have not been captured in other elements of the schema."
+                        }
+                    ]
+                },
+                {
+                    "key": "table_description_container1674847167756",
+                    "title": "Contacts",
+                    "type": "section",
+                    "items": [
+                        {
+                            "key": "table_description.contacts",
+                            "title": "Contacts",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "prop_key": "table_description.contacts.name",
+                                    "help_text": "Name of a person or unit (such as a data help desk). It will usually be better to provide a title/function than the actual name of the person. Keep in mind that people do not stay forever in their position.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "role",
+                                    "title": "Role",
+                                    "type": "string",
+                                    "prop_key": "table_description.contacts.role",
+                                    "help_text": "The specific role of name, in regards to supporting users. This element is used when multiple names are provided, to help users identify the most appropriate person or unit to contact.",
+                                    "display_type": "textarea"
+                                },
+                                {
+                                    "key": "affiliation",
+                                    "title": "Affiliation",
+                                    "type": "string",
+                                    "prop_key": "table_description.contacts.affiliation",
+                                    "help_text": "Affiliation of the person/unit.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "email",
+                                    "title": "Email",
+                                    "type": "string",
+                                    "prop_key": "table_description.contacts.email",
+                                    "help_text": "E-mail address of the person.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "telephone",
+                                    "title": "Phone",
+                                    "type": "string",
+                                    "prop_key": "table_description.contacts.telephone",
+                                    "help_text": "A phone number that can be called to obtain information or provide feedback on the table. This should never be a personal phone number; a corporate number (typically of a data help desk) should be provided.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "table_description.contacts.uri",
+                                    "help_text": "A link to a website where contact information for name can be found.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                }
+                            ],
+                            "help_text": "Users of the data may need further clarification and information. This section may include the name-affiliation-email-URI of one or multiple contact persons. This block of elements will identify contact persons who can be used as resource persons regarding problems or questions raised by the user community. The URI attribute should be used to indicate a URN or URL for the homepage of the contact individual. The email attribute is used to indicate an email address for the contact individual. It is recommended to avoid putting the actual name of individuals. The information provided here should be valid for the long term. It is therefore preferable to identify contact persons by a title. The same applies for the email field. Ideally, a “generic” email address should be provided. It is easy to configure a mail server in such a way that all messages sent to the generic email address would be automatically forwarded to some staff members."
+                        }
+                    ],
+                    "help_text": ""
+                }
+            ]
+        },
+        {
+            "type": "section_container",
+            "id": "tags",
+            "key": "tags_container",
+            "title": "Tags",
+            "items": [
+                {
+                    "key": "tags",
+                    "title": "Tags",
+                    "type": "array",
+                    "props": [
+                        {
+                            "key": "tag",
+                            "title": "Tag",
+                            "type": "string",
+                            "prop_key": "tags.tag",
+                            "help_text": "A user-defined tag.",
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "tag_group",
+                            "title": "Tag group",
+                            "type": "string",
+                            "prop_key": "tags.tag_group",
+                            "help_text": "A user-defined group (optional) to which the tag belongs. Grouping tags allows implementation of controlled facets in data catalogs.",
+                            "display_type": "text"
+                        }
+                    ],
+                    "help_text": "Tags, especially when organized in tag groups, provide a powerful and flexible solution to enable custom facets (filters) in data catalogs. "
+                }
+            ]
+        }
+    ]
+}

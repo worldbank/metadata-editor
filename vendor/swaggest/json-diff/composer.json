@@ -1,0 +1,33 @@
+{
+  "name": "swaggest/json-diff",
+  "description": "JSON diff/rearrange/patch/pointer library for PHP",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Viacheslav Poturaev",
+      "email": "vearutop@gmail.com"
+    }
+  ],
+  "require": {
+    "ext-json": "*"
+  },
+  "require-dev": {
+    "phperf/phpunit": "4.8.37"
+  },
+  "autoload": {
+    "psr-4": {
+      "Swaggest\\JsonDiff\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Swaggest\\JsonDiff\\Tests\\": "tests/src"
+    }
+  },
+  "config": {
+    "platform": {
+      "php": "5.4.45"
+    }
+  }
+}

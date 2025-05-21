@@ -1,0 +1,34 @@
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On    
+    
+    # if using sub-folder, uncomment the following line
+    # RewriteBase /editor/
+
+    # Prevent access to system and application folders
+    RewriteCond %{REQUEST_URI} ^system.*
+    RewriteRule ^(.*)$ /myproject/index.php?/$1 [L]
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    RewriteRule ^(.*)$ index.php/$1 [L]
+
+</IfModule>
+
+<ifModule mod_headers.c>
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set X-Content-Type-Options "nosniff"
+    Header set Referrer-Policy "same-origin"
+
+    #always connect via https
+    Header set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+</IfModule>
+
+
+<FilesMatch "composer.json|composer.lock">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>

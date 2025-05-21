@@ -1,0 +1,141 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "Census table type schema",
+  "description": "",
+  "type": "object",
+  "definitions":{
+    "feature": {
+      "type": "object",
+      "description": "Feature name",
+      "properties": {
+        "feature_name":{
+          "type": "string",
+          "title": "Feature name"
+        },
+        "code_list": {
+          "type": "array",
+          "title": "Feature code list",
+          "items": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "title": "Code",
+                "type": "integer"
+              },
+              "label": {
+                "title": "Label",
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    
+    "indicator": {
+      "type": "array",
+      "title": "Indicator",
+      "items": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "integer"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "measurement_unit": {
+            "title": "Unit of Measurement",
+            "type": "string"
+          }
+        },
+        "required":["code","label","measurement_unit"]
+      }
+    }
+  
+    
+  },
+    "properties": {                
+      "table_id": {
+        "type": "string",
+        "description": "Table ID number"
+      },
+
+      "title": {
+        "type": "string",
+        "description": "Table title"
+      },
+
+      "description": {
+        "type": "string",
+        "description": "Table description"
+      },
+      
+      "indicators": {
+        "allOf": [ 
+          {"$ref":"#/definitions/indicator"}
+        ],
+        "title":"Indicators"
+      },
+
+      "feature_1": {
+        "allOf": [ 
+          {"$ref":"#/definitions/feature"}
+        ],
+        "title":"Feature"
+      },
+
+      "feature_2": {
+        "allOf": [ 
+          {"$ref":"#/definitions/feature"}
+        ],
+        "title":"Feature"
+      },
+
+      "feature_3": {
+        "allOf": [ 
+          {"$ref":"#/definitions/feature"}
+        ],
+        "title":"Feature"
+      },
+      "feature_4": {
+        "allOf": [ 
+          {"$ref":"#/definitions/feature"}
+        ],
+        "title":"Feature"
+      },
+      "feature_5": {
+        "allOf": [ 
+          {"$ref":"#/definitions/feature"}
+        ],
+        "title":"Feature"
+      },
+      "feature_6": {
+        "allOf": [ 
+          {"$ref":"#/definitions/feature"}
+        ],
+        "title":"Feature"
+      },
+      "feature_7": {
+        "allOf": [ 
+          {"$ref":"#/definitions/feature"}
+        ],
+        "title":"Feature"
+      },
+      "feature_8": {
+        "allOf": [ 
+          {"$ref":"#/definitions/feature"}
+        ],
+        "title":"Feature"
+      },
+      "feature_9": {
+        "allOf": [ 
+          {"$ref":"#/definitions/feature"}
+        ],
+        "title":"Feature"
+      }
+      
+  }
+}

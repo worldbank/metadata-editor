@@ -1,0 +1,6 @@
+Author's website: http://bassistance.de/jquery-plugins/jquery-plugin-autocomplete/
+
+Current version: 1.1
+Compressed filesize: 8.001 bytes
+License: MIT/GPL
+Tested in: Firefox 3, IE 6 & 7, Opera 9, Safari 3

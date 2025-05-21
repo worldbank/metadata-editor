@@ -1,0 +1,773 @@
+{
+  "$id": "http://ihsn.org/schemas/video",
+  "id": "http://ihsn.org/schemas/video",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Video schema based on the elements from Dublin Core and Schema.org's VideoObject",
+  "type": "object",
+  "properties": {
+    "repositoryid": {
+      "type": "string",
+      "title": "Collection ID that owns the document",
+      "description": "Abbreviation for the collection that owns the document"
+    },
+    "published": {
+      "type": "integer",
+      "title": "Status",
+      "description": "Status  - 0=draft, 1=published",
+      "default": 0
+    },
+    "overwrite": {
+      "type": "string",
+      "description": "Overwrite document if already exists?",
+      "enum": [
+        "yes",
+        "no"
+      ],
+      "default": "no"
+    },
+    "metadata_information": {
+			"type": "object",
+			"title": "Document metadata information",
+			"description": "Document description",
+			"additionalProperties": false,
+			"properties": {
+				"title": {
+					"type": "string",
+					"title": "Document title",
+					"description": "Document title"
+				},
+				"idno": {
+					"type": "string",
+					"title": "Unique ID number for the document"
+				},
+				"producers": {
+					"type": "array",
+					"title": "Producers",
+					"description": "List of producers",
+					"items": {
+						"type": "object",
+						"properties": {
+							"name": {
+								"type": "string",
+								"title": "Name",
+								"description": "Name (required)"
+							},
+							"abbr": {
+								"type": "string",
+								"title": "Abbreviation"
+							},
+							"affiliation": {
+								"type": "string",
+								"title": "Affiliation"
+							},
+							"role": {
+								"type": "string",
+								"title": "Role"
+							}
+						}
+					}
+				},
+				"production_date": {
+					"type": "string",
+					"title": "Date of Production",
+					"description": "Document production date using format(YYYY-MM-DD)"
+				},
+				"version": {
+					"type": "string",
+					"title": "Document version",
+					"description": "Identify and describe the current version of the document"
+				}
+			}
+		},
+    "video_description": {
+      "type": "object",
+      "title": "Video metadata information",
+      "description": "Video description",
+      "properties": {
+        "idno": {
+          "type": "string",
+          "title": "Unique video identifier"
+        },
+        "identifiers": {
+          "type": "array",
+          "title": "Other identifiers",
+          "description": "Other identifiers",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "title": "Identifier type",
+                "description": "Type of identifier e.g. `doi`, `handle`, `other`",
+                "type": "string"
+              },
+              "identifier": {
+                "title": "Identifier",
+                "type": "string"
+              }
+            },
+            "required": [
+              "identifier"
+            ]
+          }
+        },
+        "title": {
+          "type": "string",
+          "description": "Title"
+        },
+        "alt_title": {
+          "type": "string",
+          "description": "Alternate title or other title"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description"
+        },
+        "genre": {
+          "type": "string",
+          "description": "Genre"
+        },
+        "keywords":{
+          "type":"array",
+          "items":{
+            "type":"object",
+            "properties":{
+              "name":{
+                "title":"Name",
+                "type":"string"
+              },
+              "vocabulary":{
+                "title":"Vocabulary name",
+                "type":"string"
+              },
+              "uri":{
+                "title":"Vocabulary URI",
+                "type":"string"
+              }
+            }
+          }
+        },
+
+        "topics": {
+          "type": "array",
+          "title": "Topics",
+          "description": "Topics covered by the table (ideally, the list of topics will be a controlled vocabulary)",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "title": "Unique Identifier",
+                "type": "string"
+              },
+              "name": {
+                "title": "Topic",
+                "type": "string"
+              },
+              "parent_id": {
+                "title": "Parent topic Identifier",
+                "description":"For subtopics, provide the ID of the parent topic",
+                "type": "string"
+              },
+              "vocabulary": {
+                "title": "Vocabulary",
+                "description": "Name of the controlled vocabulary, if the topic is from a taxonomy.",
+                "type": "string"
+              },
+              "uri": {
+                "title": "Vocabulary URI",
+                "description": "Link to the controlled vocabulary web page, if the topic is from a taxonomy.",
+                "type": "string"
+              }
+            },
+            "required": [
+              "name"
+            ]
+          }
+        },
+
+        "persons":{
+          "type":"array",
+          "title":"Persons shown in the video",
+          "items":{
+            "type":"object",
+            "properties":{
+              "name":{
+                "title":"Name",
+                "type":"string"
+              },
+              "role":{
+                "title":"Role",
+                "type":"string"
+              }
+            },
+            "required":[
+              "name"
+            ]
+          }
+        },
+        "main_entity": {
+          "type": "string",
+          "description": "Primary entity described in the video"
+        },
+
+        "date_created": {
+          "type": "string",
+          "description": "Date of creation (YYYY-MM-DD)"
+        },
+        "date_published": {
+          "type": "string",
+          "description": "Date published (YYYY-MM-DD)"
+        },
+        "version": {
+          "type": "string",
+          "description": "Version"
+        },
+        "status": {
+          "type": "string",
+          "title":"Creative work status",
+          "description": "Status of a creative work in terms of its stage in lifecycle. e.g. `incomplete`, `draft`, `published`, `obsolete`"
+        },
+
+        "country": {
+          "type": "array",
+          "title": "Countries",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "title": "Country name",
+                "type": "string"
+              },
+              "code": {
+                "title": "Country code",
+                "type": "string"
+              }
+            }
+          }
+        },
+
+        "spatial_coverage": {
+          "type": "string",
+          "description": "Place(s) which are the focus of the content"
+        },
+
+        "content_reference_time": {
+          "type": "string",
+          "description": "Specific time described by a creative work, for works that emphasize a particular moment within an Event"
+        },
+
+        "temporal_coverage": {
+          "type": "string",
+          "description": "Period that the content applies to using ISO 8601 date time format"
+        },
+
+        "recorded_at": {
+          "type": "string",
+          "description": "Location where video was recorded"
+        },
+
+        "audience": {
+          "type": "string",
+          "description": "Intended audience"
+        },
+
+        "bbox": {
+          "title": "Geographic bounding box",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "west": {
+                "title": "West",
+                "type": "string"
+              },
+              "east": {
+                "title": "East",
+                "type": "string"
+              },
+              "south": {
+                "title": "South",
+                "type": "string"
+              },
+              "north": {
+                "title": "North",
+                "type": "string"
+              }
+            }
+          }
+        },
+                
+        "language": {
+          "type": "array",
+          "description": "languages",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "title": "Name",
+                "description": "Language name",
+                "type": "string"
+              },
+              "code": {
+                "title": "code",
+                "Descripton": "Language code",
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "name"
+          ]
+        },
+
+        "creator": {
+          "type": "string",
+          "description": "Creator"
+        },
+
+        "production_company": {
+          "type": "string",
+          "description": "Production company"
+        },
+
+        "publisher": {
+          "type": "string",
+          "description": "Publisher"
+        },
+
+        "repository": {
+          "type": "string",
+          "title": "Repository"
+        },
+        "contacts": {
+          "type": "array",
+          "title": "Contacts",
+          "description": "Contacts",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "title": "Name",
+                "type": "string"
+              },
+              "role": {
+                "title": "Role",
+                "type": "string"
+              },
+              "affiliation": {
+                "title": "Affiliation",
+                "type": "string"
+              },
+              "email": {
+                "title": "Email",
+                "type": "string"
+              },
+              "telephone": {
+                "title": "Telephone",
+                "type": "string"
+              },
+              "uri": {
+                "title": "URI",
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "name"
+          ]
+        },
+
+        "contributors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "title": "Name",
+                "type": "string"
+              },
+              "affiliation": {
+                "title": "Affiliation",
+                "type": "string"
+              },
+              "abbreviation": {
+                "title": "Abbreviation",
+                "type": "string"
+              },
+              "role": {
+                "title": "Role",
+                "type": "string"
+              },
+              "uri": {
+                "title": "URI",
+                "type": "string"
+              }
+            },
+            "required": [
+              "name"
+            ]
+          }
+        },
+        "sponsors": {
+          "type": "array",
+          "title": "Funding Agency/Sponsor",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "title": "Funding Agency/Sponsor",
+                "type": "string"
+              },
+              "abbr": {
+                "title": "Abbreviation",
+                "type": "string"
+              },
+              "grant": {
+                "title": "Grant Number",
+                "type": "string"
+              },
+              "role": {
+                "title": "Role",
+                "type": "string"
+              }
+            },
+            "required": [
+              "name"
+            ]
+          }
+        },
+        
+        "translators": {
+          "type": "array",
+          "title": "Translators",
+          "description": "Translators",
+          "items": {
+            "type": "object",
+            "properties": {
+              "first_name": {
+                "title": "First name",
+                "type": "string"
+              },
+              "initial": {
+                "title": "Initial",
+                "type": "string"
+              },
+              "last_name": {
+                "title": "Last name",
+                "type": "string"
+              },              
+              "affiliation": {
+                "title": "Affiliation",
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "first_name"
+          ]
+        },
+
+        "is_based_on": {
+          "type": "string",
+          "title":"A resource from which this work is derived",
+          "description": "A resource from which this work is derived or from which it is a modification or adaption"
+        },
+        "is_part_of": {
+          "type": "string",
+          "title":"Indicate an item that this item is part of"
+        },
+
+        "relations": {
+          "type": "array",
+          "title":"Defines, as a free text field, the relation between the video being documented and other resources. This is a Dublin Core element."
+        },
+
+        "video_provider": {
+          "type": "string",
+          "description": "Video provider e.g.  youtube, vimeo, facebook"
+        },
+
+        "video_url": {
+          "type": "string",
+          "description": "Video URL"
+        },
+
+        "embed_url": {
+          "type": "string",
+          "description": "Video embed URL"
+        },
+        "encoding_format": {
+          "type": "string",
+          "title":"Encoding format",
+          "description": "Media type using a MIME format"
+        },
+        "duration": {
+          "type": "string",
+          "title":"Duration",
+          "description": "The duration of the video in ISO 8601 date time format - `hh:mm:ss`"
+        },
+        "rights": {
+          "type": "string",
+          "description": "Rights"
+        },
+        "copyright_holder": {
+          "type": "string",
+          "title": "Copyright holder",
+          "description": "The party holding the legal copyright"
+        },
+
+        "copyright_notice": {
+          "type": "string",
+          "title": "Copyright text",
+          "description": "Text of a notice describing the copyright"
+        },
+
+        "copyright_year": {
+          "type": "string",
+          "title": "Copyright year",
+          "description": "Year during which claimed copyright for the video was first asserted"
+        },
+
+        "credit_text": {
+          "type": "string",
+          "title": "Credits",
+          "description": "This element that can be used to credit the person(s) and/or organization(s) associated with a published video. It corresponds to the `creditText` element of VideoObject."
+        },
+
+        "citation": {
+          "type": "string",
+          "title": "Citation",
+          "description": "This element provides a required or recommended citation of the audio file."
+        },
+
+        "transcript": {
+          "type": "array",
+          "title": "Transcript",
+          "items": {
+            "type": "object",
+            "properties": {
+              "language": {
+                "title": "Language",
+                "type": "string"
+              },
+              "text": {
+                "title": "Text",
+                "type": "string"
+              }              
+            }
+          },
+          "required": [
+            "text"
+          ]
+        },
+
+        "media": {
+          "type": "array",
+          "title": "Media",
+          "items": {
+            "type": "string"
+          }          
+        },
+        
+        "album": {
+					"type": "array",
+					"title": "Album",
+					"items": {
+						"type": "object",
+						"properties": {
+							"name": {
+								"title": "Name of album",
+								"type": "string"
+							},
+							"description": {
+								"title": "Description",
+								"type": "string"
+							},
+							"owner": {
+								"title": "Owner",
+								"type": "string"
+							},
+							"uri": {
+								"title": "URI",
+								"type": "string"
+							}
+						}
+					}
+				}
+
+        
+      },
+      "required": [
+        "idno","title"
+      ]
+    },
+    "provenance":{
+      "type":"array",
+      "description":"Provenance",
+      "items":{
+        "$ref":"provenance-schema.json"
+      }
+      },
+
+    "tags": {
+      "type": "array",
+      "title": "Tags",
+      "description": "Tags",
+      "items": {
+        "type": "object",
+        "properties": {
+          "tag": {
+            "title": "Tag",
+            "type": "string"
+          },
+          "tag_group": {
+            "title": "Tag group",
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "tag"
+      ]
+    },
+    "lda_topics": {
+      "type": "array",
+      "title": "LDA topics",
+      "description": "LDA topics",
+      "items": {
+        "type": "object",
+        "properties": {
+          "model_info": {
+            "type": "array",
+            "title": "Model information",
+            "items": {
+              "type": "object",
+              "properties": {
+                "source": {
+                  "title": "Source",
+                  "type": "string"
+                },
+                "author": {
+                  "title": "Author",
+                  "type": "string"
+                },
+                "version": {
+                  "title": "Version",
+                  "type": "string"
+                },
+                "model_id": {
+                  "title": "Model Identifier",
+                  "type": "string"
+                },
+                "nb_topics": {
+                  "title": "Number of topics",
+                  "type": "number"
+                },
+                "description": {
+                  "title": "Description",
+                  "type": "string"
+                },
+                "corpus": {
+                  "title": "Corpus name",
+                  "type": "string"
+                },
+                "uri": {
+                  "title": "URI",
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "model_id"
+            ]
+          },              
+          "topic_description": {
+            "type": "array",
+            "title": "Topic information",
+            "items": {
+              "type": "object",
+              "properties": {
+                "topic_id": {
+                  "title": "Topic identifier",
+                  "type": ["integer", "string"]
+                },
+                "topic_score": {
+                  "title": "Topic score",
+                  "type": ["number", "string"]
+                },
+                "topic_label": {
+                  "title": "Topic label",
+                  "type": "string"
+                },
+                "topic_words": {
+                  "type": "array",
+                  "title": "Topic words",
+                  "description": "Words",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "word": {
+                        "title": "Word",
+                        "type": "string"
+                      },
+                      "word_weight": {
+                        "title": "Word weight",
+                        "type": "number"
+                      }
+                    }
+                  },
+                  "required": [
+                    "word"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "topic_id"
+            ]
+          }
+          
+        },
+        "additionalProperties": false
+      }
+    },
+    "embeddings":{
+      "type": "array",
+      "title": "Word embeddings",
+      "description": "Word embeddings",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "title": "Vector Model ID",
+            "type": "string"
+          },
+          "description": {
+            "title": "Vector Model Description",
+            "type": "string"
+          },
+          "date": {
+            "title": "Date (YYYY-MM-DD)",
+            "type": "string"
+          },
+          "vector": {
+            "title": "Vector",
+            "type": "object"
+          }
+        },
+        "required": [
+          "id","vector"
+        ]
+      }
+    },
+
+    "additional": {
+      "type": "object",
+      "description": "Additional metadata",
+      "properties": {}
+    }
+
+  },
+  "required": [
+    "video_description"
+  ]
+}

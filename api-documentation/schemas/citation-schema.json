@@ -1,0 +1,200 @@
+{
+	"$id": "http://ihsn.org/schemas/citation-schema.json",
+	"@type": "citation",
+	"type": "object",
+	"definitions": {},
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"properties": {
+		"id": {
+			"type": "integer",
+			"title": "ID",
+			"description": "Unique ID",
+			"readOnly": true
+		},
+		"uuid": {
+			"type": "string",
+			"title": "Unique user defined ID",
+			"description": "Unique user defined ID"
+		},
+		"ctype": {
+			"type": "string",
+			"title" : "Citation type",
+			"description": "Citation type ",
+			"enum": [ "book", "book-section","report","anthology-editor","anthology-translator","corporate-author","journal","working-paper","conference-paper","magazine","newspaper","website","website-doc","thesis"]
+		},
+		"title": {
+			"type": "string",
+			"title": "Title"
+		},
+		"subtitle": {
+			"type": "string",
+			"title": "Sub title"
+		},
+		"alt_title": {
+			"type": "string",
+			  "title" : "Alternate title",
+			"description": "Alternate title"
+		},			
+		"authors": {
+            "type": "array",
+            "description": "Authors",
+			"items": {
+				"type": "object",
+				"properties": {
+					"fname": {
+						"type": "string",
+						"title": "First name"
+					},
+					"lname": {
+						"type": "string",
+						"title": "Last name"
+					},
+					"initial": {
+						"type": "string",
+						"title": "Middle name initial"
+					}
+				}
+			}
+		},
+		"editors": {
+            "type": "array",
+            "description": "Editors",
+			"items": {
+				"type": "object",
+				"properties": {
+					"fname": {
+						"type": "string",
+						"title": "First name"
+					},
+					"lname": {
+						"type": "string",
+						"title": "Last name"
+					},
+					"initial": {
+						"type": "string",
+						"title": "Middle name initial"
+					}
+				}
+			}
+		},		
+		"translators": {
+            "type": "array",
+            "description": "Authors",
+			"items": {
+				"type": "object",
+				"properties": {
+					"fname": {
+						"type": "string",
+						"title": "First name"
+					},
+					"lname": {
+						"type": "string",
+						"title": "Last name"
+					},
+					"initial": {
+						"type": "string",
+						"title": "Middle name initial"
+					}
+				}
+			}
+		},
+		"volume": {
+			"type": "string",
+			"title": "Volumne number"
+		},
+		"issue": {
+			"type": "string",
+            "title": "Issue number"		
+        },
+		"edition": {
+			"type": "string",
+			"title": "Edition"
+		},
+		"place_publication": {
+			"type": "string",
+			"title": "Place of publication",
+			"description": "Name of place such as the city or town"
+		},
+		"place_state": {
+			"type": "string",
+			"title": "Publication place state information",
+			"description": "Country or state name where the publication was printed"
+		},
+		"publisher": {
+			"type": "string",
+			"title": "Publisher",
+			"description": "Name of the publisher"
+		},
+		"url": {
+			"type": "string",
+			"title": "Publication URL"
+		},
+		"page_from": {
+			"type": "string",
+			"title": "Page from"
+		},
+		"page_to": {
+			"type": "string",
+			"title": "Page to"
+		},
+		"organization": {
+			"type": "string",
+			"title": "Organization name"
+		},		
+		"pub_day": {
+			"type": "integer",
+			"title": "Publication date (day only)",
+			"description": "Provide the day part of the publication date"
+		},
+		"pub_month": {
+			"type": "integer",
+			"title": "Publication date (Month only)",
+			"description": "Provide the month of the publication date"
+		},
+		"pub_year": {
+			"type": "string",
+			"title": "Publication date (Year only)",
+			"description": "Provide the year in (YYYY) format for the publication date"
+		},
+		"abstract": {
+			"type": "string",
+			"title": "Abstract"
+		},
+		"keywords": {
+			"type": "string",
+			"title": "Keywords"
+		},
+		"notes": {
+			"type": "string",
+			"title": "Notes"
+		},
+		"doi": {
+			"type": "string",
+			"title": "DOI handle"
+		},
+		"lang": {
+			"type": "string",
+			"title": "Citation Language",
+			"description": "Language code or language title e.g. `en` or `english`"
+		},
+		"published": {
+			"type": "integer",
+			"title": "Status",
+			"description": "Citation status - `Published=1`, `Unpublished=0`"
+		},
+		"overwrite": {
+            "type": "integer",
+            "description": "Overwrite citation if already exists? - `Yes=1`, `No=0` ",            
+            "default": 0
+          },
+		"related_studies": {
+			"type": "array",
+			"title":"Related studies",
+			"description": "IDNOs for related studies",
+			"items":{
+				"type":"string"
+			}
+		}
+    },
+    "required": [ "ctype", "title", "uuid"]
+}

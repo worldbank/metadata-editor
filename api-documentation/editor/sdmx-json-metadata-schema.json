@@ -1,0 +1,862 @@
+{
+	"id":"https://raw.githubusercontent.com/sdmx-twg/sdmx-json/master/metadata-message/tools/schemas/2.0.0/sdmx-json-metadata-schema.json",
+	"$schema":"http://json-schema.org/schema#",
+	"description":"SDMX-JSON 2.0.0 Schema for SDMX 3.0.0 referential metadata messages",
+	"type":"object",
+	"properties":{
+		"meta":{
+			"description":"A meta object that contains non-standard meta-information and basic technical information about the message, such as when it was prepared and who has sent it.",
+			"type":"object",
+			"properties":{
+				"schema":{
+					"description":"Contains the URL to the schema allowing to validate the message. This also allows identifying the version of SDMX-JSON format used in this message. Providing the link to the SDMX-JSON schema is recommended.",
+					"$ref":"#/definitions/uri"
+				},
+				"id":{
+					"description":"Unique string assigned by the sender that identifies the message for further references.",
+					"type":"string",
+					"pattern":"^[A-Za-z0-9_@$-]+$"
+				},
+				"test":{
+					"description":"Test indicates whether the message is for test purposes or not. False for normal messages.",
+					"type":"boolean"
+				},
+				"prepared":{
+					"description":"A timestamp indicating when the message was prepared. Values must follow the ISO 8601 syntax for combined dates and times, including time zone.",
+					"type":"string",
+					"format":"date-time"
+				},
+				"contentLanguages":{
+					"description":"Array of strings containing the identifyer of all languages used anywhere in the message for localized elements, and thus the languages of the intended audience, representing in an array format the same information than the http Content-Language response header, e.g. \"en, fr-fr\". See IETF Language Tags: https://tools.ietf.org/html/rfc5646#section-2.1. The array's first element indicates the main language used in the message for localized elements. The usage of this property is recommended.",
+					"type":"array",
+					"items":{
+						"type":"string",
+						"pattern":"^(?:(en-GB-oed|i-ami|i-bnn|i-default|i-enochian|i-hak|i-klingon|i-lux|i-mingo|i-navajo|i-pwn|i-tao|i-tay|i-tsu|sgn-BE-FR|sgn-BE-NL|sgn-CH-DE)|(art-lojban|cel-gaulish|no-bok|no-nyn|zh-guoyu|zh-hakka|zh-min|zh-min-nan|zh-xiang))$|^((?:[a-z]{2,3}(?:(?:-[a-z]{3}){1,3})?)|[a-z]{4}|[a-z]{5,8})(?:-([a-z]{4}))?(?:-([a-z]{2}|[0-9]{3}))?((?:-(?:[0-9a-z]{5,8}|[0-9][0-9a-z]{3}))*)?((?:-[0-9a-wy-z](?:-[0-9a-z]{2,8})+)*)?(-x(?:-[0-9a-z]{1,8})+)?$|^(x(?:-[0-9a-z]{1,8})+)$"
+					}
+				},
+				"name":{
+					"description":"Name provides a name for the transmission. Multiple instances allow for parallel language values.",
+					"$ref":"#/definitions/localisedBestMatchText"
+				},
+				"names":{
+					"description":"Name provides a name for the transmission. Multiple instances allow for parallel language values.",
+					"$ref":"#/definitions/localisedText"
+				},
+				"sender":{
+					"description":"Sender is information about the party that is transmitting the message.",
+					"$ref":"#/definitions/party"
+				},
+				"receivers":{
+					"description":"Receiver is information about the part(y/ies) that is/are the intended recipient(s) of the message. This can be useful if the WS requires authentication.",
+					"type":"array",
+					"items":{
+						"$ref":"#/definitions/party"
+					}
+				},
+				"links":{
+					"$ref":"#/definitions/links"
+				}
+			},
+			"required":[
+				"id",
+				"prepared",
+				"sender"
+			]
+		},
+		"data":{
+			"description":"Data contains the message's “primary data”.",
+			"type":"object",
+			"properties":{
+				"metadataSets":{
+					"type":"array",
+					"items":{
+						"$ref":"#/definitions/MetadataSetType"
+					}
+				}
+			}
+		},
+		"errors":{
+			"type":"array",
+			"items":{
+				"$ref":"#/definitions/statusMessage"
+			}
+		}
+	},
+	"additionalProperties":true,
+	"required":[
+		"meta"
+	],
+	"definitions":{
+		"party":{
+			"description":"Sender contains information about the party that is transmitting the message.",
+			"type":"object",
+			"properties":{
+				"id":{
+					"description":"The id holds the identification of the party.",
+					"type":"string",
+					"pattern":"^[A-Za-z0-9_@$-]+$"
+				},
+				"name":{
+					"description":"Name is a human-readable name of the party.",
+					"$ref":"#/definitions/localisedBestMatchText"
+				},
+				"names":{
+					"description":"Name is a human-readable name of the party.",
+					"$ref":"#/definitions/localisedText"
+				},
+				"contacts":{
+					"description":"Contact provides contact information for the party in regard to the transmission of the message.",
+					"type":"array",
+					"items":{
+						"$ref":"#/definitions/contactType"
+					}
+				}
+			},
+			"required":[
+				"id"
+			]
+		},
+		"statusMessage":{
+			"description":"statusMessage describes the structure of an error or warning message.",
+			"type":"object",
+			"properties":{
+				"code":{
+					"description":"Provides a code number for the status message. Standard code numbers are defined in the SDMX 2.1 Web Services Guidelines.",
+					"type":"number"
+				},
+				"title":{
+					"description":"Title contains the title of the message, in best-match language value. A short, human-readable localised summary of the status that SHOULD NOT change from occurrence to occurrence of the status, except for purposes of localization.",
+					"$ref":"#/definitions/localisedBestMatchText"
+				},
+				"titles":{
+					"description":"Title contains the title of the message, in parallel language values. A list of short, human-readable localised summary of the status that SHOULD NOT change from occurrence to occurrence of the status, except for purposes of localization.",
+					"$ref":"#/definitions/localisedText"
+				},
+				"detail":{
+					"description":"Detail contains the detailed text of the message, in best-match language value. A human-readable localised explanation specific to this occurrence of the status. Like title, this field’s value can be localized. It is fully customizable by the service providers and should provide enough detail to ease understanding the reasons of the status.",
+					"$ref":"#/definitions/localisedBestMatchText"
+				},
+				"details":{
+					"description":"Detail contains the detailed text of the message, in parallel language values. A list of human-readable localised explanations specific to this occurrence of the status. Like title, this field’s value can be localized. It is fully customizable by the service providers and should provide enough detail to ease understanding the reasons of the status.",
+					"$ref":"#/definitions/localisedText"
+				},
+				"links":{
+					"description":"Links field is an array of link objects. If appropriate, a collection of links to additional external resources for the status.",
+					"$ref":"#/definitions/links"
+				}
+			},
+			"required":[
+				"code"
+			]
+		},
+		"links":{
+			"description":"Links field is an array of link objects. If appropriate, a collection of links to additional external resources for the header.",
+			"type":"array",
+			"items":{
+				"type":"object",
+				"properties":{
+					"href":{
+						"$ref":"#/definitions/uri"
+					},
+					"rel":{
+						"description":"Relationship of the object to the external resource. See semantics below. Use 'self' to indicate the urn to the parent object.",
+						"anyOf":[
+							{
+								"type":"string"
+							},
+							{
+								"description":"structure: provides a reference to the data structure or metadata structure definition depending on the context. Other SDMX artefact types can be specified, e.g. dataflow, provisionagreement, etc. For the others please see: https://tools.ietf.org/rfc/rfc5988.txt",
+								"type":"string",
+								"enum":[
+									"agencyscheme",
+									"alternate",
+									"appendix",
+									"bookmark",
+									"categorisation",
+									"categoryscheme",
+									"chapter",
+									"codelist",
+									"conceptscheme",
+									"constraint",
+									"contents",
+									"copyright",
+									"current",
+									"dataflow",
+									"dataconsumerscheme",
+									"dataproviderscheme",
+									"describedby",
+									"edit",
+									"edit-media",
+									"enclosure",
+									"first",
+									"glossary",
+									"help",
+									"hierarchicalcodelist",
+									"hub",
+									"index",
+									"last",
+									"latest-version",
+									"license",
+									"metadataflow",
+									"metadatastructure",
+									"next",
+									"next-archive",
+									"organisationunitscheme",
+									"payment",
+									"prev",
+									"predecessor-version",
+									"previous",
+									"prev-archive",
+									"process",
+									"provisionagreement",
+									"related",
+									"replies",
+									"reportingtaxonomy",
+									"section",
+									"self",
+									"service",
+									"start",
+									"structure",
+									"structureset",
+									"stylesheet",
+									"subsection",
+									"successor-version",
+									"up",
+									"version-history",
+									"via",
+									"working-copy",
+									"working-copy-of"
+								]
+							}
+						]
+					},
+					"urn":{
+						"description":"The urn holds a valid SDMX Registry URN (see SDMX Registry Specification for details).",
+						"$ref":"#/definitions/urn"
+					},
+					"uri":{
+						"description":"The uri attribute holds a URI that contains a link to additional information about the resource, such as a web page. This uri is not an SDMX resource.",
+						"$ref":"#/definitions/uri"
+					},
+					"title":{
+						"$ref":"#/definitions/localisedBestMatchText"
+					},
+					"titles":{
+						"$ref":"#/definitions/localisedText"
+					},
+					"type":{
+						"description":"A hint about the type of representation returned by the link.",
+						"type":"string"
+					},
+					"hreflang":{
+						"description":"The natural language of the external link, the same as used in the HTTP Accept-Language request header.",
+						"type":"string",
+						"pattern":"^(?:(en-GB-oed|i-ami|i-bnn|i-default|i-enochian|i-hak|i-klingon|i-lux|i-mingo|i-navajo|i-pwn|i-tao|i-tay|i-tsu|sgn-BE-FR|sgn-BE-NL|sgn-CH-DE)|(art-lojban|cel-gaulish|no-bok|no-nyn|zh-guoyu|zh-hakka|zh-min|zh-min-nan|zh-xiang))$|^((?:[a-z]{2,3}(?:(?:-[a-z]{3}){1,3})?)|[a-z]{4}|[a-z]{5,8})(?:-([a-z]{4}))?(?:-([a-z]{2}|[0-9]{3}))?((?:-(?:[0-9a-z]{5,8}|[0-9][0-9a-z]{3}))*)?((?:-[0-9a-wy-z](?:-[0-9a-z]{2,8})+)*)?(-x(?:-[0-9a-z]{1,8})+)?$|^(x(?:-[0-9a-z]{1,8})+)$"
+					}
+				},
+				"anyOf":[
+					{
+						"required":[
+							"href",
+							"rel"
+						]
+					},
+					{
+						"required":[
+							"urn",
+							"rel"
+						]
+					}
+				]
+			}
+		},
+		"localisedBestMatchText":{
+			"description":"localisedBestMatchText is a reusable element, used for providing a human-readable best-language-match texts.",
+			"type":"string"
+		},
+		"localisedText":{
+			"description":"localisedText provides for a set of language-specific alternates to be provided for any human-readable constructs in the instance. ",
+			"type":"object",
+			"patternProperties":{
+				"^(?:(en-GB-oed|i-ami|i-bnn|i-default|i-enochian|i-hak|i-klingon|i-lux|i-mingo|i-navajo|i-pwn|i-tao|i-tay|i-tsu|sgn-BE-FR|sgn-BE-NL|sgn-CH-DE)|(art-lojban|cel-gaulish|no-bok|no-nyn|zh-guoyu|zh-hakka|zh-min|zh-min-nan|zh-xiang))$|^((?:[a-z]{2,3}(?:(?:-[a-z]{3}){1,3})?)|[a-z]{4}|[a-z]{5,8})(?:-([a-z]{4}))?(?:-([a-z]{2}|[0-9]{3}))?((?:-(?:[0-9a-z]{5,8}|[0-9][0-9a-z]{3}))*)?((?:-[0-9a-wy-z](?:-[0-9a-z]{2,8})+)*)?(-x(?:-[0-9a-z]{1,8})+)?$|^(x(?:-[0-9a-z]{1,8})+)$":{
+					"type":"string"
+				}
+			}
+		},
+		"contactType":{
+			"description":"ContactType describes the structure of a contact's details.",
+			"properties":{
+				"name":{
+					"description":"Name contains a humain-readable name for the contact.",
+					"$ref":"#/definitions/localisedBestMatchText"
+				},
+				"names":{
+					"description":"Name contains a humain-readable name for the contact.",
+					"$ref":"#/definitions/localisedText"
+				},
+				"department":{
+					"description":"Department is a humain-readable designation of the organisational structure by a linguistic expression, within which the contact person works.",
+					"$ref":"#/definitions/localisedBestMatchText"
+				},
+				"departments":{
+					"description":"Department is a humain-readable designation of the organisational structure by a linguistic expression, within which the contact person works.",
+					"$ref":"#/definitions/localisedText"
+				},
+				"role":{
+					"description":"Role is the humain-readable responsibility of the contact person with respect to the object for which this person is the contact.",
+					"$ref":"#/definitions/localisedBestMatchText"
+				},
+				"roles":{
+					"description":"Role is the humain-readable responsibility of the contact person with respect to the object for which this person is the contact.",
+					"$ref":"#/definitions/localisedText"
+				},
+				"emails":{
+					"description":"Email holds the email address for the contact person.",
+					"items":{
+						"type":"string",
+						"format":"email"
+					},
+					"type":"array"
+				},
+				"faxes":{
+					"description":"Fax holds the fax number for the contact person.",
+					"items":{
+						"type":"string"
+					},
+					"type":"array"
+				},
+				"telephones":{
+					"description":"Telephone holds the telephone number for the contact person.",
+					"items":{
+						"type":"string"
+					},
+					"type":"array"
+				},
+				"uris":{
+					"description":"URI holds an information URL for the contact person.",
+					"items":{
+						"$ref":"#/definitions/uri"
+					},
+					"type":"array"
+				},
+				"x400s":{
+					"description":"X400 holds the X.400 address for the contact person.",
+					"items":{
+						"type":"string"
+					},
+					"type":"array"
+				}
+			},
+			"type":"object"
+		},
+		"idType":{
+			"description":"IDType provides a type which is used for restricting the characters in codes and IDs throughout all SDMX-ML messages. Valid characters include A-Z, a-z, @, 0-9, _, -, $. Regex: [A-Za-z0-9_@$-]+",
+			"pattern":"^[A-Za-z0-9_@$-]+$",
+			"type":"string"
+		},
+		"AnnotationsType":{
+			"description":"Annotations is a reusable element the provides for a collection of annotations. It has been made global so that restrictions of types that extend AnnotatableType my reference it.",
+			"type":"array",
+			"items":{
+				"$ref":"#/definitions/AnnotationType"
+			},
+			"minItems":1
+		},
+		"AnnotationType":{
+			"description":"AnnotationType provides for non-documentation notes and annotations to be embedded in data and structure messages. It provides optional fields for providing a title, a type description, a URI, and the text of the annotation.",
+			"properties":{
+				"id":{
+					"description":"Non-standard identification of an annotation.",
+					"type":"string"
+				},
+				"title":{
+					"description":"AnnotationTitle provides a title for the annotation.",
+					"type":"string"
+				},
+				"type":{
+					"description":"AnnotationType is used to distinguish between annotations designed to support various uses. The types are not enumerated, as these can be specified by the user or creator of the annotations. The definitions and use of annotation types should be documented by their creator.",
+					"type":"string"
+				},
+				"value":{
+					"description":"AnnotationValue holds a string containing the non-localised value text of the annotation.",
+					"type":"string"
+				},
+				"text":{
+					"description":"AnnotationText holds a string containing a language-specific text of the annotation.",
+					"$ref":"#/definitions/localisedBestMatchText"
+				},
+				"texts":{
+					"description":"AnnotationText holds a string containing the language-specific text of the annotation.",
+					"$ref":"#/definitions/localisedText"
+				},
+				"links":{
+					"description":"Links field is an array of link objects. Also used to specify the Annotation URL which points to an external resource which may contain or supplement the annotation (using 'self' as relationship). If a specific behavior is desired, an annotation type should be defined which specifies the use of this field more exactly. If appropriate, a collection of links to additional external resources.",
+					"$ref":"#/definitions/links"
+				}
+			},
+			"type":"object"
+		},
+		"ActionType":{
+			"description":"ActionType provides a list of actions, describing the intention of the data transmission from the sender's side. Each action provided at the data or metadata set level applies to the entire data set for which it is given. Note that the actions indicated in the Message Header are optional, and used to summarize specific actions indicated with this data type for all registry interactions. The \"Informational\" value is used when the message contains information in response to a query, rather than being used to invoke a maintenance activity.",
+			"enum":[
+				"Append",
+				"Replace",
+				"Delete",
+				"Information"
+			],
+			"pattern":"^[-._:A-Za-z0-9]+$",
+			"type":"string"
+		},
+		"NestedNCNameIDType":{
+			"description":"NestedNCNameIDType restricts the NestedIDType, so that the id may be used to generate valid XML components. IDs created from this type conform to the W3C XML Schema NCNAME type, and therefore can be used as element or attribute names. Regex: [A-Za-z][A-Za-z0-9_\\-]*(\\.[A-Za-z][A-Za-z0-9_\\-]*)* ",
+			"type":"string",
+			"pattern":"^[A-Za-z][A-Za-z0-9_-]*(\\.[A-Za-z][A-Za-z0-9_-]*)*$"
+		},
+		"BasicTimePeriodType":{
+			"anyOf":[
+				{
+					"description":"xs:gYear: GregorianTimePeriodType defines the set of standard calendar periods in SDMX.",
+					"pattern":"^-?([1-9][0-9]{3,}|0[0-9]{3})(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?$"
+				},
+				{
+					"description":"xs:gYearMonth: GregorianTimePeriodType defines the set of standard calendar periods in SDMX.",
+					"pattern":"^-?([1-9][0-9]{3,}|0[0-9]{3})-(0[1-9]|1[0-2])(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?$"
+				},
+				{
+					"format":"date"
+				},
+				{
+					"format":"date-time"
+				}
+			],
+			"description":"BasicTimePeriodType contains the basic dates and calendar periods. It is a combination of the Gregorian time periods and the date time type..",
+			"type":"string"
+		},
+		"ObservationalTimePeriodType":{
+			"description":"ObservationalTimePeriodType specifies a distinct time period or point in time in SDMX. The time period can either be a Gregorian calendar period, a standard reporting period, a distinct point in time, or a time range with a specific date and duration.",
+			"anyOf":[
+				{
+					"$ref":"#/definitions/BasicTimePeriodType"
+				},
+				{
+					"$ref":"#/definitions/ReportingTimePeriodType"
+				},
+				{
+					"description":"TimeRangeType 1",
+					"pattern":"^.+/P.*T([0-9]+H)?([0-9]+M)?([0-9]+(.[0-9]+)?S)?$",
+					"type":"string"
+				},
+				{
+					"description":"TimeRangeType 2",
+					"pattern":"^.+/P[^T]+$",
+					"type":"string"
+				}
+			]
+		},
+		"ReportingTimePeriodType":{
+			"description":"ReportingTimePeriodType defines standard reporting periods in SDMX, which are all in relation to the start day (day-month) of a reporting year which is specified in the specialized reporting year start day attribute. If the reporting year start day is not defined, a day of January 1 is assumed. The reporting year must be epxressed as the year at the beginning of the period. Therfore, if the reproting year runs from April to March, any given reporting year is expressed as the year for April. The general format of a report period can be described as  [year]-[period][time zone]?, where the type of period is designated with a single character followed by a number representing the period. Note that all periods allow for an optional time zone offset. See the details of each member type for the specifics of its format.",
+			"anyOf":[
+				{
+					"$ref":"#/definitions/ReportingYearType"
+				},
+				{
+					"$ref":"#/definitions/ReportingSemesterType"
+				},
+				{
+					"$ref":"#/definitions/ReportingTrimesterType"
+				},
+				{
+					"$ref":"#/definitions/ReportingQuarterType"
+				},
+				{
+					"$ref":"#/definitions/ReportingMonthType"
+				},
+				{
+					"$ref":"#/definitions/ReportingWeekType"
+				},
+				{
+					"$ref":"#/definitions/ReportingDayType"
+				}
+			]
+		},
+		"ReportingDayType":{
+			"description":"ReportingDayType defines a time period of 1 day (P1D) in relation to a reporting year which has a start day (day-month) specified in the specialized reporting year start day attribute. In the absence of a start day for the reporting year, a day of January 1 is assumed. The format of a reporting day is YYYY-Dddd (e.g. 2000-D001), where ddd is a three digit day (i.e. 001-366).",
+			"pattern":"^.{5}D(0[0-9][1-9]|[1-2][0-9][0-9]|3[0-5][0-9]|36[0-6]).*$",
+			"type":"string"
+		},
+		"ReportingMonthType":{
+			"description":"ReportingMonthType defines a time period of 1 month (P1M) in relation to a reporting year which has a start day (day-month) specified in the specialized reporting year start day attribute. In the absence of a start day for the reporting year, a day of January 1 is assumed. In this case a reporting month will coincide with a calendar month. The format of a reporting month is YYYY-Mmm (e.g. 2000-M01), where mm is a two digit month (i.e. 01-12).",
+			"pattern":"^.{5}M(0[1-9]|1[0-2]).*$",
+			"type":"string"
+		},
+		"ReportingQuarterType":{
+			"description":"ReportingQuarterType defines a time period of 3 months (P3M) in relation to a reporting year which has a start day (day-month) specified in the specialized reporting year start day attribute. In the absence of a start day for the reporting year, a day of January 1 is assumed. The format of a reporting quarter is YYYY-Qq (e.g. 2000-Q1), where q is a value between 1 and 4.",
+			"pattern":"^.{5}Q[1-4].*$",
+			"type":"string"
+		},
+		"ReportingSemesterType":{
+			"description":"ReportingSemesterType defines a time period of 6 months (P6M) in relation to a reporting year which has a start day (day-month) specified in the specialized reporting year start day attribute. In the absence of a start day for the reporting year, a day of January 1 is assumed. The format of a reporting semester is YYYY-Ss (e.g. 2000-S1), where s is either 1 or 2.",
+			"pattern":"^.{5}S[1-2].*$",
+			"type":"string"
+		},
+		"ReportingTrimesterType":{
+			"description":"ReportingTrimesterType defines a time period of 4 months (P4M) in relation to a reporting year which has a start day (day-month) specified in the specialized reporting year start day attribute. In the absence of a start day for the reporting year, a day of January 1 is assumed. The format of a reporting trimester is YYYY-Tt (e.g. 2000-T1), where s is either 1, 2, or 3.",
+			"pattern":"^.{5}T[1-3].*$",
+			"type":"string"
+		},
+		"ReportingWeekType":{
+			"description":"ReportingWeekType defines a time period of 7 days (P7D) in relation to a reporting year which has a start day (day-month) specified in the specialized reporting year start day attribute. A standard reporting week is based on the ISO 8601 defintion of a week date, in relation to the reporting period start day. The first week is defined as the week with the first Thursday on or after the reporting year start day. An equivalent definition is the week starting with the Monday nearest in time to the reporting year start day. There are other equivalent defintions, all of which should be adjusted based on the reporting year start day. In the absence of a start day for the reporting year, a day of January 1 is assumed. The format of a reporting week is YYYY-Www (e.g. 2000-W01), where mm is a two digit week (i.e. 01-53).",
+			"pattern":"^.{5}W(0[1-9]|[1-4][0-9]|5[0-3]).*$",
+			"type":"string"
+		},
+		"ReportingYearType":{
+			"description":"ReportingYearType defines a time period of 1 year (P1Y) in relation to a reporting year which has a start day (day-month) specified in the specialized reporting year start day attribute. In the absence of a start day for the reporting year, a day of January 1 is assumed. In this case a reporting year will coincide with a calendar year. The format of a reporting year is YYYY-A1 (e.g. 2000-A1). Note that the period value of 1 is fixed.",
+			"pattern":"^.{5}A1.*$",
+			"type":"string"
+		},
+		"VersionType":{
+			"description":"VersionType is used to communicate version information. The format is restricted to semantic versioning rules (reduced version without 'build metadata'.",
+			"type":"string",
+			"pattern":"^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?$",
+			"default":1.0
+		},
+		"MetadataSetType":{
+			"description":"MetadataSetType describes the structure for a metadata set, which contains a collection of reported metadata against a set of values for a given full or partial target identifier, as described in a metadata structure definition. The metadata set may contain reported metadata for multiple report structures defined in a metadata structure definition.",
+			"additionalProperties":false,
+			"properties":{
+				"action":{
+					"$ref":"#/definitions/ActionType"
+				},
+				"publicationPeriod":{
+					"$ref":"#/definitions/ObservationalTimePeriodType"
+				},
+				"publicationYear":{
+					"$ref":"#/definitions/gYear"
+				},
+				"reportingBegin":{
+					"$ref":"#/definitions/BasicTimePeriodType"
+				},
+				"reportingEnd":{
+					"$ref":"#/definitions/BasicTimePeriodType"
+				},
+				"id":{
+					"$ref":"#/definitions/idType"
+				},
+				"version":{
+					"$ref":"#/definitions/VersionType"
+				},
+				"agencyID":{
+					"$ref":"#/definitions/NestedNCNameIDType"
+				},
+				"isExternalReference":{
+					"type":"boolean"
+				},
+				"metadataflow":{
+					"description":"URN reference to the metadataflow definition the metadata set is being reported against (either metadataflowRef or metadataProvisionRef is required).",
+					"$ref":"#/definitions/MetadataflowReferenceType"
+				},
+				"metadataProvisionAgreement":{
+					"description":"URN reference to the metadata provision agreement definition the metadata set is being reported against (either metadataflowRef or metadataProvisionRef is required).",
+					"$ref":"#/definitions/MetadataProvisionAgreementReferenceType"
+				},
+				"validFrom":{
+					"type":"string",
+					"format":"date-time"
+				},
+				"validTo":{
+					"type":"string",
+					"format":"date-time"
+				},
+				"annotations":{
+					"$ref":"#/definitions/AnnotationsType"
+				},
+				"name":{
+					"$ref":"#/definitions/localisedBestMatchText"
+				},
+				"names":{
+					"$ref":"#/definitions/localisedText"
+				},
+				"description":{
+					"$ref":"#/definitions/localisedBestMatchText"
+				},
+				"descriptions":{
+					"$ref":"#/definitions/localisedText"
+				},
+				"links":{
+					"$ref":"#/definitions/links"
+				},
+				"targets":{
+					"description":"Target holds a valid SDMX Registry URN (see SDMX Registry Specification for details) of the object to which the reported metadata apply.",
+					"items":{
+						"$ref":"#/definitions/urn"
+					},
+					"minItems":1,
+					"type":"array"
+				},
+				"attributes":{
+					"description":"Report contains the details of a the reported metadata, including the identification of the target and the report attributes.",
+					"items":{
+						"$ref":"#/definitions/attributeType"
+					},
+					"minItems":1,
+					"type":"array"
+				}
+			},
+			"anyOf":[
+				{
+					"required":[
+						"id",
+						"agencyID",
+						"name",
+						"metadataflow",
+						"targets",
+						"attributes"
+					]
+				},
+				{
+					"required":[
+						"id",
+						"agencyID",
+						"name",
+						"metadataProvisionAgreement",
+						"targets",
+						"attributes"
+					]
+				}
+			],
+			"type":"object"
+		},
+		"attributeType":{
+			"description":"attributeType defines the structure for a reported metadata attribute. A value for the attribute can be supplied as either a single value, or multi-lingual text values (either structured or unstructured). An optional set of child metadata attributes is also available if the metadata attribute definition defines nested metadata attributes.",
+			"additionalProperties":false,
+			"properties":{
+				"id":{
+					"$ref":"#/definitions/idType"
+				},
+				"annotations":{
+					"$ref":"#/definitions/AnnotationsType"
+				},
+				"format":{
+					"$ref":"#/definitions/format"
+				},
+				"value":{
+					"anyOf":[
+						{
+							"type":"integer"
+						},
+						{
+							"type":"number"
+						},
+						{
+							"type":"boolean"
+						},
+						{
+							"type":"string"
+						},
+						{
+							"$ref":"#/definitions/localisedText"
+						},
+						{
+							"type":"null"
+						}
+					]
+				},
+				"attributes":{
+					"description":"Non-empty array of recursive attribute objects. Contains the reported metadata attribute values for the reported metadata and recursively their child metadata attributes.",
+					"items":{
+						"$ref":"#/definitions/attributeType"
+					},
+					"minItems":1,
+					"type":"array"
+				}
+			},
+			"anyOf":[
+				{
+					"required":[
+						"id"
+					]
+				},
+				{
+					"required":[
+						"id",
+						"value"
+					]
+				}
+			],
+			"type":"object"
+		},
+		"format": {
+			"type": "object",
+			"properties": {
+				"dataType": {"$ref": "#/definitions/nonDimensionDataType"},
+				"isSequence":{"type":"boolean"},
+				"interval":{"type":"number"},
+				"startValue":{"type":"number"},
+				"endValue":{"type":"number"},
+				"timeInterval":{"$ref":"#/definitions/duration"},
+				"startTime":{"$ref":"#/definitions/StandardTimePeriodType"},
+				"endTime":{"$ref":"#/definitions/StandardTimePeriodType"},
+				"minLength":{
+					"type":"integer",
+					"minimum":1
+				},
+				"maxLength":{
+					"type":"integer",
+					"minimum":1
+				},
+				"minValue":{"type":"number"},
+				"maxValue":{"type":"number"},
+				"decimals":{
+					"type":"integer",
+					"minimum":1
+				},
+				"pattern":{"type":"string"},
+				"isMultiLingual":{"type":"boolean"},
+				"sentinelValues":{"$ref":"#/definitions/sentinelValues"}
+			}
+		},
+		"sentinelValues": {
+			"type": "array",
+			"items": {
+				"type": "object",
+				"anyOf": [
+					{"required": ["value", "name"]},
+					{"required": ["value", "name", "names"]}
+				],
+				"properties": {
+					"value": {
+						"anyOf": [
+							{"type":"number"},
+							{"type":"integer"},
+							{"type":"string"},
+							{"type":"boolean"}
+						]
+					},
+					"name": {"$ref": "#/definitions/localisedBestMatchText"},
+					"names": {"$ref": "#/definitions/localisedText"},
+					"description": {"$ref": "#/definitions/localisedBestMatchText"},
+					"descriptions": {"$ref": "#/definitions/localisedText"}
+				}
+			},
+			"minItems": 1,
+			"uniqueItems": true
+		},
+		"nonDimensionDataType": {
+			"description": "nonDimensionDataType provides an enumerated list of the types of data formats allowed as the for the representation of measures and attributes, since SDMX 3.0.0 also including XHTML and GeospatialInformation.",
+			"oneOf": [
+				{
+					"type": "string",
+					"enum": [
+						"XHTML"
+					]
+				},
+				{
+					"$ref":"#/definitions/dimensionDataType"
+				}
+			]
+		},
+		"dimensionDataType": {
+			"description": "dimensionDataType provides an enumerated list of the types of data formats allowed as the for the representation of dimensions, since SDMX 3.0.0 also including GeospatialInformation. However, time dimensions only allow for 'ObservationalTimePeriod', 'StandardTimePeriod', 'BasicTimePeriod', 'GregorianTimePeriod', 'GregorianYear', 'GregorianYearMonth', 'GregorianDay', 'ReportingTimePeriod', 'ReportingYear', 'ReportingSemester', 'ReportingTrimester', 'ReportingQuarter', 'ReportingMonth', 'ReportingWeek', 'ReportingDay', 'DateTime' and 'TimeRange'.",
+			"type": "string",
+			"enum": [
+				"String",
+				"Alpha",
+				"AlphaNumeric",
+				"Numeric",
+				"BigInteger",
+				"Integer",
+				"Long",
+				"Short",
+				"Decimal",
+				"Float",
+				"Double",
+				"Boolean",
+				"URI",
+				"Count",
+				"InclusiveValueRange",
+				"ExclusiveValueRange",
+				"Incremental",
+				"ObservationalTimePeriod",
+				"StandardTimePeriod",
+				"BasicTimePeriod",
+				"GregorianTimePeriod",
+				"GregorianYear",
+				"GregorianYearMonth",
+				"GregorianDay",
+				"ReportingTimePeriod",
+				"ReportingYear",
+				"ReportingSemester",
+				"ReportingTrimester",
+				"ReportingQuarter",
+				"ReportingMonth",
+				"ReportingWeek",
+				"ReportingDay",
+				"DateTime",
+				"TimeRange",
+				"Month",
+				"MonthDay",
+				"Day",
+				"Time",
+				"Duration",
+				"GeospatialInformation"
+			]
+		},
+		"StandardTimePeriodType":{
+			"description":"StandardTimePeriodType defines the set of standard time periods in SDMX. This includes the reporting time periods and the basic date type (i.e. the calendar time periods and the dateTime format).",
+			"anyOf":[
+				{
+					"description":"xs:gYear: GregorianTimePeriodType defines the set of standard calendar periods in SDMX.",
+					"type":"string",
+					"pattern":"^([1-9][0-9]{3,}|0[0-9]{3})(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?$"
+				},
+				{
+					"description":"xs:gYearMonth: GregorianTimePeriodType defines the set of standard calendar periods in SDMX.",
+					"type":"string",
+					"pattern":"^([1-9][0-9]{3,}|0[0-9]{3})-(0[1-9]|1[0-2])(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?$"
+				},
+				{
+					"type":"string",
+					"format":"date"
+				},
+				{
+					"type":"string",
+					"format":"date-time"
+				},
+				{
+					"description":"ReportingTimePeriodType defines standard reporting periods in SDMX, which are all in relation to the start day (day-month) of a reporting year which is specified in the specialized reporting year start day attribute. If the reporting year start day is not defined, a day of January 1 is assumed. The reporting year must be epxressed as the year at the beginning of the period. Therfore, if the reproting year runs from April to March, any given reporting year is expressed as the year for April. The general format of a report period can be described as  [year]-[period][time zone]?, where the type of period is designated with a single character followed by a number representing the period. Note that all periods allow for an optional time zone offset. See the details of each member type for the specifics of its format.",
+					"type":"string",
+					"pattern":"^\\d{4}\\-([ASTQ]\\d{1}|[MW]\\d{2}|[D]\\d{3})(Z|((\\+|\\-)\\d{2}:\\d{2}))?$"
+				}
+			]
+		},
+		"uri":{
+			"description":"Contains the URL to the schema allowing to validate the message. This also allows identifying the version of SDMX-JSON format used in this message. Providing the link to the SDMX-JSON schema is recommended.",
+			"type":"string",
+			"format":"uri"
+		},
+		"urn":{
+			"description":"Universal Resource Name (URN) is constructed according to the generic structure 'urn:sdmx:org.SDMX-IM-package-name.class-name=agencyid:maintainedobject-id(maintainedobject-version).containerobject-id.object-id*'. For more information see: Unique identification of SDMX objects, in: SDMX STANDARDS: SECTION 5 SDMX REGISTRY SPECIFICATION",
+			"type":"string",
+			"pattern":"^urn:sdmx:org\\.sdmx\\.infomodel\\.((base\\.((Agency)|(OrganisationUnitScheme)|(AgencyScheme)|(DataProviderScheme)|(MetadataProviderScheme)|(DataConsumerScheme)|(OrganisationUnit)|(DataProvider)|(MetadataProvider)|(DataConsumer)))|(codelist\\.((Codelist)|(Valuelist)|(Hierarchy)|(HierarchyAssociation)|(Code)|(HierarchicalCode)|(Level)))|(conceptscheme\\.((ConceptScheme)|(Concept)))|(datastructure\\.((DataStructure)|(AttributeDescriptor)|(DataAttribute)|(ReportingYearStartDay)|(GroupDimensionDescriptor)|(DimensionDescriptor)|(Dimension)|(TimeDimension)|(MeasureDescriptor)|(Measure)|(Dataflow)))|(categoryscheme\\.((CategoryScheme)|(Category)|(Categorisation)|(ReportingTaxonomy)|(ReportingCategory)))|(registry\\.((ProvisionAgreement)|(MetadataProvisionAgreement)|(DataConstraint)|(MetadataConstraint)|(Subscription)))|(metadatastructure\\.((MetadataAttributeDescriptor)|(MetadataAttribute)|(MetadataStructure)|(Metadataflow)))|(process\\.((Process)|(ProcessStep)|(Transition)))|(structuremapping\\.((StructureMap)|(ComponentMap)|(EpochMap)|(DatePatternMap)|(ConceptSchemeMap)|(OrganisationSchemeMap)|(CategorySchemeMap)|(ReportingTaxonomyMap)|(RepresentationMap)|(FrequencyFormatMapping)))|(transformation\\.((TransformationScheme)|(Transformation)|(CustomTypeScheme)|(CustomType)|(NamePersonalisationScheme)|(NamePersonalisation)|(VtlMappingScheme)|(VtlCodelistMapping)|(VtlConceptMapping)|(VtlDataflowMapping)|(RulesetScheme)|(Ruleset)|(UserDefinedOperatorScheme)|(UserDefinedOperator))))=([A-Za-z][A-Za-z0-9_-]*(\\.[A-Za-z][A-Za-z0-9_-]*)*):([A-Za-z0-9_@$-]+)\\((((0|[1-9]\\d*)(\\.(0|[1-9]\\d*))?)|((0|[1-9]\\d*)(\\.(0|[1-9]\\d*)){2}(-(([A-Za-z-]|([A-Za-z-][A-Za-z0-9-]+)|([A-Za-z0-9-]+[A-Za-z-][A-Za-z0-9-]*))|(0|[1-9][0-9]*))(\\.(([A-Za-z-]|([A-Za-z-][A-Za-z0-9-]+)|([A-Za-z0-9-]+[A-Za-z-][A-Za-z0-9-]*))|(0|[1-9][0-9]*)))*)?)|(((0|[1-9]\\d*)\\+\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*))|((0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\+\\.(0|[1-9]\\d*))|((0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\+)))\\)(\\.[A-Za-z0-9_@$-]+(\\.[A-Za-z0-9_@$-]+)*)?$"
+		},
+		"duration":{
+			"type":"string",
+			"pattern":"^P((([0-9]+Y([0-9]+M)?([0-9]+D)?|([0-9]+M)([0-9]+D)?|([0-9]+D))(T(([0-9]+H)([0-9]+M)?([0-9]+(\\.[0-9]+)?S)?|([0-9]+M)([0-9]+(\\.[0-9]+)?S)?|([0-9]+(\\.[0-9]+)?S)))?)|(T(([0-9]+H)([0-9]+M)?([0-9]+(\\.[0-9]+)?S)?|([0-9]+M)([0-9]+(\\.[0-9]+)?S)?|([0-9]+(\\.[0-9]+)?S))))$"
+		},
+		"MetadataflowReferenceType":{
+			"description":"MetadataflowReferenceType is a type for referencing a metadata flow object. It consists of a URN.",
+			"type":"string",
+			"pattern":"^urn:sdmx:org\\.sdmx\\.infomodel\\.metadatastructure\\.Metadataflow=([A-Za-z][A-Za-z0-9_-]*(\\.[A-Za-z][A-Za-z0-9_-]*)*):([A-Za-z0-9_@$-]+)\\((((0|[1-9]\\d*)(\\.(0|[1-9]\\d*))?)|((0|[1-9]\\d*)(\\.(0|[1-9]\\d*)){2}(-(([A-Za-z-]|([A-Za-z-][A-Za-z0-9-]+)|([A-Za-z0-9-]+[A-Za-z-][A-Za-z0-9-]*))|(0|[1-9][0-9]*))(\\.(([A-Za-z-]|([A-Za-z-][A-Za-z0-9-]+)|([A-Za-z0-9-]+[A-Za-z-][A-Za-z0-9-]*))|(0|[1-9][0-9]*)))*)?)|(((0|[1-9]\\d*)\\+\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*))|((0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\+\\.(0|[1-9]\\d*))|((0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\+)))\\)$"
+		},
+		"MetadataProvisionAgreementReferenceType":{
+			"description":"MetadataProvisionAgreementReferenceType is a type for referencing a metadata provision agreement. It consists of a URN.",
+			"type":"string",
+			"pattern":"^urn:sdmx:org\\.sdmx\\.infomodel\\.registry\\.MetadataProvisionAgreement=([A-Za-z][A-Za-z0-9_-]*(\\.[A-Za-z][A-Za-z0-9_-]*)*):([A-Za-z0-9_@$-]+)\\((((0|[1-9]\\d*)(\\.(0|[1-9]\\d*))?)|((0|[1-9]\\d*)(\\.(0|[1-9]\\d*)){2}(-(([A-Za-z-]|([A-Za-z-][A-Za-z0-9-]+)|([A-Za-z0-9-]+[A-Za-z-][A-Za-z0-9-]*))|(0|[1-9][0-9]*))(\\.(([A-Za-z-]|([A-Za-z-][A-Za-z0-9-]+)|([A-Za-z0-9-]+[A-Za-z-][A-Za-z0-9-]*))|(0|[1-9][0-9]*)))*)?)|(((0|[1-9]\\d*)\\+\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*))|((0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\+\\.(0|[1-9]\\d*))|((0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\+)))\\)$"
+		},
+		"gYear":{
+			"description":"gYear: GregorianTimePeriodType defines the set of standard calendar periods in SDMX.",
+			"type":"string",
+			"pattern":"^-?([1-9][0-9]{3,}|0[0-9]{3})(Z|(\\+|-)((0[0-9]|1[0-3]):[0-5][0-9]|14:00))?$"
+		}
+	}
+}

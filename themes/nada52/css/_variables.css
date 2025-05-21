@@ -1,0 +1,64 @@
+:root {
+  --action-color: hsl(204, 100%, 37%, 1);
+  --action-color--hover: #009FDA;
+  --success-color: #529600;
+  --danger-color: #EB5757;
+  --warning-color: #FF8B00;
+  --accent-01-color: #814C89; /* license open */
+  --accent-02-color: #FFDF85; 
+  --accent-03-color: #529600; /* license public */
+  --accent-04-color: #7FB142; /* license direct download */
+  --wbg-gray: #333333;
+  --wbg-light: #fff;
+  --wbg-lightgray: hsl(0, 0%, 45%);
+  --wbg-lightbluegray: #F3F5F7;
+  --wbg-lightblue: #E6F1F9;
+  --font-family: 'Inter', 'Roboto', 'Open Sans', sans-serif;
+  --color-main: var(--wbg-gray);
+  --color-main-dark: var(--wbg-gray);
+  --color-link: var(--action-color);
+  --color-link-hover: var(--action-color--hover);
+  --color-highlight-bg: #fffaec;
+  --color-highlight: var(--warning-color);
+  --color-label: var(--wbg-lightgray);
+  --color-value: var(--wbg-gray);
+  --opacity-hover: 0.8;
+  --border-width: 1px;
+  --border-color: #e5e5e5;
+  --border-color-light: #eceeef;
+  --border-radius: 4px;
+  --border-radius-sm: .25rem;
+  --border-radius-md: .5rem;
+  --border-radius-lg: 1rem;
+  --border-radius-buttons: 50px;
+  --bg-color-main: #fff;
+  --bg-color-light: #fff;
+  --bg-color-card: #fff;
+  --bg-color-card-solid: var(--wbg-lightbluegray);
+  --color-button-primary: var(--action-color);
+  --color-button-secondary: var(--action-color);
+  --color-button-success: var(--success-color);
+  --color-button-danger: var(--danger-color);
+  --color-button-warning: var(--warning-color);
+  --color-button-info: var(--action-color);
+  --color-button-light: var(--wbg-lightbluegray);
+  --color-button-dark: var(--wbg-gray);  
+  --color-button-accent-01: var(--accent-01-color); 
+  --color-button-featured: var(--accent-02-color); 
+  --color-button-accent-02: var(--accent-02-color);
+  --color-button-accent-03: var(--accent-03-color);
+  --color-button-accent-04: var(--accent-04-color);
+  --color-badge-primary: var(--action-color);
+  --color-badge-secondary: var(--action-color);
+  --color-badge-success: var(--success-color);
+  --color-badge-danger: var(--danger-color);
+  --color-badge-warning: var(--warning-color);
+  --color-badge-info: var(--action-color);
+  --color-badge-light: var(--wbg-lightbluegray);
+  --color-badge-dark: var(--wbg-gray);
+  --color-badge-featured: var(--accent-02-color); 
+  --shadow-card: 0px 4px 16px rgba(0, 0, 0, 0.08), 0px 2px 4px rgba(0, 0, 0, 0.12);
+  --shadow-button: var(--shadow-card);
+  --shadow-dropdown: var(--shadow-card);
+  --font-mono: normal normal normal 1rem/1.2rem 'IBM Plex Mono', monospace; 
+}

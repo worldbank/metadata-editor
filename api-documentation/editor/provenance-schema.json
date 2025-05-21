@@ -1,0 +1,80 @@
+{
+    "$id": "http://ihsn.org/schemas/provenance",
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "description": "Provenance of metadata records",
+    "properties": {
+        "original_repository": {
+            "type": "object",
+            "title": "Original repository",
+            "properties": {
+                "repository_name": {
+                    "type": "string",
+                    "description": "Name of the original repository where the metadata was first published"
+                },
+                "url": {
+                    "type": "string",
+                    "description": "URL of the original repository or dataset"
+                },
+                "dataset_identifier": {
+                    "type": "string",
+                    "description": "Unique identifier of the dataset in the original repository"
+                },
+                "doi": {
+                    "type": "string",
+                    "description": "Digital Object Identifier (DOI) of the dataset"
+                },
+                "dataset_title": {
+                    "type": "string",
+                    "description": "Title of the dataset in the original repository"
+                },
+                "date_published": {
+                    "type": "string",
+                    "description": "Date and time when the dataset was first published"
+                },
+                "notes": {
+                    "type": "string",
+                    "description": "Additional notes on the dataset publication process"
+                }
+            }
+        },
+        "source_repository": {
+            "type": "array",
+            "title": "Source repository",
+            "description": "Information on the source repositories from which the metadata was harvested",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "repository_name": {
+                        "type": "string",
+                        "description": "Name of the source repository where the metadata was harvested"
+                    },
+                    "url": {
+                        "type": "string",
+                        "description": "URL of the source repository or dataset"
+                    },
+                    "dataset_identifier": {
+                        "type": "string",
+                        "description": "Unique identifier of the dataset in the source repository"
+                    },
+                    "dataset_title": {
+                        "type": "string",
+                        "description": "Title of the dataset in the source repository"
+                    },
+                    "date_acquired": {
+                        "type": "string",
+                        "description": "Date and time when the metadata was acquired from the source repository"
+                    },
+                    "acquisition_mode": {
+                        "type": "string",
+                        "description": "Method used to acquire the metadata from the source repository"
+                    },
+                    "notes": {
+                        "type": "string",
+                        "description": "Additional notes on the metadata acquisition process"
+                    }
+                }
+            }
+        }
+    }
+}

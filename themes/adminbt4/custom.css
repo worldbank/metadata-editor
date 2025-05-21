@@ -1,0 +1,106 @@
+
+#breadcrumb{
+	margin-left:16px;
+	margin-bottom:25px;
+	color:gray;
+}
+
+#breadcrumb a{
+	font-size:14px;
+}
+
+.table-sm td,
+.table-sm th
+{
+	font-size:smaller;
+}
+
+.sidebar-nav {
+		padding: 9px 0;
+}
+.sub-header {
+		background: #F1F1F1;
+		background: -webkit-gradient(radial, 100 36, 0, 100 -40, 120, from(#FAFAFA), to(#F1F1F1)), #F1F1F1;
+		border-bottom: 1px solid #666;
+		border-color: #E5E5E5;
+		height: 100px;
+		width: 100%;
+		margin-top: -10px;
+		margin-bottom: 20px;
+		padding: 10px 25px
+}
+
+
+.table .header th{
+	background:#ddd;
+}
+
+.form-inline-with-spacing .form-group{
+	margin-right:25px;
+}
+
+.table-border-bottom{
+	border-bottom:1px solid gainsboro;
+}
+
+fieldset{
+	border:1px solid gainsboro;
+	padding:15px;
+}
+fieldset legend {
+	font-size: 14px;
+	font-weight:bold;
+    border: 0px;
+    display: block;
+	width: auto;
+	padding-right:10px;	
+	padding-left:10px;
+	margin-bottom:0px;
+}
+
+/*admin/dashboard*/
+.page-dashboard .panel-heading{
+	font-weight:bold;
+	font-size:16px;
+}
+
+/*hide buttons for central catalog on dashboard*/
+.page-dashboard .central .manage-permissions,
+.page-dashboard .central .manage-collection{
+	display:none;
+}
+
+/*citations edit page */
+.citation-authors-table .author-field{
+	margin-right:5px;
+	margin-bottom:5px;
+}
+
+/*default file input control style*/
+input[type="file"] {
+    display: block;
+    background: #9e9e9e2e;
+    width: 100%;
+    padding: 5px;
+}
+
+.citations-index-page .search-filters{
+	background:#eee;
+	padding:10px;
+}
+
+.citations-index-page .search-filters label{
+	font-weight:normal;
+	font-size:14px;
+}
+
+
+.citations-index-page h2{
+	font-size:16px;
+	margin:0px;
+	padding:0px;
+}
+
+.citations-index-page h3{
+	font-size:14px;
+}

@@ -1,0 +1,89 @@
+{
+  "$id": "http://ihsn.org/schemas/resource",
+  "id": "http://ihsn.org/schemas/resource",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "External resource schema",
+  "type": "object",
+  
+  "properties": {    
+
+    "dctype": {
+      "type": "string",
+      "title": "Resource type",
+      "description": "Document types for external resource e.g. `doc/adm` \n* `doc/adm` - Document, Administrative [doc/adm] \n* `doc/anl` - Document, Analytical [doc/anl] \n* `doc/oth` - Document, Other [doc/oth] \n* `doc/qst` - Document, Questionnaire [doc/qst] \n* `doc/ref` - Document, Reference [doc/ref] \n* `doc/rep` - Document, Report [doc/rep]  \n* `doc/tec` - Document, Technical [doc/tec] \n* `aud` - Audio [aud]\n* `dat` - Database [dat]\n* `map` - Map [map]\n* `dat/micro` - Microdata File [dat/micro]\n* `pic` - Photo [pic]\n* `prg` - Program [prg]\n* `tbl` - Table [tbl]\n* `vid` - Video [vid]  \n* `web` - Web Site [web]"
+      ,
+      "default": "doc/oth"
+    },
+
+    "dcformat":{
+        "type":"string",
+        "title":"Resource Format",
+        "description":"Document file format e.g. `application/zip` \n* `application/x-compressed` - Compressed, Generic \n* `application/zip` - Compressed, ZIP  \n* `application/x-cspro` - Data, CSPro  \n* `application/dbase` - Data, dBase   \n* `application/msaccess` - Data, Microsoft Access  \n* `application/x-sas` - Data, SAS  \n* `application/x-spss` - Data, SPSS   \n* `application/x-stata` - Data, Stata   \n* `text` - Document, Generic  \n* `text/html` - Document, HTML  \n* `application/msexcel` - Document, Microsoft Excel  \n* `application/mspowerpoint` - Document, Microsoft PowerPoint \n* `application/msword` - Document, Microsoft Word  \n* `application/pdf` - Document, PDF  \n* `application/postscript` - Document, Postscript  \n* `text/plain` - Document, Plain \n* `text/wordperfect` - Document, WordPerfect  \n* `image/gif` - Image, GIF  \n* `image/jpeg` - Image, JPEG   \n* `image/png` - Image, PNG   \n* `image/tiff` - Image, TIFF"
+    },
+    
+    "title": {
+      "type": "string",
+      "description": "Title"
+    },
+
+    "author": {
+      "type": "string",
+      "description": "Author"
+    },
+
+    "dcdate": {
+      "type": "string",
+      "description": "Date"
+    },
+
+    "country": {
+      "type": "string",
+      "description": "Country"
+    },
+
+    "language": {
+      "type": "string",
+      "description": "Language"
+    },
+
+    "contributor": {
+      "type": "string",
+      "description": "Contributor"
+    },
+
+    "publisher": {
+      "type": "string",
+      "description": "Publisher"
+    },
+
+    "rights": {
+      "type": "string",
+      "description": "Rights"
+    },
+
+    "description": {
+      "type": "string",
+      "description": "Description"
+    },
+
+    "abstract": {
+      "type": "string",
+      "description": "Abstract"
+    },
+
+    "toc": {
+      "type": "string",
+      "description": "TOC"
+    },
+
+    "filename": {
+      "type": "string",
+      "description": "Resource file or URL"
+    }
+
+
+  },
+  "required": [
+    "title"
+  ]
+}

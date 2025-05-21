@@ -1,0 +1,36 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "json-patch-schema.json",
+	"title": "JSON patch options Schema",
+    "type": "object",
+
+    "properties": {
+      "patches": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "value": {
+                "type": ["string", "number", "boolean", "object", "array"]
+            },
+            "op": {
+              "type": "string",
+              "enum": ["add", "remove", "replace", "move", "copy", "test"]
+            },
+            "path": {
+              "type": "string",
+              "title": "Path to the JSON element",
+                "description": "Path to the JSON element to be patched. The path is a JSON Pointer (RFC 6901) string. Example: /path/to/element"
+            }
+          },
+          "required": ["op", "path"],
+          "additionalProperties": false
+        }
+      },
+      "validate": {
+        "type": "boolean"
+      }
+    },
+    "required": ["patches"],
+    "additionalProperties": false
+  }

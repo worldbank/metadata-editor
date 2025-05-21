@@ -1,0 +1,46 @@
+{
+    "type": "template",
+    "title": "Administrative metadata template",
+    "items": [
+        {
+            "type": "section_container",
+            "key": "metadata_container",
+            "is_locked": true,
+            "title": "Administrative metadata",
+            "items": [
+                {
+                    "type": "section",
+                    "key": "metadata_section",
+                    "title": "Metadata",
+                    "items": [
+                        {
+                            "key": "options",
+                            "title": "Options",
+                            "type": "array",
+                            "props": [
+                                {
+                                    "key": "key",
+                                    "title": "Key",
+                                    "type": "string",
+                                    "help_text": "Key for the metadata element.",
+                                    "prop_key": "options.key",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "value",
+                                    "title": "Value",
+                                    "type": "string",
+                                    "prop_key": "options.value",
+                                    "help_text": "Value for the metadata element.",
+                                    "display_type": "text"
+                                }                                
+                            ],
+                            "help_text": "Options"
+                        }
+                    ]
+                }
+            ]
+        }
+        
+    ]
+}

@@ -1,0 +1,187 @@
+/*Page Layout based on YUI Grids*/
+body, html {
+	background-color:#D8DCD0; 
+}
+#doc2, #doc4 {
+	background-color:white;
+}
+#custom-doc {
+	background-color:white;
+	width:50.85em;
+	*width:50.07em;
+	min-width:400px;
+	margin:auto;
+	text-align:left;
+	padding:23px;
+	padding-bottom:0px;
+	padding-top:5px;
+	background:url("bleed_page.png") repeat-y scroll 50% 0 transparent;
+}
+#bd{margin-top:0px;border:1px solid gainsboro;}
+#yui-main .yui-b {
+	background-color:white;
+	padding:0px;
+	min-height:300px;
+}
+#banner {
+	padding:15px;
+	font-size:1.5em;
+	color:white;
+	display:inline;
+}
+
+#site-banner{
+	height:35px;
+	padding:10px;
+	background-color:#93B582;	
+}
+
+#site-banner a{color:white;}
+
+#ft {
+	background-color:none;
+	text-align:right;
+	margin:0px;
+	border-bottom:20px solid white;
+	color:#CCCCCC
+}
+
+/*user login bar */
+#user-bar {
+	padding:5px;
+	text-align:right
+}
+.user-box{text-align:right;}
+.user-box li{display:inline;}
+.user-box li a{color:gray;border-left:1px solid gainsboro;padding-left:5px;}
+.user-box li a:hover{color:black;}
+
+.site-logo {
+	color:gray;
+	font-size:18px;
+	font-weight:bold;
+}
+.site-logo img {
+	float:left;
+}
+.site-logo-title {
+	float:left;
+	padding-top:15px;
+	color:#666666
+}
+#content {
+	padding:0px;
+	padding-top:0px;
+	xmin-height:400px;
+}
+#inner-body{border:0px solid gainsboro;}
+/*side menu*/
+#sidebar {
+	padding:5px;
+}
+#sidebar a {
+	display:block;
+	margin-bottom:0px;
+	background-color:#666666;
+	padding:5px;
+	color:white;
+	text-decoration:none;
+	border-bottom:1px dotted white;
+	font-weight:normal;
+	font-size:12px;
+}
+
+#sidebar li.selected a{background-color:#993300;}
+
+#sidebar a:hover {
+	background-color:#993300;
+}
+.menu-horizontal {
+	border:1px solid gainsboro;
+	border-left:0px;
+	border-right:0px;
+	border-top:0px;
+	height:34px;
+	margin-bottom:20px;
+	margin-top:0px;
+}
+/*
+.menu-horizontal li {
+	float:left;
+	padding:10px;
+	border-right:1px solid gainsboro;
+}
+.menu-horizontal li a {
+	font-weight:bold;
+	color:gray;
+}
+.menu-horizontal li.selected {
+	border-bottom:1px solid white;
+	margin-bottom:-1px;
+}
+.menu-horizontal li a:hover, .menu-horizontal li.selected a {
+	color:black;
+}
+*/
+/* site general styles */
+h1 {
+	font-size:1.8em;
+}
+h2 {
+	font-size:1.5em;
+}
+h3 {
+	font-size:1.2em;
+}
+h4 {
+	font-size:1em;
+}
+p {
+	margin-bottom:10px;
+}
+
+img {
+	border:0px;
+}
+a {
+	text-decoration:none;
+	color:#003399;
+}
+a:hover {
+	color:#990000;
+}
+
+/*Table/Grid style*/
+.grid-table tr td {
+	padding:5px;
+	border-bottom:1px solid #C1DAD7;
+}
+.grid-table .alternate {
+	background-color:#FBFBFB
+}
+.grid-table a {
+	color:#00679C;
+	text-decoration:none;
+}
+.grid-table a:hover {
+	color:maroon;
+}
+
+/*Button styles*/
+.button{padding:1px;margin-top:5px;cursor:pointer;background-color:green;color:white;border:0px;}
+.button:hover{background-color:black;color:white;}
+
+input{padding-left:3px;padding-right:3px;}
+
+/*ordered lists*/
+ol{ display: block;margin-bottom:20px; }
+ol li{list-style-type:decimal;margin-left:20px;}
+
+/*lsms related styles*/
+.highlights, .highlights td {color:gray;font-family: verdana; font-size:11px; line-height:1.5em;}
+.lsms p,.lsms ul, .lsms ol{font-size:14px;margin-bottom:10px; color:#333333}
+.lsms li li {font-size:14px;}
+.lsms li, .lsms ul{margin-left:15px;list-style:disc outside;}
+.lsms h1{margin-bottom:15px;}
+.lsms ul{display:block;}
+.highlights h3{padding:5px;margin:0px;background-color:#CCCCCC;color:#333333;height:32px; overflow:hidden; margin-bottom:5px;}

@@ -1,0 +1,91 @@
+{
+    "type": "template",
+    "title": "External resources",
+    "items": [
+        {
+            "type": "section_container",
+            "key": "resource_container",
+            "title": "External resource",
+            "items": [
+                {
+                    "type": "section",
+                    "key": "resource_section",
+                    "title": "Resource",
+                    "items": [
+                        {
+                            "key": "dctype",
+                            "title": "Document type",
+                            "type": "text"                            
+                        },
+                        {
+                            "key": "dcformat",
+                            "title": "Document format",
+                            "type": "text"                            
+                        },
+                        {
+                            "key": "title",
+                            "title": "Title",
+                            "type": "text"                            
+                        },
+                        {
+                            "key": "author",
+                            "title": "Author",
+                            "type": "text"                            
+                        },
+                        {
+                            "key": "dcdate",
+                            "title": "Date",
+                            "type": "text"                            
+                        },
+                        {
+                            "key": "country",
+                            "title": "Country",
+                            "type": "text"                            
+                        },
+                        {
+                            "key": "language",
+                            "title": "Language",
+                            "type": "text"                            
+                        },
+                        {
+                            "key": "contributor",
+                            "title": "Contributor",
+                            "type": "text"                            
+                        },
+                        {
+                            "key": "publisher",
+                            "title": "Publisher",
+                            "type": "text"                            
+                        },
+                        {
+                            "key": "rights",
+                            "title": "Rights",
+                            "type": "text"                            
+                        },
+                        {
+                            "key": "description",
+                            "title": "Description",
+                            "type": "text"                            
+                        },
+                        {
+                            "key": "abstract",
+                            "title": "Abstract",
+                            "type": "text"                            
+                        },
+                        {
+                            "key": "toc",
+                            "title": "TOC",
+                            "type": "text"                            
+                        },
+                        {
+                            "key": "filename",
+                            "title": "Filename",
+                            "type": "text"                            
+                        }
+                    ]
+                }
+            ]
+        }
+        
+    ]
+}

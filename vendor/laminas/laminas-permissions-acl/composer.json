@@ -1,0 +1,59 @@
+{
+    "name": "laminas/laminas-permissions-acl",
+    "description": "Provides a lightweight and flexible access control list (ACL) implementation for privileges management",
+    "license": "BSD-3-Clause",
+    "keywords": [
+        "laminas",
+        "acl"
+    ],
+    "homepage": "https://laminas.dev",
+    "support": {
+        "docs": "https://docs.laminas.dev/laminas-permissions-acl/",
+        "issues": "https://github.com/laminas/laminas-permissions-acl/issues",
+        "source": "https://github.com/laminas/laminas-permissions-acl",
+        "rss": "https://github.com/laminas/laminas-permissions-acl/releases.atom",
+        "chat": "https://laminas.dev/chat",
+        "forum": "https://discourse.laminas.dev"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "conflict": {
+        "laminas/laminas-servicemanager": "<3.0",
+        "zendframework/zend-permissions-acl": "*"
+    },
+    "require": {
+        "php": "^7.3 || ~8.0.0 || ~8.1.0"
+    },
+    "require-dev": {
+        "laminas/laminas-coding-standard": "~1.0.0",
+        "laminas/laminas-servicemanager": "^3.0.3",
+        "phpunit/phpunit": "^9.5.0",
+        "psalm/plugin-phpunit": "^0.15.1",
+        "vimeo/psalm": "^4.7"
+    },
+    "suggest": {
+        "laminas/laminas-servicemanager": "To support Laminas\\Permissions\\Acl\\Assertion\\AssertionManager plugin manager usage"
+    },
+    "autoload": {
+        "psr-4": {
+            "Laminas\\Permissions\\Acl\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "LaminasTest\\Permissions\\Acl\\": "test/"
+        }
+    },
+    "scripts": {
+        "check": [
+            "@cs-check",
+            "@test"
+        ],
+        "cs-check": "phpcs",
+        "cs-fix": "phpcbf",
+        "static-analysis": "psalm --shepherd --stats",
+        "test": "phpunit --colors=always",
+        "test-coverage": "phpunit --colors=always --coverage-clover clover.xml"
+    }
+}
