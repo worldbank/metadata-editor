@@ -25,6 +25,9 @@ tags:
   - name: Timeseries
     description: Manage timeseries projects
 
+  - name: Timeseries-db
+    description: Manage timeseries database projects
+
   - name: Geospatial
     description: Manage geospatial projects
 
@@ -73,6 +76,11 @@ x-tagGroups:
   - name: Timeseries
     tags:
       - Timeseries
+
+  - name: Timeseries-db
+    tags:
+      - Timeseries-db
+
   - name: Geospatial    
     tags:
       - Geospatial
@@ -526,6 +534,63 @@ paths:
               $ref: 'timeseries-schema.json'
         security:
           - ApiKeyAuth: []   
+
+  /editor/create/timeseries-db:
+      post:
+        tags:
+          - Projects 
+          - Timeseries-db
+        summary: Create Timeseries Database
+        description: Create a new timeseries database project
+        operationId: createTimeseriesDb
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: 'timeseries-db-schema.json'
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: 'timeseries-db-schema.json'
+        security:
+          - ApiKeyAuth: []
+  /editor/update/timeseries-db/{id}:
+      post:
+        tags:
+          - Timeseries
+          - Projects
+        summary: Update Timeseries database
+        description: Update Timeseries database project
+        operationId: updateTimseriesDb
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "id"
+            description: Project ID
+            type: string
+            format: string
+            required: true
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: 'timeseries-db-schema.json'
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: 'timeseries-db-schema.json'
+        security:
+          - ApiKeyAuth: [] 
 
   /editor/create/geospatial:
       post:

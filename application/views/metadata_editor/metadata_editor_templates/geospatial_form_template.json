@@ -211,7 +211,7 @@
                                 {
                                     "key": "description.characterSet.codeList",
                                     "type": "string",
-                                    "title": "Codelist used",                                    
+                                    "title": "Codelist used",
                                     "display_type": "text"
                                 }
                             ],
@@ -226,7 +226,7 @@
                         },
                         {
                             "key": "description.hierarchyLevel",
-                            "type": "string",                            
+                            "type": "string",
                             "title": "Hierarchy level",
                             "help_text": "This is the type of resource being described by the metadata and it is filled in with a value from a classification of the resource based on its scope. The choice of Resource Type will be probably the first decision made by the user and it will define the metadata elements that should be filled.\n\nThe hierarchy level defines the scope of the resource. It indicates whether the resource is a collection, a dataset, a series, a service, or another type of resource. The ISO 19139 provides a controlled vocabulary for this element. It is recommended but not mandatory to make use of it. The most relevant levels for the purpose of cataloguing geographic data and services are dataset (for both raster and vector data), service (a capability which a service provider entity makes available to a service user entity through a set of interfaces that define a behavior), and series. Series will be used when the data represent an ordered succession, in time or in space; this will typically apply to time series, but it can also be used to describe other types of series (e.g., a series of ocean water temperatures collected at a succession of depths).\n\nNOTES\n- dataset: is an identifiable data that can be accessed separately. A dataset can be a part of a whole (series) or a segregate resource.\n- series: is a collection of resources or related datasets that share the same product specification.\n- service: technologies providing availability and access to spatial information, for example, web map services, web feature services, web coverage services, web processing services, catalogue web services, etc.",
                             "enum": [
@@ -751,7 +751,7 @@
                                 {
                                     "key": "description.identificationInfo.citation.identifier",
                                     "title": "Identifier",
-                                    "type": "array",                                                                        
+                                    "type": "array",
                                     "help_text": "",
                                     "props": [
                                         {
@@ -772,7 +772,6 @@
                                         }
                                     ]
                                 },
-                                
                                 {
                                     "key": "description.identificationInfo.citation.citedResponsibleParty",
                                     "type": "nested_array",
@@ -1576,28 +1575,28 @@
                                             "type": "string",
                                             "prop_key": "description.identificationInfo.resourceMaintenance.userDefinedMaintenanceFrequency",
                                             "display_type": "text",
-                                            "help_text": "User defined maintenance frequency."                                                                                        
+                                            "help_text": "User defined maintenance frequency."
                                         },
                                         {
-                                            "key":"updateScope",
-                                            "title":"Update scope",
-                                            "type":"array",
-                                            "props":[
+                                            "key": "updateScope",
+                                            "title": "Update scope",
+                                            "type": "array",
+                                            "props": [
                                                 {
-                                                    "key":"scope",
-                                                    "title":"Update scope",
-                                                    "type":"string",
-                                                    "prop_key":"description.identificationInfo.resourceMaintenance.updateScope.scope",
-                                                    "display_type":"text",
-                                                    "help_text":"Update scope."                                                    
+                                                    "key": "scope",
+                                                    "title": "Update scope",
+                                                    "type": "string",
+                                                    "prop_key": "description.identificationInfo.resourceMaintenance.updateScope.scope",
+                                                    "display_type": "text",
+                                                    "help_text": "Update scope."
                                                 },
                                                 {
-                                                    "key":"description",
-                                                    "title":"Description",
-                                                    "type":"string",
-                                                    "prop_key":"description.identificationInfo.resourceMaintenance.updateScope.description",
-                                                    "display_type":"textarea",
-                                                    "help_text":"Description of the update scope."
+                                                    "key": "description",
+                                                    "title": "Description",
+                                                    "type": "string",
+                                                    "prop_key": "description.identificationInfo.resourceMaintenance.updateScope.description",
+                                                    "display_type": "textarea",
+                                                    "help_text": "Description of the update scope."
                                                 }
                                             ]
                                         },
@@ -1831,7 +1830,6 @@
                                                 }
                                             ]
                                         }
-
                                     ],
                                     "prop_key": "description.identificationInfo.resourceMaintenance"
                                 }
@@ -2546,7 +2544,7 @@
                                             "key": "geohash",
                                             "title": "Geohash",
                                             "type": "array",
-                                            "props":[
+                                            "props": [
                                                 {
                                                     "key": "geohash",
                                                     "type": "string",
@@ -2564,7 +2562,6 @@
                                                     "display_type": "textarea"
                                                 }
                                             ]
-
                                         },
                                         {
                                             "key": "geographicDescription",
@@ -2579,60 +2576,67 @@
                                             "type": "section",
                                             "props": [
                                                 {
-                                                    "key":"geographicBoundingPolygon.id",
-                                                    "type":"text",
-                                                    "title":"Polygon Identifier (ID)",
-                                                    "prop_key":"description.identificationInfo.extent.geographicElement.geographicBoundingPolygon.id"
+                                                    "key": "geographicBoundingPolygon.id",
+                                                    "type": "text",
+                                                    "title": "Polygon Identifier (ID)",
+                                                    "prop_key": "description.identificationInfo.extent.geographicElement.geographicBoundingPolygon.id"
                                                 },
                                                 {
                                                     "key": "geographicBoundingPolygon.polygon",
                                                     "type": "array",
                                                     "title": "Polygon",
                                                     "prop_key": "description.identificationInfo.extent.geographicElement.geographicBoundingPolygon.polygon",
-                                                    "props":[
+                                                    "props": [
                                                         {
-                                                            "key":"ring",
-                                                            "type":"string",
-                                                            "title":"Interior or exterior ring",
-                                                            "prop_key":"description.identificationInfo.extent.geographicElement.geographicBoundingPolygon.polygon.ring",
-                                                            "display_type":"dropdown-custom",
-                                                            "enum":[
-                                                                {"code":"interior","label":"Interior"},
-                                                                {"code":"exterior","label":"Exterior"}
+                                                            "key": "ring",
+                                                            "type": "string",
+                                                            "title": "Interior or exterior ring",
+                                                            "prop_key": "description.identificationInfo.extent.geographicElement.geographicBoundingPolygon.polygon.ring",
+                                                            "display_type": "dropdown-custom",
+                                                            "enum": [
+                                                                {
+                                                                    "code": "interior",
+                                                                    "label": "Interior"
+                                                                },
+                                                                {
+                                                                    "code": "exterior",
+                                                                    "label": "Exterior"
+                                                                }
                                                             ]
                                                         },
                                                         {
-                                                            "key":"type",
-                                                            "type":"string",
-                                                            "title":"Type",
-                                                            "prop_key":"description.identificationInfo.extent.geographicElement.geographicBoundingPolygon.polygon.type",
-                                                            "display_type":"dropdown-custom",
-                                                            "enum":[
-                                                                {"code":"point","label":"Point"},
-                                                                {"code":"line","label":"Line"},
-                                                                {"code":"polygon","label":"Polygon"}
+                                                            "key": "type",
+                                                            "type": "string",
+                                                            "title": "Type",
+                                                            "prop_key": "description.identificationInfo.extent.geographicElement.geographicBoundingPolygon.polygon.type",
+                                                            "display_type": "dropdown-custom",
+                                                            "enum": [
+                                                                {
+                                                                    "code": "point",
+                                                                    "label": "Point"
+                                                                },
+                                                                {
+                                                                    "code": "line",
+                                                                    "label": "Line"
+                                                                },
+                                                                {
+                                                                    "code": "polygon",
+                                                                    "label": "Polygon"
+                                                                }
                                                             ],
-                                                            "help_text":"Type of geometry"
+                                                            "help_text": "Type of geometry"
                                                         },
                                                         {
-                                                            "key":"coordinates",
-                                                            "type":"textarea",
-                                                            "title":"Coordinates",
-                                                            "prop_key":"description.identificationInfo.extent.geographicElement.geographicBoundingPolygon.polygon.coordinates",                                                            
-                                                            "help_text":"Coordinates of the polygon. The first and last coordinate pairs must be the same to close the polygon."
+                                                            "key": "coordinates",
+                                                            "type": "textarea",
+                                                            "title": "Coordinates",
+                                                            "prop_key": "description.identificationInfo.extent.geographicElement.geographicBoundingPolygon.polygon.coordinates",
+                                                            "help_text": "Coordinates of the polygon. The first and last coordinate pairs must be the same to close the polygon."
                                                         }
-                                                        
                                                     ]
                                                 }
-                                               
                                             ]
-                                        } 
-
-
-
-
-
-
+                                        }
                                     ],
                                     "prop_key": "description.identificationInfo.extent.geographicElement",
                                     "help_text": "Spatial (horizontal) extent element. This can be defined either with a Bounding Box (recommended); or using Geographic Description - free text that defines the area covered. When the dataset covers one or more countries, it is recommended to enter the country names in this element, as it can then be used in data catalogs for filtering by geography.\n\nThe bounding box shall be as small as possible.\nThe bounding box shall be expressed in decimal degree with a precision of at least 2 decimals.",
@@ -2741,7 +2745,7 @@
                                     "title": "Spatial resolution",
                                     "prop_key": "description.identificationInfo.spatialResolution",
                                     "help_text": "The spatial resolution of the data as numeric value associated to a unit of measure. Spatial resolution refers to the level of detail of the data set. It shall be expressed as a set of zero to many resolution distances (typically for gridded data and imagery-derived products) or equivalent scales (typically for maps or map-derived products). An equivalent scale is generally expressed as an integer value expressing the scale denominator. A resolution distance shall be expressed as a numerical value associated with a unit of length.\n\nEXAMPLES:\n- 50000 (e.g. 1:50000 scale map)\n- 0.25 (degrees)\n\nNOTES:\n- For services, it is not possible to express the restriction of a service concerning the spatial resolution in the current version of ISO 19119. While the problem is addressed by the standardization community, spatial resolution restrictions for services shall be expressed in the Abstract.\n- When two equivalent scales or two ground sample distances are expressed, the spatial resolution is an interval bounded by these two values",
-                                    "props":[
+                                    "props": [
                                         {
                                             "key": "uom",
                                             "type": "string",
@@ -2779,7 +2783,7 @@
                         {
                             "key": "description.identificationInfo.characterSet",
                             "title": "Character set",
-                            "type": "array",                            
+                            "type": "array",
                             "props": [
                                 {
                                     "key": "codeListValue",
@@ -4488,41 +4492,208 @@
                                     ]
                                 },
                                 {
-                                    "key": "featureCatalogueDescription.coverageDescription",
+                                    "key": "coverageDescription",
                                     "title": "Coverage description",
                                     "type": "section",
                                     "items": [],
-                                    "prop_key": "description.contentInfo.featureCatalogueDescription.coverageDescription",
+                                    "prop_key": "description.contentInfo.coverageDescription",
                                     "props": [
                                         {
-                                            "key": "featureCatalogueDescription.coverageDescription.contentType",
+                                            "key": "coverageDescription.contentType",
                                             "title": "Content type",
                                             "type": "string",
-                                            "prop_key": "description.contentInfo.featureCatalogueDescription.coverageDescription.featureCatalogueDescription.coverageDescription.contentType",
+                                            "prop_key": "description.contentInfo.coverageDescription.contentType",
                                             "display_type": "text"
                                         },
                                         {
-                                            "key": "featureCatalogueDescription.coverageDescription.dimension",
+                                            "key": "coverageDescription.dimension",
                                             "title": "Dimension",
-                                            "type": "array",
+                                            "type": "nested_array",
+                                            "help_text": "List of coverage dimensions. Each dimension can be defined by a name and a type. For the type, a good practice is to rely on primitive data types defined in the XML Schema https://www.w3.org/2009/XMLSchema/XMLSchema.xsd",
+                                            "prop_key": "description.contentInfo.coverageDescription.dimension",
                                             "props": [
                                                 {
-                                                    "key": "name",
-                                                    "title": "Name",
-                                                    "type": "string",
-                                                    "prop_key": "description.contentInfo.featureCatalogueDescription.coverageDescription.featureCatalogueDescription.coverageDescription.dimension.name",
-                                                    "display_type": "text"
+                                                    "key": "band_section",
+                                                    "title": "Band",
+                                                    "type": "section",
+                                                    "prop_key": "description.contentInfo.coverageDescription.dimension.band",
+                                                    "props":[
+                                                        {
+                                                            "key": "band.name",
+                                                            "title": "Band name",
+                                                            "type": "string",
+                                                            "prop_key": "description.contentInfo.coverageDescription.dimension.band.name",
+                                                            "display_type": "text",
+                                                            "help_text": "The name of the band"
+                                                        },
+                                                        {
+                                                            "key": "band.type",
+                                                            "title": "Band type",
+                                                            "type": "string",
+                                                            "prop_key": "description.contentInfo.coverageDescription.dimension.band.type",
+                                                            "enum": [
+                                                                {
+                                                                    "code": "integer",
+                                                                    "label": "Integer"
+                                                                },
+                                                                {
+                                                                    "code": "float",
+                                                                    "label": "Float"
+                                                                },
+                                                                {
+                                                                    "code": "double",
+                                                                    "label": "Double"
+                                                                },
+                                                                {
+                                                                    "code": "string",
+                                                                    "label": "String"
+                                                                }
+                                                            ],
+                                                            "display_type": "dropdown",
+                                                            "help_text": "The type of the band. The type can be one of the following: integer, float, double, string."
+                                                        },
+                                                        {
+                                                            "key":"band.description",
+                                                            "title": "Band description",
+                                                            "type": "string",
+                                                            "prop_key": "description.contentInfo.coverageDescription.dimension.band.description",
+                                                            "display_type": "textarea",
+                                                            "help_text": "A description of the band."
+                                                        },
+                                                        {
+                                                            "key":"band.minimumValue",
+                                                            "title": "Minimum value",
+                                                            "type": "number",
+                                                            "prop_key": "description.contentInfo.coverageDescription.dimension.band.minimumValue",
+                                                            "display_type": "text",
+                                                            "help_text": "The minimum value of the band."
+                                                        },
+                                                        {
+                                                            "key":"band.maximumValue",
+                                                            "title": "Maximum value",
+                                                            "type": "number",
+                                                            "prop_key": "description.contentInfo.coverageDescription.dimension.band.maximumValue",
+                                                            "display_type": "text",
+                                                            "help_text": "The maximum value of the band."
+                                                        },
+                                                        {
+                                                            "key":"band.units.identifier",
+                                                            "title": "Band unit identifier",
+                                                            "type": "string",
+                                                            "prop_key": "description.contentInfo.coverageDescription.dimension.band.units.identifier",
+                                                            "display_type": "text",
+                                                            "help_text": "The identifier of the band unit. The identifier can be a string or a URI."
+                                                        },
+                                                        {
+                                                            "key":"band.units.name",
+                                                            "title": "Band unit name",
+                                                            "type": "string",
+                                                            "prop_key": "description.contentInfo.coverageDescription.dimension.band.units.name",
+                                                            "display_type": "text",
+                                                            "help_text": "The name of the band unit."
+                                                        },
+                                                        {
+                                                            "key":"band.units.quantityType",
+                                                            "title": "Band unit quantity type",
+                                                            "type": "string",
+                                                            "prop_key": "description.contentInfo.coverageDescription.dimension.band.units.quantityType",
+                                                            "display_type": "text",
+                                                            "help_text": "The quantity type of the band unit."
+                                                        },
+                                                        {
+                                                            "key":"band.peakResponse",
+                                                            "title": "Band peak response",
+                                                            "type": "number",
+                                                            "prop_key": "description.contentInfo.coverageDescription.dimension.band.peakResponse",
+                                                            "display_type": "text",
+                                                            "help_text": "The peak response of the band."
+                                                        },
+                                                        {
+                                                            "key":"band.bitsPerValue",
+                                                            "title": "Band bits per value",
+                                                            "type": "number",
+                                                            "prop_key": "description.contentInfo.coverageDescription.dimension.band.bitsPerValue",
+                                                            "display_type": "text",
+                                                            "help_text": "The number of bits per value of the band."                                                    
+                                                        },
+                                                        {
+                                                            "key":"band.toneGradation",
+                                                            "title": "Band tone gradation",
+                                                            "type": "number",
+                                                            "prop_key": "description.contentInfo.coverageDescription.dimension.band.toneGradation",
+                                                            "display_type": "text",
+                                                            "help_text": "The tone gradation of the band."
+                                                        },
+                                                        {
+                                                            "key":"band.scaleFactor",
+                                                            "title": "Band scale factor",
+                                                            "type": "number",
+                                                            "prop_key": "description.contentInfo.coverageDescription.dimension.band.scaleFactor",
+                                                            "display_type": "text",
+                                                            "help_text": "The scale factor of the band."
+                                                        },
+                                                        {
+                                                            "key":"band.offset",
+                                                            "title": "Band offset",
+                                                            "type": "number",
+                                                            "prop_key": "description.contentInfo.coverageDescription.dimension.band.offset",
+                                                            "display_type": "text",
+                                                            "help_text": "The offset of the band."
+                                                        }
+                                                    ]
                                                 },
                                                 {
-                                                    "key": "type",
-                                                    "title": "Type",
-                                                    "type": "string",
-                                                    "prop_key": "description.contentInfo.featureCatalogueDescription.coverageDescription.featureCatalogueDescription.coverageDescription.dimension.type",
-                                                    "display_type": "text"
+                                                    "key": "rangeDimension_section",
+                                                    "title": "Range dimension",
+                                                    "type": "section",
+                                                    "prop_key": "description.contentInfo.coverageDescription.dimension.rangeDimension",
+                                                    "props": [
+                                                        {
+                                                            "key": "rangeDimension.name",
+                                                            "title": "Range dimension name",
+                                                            "type": "string",
+                                                            "prop_key": "description.contentInfo.coverageDescription.dimension.rangeDimension.name",
+                                                            "display_type": "text",
+                                                            "help_text": "The name of the range dimension."
+                                                        },
+                                                        {
+                                                            "key": "rangeDimension.type",
+                                                            "title": "Range dimension type",
+                                                            "type": "string",
+                                                            "prop_key": "description.contentInfo.coverageDescription.dimension.rangeDimension.type",
+                                                            "enum": [
+                                                                {
+                                                                    "code": "integer",
+                                                                    "label": "Integer"
+                                                                },
+                                                                {
+                                                                    "code": "float",
+                                                                    "label": "Float"
+                                                                },
+                                                                {
+                                                                    "code": "double",
+                                                                    "label": "Double"
+                                                                },
+                                                                {
+                                                                    "code": "string",
+                                                                    "label": "String"
+                                                                }
+                                                            ],
+                                                            "display_type": "dropdown",
+                                                            "help_text": ""
+                                                        },
+                                                        {
+                                                            "key": "rangeDimension.description",
+                                                            "title": "Range dimension description",
+                                                            "type": "string",
+                                                            "prop_key": "description.contentInfo.coverageDescription.dimension.rangeDimension.description",
+                                                            "display_type": "textarea",
+                                                            "help_text": "A description of the range dimension."
+                                                        }
+                                                        
+                                                    ]
                                                 }
-                                            ],
-                                            "prop_key": "description.contentInfo.featureCatalogueDescription.coverageDescription.featureCatalogueDescription.coverageDescription.dimension",
-                                            "help_text": "List of coverage dimensions. Each dimension can be defined by a name and a type. For the type, a good practice is to rely on primitive data types defined in the XML Schema https://www.w3.org/2009/XMLSchema/XMLSchema.xsd"
+                                            ]
                                         }
                                     ]
                                 }
@@ -5149,35 +5320,86 @@
                                     "type": "nested_array",
                                     "props": [
                                         {
-                                            "key": "DQ_DomainConsistency.result.nameOfMeasure",
+                                            "key": "dataQualityElement.elementType",
+                                            "title": "Element type",
+                                            "type": "string",
+                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.elementType",
+                                            "enum":[
+                                                {
+                                                    "code": "DQ_CompletenessOmission",
+                                                    "label": "DQ_CompletenessOmission"
+                                                },
+                                                {
+                                                    "code": "DQ_CompletenessCommission",
+                                                    "label": "DQ_CompletenessCommission"
+                                                },
+                                                {
+                                                    "code": "DQ_ConceptualConsistency",
+                                                    "label": "DQ_ConceptualConsistency"
+                                                },
+                                                {
+                                                    "code": "DQ_DomainConsistency",
+                                                    "label": "DQ_DomainConsistency"
+                                                },
+                                                {
+                                                    "code": "DQ_FormatConsistency",
+                                                    "label": "DQ_FormatConsistency"
+                                                },
+                                                {
+                                                    "code": "DQ_TopologicalConsistency",
+                                                    "label": "DQ_TopologicalConsistency"
+                                                },
+                                                {
+                                                    "code": "DQ_PositionalAccuracy",
+                                                    "label": "DQ_PositionalAccuracy"
+                                                },
+                                                {
+                                                    "code": "DQ_ThematicAccuracy",
+                                                    "label": "DQ_ThematicAccuracy"
+                                                },
+                                                {
+                                                    "code": "DQ_TemporalAccuracy",
+                                                    "label": "DQ_TemporalAccuracy"
+                                                },
+                                                {
+                                                    "code": "DQ_QuantitativeAttributeAccuracy",
+                                                    "label": "DQ_QuantitativeAttributeAccuracy"
+                                                },
+                                                {
+                                                    "code": "DQ_UsabilityElement",
+                                                    "label": "DQ_UsabilityElement"
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "key": "dataQualityElement.nameOfMeasure",
                                             "title": "Name of measure",
-                                            "type": "simple_array",
-                                            "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.nameOfMeasure",
-                                            "enum": [],
+                                            "type": "string",
+                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.nameOfMeasure",
                                             "help_text": "One or more measure names used for the data quality report.",
                                             "display_type": "text"
                                         },
                                         {
-                                            "key": "DQ_DomainConsistency.result.measureIdentification",
+                                            "key": "dataQualityElement.measureIdentification",
                                             "title": "Measure identification",
                                             "type": "string",
-                                            "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.measureIdentification",
+                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.measureIdentification",
                                             "help_text": "Identification of the measure, using a unique identifier (if applicable).",
                                             "display_type": "text"
                                         },
                                         {
-                                            "key": "DQ_DomainConsistency.result.measureDescription",
+                                            "key": "dataQualityElement.measureDescription",
                                             "title": "Measure description",
                                             "type": "string",
-                                            "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.measureDescription",
+                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.measureDescription",
                                             "help_text": "A description of the measure.",
                                             "display_type": "textarea"
                                         },
                                         {
-                                            "key": "DQ_DomainConsistency.result.evaluationMethodType",
+                                            "key": "dataQualityElement.evaluationMethodType",
                                             "title": "Evaluation method type",
                                             "type": "simple_array",
-                                            "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.evaluationMethodType",
+                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationMethodType",
                                             "enum": [
                                                 {
                                                     "label": "Direct internal",
@@ -5196,10 +5418,10 @@
                                             "display_type": "dropdown-custom"
                                         },
                                         {
-                                            "key": "DQ_DomainConsistency.result.evaluationMethodDescription",
+                                            "key": "dataQualityElement.evaluationMethodDescription",
                                             "title": "Evaluation method description",
                                             "type": "string",
-                                            "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.evaluationMethodDescription",
+                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationMethodDescription",
                                             "help_text": "Description of the evaluation method.",
                                             "display_type": "textarea"
                                         },
@@ -5210,22 +5432,22 @@
                                             "type": "section",
                                             "props": [
                                                 {
-                                                    "key": "DQ_DomainConsistency.result.evaluationProcedure.title",
+                                                    "key": "dataQualityElement.evaluationProcedure.title",
                                                     "title": "Title",
                                                     "type": "string",
-                                                    "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.title",
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.title",
                                                     "help_text": "Citation of the evaluation procedure (as citation element).",
                                                     "display_type": "text"
                                                 },
                                                 {
-                                                    "key": "DQ_DomainConsistency.result.evaluationProcedure.alternateTitle",
+                                                    "key": "dataQualityElement.evaluationProcedure.alternateTitle",
                                                     "title": "Alternate title",
                                                     "type": "string",
-                                                    "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.alternateTitle",
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.alternateTitle",
                                                     "display_type": "text"
                                                 },
                                                 {
-                                                    "key": "DQ_DomainConsistency.result.evaluationProcedure.date",
+                                                    "key": "dataQualityElement.evaluationProcedure.date",
                                                     "title": "Date",
                                                     "type": "array",
                                                     "props": [
@@ -5233,7 +5455,7 @@
                                                             "key": "date",
                                                             "type": "string",
                                                             "title": "Date",
-                                                            "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.date.date",
+                                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.date.date",
                                                             "display_type": "text"
                                                         },
                                                         {
@@ -5241,50 +5463,50 @@
                                                             "type": "string",
                                                             "title": "Type",
                                                             "help_text": "Date type e.g. publication, revision, creation",
-                                                            "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.date.type",
+                                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.date.type",
                                                             "display_type": "text"
                                                         }
                                                     ],
-                                                    "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.date",
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.date",
                                                     "help_text": "Date time when the report was established."
                                                 },
                                                 {
-                                                    "key": "DQ_DomainConsistency.result.evaluationProcedure.edition",
+                                                    "key": "dataQualityElement.evaluationProcedure.edition",
                                                     "title": "Edition",
                                                     "type": "string",
-                                                    "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.edition",
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.edition",
                                                     "display_type": "text"
                                                 },
                                                 {
-                                                    "key": "DQ_DomainConsistency.result.evaluationProcedure.editionDate",
+                                                    "key": "dataQualityElement.evaluationProcedure.editionDate",
                                                     "title": "Edition date",
                                                     "type": "string",
-                                                    "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.editionDate",
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.editionDate",
                                                     "display_type": "text"
                                                 },
                                                 {
-                                                    "key": "DQ_DomainConsistency.result.evaluationProcedure.identifier.authority",
+                                                    "key": "dataQualityElement.evaluationProcedure.identifier.authority",
                                                     "title": "Identifier authority",
                                                     "type": "string",
-                                                    "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.identifier.authority",
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.identifier.authority",
                                                     "display_type": "text"
                                                 },
                                                 {
-                                                    "key": "DQ_DomainConsistency.result.evaluationProcedure.identifier.code",
+                                                    "key": "dataQualityElement.evaluationProcedure.identifier.code",
                                                     "title": "Identifier code",
                                                     "type": "string",
-                                                    "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.identifier.code",
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.identifier.code",
                                                     "display_type": "text"
                                                 },
                                                 {
-                                                    "key": "DQ_DomainConsistency.result.dateTime",
+                                                    "key": "dataQualityElement.dateTime",
                                                     "title": "Date and time",
                                                     "type": "string",
-                                                    "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.dateTime",
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.dateTime",
                                                     "display_type": "date"
                                                 },
                                                 {
-                                                    "key": "DQ_DomainConsistency.result.evaluationProcedure.citedResponsibleParty",
+                                                    "key": "dataQualityElement.evaluationProcedure.citedResponsibleParty",
                                                     "type": "nested_array",
                                                     "title": "Responsible party",
                                                     "props": [
@@ -5292,28 +5514,28 @@
                                                             "key": "individualName",
                                                             "title": "Individual name",
                                                             "type": "string",
-                                                            "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.citedResponsibleParty.individualName",
+                                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.citedResponsibleParty.individualName",
                                                             "display_type": "text"
                                                         },
                                                         {
                                                             "key": "organisationName",
                                                             "title": "Organisation name",
                                                             "type": "string",
-                                                            "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.citedResponsibleParty.organisationName",
+                                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.citedResponsibleParty.organisationName",
                                                             "display_type": "text"
                                                         },
                                                         {
                                                             "key": "positionName",
                                                             "title": "Position",
                                                             "type": "string",
-                                                            "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.citedResponsibleParty.positionName",
+                                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.citedResponsibleParty.positionName",
                                                             "display_type": "text"
                                                         },
                                                         {
                                                             "key": "role",
                                                             "title": "Role",
                                                             "type": "string",
-                                                            "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.citedResponsibleParty.role",
+                                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.citedResponsibleParty.role",
                                                             "display_type": "dropdown-custom",
                                                             "enum": [
                                                                 {
@@ -5402,26 +5624,26 @@
                                                             "key": "contactInfo.address.electronicMailAddress",
                                                             "title": "Email",
                                                             "type": "string",
-                                                            "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.citedResponsibleParty.contactInfo.address.electronicMailAddress",
+                                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.citedResponsibleParty.contactInfo.address.electronicMailAddress",
                                                             "display_type": "text"
                                                         },
                                                         {
                                                             "key": "contactInfo.phone.voice",
                                                             "title": "Voice",
                                                             "type": "string",
-                                                            "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.citedResponsibleParty.contactInfo.phone.voice",
+                                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.citedResponsibleParty.contactInfo.phone.voice",
                                                             "display_type": "text"
                                                         },
                                                         {
                                                             "key": "contactInfo.phone.facsimile",
                                                             "title": "Facsimile",
                                                             "type": "string",
-                                                            "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.citedResponsibleParty.contactInfo.phone.facsimile",
+                                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.citedResponsibleParty.contactInfo.phone.facsimile",
                                                             "display_type": "text"
                                                         },
                                                         {
                                                             "key": "section-1676486382816",
-                                                            "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.citedResponsibleParty.section-1676486382816",
+                                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.citedResponsibleParty.section-1676486382816",
                                                             "title": "Address",
                                                             "type": "section",
                                                             "props": [
@@ -5429,28 +5651,28 @@
                                                                     "key": "contactInfo.address.deliveryPoint",
                                                                     "title": "Delivery point",
                                                                     "type": "string",
-                                                                    "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.citedResponsibleParty.section-1676486382816.contactInfo.address.deliveryPoint",
+                                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.citedResponsibleParty.section-1676486382816.contactInfo.address.deliveryPoint",
                                                                     "display_type": "text"
                                                                 },
                                                                 {
                                                                     "key": "contactInfo.address.city",
                                                                     "title": "City",
                                                                     "type": "string",
-                                                                    "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.citedResponsibleParty.section-1676486382816.contactInfo.address.city",
+                                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.citedResponsibleParty.section-1676486382816.contactInfo.address.city",
                                                                     "display_type": "text"
                                                                 },
                                                                 {
                                                                     "key": "contactInfo.address.postalCode",
                                                                     "title": "Postal code",
                                                                     "type": "string",
-                                                                    "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.citedResponsibleParty.section-1676486382816.contactInfo.address.postalCode",
+                                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.citedResponsibleParty.section-1676486382816.contactInfo.address.postalCode",
                                                                     "display_type": "text"
                                                                 },
                                                                 {
                                                                     "key": "contactInfo.address.country",
                                                                     "title": "Country",
                                                                     "type": "string",
-                                                                    "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.citedResponsibleParty.section-1676486382816.contactInfo.address.country",
+                                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.citedResponsibleParty.section-1676486382816.contactInfo.address.country",
                                                                     "display_type": "text"
                                                                 }
                                                             ],
@@ -5458,7 +5680,7 @@
                                                         },
                                                         {
                                                             "key": "section-1676486391064",
-                                                            "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.citedResponsibleParty.section-1676486391064",
+                                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.citedResponsibleParty.section-1676486391064",
                                                             "title": "Online resource",
                                                             "type": "section",
                                                             "props": [
@@ -5466,14 +5688,14 @@
                                                                     "key": "contactInfo.onlineResource.name",
                                                                     "title": "Name",
                                                                     "type": "string",
-                                                                    "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.citedResponsibleParty.section-1676486391064.contactInfo.onlineResource.name",
+                                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.citedResponsibleParty.section-1676486391064.contactInfo.onlineResource.name",
                                                                     "display_type": "text"
                                                                 },
                                                                 {
                                                                     "key": "contactInfo.onlineResource.linkage",
                                                                     "title": "URL",
                                                                     "type": "string",
-                                                                    "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.citedResponsibleParty.section-1676486391064.contactInfo.onlineResource.linkage",
+                                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.citedResponsibleParty.section-1676486391064.contactInfo.onlineResource.linkage",
                                                                     "rules": {
                                                                         "is_uri": true
                                                                     },
@@ -5483,31 +5705,31 @@
                                                                     "key": "contactInfo.onlineResource.description",
                                                                     "title": "Description",
                                                                     "type": "string",
-                                                                    "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.citedResponsibleParty.section-1676486391064.contactInfo.onlineResource.description",
+                                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.citedResponsibleParty.section-1676486391064.contactInfo.onlineResource.description",
                                                                     "display_type": "textarea"
                                                                 },
                                                                 {
                                                                     "key": "contactInfo.onlineResource.protocol",
                                                                     "title": "Protocol",
                                                                     "type": "string",
-                                                                    "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.citedResponsibleParty.section-1676486391064.contactInfo.onlineResource.protocol",
+                                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.citedResponsibleParty.section-1676486391064.contactInfo.onlineResource.protocol",
                                                                     "display_type": "text"
                                                                 },
                                                                 {
                                                                     "key": "contactInfo.onlineResource.function",
                                                                     "title": "Function",
                                                                     "type": "string",
-                                                                    "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.citedResponsibleParty.section-1676486391064.contactInfo.onlineResource.function",
+                                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.citedResponsibleParty.section-1676486391064.contactInfo.onlineResource.function",
                                                                     "display_type": "text"
                                                                 }
                                                             ],
                                                             "help_text": ""
                                                         }
                                                     ],
-                                                    "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.citedResponsibleParty"
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.citedResponsibleParty"
                                                 },
                                                 {
-                                                    "key": "DQ_DomainConsistency.result.evaluationProcedure.presentationForm",
+                                                    "key": "dataQualityElement.evaluationProcedure.presentationForm",
                                                     "title": "Resource presentation",
                                                     "type": "string",
                                                     "enum": [
@@ -5596,12 +5818,12 @@
                                                             "label": "Diagram hardcopy"
                                                         }
                                                     ],
-                                                    "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.presentationForm",
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.presentationForm",
                                                     "display_type": "dropdown-custom"
                                                 },
                                                 {
                                                     "key": "section-1676486975620",
-                                                    "prop_key": "description.dataQualityInfo.report.section-1676486651592.section-1676486975620",
+                                                    "prop_key": "description.dataQualityInfo.report.section-1676486975620",
                                                     "title": "Series",
                                                     "type": "section",
                                                     "props": [
@@ -5609,14 +5831,14 @@
                                                             "key": "specification.series.name",
                                                             "title": "Name",
                                                             "type": "string",
-                                                            "prop_key": "description.dataQualityInfo.report.section-1676486651592.section-1676486975620.specification.series.name",
+                                                            "prop_key": "description.dataQualityInfo.report.specification.series.name",
                                                             "display_type": "text"
                                                         },
                                                         {
                                                             "key": "specification.series.issueIdentification",
                                                             "title": "Issue",
                                                             "type": "string",
-                                                            "prop_key": "description.dataQualityInfo.report.section-1676486651592.section-1676486975620.specification.series.issueIdentification",
+                                                            "prop_key": "description.dataQualityInfo.report.specification.series.issueIdentification",
                                                             "display_type": "text",
                                                             "help_text": "Identification of the issue"
                                                         },
@@ -5624,67 +5846,67 @@
                                                             "key": "specification.series.page",
                                                             "title": "Page",
                                                             "type": "string",
-                                                            "prop_key": "description.dataQualityInfo.report.section-1676486651592.section-1676486975620.specification.series.page",
+                                                            "prop_key": "description.dataQualityInfo.report.specification.series.page",
                                                             "display_type": "text"
                                                         }
                                                     ],
                                                     "help_text": ""
                                                 },
                                                 {
-                                                    "key": "DQ_DomainConsistency.result.evaluationProcedure.otherCitationDetails",
+                                                    "key": "dataQualityElement.evaluationProcedure.otherCitationDetails",
                                                     "title": "Other citation details",
                                                     "type": "string",
-                                                    "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.otherCitationDetails",
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.otherCitationDetails",
                                                     "display_type": "textarea"
                                                 },
                                                 {
-                                                    "key": "DQ_DomainConsistency.result.evaluationProcedure.collectiveTitle",
+                                                    "key": "dataQualityElement.evaluationProcedure.collectiveTitle",
                                                     "title": "Collective title",
                                                     "type": "string",
-                                                    "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.collectiveTitle",
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.collectiveTitle",
                                                     "display_type": "text"
                                                 },
                                                 {
-                                                    "key": "DQ_DomainConsistency.result.evaluationProcedure.ISBN",
+                                                    "key": "dataQualityElement.evaluationProcedure.ISBN",
                                                     "title": "ISBN",
                                                     "type": "string",
-                                                    "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.ISBN",
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.ISBN",
                                                     "display_type": "text"
                                                 },
                                                 {
-                                                    "key": "DQ_DomainConsistency.result.evaluationProcedure.ISSN",
+                                                    "key": "dataQualityElement.evaluationProcedure.ISSN",
                                                     "title": "ISSN",
                                                     "type": "string",
-                                                    "prop_key": "description.dataQualityInfo.report.section-1676486651592.DQ_DomainConsistency.result.evaluationProcedure.ISSN",
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.evaluationProcedure.ISSN",
                                                     "display_type": "text"
                                                 }
                                             ],
                                             "help_text": ""
                                         },
                                         {
-                                            "key": "DQ_DomainConsistency.result.dateTime",
+                                            "key": "dataQualityElement.dateTime",
                                             "title": "Date and time",
                                             "type": "string",
-                                            "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.dateTime",
+                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.dateTime",
                                             "display_type": "date"
                                         },
                                         {
-                                            "key": "DQ_DomainConsistency.result.result",
-                                            "title": "Result of consistency check",
+                                            "key": "dataQualityElement.conformanceResult",
+                                            "title": "Conformance result",
                                             "type": "nested_array",
                                             "props": [
                                                 {
                                                     "key": "specification.title",
                                                     "title": "Title",
                                                     "type": "string",
-                                                    "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.title",
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.title",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "specification.alternateTitle",
                                                     "title": "Alternate title",
                                                     "type": "string",
-                                                    "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.alternateTitle",
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.alternateTitle",
                                                     "display_type": "text"
                                                 },
                                                 {
@@ -5696,7 +5918,7 @@
                                                             "key": "date",
                                                             "type": "string",
                                                             "title": "Date",
-                                                            "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.date.date",
+                                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.date.date",
                                                             "display_type": "text"
                                                         },
                                                         {
@@ -5704,38 +5926,38 @@
                                                             "type": "string",
                                                             "title": "Type",
                                                             "help_text": "Date type e.g. publication, revision, creation",
-                                                            "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.date.type",
+                                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.date.type",
                                                             "display_type": "text"
                                                         }
                                                     ],
-                                                    "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.date"
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.date"
                                                 },
                                                 {
                                                     "key": "specification.edition",
                                                     "title": "Edition",
                                                     "type": "string",
-                                                    "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.edition",
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.edition",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "specification.editionDate",
                                                     "title": "Edition date",
                                                     "type": "string",
-                                                    "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.editionDate",
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.editionDate",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "specification.identifier.authority",
                                                     "title": "Identifier authority",
                                                     "type": "string",
-                                                    "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.identifier.authority",
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.identifier.authority",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "specification.identifier.code",
                                                     "title": "Identifier code",
                                                     "type": "string",
-                                                    "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.identifier.code",
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.identifier.code",
                                                     "display_type": "text"
                                                 },
                                                 {
@@ -5747,28 +5969,28 @@
                                                             "key": "individualName",
                                                             "title": "Individual name",
                                                             "type": "string",
-                                                            "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.citedResponsibleParty.individualName",
+                                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.citedResponsibleParty.individualName",
                                                             "display_type": "text"
                                                         },
                                                         {
                                                             "key": "organisationName",
                                                             "title": "Organisation name",
                                                             "type": "string",
-                                                            "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.citedResponsibleParty.organisationName",
+                                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.citedResponsibleParty.organisationName",
                                                             "display_type": "text"
                                                         },
                                                         {
                                                             "key": "positionName",
                                                             "title": "Position",
                                                             "type": "string",
-                                                            "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.citedResponsibleParty.positionName",
+                                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.citedResponsibleParty.positionName",
                                                             "display_type": "text"
                                                         },
                                                         {
                                                             "key": "role",
                                                             "title": "Role",
                                                             "type": "string",
-                                                            "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.citedResponsibleParty.role",
+                                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.citedResponsibleParty.role",
                                                             "display_type": "dropdown-custom",
                                                             "enum": [
                                                                 {
@@ -5857,26 +6079,26 @@
                                                             "key": "contactInfo.address.electronicMailAddress",
                                                             "title": "Email",
                                                             "type": "string",
-                                                            "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.citedResponsibleParty.contactInfo.address.electronicMailAddress",
+                                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.citedResponsibleParty.contactInfo.address.electronicMailAddress",
                                                             "display_type": "text"
                                                         },
                                                         {
                                                             "key": "contactInfo.phone.voice",
                                                             "title": "Voice",
                                                             "type": "string",
-                                                            "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.citedResponsibleParty.contactInfo.phone.voice",
+                                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.citedResponsibleParty.contactInfo.phone.voice",
                                                             "display_type": "text"
                                                         },
                                                         {
                                                             "key": "contactInfo.phone.facsimile",
                                                             "title": "Facsimile",
                                                             "type": "string",
-                                                            "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.citedResponsibleParty.contactInfo.phone.facsimile",
+                                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.citedResponsibleParty.contactInfo.phone.facsimile",
                                                             "display_type": "text"
                                                         },
                                                         {
                                                             "key": "section-1676487442077",
-                                                            "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.citedResponsibleParty.section-1676487442077",
+                                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.citedResponsibleParty.section-1676487442077",
                                                             "title": "Address",
                                                             "type": "section",
                                                             "props": [
@@ -5884,28 +6106,28 @@
                                                                     "key": "contactInfo.address.deliveryPoint",
                                                                     "title": "Delivery point",
                                                                     "type": "string",
-                                                                    "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.citedResponsibleParty.section-1676487442077.contactInfo.address.deliveryPoint",
+                                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.citedResponsibleParty.contactInfo.address.deliveryPoint",
                                                                     "display_type": "text"
                                                                 },
                                                                 {
                                                                     "key": "contactInfo.address.city",
                                                                     "title": "City",
                                                                     "type": "string",
-                                                                    "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.citedResponsibleParty.section-1676487442077.contactInfo.address.city",
+                                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.citedResponsibleParty.contactInfo.address.city",
                                                                     "display_type": "text"
                                                                 },
                                                                 {
                                                                     "key": "contactInfo.address.postalCode",
                                                                     "title": "Postal code",
                                                                     "type": "string",
-                                                                    "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.citedResponsibleParty.section-1676487442077.contactInfo.address.postalCode",
+                                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.citedResponsibleParty.contactInfo.address.postalCode",
                                                                     "display_type": "text"
                                                                 },
                                                                 {
                                                                     "key": "contactInfo.address.country",
                                                                     "title": "Country",
                                                                     "type": "string",
-                                                                    "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.citedResponsibleParty.section-1676487442077.contactInfo.address.country",
+                                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.citedResponsibleParty.contactInfo.address.country",
                                                                     "display_type": "text"
                                                                 }
                                                             ],
@@ -5913,7 +6135,7 @@
                                                         },
                                                         {
                                                             "key": "section-1676487449053",
-                                                            "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.citedResponsibleParty.section-1676487449053",
+                                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.citedResponsibleParty.section-1676487449053",
                                                             "title": "Online resource",
                                                             "type": "section",
                                                             "props": [
@@ -5921,14 +6143,14 @@
                                                                     "key": "contactInfo.onlineResource.name",
                                                                     "title": "Name",
                                                                     "type": "string",
-                                                                    "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.citedResponsibleParty.section-1676487449053.contactInfo.onlineResource.name",
+                                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.citedResponsibleParty.contactInfo.onlineResource.name",
                                                                     "display_type": "text"
                                                                 },
                                                                 {
                                                                     "key": "contactInfo.onlineResource.linkage",
                                                                     "title": "URL",
                                                                     "type": "string",
-                                                                    "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.citedResponsibleParty.section-1676487449053.contactInfo.onlineResource.linkage",
+                                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.citedResponsibleParty.contactInfo.onlineResource.linkage",
                                                                     "rules": {
                                                                         "is_uri": true
                                                                     },
@@ -5938,28 +6160,28 @@
                                                                     "key": "contactInfo.onlineResource.description",
                                                                     "title": "Description",
                                                                     "type": "string",
-                                                                    "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.citedResponsibleParty.section-1676487449053.contactInfo.onlineResource.description",
+                                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.citedResponsibleParty.contactInfo.onlineResource.description",
                                                                     "display_type": "textarea"
                                                                 },
                                                                 {
                                                                     "key": "contactInfo.onlineResource.protocol",
                                                                     "title": "Protocol",
                                                                     "type": "string",
-                                                                    "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.citedResponsibleParty.section-1676487449053.contactInfo.onlineResource.protocol",
+                                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.citedResponsibleParty.contactInfo.onlineResource.protocol",
                                                                     "display_type": "text"
                                                                 },
                                                                 {
                                                                     "key": "contactInfo.onlineResource.function",
                                                                     "title": "Function",
                                                                     "type": "string",
-                                                                    "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.citedResponsibleParty.section-1676487449053.contactInfo.onlineResource.function",
+                                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.citedResponsibleParty.contactInfo.onlineResource.function",
                                                                     "display_type": "text"
                                                                 }
                                                             ],
                                                             "help_text": ""
                                                         }
                                                     ],
-                                                    "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.citedResponsibleParty"
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.citedResponsibleParty"
                                                 },
                                                 {
                                                     "key": "specification.presentationForm",
@@ -6051,7 +6273,7 @@
                                                             "label": "Diagram hardcopy"
                                                         }
                                                     ],
-                                                    "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.presentationForm",
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.presentationForm",
                                                     "display_type": "dropdown-custom"
                                                 },
                                                 {
@@ -6059,20 +6281,20 @@
                                                     "title": "Series",
                                                     "type": "section",
                                                     "items": [],
-                                                    "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.series_section",
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.series_section",
                                                     "props": [
                                                         {
                                                             "key": "specification.series.name",
                                                             "title": "Name",
                                                             "type": "string",
-                                                            "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.series_section.specification.series.name",
+                                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.series_section.specification.series.name",
                                                             "display_type": "text"
                                                         },
                                                         {
                                                             "key": "specification.series.issueIdentification",
                                                             "title": "Issue",
                                                             "type": "string",
-                                                            "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.series_section.specification.series.issueIdentification",
+                                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.series_section.specification.series.issueIdentification",
                                                             "help_text": "Identification of the issue",
                                                             "display_type": "text"
                                                         },
@@ -6080,7 +6302,7 @@
                                                             "key": "specification.series.page",
                                                             "title": "Page",
                                                             "type": "string",
-                                                            "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.series_section.specification.series.page",
+                                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.series_section.specification.series.page",
                                                             "display_type": "text"
                                                         }
                                                     ]
@@ -6089,42 +6311,42 @@
                                                     "key": "specification.otherCitationDetails",
                                                     "title": "Other citation details",
                                                     "type": "string",
-                                                    "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.otherCitationDetails",
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.otherCitationDetails",
                                                     "display_type": "textarea"
                                                 },
                                                 {
                                                     "key": "specification.collectiveTitle",
                                                     "title": "Collective title",
                                                     "type": "string",
-                                                    "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.collectiveTitle",
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.collectiveTitle",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "specification.ISBN",
                                                     "title": "ISBN",
                                                     "type": "string",
-                                                    "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.ISBN",
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.ISBN",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "specification.ISSN",
                                                     "title": "ISSN",
                                                     "type": "string",
-                                                    "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.specification.ISSN",
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.ISSN",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "explanation",
                                                     "title": "Explanation",
                                                     "type": "string",
-                                                    "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.explanation",
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.explanation",
                                                     "display_type": "textarea"
                                                 },
                                                 {
                                                     "key": "pass",
                                                     "title": "Pass",
                                                     "type": "boolean",
-                                                    "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result.pass",
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.pass",
                                                     "help_text": "Indication of the conformance result.\n- true if conformant\n- false if not conformant\n- null (blank) if not evaluated",
                                                     "enum": [
                                                         [],
@@ -6136,7 +6358,48 @@
                                                     "display_type": "dropdown"
                                                 }
                                             ],
-                                            "prop_key": "description.dataQualityInfo.report.DQ_DomainConsistency.result.result"
+                                            "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult"
+                                        },
+                                        {
+                                            "key":"dataQualityElement.quantitativeResult",
+                                            "title": "Quantitative result",
+                                            "type": "section",
+                                            "props": [
+                                                {
+                                                    "key": "dataQualityElement.quantitativeResult.valueType",
+                                                    "title": "Value type",
+                                                    "type": "string",
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.quantitativeResult.valueType",
+                                                    "display_type": "text"
+                                                },
+                                                {
+                                                    "key": "dataQualityElement.quantitativeResult.valueUnit.identifier",
+                                                    "title": "Value unit identifier",
+                                                    "type": "string",
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.quantitativeResult.valueUnit.identifier",
+                                                    "display_type": "text"
+                                                },
+                                                {
+                                                    "key": "dataQualityElement.quantitativeResult.valueUnit.name",
+                                                    "title": "Value unit name",
+                                                    "type": "string",
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.quantitativeResult.valueUnit.name",
+                                                    "display_type": "text"
+                                                },
+                                                {
+                                                    "key": "dataQualityElement.conformanceResult.valueUnit.quantityType",
+                                                    "title": "Value unit quantity type",
+                                                    "type": "string",
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.quantitativeResult.valueUnit.quantityType",
+                                                    "display_type": "text"
+                                                },
+                                                {
+                                                    "key": "dataQualityElement.quantitativeResult.value",
+                                                    "title": "Value",
+                                                    "type": "string",
+                                                    "prop_key": "description.dataQualityInfo.report.dataQualityElement.quantitativeResult.value"
+                                                }
+                                            ]
                                         }
                                     ],
                                     "prop_key": "description.dataQualityInfo.report",
@@ -6333,28 +6596,28 @@
                                                                     "key": "contactInfo.address.deliveryPoint",
                                                                     "title": "Delivery point",
                                                                     "type": "string",
-                                                                    "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.processor.section-1676487859880.contactInfo.address.deliveryPoint",
+                                                                    "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.processor.contactInfo.address.deliveryPoint",
                                                                     "display_type": "text"
                                                                 },
                                                                 {
                                                                     "key": "contactInfo.address.city",
                                                                     "title": "City",
                                                                     "type": "string",
-                                                                    "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.processor.section-1676487859880.contactInfo.address.city",
+                                                                    "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.processor.contactInfo.address.city",
                                                                     "display_type": "text"
                                                                 },
                                                                 {
                                                                     "key": "contactInfo.address.postalCode",
                                                                     "title": "Postal code",
                                                                     "type": "string",
-                                                                    "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.processor.section-1676487859880.contactInfo.address.postalCode",
+                                                                    "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.processor.contactInfo.address.postalCode",
                                                                     "display_type": "text"
                                                                 },
                                                                 {
                                                                     "key": "contactInfo.address.country",
                                                                     "title": "Country",
                                                                     "type": "string",
-                                                                    "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.processor.section-1676487859880.contactInfo.address.country",
+                                                                    "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.processor.contactInfo.address.country",
                                                                     "display_type": "text"
                                                                 }
                                                             ],
@@ -6370,14 +6633,14 @@
                                                                     "key": "contactInfo.onlineResource.name",
                                                                     "title": "Name",
                                                                     "type": "string",
-                                                                    "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.processor.section-1676487869001.contactInfo.onlineResource.name",
+                                                                    "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.processor.contactInfo.onlineResource.name",
                                                                     "display_type": "text"
                                                                 },
                                                                 {
                                                                     "key": "contactInfo.onlineResource.linkage",
                                                                     "title": "URL",
                                                                     "type": "string",
-                                                                    "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.processor.section-1676487869001.contactInfo.onlineResource.linkage",
+                                                                    "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.processor.contactInfo.onlineResource.linkage",
                                                                     "rules": {
                                                                         "is_uri": true
                                                                     },
@@ -6387,21 +6650,21 @@
                                                                     "key": "contactInfo.onlineResource.description",
                                                                     "title": "Description",
                                                                     "type": "string",
-                                                                    "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.processor.section-1676487869001.contactInfo.onlineResource.description",
+                                                                    "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.processor.contactInfo.onlineResource.description",
                                                                     "display_type": "textarea"
                                                                 },
                                                                 {
                                                                     "key": "contactInfo.onlineResource.protocol",
                                                                     "title": "Protocol",
                                                                     "type": "string",
-                                                                    "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.processor.section-1676487869001.contactInfo.onlineResource.protocol",
+                                                                    "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.processor.contactInfo.onlineResource.protocol",
                                                                     "display_type": "text"
                                                                 },
                                                                 {
                                                                     "key": "contactInfo.onlineResource.function",
                                                                     "title": "Function",
                                                                     "type": "string",
-                                                                    "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.processor.section-1676487869001.contactInfo.onlineResource.function",
+                                                                    "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.processor.contactInfo.onlineResource.function",
                                                                     "display_type": "text"
                                                                 }
                                                             ],
@@ -6634,28 +6897,28 @@
                                                                             "key": "contactInfo.address.deliveryPoint",
                                                                             "title": "Delivery point",
                                                                             "type": "string",
-                                                                            "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.source.sourceCitation.citedResponsibleParty.section-1676488006215.contactInfo.address.deliveryPoint",
+                                                                            "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.source.sourceCitation.citedResponsibleParty.contactInfo.address.deliveryPoint",
                                                                             "display_type": "text"
                                                                         },
                                                                         {
                                                                             "key": "contactInfo.address.city",
                                                                             "title": "City",
                                                                             "type": "string",
-                                                                            "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.source.sourceCitation.citedResponsibleParty.section-1676488006215.contactInfo.address.city",
+                                                                            "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.source.sourceCitation.citedResponsibleParty.contactInfo.address.city",
                                                                             "display_type": "text"
                                                                         },
                                                                         {
                                                                             "key": "contactInfo.address.postalCode",
                                                                             "title": "Postal code",
                                                                             "type": "string",
-                                                                            "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.source.sourceCitation.citedResponsibleParty.section-1676488006215.contactInfo.address.postalCode",
+                                                                            "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.source.sourceCitation.citedResponsibleParty.contactInfo.address.postalCode",
                                                                             "display_type": "text"
                                                                         },
                                                                         {
                                                                             "key": "contactInfo.address.country",
                                                                             "title": "Country",
                                                                             "type": "string",
-                                                                            "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.source.sourceCitation.citedResponsibleParty.section-1676488006215.contactInfo.address.country",
+                                                                            "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.source.sourceCitation.citedResponsibleParty.contactInfo.address.country",
                                                                             "display_type": "text"
                                                                         }
                                                                     ],
@@ -6671,14 +6934,14 @@
                                                                             "key": "contactInfo.onlineResource.name",
                                                                             "title": "Name",
                                                                             "type": "string",
-                                                                            "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.source.sourceCitation.citedResponsibleParty.section-1676488011368.contactInfo.onlineResource.name",
+                                                                            "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.source.sourceCitation.citedResponsibleParty.contactInfo.onlineResource.name",
                                                                             "display_type": "text"
                                                                         },
                                                                         {
                                                                             "key": "contactInfo.onlineResource.linkage",
                                                                             "title": "URL",
                                                                             "type": "string",
-                                                                            "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.source.sourceCitation.citedResponsibleParty.section-1676488011368.contactInfo.onlineResource.linkage",
+                                                                            "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.source.sourceCitation.citedResponsibleParty.contactInfo.onlineResource.linkage",
                                                                             "rules": {
                                                                                 "is_uri": true
                                                                             },
@@ -6688,21 +6951,21 @@
                                                                             "key": "contactInfo.onlineResource.description",
                                                                             "title": "Description",
                                                                             "type": "string",
-                                                                            "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.source.sourceCitation.citedResponsibleParty.section-1676488011368.contactInfo.onlineResource.description",
+                                                                            "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.source.sourceCitation.citedResponsibleParty.contactInfo.onlineResource.description",
                                                                             "display_type": "textarea"
                                                                         },
                                                                         {
                                                                             "key": "contactInfo.onlineResource.protocol",
                                                                             "title": "Protocol",
                                                                             "type": "string",
-                                                                            "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.source.sourceCitation.citedResponsibleParty.section-1676488011368.contactInfo.onlineResource.protocol",
+                                                                            "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.source.sourceCitation.citedResponsibleParty.contactInfo.onlineResource.protocol",
                                                                             "display_type": "text"
                                                                         },
                                                                         {
                                                                             "key": "contactInfo.onlineResource.function",
                                                                             "title": "Function",
                                                                             "type": "string",
-                                                                            "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.source.sourceCitation.citedResponsibleParty.section-1676488011368.contactInfo.onlineResource.function",
+                                                                            "prop_key": "description.dataQualityInfo.lineage.lineage.processStep.source.sourceCitation.citedResponsibleParty.contactInfo.onlineResource.function",
                                                                             "display_type": "text"
                                                                         }
                                                                     ],
@@ -7162,28 +7425,28 @@
                                                     "key": "contactInfo.address.deliveryPoint",
                                                     "title": "Delivery point",
                                                     "type": "string",
-                                                    "prop_key": "description.portrayalCatalogueInfo.portrayalCatalogueCitation.citedResponsibleParty.section-1676489185668.contactInfo.address.deliveryPoint",
+                                                    "prop_key": "description.portrayalCatalogueInfo.portrayalCatalogueCitation.citedResponsibleParty.contactInfo.address.deliveryPoint",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "contactInfo.address.city",
                                                     "title": "City",
                                                     "type": "string",
-                                                    "prop_key": "description.portrayalCatalogueInfo.portrayalCatalogueCitation.citedResponsibleParty.section-1676489185668.contactInfo.address.city",
+                                                    "prop_key": "description.portrayalCatalogueInfo.portrayalCatalogueCitation.citedResponsibleParty.contactInfo.address.city",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "contactInfo.address.postalCode",
                                                     "title": "Postal code",
                                                     "type": "string",
-                                                    "prop_key": "description.portrayalCatalogueInfo.portrayalCatalogueCitation.citedResponsibleParty.section-1676489185668.contactInfo.address.postalCode",
+                                                    "prop_key": "description.portrayalCatalogueInfo.portrayalCatalogueCitation.citedResponsibleParty.contactInfo.address.postalCode",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "contactInfo.address.country",
                                                     "title": "Country",
                                                     "type": "string",
-                                                    "prop_key": "description.portrayalCatalogueInfo.portrayalCatalogueCitation.citedResponsibleParty.section-1676489185668.contactInfo.address.country",
+                                                    "prop_key": "description.portrayalCatalogueInfo.portrayalCatalogueCitation.citedResponsibleParty.contactInfo.address.country",
                                                     "display_type": "text"
                                                 }
                                             ],
@@ -7199,14 +7462,14 @@
                                                     "key": "contactInfo.onlineResource.name",
                                                     "title": "Name",
                                                     "type": "string",
-                                                    "prop_key": "description.portrayalCatalogueInfo.portrayalCatalogueCitation.citedResponsibleParty.section-1676489193500.contactInfo.onlineResource.name",
+                                                    "prop_key": "description.portrayalCatalogueInfo.portrayalCatalogueCitation.citedResponsibleParty.contactInfo.onlineResource.name",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "contactInfo.onlineResource.linkage",
                                                     "title": "URL",
                                                     "type": "string",
-                                                    "prop_key": "description.portrayalCatalogueInfo.portrayalCatalogueCitation.citedResponsibleParty.section-1676489193500.contactInfo.onlineResource.linkage",
+                                                    "prop_key": "description.portrayalCatalogueInfo.portrayalCatalogueCitation.citedResponsibleParty.contactInfo.onlineResource.linkage",
                                                     "rules": {
                                                         "is_uri": true
                                                     },
@@ -7216,21 +7479,21 @@
                                                     "key": "contactInfo.onlineResource.description",
                                                     "title": "Description",
                                                     "type": "string",
-                                                    "prop_key": "description.portrayalCatalogueInfo.portrayalCatalogueCitation.citedResponsibleParty.section-1676489193500.contactInfo.onlineResource.description",
+                                                    "prop_key": "description.portrayalCatalogueInfo.portrayalCatalogueCitation.citedResponsibleParty.contactInfo.onlineResource.description",
                                                     "display_type": "textarea"
                                                 },
                                                 {
                                                     "key": "contactInfo.onlineResource.protocol",
                                                     "title": "Protocol",
                                                     "type": "string",
-                                                    "prop_key": "description.portrayalCatalogueInfo.portrayalCatalogueCitation.citedResponsibleParty.section-1676489193500.contactInfo.onlineResource.protocol",
+                                                    "prop_key": "description.portrayalCatalogueInfo.portrayalCatalogueCitation.citedResponsibleParty.contactInfo.onlineResource.protocol",
                                                     "display_type": "text"
                                                 },
                                                 {
                                                     "key": "contactInfo.onlineResource.function",
                                                     "title": "Function",
                                                     "type": "string",
-                                                    "prop_key": "description.portrayalCatalogueInfo.portrayalCatalogueCitation.citedResponsibleParty.section-1676489193500.contactInfo.onlineResource.function",
+                                                    "prop_key": "description.portrayalCatalogueInfo.portrayalCatalogueCitation.citedResponsibleParty.contactInfo.onlineResource.function",
                                                     "display_type": "text"
                                                 }
                                             ],

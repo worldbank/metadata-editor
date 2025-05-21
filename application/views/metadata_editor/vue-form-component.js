@@ -230,7 +230,9 @@ Vue.component('v-form', {
                 v-model="formData[item.key]"
                 :columns="item.props"
                 :title="item.title"
-                :path="item.key">
+                :path="item.key"
+                :field="item"
+                >
             </nested-array> 
 
         </div>

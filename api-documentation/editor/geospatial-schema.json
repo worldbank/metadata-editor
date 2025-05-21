@@ -248,9 +248,9 @@
 				"identifier": {
 					"title": "Identifier",
 					"description": "Identifiers for the resource metadata",
-					"type":"array",
+					"type": "array",
 					"items": {
-						"type":"object",
+						"type": "object",
 						"properties": {
 							"authority": {
 								"title": "Authority",
@@ -261,8 +261,8 @@
 								"title": "Code",
 								"description": "A code uniquely identifying the resource metadata"
 							}
-						}						
-					}					
+						}
+					}
 				},
 				"citedResponsibleParty": {
 					"title": "Responsible party(ies)",
@@ -275,7 +275,9 @@
 				"presentationForm": {
 					"title": "Presentation form",
 					"description": "The resource presentation form. e.g. 'mapDigital'. Recommended code following the [ISO/TS 19139](http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_PresentationFormCode) PresentationForm codelist. Suggested values: {`documentDigital`, `imageDigital`, `documentHardcopy`, `imageHardcopy`, `mapDigital`, `mapHardcopy`, `modelDigital`, `modelHardcopy`, `profileDigital`, `profileHardcopy`, `tableDigital`, `tableHardcopy`, `videoDigital`, `videoHardcopy`, `audioDigital`, `audioHardcopy`, `multimediaDigital`, `multimediaHardcopy`, `physicalSample`, `diagramDigital`, `diagramHardcopy`}",
-					"type": ["array"]
+					"type": [
+						"array"
+					]
 				},
 				"series": {
 					"title": "Series",
@@ -377,7 +379,6 @@
 						}
 					}
 				},
-
 				"maintenanceNote": {
 					"title": "Maintenance Note",
 					"description": "Note about the maintenance",
@@ -392,7 +393,6 @@
 					"type": "object",
 					"$ref": "#/definitions/responsibleParty"
 				}
-
 			}
 		},
 		"graphicOverview": {
@@ -698,7 +698,7 @@
 			"type": "string",
 			"title": "Project unique identifier",
 			"description": "Project unique identifier"
-		},	
+		},
 		"metadata_information": {
 			"type": "object",
 			"title": "Document metadata information",
@@ -786,7 +786,6 @@
 					"description": "List of Scope(s), or 'hierarchy level(s)'. e.g. `dataset`, `service`. Recommended code following the [ISO/TS 19139](http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MX_ScopeCode) Scope codelist.  (string)",
 					"type": "string",
 					"_xpath": "gmd:hierarchyLevel"
-					
 				},
 				"hierarchyLevelName": {
 					"title": "Scope / hierarchy level names.",
@@ -1200,7 +1199,7 @@
 												}
 											},
 											"geohash": {
-												"title": "Geohash",												
+												"title": "Geohash",
 												"type": "object",
 												"properties": {
 													"geohash": {
@@ -1210,7 +1209,7 @@
 													"note": {
 														"title": "Note",
 														"type": "string"
-													}													
+													}
 												}
 											},
 											"geographicDescription": {
@@ -1221,9 +1220,9 @@
 											"geographicBoundingPolygon": {
 												"title": "Geographic Bounding Polygon",
 												"description": "Geographic Bounding Polygon",
-												"type": "object",												
+												"type": "object",
 												"properties": {
-													"id":{
+													"id": {
 														"title": "Identifier",
 														"type": "string"
 													},
@@ -1233,17 +1232,22 @@
 														"items": {
 															"type": "object",
 															"properties": {
-
-																"ring":{
+																"ring": {
 																	"title": "Ring boundary",
 																	"type": "string",
-																	"enum": ["exterior", "interior"]
+																	"enum": [
+																		"exterior",
+																		"interior"
+																	]
 																},
-
-																"type":{
+																"type": {
 																	"title": "Type",
 																	"type": "string",
-																	"enum": ["point", "lineString", "polygon"]
+																	"enum": [
+																		"point",
+																		"lineString",
+																		"polygon"
+																	]
 																},
 																"coordinates": {
 																	"title": "Coordinates",
@@ -1259,13 +1263,9 @@
 																}
 															}
 														}
-													}												
+													}
 												}
 											}
-
-
-
-
 										}
 									}
 								},
@@ -1324,7 +1324,7 @@
 							"description": "Spatial representation type of the resource. e.g. 'vector'. Recommended code following the [ISO/TS 19139](http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_SpatialRepresentationTypeCode) SpatialRepresentationType codelist. Suggested values: {`vector`, `grid`, `textTable`, `tin`, `stereoModel`, `video`}",
 							"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:spatialRepresentationType/gmd:MD_SpatialRepresentationTypeCode",
 							"items": {
-								"type": "string"							
+								"type": "string"
 							}
 						},
 						"spatialResolution": {
@@ -1332,13 +1332,13 @@
 							"description": "Spatial resolution of the resource",
 							"type": "array",
 							"_xpath": "gmd:identificationInfo/gmd:MD_DataIdentification/gmd:spatialResolution/gmd:MD_Resolution/gco:Distance",
-							"items":{
+							"items": {
 								"type": "object",
 								"properties": {
 									"uom": {
 										"title": "Unit Of Measure",
 										"description": "Unit considered for the resolution measure",
-										"type": "string"										
+										"type": "string"
 									},
 									"value": {
 										"title": "Value",
@@ -1346,7 +1346,7 @@
 										"type": "number"
 									}
 								}
-							}							
+							}
 						},
 						"language": {
 							"type": "array",
@@ -1615,13 +1615,91 @@
 										"items": {
 											"type": "object",
 											"properties": {
-												"name": {
-													"title": "Name",
-													"type": "string"
+												"band": {
+													"title": "Band",
+													"description": "Band",
+													"type": "object",
+													"properties": {
+														"name": {
+															"title": "Band name",
+															"type": "string"
+														},
+														"type": {
+															"title": "Band type",
+															"description": "Band type, eg. 'Integer'. Recommended code following the [ISO/TS 19139](http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_BandTypeCode) BandType codelist. Suggested values: {integer, float, double, string}",
+															"type": "string",
+															"propertyType": "attribute"
+														},
+														"description": {
+															"title": "Band description",
+															"type": "string"
+														},
+														"minimumValue": {
+															"title": "Minimum value",
+															"type": "number"
+														},
+														"maximumValue": {
+															"title": "Maximum value",
+															"type": "number"
+														},
+														"units": {
+															"title": "Units",
+															"type": "object",
+															"description": "Units of the band value",
+															"properties": {
+																"identifier": {
+																	"title": "Identifier",
+																	"type": "string"
+																},
+																"name": {
+																	"title": "Name",
+																	"type": "string"
+																},
+																"quantityType": {
+																	"title": "Quantity type",
+																	"type": "string"
+																}
+															}
+														},
+														"peakResponse": {
+															"title": "Peak response",
+															"type": "number"
+														},
+														"bitsPerValue": {
+															"title": "Bits per value",
+															"type": "integer"
+														},
+														"toneGradation": {
+															"title": "Tone gradation",
+															"type": "integer"
+														},
+														"scaleFactor": {
+															"title": "Scale factor",
+															"type": "number"
+														},
+														"offset": {
+															"title": "Offset",
+															"type": "number"
+														}
+													}
 												},
-												"type": {
+												"rangeDimension": {
 													"title": "Dimension type",
-													"type": "string"
+													"type": "object",
+													"properties": {
+														"name": {
+															"title": "Member name",
+															"type": "string"
+														},
+														"type": {
+															"title": "Attribute type",
+															"type": "string"
+														},
+														"description": {
+															"title": "Description",
+															"type": "string"
+														}
+													}
 												}
 											}
 										}
@@ -1658,8 +1736,8 @@
 							"description": "Options of digital transfer available for the resource",
 							"type": "array",
 							"_xpath": "gmd:distributionInfo/gmd:MD_DigitalTransferOptions",
-							"items":{
-								"type":"object",
+							"items": {
+								"type": "object",
 								"properties": {
 									"transferSize": {
 										"title": "Transfer size",
@@ -1702,97 +1780,137 @@
 								"items": {
 									"type": "object",
 									"properties": {
-										"DQ_DomainConsistency": {
-											"title": "Data quality domain consistency",
-											"description": "Domain consistency report information",
+										"dataQualityElement": {
+											"title": "Data quality element",
+											"description": "Data quality element",
 											"type": "object",
-											"_xpath": "gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency",
+											"_xpath": "gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency | gmd:DQ_ConceptualConsistency | gmd:DQ_TopologicalConsistency | gmd:DQ_CompletenessCommission | gmd:DQ_CompletenessOmission | gmd:DQ_LogicalConsistency | gmd:DQ_PositionalAccuracy | gmd:DQ_ThematicAccuracy | gmd:DQ_TemporalAccuracy",
 											"properties": {
-												"result": {
+												"elementType": {
+													"title": "Data quality element type e.g. DQ_DomainConsistency, DQ_ConceptualConsistency, DQ_TopologicalConsistency, DQ_CompletenessCommission, DQ_CompletenessOmission, DQ_LogicalConsistency, DQ_PositionalAccuracy, DQ_ThematicAccuracy, DQ_TemporalAccuracy",
+													"type": "string",
+													"enum": [
+														"DQ_CompletenessCommission",
+														"DQ_CompletenessOmission",
+														"DQ_ConceptualConsistency",
+														"DQ_DomainConsistency",
+														"DQ_FormatConsistency",
+														"DQ_TopologicalConsistency",
+														"DQ_PositionalAccuracy",
+														"DQ_ThematicAccuracy",
+														"DQ_TemporalAccuracy",
+														"DQ_QuantitativeAttributeAccuracy",
+														"DQ_UsabilityElement"
+													]
+												},
+												"nameOfMeasure": {
+													"title": "Measures",
+													"description": "Data quality measure names",
+													"type": "string",
+													"_xpath": "gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:nameOfMeasure"													
+												},
+												"measureIdentification": {
+													"title": "Measure identification",
+													"description": "Unique identifier for the data quality measure",
+													"type": "string",
+													"_xpath": "gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:measureIdentification/gmd:MD_Identifier"
+												},
+												"measureDescription": {
+													"title": "Measure description",
+													"description": "Description for the data quality measure",
+													"type": "string",
+													"_xpath": "gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:measureDescription/gco:CharacterString"
+												},
+												"evaluationMethodType": {
+													"title": "Evaluation method type",
+													"description": "The type of method to evaluate the data quality measure. e.g. 'indirect'. Recommended code following the [ISO/TS 19139](http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#DQ_EvaluationMethodTypeCode) TopicCategory codelist. Suggested values: {`directInternal`, `directExternal`, `indirect`}",
+													"type": "array",
+													"_xpath": "gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:evaluationMethodType/gmd:DQ_EvaluationMethodTypeCode",
+													"items": {
+														"type": "string"
+													}
+												},
+												"evaluationMethodDescription": {
+													"title": "Evaluation method description",
+													"description": "a description of the data quality evaluation method",
+													"type": "string",
+													"_xpath": "gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:evaluationMethodDescription/gco:CharacterString"
+												},
+												"evaluationProcedure": {
+													"title": "Evaluation procedure",
+													"description": "Evaluation procedure description (as 'citation')",
+													"type": "object",
+													"_xpath": "gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:evaluationMethodDescription/gco:CharacterString",
+													"$ref": "#/definitions/citation"
+												},
+												"dateTime": {
+													"title": "Report Date Stamp",
+													"type": "string",
+													"description": "Date and time when the data quality report has been established. Requires an extended ISO 8601 formatted combined UTC date and time string (2009-11-17T10:00:00)",
+													"_xpath": "gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:dateTime/gco:DateTime"
+												},
+												"conformanceResult": {
 													"title": "Conformance Result",
 													"description": "Result of conformance of the resource",
 													"type": "object",
 													"_xpath": "gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult",
 													"properties": {
-														"nameOfMeasure": {
-															"title": "Measures",
-															"description": "Data quality measure names",
-															"type": "array",
-															"_xpath": "gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:nameOfMeasure",
-															"items": {
-																"type": "string",
-																"title": "Measure of the data quality"
-															}
-														},
-														"measureIdentification": {
-															"title": "Measure identification",
-															"description": "Unique identifier for the data quality measure",
-															"type": "string",
-															"_xpath": "gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:measureIdentification/gmd:MD_Identifier"
-														},
-														"measureDescription": {
-															"title": "Measure description",
-															"description": "Description for the data quality measure",
-															"type": "string",
-															"_xpath": "gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:measureDescription/gco:CharacterString"
-														},
-														"evaluationMethodType": {
-															"title": "Evaluation method type",
-															"description": "The type of method to evaluate the data quality measure. e.g. 'indirect'. Recommended code following the [ISO/TS 19139](http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#DQ_EvaluationMethodTypeCode) TopicCategory codelist. Suggested values: {`directInternal`, `directExternal`, `indirect`}",
-															"type": "array",
-															"_xpath": "gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:evaluationMethodType/gmd:DQ_EvaluationMethodTypeCode",
-															"items": {
-																"type": "string"
-															}
-														},
-														"evaluationMethodDescription": {
-															"title": "Evaluation method description",
-															"description": "a description of the data quality evaluation method",
-															"type": "string",
-															"_xpath": "gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:evaluationMethodDescription/gco:CharacterString"
-														},
-														"evaluationProcedure": {
-															"title": "Evaluation procedure",
-															"description": "Evaluation procedure description (as 'citation')",
+														"specification": {
+															"title": "Result specification",
+															"description": "The specification(s) of the data quality conformance result",
 															"type": "object",
-															"_xpath": "gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:evaluationMethodDescription/gco:CharacterString",
+															"_xpath": "gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:result/gmd:DQ_ConformanceResult/gmd:specification/gmd:CI_Citation",
 															"$ref": "#/definitions/citation"
 														},
-														"dateTime": {
-															"title": "Report Date Stamp",
-															"type": "string",
-															"description": "Date and time when the data quality report has been established. Requires an extended ISO 8601 formatted combined UTC date and time string (2009-11-17T10:00:00)",
-															"_xpath": "gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:dateTime/gco:DateTime"
+														"explanation": {
+															"title": "Result explanation",
+															"description": "The explanation(s) of the data quality conformance (or non-conformance) result",
+															"_xpath": "gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:result/gmd:DQ_ConformanceResult/gmd:explanation/gco:CharacterString",
+															"type": "string"
 														},
-														"result": {
-															"title": "Result(s)",
-															"description": "Result(s) of consistency associated to the data quality report",
-															"type": "array",
-															"_xpath": "gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:result/gmd:DQ_ConformanceResult",
-															"items": {
-																"type": "object",
-																"properties": {
-																	"specification": {
-																		"title": "Result specification",
-																		"description": "The specification(s) of the data quality conformance result",
-																		"type": "object",
-																		"_xpath": "gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:result/gmd:DQ_ConformanceResult/gmd:specification/gmd:CI_Citation",
-																		"$ref": "#/definitions/citation"
-																	},
-																	"explanation": {
-																		"title": "Result explanation",
-																		"description": "The explanation(s) of the data quality conformance (or non-conformance) result",
-																		"_xpath": "gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:result/gmd:DQ_ConformanceResult/gmd:explanation/gco:CharacterString",
-																		"type": "string"
-																	},
-																	"pass": {
-																		"title": "Result pass",
-																		"description": "Indicates whether or not the conformance result is a success",
-																		"_xpath": "gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:result/gmd:DQ_ConformanceResult/gmd:pass/gco:Boolean",
-																		"type": "boolean"
-																	}
+														"pass": {
+															"title": "Result pass",
+															"description": "Indicates whether or not the conformance result is a success",
+															"_xpath": "gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_ConformanceResult/gmd:result/gmd:DQ_ConformanceResult/gmd:pass/gco:Boolean",
+															"type": "boolean"
+														}
+													}
+												},
+												"quantitativeResult": {
+													"title": "Quantitative result",
+													"description": "Quantitative result of the data quality report",
+													"type": "object",
+													"_xpath": "gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_QuantitativeResult",
+													"properties": {
+														"valueType": {
+															"title": "Value type",
+															"description": "Type of the quantitative result value, eg. 'integer'. Recommended code following the [ISO/TS 19139](http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#DQ_QuantitativeValueTypeCode) QuantitativeValueType codelist. Suggested values: {`integer`, `real`, `string`}",
+															"type": "string"
+														},
+														"valueUnit": {
+															"title": "Value unit",
+															"description": "Unit of the quantitative result value",
+															"type": "object",
+															"properties": {
+																"identifier": {
+																	"title": "Identifier",
+																	"type": "string"
+																},
+																"name": {
+																	"title": "Name",
+																	"type": "string"
+																},
+																"quantityType": {
+																	"title": "Quantity type",
+																	"type": "string"
 																}
 															}
+														},
+														"value": {
+															"title": "Result value",
+															"description": "Value of the quantitative result",
+															"type": "number",
+															"_xpath": "gmd:dataQualityInfo/gmd:DQ_DataQuality/gmd:report/gmd:DQ_DomainConsistency/gmd:result/gmd:DQ_QuantitativeResult/gmd:resultValue/gco:Real"
 														}
 													}
 												}
@@ -2083,8 +2201,8 @@
 				"idno"
 			]
 		},
-		"provenance":{
-			  "$ref":"provenance-schema.json"
+		"provenance": {
+			"$ref": "provenance-schema.json"
 		},
 		"tags": {
 			"type": "array",
@@ -2106,11 +2224,11 @@
 			"required": [
 				"tag"
 			]
-		},		 
+		},
 		"additional": {
 			"title": "Additional metadata",
 			"description": "Any additional metadata",
-			"type":"object"
+			"type": "object"
 		}
 	},
 	"required": [

@@ -47,7 +47,18 @@ Vue.component('nested-array', {
         },
         localColumns(){
             return this.columns;
-        }
+        },
+        isFieldReadOnly() {
+            if (!this.$store.getters.getUserHasEditAccess) {
+              return true;
+            }
+
+            if (!this.field){
+                return false;
+            }
+      
+            return this.field.is_readonly;
+          }
         
     },
     methods:{
@@ -108,7 +119,7 @@ Vue.component('nested-array', {
             <div class="nested-array" >
 
                 <template>                
-                    <v-expansion-panels :value="0" :multiple="true" :disabled="field.is_readonly">
+                    <v-expansion-panels :value="0" :multiple="true" :disabled="isFieldReadOnly">
                         <draggable tag="v-expansion-panel" :list="local_data" handle=".handle">
                         <v-expansion-panel v-for="(item,index) in local_data">
                         <v-expansion-panel-header>
@@ -154,14 +165,15 @@ Vue.component('nested-array', {
                                         <!-- end section -->
                                     </template>
 
-                                    <template v-else-if="column.type=='nested_array'">                                                                            
+                                    <template v-else-if="column.type=='nested_array'">
                                         <nested-array
                                             :key="column.key" 
                                             :value="localValue(index,column.key)"
                                             @input="update(index,column.key, $event)"
                                             :columns="column.props"
                                             :title="column.title"
-                                            :path="column.key">
+                                            :path="column.key"
+                                            :field="column">
                                         </nested-array> 
                                     </template>
 
