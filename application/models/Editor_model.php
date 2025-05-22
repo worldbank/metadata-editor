@@ -96,6 +96,9 @@ class Editor_model extends CI_Model {
 		$this->load->model("Editor_datafile_model");		
 		$this->load->model("Collection_model");
 		$this->load->model("Editor_template_model");
+
+		$this->load->config("editor");
+		$this->storage_path = $this->config->item('storage_path', 'editor');
 	}
 
 

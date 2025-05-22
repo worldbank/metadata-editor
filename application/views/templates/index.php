@@ -64,7 +64,7 @@
       <?php //echo $this->load->view('editor_common/global-header', null, true); ?>
       <vue-global-site-header></vue-global-site-header>
 
-      <div class="content-wrapper" xstyle="overflow:auto;height:100vh">
+      <div class="content-wrapper">
         <section class="content">
           
           <div class="container-fluid" >
@@ -86,7 +86,7 @@
                             <v-list-item-group color="primary">
                                 <v-list-item @click="sidebar_selected=''">
                                     <v-list-item-icon>
-                                        <i class="fa fa-filter"></i>
+                                        <v-icon>mdi-filter</v-icon>
                                     </v-list-item-icon>
                                     <v-list-item-content>
                                         <v-list-item-title>{{$t('All')}}</v-list-item-title>
@@ -158,7 +158,9 @@
                       
                       <template v-slot:top>
                             <div class="d-flex pl-6 pb-4 align-center">                                
-                                <div class="v-data-table--title" style="font-size:20px;"><i :class="getProjectIcon(data_type)"></i>&nbsp;{{data_type_label}}</div>                                
+                                <div class="v-data-table--title font-weight-bold" >
+                                  <v-icon style="font-size:24px;">{{getProjectIcon(data_type)}}</v-icon>
+                                  &nbsp;{{data_type_label}}</div>
                             </div>
                         </template>                                                   
                       
