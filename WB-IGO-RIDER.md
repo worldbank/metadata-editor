@@ -1,4 +1,4 @@
-### ADDITIONAL TERMS FOR INTERGOVERNMENTAL ORGANIZATIONS 
+### WORLD BANK IGO RIDER - PROCEDURAL TERMS
 Where the Licensor is an intergovernmental organization (IGO), the following additional terms shall apply: 
 1. **Privileges and Immunities** Nothing in this License shall constitute or be interpreted as a waiver, express or implied, of any privileges and immunities that apply to the Licensor pursuant to international law, treaties, or the Licensor's constituent documents, including immunity from jurisdiction and execution. 
 2. **Dispute Resolution** Any dispute arising under this License that involves the Licensor shall be resolved, to the extent not settled amicably, through the following procedures: 
