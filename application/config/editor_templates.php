@@ -121,9 +121,6 @@ $config['timeseries-db'][]=array(
 
 
 
-
-
-
 $config['script'][]=array(
     'template' => 'metadata_editor/metadata_editor_templates/script_form_template.json',
     'lang'=>'en',
@@ -163,6 +160,18 @@ $config['geospatial'][]=array(
         'lang'=>'en',
         'uid'=>'geospatial-system-en',
         'name'=>'Geospatial schema'
+);
+
+$config['geospatial'][]=array(
+    'template' => 'metadata_editor/metadata_editor_templates/geospatial_template_ihsn_fr.json',
+    "uid"=> "geospatial-gemini-inspire-en",
+    "data_type"=> "geospatial",
+    "lang"=> "en",
+    "name"=> "Inspire/Gemini with additional elements",
+    "version"=> "1.0",
+    "organization"=> "World Bank",
+    "author"=> "MA OD",
+    "description"=> "Geospatial template based on Inspire and Gemini 2.3 \n\n- https://agiorguk.github.io/gemini/1062-gemini-datasets-and-data-series.html",    
 );
 
 
