@@ -32,6 +32,6 @@ See [Documentation](https://worldbank.github.io/metadata-editor-docs)
 
 ## License
 
-This project is licensed under the MIT License. Additional terms applicable to intergovernmental organizations are provided in [IGO-LICENSE-ADDENDUM](IGO-LICENSE-ADDENDUM.md).
+This project is licensed under the MIT License. Additional terms applicable when the licensor is an intergovernmental organization are provided in [IGO-LICENSE-ADDENDUM](IGO-LICENSE-ADDENDUM.md).
 
 
