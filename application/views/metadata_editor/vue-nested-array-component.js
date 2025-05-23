@@ -8,41 +8,13 @@ Vue.component('nested-array', {
             active_sections:[]
         }
     },
-    watch: { 
-        /*field_data: function(newVal, oldVal) {
-            console.log("watch field_data",this.key_path,newVal, oldVal);
-            //this.$vueSet (this.$store.state.formData, this.key_path, newVal);
-        }*/
-    },
-    mounted: function () {
-        //console.log("mounted nested array",Array.isArray(this.value),this.path,JSON.stringify(this.value));
-        /*let value= this.value ? this.value : [{}];
-
-        if (value.length<1){
-            value= [{}];
-        }
-
-        this.local_data= value;*/
-    },
     computed: {
-        /*local(){
-            let value= this.value ? this.value : [{}];
-
-            if (value.length<1){
-                value= [{}];
-            }
-        
-            //console.log("local value",JSON.stringify(value));
-            return value;
-        },*/
         local_data(){
             let value= this.value ? this.value : [{}];
 
             if (value.length<1){
                 value= [{}];
             }
-        
-            //console.log("local value",JSON.stringify(value));
             return value;
         },
         localColumns(){
@@ -88,9 +60,7 @@ Vue.component('nested-array', {
             }
 
             if (key.indexOf(".") !== -1 && this.local_data[index][key]){
-                //let value=JSON.stringify(this.local_data[index][key]);
                 delete this.local_data[index][key];
-                //_.set(this.local_data[index],key,value);
             }
 
             _.set(this.local_data[index],key,value);
@@ -152,12 +122,14 @@ Vue.component('nested-array', {
                                         ></form-input>
                                     </template>
                                     <template v-else-if="column.type=='section'">
-                                        <!-- section -->
+                                        <!-- section -->                                        
                                         <nested-section-subsection
                                             :key="column.key"
                                             :parentElement="local_data[index]"
                                             :value="local_data[index][column.key+'section']"
                                             @input="updateSection(index,column.key+'section', $event)"
+                                            :value="localValue(index,column.key)"
+                                            @input="updateSection(index,column.key, $event)"
                                             :columns="column.props"
                                             :title="column.title"
                                             :path="column.key">

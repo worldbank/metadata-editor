@@ -7,6 +7,9 @@ Vue.component('nested-section-subsection', {
         }
     },
     watch: { 
+        parentElement: function (newValue, oldValue) {
+            this.local_data= newValue;
+        }
     },
     mounted: function () {     
         console.log("local value beforex",JSON.stringify(this.parentElement));
@@ -15,20 +18,6 @@ Vue.component('nested-section-subsection', {
         this.local_data= value;
     },
     computed: {
-        /*local(){
-            //return this.value;
-            console.log("local value before",JSON.stringify(this.value));
-            let value= this.value ? this.value : {};
-
-            return value;
-
-            if (value.length<1){
-                value= [{}];
-            }
-            console.log("local value after",JSON.stringify(value));
-            //console.log("local value",JSON.stringify(value));
-            return value;
-        },*/
         localColumns(){
             return this.columns;
         },
@@ -56,9 +45,8 @@ Vue.component('nested-section-subsection', {
         },
         update: function (key, value)
         {
-            //this.local[key] = value;
             _.set(this.local_data,key,value);
-            this.$emit('input', JSON.parse(JSON.stringify(this.local_data)));            
+            this.$emit('input', JSON.parse(JSON.stringify(this.local_data)));
         },
         toggleChildren(index) {
             if (!this.active_sections.includes(index)) {
@@ -142,7 +130,6 @@ Vue.component('nested-section-subsection', {
                                                     <span class="small" v-if="column.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(column.key)" ><i class="far fa-question-circle"></i></span>
                                                     <small :id="'field-toggle-' + normalizeClassID(column.key)" class="collapse help-text form-text text-muted">{{column.help_text}}</small>
                                                     
-
                                                     <table-grid-component 
                                                         :value=" localValue(column.key)"
                                                         @input="update(column.key, $event)"
