@@ -1342,7 +1342,7 @@ class Editor_model extends CI_Model {
 
 		$filename=trim($project['idno'])!=='' ? trim($project['idno']) : md5($project['id']);
 
-		$ddi_path=$project_folder.'/'.$filename.'.xml';
+		$ddi_path=realpath($project_folder.'/'.$filename.'.xml');
 		$this->editor_ddi_writer->generate_ddi($sid,$ddi_path);
 		return $ddi_path;
 	}

@@ -162,8 +162,10 @@ class Editor_resource_model extends ci_model {
 
     public function upload_temporary_file($allowed_file_type,$file_field_name='file',$temp_upload_folder=null)
     {
+		$storage_path=$this->Editor_model->get_storage_path();
+
         if (!$temp_upload_folder){
-            $temp_upload_folder='datafiles/tmp';
+            $temp_upload_folder=$storage_path.'/tmp'; 
         }
 
 		if (!file_exists($temp_upload_folder)){
