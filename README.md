@@ -32,6 +32,4 @@ See [Documentation](https://worldbank.github.io/metadata-editor-docs)
 
 ## License
 
-This project is licensed under the MIT License. Additional terms applicable when the licensor is an intergovernmental organization are provided in [IGO-LICENSE-ADDENDUM](IGO-LICENSE-ADDENDUM.md).
-
-
+This project is licensed under the MIT License together with the [World Bank IGO Rider](WB-IGO-RIDER.md). The Rider is purely procedural: it reserves all privileges and immunities enjoyed by the World Bank, without adding restrictions to the MIT permissions. Please review both files before using, distributing or contributing.
