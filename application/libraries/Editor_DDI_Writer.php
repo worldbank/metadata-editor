@@ -267,14 +267,21 @@ class Editor_DDI_Writer
 
         $result = new Spatie\ArrayToXml\ArrayToXml($doc_desc,'docDscr');
         $result=$result->prettify()->toDom();
-        //$result->formatOutput = true;
-        //$result=$this->remove_empty_xml($result);
+
         return $result->saveXML($result->documentElement);
     }
 
+
+    /**
+     * 
+     * Remove empty nodes from XML document
+     * 
+     * @param \DOMDocument $xmlDoc
+     * @return \DOMDocument
+     */
     function remove_empty_xml($xmlDoc)
     {        
-        $xmlDoc->preserveWhiteSpace = false;        
+        $xmlDoc->preserveWhiteSpace = false;
         $xpath = new DOMXPath($xmlDoc);
 
         while (($notNodes = $xpath->query('//*[not(node())]')) && ($notNodes->length)) {
@@ -284,9 +291,30 @@ class Editor_DDI_Writer
         }
 
         return $xmlDoc;
+    }
 
-        //$doc->formatOutput = true;
-        return $xmlDoc->saveXML();
+
+    /**
+     * 
+     * Recursively remove empty nodes from DOM
+     * 
+     * @param \DOMNode $node
+     */
+    function remove_empty_nodes(\DOMNode $node): void
+    {
+        if (!$node->hasChildNodes() && trim($node->nodeValue) === '') {
+            $node->parentNode->removeChild($node);
+            return;
+        }
+
+        foreach (iterator_to_array($node->childNodes) as $child) {
+            $this->remove_empty_nodes($child);
+        }
+
+        // Remove the node if it has no children and no meaningful content
+        if (!$node->hasChildNodes() && trim($node->nodeValue) === '') {
+            $node->parentNode->removeChild($node);
+        }
     }
 
     function get_study_desc_xml($data)
@@ -295,10 +323,17 @@ class Editor_DDI_Writer
         $this->set_data($data['metadata']);
         $xml_str=$this->ci->load->view('editor_ddi/ddi25_stdy_dscr',array('survey'=>$data), true);
         $xml_str=str_replace("\t","",$xml_str);
+
+        //remove empty <![CDATA[]]>
+        $xml_str=preg_replace('/<!\[CDATA\[\s*\]\]>/','',$xml_str);
         
         $stdy_desc->preserveWhiteSpace = false;
         $stdy_desc->formatOutput = true;
-        $stdy_desc->loadXML($xml_str);        
+        $stdy_desc->loadXML($xml_str);
+        
+        //remove empty elements
+        $stdy_desc=$this->remove_empty_xml($stdy_desc);
+
         return $stdy_desc->saveXML($stdy_desc->documentElement);
     }
 
@@ -346,7 +381,8 @@ class Editor_DDI_Writer
         
         $result = new Spatie\ArrayToXml\ArrayToXml($output->all(),'fileDscr');
         $result=$result->prettify()->toDom();
-        //$result->formatOutput = true;
+
+        $this->remove_empty_nodes($result->documentElement);
         return ($result->saveXML($result->documentElement));
     }
 
@@ -486,6 +522,9 @@ class Editor_DDI_Writer
         //sumstats
         $sumstats=new \Adbar\Dot($var->get('var_sumstat'));
         foreach($sumstats->all() as $idx=>$sumstat){
+            if ($sumstats[$idx]['value']=='None' || $sumstats[$idx]['value']==''){
+                continue;
+            }
             $output->set([
                 'sumStat.'.$idx.'._value'=>(string)$sumstats["{$idx}.value"],
                 'sumStat.'.$idx.'._attributes'=>[
