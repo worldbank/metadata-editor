@@ -150,6 +150,8 @@ $lang['export_iso19139']="Export XML";
 $lang['Project']="Project";
 $lang['Metadata']="Metadata";
 $lang['shared']="Shared";
+$lang['update']="Update";
+$lang['all_fields']="All fields";
 
 /* End of file general_lang.php */
 /* Location: ./application/language/base/general_lang.php */

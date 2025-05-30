@@ -104,10 +104,11 @@ $site_navigation_menu=get_site_menu();
           font-size:14px;
       }
 
-  /*.navbar-inverse .navbar-nav > .show > a, .navbar-inverse .navbar-nav > .show > a:hover, .navbar-inverse .navbar-nav > .show > a:focus {
-      background-color: #080808;
-      color: #ffffff;
-  }*/
+      .app-version{
+        font-weight:normal;
+        font-size: 0.8em;
+        vertical-align: super;        
+      }
     </style>
 
     <script>
@@ -153,7 +154,7 @@ $site_navigation_menu=get_site_menu();
 
 
 <nav class="navbar navbar-inverse navbar-expand-lg navbar-secondary bg-dark nada-site-admin-nav">  
-  <a class="navbar-brand site-title" href="<?php echo site_url();?>/admin">Editor <?php echo APP_VERSION;?></a>
+  <a class="navbar-brand site-title" href="<?php echo site_url();?>/admin">Editor <span class="app-version"><?php echo APP_VERSION;?></span></a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>

@@ -10,6 +10,7 @@ class Configurations extends MY_Controller {
        	$this->load->model('Configurations_model');		
 		$this->template->set_template('admin5');
 		
+		$this->lang->load("general");
 		$this->lang->load("configurations");
 		
 		//initialize db with default config values		
