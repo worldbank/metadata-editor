@@ -1,4 +1,5 @@
 # Metadata Editor
+
 <p align="center"><img src="images/metadata-editor.png" ></p>
 
 The Metadata Editor is an open-source web-based application developed by the Office of the Chief Statistician at the World Bank. It is designed to assist data curators in documenting data of various types according to specialized metadata standards. The application currently supports the following data types and corresponding metadata standards:
@@ -17,14 +18,13 @@ The metadata schemas supported by the Metadata Editor are detailed at https://wo
 
 ### Server Requirements
 
-* PHP version 7 or later
-* MySQL/MariDB
-* Apache, IIS or NGINX
+- PHP version 7 or later
+- MySQL/MariDB
+- Apache, IIS or NGINX
 
 ### Installation
 
 See [Installation guide](https://worldbank.github.io/metadata-editor-docs/tech_installation.html)
-
 
 ### Documentation
 
