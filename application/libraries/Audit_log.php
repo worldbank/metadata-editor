@@ -21,7 +21,7 @@ class Audit_log
 	 * 
 	 * 
 	 */
-	function log_event($obj_type,$obj_id,$action, $metadata=NULL, $user_id=NULL)
+	function log_event($obj_type,$obj_id,$action, $metadata=NULL, $user_id=NULL, $obj_ref_id=NULL)
 	{
 		//validate metadata is json
 		if($metadata != NULL){
@@ -37,7 +37,8 @@ class Audit_log
 			"obj_id"=>$obj_id,
 			"user_id"=>$user_id,
 			"action_type"=>$action,
-			"metadata"=>$metadata
+			"metadata"=>$metadata,
+			"obj_ref_id"=>$obj_ref_id,
 		);
 
 		try{
@@ -46,6 +47,18 @@ class Audit_log
 		catch(Exception $e){
 			log_message('error', 'audit_log:: failed to log_event '.$e->getMessage());
 		}		
+	}
+
+	/**
+	 * 
+	 * 
+	 * Get log entries
+	 * 
+	 * 
+	 */
+	function get_history($options=array(),$limit=10, $offset=0)
+	{
+		return $this->ci->Audit_log_model->get_history($options, $limit, $offset);
 	}
 
 }
