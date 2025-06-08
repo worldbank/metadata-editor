@@ -238,31 +238,6 @@ UNLOCK TABLES;
 
 
 --
--- Table structure for table `survey_types`
---
-
-CREATE TABLE `survey_types` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `code` varchar(50) NOT NULL,
-  `title` varchar(250) DEFAULT NULL,
-  `weight` int DEFAULT '0',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `title_UNIQUE` (`code`)
-) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
-
-INSERT INTO `survey_types`(`id`,`code`,`title`, weight) VALUES(1,'survey','Survey',100);
-INSERT INTO `survey_types`(`id`,`code`,`title`, weight) VALUES(2,'geospatial','Geospatial',90);
-INSERT INTO `survey_types`(`id`,`code`,`title`, weight) VALUES(3,'timeseries','Time series',80);
-INSERT INTO `survey_types`(`id`,`code`,`title`, weight) VALUES(4,'document','Document',50);
-INSERT INTO `survey_types`(`id`,`code`,`title`, weight) VALUES(5,'table','Table',70);
-INSERT INTO `survey_types`(`id`,`code`,`title`, weight) VALUES(6,'image','Photo',40);
-INSERT INTO `survey_types`(`id`,`code`,`title`, weight) VALUES(7,'script','Script',30);
-INSERT INTO `survey_types`(`id`,`code`,`title`, weight) VALUES(8,'visualization','Visualization',60);
-INSERT INTO `survey_types`(`id`,`code`,`title`, weight) VALUES(9,'video','Video',40);
-
-
-
---
 -- API KEYS table
 --
 CREATE TABLE `api_keys` (
@@ -310,7 +285,7 @@ CREATE TABLE `roles` (
 LOCK TABLES `roles` WRITE;
 /*!40000 ALTER TABLE `roles` DISABLE KEYS */;
 insert into roles(id,name,description, weight, is_admin, is_locked) values 
-(1,'admin','It is the site administrator and has access to all site content', 0,1,1),
+(1,'admin','Site administrator and has access to all site content', 0,1,1),
 (2,'user','General user account with no access to site administration', 0,0,1);
 /*!40000 ALTER TABLE `roles` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -322,7 +297,7 @@ CREATE TABLE `role_permissions` (
   `resource` varchar(45) DEFAULT NULL,
   `permissions` varchar(500) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) AUTO_INCREMENT=1;
 
 
 CREATE TABLE `user_roles` (
@@ -330,7 +305,7 @@ CREATE TABLE `user_roles` (
   `user_id` int(11) DEFAULT NULL,
   `role_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) AUTO_INCREMENT=1;
 
 
 
@@ -347,15 +322,15 @@ CREATE TABLE `editor_catalogs` (
 CREATE TABLE `editor_data_files` (
   `id` int NOT NULL AUTO_INCREMENT,
   `sid` int NOT NULL,
-  `file_id` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
-  `file_name` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
-  `description` text CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci,
+  `file_id` varchar(100)  DEFAULT NULL,
+  `file_name` varchar(255)  DEFAULT NULL,
+  `description` text ,
   `case_count` int DEFAULT NULL,
   `var_count` int DEFAULT NULL,
-  `producer` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `producer` varchar(255)  DEFAULT NULL,
   `data_checks` text,
   `missing_data` text,
-  `version` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `version` varchar(255)  DEFAULT NULL,
   `notes` text,
   `metadata` text,
   `wght` int DEFAULT NULL,
@@ -374,27 +349,35 @@ CREATE TABLE `editor_data_files` (
 CREATE TABLE `editor_projects` (
   `id` int NOT NULL AUTO_INCREMENT,
   `idno` varchar(200) DEFAULT NULL,
-  study_idno varchar(300) default null,
-  `type` varchar(15) DEFAULT NULL,
-  `title` varchar(255) NOT NULL DEFAULT '',
-  `abbreviation` varchar(45) DEFAULT NULL,
-  `authoring_entity` text CHARACTER SET utf8,
-  `nation` varchar(150) DEFAULT '',
+  `version_number` varchar(15) DEFAULT NULL,
+  `type` varchar(15)  DEFAULT NULL,
+  `title` varchar(255)  NOT NULL DEFAULT '',
+  `abbreviation` varchar(45)  DEFAULT NULL,
+  `authoring_entity` text ,
+  `nation` varchar(150)  DEFAULT '',
   `year_start` int DEFAULT '0',
   `year_end` int DEFAULT '0',
-  `metafile` varchar(255) DEFAULT NULL,
-  `dirpath` varchar(255) DEFAULT NULL,
+  `metafile` varchar(255)  DEFAULT NULL,
+  `dirpath` varchar(255)  DEFAULT NULL,
   `varcount` int DEFAULT NULL,
   `published` tinyint DEFAULT NULL,
   `created` int DEFAULT NULL,
   `changed` int DEFAULT NULL,
   `created_by` int DEFAULT NULL,
   `changed_by` int DEFAULT NULL,
-  `thumbnail` varchar(300) DEFAULT NULL,
-  `metadata` mediumtext CHARACTER SET utf8,
-  `template_uid` varchar(100),
-  `attributes` JSON,
+  `thumbnail` varchar(300)  DEFAULT NULL,
+  `metadata` mediumtext ,
+  `template_uid` varchar(100) DEFAULT NULL,
+  `is_shared` int DEFAULT NULL,
+  `study_idno` varchar(300) DEFAULT NULL,
+  `pid` int DEFAULT NULL,
+  `is_locked` int DEFAULT NULL,
+  `version_created` int DEFAULT NULL,
+  `version_created_by` int DEFAULT NULL,
+  `version_notes` varchar(500) DEFAULT NULL,
+  `attributes` json DEFAULT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `unq_idno` (`idno`,`version_number`),
   FULLTEXT KEY `ft_projects` (`title`)
 ) AUTO_INCREMENT=1;
 
@@ -428,11 +411,11 @@ CREATE TABLE `editor_resources` (
 CREATE TABLE `editor_variables` (
   `uid` int NOT NULL AUTO_INCREMENT,
   `sid` int NOT NULL,
-  `fid` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
-  `vid` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT '',
-  `name` varchar(100) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT '',
-  `labl` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT '',
-  `metadata` mediumtext CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci,
+  `fid` varchar(45)  DEFAULT NULL,
+  `vid` varchar(45)  DEFAULT '',
+  `name` varchar(100)  DEFAULT '',
+  `labl` varchar(255)  DEFAULT '',
+  `metadata` mediumtext ,
   `sort_order` int DEFAULT '0',
   `user_missings` varchar(300) DEFAULT NULL,
   `is_weight` int DEFAULT '0',
@@ -443,8 +426,6 @@ CREATE TABLE `editor_variables` (
   PRIMARY KEY (`uid`)
 ) AUTO_INCREMENT=1;
 
-
-select * from editor_data_files;
 
 CREATE TABLE `editor_templates` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -470,10 +451,7 @@ CREATE TABLE `editor_templates` (
   `deleted_at` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uid_UNIQUE` (`uid`)
-) ENGINE=InnoDB AUTO_INCREMENT=1;
-
-
-
+) AUTO_INCREMENT=1;
 
 
 CREATE TABLE `editor_templates_default` (
@@ -481,7 +459,7 @@ CREATE TABLE `editor_templates_default` (
   `data_type` varchar(30) NOT NULL,
   `template_uid` varchar(255) NOT NULL,  
   PRIMARY KEY (`id`)
-) DEFAULT CHARSET=utf8;
+);
 
 
 insert into `editor_templates_default` (data_type, template_uid)
@@ -496,7 +474,7 @@ CREATE TABLE `editor_template_acl` (
   `user_id` int NOT NULL,
   `created` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1;
+)  AUTO_INCREMENT=1;
 
 
 create table editor_project_owners (
@@ -521,7 +499,7 @@ CREATE TABLE `editor_collections` (
   `wgt` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `title` (`title`,`pid`)
-) ENGINE=InnoDB AUTO_INCREMENT=1;
+) AUTO_INCREMENT=1;
 
 
 create table editor_collection_projects (
@@ -540,20 +518,12 @@ create table editor_collection_access (
 );
 
 
-create table editor_tags (
-  id int not null auto_increment,
-  tag varchar(255) not null,
-  primary key (id)
-);
-
 create table editor_project_tags (
   id int not null auto_increment,
   sid int not null,
   tag_id int not null,
   primary key (id)
 );
-
-alter table editor_projects add column is_shared int;
 
 
 CREATE TABLE editor_tags(  
@@ -568,20 +538,13 @@ CREATE TABLE editor_project_tags(
     tag_id int not null
 );
 
-alter table editor_data_files
-add wght int default null;
-
-alter table editor_data_files add column `file_physical_name` varchar(500) default null;
-alter table editor_data_files drop column `file_uri`;
-
-
 
 CREATE TABLE `editor_variable_groups` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `sid` int(11) DEFAULT NULL,
   `metadata` MEDIUMTEXT,
   PRIMARY KEY (`id`)
-) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) AUTO_INCREMENT=1;
 
 
 
@@ -593,9 +556,6 @@ CREATE TABLE editor_variables_sort_tmp(
 );
 
 
-alter table editor_projects add column study_idno varchar(300) default null;
-
-
 CREATE TABLE `audit_logs` (
   `id` int NOT NULL AUTO_INCREMENT,
   `obj_type` varchar(25) NOT NULL,
@@ -604,8 +564,10 @@ CREATE TABLE `audit_logs` (
   `action_type` varchar(25) NOT NULL,
   `created` datetime NOT NULL,
   `metadata` json DEFAULT NULL,
+  `obj_ref_id` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) AUTO_INCREMENT=1;
+
 
 
 CREATE TABLE `edit_history` (
@@ -617,11 +579,9 @@ CREATE TABLE `edit_history` (
   `created` datetime NOT NULL,
   `metadata` json DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb3;
+) AUTO_INCREMENT=1;
 
 
-
-drop table if exists editor_code_lists;
 
 CREATE TABLE editor_code_lists(  
     pk_id int NOT NULL AUTO_INCREMENT,
@@ -660,7 +620,7 @@ CREATE TABLE `editor_collections_tree` (
   `depth` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_closure` (`parent_id`,`child_id`,`depth`)
-) ENGINE=InnoDB AUTO_INCREMENT=1;
+) AUTO_INCREMENT=1;
 
 
 CREATE TABLE `admin_metadata` (
@@ -674,7 +634,7 @@ CREATE TABLE `admin_metadata` (
   `changed` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `meta_unq` (`template_id`,`sid`)
-) ENGINE=InnoDB AUTO_INCREMENT=1;
+) AUTO_INCREMENT=1;
 
 CREATE TABLE `admin_metadata_acl` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -683,7 +643,7 @@ CREATE TABLE `admin_metadata_acl` (
   `user_id` int NOT NULL,
   `created` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1;
+) AUTO_INCREMENT=1;
 
 CREATE TABLE `admin_metadata_projects` (
   `id` int NOT NULL AUTO_INCREMENT,
