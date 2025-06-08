@@ -560,6 +560,9 @@ class Editor extends MY_REST_Controller
 			//validate & update project
 			$this->Editor_model->validate_schema($project['type'],$project['metadata']);
 
+			//validate variables
+			$this->Editor_variable_model->validate_variables($sid);
+
 			$response=array(
 				'status'=>'success'				
 			);
@@ -935,6 +938,7 @@ class Editor extends MY_REST_Controller
 		try{
 			$sid=$this->get_sid($sid);
 			$exists=$this->Editor_model->check_id_exists($sid);
+			$exclude_private_fields=0;
 
 			if(!$exists){
 				throw new Exception("Project not found");
@@ -1388,7 +1392,12 @@ class Editor extends MY_REST_Controller
 			$sid=$this->get_sid($sid);
 			$this->editor_acl->user_has_project_access($sid,$permission='view',$this->api_user);
 
-			$result=$this->Audit_log_model->get_history($obj_type='project',$obj_id=$sid,$limit=10, $offset=0);
+			$result=$this->Audit_log_model->get_history(
+				array(
+					'obj_type'=>'project',
+					'obj_id'=>$sid
+				)
+				,$limit=10, $offset=0);
 			//array_walk($result, 'unix_date_to_gmt_row',array('created','changed'));
 				
 			$response=array(

@@ -64,7 +64,7 @@ class Editor_variable_model extends ci_model {
      */
     function chunk_read($sid,$start_uid=0, $limit=100)
     {
-        $this->db->select("uid,sid,metadata");
+        $this->db->select("uid,sid,fid,metadata");
         $this->db->order_by('uid');
         $this->db->limit($limit);
         $this->db->where("sid",$sid);
@@ -473,6 +473,42 @@ class Editor_variable_model extends ci_model {
 		$errors=$this->form_validation->error_array();
 		$error_str=$this->form_validation->error_array_to_string($errors);
 		throw new ValidationException("VALIDATION_ERROR: ".$error_str, $errors);
+    }
+
+
+    /**
+     * 
+     * Validate variable against schema
+     * 
+     */
+    function validate_schema($data)
+    {
+        return $this->Editor_model->validate_schema('variable', $data);
+    }
+
+
+    function validate_variables($sid)
+    {
+        foreach($this->chunk_reader_generator($sid) as $variable){
+            try{
+                $result=$this->validate_schema(array_remove_empty($variable['metadata']));
+            }
+            catch(ValidationException $e){
+                $validation_errors=$e->GetValidationErrors();
+
+                foreach($validation_errors as $idx=>$error)
+                {
+                    if (isset($error['message'])){
+                        $validation_errors[$idx]['property']= 'variables/' . $variable['fid'];
+                        $validation_errors[$idx]['message']=$error['message'] . ' - FILE: ' . $variable['fid'] . ' - Variable: ' . $variable['metadata']['name'];
+                    }                    
+                }
+
+                throw new ValidationException("VALIDATION_ERROR: ".$e->getMessage(),$validation_errors);
+            }
+            
+            //yield $variable['metadata'];
+        }
     }
 
 

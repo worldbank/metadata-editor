@@ -77,9 +77,20 @@ Vue.component('template-validation-component', {
         }
     },
     methods:{
+        RefreshValidation: function() {
+            this.validateProject();
+            this.projectValidationReport();
+        },
         navigateToError: function(key){
             let vm=this;
             let key_parts=key.split("[");
+
+            //variables
+            if (key.startsWith("variables")){
+                store.commit('tree_active_node_path',key);
+                this.$router.push(key);
+                return;
+            }
 
             store.commit('tree_active_node_path',key_parts[0]);
             this.$router.push('/study/' + key_parts[0]);
@@ -228,7 +239,7 @@ Vue.component('template-validation-component', {
                 <v-card>
                     <v-card-title class="d-flex justify-space-between">
                         <h6>{{$t("project_validation")}}</h6>
-                        <v-btn title="Re-run validation" icon @click="projectValidationReport">
+                        <v-btn title="Re-run validation" icon @click="RefreshValidation">
                             <v-icon small>mdi-refresh</v-icon>
                         </v-btn>
                     </v-card-title>
@@ -239,7 +250,7 @@ Vue.component('template-validation-component', {
                     <div>{{$t("Schema validation")}} <v-icon small :title="$t('Requires project to be saved')" >mdi-information-outline</v-icon></div>
                     <div class="validation-errors mt-2" v-if="validation_errors!=''" style="color:red;font-size:small;" >
                         
-                        <v-list dense>                            
+                        <v-list dense>
                             <template v-for="error in validation_errors.errors" >
                                 <v-list-item @click="navigateToError(error.property)">
                                     <v-list-item-icon>
