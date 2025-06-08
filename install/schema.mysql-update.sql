@@ -136,3 +136,7 @@ ADD COLUMN `attributes` JSON NULL;
 ALTER TABLE `editor_variables`
 ADD COLUMN `is_key` INT NULL;
 
+
+# 2025/06/07
+ALTER TABLE `audit_logs`
+ADD COLUMN `obj_ref_id` INT NULL;

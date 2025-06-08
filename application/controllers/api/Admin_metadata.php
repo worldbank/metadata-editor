@@ -629,6 +629,58 @@ class Admin_metadata extends MY_REST_Controller
         }
     }
 
+
+
+    /**
+     * 
+     * 
+     * Get metadata edit history
+     * 
+     * 
+     */
+    function edit_history_get($project_id, $admin_template_uid=null)
+    {
+        try{
+            $project_id=$this->get_sid($project_id);
+
+            if (!$project_id){
+                throw new Exception("Project not found");
+            }
+
+            if (!$admin_template_uid){
+                throw new Exception("Missing parameter: admin_template_uid");
+            }
+            
+            $template_id=$this->Editor_template_model->get_id_by_uid($admin_template_uid);
+
+            if (!$template_id){
+                throw new Exception("Template not found: " . $admin_template_uid);
+            }
+
+            $offset=(int)$this->input->get('offset') ? (int)$this->input->get('offset') : 0;
+            $limit=(int)$this->input->get('limit') ? (int)$this->input->get('limit') : 50;
+
+            $this->editor_acl->user_has_admin_metadata_access($template_id,$permission='view',$this->api_user);
+            $result=$this->Admin_metadata_model->history($template_id,$project_id, $limit, $offset); 
+
+            $response=array(
+                'status'=>'success',
+                'offset'=>$offset,
+                'limit'=>$limit,                
+                'data'=>$result
+            );
+
+            $this->set_response($response, REST_Controller::HTTP_OK);
+        }
+        catch(Exception $e){
+            $error_response=array(
+                'status'=>'error',
+                'message'=>$e->getMessage()
+            );
+            $this->set_response($error_response, REST_Controller::HTTP_BAD_REQUEST);
+        }
+    }
+
 	
     
     function _auth_override_check()

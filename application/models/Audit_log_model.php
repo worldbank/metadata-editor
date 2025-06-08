@@ -8,7 +8,8 @@ class Audit_log_model extends CI_Model {
 		"user_id",
 		"action_type", //create, update, delete, patch
 		"created",
-		"metadata"
+		"metadata",
+		"obj_ref_id"
 	);
  
     public function __construct()
@@ -69,14 +70,34 @@ class Audit_log_model extends CI_Model {
 
 	/**
 	 * 
-	 * Returns the history of a specific object
+	 * Search for audit logs based on various options
 	 * 
 	 */
-	function get_history($obj_type,$obj_id,$limit=10, $offset=0)
+	function get_history($options=array(),$limit=10, $offset=0)
 	{
+		$obj_type = isset($options['obj_type']) ? $options['obj_type'] : '';
+		$obj_id = isset($options['obj_id']) ? $options['obj_id'] : '';
+		$user_id = isset($options['user_id']) ? $options['user_id'] : '';
+		$obj_ref_id = isset($options['obj_ref_id']) ? $options['obj_ref_id'] : '';		
+
 		$this->db->select('audit_logs.*, users.username, users.email');
-		$this->db->where('obj_type',$obj_type);
-		$this->db->where('obj_id',$obj_id);
+		
+		if (!empty($user_id)){
+			$this->db->where('audit_logs.user_id', $user_id);
+		}
+
+		if (!empty($obj_type)){
+			$this->db->where('audit_logs.obj_type', $obj_type);
+		}
+
+		if (!empty($obj_id)){
+			$this->db->where('audit_logs.obj_id', $obj_id);
+		}
+
+		if (!empty($obj_ref_id)){
+			$this->db->where('audit_logs.obj_ref_id', $obj_ref_id);
+		}
+		
 		$this->db->join('users', 'users.id = audit_logs.user_id', 'left');
 		$this->db->order_by('created','desc');
 		$this->db->limit($limit);
@@ -85,14 +106,12 @@ class Audit_log_model extends CI_Model {
 			$this->db->offset($offset);
 		}
 
-		$query = $this->db->get("audit_logs");
-		$result=$query->result_array();
+		$result = $this->db->get("audit_logs")->result_array();		
 
-		foreach($result as $idx=>$row)
-		{
+		foreach($result as $idx=>$row){
 			$result[$idx]['metadata']=json_decode($row['metadata'],true);
 		}
-
+		
 		return $result;
 	}
 

@@ -187,6 +187,18 @@ CCREATE TABLE `admin_metadata` (
         return count($result)>0;
     }
 
+    function get_project_id_by_template($template_id,$sid)
+    {
+        $this->db->select('id');
+        $this->db->where('template_id',$template_id);
+        $this->db->where('sid',$sid);
+        $result=$this->db->get('admin_metadata')->row_array();
+
+        if (isset($result) && isset($result['id'])){
+            return $result['id'];
+        }        
+    }
+
     function insert($template_id, $sid, $data)
 	{
         $user_id=isset($data['user_id']) ? $data['user_id'] : null;
@@ -213,13 +225,19 @@ CCREATE TABLE `admin_metadata` (
     function upsert($template_id, $sid, $data)
     {
         if ($this->exists($template_id,$sid)){
-            $this->update($template_id,$sid,$data);
+
+            $this->metadata_edit_audit_log(
+                $template_id, 
+                $sid, 
+                $data['metadata'], 
+                isset($data['user_id']) ? $data['user_id'] : null);
+
+            $this->update($template_id,$sid,$data);            
         }
         else{
             $this->insert($template_id,$sid,$data);
         }
     }
-
 
 
     function update($template_id, $sid, $data)
@@ -317,6 +335,69 @@ CCREATE TABLE `admin_metadata` (
 		return $this->Editor_template_model->get_template_by_uid($uid);
 
 	}
+
+
+    /**
+     * 
+     * Keep audit log of metadata edits
+     * 
+     * 
+     */
+    function metadata_edit_audit_log($template_id, $sid, $new_metadata, $user_id)
+    {
+        //get original metadata
+        $project=$this->select_single($template_id,$sid);
+
+        if (!$project){
+            return;
+        }
+
+        $original_metadata=$project['metadata'];
+
+        if(empty($original_metadata)){
+            return;
+        }
+
+        //generate diff
+        $diff=$this->Editor_model->get_metadata_diff($metadata_original_=$original_metadata,$new_metadata, $ignore_errors=true);
+
+        if (empty($diff)){
+            return;
+        }
+        
+        $this->audit_log->log_event(
+            $obj_type_='admin-metadata',
+            $obj_id_=$project['id'],
+            $action='update', 
+            $metadata_=$diff, 
+            $user_id_=$user_id, 
+            $obj_ref_id=$sid
+        );        
+    }
+
+
+
+    /**
+     * 
+     * Get edit history
+     * 
+     */
+    function history($template_id,$project_id, $limit=10, $offset=0)
+    {
+        //get admin_metadata id
+        $admin_metadata_id=$this->get_project_id_by_template($template_id,$project_id);
+
+        //get history from audit log
+        return $this->Audit_log_model->get_history(
+            array(
+                'obj_type'=>'admin-metadata',
+                'obj_id'=>$admin_metadata_id,
+                'obj_ref_id'=>$project_id
+            )
+            ,$limit, $offset);
+    }
+
+
     
 
 }

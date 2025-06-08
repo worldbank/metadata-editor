@@ -1715,7 +1715,33 @@ paths:
             description: successful operation
         security:
           - ApiKeyAuth: []
-  
+  /admin-metadata/edit_history/{projectId}/{templateUid}:
+      get:
+        tags:
+          - Admin metadata
+        summary: Get edit history
+        description: Get edit history of admin metadata for a project
+        operationId: getAdminMetadataHistory
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "projectId"
+            type: string
+            description: Project ID or IDNO
+            required: true
+          - in: "path"
+            name: "templateUid"
+            type: string
+            description: Admin metadata template UID
+            required: true
+        responses:
+          '200':
+            description: successful operation
+        security:
+          - ApiKeyAuth: []
 
 
 
