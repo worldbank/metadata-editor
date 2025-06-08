@@ -399,7 +399,7 @@ class Editor_model extends CI_Model {
 		}
 
 		//generate/log diff
-		$diff=$this->get_metadata_diff($this->get_metadata($id),$options);
+		$diff=$this->get_metadata_diff($this->get_metadata($id),$options, $ignore_errors=true);
 		$this->audit_log->log_event($obj_type='project',$obj_id=$id,$action='update', $metadata=$diff, isset($options['changed_by']) ? $options['changed_by'] : null);
 
 		//partial update metadata
@@ -1580,10 +1580,48 @@ class Editor_model extends CI_Model {
 	function get_metadata_diff($metadata_original, $metadata_updated, $ignore_errors=false)
 	{
 		try{
+			//remove fields that are not needed for diff
+			$fields_to_remove=[
+				'schema',
+				'schema_version',
+				'type',				
+				'created_by',
+				'created',
+				'changed'
+			];
+
+			foreach($fields_to_remove as $field){
+				if (isset($metadata_original[$field])){
+					unset($metadata_original[$field]);
+				}
+				if (isset($metadata_updated[$field])){
+					unset($metadata_updated[$field]);
+				}
+			}
+
 			$diff = new JsonDiff($metadata_original, $metadata_updated, JsonDiff::TOLERATE_ASSOCIATIVE_ARRAYS);
 
 			$patch=$diff->getPatch();
-			return json_decode(json_encode($patch));
+
+			$json_patch=[				
+				//'added'=>$diff->getAdded(),
+				//'changed'=>$diff->getModifiedNew(),
+				'removed'=>$diff->getRemoved(),
+				'patch'=>$patch,
+			];
+
+			$json_patch= array_filter($json_patch, function($value) {
+				return !empty($value);
+			});
+
+			if (empty($json_patch)){
+				return false; //no changes
+			}
+
+			//encode
+			$json_patch=json_decode(json_encode($json_patch),true);
+
+			return $json_patch;
 		} catch (Exception $e) {
 			if ($ignore_errors==true){
 				return false;
