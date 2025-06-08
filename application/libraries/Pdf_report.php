@@ -97,6 +97,8 @@ class PDF_Report{
 			}
 
 			foreach($data_files as $data_file){
+				set_time_limit(0);
+
 				//data file variable list
 				$mpdf->AddPage();
 				$mpdf->Bookmark($data_file['file_name'],0);
