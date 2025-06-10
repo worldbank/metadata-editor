@@ -20,7 +20,6 @@ class DataUtils
 	function __construct()
 	{
 		log_message('debug', "DataUtils Class Initialized.");
-		require_once 'modules/guzzle/vendor/autoload.php';
 		$this->ci =& get_instance();
 		$this->ci->load->model("Editor_model");
 		$this->ci->load->config("editor");

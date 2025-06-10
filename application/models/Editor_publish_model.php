@@ -19,7 +19,6 @@ class Editor_publish_model extends ci_model {
     {
         parent::__construct();
         $this->load->model('Editor_model');
-		require_once 'modules/guzzle/vendor/autoload.php';
     }
 
     function publish_to_catalog($sid,$user_id,$catalog_connection_id,$options=[])

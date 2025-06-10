@@ -4,7 +4,6 @@
         "violet/streaming-json-encoder": "^1.1",
         "salsify/json-streaming-parser": "^8.0",
         "slim/csrf": "^0.8.3",
-        "solarium/solarium": "^6.1",
         "league/event": "^2.2",
         "league/csv": "^9.3",
         "adbario/php-dot-notation": "^2.2",

@@ -17,7 +17,6 @@ class Data extends MY_REST_Controller
 	public function __construct()
 	{
 		parent::__construct();
-		require_once 'modules/guzzle/vendor/autoload.php';
 
 		$this->load->model("Editor_model");
 		$this->load->model("Editor_resource_model");
