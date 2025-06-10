@@ -152,8 +152,13 @@ class Editor_resource_model extends ci_model {
 		//process uploaded rdf file
 		$upload_result=$this->upload->do_upload($file_field_name);
 
+		//writeable?
+		if (!is_writable($survey_folder_type)){
+			throw new Exception('EDITOR_FOLDER_NOT_WRITABLE: '.$survey_folder_type);
+		}
+
 		if (!$upload_result){
-			throw new Exception($this->upload->display_errors());
+			throw new Exception('FILE_UPLOAD_FAILED: '. strip_tags($this->upload->display_errors()). ' Path: ' . $survey_folder_type);
 		}
 
 		return $this->upload->data();		
