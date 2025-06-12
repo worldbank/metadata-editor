@@ -87,25 +87,35 @@ class Collection_tree_model extends CI_Model {
 
     function collections_tree_by_user_access($user_id)
     {
-        $sql='select ect.parent_id,ect.child_id,ect.depth,c.* from editor_collections_tree ect
-        inner join editor_collections c on ect.child_id=c.id
-        where ect.parent_id in (
-                select c.id from editor_collections c
-                inner join editor_collections_tree t on c.id = t.parent_id 
-                where t.child_id in (
-                        select ect.child_id from editor_collections_tree ect
-                            inner join editor_collections c on ect.child_id=c.id
-                            where ect.parent_id in (
-                                    select c.id from editor_collections c
-                                    inner join editor_collections_tree t on c.id = t.parent_id 
-                                    inner join editor_collection_access eca on eca.collection_id=c.id
-                                    where eca.user_id='. $this->db->escape($user_id) . '
-                            )
-                
-                ) and c.pid is null    
-        )
-        order by c.title,ect.child_id,ect.parent_id,ect.id,ect.depth;';
-        
+        $sql='SELECT 
+                ect.parent_id, 
+                ect.child_id, 
+                ect.depth, 
+                c.*
+            FROM 
+                editor_collections_tree ect
+            INNER JOIN 
+                editor_collections c ON ect.child_id = c.id
+            WHERE 
+                ect.parent_id IN (
+                    SELECT 
+                        t.parent_id
+                    FROM 
+                        editor_collections c
+                    INNER JOIN 
+                        editor_collections_tree t ON c.id = t.parent_id
+                    INNER JOIN 
+                        editor_collections_tree ect2 ON t.child_id = ect2.child_id
+                    INNER JOIN 
+                        editor_collections c2 ON ect2.child_id = c2.id
+                    INNER JOIN 
+                        editor_collection_access eca ON eca.collection_id = c2.id
+                    WHERE 
+                        eca.user_id = '. $this->db->escape($user_id) . '
+                        AND c.pid IS NULL
+                )
+            ORDER BY 
+                c.title, ect.child_id, ect.parent_id, ect.id, ect.depth;';
 
         $items=$this->db->query($sql)->result_array();
         
