@@ -75,6 +75,7 @@ class ISO19139Writer
         $this->createIdentificationInfo($this->xml,$metadata['identificationInfo']);
 
         //contentInfo
+        $this->createContentInfo($this->xml,$metadata['contentInfo']);
 
         //distributionInfo
         $distributionInfoNode = $this->xml->addChild('gmd:distributionInfo');
@@ -592,6 +593,112 @@ class ISO19139Writer
         //serviceIdentification
 
     }
+
+
+    function createContentInfo($xmlNode, $contentInfoArray)
+    {
+        $metadata_arr=new \Adbar\Dot($contentInfoArray);
+
+        foreach($metadata_arr as $metadata) {
+            $metadata=new \Adbar\Dot($metadata);
+            $contentInfo = $xmlNode->addChild('gmd:contentInfo');
+            $miCoverageDescription = $contentInfo->addChild('gmi:MI_CoverageDescription', null, 'http://www.isotc211.org/2005/gmi');
+
+            //attributeDescription
+            $attributeDescription = $miCoverageDescription->addChild('gmd:attributeDescription', null, 'http://www.isotc211.org/2005/gmd');
+            
+            //gco:RecordType
+            $gcoRecordType = $attributeDescription->addChild('gco:RecordType', $metadata['coverageDescription.attributeDescription'], 'http://www.isotc211.org/2005/gco');
+
+
+            //contentType
+            $contentType = $miCoverageDescription->addChild('gmd:contentType');
+            $contentTypeCode = $contentType->addChild('gmd:MD_ContentTypeCode', $metadata['contentType']);
+            $contentTypeCode->addAttribute('codeList', 'http://www.isotc211.org/2005/resources/Codelist/gmxCodelists.xml#MD_ContentTypeCode');
+            $contentTypeCode->addAttribute('codeListValue', $metadata['contentType']);
+
+            //var_dump($metadata['coverageDescription.dimension']); //debugging, remove later
+            //die();
+
+            //dimensions
+            foreach((array)$metadata['coverageDescription.dimension'] as $dimension) {
+
+                $dimension=new \Adbar\Dot($dimension);
+
+                $dimensionNode = $miCoverageDescription->addChild('gmd:dimension', null, 'http://www.isotc211.org/2005/gmd');
+                $mdBand = $dimensionNode->addChild('gmd:MD_Band');                
+
+                //band name
+                $sequenceIdentifier = $mdBand->addChild('gmd:sequenceIdentifier');
+                $memberName = $sequenceIdentifier->addChild('gco:MemberName', null, 'http://www.isotc211.org/2005/gco');
+                $aName = $memberName->addChild('gco:aName', null, 'http://www.isotc211.org/2005/gco');
+                $aName->addChild('gco:CharacterString', $dimension['band.name'], 'http://www.isotc211.org/2005/gco');
+
+                //band type
+                $attributeType = $memberName->addChild('gco:attributeType', null, 'http://www.isotc211.org/2005/gco');
+                $typeName = $attributeType->addChild('gco:TypeName', null, 'http://www.isotc211.org/2005/gco');
+                $typeName->addChild('gco:aName')->addChild('gco:CharacterString', $dimension['band.type'], 'http://www.isotc211.org/2005/gco');
+
+                //band descriptor
+                $descriptor = $mdBand->addChild('gmd:descriptor');
+                $descriptor->addChild('gco:CharacterString', $dimension['band.description'], 'http://www.isotc211.org/2005/gco');
+
+                //minValue
+                $minValue = $mdBand->addChild('gmd:minValue');
+                $minValue->addChild('gco:Real', $dimension['band.minimumValue'], 'http://www.isotc211.org/2005/gco');
+
+                //maxValue
+                $maxValue = $mdBand->addChild('gmd:maxValue');
+                $maxValue->addChild('gco:Real', $dimension['band.maximumValue'], 'http://www.isotc211.org/2005/gco');
+
+                //units
+                $units = $mdBand->addChild('gmd:units');
+                $units->addChild('gco:CharacterString', $dimension['band.units'], 'http://www.isotc211.org/2005/gco');
+
+                //peakResponse
+                if (isset($dimension['band.peakResponse'])) {
+                    $peakResponse = $mdBand->addChild('gmd:peakResponse');
+                    $peakResponse->addChild('gco:Real', $dimension['band.peakResponse'], 'http://www.isotc211.org/2005/gco');
+                }
+
+                //bitsPerValue
+                if (isset($dimension['band.bitsPerValue'])) {
+                    $bitsPerValue = $mdBand->addChild('gmd:bitsPerValue');
+                    $bitsPerValue->addChild('gco:Integer', $dimension['band.bitsPerValue'], 'http://www.isotc211.org/2005/gco');
+                }
+
+                //toneGradation
+                if (isset($dimension['band.toneGradation'])) {
+                    $toneGradation = $mdBand->addChild('gmd:toneGradation');
+                    $toneGradation->addChild('gco:Integer', $dimension['band.toneGradation'], 'http://www.isotc211.org/2005/gco');
+                }
+
+                //scaleFactor
+                if (isset($dimension['band.scaleFactor'])) {
+                    $scaleFactor = $mdBand->addChild('gmd:scaleFactor');
+                    $scaleFactor->addChild('gco:Real', $dimension['band.scaleFactor'], 'http://www.isotc211.org/2005/gco');
+                }
+
+                //offset
+                if (isset($dimension['band.offset'])) {
+                    $offset = $mdBand->addChild('gmd:offset');
+                    $offset->addChild('gco:Real', $dimension['band.offset'], 'http://www.isotc211.org/2005/gco');
+                }
+
+            }
+
+            
+
+            //featureCatalogueCitation
+            /*if (isset($metadata['featureCatalogueCitation'])) {
+                $featureCatalogueCitation = $mdContentInformation->addChild('gmd:featureCatalogueCitation');
+                $ciCitation = $featureCatalogueCitation->addChild('gmd:CI_Citation');
+                $title = $ciCitation->addChild('gmd:title');
+                $title->addChild('gco:CharacterString', $metadata['featureCatalogueCitation.title'], 'http://www.isotc211.org/2005/gco');
+            }*/
+        }
+    }
+
 
 
     //convert contact from JSON to ISO19139 XML contact

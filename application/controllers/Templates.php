@@ -33,7 +33,7 @@ class Templates extends MY_Controller {
 
 	function edit($uid)
 	{
-		$this->editor_acl->has_access_or_die($resource_='template_manager',$privilege='edit');
+		
 		$this->template->set_template('blank');		
 		$user_template=$this->Editor_template_model->get_template_by_uid($uid);
 
@@ -41,6 +41,7 @@ class Templates extends MY_Controller {
 			show_error("Template not found");
 		}
 
+		$this->editor_acl->user_has_template_access($uid,$permission='edit');
 		$core_templates=$this->Editor_template_model->get_core_template_by_data_type($user_template['data_type']);
 
 		if (!$core_templates){

@@ -1,9 +1,9 @@
 {
-	"$id": "http://ihsn.org/schemas/geospatial",
-	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://ihsn.org/schemas/geospatial/1.0.0",
+	"$schema": "https://json-schema.org/draft-07/schema#",
 	"title": "Geospatial Schema",
-	"description": "Geospatial draft schema",
-	"version": "0.0",
+	"description": "Geospatial schema",
+	"version": "1.0.0",
 	"id": "geospatial-schema.json",
 	"definitions": {
 		"language": {
@@ -1587,10 +1587,16 @@
 								"description": "description of the coverage (grid/raster), ie. the definition of the grid/raster data structure",
 								"type": "object",
 								"properties": {
+									"attributeDescription":{
+										"title": "Attribute description",
+										"description": "Description of the attributes of the coverage",
+										"type": "string",
+										"_xpath": "gmd:contentInfo/gmd:MD_CoverageDescription/gmd:attributeDescription/gco:RecordType"
+									},
 									"contentType": {
 										"title": "Coverage content type",
 										"description": "Type of coverage content",
-										"type": "string",
+										"type": "object",
 										"properties": {
 											"codeListValue": {
 												"title": "Type of coverage content, eg. 'image'. Recommended code following the [ISO/TS 19139](http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_CoverageContentTypeCode) Coverage content type codelist. Suggested values: {image, thematicClassification, physicalMeasurement, auxillaryInformation, qualityInformation, referenceInformation, modelResult, coordinate, auxilliaryData}",
@@ -1601,12 +1607,7 @@
 												"title": "Codelist used for coverage content types. Recommended URI: http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_CoverageContentTypeCode",
 												"type": "string",
 												"propertyType": "attribute"
-											},
-											"codeSpace": {
-												"title": "Codespace of the coverage content types codelist. Recommended value: ISOTC211/19115",
-												"type": "string",
-												"propertyType": "attribute"
-											}
+											}											
 										}
 									},
 									"dimension": {
@@ -1644,22 +1645,8 @@
 														},
 														"units": {
 															"title": "Units",
-															"type": "object",
-															"description": "Units of the band value",
-															"properties": {
-																"identifier": {
-																	"title": "Identifier",
-																	"type": "string"
-																},
-																"name": {
-																	"title": "Name",
-																	"type": "string"
-																},
-																"quantityType": {
-																	"title": "Quantity type",
-																	"type": "string"
-																}
-															}
+															"type": "string",
+															"description": "Units of the band value"
 														},
 														"peakResponse": {
 															"title": "Peak response",

@@ -686,9 +686,19 @@ class Editor_acl
 			throw new Exception("User not set");
 		}
 
-		//check if user has global template admin access
-		if ($this->has_access('template_manager','admin', $user)){
+		//global admin role
+		if ($this->user_is_admin($user)){
 			return true;
+		}
+
+		//check if user has global template admin access
+		try{
+			if ($this->has_access('template_manager','admin', $user)){
+				return true;
+			}
+		}
+		catch(Exception $e){
+			//do nothing
 		}
 
 		//check if user is template owner
@@ -773,7 +783,6 @@ class Editor_acl
 		$has_access=$this->user_has_shared_template_access_acl($user_permissions, $permission);
 
 		if (!$has_access){
-			//throw new AclAccessDeniedException("Access denied, you don't have permissions");
 			throw new Exception("Access denied, you don't have permissions");
 		}
 

@@ -186,7 +186,13 @@ class Editor_template_model extends ci_model {
 					throw new Exception("Template not found:",$template['template']);
 				}
 
-				return json_decode(file_get_contents($template_path),true);
+				try{
+					$template_content=file_get_contents($template_path);
+				} catch (Exception $e) {
+					throw new Exception("Failed to read template file: ".$template_path. " - ".$e->getMessage());
+				}
+
+				return json_decode($template_content,true);
 			}
 		}		
 	}

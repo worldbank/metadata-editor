@@ -4502,7 +4502,7 @@
                                             "key": "coverageDescription.contentType",
                                             "title": "Content type",
                                             "type": "string",
-                                            "prop_key": "description.contentInfo.coverageDescription.contentType",
+                                            "prop_key": "description.contentInfo.coverageDescription.contentType.codeListValue",
                                             "display_type": "text"
                                         },
                                         {
@@ -4577,28 +4577,12 @@
                                                             "help_text": "The maximum value of the band."
                                                         },
                                                         {
-                                                            "key":"band.units.identifier",
-                                                            "title": "Band unit identifier",
+                                                            "key": "band.units",
+                                                            "title": "Band units",
                                                             "type": "string",
-                                                            "prop_key": "description.contentInfo.coverageDescription.dimension.band.units.identifier",
+                                                            "prop_key": "description.contentInfo.coverageDescription.dimension.band.units",
                                                             "display_type": "text",
-                                                            "help_text": "The identifier of the band unit. The identifier can be a string or a URI."
-                                                        },
-                                                        {
-                                                            "key":"band.units.name",
-                                                            "title": "Band unit name",
-                                                            "type": "string",
-                                                            "prop_key": "description.contentInfo.coverageDescription.dimension.band.units.name",
-                                                            "display_type": "text",
-                                                            "help_text": "The name of the band unit."
-                                                        },
-                                                        {
-                                                            "key":"band.units.quantityType",
-                                                            "title": "Band unit quantity type",
-                                                            "type": "string",
-                                                            "prop_key": "description.contentInfo.coverageDescription.dimension.band.units.quantityType",
-                                                            "display_type": "text",
-                                                            "help_text": "The quantity type of the band unit."
+                                                            "help_text": "Band units description"
                                                         },
                                                         {
                                                             "key":"band.peakResponse",

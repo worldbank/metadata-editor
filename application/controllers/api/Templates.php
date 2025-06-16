@@ -285,12 +285,11 @@ class Templates extends MY_REST_Controller
 	function delete_post($uid=null)
 	{		
 		try{
-			$this->has_access($resource_='template_manager',$privilege='delete');
-
 			if (!$uid){
 				throw new Exception("Missing parameter: UID");
 			}
 
+			$this->editor_acl->user_has_template_access($uid,$permission='delete');
 			$result=$this->Editor_template_model->delete($uid, $this->user_id);
 
 			$output=array(

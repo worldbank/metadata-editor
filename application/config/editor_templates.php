@@ -163,7 +163,7 @@ $config['geospatial'][]=array(
 );
 
 $config['geospatial'][]=array(
-    'template' => 'metadata_editor/metadata_editor_templates/geospatial_template_ihsn_fr.json',
+    'template' => 'metadata_editor/metadata_editor_templates/geospatial_form_template_gemini.json',
     "uid"=> "geospatial-gemini-inspire-en",
     "data_type"=> "geospatial",
     "lang"=> "en",

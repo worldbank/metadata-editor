@@ -56,7 +56,10 @@ class ISO19139Reader
         $result['description']['referenceSystemInfo']=$this->getReferenceSystemInfo();
 
         //identificationInfo
-        $result['description']['identificationInfo']=$this->getidentificationInfo();
+        $result['description']['identificationInfo']=$this->getIdentificationInfo();
+
+        //contentInfo
+        $result['description']['contentInfo']=$this->getContentInfo();
 
         //distributionInfo
         $result['description']['distributionInfo']=$this->getDistributionInfo();
@@ -164,7 +167,7 @@ class ISO19139Reader
     }
 
 
-    function getidentificationInfo()
+    function getIdentificationInfo()
     {
         $result = array();
 
@@ -224,6 +227,111 @@ class ISO19139Reader
         
         return $result;
     }
+
+
+    function getContentInfo()
+    {
+        $result = array();
+
+        //check for both
+        // MI_CoverageDescription
+        // MD_CoverageDescription
+
+        $nodes=$this->xml->xpath('//gmd:contentInfo/gmi:MI_CoverageDescription | //gmd:contentInfo/gmd:MD_CoverageDescription');
+
+        if (empty($nodes)){
+            return null;
+        }
+
+        //iterate converageDescription array
+        foreach ($nodes as $node) {
+            
+            //get description
+            $attributeDescription = (string) $this->xpath_query('gmd:attributeDescription/gco:RecordType', $node);
+
+            $contentType= [
+                "codeListValue" => (string) $this->xpath_query('gmd:contentType/gmd:MD_CoverageContentTypeCode/@codeListValue', $node),
+                "codeList" => (string) $this->xpath_query('gmd:contentType/gmd:MD_CoverageContentTypeCode/@codeList', $node)
+            ];
+
+            //dimensions/bands
+            $dimensions = (array) $node->xpath('gmd:dimension');
+            $dimensionsArray = [];
+        
+            // Iterate over all dimensions
+            foreach ($dimensions as $dimension) {
+                $band = $dimension->xpath('gmd:MD_Band');
+
+                //there can be only be one band under each dimension
+                
+                if (!empty($band)){
+                    $bandNode = $band[0]; // Get the first (and only) band node
+                    $bandArray = [
+                        "name" => (string) $this->xpath_query('gmd:sequenceIdentifier/gco:MemberName/gco:aName/gco:CharacterString', $bandNode),
+                        "type" => (string) $this->xpath_query('gmd:sequenceIdentifier/gco:attributeType/gco:TypeName/gco:aName/gco:CharacterString', $bandNode),
+                        "description" => (string) $this->xpath_query('gmd:descriptor/gco:CharacterString', $bandNode),
+                        "minimumValue" => (float) $this->xpath_query('gmd:minValue/gco:Real', $bandNode),
+                        "maximumValue" => (float) $this->xpath_query('gmd:maxValue/gco:Real', $bandNode),
+                        "units" => (string) $this->xpath_query('gmd:units/gco:CharacterString', $bandNode),
+                        "peakResponse" => (float) $this->xpath_query('gmd:peakResponse/gco:Real', $bandNode),
+                        "bitsPerValue" => (int) $this->xpath_query('gmd:bitsPerValue/gco:Integer', $bandNode),
+                        "toneGradation" => (int) $this->xpath_query('gmd:toneGradation/gco:Integer', $bandNode),
+                        "scaleFactor" => (float) $this->xpath_query('gmd:scaleFactor/gco:Real', $bandNode),
+                        "offset" => (float) $this->xpath_query('gmd:offset/gco:Real', $bandNode),
+                    ];
+        
+                    // Add the band array to the dimensions array
+                    $dimensionsArray[] = [
+                        "band" => $bandArray,
+                    ];
+                }
+
+                //rangeDimension
+                $rangeDimension = $dimension->xpath('gmd:rangeDimension');
+
+                //there can be only be one rangeDimension under each dimension
+                if (!empty($rangeDimension)){
+                    $rangeDimensionNode = $rangeDimension[0]; // Get the first (and only) rangeDimension node
+                    $dimensionsArray[] = [
+                        "rangeDimension" => [
+                            "name" => (string) $this->xpath_query('gmd:sequenceIdentifier/gco:MemberName/gco:aName/gco:CharacterString', $rangeDimensionNode),
+                            "type" => (string) $this->xpath_query('gmd:sequenceIdentifier/gco:attributeType/gco:TypeName/gco:aName/gco:CharacterString', $rangeDimensionNode),
+                            "description" => (string) $this->xpath_query('gmd:descriptor/gco:CharacterString', $rangeDimensionNode),
+                        ],
+                    ];
+                }
+            }
+
+            $result[] = [                
+                "coverageDescription" => [
+                    "attributeDescription" => $attributeDescription,
+                    "contentType" => $contentType,
+                    "dimension" => $dimensionsArray,
+                ]                
+            ];
+        }
+
+        return $result;
+    }
+
+    function getCoverageDescription($coverageDescription)
+    {
+        $result = array();
+
+        if (empty($coverageDescription)){
+            return null;
+        }
+
+        foreach ($coverageDescription as $description) {
+            $result[] = [
+                "description" => (string) $this->xpath_query('gmd:description/gco:CharacterString', $description),
+                "dimensions" => (array) $this->getCoverageDescription($description->xpath('gmd:dimension')),
+            ];
+        }
+        
+        return $result;
+    }
+    
 
 
     function getPresentationForm($presentationForm)

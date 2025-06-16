@@ -4356,7 +4356,7 @@
                                             "key": "coverageDescription.contentType",
                                             "title": "Content type",
                                             "type": "string",
-                                            "prop_key": "description.contentInfo.coverageDescription.contentType",
+                                            "prop_key": "description.contentInfo.coverageDescription.contentType.codeListValue",
                                             "display_type": "text",
                                             "help_text": "Indicates the type of information represented in the coverage (e.g., physical measurement, thematic classification, etc.). Examples: image, thematicClassification, physicalMeasurement"
                                         },
@@ -4433,28 +4433,12 @@
                                                             "help_text": "The largest possible or observed value in the band."
                                                         },
                                                         {
-                                                            "key": "band.units.identifier",
-                                                            "title": "Band unit identifier",
+                                                            "key": "band.units",
+                                                            "title": "Band units",
                                                             "type": "string",
-                                                            "prop_key": "description.contentInfo.coverageDescription.dimension.band.units.identifier",
+                                                            "prop_key": "description.contentInfo.coverageDescription.dimension.band.units",
                                                             "display_type": "text",
-                                                            "help_text": "Unique identifier for the unit of measurement (often a URI)."
-                                                        },
-                                                        {
-                                                            "key": "band.units.name",
-                                                            "title": "Band unit name",
-                                                            "type": "string",
-                                                            "prop_key": "description.contentInfo.coverageDescription.dimension.band.units.name",
-                                                            "display_type": "text",
-                                                            "help_text": "The name of the measurement unit (e.g., \"W/m²/sr/μm\")"
-                                                        },
-                                                        {
-                                                            "key": "band.units.quantityType",
-                                                            "title": "Band unit quantity type",
-                                                            "type": "string",
-                                                            "prop_key": "description.contentInfo.coverageDescription.dimension.band.units.quantityType",
-                                                            "display_type": "text",
-                                                            "help_text": "The physical quantity measured (e.g., \"radiance\", \"temperature\")."
+                                                            "help_text": "Band units description"
                                                         },
                                                         {
                                                             "key": "band.peakResponse",
