@@ -708,6 +708,63 @@ paths:
         security:
           - ApiKeyAuth: []
 
+
+  /editor/create/script:
+      post:
+        tags:          
+          - Script
+        summary: Create Script
+        description: Create a new script type project
+        operationId: createScript
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: 'script-schema.json'
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: 'script-schema.json'
+        security:
+          - ApiKeyAuth: []
+
+  /editor/update/script/{id}:
+      post:
+        tags:
+          - Script
+        summary: Update Script
+        description: Update script project
+        operationId: updateScript
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "id"
+            description: Project ID
+            type: string
+            format: string
+            required: true
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: 'script-schema.json'
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: 'script-schema.json'
+        security:
+          - ApiKeyAuth: []
+
   /data/datafile//{id}:
         post:
           tags:
