@@ -44,56 +44,18 @@
             </div>
             </div>
 
-                <?php /*
-                <!-- icons -->
-                <div class="pb-2 mb-3 sidebar-menu-bar d-flex justify-content-center" style="border-bottom:1px solid #343a40; color:#343a40">
-
-                
-
-                    <button type="button" title="Expand/Collapse" class="btn btn-xs btn-link" @click="toggleTree">
-                        <i class="icon fas fa-compress-arrows-alt"></i>
-                    </button>
-
-                    <button type="button" title="Show mandatory fields" class="btn btn-xs btn-link" :class="{ active: show_fields_mandatory }" @click="toggleFields('mandatory')">
-                        <v-icon class="icon">mdi-check-circle</v-icon>
-                    </button>
-
-                    <button type="button" title="Show recommended fields" class="btn btn-xs btn-link" :class="{ active: show_fields_recommended }" @click="toggleFields('recommended')">
-                        <v-icon class="icon">mdi-circle-half-full</v-icon>
-                    </button>
-
-                    <button type="button" title="Show empty fields" class="btn btn-xs btn-link" :class="{ active: show_fields_empty }" @click="toggleFields('empty')">
-                        <v-icon class="icon">mdi-circle-outline</v-icon>
-                    </button>
-
-                    <button type="button" title="Expand/Collapse" class="btn btn-xs btn-link" :class="{ active: show_fields_nonempty }" @click="toggleFields('nonempty')">
-                        <v-icon class="icon">mdi-checkbox-blank-circle</v-icon>
-                    </button>
-
-                </div>
-                <!-- end-icons -->
-                */ ?>
-
-                <?php /*
-                <div>
-                    <!--search box -->
-                <v-text-field
-                    min-height="6px"
-                    filled
-                    rounded dense
-                    label=""
-                    append-icon="mdi-magnify"
-                 ></v-text-field>
-                 <!--end search box -->
-                </div>
-                */ ?>
-
-
-
                 <div class="mb-5 ml-2 pr-3 side-navigation" >
 
+                <div class="d-flex justify-center align-center ml-3 mr-3">
+                <v-progress-linear
+                    v-if="ProjectIsLoading"
+                    indeterminate
+                    color="primary"
+                    height="4"                    
+                    ></v-progress-linear>
+                </div>
 
-                    <v-treeview 
+                    <v-treeview                         
                         color="warning" 
                         v-model="tree" 
                         :active.sync="tree_active_items" 

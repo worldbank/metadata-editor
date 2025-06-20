@@ -494,7 +494,16 @@ abstract class REST_Controller extends CI_Controller {
         // Not all methods have a body attached with them
         $this->request->body = NULL;
 
-        $this->{'_parse_' . $this->request->method}();
+        if (in_array($this->request->method, $this->allowed_http_methods, true)) {
+            $method = '_parse_' . $this->request->method;
+            if (method_exists($this, $method)) {
+                $this->$method();
+            } else {
+                throw new BadMethodCallException("Method $method does not exist");
+            }
+        } else {
+            throw new InvalidArgumentException('Invalid request method');
+        }
 
         // Fix parse method return arguments null
         if($this->{'_'.$this->request->method.'_args'} === null)
@@ -790,6 +799,11 @@ abstract class REST_Controller extends CI_Controller {
         try
         {
             if ($this->is_valid_request) {
+
+                if (!method_exists($this, $controller_method)) {
+                    throw new Exception("invalid_method");
+                }
+
                 call_user_func_array([$this, $controller_method], $arguments);
             }
         }

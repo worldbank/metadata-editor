@@ -126,12 +126,11 @@ class Share extends MY_REST_Controller
 	function list_get($sid=null)
 	{
 		try{
-			//$this->has_dataset_access('view',$sid);
-
 			if(!$sid){
 				throw new Exception("Missing parameter  `sid`");
 			}
 
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
 			$result=$this->editor_owners_model->select_all($sid);
 				
 			$response=array(

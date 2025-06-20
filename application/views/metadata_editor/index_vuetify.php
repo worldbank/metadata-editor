@@ -253,6 +253,9 @@
         );
       },
       computed:{
+        ProjectIsLoading(){
+          return this.$store.state.project_isloading;
+        },
         hideProjectSaveOnRoute(){
           return this.$route.path.startsWith("/datafile/") 
             || this.$route.path.startsWith("/external-resources/") ;
@@ -747,7 +750,6 @@
           }
         },
         init_tree_data: function() {
-          this.is_loading=true;
           this.items=[];
           let tree_data=this.filterRecursiveSearch(this.cloneObject(this.form_template.template.items),'');
 

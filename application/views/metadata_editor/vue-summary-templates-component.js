@@ -10,7 +10,7 @@ Vue.component('summary-templates-component', {
         }
       },
     mounted: function(){
-        this.loadAdminMetadataTemplates();
+       // this.loadAdminMetadataTemplates();
     },
     computed: {
         isProjectEditable(){

@@ -1009,11 +1009,16 @@ class Editor extends MY_REST_Controller
 	{
 		try{
 			$sid=$this->get_sid($sid);
+			$this->editor_acl->user_has_project_access($sid,$permission='view');
 			$this->Editor_model->download_project_thumbnail($sid);
 			die();
 		}
 		catch(Exception $e){
-			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
+			$output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($output, REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
 

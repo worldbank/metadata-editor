@@ -8,10 +8,6 @@ Vue.component('template-validation-component', {
           validation_report:[]
         }
       },
-    created: function(){      
-        this.validateProject();
-        this.projectValidationReport();
-    },
     watch:{
         ProjectMetadata: {
             handler: function (val, oldVal) {

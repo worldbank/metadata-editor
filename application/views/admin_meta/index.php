@@ -15,7 +15,7 @@
   <script src="<?php echo base_url(); ?>javascript/axios.min.js"></script>
   <script src="https://unpkg.com/vue-i18n@8"></script>
 
-  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.20/lodash.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
   <script src="https://unpkg.com/moment@2.26.0/moment.js"></script>
 
 
