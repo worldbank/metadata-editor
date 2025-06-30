@@ -349,29 +349,29 @@ CREATE TABLE `editor_data_files` (
 CREATE TABLE `editor_projects` (
   `id` int NOT NULL AUTO_INCREMENT,
   `idno` varchar(200) DEFAULT NULL,
-  `version_number` varchar(15) DEFAULT NULL,
-  `type` varchar(15)  DEFAULT NULL,
-  `title` varchar(255)  NOT NULL DEFAULT '',
-  `abbreviation` varchar(45)  DEFAULT NULL,
+  `type` varchar(15) DEFAULT NULL,
+  `title` varchar(255) NOT NULL DEFAULT '',
+  `abbreviation` varchar(45) DEFAULT NULL,
   `authoring_entity` text ,
-  `nation` varchar(150)  DEFAULT '',
+  `nation` varchar(150) DEFAULT '',
   `year_start` int DEFAULT '0',
   `year_end` int DEFAULT '0',
-  `metafile` varchar(255)  DEFAULT NULL,
-  `dirpath` varchar(255)  DEFAULT NULL,
+  `metafile` varchar(255) DEFAULT NULL,
+  `dirpath` varchar(255) DEFAULT NULL,
   `varcount` int DEFAULT NULL,
   `published` tinyint DEFAULT NULL,
   `created` int DEFAULT NULL,
   `changed` int DEFAULT NULL,
   `created_by` int DEFAULT NULL,
   `changed_by` int DEFAULT NULL,
-  `thumbnail` varchar(300)  DEFAULT NULL,
+  `thumbnail` varchar(300) DEFAULT NULL,
   `metadata` mediumtext ,
   `template_uid` varchar(100) DEFAULT NULL,
   `is_shared` int DEFAULT NULL,
   `study_idno` varchar(300) DEFAULT NULL,
   `pid` int DEFAULT NULL,
   `is_locked` int DEFAULT NULL,
+  `version_number` varchar(15) DEFAULT NULL,
   `version_created` int DEFAULT NULL,
   `version_created_by` int DEFAULT NULL,
   `version_notes` varchar(500) DEFAULT NULL,
@@ -380,6 +380,7 @@ CREATE TABLE `editor_projects` (
   UNIQUE KEY `unq_idno` (`idno`,`version_number`),
   FULLTEXT KEY `ft_projects` (`title`)
 ) AUTO_INCREMENT=1;
+
 
 
 CREATE TABLE `editor_resources` (

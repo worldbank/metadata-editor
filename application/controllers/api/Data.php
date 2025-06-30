@@ -610,7 +610,7 @@ class Data extends MY_REST_Controller
 			$project_folder=realpath($project_folder);
 
 			//get filename by FID
-			$datafile=$this->Editor_model->data_file_by_id($sid,$fileid);
+			$datafile=$this->Editor_datafile_model->data_file_by_id($sid,$fileid);
 			
 			if (!$datafile){
 				throw new Exception("DATAFILE_NOT_FOUND");

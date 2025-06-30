@@ -287,7 +287,7 @@ class Editor_resource_model extends ci_model {
 			throw new Exception('EDITOR_FOLDER_NOT_FOUND: '.$survey_folder);
 		}
 
-		$datafile=$this->Editor_model->data_file_by_id($sid,$file_id);
+		$datafile=$this->Editor_datafile_model->data_file_by_id($sid,$file_id);
 			
 		if (!$datafile){
 			throw new Exception("DATAFILE_NOT_FOUND: ".$file_id);

@@ -267,7 +267,13 @@
             return this.$store.state.formTemplate.uid;
         },
         UserHasEditAccess(){
-          return this.$store.state.user_has_edit_access;
+          return this.$store.state.user_has_edit_access && !this.$store.state.project_is_locked;
+        },
+        ProjectIsLocked(){
+          return this.$store.state.project_is_locked;
+        },
+        ProjectVersionInfo(){
+          return this.$store.state.project_version_info;
         },
         Title(){          
           let titles={

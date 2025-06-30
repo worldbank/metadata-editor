@@ -117,34 +117,34 @@ class Datafiles extends MY_REST_Controller
 			}*/
 
 			//validate 
-			if ($this->Editor_model->validate_data_file($options)){
+			if ($this->Editor_datafile_model->validate_data_file($options)){
 				$options['file_uri']=$options['file_name'];
-				$options['file_name']=$this->Editor_model->data_file_filename_part($options['file_name']);
+				$options['file_name']=$this->Editor_datafile_model->data_file_filename_part($options['file_name']);
 
 				if (isset($options['id'])){
-					$data_file=$this->Editor_model->data_file_by_pk_id($sid,$options['id']);
+					$data_file=$this->Editor_datafile_model->data_file_by_pk_id($options['id'],$sid);
 
 					if (!$data_file){
 						throw new Exception("Data file not found");
 					}
 
-					$data_file_by_name=$this->Editor_model->data_file_by_name($sid,$options['file_name']);
+					$data_file_by_name=$this->Editor_datafile_model->data_file_by_name($sid,$options['file_name']);
 
 					if($data_file_by_name && $data_file_by_name['id']!=$options['id']){
 						throw new Exception("Data file name already exists");
 					}
 
-					$this->Editor_model->data_file_update($data_file["id"],$options);
+					$this->Editor_datafile_model->data_file_update($data_file["id"],$options);
 				}else{
 
 					//check if file name exists
-					$data_file=$this->Editor_model->data_file_by_name($sid,$options['file_name']);
+					$data_file=$this->Editor_datafile_model->data_file_by_name($sid,$options['file_name']);
 
 					if ($data_file){
 						throw new Exception("Data file name already exists");
 					}
 
-					$this->Editor_model->data_file_insert($sid,$options);					
+					$this->Editor_datafile_model->data_file_insert($sid,$options);					
 				}
 				
 				$response=array(
@@ -212,7 +212,7 @@ class Datafiles extends MY_REST_Controller
 					'wght'=>$row['wght']
 				);
 
-				$this->Editor_model->data_file_update($row['id'],$update_options);
+				$this->Editor_datafile_model->data_file_update($row['id'],$update_options);
 			}
 			
 				
@@ -369,7 +369,7 @@ class Datafiles extends MY_REST_Controller
 			}
 			
 			$user_id=$this->get_api_user_id();
-			$survey_datafiles=$this->Editor_model->data_file_by_name($sid,$filename);
+			$survey_datafiles=$this->Editor_datafile_model->data_file_by_name($sid,$filename);
 
 			if (!$survey_datafiles){
 				throw new Exception("Data file not found");
@@ -404,7 +404,7 @@ class Datafiles extends MY_REST_Controller
 			$this->editor_acl->user_has_project_access($sid,$permission='view',$this->api_user);
 			
 			$user_id=$this->get_api_user_id();
-			$file_id=$this->Editor_model->data_file_generate_fileid($sid);
+			$file_id=$this->Editor_datafile_model->data_file_generate_fileid($sid);
 
 			$response=array(
 				'file_id'=>$file_id

@@ -387,13 +387,16 @@ class Editor_datafile_model extends CI_Model {
         return $this->db->get("editor_data_files")->row_array();
 	}
 
-	function data_file_by_pk_id($sid,$id)
+	function data_file_by_pk_id($pk_id, $sid=null)
     {
         $this->db->select("*");
-        $this->db->where("sid",$sid);
-        $this->db->where("id",$id);
+        if ($sid){
+            $this->db->where("sid",$sid);
+        }
+        $this->db->where("id",$pk_id);
         return $this->db->get("editor_data_files")->row_array();
 	}
+
 
 	function data_file_by_name($sid,$file_name)
     {
@@ -560,6 +563,8 @@ class Editor_datafile_model extends CI_Model {
 
 	function delete($sid,$file_id)
     {        
+		$this->Editor_model->check_project_editable($sid);
+
         $this->db->where("sid",$sid);
         $this->db->where("file_id",$file_id);
         $this->db->delete("editor_data_files");
@@ -582,6 +587,8 @@ class Editor_datafile_model extends CI_Model {
 	*/
 	function insert($sid,$options)
 	{		
+		$this->Editor_model->check_project_editable($sid);
+
 		$data=array();
 		//$data['created']=date("U");
 		//$data['changed']=date("U");
@@ -635,6 +642,14 @@ class Editor_datafile_model extends CI_Model {
 	*/
 	function update($id,$options)
 	{
+		$data_file=$this->data_file_by_pk_id($id);
+
+		if (!$data_file){
+			throw new Exception("DATA_FILE_NOT_FOUND: " . $id);
+		}
+
+		$this->Editor_model->check_project_editable($data_file['sid']);
+
 		$data=array();
 		
 		foreach($options as $key=>$value)
@@ -678,6 +693,9 @@ class Editor_datafile_model extends CI_Model {
 	 */
 	function update_by_filename($sid,$file_name,$options)
 	{
+		// Check if project is locked
+		$this->Editor_model->check_project_editable($sid);
+
 		foreach($options as $key=>$value){
 			if ($key=='id'){
 				unset($options[$key]);
@@ -855,6 +873,167 @@ class Editor_datafile_model extends CI_Model {
 			'base64'=>base64_encode($uploaded_file_name),
 			'uploaded_path'=>$uploaded_path
 		];
+	}
+
+	function data_file_generate_fileid($sid)
+    {
+        $this->db->select("file_id");
+        $this->db->where("sid",$sid);
+        $result=$this->db->get("editor_data_files")->result_array();
+
+		if (!$result){
+			return 'F1';
+		}
+
+		$max=1;
+		foreach($result as $row)
+		{
+			$val=substr($row['file_id'],1);
+			if (strtoupper(substr($row['file_id'],0,1))=='F' && is_numeric($val)){
+				if ($val >$max){
+					$max=$val;
+				}
+			}
+		}
+
+		return 'F'.($max +1);
+	}
+
+	function data_file_insert($sid,$options)
+	{		
+		// Check if project is locked
+		$this->Editor_model->check_project_editable($sid);
+
+		$data=array();
+		$data['created']=date("U");
+		$data['changed']=date("U");
+		
+		foreach($options as $key=>$value){
+			if (in_array($key,$this->data_file_fields) ){
+				$data[$key]=$value;
+			}
+		}
+
+		//filename
+		if ($data['file_name']){
+			$data['file_name']=$this->filename_part($data['file_name']);
+		}
+
+		$data['sid']=$sid;		
+		$result=$this->db->insert('editor_data_files', $data);
+
+		if ($result===false){
+			throw new MY_Exception($this->db->_error_message());
+		}
+		
+		return $this->db->insert_id();
+	}
+
+	function data_file_filename_part($filename)
+	{
+		$info=pathinfo($filename);
+		return $info['filename'];
+	}
+
+	function data_file_update($id,$options)
+	{
+		// Get the project ID from the data file
+		$this->db->select('sid');
+		$this->db->where('id', $id);
+		$data_file = $this->db->get('editor_data_files')->row_array();
+		
+		if (!$data_file) {
+			throw new Exception("DATA_FILE_NOT_FOUND: " . $id);
+		}
+		
+		// Check if project is locked
+		$this->Editor_model->check_project_editable($data_file['sid']);
+
+		$data=array();
+		
+		foreach($options as $key=>$value)
+		{
+			if ($key=='id'){
+				continue;
+			}
+
+			if (in_array($key,$this->data_file_fields) ){
+				$data[$key]=$value;
+			}
+		}
+
+		$data['changed']=date("U");
+
+		//filename
+		if (isset($data['file_name'])){
+			$data['file_name']=$this->filename_part($data['file_name']);
+		}
+		
+		$this->db->where('id',$id);
+		$result=$this->db->update('editor_data_files', $data);
+
+		if ($result===false){
+			throw new MY_Exception($this->db->_error_message());
+		}
+		
+		return TRUE;
+	}
+
+	function data_files_get_varcount($sid)
+	{
+		$this->db->select("sid,fid, count(*) as varcount");
+		$this->db->where("sid",$sid);
+		$this->db->group_by("sid,fid");
+		$result= $this->db->get("editor_variables")->result_array();		
+
+		$output=array();
+		foreach($result as $row)
+		{
+			$output[$row['fid']]=$row['varcount'];
+		}
+
+		return $output;
+	}
+
+	function validate_data_file($options,$is_new=true)
+	{		
+		$this->load->library("form_validation");
+		$this->form_validation->reset_validation();
+		$this->form_validation->set_data($options);
+	
+		//validation rules for a new record
+		if($is_new){				
+			#$this->form_validation->set_rules('surveyid', 'IDNO', 'xss_clean|trim|max_length[255]|required');
+			//$this->form_validation->set_rules('file_id', 'File ID', 'required|xss_clean|trim|max_length[50]');	
+			$this->form_validation->set_rules('file_name', 'File name', 'required|xss_clean|trim|max_length[200]');	
+			$this->form_validation->set_rules('case_count', 'Case count', 'xss_clean|trim|max_length[10]');	
+			$this->form_validation->set_rules('var_count', 'Variable count', 'xss_clean|trim|max_length[10]');	
+
+			
+			//file id
+			$this->form_validation->set_rules(
+				'file_id', 
+				'File ID',
+				array(
+					"required",
+					"max_length[50]",
+					"trim",
+					"alpha_dash",
+					"xss_clean",
+					//array('validate_file_id',array($this, 'validate_file_id')),				
+				)		
+			);
+
+		}
+		
+		if ($this->form_validation->run() == TRUE){
+			return TRUE;
+		}
+		
+		//failed
+		$errors=$this->form_validation->error_array();
+		$error_str=$this->form_validation->error_array_to_string($errors);
+		throw new ValidationException("VALIDATION_ERROR: ".$error_str, $errors);
 	}
 
 	

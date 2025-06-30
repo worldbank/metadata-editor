@@ -119,9 +119,7 @@
             <!--end left-->
         
             </pane>
-        <?php /* 
-        </div>*/ ?>
-        <?php /* <div class="col col-md-9 col-xl-10" style="height:100vh;overflow-y:scroll;">*/?>
+                
         <pane size="80" class="pane-main-content">
             <!-- right -->
 
@@ -129,6 +127,26 @@
             <?php echo $this->load->view('metadata_editor/header', array(), true); ?>
 
             <div class="content-wrapper" style="margin-left:0px;">
+    
+                <!-- Project Lock Warning Banner -->
+                <v-alert
+                    v-if="ProjectIsLocked"                                        
+                    border="left"
+                    colored-border
+                    color="deep-orange"
+                    elevation="2"
+                    class="ma-3"
+                    icon="mdi-lock"
+                    prominent
+                    type="warning"
+                >
+                    <div>                        
+                        <div class="ml-2">
+                            <strong>{{$t('project_locked')}}</strong><br>
+                            {{$t('project_locked_message')}}
+                        </div>
+                    </div>
+                </v-alert>
 
                 <section class="content-main-container mt-3">
 
@@ -136,33 +154,6 @@
 
                         <v-login v-model="login_dialog"></v-login>
                         <project-export-json-component v-model="export_json_dialog"></project-export-json-component>
-
-                        <?php /*
-                //route path: {{$route.fullPath}}
-                <div v-if="active_form_field">active_form_field.key:{{active_form_field.key}}</div>
-
-                <div v-if="form_errors.length>0 || schema_errors.length>0" style="margin-bottom:15px;" class="pl-2">
-                    <div style="color:red;font-weight:bold;">Please correct the following errors:</div>
-                        <div style="color:red;" v-if="form_errors.length>0">
-                            <div v-for="error in form_errors">
-                                <span v-if="error.message">
-                                    <i class="fas fa-times-circle"></i> {{ error.message }}
-                                    <span class="label label-warning">{{error.property}}{{error.dataPath}}</span>
-                                </span>
-                                <span v-if="!error.message"><i class="fas fa-times-circle"></i> {{ error }}</span>
-                            </div>
-                        </div>
-                        <div style="color:red;" v-if="schema_errors.length>0">
-                            <div v-for="error in schema_errors">
-                                <span v-if="error.message">
-                                    <i class="fas fa-times-circle"></i> {{ error.message }}
-                                    <span class="label label-warning">{{error.property}}{{error.dataPath}}</span>
-                                </span>
-                                <span v-if="!error.message"><i class="fas fa-times-circle"></i> {{ error }}</span>
-                            </div>
-                        </div>
-                </div>
-                */ ?>
 
                         <validation-observer ref="form" v-slot="{ invalid }">
                             <div class="container-app">
@@ -173,12 +164,7 @@
 
                         </validation-observer>
                     </div>
-
-                    <?php // store_state:<pre>{{$store.state}}</pre> 
-                    ?>
-                    <?php // <pre>{{form_template}}</pre> 
-                    ?>
-
+                   
                 </section>
             </div>
             <!--end right-->

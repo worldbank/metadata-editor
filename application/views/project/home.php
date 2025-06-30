@@ -254,7 +254,8 @@
                         </tr>
                       </thead>
                       <tbody>
-                        <tr v-for="project in Projects" @click.prevent="EditProject(project.id)">
+                        <template v-for="project in Projects" @click.prevent="EditProject(project.id)">
+                        <tr>
                           <td><input type="checkbox" v-model="selected_projects" :value="project.id" @click="checkboxOnClick" /></td>
                           <td><template v-if="project.thumbnail">
                                 <img style="width:60px;height:60px;" :src="'<?php echo site_url('api/editor/thumbnail'); ?>/' + project.id" alt="" class=" border img-fluid img-thumbnail rounded shadow-sm project-card-thumbnail">
@@ -266,7 +267,7 @@
                           <td style="vertical-align:top"><v-icon :title="project.type">{{project_types_icons[project.type]}}</v-icon></td>
                           <td>
                             <div class="project-title">
-                              <a :href="'editor/edit/' + project.id" :title="project.title" class="d-flex xtext-title" @click="EditProject(project.id)">                                
+                              <a :href="'editor/edit/' + project.id" :title="project.title" class="d-flex xtext-title" @click.prevent="EditProject(project.id)">                                
                                 <span v-if="project.title.length>1">{{project.title}}</span>
                                 <span v-else>Untitled</span>
                               </a>
@@ -289,6 +290,12 @@
                               </template>
                             </div>
 
+                            <div class="mt-2" v-if="project.versions && project.versions.length>0">
+                              <v-btn color="primary" outlined x-small dark @click.stop="toggleRevisions(project.id)" :title="project.versions.length">
+                                <v-icon x-small left>mdi-content-copy</v-icon> Versions <span class="ml-1">{{project.versions.length}}</span>
+                              </v-btn>
+                            </div>
+
                           </td>
                           <td class="capitalize text-small">{{project.username_cr}}</td>
                           <td class="capitalize text-small">{{project.username}}</td>
@@ -298,6 +305,14 @@
                           <v-icon @click.stop.prevent="showProjectMenu($event, project.id, true)">mdi-dots-vertical</v-icon> 
                           </td>
                         </tr>
+                        <tr v-if="project.versions && project.versions.length>0 && project.versions_show==1" style="background:white;">
+                          <td colspan="3"></td>
+                          <td colspan="5">                          
+                            <vue-list-revisions :revisions="project.versions" v-on:edit-project="EditProject($event)" v-on:delete-project="DeleteProjectRevision($event)" ></vue-list-revisions>
+                          </td>
+                        </tr>
+                        </template>
+
                       </tbody>
                     </table>
 
@@ -335,6 +350,10 @@
 
     <vue-collection-remove-dialog v-model="dialog_manage_collections" v-bind="dialog_manage_collections_options" v-on:collection-removed="search">
     </vue-collection-remove-dialog>
+
+    <vue-create-revision-dialog v-model="dialog_project_revision" v-bind="dialog_project_revision_options" v-on:revision-created="search" >
+    </vue-create-revision-dialog>
+
     
 
     <template class="create-new-project">
@@ -488,6 +507,11 @@
           </v-list-item>
 
           <v-list-item>
+            <v-list-item-title @click="createProjectRevision(menu_active_project_id)"><v-btn text>{{$t('Create version')}}</v-btn></v-list-item-title>
+          </v-list-item>
+
+
+          <v-list-item>
             <v-list-item-title @click="transferOwnership(menu_active_project_id)" ><v-btn text>{{$t('transfer_ownership')}}</v-btn></v-list-item-title>
           </v-list-item>
           
@@ -542,6 +566,9 @@
     echo $this->load->view("project/vue-transfer-ownership-component.js", null, true);
     echo $this->load->view("editor_common/navigation-tabs-component.js", null, true);
     echo $this->load->view("editor_common/global-site-header-component.js", null, true);
+    echo $this->load->view("project/vue-create-revision-component.js", null, true);
+    echo $this->load->view("project/vue-list-revisions-component.js", null, true);    
+
     ?>
 
     const translation_messages = {
@@ -577,23 +604,55 @@
     ]
 
     const router = new VueRouter({
-    routes, 
-    mode: 'history'
-  })
+      routes, 
+      mode: 'history'
+    })
 
-  const vuetify = new Vuetify({
-    theme: {
-      themes: {
-        light: {
-          primary: '#526bc7',
-          "primary-dark": '#0c1a4d',
-          secondary: '#b0bec5',
-          accent: '#8c9eff',
-          error: '#b71c1c',
+    const vuetify = new Vuetify({
+      theme: {
+        themes: {
+          light: {
+            primary: '#526bc7',
+            "primary-dark": '#0c1a4d',
+            secondary: '#b0bec5',
+            accent: '#8c9eff',
+            error: '#b71c1c',
+          },
         },
       },
-    },
-  })
+    });
+
+
+    const momentMixin = {
+      methods: {
+          momentDate(date) {
+            let utc_date = moment(date, "YYYY-MM-DD HH:mm:ss").toDate();
+            return moment.utc(utc_date).format("YYYY-MM-DD");
+          },
+          momentDateLong(date) {
+            let utc_date = moment(date, "YYYY-MM-DD HH:mm:ss").toDate();
+            return moment.utc(utc_date).format("YYYY-MM-DD HH:mm:ss");
+          },
+          momentShortDate(date) {
+            let utc_date = moment(date, "YYYY-MM-DD HH:mm:ss").toDate();
+            let year = moment.utc(utc_date).format("YYYY");
+            let current_year = moment.utc().format("YYYY");
+
+            if (year == current_year) {
+              return moment.utc(utc_date).format("MMM DD");
+            } else {
+              return moment.utc(utc_date).format("MMM DD, YYYY");
+            }
+          },
+          momentAgo(date) {
+            let utc_date = moment(date, "YYYY-MM-DD HH:mm:ss").toDate();
+            return moment.utc(date).fromNow();
+          }
+        }
+      }
+
+    Vue.mixin(momentMixin);
+
 
 
     vue_app = new Vue({
@@ -667,7 +726,8 @@
         sort_by_options:[],            
         sort_by:"updated_desc",
         collections_flat_list:[],
-
+        dialog_project_revision: false,
+        dialog_project_revision_options: {}
       },
       created: async function() {
         //reload projects on window focus
@@ -757,6 +817,23 @@
         }
       },
       methods: {
+        toggleRevisions: function(project_id) {
+          let project = this.Projects.find(x => x.id == project_id);
+          if (project) {
+            Vue.set(project, 'versions_show', !project.versions_show);
+          }
+        },
+        createProjectRevision: function(project_id) {
+
+          let project = this.Projects.find(x => x.id == project_id);
+
+          this.dialog_project_revision_options = {
+            'project_id': project_id,
+            'project': project || []
+          };
+          this.dialog_project_revision = true;
+        },
+
         pageLink: function(page) {
           window.location.href = CI.site_url + '/' + page;
         },
@@ -855,28 +932,7 @@
         },
         projectEditUrl: function(project_id) {
           return CI.site_url + '/editor/edit/' + project_id;
-        },
-        momentDate(date) {
-          //gmt to utc
-          let utc_date = moment(date, "YYYY-MM-DD HH:mm:ss").toDate();
-          return moment.utc(utc_date).format("YYYY-MM-DD")
-        },
-        momentShortDate(date) {
-          let utc_date = moment(date, "YYYY-MM-DD HH:mm:ss").toDate();
-          let year=moment.utc(utc_date).format("YYYY");
-          let current_year=moment.utc().format("YYYY");
-
-          if (year==current_year){
-            return moment.utc(utc_date).format("MMM DD");
-          }else{
-            return moment.utc(utc_date).format("MMM DD, YYYY");
-          }
-        },
-        momentAgo(date) {
-          //moment.locale('fr');
-          let utc_date = moment(date, "YYYY-MM-DD HH:mm:ss").toDate();
-          return moment.utc(date).fromNow();
-        },
+        },        
         search: function() {
           this.pagination_page = 1;
           this.CreateFilterQS();
@@ -1093,6 +1149,28 @@
               console.log("error", error);
               alert("Failed", error);
             });
+        },
+        DeleteProjectRevision: function(id) {
+          if (!confirm(this.$t("confirm_delete"))) {
+            return false;
+          }
+
+          vm = this;
+          let url = CI.site_url + '/api/versions/delete/' + id;
+
+          axios.post(url)
+            .then(function(response) {
+              vm.loadProjects();
+            })
+            .catch(function(error) {
+              console.log("error", error);
+              if (error.response.data.message){                
+                alert("Failed: " + error.response.data.message);
+              }
+              else{
+                alert("Failed: " + JSON.stringify(error));
+              }
+            });            
         },
         getProjectIcon: function(type) {
           projectIcon = this.project_types_icons[type];

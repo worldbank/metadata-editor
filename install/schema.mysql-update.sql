@@ -140,3 +140,18 @@ ADD COLUMN `is_key` INT NULL;
 # 2025/06/07
 ALTER TABLE `audit_logs`
 ADD COLUMN `obj_ref_id` INT NULL;
+
+
+# 2025/06/19
+# project versions
+
+ALTER TABLE `editor_projects` 
+ADD COLUMN `pid` INT NULL AFTER `study_idno`,
+ADD COLUMN `is_locked` INT NULL AFTER `pid`,
+ADD COLUMN `version_created` INT NULL AFTER `is_locked`,
+ADD COLUMN `version_created_by` INT NULL AFTER `version_created`,
+ADD COLUMN `version_notes` VARCHAR(500) NULL AFTER `version_created_by`,
+ADD COLUMN `version_number` VARCHAR(15) NULL AFTER `study_idno`,
+ADD UNIQUE INDEX `unq_idno` (`idno` ASC, `version_number` ASC);
+
+

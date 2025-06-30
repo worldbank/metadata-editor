@@ -4,6 +4,8 @@ class Project_search
 {
 	private $listing_fields=array(
 		'id',
+		'pid',
+		'version_number',
 		'type',
 		'idno',
 		'study_idno',
@@ -21,7 +23,8 @@ class Project_search
 		'is_shared',
 		"thumbnail",
 		'template_uid',
-		'attributes'
+		'attributes',
+		'is_locked'		
 		);
 		
 	/**
@@ -33,6 +36,7 @@ class Project_search
 		$this->ci->load->model('Collection_model');
 		$this->ci->load->model('Collection_tree_model');
 		$this->ci->load->model('Editor_model');
+		$this->ci->load->library('project_versions');
 	}
 
 
@@ -93,6 +97,13 @@ class Project_search
 					$result[$idx]['attributes']=json_decode($row['attributes'],true);
 				}
 			}
+
+			//add versions info
+			foreach($result as $idx=>$row){
+				$versions=$this->ci->project_versions->get_versions($row['id']);
+				$result[$idx]['versions']=$versions;				
+			}
+
 		}
 		
 
@@ -229,6 +240,8 @@ class Project_search
 			}
 		}
 
+		//filter by pid
+		$this->ci->db->where('editor_projects.pid is null');
 
 		//filter by created_by
 		$created_by=$this->parse_filter_values_as_int($this->get_search_filter($search_options,'created_by'));
@@ -443,7 +456,6 @@ class Project_search
 
 		return $date;		
 	}
-
 
 }
 

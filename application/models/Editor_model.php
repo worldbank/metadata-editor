@@ -35,29 +35,6 @@ class Editor_model extends CI_Model {
         'visualization'=>'visualization'
     );
 
-	private $data_file_fields=array(
-		'id',
-		'sid',
-		'file_id',
-		'file_physical_name',
-		'file_name',
-		'description', 
-		'case_count',
-		'var_count',
-		'producer',
-		'data_checks',
-		'missing_data',
-		'version',
-		'notes',
-		'metadata',
-		'wght',
-		'created',
-		'changed',
-		'created_by',
-		'changed_by',
-		'store_data'
-	);
-	
 	private $listing_fields=array(
 		'id',
 		'type',
@@ -318,7 +295,7 @@ class Editor_model extends CI_Model {
 	//get project basic info
     function get_basic_info($sid)
     {
-		$this->db->select("id,idno,study_idno,type,study_idno,title,abbreviation,nation,year_start,year_end,published,created,changed, template_uid");
+		$this->db->select("id,pid,idno,study_idno,type,study_idno,title,abbreviation,nation,year_start,year_end,published,created,changed, template_uid, is_locked, version_number, version_created, version_created_by, version_created");
 		$this->db->where("id",$sid);
 		
 		$survey=$this->db->get("editor_projects")->row_array();
@@ -370,6 +347,9 @@ class Editor_model extends CI_Model {
 		if (!isset($options['metadata'])){			
 			$options['metadata']=$this->encode_metadata(array('type'=>$type));
 		}
+		else{
+			$options['metadata']=$this->encode_metadata($options['metadata']);
+		}
 
 		$this->db->insert('editor_projects',$options);
 		$new_id=$this->db->insert_id();
@@ -381,11 +361,73 @@ class Editor_model extends CI_Model {
 		return $new_id;
 	}
 
+	/**
+	 * 
+	 * Check if project is locked
+	 * 
+	 */
+	function is_project_locked($sid)
+	{
+		$this->db->select('is_locked');
+		$this->db->where('id', $sid);
+		$result = $this->db->get('editor_projects')->row_array();
+		
+		return $result && $result['is_locked'] == 1;
+	}
+
+	/**
+	 * 
+	 * Unlock a project (set is_locked to 0)
+	 * 
+	 */
+	function unlock_project($sid)
+	{
+		$this->db->where('id', $sid);
+		$this->db->update('editor_projects', array('is_locked' => 0));
+		
+		// Check if update was successful
+		if ($this->db->affected_rows() == 0) {
+			throw new Exception("PROJECT_NOT_FOUND: Project with ID $sid not found");
+		}
+		
+		return true;
+	}
+
+
+	/**
+	 * 
+	 * Lock a project (set is_locked to 1)
+	 * 
+	 */
+	function lock_project($sid)
+	{
+		$this->db->where('id', $sid);
+		$this->db->update('editor_projects', array('is_locked' => 1));
+		
+		return true;
+	}
+
+
+	/**
+	 * 
+	 * Check if project can be edited (not locked)
+	 * 
+	 */
+	function check_project_editable($sid)
+	{
+		if ($this->is_project_locked($sid)) {
+			throw new Exception("PROJECT_IS_LOCKED: This project is locked and cannot be edited." .$sid);
+		}
+		return true;
+	}
+
 	function update_project($type,$id,$options=array(),$validate=false)
 	{
 		if (!array_key_exists($type,$this->types)){
 			throw new Exception("INVALID_TYPE: ".$type);
 		}
+
+		$this->check_project_editable($id);
 
 		$template_uid=null;
 
@@ -449,6 +491,8 @@ class Editor_model extends CI_Model {
 
 	function set_project_options($sid,$options=array())
 	{
+		$this->check_project_editable($sid);
+
 		$valid_options=array(
 			"thumbnail",
 			"template_uid",
@@ -467,7 +511,6 @@ class Editor_model extends CI_Model {
 
 		//idno
 		if (isset($options['idno']) && $this->idno_exists($options['idno'])){
-			//unset($options['idno']);
 			throw new Exception("IDNO_EXISTS: ". $options['idno']);
 		}
 
@@ -481,6 +524,8 @@ class Editor_model extends CI_Model {
 		if (!array_key_exists($type,$this->types)){
 			throw new Exception("INVALID_TYPE: ".$type);
 		}
+
+		$this->check_project_editable($id);
 
 		if (!isset($options['patches'])){
 			throw new Exception("`Patches` parameter is required");
@@ -525,6 +570,8 @@ class Editor_model extends CI_Model {
 
 	function update_project_template($sid,$type,$template_uid)
 	{
+		$this->check_project_editable($sid);
+
 		$template_data_type=$this->Editor_template_model->get_template_data_type($template_uid);
 
 		if (!$template_data_type){
@@ -544,12 +591,14 @@ class Editor_model extends CI_Model {
 	 * 
 	 */
 	function set_project_template($sid,$template_uid)
-	{
+	{		
 		$project=$this->get_basic_info($sid);
 
 		if (!$project){
 			throw new Exception("PROJECT_NOT_FOUND: ".$sid);
 		}
+
+		$this->check_project_editable($sid);
 
 		$this->load->model("Editor_template_model");
 		$template=$this->Editor_template_model->get_template_by_uid($template_uid);
@@ -682,228 +731,7 @@ class Editor_model extends CI_Model {
 		return $output;
 	}
 
-	//get data file by file_id
-    function data_file_by_id($sid,$file_id)
-    {
-        $this->db->select("*");
-        $this->db->where("sid",$sid);
-        $this->db->where("file_id",$file_id);
-        return $this->db->get("editor_data_files")->row_array();
-	}
-
-	function data_file_by_pk_id($sid,$id)
-    {
-        $this->db->select("*");
-        $this->db->where("sid",$sid);
-        $this->db->where("id",$id);
-        return $this->db->get("editor_data_files")->row_array();
-	}
-
-	function data_file_by_name($sid,$file_name)
-    {
-        $this->db->select("*");
-        $this->db->where("sid",$sid);
-		$file_name=$this->data_file_filename_part($file_name);
-        $this->db->where("file_name",$file_name);
-        return $this->db->get("editor_data_files")->row_array();
-	}
-
-	function data_file_generate_fileid($sid)
-    {
-        $this->db->select("file_id");
-        $this->db->where("sid",$sid);
-        $result=$this->db->get("editor_data_files")->result_array();
-
-		if (!$result){
-			return 'F1';
-		}
-
-		$max=1;
-		foreach($result as $row)
-		{
-			$val=substr($row['file_id'],1);
-			if (strtoupper(substr($row['file_id'],0,1))=='F' && is_numeric($val)){
-				if ($val >$max){
-					$max=$val;
-				}
-			}
-		}
-
-		return 'F'.($max +1);
-	}
-	
-
-
-	/**
-	*
-	* insert new file and return the new file id
-	*
-	* @options - array()
-	*/
-	function data_file_insert($sid,$options)
-	{		
-		$data=array();
-		$data['created']=date("U");
-		$data['changed']=date("U");
-		
-		foreach($options as $key=>$value){
-			if (in_array($key,$this->data_file_fields) ){
-				$data[$key]=$value;
-			}
-		}
-
-		//filename
-		if ($data['file_name']){
-			$data['file_name']=$this->data_file_filename_part($data['file_name']);
-		}
-
-		$data['sid']=$sid;		
-		$result=$this->db->insert('editor_data_files', $data);
-
-		if ($result===false){
-			throw new MY_Exception($this->db->_error_message());
-		}
-		
-		return $this->db->insert_id();
-	}
-
-	/**
-	 * 
-	 * Get filename without file extension
-	 * 
-	 */
-	function data_file_filename_part($filename)
-	{
-		$info=pathinfo($filename);
-		return $info['filename'];
-	}
-	
-	
-	/**
-	*
-	* update file
-	*
-	* @options - array()
-	*/
-	function data_file_update($id,$options)
-	{
-		$data=array();
-		
-		foreach($options as $key=>$value)
-		{
-			if ($key=='id'){
-				continue;
-			}
-
-			if (in_array($key,$this->data_file_fields) ){
-				$data[$key]=$value;
-			}
-		}
-
-		$data['changed']=date("U");
-
-		//filename
-		if (isset($data['file_name'])){
-			$data['file_name']=$this->data_file_filename_part($data['file_name']);
-		}
-		
-		$this->db->where('id',$id);
-		$result=$this->db->update('editor_data_files', $data);
-
-		if ($result===false){
-			throw new MY_Exception($this->db->_error_message());
-		}
-		
-		return TRUE;
-	}
-
-	function data_files_get_varcount($sid)
-	{
-		$this->db->select("sid,fid, count(*) as varcount");
-		$this->db->where("sid",$sid);
-		$this->db->group_by("sid,fid");
-		$result= $this->db->get("editor_variables")->result_array();		
-
-		$output=array();
-		foreach($result as $row)
-		{
-			$output[$row['fid']]=$row['varcount'];
-		}
-
-		return $output;
-	}
-
-
-	/**
-	 * 
-	 * 
-	 * Validate data file
-	 * @options - array of fields
-	 * @is_new - boolean - for new records
-	 * 
-	 **/
-	function validate_data_file($options,$is_new=true)
-	{		
-		$this->load->library("form_validation");
-		$this->form_validation->reset_validation();
-		$this->form_validation->set_data($options);
-	
-		//validation rules for a new record
-		if($is_new){				
-			#$this->form_validation->set_rules('surveyid', 'IDNO', 'xss_clean|trim|max_length[255]|required');
-			//$this->form_validation->set_rules('file_id', 'File ID', 'required|xss_clean|trim|max_length[50]');	
-			$this->form_validation->set_rules('file_name', 'File name', 'required|xss_clean|trim|max_length[200]');	
-			$this->form_validation->set_rules('case_count', 'Case count', 'xss_clean|trim|max_length[10]');	
-			$this->form_validation->set_rules('var_count', 'Variable count', 'xss_clean|trim|max_length[10]');	
-
-			
-			//file id
-			$this->form_validation->set_rules(
-				'file_id', 
-				'File ID',
-				array(
-					"required",
-					"max_length[50]",
-					"trim",
-					"alpha_dash",
-					"xss_clean",
-					//array('validate_file_id',array($this, 'validate_file_id')),				
-				)		
-			);
-
-		}
-		
-		if ($this->form_validation->run() == TRUE){
-			return TRUE;
-		}
-		
-		//failed
-		$errors=$this->form_validation->error_array();
-		$error_str=$this->form_validation->error_array_to_string($errors);
-		throw new ValidationException("VALIDATION_ERROR: ".$error_str, $errors);
-	}
-
-	//validate data file ID
-	public function validate_file_id($file_id)
-	{	
-		$sid=null;
-		if(array_key_exists('sid',$this->form_validation->validation_data)){
-			$sid=$this->form_validation->validation_data['sid'];
-		}
-
-		//list of all existing FileIDs
-		$files=$this->data_files_list($sid);
-
-		if(in_array($file_id,$files)){
-			$this->form_validation->set_message(__FUNCTION__, 'FILE_ID already exists. The FILE_ID should be unique.' );
-			return false;
-		}
-
-		return true;
-	}
-
-
-	/**
+    /**
      * 
      * 
      * get all variables attached to a study
@@ -1048,6 +876,8 @@ class Editor_model extends CI_Model {
 
     public function variable_update($sid,$uid,$options)
     {
+        $this->check_project_editable($sid);
+
         $valid_fields=array(
             'name',
             'labl',
@@ -1449,25 +1279,88 @@ class Editor_model extends CI_Model {
 
 	function delete_project($sid)
 	{
-		$project_folder=$this->get_project_folder($sid);
+		// Check if project is locked
+		$this->check_project_editable($sid);
 
+		// Get project info to check if it's a main project
+		$project = $this->get_basic_info($sid);
+		if (!$project) {
+			throw new Exception("Project not found");
+		}
+
+		// Check if this is a main project (pid is 0, NULL, or equals the project id)
+		$is_main_project = ($project['pid'] == 0 || $project['pid'] == null || $project['pid'] == $sid);
+
+		if ($is_main_project) {
+			// Delete all versions first
+			$this->delete_project_versions($sid);
+		}
+
+		// Delete the main project
+		$this->delete_single_project($sid);
+	}
+
+	/**
+	 * 
+	 * Delete all versions for a main project
+	 * 
+	 */
+	function delete_project_versions($main_project_id)
+	{
+		// Get all versions for this main project
+		$this->db->select('id, dirpath');
+		$this->db->where('pid', $main_project_id);
+		$this->db->where('id !=', $main_project_id); // Exclude the main project itself
+		$versions = $this->db->get('editor_projects')->result_array();
+
+		foreach ($versions as $version) {
+			$this->delete_single_project($version['id']);
+		}
+	}
+
+	/**
+	 * 
+	 * Delete a single project and all its related data
+	 * 
+	 */
+	function delete_single_project($sid)
+	{
+		// Delete project folder
+		$project_folder = $this->get_project_folder($sid);
 		$storage_root = $this->get_storage_path();
 
-		if ($storage_root !== $project_folder){
+		if ($storage_root !== $project_folder && file_exists($project_folder)) {
 			remove_folder($project_folder);
 		}
 		
-		$this->db->where('id',$sid);
+		// Delete from all related tables
+		$this->db->where('id', $sid);
 		$this->db->delete("editor_projects");
 
-		$this->db->where('sid',$sid);
+		$this->db->where('sid', $sid);
 		$this->db->delete("editor_data_files");
 
-		$this->db->where('sid',$sid);
+		$this->db->where('sid', $sid);
 		$this->db->delete("editor_resources");
 
-		$this->db->where('sid',$sid);
+		$this->db->where('sid', $sid);
 		$this->db->delete("editor_variables");
+
+		// Delete variable groups
+		$this->db->where('sid', $sid);
+		$this->db->delete("editor_variable_groups");
+
+		// Delete admin metadata projects
+		$this->db->where('sid', $sid);
+		$this->db->delete("admin_metadata_projects");
+
+		// Delete collection associations
+		$this->db->where('sid', $sid);
+		$this->db->delete("editor_collection_projects");
+
+		// Delete project owners
+		$this->db->where('sid', $sid);
+		$this->db->delete("editor_project_owners");
 	}
 
 
@@ -1654,8 +1547,52 @@ class Editor_model extends CI_Model {
 		$this->db->where('id',$sid);
 		return $this->db->update('editor_projects',$options);
 	}
+		
 	
+	/**
+	 * 
+	 * Find a specific version project by version number
+	 * 
+	 * @param int $main_project_id - The main project ID
+	 * @param string $version_number - Version number (e.g., "1.0.0")
+	 * @return int|null - The project ID for the specific version, or null if not found
+	 */
+	function find_version_by_number($main_project_id, $version_number)
+	{
+		$this->db->select("id");
+		$this->db->where("pid", $main_project_id);
+		$this->db->where("version_number", $version_number);
+		$result = $this->db->get("editor_projects")->row_array();
+		
+		if (isset($result['id'])){
+			return $result['id'];
+		}
+		
+		return null;
+	}
 
+	function get_metadata_version_notes($sid)
+	{
+		$project=$this->get_row($sid);
+
+		$mapping=[
+			'survey'=>'study_desc/version_statement/version_notes',
+			'timeseries'=>'series_description/version_statement/version_notes',
+			'timeseries-db'=>'database_description/version/notes',			
+			'script'=>'project_desc/version_statement/version_notes',
+			//geospatial - no version notes fields available
+		];
+
+		$version_notes=null;
+
+		if (isset($mapping[$project['type']])){
+			$field_path=$mapping[$project['type']];
+
+			$version_notes=get_array_nested_value($project['metadata'], $field_path,"/");
+		}
+
+		return $version_notes;
+	}
 	
 }//end-class
 	

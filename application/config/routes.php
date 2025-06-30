@@ -58,6 +58,7 @@ $route['about'] = "page/about";
 $route['editor'] = "projects";
 $route['editor/(.*)'] = "projects/$1";
 
+
 //admin paths
 $route['admin'] = "admin/admin";
 $route['admin/permissions/(:num)'] = "admin/permissions/index/$1";
@@ -65,6 +66,13 @@ $route['admin/permissions/(:num)'] = "admin/permissions/index/$1";
 $route['api/admin-metadata'] = "api/admin_metadata";
 //$route['api/admin-metadata/type'] = "api/metadata/type";
 $route['api/admin-metadata/(.*)'] = "api/admin_metadata/$1";
+
+//versions
+$route['api/editor/versions'] = "api/versions";
+$route['api/editor/(.*)/versions'] = "api/versions/$1";
+$route['api/editor/(.*)/versions/(.*)'] = "api/versions/index/$1/$2";
+$route['api/editor/versions/(.*)'] = "api/versions/$1";
+
 
 /* End of file routes.php */
 /* Location: ./system/application/config/routes.php */
