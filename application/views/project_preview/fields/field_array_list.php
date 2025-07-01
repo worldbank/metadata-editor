@@ -26,11 +26,11 @@
             } ?>        
             <ul>
             <?php foreach($data as $row):?>
-                <li><?php echo $row[$columns[0]];?></li>
+                <li><?php echo html_escape($row[$columns[0]]);?></li>
             <?php endforeach;?>
             </ul>
         <?php else:?>            
-            <li><?php echo implode("<br/>",$data);?></li>
+            <li><?php echo implode("<br/>",array_map('html_escape', $data));?></li>
         <?php endif;?>
 
     </div>

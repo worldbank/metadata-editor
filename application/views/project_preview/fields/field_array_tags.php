@@ -25,7 +25,7 @@
     <?php endif;?>
     <div class="field-value">                        
         <?php foreach($data as $row):?>
-            <span class="<?php echo $badge_class;?>"><?php echo $row;?></span>
+            <span class="<?php echo $badge_class;?>"><?php echo html_escape($row);?></span>
         <?php endforeach;?>
     </div>
 </div>

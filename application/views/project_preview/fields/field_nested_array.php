@@ -21,7 +21,7 @@
 <table class="table table-bordered table-striped table-condensed xsl-table table-grid">
     <tr>
         <?php foreach($columns as $column):?>            
-        <th><?php echo $column['title'];?></th>
+        <th><?php echo html_escape($column['title']);?></th>
         <?php endforeach;?>
     </tr>
     <?php foreach($data as $row):?>
@@ -35,7 +35,7 @@
                 ?>
                 <?php  echo $this->load->view('project_preview/fields/field_array',array('data'=>isset($row[$column['key']]) ? $row[$column['key']] : [] ,'template'=>$column),true);?>
             <?php else:?>
-                <?php echo isset($row[$column['key']]) ? $row[$column['key']] : '';?>
+                <?php echo isset($row[$column['key']]) ? html_escape($row[$column['key']]) : '';?>
             <?php endif;?>
         </td>
         <?php endforeach;?>

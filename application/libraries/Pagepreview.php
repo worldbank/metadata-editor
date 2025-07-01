@@ -72,8 +72,8 @@ class Pagepreview{
 
     private function render_section_container($item){
         $output=array();
-        $output[]='<div id="'.$item['key'].'">';
-        $output[]='<h1 class="field-section-container mt-3" >'.$item['title'].'</h1>';
+        $output[]='<div id="'.html_escape($item['key']).'">';
+        $output[]='<h1 class="field-section-container mt-3" >'.html_escape($item['title']).'</h1>';
 
         if (isset($item['items'])){
             $el_html=$this->render_element($item['items']);
@@ -91,8 +91,8 @@ class Pagepreview{
     {
         $output=array();
         $item_key=isset($item['prop_key']) ? $item['prop_key'] : $item['key'];
-        $output[]='<div id="'.$item_key.'">';
-        $output[]='<h2 class="field-section mt-3">'.$item['title'].'</h2>';
+        $output[]='<div id="'.html_escape($item_key).'">';
+        $output[]='<h2 class="field-section mt-3">'.html_escape($item['title']).'</h2>';
 
         if (isset($item['items'])){
             $el_html=$this->render_element($item['items']);

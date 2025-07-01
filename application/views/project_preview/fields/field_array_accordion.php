@@ -26,10 +26,10 @@
 
           <?php if (isset($template['display_options']['header_fields'])):?>
             <?php foreach($template['display_options']['header_fields'] as $header_field):?>
-              <?php echo isset($row[$header_field]) ? $row[$header_field] : '';?>
+              <?php echo isset($row[$header_field]) ? html_escape($row[$header_field]) : '';?>
             <?php endforeach;?>
           <?php else:?>
-            <?php echo $template['title'];?>
+            <?php echo html_escape($template['title']);?>
           <?php endif;?>          
         </button>
       </h5>
@@ -49,8 +49,8 @@
                 <?php else:?>
                     <?php if(isset($row[$column['key']])):?>
                     <div class="mb-3">
-                      <div class="font-weight-bold field-label"><?php echo $column['title'];?></div>
-                      <div><?php echo isset($row[$column['key']]) ? $row[$column['key']] : '';?></div>
+                      <div class="font-weight-bold field-label"><?php echo html_escape($column['title']);?></div>
+                      <div><?php echo isset($row[$column['key']]) ? html_escape($row[$column['key']]) : '';?></div>
                     </div>
                     <?php endif;?>    
                 <?php endif;?>

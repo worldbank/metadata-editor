@@ -9,16 +9,7 @@
  */
 class Editor_owners_model extends ci_model {
  
-    /*
-    CREATE TABLE editor_project_owners(  
-    id int NOT NULL PRIMARY KEY AUTO_INCREMENT,
-    sid int not null,
-    user_id int not null,
-    permissions varchar(100) not null,
-    created int
-);
-*/
-
+ 
     private $permissions=array(
         'view'=>'View',
         'edit'=>'Edit',
@@ -165,6 +156,13 @@ class Editor_owners_model extends ci_model {
     {
         $this->db->select('users.id,username,email,meta.first_name,meta.last_name');
         $this->db->join('meta','users.id=meta.user_id');
+
+        $keywords= $this->db->escape_str($keywords);
+        $keywords= trim($keywords);
+
+        if (strlen($keywords)>100){
+            return array();
+        }
 
         $this->db->where("username like '".$keywords."%'");
         $this->db->or_where("email like '".$keywords."%'");

@@ -18,7 +18,7 @@
     <div class="field-value">                        
         <ul>
         <?php foreach($data as $row):?>
-            <li><?php echo $row;?></li>
+            <li><?php echo html_escape($row);?></li>
         <?php endforeach;?>
         </ul>        
     </div>

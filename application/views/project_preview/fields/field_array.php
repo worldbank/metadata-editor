@@ -47,7 +47,7 @@ $data= array_remove_empty($data);
     <?php if ($hide_column_headings!=true):?>
     <tr>
         <?php foreach($columns as $column):?>
-        <th><?php echo $column['title'];?></th>
+        <th><?php echo html_escape($column['title']);?></th>
         <?php endforeach;?>
     </tr>
     <?php endif;?>
@@ -63,7 +63,7 @@ $data= array_remove_empty($data);
                 ?>
                 <?php  echo $this->load->view('project_preview/fields/field_array',array('data'=>isset($row[$column['key']]) ? $row[$column['key']] : [] ,'template'=>$column),true);?>
             <?php else:?>
-                <?php echo isset($row[$column['key']]) ? $row[$column['key']] : '';?>
+                <?php echo isset($row[$column['key']]) ? html_escape($row[$column['key']]) : '';?>
             <?php endif;?>
         </td>
         <?php endforeach;?>
