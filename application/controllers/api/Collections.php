@@ -229,7 +229,7 @@ class Collections extends MY_REST_Controller
 	function projects_get($collection_id=null)
 	{
 		try{
-			$this->has_access($resource_='collection',$privilege='view');
+			$this->has_access($resource_='collection',$privilege='edit');
 
 			if (!$collection_id){
 				throw new Exception("Missing parameter: collection ID");
@@ -403,7 +403,7 @@ class Collections extends MY_REST_Controller
 	function user_access_get($collection_id=null)
 	{
 		try{
-			$this->has_access($resource_='collection',$privilege='view');
+			$this->has_access($resource_='collection',$privilege='edit');
 
 			if (!$collection_id){
 				throw new Exception("Missing parameter: collection ID");
