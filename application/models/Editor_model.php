@@ -1336,13 +1336,15 @@ class Editor_model extends CI_Model {
 
 		$project_folder=$this->get_project_folder($sid);
 
+
 		if (!$project_folder || !file_exists($project_folder)){
 			throw new Exception("download_project_ddi::Project folder not found");
 		}
 
 		$filename=trim($project['idno'])!=='' ? trim($project['idno']) : md5($project['id']);
 
-		$ddi_path=realpath($project_folder.'/'.$filename.'.xml');
+		$ddi_path=$project_folder.'/'.$filename.'.xml';
+
 		$this->editor_ddi_writer->generate_ddi($sid,$ddi_path);
 		return $ddi_path;
 	}
