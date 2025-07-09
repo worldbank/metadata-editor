@@ -99,7 +99,7 @@ class Project_versions
 	 * @return array metadata with version notes applied
 	 * 
 	 */
-	function apply_metadata_version_notes($type, $metadata, $version_info=[])
+	/*function apply_metadata_version_notes($type, $metadata, $version_info=[])
 	{
 		$mapping=[
 			'survey'=>[
@@ -182,12 +182,7 @@ class Project_versions
 			'version_created' => date("U"),			
 			'version_created_by' => $user_id,
 			'version_notes' => $version_notes,
-			'metadata' => $this->apply_metadata_version_notes(
-				$project_info['type'], $project_info['metadata'], [
-					'version_notes' => $version_notes,
-					'version_number' => $version_number,
-					'version_date' => date("Y-m-d") //YYYY-MM-DD
-				])
+			'metadata' => $project_info['metadata']
 		];
 
 		//create target project

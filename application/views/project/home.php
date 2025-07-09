@@ -351,7 +351,7 @@
     <vue-collection-remove-dialog v-model="dialog_manage_collections" v-bind="dialog_manage_collections_options" v-on:collection-removed="search">
     </vue-collection-remove-dialog>
 
-    <vue-create-revision-dialog v-model="dialog_project_revision" v-bind="dialog_project_revision_options" v-on:revision-created="search" >
+    <vue-create-revision-dialog v-model="dialog_project_revision" v-bind="dialog_project_revision_options" v-on:revision-created="search" :key="dialog_project_revision_key">
     </vue-create-revision-dialog>
 
     
@@ -727,7 +727,8 @@
         sort_by:"updated_desc",
         collections_flat_list:[],
         dialog_project_revision: false,
-        dialog_project_revision_options: {}
+        dialog_project_revision_options: {},
+        dialog_project_revision_key: 0
       },
       created: async function() {
         //reload projects on window focus
@@ -831,6 +832,7 @@
             'project_id': project_id,
             'project': project || []
           };
+          this.dialog_project_revision_key++;
           this.dialog_project_revision = true;
         },
 
