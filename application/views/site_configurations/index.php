@@ -189,10 +189,7 @@ function get_languages()
                     continue;
                 }
 
-                //make it Capital case
-                $lang = ucfirst($lang);                
-
-             $output[$lang]=$lang;
+             $output[$lang]=ucfirst($lang);  
           }	
 	}	
 	return $output;
