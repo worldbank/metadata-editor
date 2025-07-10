@@ -222,6 +222,34 @@ paths:
         '200':
           description: successful operation
 
+  /editor/json{id}:
+    get:
+      tags:
+        - Projects
+      summary: Get project JSON
+      description: "Get study level metadata for a project as JSON"
+      operationId: singleProjectJSON
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          title: Project unique ID
+          description: Project unique ID number
+          type: string
+          required: true
+        - name: version
+          in: query
+          title: Version number
+          description: Get project by specific version number (e.g. 1.0.0)
+          type: string
+          required: false
+      responses:
+        '200':
+          description: successful operation
+
   /editor/delete/{id}:
     get:
       tags:
