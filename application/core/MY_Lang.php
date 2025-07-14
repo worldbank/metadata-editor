@@ -75,32 +75,43 @@ class MY_Lang extends CI_Lang {
 			return;
 		}
 
-		// Load the base file, so any others found can override it
+		$found = FALSE;
+		$lang = array();
+
+		// 1. Load system language file first (BASEPATH)
 		$basepath = BASEPATH.'language/'.$idiom.'/'.$langfile;
-		if (($found = file_exists($basepath)) === TRUE)
+		if (file_exists($basepath))
 		{
 			include($basepath);
+			$found = TRUE;
 		}
 
+		// 2. Load application language file (APPPATH) - this will override system
+		$apppath = APPPATH.'language/'.$idiom.'/'.$langfile;
+		if (file_exists($apppath))
+		{
+			include($apppath);
+			$found = TRUE;
+		}
 
+		// 3. Load user custom language file (userdata_path) - this will override application
 		if(empty($alt_path))
 		{
-			//set alt_path to user_data folder
-			$alt_path=empty($config['userdata_path']) ? '' : $config['userdata_path'];
+			$alt_path = empty($config['userdata_path']) ? '' : $config['userdata_path'];
 		}
 
-		// Do we have an alternative path to look in?
 		if ($alt_path !== '')
 		{
-			$alt_path .= '/language/'.$idiom.'/'.$langfile;
-			if (file_exists($alt_path))
+			$userpath = $alt_path.'/language/'.$idiom.'/'.$langfile;
+			if (file_exists($userpath))
 			{
-				include($alt_path);
+				include($userpath);
 				$found = TRUE;
 			}
 		}
 				
-		if($found!==TRUE)
+		// 4. If still not found, check package paths
+		if($found !== TRUE)
 		{
 			foreach (get_instance()->load->get_package_paths(TRUE) as $package_path)
 			{
