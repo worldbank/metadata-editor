@@ -81,12 +81,12 @@ $config['url_suffix'] = '';
 $config['language']	= "english";
 
 //List of supported languages. type language name in lower case
-$config['supported_languages']=array("english","french");//array("english","french","arabic","russian","spanish","mongolian");
+$config['supported_languages']=array("english","french","spanish");
 
 $config['language_codes']=[
     'english'=>
         [
-            'name'=>'English',
+            'name'=>'english',
             'language_file'=>'english',
             'display'=>'English',
             'code'=>'en',
@@ -94,10 +94,18 @@ $config['language_codes']=[
         ],
     'french'=>
         [
-            'name'=>'French',
+            'name'=>'french',
             'language_file'=>'french',
             'display'=>'Français',
             'code'=>'fr',
+            'direction'=>'ltr'
+        ],
+    'spanish'=>
+        [
+            'name'=>'spanish',
+            'language_file'=>'spanish',
+            'display'=>'Español',
+            'code'=>'es',
             'direction'=>'ltr'
         ],
 ];

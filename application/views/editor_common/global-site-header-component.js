@@ -1,11 +1,58 @@
 Vue.component('vue-global-site-header', {
     data() {
-        return {}  
+        return {
+            languages: [],
+            current_language: {
+                title:'Language',
+            }
+        }  
+    },
+    mounted() {
+        this.loadLanguages();
     },
     methods: {
         pageLink: function(page) {
             window.location.href = CI.site_url + '/' + page;
         },
+        switchLanguage: function(lang) {
+            let page = window.location.pathname;            
+
+            if (page.endsWith('/')) {
+                page = page.slice(0, -1);
+            }
+            page = page.split('/').pop();
+
+            if (page === 'index.php' || page === '/') {
+                page = 'projects';
+            }
+
+            //remove starting slash if exists
+            if (page.startsWith('/')) {
+                page = page.slice(1);
+            }
+
+            window.location.href = CI.site_url + '/switch_language/' + lang + '/?destination=' + page;
+        },
+        loadLanguages: function() {
+            axios.get(CI.site_url + '/api/languages')
+                .then(response => {
+                    console.log('Languages loaded:', response.data);
+                    if (response.data && response.data.languages) {
+                    this.languages = response.data.languages;
+
+                        if (response.data.current_language_title) {
+                            this.current_language.title = response.data.current_language_title;
+                        }
+
+                    } else {
+                        console.error('Unexpected response format:', response.data);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading languages:', error);
+                }
+            );
+        }
     },
     computed:{
 
@@ -31,6 +78,28 @@ Vue.component('vue-global-site-header', {
                 <v-spacer></v-spacer>
                 
                 <v-btn text @click="pageLink('about')">{{$t('About')}}</v-btn>
+
+                <v-menu offset-y style="z-index: 2000;" >
+                    <template v-slot:activator="{ on, attrs }">
+                        <v-btn
+                        text
+                        dark
+                        v-bind="attrs"
+                        v-on="on"
+                        >
+                        <v-icon>mdi mdi-translate</v-icon> {{current_language.title}}
+                        </v-btn>
+                    </template>
+                    <v-list>
+                        <v-list-item v-for="lang in languages" :key="lang.code">
+                            <v-list-item-title>
+                                <v-btn text @click="switchLanguage(lang.name)" >                                    
+                                    {{lang.display}}
+                                </v-btn>
+                            </v-list-item-title>
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
                 
                 <v-menu offset-y style="z-index: 2000;" >
                 <template v-slot:activator="{ on, attrs }">
