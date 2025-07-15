@@ -19,7 +19,7 @@ Vue.component('vue-create-revision-dialog', {
             vm=this;
             let url=CI.site_url + '/api/versions/create';
             let options={
-                "sid": vm.project_id,
+                "id": vm.project_id,
                 "version_type": vm.revision.version_type,
                 "version_notes": vm.revision.version_notes
             }
