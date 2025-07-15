@@ -1158,21 +1158,24 @@
           }
 
           vm = this;
-          let url = CI.site_url + '/api/versions/delete_by_id/' + id;
+          let url = CI.site_url + '/api/versions/delete_by_id';
+          let options = {
+            id: id
+          };
 
-          axios.post(url)
-            .then(function(response) {
-              vm.loadProjects();
-            })
-            .catch(function(error) {
-              console.log("error", error);
-              if (error.response.data.message){                
-                alert("Failed: " + error.response.data.message);
-              }
-              else{
-                alert("Failed: " + JSON.stringify(error));
-              }
-            });            
+          axios.post(url, options)
+          .then(function(response) {
+            vm.loadProjects();
+          })
+          .catch(function(error) {
+            console.log("error", error);
+            if (error.response.data.message){                
+              alert("Failed: " + error.response.data.message);
+            }
+            else{
+              alert("Failed: " + JSON.stringify(error));
+            }
+          });            
         },
         getProjectIcon: function(type) {
           projectIcon = this.project_types_icons[type];
