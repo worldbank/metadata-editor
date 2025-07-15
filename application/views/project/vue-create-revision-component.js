@@ -17,7 +17,7 @@ Vue.component('vue-create-revision-dialog', {
         CreateRevision: function(){
             this.is_processing = true;
             vm=this;
-            let url=CI.base_url + '/api/versions/create';
+            let url=CI.site_url + '/api/versions/create';
             let options={
                 "sid": vm.project_id,
                 "version_type": vm.revision.version_type,

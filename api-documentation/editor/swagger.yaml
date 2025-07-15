@@ -1834,7 +1834,7 @@ paths:
         security:
           - ApiKeyAuth: []
 
-  /versions/{sid}:
+  /versions/{id}:
       get:
         tags:
           - Projects
@@ -1847,14 +1847,15 @@ paths:
           - application/json
         parameters:
           - in: "path"
-            name: "sid"
+            name: "id"
             type: string
             description: Project ID or IDNO
             required: true
-          - in: "path"
-            name: "version_id"
+          - name: version
+            in: query
+            title: Version number
+            description: Get project by specific version number (e.g. 1.0.0)
             type: string
-            description: "(Optional) Specific version ID to retrieve"
             required: false
         responses:
           '200':
@@ -1885,7 +1886,7 @@ paths:
         security:
           - ApiKeyAuth: []
 
-  /versions/delete/{sid}:
+  /versions/delete:
       post:
         tags:
           - Projects
@@ -1897,11 +1898,34 @@ paths:
         produces:
           - application/json
         parameters:
-          - in: "path"
-            name: "sid"
-            type: string
-            description: Project ID or IDNO
+          - in: "body"
+            name: "body"
             required: true
+            schema:
+              $ref: "#/definitions/DeleteProjectVersion"
+        responses:
+          '200':
+            description: successful operation
+        security:
+          - ApiKeyAuth: []
+
+  /versions/delete_by_id:
+      post:
+        tags:
+          - Projects
+        summary: Delete project version by ID
+        description: Delete a version for a project by ID
+        operationId: deleteProjectVersionById
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/DeleteProjectVersionById"
         responses:
           '200':
             description: successful operation
@@ -2269,11 +2293,11 @@ definitions:
   CreateProjectVersion:
     type: object
     required:
-      - sid
+      - id
       - version_type
       - version_notes
     properties:
-      sid:
+      id:
         type: string
         required: true
         description: Project ID or IDNO
@@ -2291,6 +2315,37 @@ definitions:
         description: Notes describing the version
     xml:
       name: CreateProjectVersion
+
+  DeleteProjectVersion:
+      type: object
+      required:
+        - id
+        - version
+      properties:
+        id:
+          type: string
+          required: true
+          description: Project ID or IDNO for the main project
+        version:
+          type: string
+          required: true
+          description: Version number to delete (e.g. 1.0.0)
+          
+      xml:
+        name: DeleteProjectVersion
+
+  DeleteProjectVersionById:
+    type: object
+    required:
+      - id
+      - version
+    properties:
+      id:
+        type: string
+        required: true
+        description: Project ID or IDNO for the version to delete      
+    xml:
+      name: DeleteProjectVersionById
       
 
   

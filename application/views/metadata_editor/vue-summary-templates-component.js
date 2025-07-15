@@ -68,6 +68,12 @@ Vue.component('summary-templates-component', {
             return moment.utc(date).local().format("YYYY-MM-DD HH:mm:ss");
           },
         selectProjectTemplate: function(){
+            
+            if (!this.isProjectEditable){
+                alert(this.$t("project_locked_message"));
+                return false;
+            }
+
             this.dialog_template=true;
             //loadTemplates();
         },
@@ -93,6 +99,12 @@ Vue.component('summary-templates-component', {
                 })
                 .catch(function(response){
                     vm.errors=response;
+                    console.error("Error updating template",response);
+                    if (response.response && response.response.data && response.response.data.message){
+                        alert(vm.$t("failed") + ": " + response.response.data.message);
+                    }
+                    vm.template_updating=false;
+                    return false;
                 });
 
             });

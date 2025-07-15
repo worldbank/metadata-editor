@@ -41,35 +41,34 @@ class Versions extends MY_REST_Controller
      * 
 	 * Get a list of versions for a project
 	 * 
-     * @param int $sid
-	 * @param int $version_id (optional)
+     * @param int $sid	 
 	 * 
      */
-    public function index_get($sid, $version_id=null)
+    public function index_get($sid)
     {
 		try{
 			$sid=$this->get_sid($sid);
+			$version_id = $this->get('version', true);
 			$this->editor_acl->user_has_project_access($sid,$permission='view',$this->user);
 
 			if ($version_id){
 				return $this->get_single_version($sid, $version_id);
 			}
-			
+
+			$is_main_project = $this->project_versions->is_main_project($sid);
 			$versions = $this->project_versions->get_versions($sid);		
 			$project = $this->Editor_model->get_basic_info($sid);			
-			$is_main_project = $this->project_versions->is_main_project($sid);
+			
 			$main_project_id = $is_main_project ? $sid : $project['pid'];			
 			$main_project = $this->Editor_model->get_basic_info($main_project_id);
 			
 			$response = array(
 				'status' => 'success',
 				'result' => array(
-					'project_id' => $sid,
-					'project_title' => $project['title'],
-					'project_idno' => $project['idno'],
-					'is_main_project' => $is_main_project,
-					'main_project_id' => $main_project_id,
-					'main_project_title' => $main_project['title'],
+					'id' => $sid,
+					'idno' => $project['idno'],
+					'title' => $project['title'],					
+					'is_main_project' => $is_main_project,					
 					'total_versions' => count($versions),
 					'versions' => $versions
 				)
@@ -87,6 +86,36 @@ class Versions extends MY_REST_Controller
     }
 
 
+	/**
+	 * Get a single version of a project
+	 * @param int $sid
+	 * @param string $version_number
+	 * @return array
+	 */
+	private function get_single_version($sid, $version_number)
+	{
+		$this->editor_acl->user_has_project_access($sid, $permission='view', $this->user);
+		
+		try {
+			$version = $this->project_versions->get_version_by_version($sid, $version_number);
+			
+			$response = array(
+				'status' => 'success',
+				'result' => $version
+			);
+			
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e) {
+			$response = array(
+				'status' => 'error',
+				'message' => $e->getMessage()
+			);
+			$this->set_response($response, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
     /**
      * 
      * 
@@ -97,7 +126,7 @@ class Versions extends MY_REST_Controller
     {
         try{			
 			$options=$this->raw_json_input();
-            $required_params=array('sid','version_type','version_notes');
+            $required_params=array('id','version_type','version_notes');
 
             foreach($required_params as $param){
                 if (!isset($options[$param])){
@@ -105,7 +134,7 @@ class Versions extends MY_REST_Controller
                 }
             }
 
-            $sid=$options['sid'];
+            $sid=$options['id'];
             $version_type=$options['version_type'];
             $version_notes=$options['version_notes'];
 
@@ -146,15 +175,76 @@ class Versions extends MY_REST_Controller
 
 	/**
 	 * 
-	 * Delete a version for a project
+	 * Delete a version for a project using project ID of the version
+	 * 
+	 * @param int $id - Project ID of the version
 	 * 
 	 */
-	function delete_post($sid)
+	function delete_by_id_post()
 	{
 		try{
-			$sid=$this->get_sid($sid);
+			$options=$this->raw_json_input();
+			$required_params=array('id');
+
+			foreach($required_params as $param){
+				if (!isset($options[$param])){
+					throw new Exception("Parameter [$param] is required");
+				}
+			}
+
+			$sid=$this->get_sid($options['id']);
 			$this->editor_acl->user_has_project_access($sid,$permission='admin',$this->user);
 			
+			$is_main_project=$this->project_versions->is_main_project($sid);
+
+			if ($is_main_project) {
+				throw new Exception("Cannot delete the main project");
+			}
+
+			$this->Editor_model->unlock_project($sid);
+			$this->Editor_model->delete_project($sid);
+				
+			$response=array(
+				'status'=>'success',
+				'message'=>'Project version was deleted successfully'
+			);
+
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	/**
+	 * 
+	 * Delete a version for a project by version number
+	 * 
+	 */
+	function delete_post()
+	{
+		try{
+			$options=$this->raw_json_input();
+			$required_params=array('id','version');
+
+			foreach($required_params as $param){
+				if (!isset($options[$param])){
+					throw new Exception("Parameter [$param] is required");
+				}
+			}
+
+			$version = $this->project_versions->get_version_by_version($options['id'], $options['version']);
+
+			if ($version['pid']!=$options['id']){
+				throw new Exception("Provide ID for the main project");
+			}
+
+			$sid=$version['id'];		
 			$is_main_project=$this->project_versions->is_main_project($sid);
 
 			if ($is_main_project) {

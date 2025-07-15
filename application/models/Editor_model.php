@@ -416,7 +416,7 @@ class Editor_model extends CI_Model {
 	function check_project_editable($sid)
 	{
 		if ($this->is_project_locked($sid)) {
-			throw new Exception("PROJECT_IS_LOCKED: This project is locked and cannot be edited." .$sid);
+			throw new Exception("PROJECT_IS_LOCKED: This project is locked and cannot be edited.");
 		}
 		return true;
 	}

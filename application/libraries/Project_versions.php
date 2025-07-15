@@ -138,6 +138,31 @@ class Project_versions
 
 	/**
 	 * 
+	 * Generate a unique idno for project versions
+	 * 
+	 * @param string $base_idno original project idno
+	 * @return string unique idno for version
+	 * 
+	 */
+	function generate_version_idno($base_idno)
+	{
+		// Create version-specific idno by appending a unique suffix
+		$version_idno = $base_idno . '_version';
+		
+		// Check if this idno already exists
+		$counter = 1;
+		$original_version_idno = $version_idno;
+		
+		while ($this->ci->Editor_model->idno_exists($version_idno)) {
+			$version_idno = $original_version_idno . '_' . $counter;
+			$counter++;
+		}
+		
+		return $version_idno;
+	}
+
+	/**
+	 * 
 	 * Create a project copy
 	 * 
 	 * @param int $source_sid source project id
@@ -157,9 +182,10 @@ class Project_versions
 		$latest_version = $this->get_latest_version($source_sid);
 		$version_number = $this->generate_version_number($latest_version, $version_type);
 
-		//copy project metadata
+		$version_idno = $this->generate_version_idno($project_info['idno']);
+
 		$options = [			
-			'idno' => $project_info['idno'],
+			'idno' => $version_idno,
 			'version_number' => $version_number,
 			'study_idno' => $project_info['study_idno'],
 			'type' => $project_info['type'],
@@ -194,14 +220,17 @@ class Project_versions
 		}
 
 		$output = array(
-			'sid' => $new_sid,
 			'pid' => $source_sid,
-			'version_number' => $version_number
+			'id' => $new_sid,			
+			'idno' => $version_idno,
+			'version_number' => $version_number,
+			'template_uid' => $project_info['template_uid']
 		);
 		
 		try {
+			
 			//create project folder and update project table
-			$output['create_project'] = $this->ci->Editor_model->create_project_folder($new_sid);
+			$output['project_folder'] = $this->ci->Editor_model->create_project_folder($new_sid);
 
 			//copy data files
 			$output['data_files'] = $this->copy_project_data_files($source_sid, $new_sid);
@@ -841,7 +870,7 @@ class Project_versions
 		$result = $this->ci->db->get("editor_projects")->row_array();
 		
 		if (!$result) {
-			throw new Exception("Version with version {$version_number} not found");
+			throw new Exception("Version not found");
 		}
 
 		unix_date_to_gmt($result, array('version_created'));

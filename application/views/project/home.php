@@ -1158,7 +1158,7 @@
           }
 
           vm = this;
-          let url = CI.site_url + '/api/versions/delete/' + id;
+          let url = CI.site_url + '/api/versions/delete_by_id/' + id;
 
           axios.post(url)
             .then(function(response) {
