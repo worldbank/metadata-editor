@@ -28,13 +28,8 @@ class Configurations extends MY_Controller {
 	function index()
 	{	
 		$this->form_validation->set_rules('catalog_root', t('catalog_folder'), 'xss_clean|trim|max_length[255]');
-		$this->form_validation->set_rules('ddi_import_folder', t('ddi_import_folder'), 'xss_clean|trim|max_length[255]');		
-		$this->form_validation->set_rules('ddi_import_folder', t('ddi_import_folder'), 'xss_clean|trim|max_length[255]|callback_check_folder_exists');
-		$this->form_validation->set_rules('catalog_root', t('catalog_folder'), 'xss_clean|trim|max_length[255]|callback_check_folder_exists');
 		$this->form_validation->set_rules('website_title', t('website_title'), 'xss_clean|trim|max_length[255]');
 		$this->form_validation->set_rules('language', t('language'), 'xss_clean|trim|max_length[255]');
-		$this->form_validation->set_rules('cache_default_expires', t('cache_expiry'), 'xss_clean|trim|max_length[10]|numeric');
-		$this->form_validation->set_rules('catalog_records_per_page', t('catalog_records_per_page'), 'xss_clean|trim|max_length[10]|numeric');
 			
 		$settings=NULL;
 		if ($this->form_validation->run() === TRUE){
@@ -49,14 +44,8 @@ class Configurations extends MY_Controller {
 				// Do the same as if all validation returned true, to prevent possibly deleted data
 				// HOWEVER: erroneous fields will NOT be saved
 				$check_if_failed = array(
-					'catalog_root',
-					'ddi_import_folder',
-					'ddi_import_folder',
-					'catalog_root',
 					'website_title',
 					'language',
-					'cache_default_expires',
-					'catalog_records_per_page',
 				);
 				
 				// Check, and unset if failed validation test
@@ -85,7 +74,7 @@ class Configurations extends MY_Controller {
 	{
 		$post=$_POST;
 		$options=array();
-		
+
 		foreach($post as $key=>$value)
 		{
 			$value=$this->security->xss_clean($value);
@@ -105,6 +94,7 @@ class Configurations extends MY_Controller {
 		}
 		
 		$result=$this->Configurations_model->update($options);
+
 		if ($result)
 		{
 			$this->message= t('form_update_success');
