@@ -12,18 +12,9 @@ Vue.component('vue-manage-users', {
             is_updating: false,
             search:'',
             user_roles: [
-                {
-                    'value':'view',
-                    'text':'View'
-                },
-                {
-                    'value':'edit',
-                    'text':'Edit'
-                },
-                {
-                    'value':'admin',
-                    'text':'Admin'
-                }
+                { value: 'view', text: this.$t('view') },
+                { value: 'edit', text: this.$t('edit') },
+                { value: 'admin', text: this.$t('admin') }
             ],
             menu_change_user_role: false,
             menu_x: 0,
@@ -95,7 +86,7 @@ Vue.component('vue-manage-users', {
             this.$emit('update-access', JSON.parse(JSON.stringify(this.title)));
         },
         removeAccess: function(index) {
-            if (!confirm("Are you sure you want to remove access?")){
+            if (!confirm(this.$t("are_you_sure_remove_access"))){
                 return;
             }
 
@@ -116,6 +107,7 @@ Vue.component('vue-manage-users', {
             })
             .catch(function (error) {
                 console.log(error);
+                alert(vm.$t("error") + ": " + error.response.data.message);
             });
         },
         getUsers: function() {
@@ -179,7 +171,7 @@ Vue.component('vue-manage-users', {
             })
             .catch(function (error) {
                 console.log(error);
-                alert("Error:" + error.response.data.message);
+                alert(vm.$t("error") + ": " + error.response.data.message);
             });
         },
         ChangeUserRole: async function (permissions){
@@ -226,7 +218,7 @@ Vue.component('vue-manage-users', {
                         multiple
                         cache-items
                         return-object
-                        no-data-text="Type user name or email to search for a user"                        
+                        no-data-text="$t('type_user_name_or_email')"                        
                     >
                         <template v-slot:selection="data">
                             <v-chip

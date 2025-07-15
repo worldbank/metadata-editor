@@ -137,7 +137,7 @@ const VueMetadataTypeEdit = Vue.component('metadata-types-edit', {
         },
         deleteMetadata: function(){
             vm=this;
-            if (!confirm("Are you sure you want to delete this metadata?")){
+            if (!confirm(this.$t("confirm_delete_metadata"))){
                 return;
             }
 
@@ -150,7 +150,7 @@ const VueMetadataTypeEdit = Vue.component('metadata-types-edit', {
             axios.post( url, json_data
             ).then(function(response){
                 vm.metadata_model={};
-                alert("Metadata deleted");
+                alert(vm.$t("metadata_deleted"));
                 vm.$router.push({name: 'metadata-types'});
             })
             .catch(function(response){
@@ -169,7 +169,7 @@ const VueMetadataTypeEdit = Vue.component('metadata-types-edit', {
             };
             axios.post( url, json_data)
             .then(function(response){
-                alert("Saved");
+                alert(vm.$t("saved"));
                 vm.is_dirty=false;
                 vm.loadMetadata();
             })
@@ -233,12 +233,12 @@ const VueMetadataTypeEdit = Vue.component('metadata-types-edit', {
                         <div style="font-weight:normal">{{$t("Edit")}} - <span v-if="MetadataTypeSchema">{{MetadataType.title}}</span></div>
 
                         <div v-if="MetadataTypeHasEditAccess">
-                            <v-btn  small outlined color="red" class="mr-5" @click="deleteMetadata" >Delete</v-btn>
-                            <v-btn color="primary" small @click="saveMetadata" >{{$t("Save")}} <span v-if="is_dirty">*</span></v-btn>
-                            <v-btn  small>Cancel</v-btn>
+                            <v-btn  small outlined color="red" class="mr-5" @click="deleteMetadata" >{{$t("delete")}}</v-btn>
+                            <v-btn color="primary" small @click="saveMetadata" >{{$t("save")}} <span v-if="is_dirty">*</span></v-btn>
+                            <v-btn  small>{{$t("cancel")}}</v-btn>
                         </div>
                         <div v-else>
-                            <v-btn  small outlined color="red">READ-ONLY</v-btn>
+                            <v-btn  small outlined color="red">{{$t("read_only")}}</v-btn>
                         </div>
                     </v-card-title>
                 </v-card>

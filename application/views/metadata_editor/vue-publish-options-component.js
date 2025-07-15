@@ -17,48 +17,48 @@ Vue.component('publish-options', {
             catalog:false,
             publish_options:{
                 "overwrite": {
-                    "title":"Overwrite if already exists?",
+                    "title":this.$t("overwrite_if_already_exists"),
                     "value":"no",
                     "type":"text",
                     "enum": {
-                        "yes":"Yes",
-                        "no":"No"
+                        "yes":this.$t("yes"),
+                        "no":this.$t("no")
                     }                    
                 },
                 "published":
                 {
-                    "title":"Publish",
+                    "title":this.$t("publish"),
                     "value":0,
                     "type":"text",
                     "enum":{
-                        "0": "Draft",
-                        "1": "Publish"
+                        "0": this.$t("draft"),
+                        "1": this.$t("publish")
                     }
                 },
                 "access_policy":{
-                    "title":"Data access",
+                    "title":this.$t("data_access"),
                     "value":"data_na",
                     "type":"text",
                     "custom":true,
                     "enum":{
-                        "direct": "Direct access",
-                        "public": "Publich use files",
-                        "licensed": "Licensed data files",
-                        "remote": "Data accessible only in data enclave",
-                        "enclave": "Data available from external repository",
-                        "": "Data not available",
-                        "open": "Open access"
+                        "direct": this.$t("direct_access"),
+                        "public": this.$t("public_use_files"),
+                        "licensed": this.$t("licensed_data_files"),
+                        "remote": this.$t("data_accessible_only_in_data_enclave"),
+                        "enclave": this.$t("data_available_from_external_repository"),
+                        "": this.$t("data_not_available"),
+                        "open": this.$t("open_access")
                     }
                 },
                 "data_remote_url":{
                     "custom":true,
-                    "title":"Data access link",
+                    "title":this.$t("data_access_link"),
                     "value":'',
                     "type":"text"
                 },
                 "repositoryid":{
                     "custom":true,
-                    "title":"Collection",
+                    "title":this.$t("collection"),
                     "value":'',
                     "type":"text"
                 },
@@ -91,12 +91,12 @@ Vue.component('publish-options', {
                     vm.project_info=response.data.project;
                 }
                 else{
-                    alert("Project metadata not found");
+                    alert(vm.$t("project_metadata_not_found"));
                     console.log("Project metadata not found", response);
                 }
             })
             .catch(function (error) {
-                alert("Failed to load project metadata");
+                alert(vm.$t("failed_to_load_project_metadata"));
                 console.log(error);
             })
         },
@@ -132,7 +132,7 @@ Vue.component('publish-options', {
         publishToCatalog: async function()
         {            
             if (this.catalog===false){
-                alert("Select a catalog for publishing");
+                alert(this.$t("select_catalog_for_publishing"));
                 return false;
             }
 
@@ -141,7 +141,7 @@ Vue.component('publish-options', {
             vm=this;
 
             if(!this.publish_metadata && !this.publish_thumbnail && !this.publish_resources){
-                alert("Please select at least one option to publish");
+                alert(this.$t("please_select_at_least_one_option_to_publish"));
                 return;
             }
 
@@ -149,19 +149,19 @@ Vue.component('publish-options', {
             this.is_publishing=true;
             this.is_publishing_completed=false;
 
-            this.publish_processing_message="Preparing project export...";
+            this.publish_processing_message=this.$t("preparing_project_export");
             await this.prepareProjectExport();
 
             if (this.publish_metadata==true){
-                this.publish_processing_message="Publishing project metadata...";
+                this.publish_processing_message=this.$t("publishing_project_metadata");
                 await this.publishProjectMetadata();
             }
 
             if (this.publish_thumbnail==true){
-                this.publish_processing_message="Publishing project thumbnail...";
+                this.publish_processing_message=this.$t("publishing_project_thumbnail");
                 try{
                     await this.publishProjectThumbnail();
-                    this.publish_responses.thumbnail.messages.push("Thumbnail published successfully");
+                    this.publish_responses.thumbnail.messages.push(this.$t("thumbnail_published_successfully"));
                 }catch(error){
                     console.log("publishing thumbnail failed", error);
                     this.publish_responses.thumbnail.errors.push(error.response.data);
@@ -169,11 +169,11 @@ Vue.component('publish-options', {
             }
 
             if (this.publish_resources==true){
-                this.publish_processing_message="Publishing external resources...";
+                this.publish_processing_message=this.$t("publishing_external_resources");
                 await this.publishExternalResoures();
             }
 
-            this.publish_processing_message="Publishing completed";
+            this.publish_processing_message=this.$t("publishing_completed");
             this.is_publishing=false;
             this.is_publishing_completed=true;
             //await this.publishExternalResourcesFiles();
@@ -186,18 +186,18 @@ Vue.component('publish-options', {
             let nada_catalog=this.getConnectionInfo(this.catalog);
             
             if(!nada_catalog){
-                alert("Catalog was not found");
+                alert(this.$t("catalog_was_not_found"));
                 return false;
             }
 
             let url=CI.base_url + '/api/publish/' +this.ProjectID +'/' + nada_catalog.id;
-            this.publish_responses.metadata.messages.push("starting metadata publishing to: " + url);
+            this.publish_responses.metadata.messages.push(this.$t("starting_metadata_publishing_to") + ": " + url);
         
             return axios.post(url,
                 formData,
                 {}
             ).then(function(response){
-                vm.publish_responses.metadata.messages.push("metadata publishing updated successfully");
+                vm.publish_responses.metadata.messages.push(vm.$t("metadata_publishing_updated_successfully"));
             })
             .catch(function(error){
                 console.log("publishing project failed", error);
@@ -214,11 +214,11 @@ Vue.component('publish-options', {
             vm=this;
 
             for (const idx of this.resources_selected) {
-                vm.publish_processing_message="Publishing external resource: " + vm.ExternalResources[idx].title;    
+                vm.publish_processing_message=vm.$t("publishing_external_resource") + ": " + vm.ExternalResources[idx].title;    
                 try {
                     const { data } = await vm.publishSingleResource(this.ExternalResources[idx]);
                     vm.publish_responses.external_resources.messages.push( 
-                        vm.ExternalResources[idx].title + ' published successfully'
+                        vm.ExternalResources[idx].title + ' ' + vm.$t("published_successfully")
                     );
                 } catch (error) {
                     console.error(`Request ${idx+1} failed:`, error.response);
@@ -241,7 +241,7 @@ Vue.component('publish-options', {
             let nada_catalog=this.getConnectionInfo(this.catalog);      
 
             if(!nada_catalog){
-                alert("Catalog was not found");
+                alert(this.$t("catalog_was_not_found"));
                 return false;
             }
 
@@ -269,7 +269,7 @@ Vue.component('publish-options', {
             let nada_catalog=this.getConnectionInfo(this.catalog);  
 
             if(!nada_catalog){
-                alert("Catalog was not found");
+                alert(this.$t("catalog_was_not_found"));
                 return false;
             }
 
@@ -283,21 +283,21 @@ Vue.component('publish-options', {
         },        
         async prepareProjectExport()
         {
-            this.project_export_status="Exporting metadata to JSON";
+            this.project_export_status=this.$t("exporting_metadata_to_json");
             await this.exportProjectJSON();
 
             if (this.ProjectType=='survey'){
-                this.project_export_status="Exporting metadata to DDI";
+                this.project_export_status=this.$t("exporting_metadata_to_ddi");
                 await this.exportProjectDDI();
                 //this.project_export_status="Exporting data files";
                 //await this.exportProjectDatafiles();
             }
             
-            this.project_export_status="Exporting external resources metadata as JSON";
+            this.project_export_status=this.$t("exporting_external_resources_metadata_as_json");
             await this.exportExternalResourcesJSON();
-            this.project_export_status="Exporting external resources as RDF/XML ";
+            this.project_export_status=this.$t("exporting_external_resources_as_rdf_xml");
             await this.exportExternalResourcesRDF();
-            this.project_export_status="Creating project ZIP file";
+            this.project_export_status=this.$t("creating_project_zip_file");
             await this.writeProjectZip();
             this.project_export_status="done";
         },
@@ -679,7 +679,7 @@ Vue.component('publish-options', {
 
                     
                     <div v-if="catalog!=false" class="mt-5 p-4 elevation-2 mb-5 bg-light" >
-                        <div><strong>{{$t('Published project link')}}:</div>
+                        <div><strong>{{$t('published_project_link')}}:</div>
                         <div><a :href="TargetCatalogPublishedUrl" target="_blank">{{TargetCatalogPublishedUrl}} <v-icon color="primary">mdi-open-in-new</v-icon></a></div>
                     </div>
 

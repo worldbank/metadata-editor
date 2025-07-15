@@ -71,7 +71,7 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
         },
         showUnsavedMessage: function(){
             if (this.is_dirty){
-                if (!confirm("You have unsaved changes. Are you sure you want to leave this page?")){
+                if (!confirm(this.$t("confirm_unsaved_changes"))){
                     return false;
                 }
             }
@@ -320,7 +320,7 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
 
                         <div>
                             <v-btn color="primary" small @click="uploadFile" :disabled="file_exists==true || !isProjectEditable">{{$t("Save")}} <span v-if="is_dirty">*</span></v-btn>
-                            <v-btn @click="cancelSave" small>Cancel</v-btn>
+                            <v-btn @click="cancelSave" small>{{$t("cancel")}}</v-btn>
                         </div>
                     </v-card-title>
                 </v-card>
@@ -369,7 +369,7 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
                     <span v-if="ResourceAttachmentType=='url'">Link:</span>
                     {{Resource.filename}}
                     <span v-if="Resource.filename">
-                        <button type="button" class="btn btn-link btn-sm" @click="resourceDeleteFile">Remove</button>
+                        <button type="button" class="btn btn-link btn-sm" @click="resourceDeleteFile">{{$t("remove")}}</button>
                     </span>
                     <span v-else>No file attached</span>
 

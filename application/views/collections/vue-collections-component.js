@@ -53,7 +53,7 @@ Vue.component('vue-collection', {
                 })
                 .catch(function(error) {
                     console.log("error", error);
-                    alert("Failed: " +  vm.errorResponseMessage(error));
+                    alert(vm.$t("failed") + ": " +  vm.errorResponseMessage(error));
                 });
         },
         loadCollections: function() {
@@ -68,7 +68,7 @@ Vue.component('vue-collection', {
                 })
                 .catch(function(error) {
                     console.log("error", error);
-                    alert("Failed to load collections: " +  vm.errorResponseMessage(error));
+                    alert(vm.$t("failed") + ": " +  vm.errorResponseMessage(error));
                 });
         },
         findByCollectionId: function(id) {
@@ -134,7 +134,7 @@ Vue.component('vue-collection', {
                 })
                 .catch(function(error) {
                     console.log("error", error);
-                    alert("Failed: " +  vm.errorResponseMessage(error));
+                    alert(vm.$t("failed") + ": " +  vm.errorResponseMessage(error));
                 });
         },
         errorResponseMessage: function(error) {
@@ -149,7 +149,7 @@ Vue.component('vue-collection', {
             return JSON.stringify(error);
         },
         DeleteCollection: function(id) {
-            if (!confirm("Are you sure you want to delete the collection?")) {
+            if (!confirm(this.$t("are_you_sure_delete_collection"))) {
                 return false;
             }
 
@@ -162,7 +162,7 @@ Vue.component('vue-collection', {
                 })
                 .catch(function(error) {
                     console.log("error", error);
-                    alert("Failed: " +  vm.errorResponseMessage(error));
+                    alert(vm.$t("failed") + ": " +  vm.errorResponseMessage(error));
                 });
         },
         ManageCollectionAccess: function(id) {

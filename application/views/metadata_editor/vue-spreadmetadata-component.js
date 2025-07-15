@@ -199,7 +199,7 @@ Vue.component('spread-metadata', {
                         <v-card-title style="m-0 p-1">
                             <div>Spread metadata <span v-if="variable_matches.length>0">[{{variable_matches.length}} matches]</span> </div>
                             <v-spacer></v-spacer>
-                            <v-btn right text color="red" @click.native="$emit('input', false)">Close</v-btn>
+                            <v-btn right text color="red" @click.native="$emit('input', false)">{{$t("close")}}</v-btn>
                         </v-card-title>
                         <v-divider class="m-0 p-1"></v-divider>
                         <v-card-text>
@@ -269,7 +269,7 @@ Vue.component('spread-metadata', {
                         <v-divider></v-divider>
                         <v-card-actions>
                         <button type="button" class="btn btn-sm btn-primary" @click="spreadMetadata">Spread metadata</button>
-                        <button type="button" class="btn btn-sm btn-link" @click="$emit('input', false)">Cancel</button>
+                        <button type="button" class="btn btn-sm btn-link" @click="$emit('input', false)">{{$t("cancel")}}</button>
                         
                         </v-card-actions>
                     </v-card>

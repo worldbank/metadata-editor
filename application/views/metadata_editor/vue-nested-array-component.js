@@ -101,7 +101,7 @@ Vue.component('nested-array', {
                             </v-col>
                             <v-col sm="6" md="4" class="text-right">
                                 <button type="button" class="btn btn-xs btn-outline-danger" @click="remove(index);return false;">
-                                    <span v-if="local_data.length>1">Remove</span>
+                                    <span v-if="local_data.length>1">{{$t("remove")}}</span>
                                     <span v-else>Clear</span>
                                     </button>
                             </v-col>

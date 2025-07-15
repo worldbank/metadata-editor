@@ -165,7 +165,7 @@ ul.tree, ul.tree ul {
         <div class="p-3">
             <ul class="tree">
                 <li class="node">
-                    <a href="#template">Information</a>
+                    <a href="#template"><?php echo t('information'); ?></a>
                 </li>                    
                 <?php foreach ($template['template']['items'] as $item) : ?>
                     <li class="node">
@@ -188,14 +188,14 @@ ul.tree, ul.tree ul {
                 <div class="bg-light p-3">
                     <?php 
                         $fields = array(
-                            "uid"=> "ID", 
-                            "lang"=>"Language",
-                            "data_type"=>"Data type",
-                            "version", "Version", 
-                            "organization"=>"Organization", 
-                            "author"=>"Authors", 
-                            "description"=>"Description",
-                            "instructions"=>"Instructions",
+                            "uid"=> t("id"), 
+                            "lang"=>t("language"),
+                            "data_type"=>t("data_type"),
+                            "version"=> t("version"), 
+                            "organization"=>t("organization"), 
+                            "author"=>t("authors"), 
+                            "description"=>t("description"),
+                            "instructions"=>t("instructions"),
                         );?>
                     
                     <div class="mb-3">
@@ -225,8 +225,8 @@ ul.tree, ul.tree ul {
                             <h3><?php echo $item['title']; ?></h3>
                         <?php endif; ?>
                                     
-                        <span class="badge badge-primary" title="Type"><?php echo $item['type']; ?></span>
-                        <span class="badge badge-light" title="Key"><?php echo $item['key']; ?></span>
+                        <span class="badge badge-primary" title="<?php echo t('type'); ?>"><?php echo $item['type']; ?></span>
+                        <span class="badge badge-light" title="<?php echo t('key'); ?>"><?php echo $item['key']; ?></span>
                     </div>
         
                     <?php if (isset($item['help_text']) && trim($item['help_text'])!=='') : ?>

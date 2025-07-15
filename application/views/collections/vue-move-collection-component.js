@@ -21,7 +21,7 @@ Vue.component('vue-move-collection', {
                 vm.collections = response.data.collections;
             })
             .catch(function (error) {
-                alert("Error:" + error.response.data.message);
+                alert(vm.$t("error") + ": " + error.response.data.message);
                 console.log(error);
             });
         },
@@ -38,13 +38,13 @@ Vue.component('vue-move-collection', {
             .then(response => {
                 console.log("move-collection",response);
                 vm.loadCollections();
-                alert("Collection moved successfully");
+                alert(vm.$t("collection_moved_successfully"));
                 vm.dialog=false;
                 //trigger event
                 vm.$emit('collection-moved');
             })
             .catch(function (error) {
-                alert("Error:" + error.response.data.message);
+                alert(vm.$t("error") + ": " + error.response.data.message);
                 console.log(error);
             });
         },

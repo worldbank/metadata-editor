@@ -41,7 +41,7 @@ Vue.component('vue-template-uuid', {
             })
             .catch(function (error) {
                 console.log(error);
-                alert("Failed: " + vm.erorrMessageToText(error));
+                alert(vm.$t("failed") + ": " + vm.erorrMessageToText(error));
             });
             
         }               
@@ -70,21 +70,21 @@ Vue.component('vue-template-uuid', {
 
                 <v-card>
                     <v-card-title class="text-h5 grey lighten-2">
-                    Change template UID
+                    {{$t('change_template_uid')}}
                     </v-card-title>
                     <v-card-text>
 
-                        <div>Template UID: {{template_id}}</div>
+                        <div>{{$t('template_uid')}}: {{template_id}}</div>
 
                         <v-divider></v-divider>
 
-                        <strong>New UID:</strong>
+                        <strong>{{$t('new_uid')}}:</strong>
                         <v-row>
                             <v-col cols="8">                                
                                 <v-text-field
                                     v-model="new_value"
                                     :loading="is_loading"
-                                    :rules="[v => !!v || 'Template UID is required']"
+                                    :rules="[v => !!v || $t('template_uid_required')]"
                                     label=""
                                     required
                                     clearable
@@ -101,7 +101,7 @@ Vue.component('vue-template-uuid', {
                                     color="indigo"                                    
                                     @click="updateUid"
                                 >
-                                    Update
+                                    {{$t('update')}}
                                 </v-btn>
                             </v-col>
 
@@ -120,7 +120,7 @@ Vue.component('vue-template-uuid', {
                         small
                         @click="selected=[];dialog = false"
                     >
-                        Close
+                        {{$t('close')}}
                     </v-btn>
                     </v-card-actions>
                     

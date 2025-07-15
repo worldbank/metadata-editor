@@ -138,8 +138,8 @@ Vue.component('table-grid-component', {
 
             let rows=this.CSVToArray( tsv, strDelimiter= "\t" );
 
-            if (rows.length<1){
-                alert("Invalid data format. No rows found");
+            if (rows.length<1){                
+                alert(this.$t("invalid_data_format_no_rows_found"));
                 return false;
             }
 
@@ -147,7 +147,7 @@ Vue.component('table-grid-component', {
             let colsCount=rows[0].length;
 
             if (colsCount>keys.length){
-                alert("Invalid data format. Too many columns");
+                alert(this.$t("invalid_data_format_too_many_columns"));
                 return false;
             }
             

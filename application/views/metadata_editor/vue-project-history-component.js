@@ -83,7 +83,7 @@ Vue.component('project-history', {
             </v-simple-table>
             <div v-else>
                 <v-alert outlined color="red">
-                    No revisions found.
+                    {{$t("no_revisions_found")}}.
                 </v-alert>
             </div>
             

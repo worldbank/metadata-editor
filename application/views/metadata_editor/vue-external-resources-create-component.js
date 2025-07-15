@@ -69,7 +69,7 @@ const VueExternalResourcesCreate= Vue.component('external-resources-create', {
         },
         showUnsavedMessage: function(){
             if (this.is_dirty){
-                if (!confirm("You have unsaved changes. Are you sure you want to leave this page?")){
+                if (!confirm(this.$t("confirm_unsaved_changes"))){
                     return false;
                 }
             }
@@ -227,7 +227,7 @@ const VueExternalResourcesCreate= Vue.component('external-resources-create', {
         },
         resourceDeleteFile: function()
         {
-            if (!confirm("Are you sure you want to delete this file?")){
+            if (!confirm(this.$t("confirm_delete_file"))){
                 return false;
             }
 
@@ -247,7 +247,7 @@ const VueExternalResourcesCreate= Vue.component('external-resources-create', {
             })
             .catch(function(response){
                 vm.errors=response;
-                alert("Failed to delete file");
+                alert(vm.$t("failed_to_delete_file"));
             });    
         },
         findTemplateByItemKey: function (items,key){
@@ -353,7 +353,7 @@ const VueExternalResourcesCreate= Vue.component('external-resources-create', {
 
                         <div>
                             <v-btn color="primary" small @click="uploadFile" :disabled="!isProjectEditable">{{$t("Save")}} <span v-if="is_dirty">*</span></v-btn>
-                            <v-btn @click="cancelSave" small>Cancel</v-btn>
+                            <v-btn @click="cancelSave" small>{{$t("cancel")}}</v-btn>
                         </div>
                     </v-card-title>
 
@@ -405,7 +405,7 @@ const VueExternalResourcesCreate= Vue.component('external-resources-create', {
                     <span v-if="ResourceAttachmentType=='url'">Link:</span>
                     {{Resource.filename}}
                     <span v-if="Resource.filename">
-                        <button type="button" class="btn btn-link btn-sm" @click="resourceDeleteFile">Remove</button>
+                        <button type="button" class="btn btn-link btn-sm" @click="resourceDeleteFile">{{$t("remove")}}</button>
                     </span>
                     <span v-else>No file attached</span>
 

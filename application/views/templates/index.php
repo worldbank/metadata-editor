@@ -580,7 +580,7 @@
           vm = this;
 
           let url = CI.site_url + '/api/templates/';
-          this.loading_status = "Loading templates...";
+          this.loading_status = vm.$t("loading_templates");
 
           return axios
             .get(url)
@@ -619,7 +619,7 @@
             })
             .catch(function(error) {
               console.log("error", error);
-              alert("Failed", error);
+              alert(vm.$t("failed"), error);
             })
             .then(function() {
               console.log("request completed");
@@ -643,7 +643,7 @@
           return false;
         },
         deleteTemplate: function(uid) {
-          if (!confirm("Confirm to delete?")) {
+          if (!confirm(vm.$t("confirm_delete"))) {
             return false;
           }
 
@@ -661,9 +661,9 @@
             .catch(function(error) {
               console.log("error", error);
               if (error.response.data.message){
-                alert ("Failed: " + error.response.data.message);
+                alert (vm.$t("failed") + ": " + error.response.data.message);
               }else{
-                alert("Failed: "+ JSON.stringify(error.response.data));
+                alert(vm.$t("failed") + ": "+ JSON.stringify(error.response.data));
               }
             })
             .then(function() {
@@ -686,7 +686,7 @@
           vm = this;
           let form_data = {};
           let url = CI.site_url + '/api/templates/duplicate/' + uid;
-          this.loading_status = "Creating template...";
+          this.loading_status = vm.$t("creating_template");
 
           axios.post(url,
               form_data
@@ -704,9 +704,9 @@
             .catch(function(error) {
               console.log("error", error);
               if (error.response.data.error){
-                alert ("Failed: " + error.response.data.error);
+                alert (vm.$t("failed") + ": " + error.response.data.error);
               }else{
-                alert("Failed", error);
+                alert(vm.$t("failed"), error);
               }
             })
             .then(function() {

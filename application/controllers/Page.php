@@ -49,7 +49,7 @@ class Page extends MY_Controller {
 			if ($this->input->get("destination")){
 				$destination=$this->input->get("destination");
 
-				$valid_redirects=array('admin','editor','collections');
+				$valid_redirects=array('admin','editor','collections', 'projects', 'home', 'about', 'auth');
 
 				$destination_parts=explode("/",$destination);
 
