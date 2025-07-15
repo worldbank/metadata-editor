@@ -55,15 +55,15 @@ Vue.component('vue-template-revision-history', {
 
                 <v-card>
                     <v-card-title class="text-h5 grey lighten-2">
-                    Revision History
+                    {{$t('revision_history')}}
                     </v-card-title>
                     <v-card-text>
                         <v-simple-table v-if="revisions && revisions.history && revisions.history.length>0">
                             <template v-slot:default>
                                 <thead>
                                     <tr>
-                                        <th class="text-left" style="width:200px">Date</th>    
-                                        <th class="text-left" style="width:100px">User</th>
+                                        <th class="text-left" style="width:200px">{{$t('date')}}</th>    
+                                        <th class="text-left" style="width:100px">{{$t('user')}}</th>
                                         <th class="text-left"></th>
                                     </tr>
                                 </thead>
@@ -82,7 +82,7 @@ Vue.component('vue-template-revision-history', {
                         </v-simple-table>
                         <div v-else>
                             <v-alert outlined color="red">
-                                No revisions found.
+                                {{$t('no_revisions_found')}}
                             </v-alert>
                         </div>
 
@@ -100,7 +100,7 @@ Vue.component('vue-template-revision-history', {
                         small
                         @click=";dialog = false"
                     >
-                        Close
+                        {{$t('close')}}
                     </v-btn>
                     </v-card-actions>
                     

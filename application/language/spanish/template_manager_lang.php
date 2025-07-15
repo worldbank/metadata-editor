@@ -17,6 +17,26 @@ $lang['show_all_elements']="Mostrar todos los elementos";
 
 $lang['array_properties']="Propiedades de matriz";
 
+$lang['Types']="Tipos";
+$lang['All']="Todos";
+$lang['templates']="Plantillas";
+$lang['share']="Compartir";
+$lang['duplicate']="Duplicar";
+$lang['export']="Exportar";
+$lang['delete']="Eliminar";
+$lang['preview']="Vista previa";
+$lang['table']="Tabla";
+$lang['pdf']="PDF";
+$lang['revisions']="Revisiones";
+$lang['UUID']="UUID";
+$lang['external-resource']="Recurso externo";
+$lang['administrative_metadata']="Metadatos administrativos";
+$lang['instructions']="Instrucciones";
+$lang['owner']="Propietario";
+$lang['changed_at']="Actualizado el";
+$lang['changed_by']="Última actualización por";
+$lang['available_items']="Elementos disponibles";
+$lang['controlled_vocabulary']="Vocabulario controlado";
 
 /* End of file template_manager_lang.php */
 /* Location: ./application/language/spanish/template_manager_lang.php */

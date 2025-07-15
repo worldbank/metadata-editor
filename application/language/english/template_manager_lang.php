@@ -22,7 +22,20 @@ $lang['owner']="Owner";
 $lang['changed_at']="Updated on";
 $lang['changed_by']="Last updated by";
 
-
+$lang['Types']="Types";
+$lang['All']="All";
+$lang['templates']="Templates";
+$lang['share']="Share";
+$lang['duplicate']="Duplicate";
+$lang['export']="Export";
+$lang['delete']="Delete";
+$lang['preview']="Preview";
+$lang['table']="Table";
+$lang['pdf']="PDF";
+$lang['revisions']="Revisions";
+$lang['UUID']="UUID";
+$lang['external-resource']="External resource";
+$lang['administrative_metadata']="Administrative metadata";
 
 /* End of file template_manager_lang.php */
 /* Location: ./application/language/base/template_manager_lang.php */

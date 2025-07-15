@@ -494,7 +494,7 @@ Vue.component('datafiles', {
                                 small text color="primary" 
                                 @click="removeData(data_file)" 
                                 >
-                                {{$t("Clear data")}}
+                                {{$t("clear_data")}}
                             </v-btn>
                             <v-btn v-else small text color="primary" disabled>{{$t("No data")}}</v-btn>                            
                         </td>

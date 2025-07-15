@@ -106,7 +106,7 @@ Vue.component('vue-custom-key-field', {
             let key=this.local_value;
 
             if (key==''){
-                this.validation_errors.push('Key cannot be empty');
+                this.validation_errors.push(this.$t('key_cannot_be_empty'));
             }
 
             //break key into parts using dot as separator
@@ -114,20 +114,20 @@ Vue.component('vue-custom-key-field', {
 
             //check if key has any empty parts
             if (parts.indexOf('')!==-1){
-                this.validation_errors.push('Key must not contain empty parts');
+                this.validation_errors.push(this.$t('key_must_not_contain_empty_parts'));
             }
 
             //check all parts only contain letters, numbers, dash, and underscores
             for(let i=1;i<parts.length;i++){
                 if (parts[i].match(/^[a-zA-Z0-9_-]+$/)==null){
-                    this.validation_errors.push('Key can only contain letters, numbers, and underscores');
+                    this.validation_errors.push(this.$t('key_can_only_contain_letters_numbers_and_underscores'));
                     break;
                 }
             }
 
             //check if key is unique            
             if (this.UserTreeUsedKeys.indexOf(this.local_value)!==-1 && this.local_value!=this.value){
-                this.validation_errors.push('Key already exists');
+                this.validation_errors.push(this.$t('key_already_exists'));
             }
 
             return this.validation_errors.length==0;

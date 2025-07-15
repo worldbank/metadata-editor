@@ -39,7 +39,7 @@ Vue.component('nested-section', {
                     <div class="label-wrapper" @click="toggleChildren(index)">
                         <div class="tree-node form-section nested-form-section" >
                             <v-icon style="padding:4px;font-weight:bold;">mdi-file-tree-outline</v-icon> {{index+1}} - {{ title }}
-                            <button type="button"  class="btn btn-sm btn-link" v-on:click="remove(index)">Remove <i class="fa fa-trash-o" aria-hidden="true"></i></button>
+                            <button type="button"  class="btn btn-sm btn-link" v-on:click="remove(index)">{{$t("remove")}} <i class="fa fa-trash-o" aria-hidden="true"></i></button>
                             <span class="float-right section-toggle-icon"><i class="fas" :class="toggleClasses(index)"></i></span>
                         </div>
                     </div>
@@ -178,7 +178,7 @@ Vue.component('nested-section', {
                 </template>
 
                 <div class="d-flex justify-content-center m-3">
-                    <button type="button" class="btn btn-light btn-sm btn-outline-primary" @click="addRow" >Add section - {{title}}</button>
+                    <button type="button" class="btn btn-light btn-sm btn-outline-primary" @click="addRow" >{{$t("add_section")}} - {{title}}</button>
                 </div>
 
             </div>  `,

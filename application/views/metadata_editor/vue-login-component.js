@@ -66,7 +66,7 @@ Vue.component('v-login', {
                     <v-card-title class="text-h5">Login</v-card-title>
                     <v-card-text v-if="is_logged_in">
                         <div class="alert alert-success">You are logged in!</div>
-                        <v-btn block color="primary" @click="closeDialog">Close</v-btn>
+                        <v-btn block color="primary" @click="closeDialog">{{$t("close")}}</v-btn>
                     </v-card-text>
                     <v-card-text v-else>
 

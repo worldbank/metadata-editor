@@ -21,7 +21,7 @@ Vue.component('vue-copy-collection', {
                 vm.collections = response.data.collections;
             })
             .catch(function (error) {
-                alert("Error:" + error.response.data.message);
+                alert(vm.$t("error") + ": " + error.response.data.message);
                 console.log(error);
             });
         },
@@ -38,12 +38,12 @@ Vue.component('vue-copy-collection', {
             .then(response => {
                 console.log("copy-collection",response);
                 vm.loadCollections();
-                alert("Collection copied successfully");
+                alert(vm.$t("collection_copied_successfully"));
                 vm.dialog=false;
                 vm.$emit('collection-copied');
             })
             .catch(function (error) {
-                alert("Error:" + error.response.data.message);
+                alert(vm.$t("error") + ": " + error.response.data.message);
                 console.log(error);
             });
         },
@@ -77,15 +77,15 @@ Vue.component('vue-copy-collection', {
 
                 <v-card>
                     <v-card-title class="text-h5 grey lighten-2">
-                    Copy collection                    
+                    {{$t('copy_collection')}}                    
                     </v-card-title>
                     
 
                     <v-card-text> 
-                        <div class="text-muted text-small">Copy projects and users from one collection to another</div>                        
+                        <div class="text-muted text-small">{{$t('copy_projects_and_users')}}</div>                        
 
                         <div class="form-group mt-3">
-                            <label>Source</label>
+                            <label>{{$t('source')}}</label>
                             <v-select
                                 :items="collections"
                                 item-text="title"
@@ -98,7 +98,7 @@ Vue.component('vue-copy-collection', {
                         </div>
 
                         <div class="form-group">
-                            <label>Target</label>                            
+                            <label>{{$t('target')}}</label>                            
                             <v-select
                                 :items="collections"
                                 item-text="title"
@@ -123,7 +123,7 @@ Vue.component('vue-copy-collection', {
                             small
                             @click="copyCollection"
                             :disabled="isCopyDisabled"
-                        >Copy</v-btn>
+                        >{{$t('copy')}}</v-btn>
                         <v-btn
                             class="ma-2"
                             outlined
@@ -131,7 +131,7 @@ Vue.component('vue-copy-collection', {
                             small
                             @click="dialog = false"
                         >
-                            Close
+                            {{$t('close')}}
                         </v-btn>
                     </v-card-actions>
                     

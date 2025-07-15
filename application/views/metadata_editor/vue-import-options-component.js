@@ -119,7 +119,7 @@ Vue.component('import-options', {
                         
                         <div v-if="!is_processing" class="mt-5" >
                         <button type="button" :disabled="!file" class="btn btn-sm btn-primary" @click="importDDI">Import file</button>
-                        <button type="button" :disabled="!file" class="btn btn-sm btn-danger" @click="onCancel">Cancel</button>
+                        <button type="button" :disabled="!file" class="btn btn-sm btn-danger" @click="onCancel">{{$t("cancel")}}</button>
                         </div>
 
                     </div>

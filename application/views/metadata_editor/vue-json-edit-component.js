@@ -90,7 +90,7 @@ Vue.component('json-edit', {
                         @input="validateJSON(localValue)"
                     ></v-textarea>
                     </div>
-                    <v-btn @click="update" small outlined color="primary">Update</v-btn>
+                    <v-btn @click="update" small outlined color="primary">{{$t("update")}}</v-btn>
                     <v-btn @click="resetValue" small outlined color="default">Reset</v-btn>
                     <div v-if="errorMessage" class="error text-white p-1">{{ errorMessage }}</div>
                 </v-tab-item>

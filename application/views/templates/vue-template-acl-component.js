@@ -48,8 +48,8 @@ Vue.component('vue-template-acl', {
                      <v-tabs v-model="tab" align-with-title>
                         <v-tabs-slider color="yellow"></v-tabs-slider>
 
-                        <v-tab key="share">Share</v-tab>
-                        <v-tab key="acl">ACL</v-tab>
+                        <v-tab key="share">{{$t('share')}}</v-tab>
+                        <v-tab key="acl">{{$t('acl')}}</v-tab>
                     </v-tabs>
 
                     <v-tabs-items v-model="tab">
@@ -73,7 +73,7 @@ Vue.component('vue-template-acl', {
                         text
                         @click="dialog = false"
                     >
-                        Close
+                        {{$t('close')}}
                     </v-btn>
                     </v-card-actions>
                 </v-card>
