@@ -1115,4 +1115,23 @@ class Editor_resource_model extends ci_model {
 		exit;
 	}
 
+
+	/**
+	 * 
+	 * Returns all resources and include full file paths
+	 * 
+	 */
+	function select_all_with_path($sid)
+	{
+		$resources=$this->select_all($sid);
+		foreach($resources as $idx=>$resource){
+			if (isset($resource['filename']) && !is_url($resource['filename'])){
+				$resources[$idx]['path']=$this->Editor_model->get_project_folder($sid).'/documentation/'.$resource['filename'];
+			}else{
+				$resources[$idx]['path']=null;
+			}
+		}
+		return $resources;
+	}
+
 }    
