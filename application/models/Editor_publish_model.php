@@ -19,11 +19,13 @@ class Editor_publish_model extends ci_model {
     {
         parent::__construct();
         $this->load->model('Editor_model');
+        $this->load->model('Catalog_connections_model');
+        $this->load->model('Editor_resource_model');
     }
 
     function publish_to_catalog($sid,$user_id,$catalog_connection_id,$options=[])
 	{
-		$conn_info=$this->Editor_model->get_catalog_connection($user_id,$catalog_connection_id);
+		$conn_info=$this->Catalog_connections_model->get_connection($user_id,$catalog_connection_id);
 
 		if (!$conn_info){
 			throw new Exception("Target catalog was not found");
@@ -115,7 +117,7 @@ class Editor_publish_model extends ci_model {
 
 	function publish_thumbnail($sid,$user_id,$catalog_connection_id,$options=[])
 	{
-		$conn_info=$this->Editor_model->get_catalog_connection($user_id,$catalog_connection_id);
+		$conn_info=$this->Catalog_connections_model->get_connection($user_id,$catalog_connection_id);
 
 		if (!$conn_info){
 			throw new Exception("Target catalog was not found");
@@ -147,7 +149,7 @@ class Editor_publish_model extends ci_model {
 
 	function publish_external_resources($sid,$user_id,$catalog_connection_id,$options=[])
 	{
-		$conn_info=$this->Editor_model->get_catalog_connection($user_id,$catalog_connection_id);
+		$conn_info=$this->Catalog_connections_model->get_connection($user_id,$catalog_connection_id);
 
 		if (!$conn_info){
 			throw new Exception("Target catalog was not found");
@@ -178,7 +180,7 @@ class Editor_publish_model extends ci_model {
 
 	public function publish_external_resource($sid,$user_id,$connection_id,$resource_id,$overwrite="no")
 	{
-		$conn_info=$this->Editor_model->get_catalog_connection($user_id,$connection_id);
+		$conn_info=$this->Catalog_connections_model->get_connection($user_id,$connection_id);
 
 		if (!$conn_info){
 			throw new Exception("Target catalog was not found");

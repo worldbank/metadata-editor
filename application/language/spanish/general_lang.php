@@ -255,5 +255,35 @@ $lang['exporting_external_resources_metadata_as_json'] = 'Exportando metadatos d
 $lang['exporting_external_resources_as_rdf_xml'] = 'Exportando recursos externos como RDF/XML';
 $lang['creating_project_zip_file'] = 'Creando archivo ZIP del proyecto';
 
+$lang['catalog_connections'] = 'Conexiones de catálogo';
+$lang['catalog_info'] = 'Información del catálogo';
+$lang['actions'] = 'Acciones';
+$lang['edit'] = 'Editar';
+$lang['delete'] = 'Eliminar';
+$lang['edit_catalog'] = 'Editar catálogo';
+$lang['configure_new_catalog'] = 'Configurar nuevo catálogo';
+$lang['loading_catalog_details'] = 'Cargando detalles del catálogo...';
+$lang['catalog_title'] = 'Título del catálogo';
+$lang['catalog_url'] = 'URL del catálogo';
+$lang['catalog_url_hint'] = 'Ingrese la URL raíz del catálogo (por ejemplo, https://catalogo.ejemplo.com)';
+$lang['api_key'] = 'Clave API';
+$lang['leave_blank_to_keep_existing_key'] = 'dejar en blanco para mantener la clave existente';
+$lang['api_key_for_catalog_access'] = 'Clave API para acceso al catálogo';
+$lang['update'] = 'Actualizar';
+$lang['submit'] = 'Enviar';
+$lang['cancel'] = 'Cancelar';
+$lang['title_required'] = 'El título es obligatorio';
+$lang['url_required'] = 'La URL es obligatoria';
+$lang['created'] = 'Creado';
+$lang['updated'] = 'Actualizado';
+$lang['failed'] = 'Fallido';
+$lang['failed_to_create_catalog_connection'] = 'Error al crear la conexión de catálogo';
+$lang['failed_to_update_catalog_connection'] = 'Error al actualizar la conexión de catálogo';
+$lang['confirm_delete_catalog_connection'] = '¿Está seguro de que desea eliminar esta conexión de catálogo?';
+$lang['url_validation_failed'] = 'Error de validación de URL';
+$lang['url_must_start_with_http'] = 'La URL debe comenzar con https:// o http://';
+$lang['url_must_point_to_root'] = 'La URL debe apuntar a la raíz del catálogo. Elimine index.php o /api';
+$lang['url_is_invalid'] = 'La URL no es válida';
+
 /* End of file general_lang.php */
 /* Location: ./application/language/base/general_lang.php */

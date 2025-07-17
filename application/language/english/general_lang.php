@@ -268,5 +268,35 @@ $lang['exporting_external_resources_metadata_as_json'] = 'Exporting external res
 $lang['exporting_external_resources_as_rdf_xml'] = 'Exporting external resources as RDF/XML';
 $lang['creating_project_zip_file'] = 'Creating project ZIP file';
 
+$lang['catalog_connections'] = 'Catalog Connections';
+$lang['catalog_info'] = 'Catalog Information';
+$lang['actions'] = 'Actions';
+$lang['edit'] = 'Edit';
+$lang['delete'] = 'Delete';
+$lang['edit_catalog'] = 'Edit Catalog';
+$lang['configure_new_catalog'] = 'Configure new catalog';
+$lang['loading_catalog_details'] = 'Loading catalog details...';
+$lang['catalog_title'] = 'Catalog Title';
+$lang['catalog_url'] = 'Catalog URL';
+$lang['catalog_url_hint'] = 'Enter the root URL of the catalog (e.g., https://catalog.example.com)';
+$lang['api_key'] = 'API Key';
+$lang['leave_blank_to_keep_existing_key'] = 'leave blank to keep existing key';
+$lang['api_key_for_catalog_access'] = 'API key for catalog access';
+$lang['update'] = 'Update';
+$lang['submit'] = 'Submit';
+$lang['cancel'] = 'Cancel';
+$lang['title_required'] = 'Title is required';
+$lang['url_required'] = 'URL is required';
+$lang['created'] = 'Created';
+$lang['updated'] = 'Updated';
+$lang['failed'] = 'Failed';
+$lang['failed_to_create_catalog_connection'] = 'Failed to create catalog connection';
+$lang['failed_to_update_catalog_connection'] = 'Failed to update catalog connection';
+$lang['confirm_delete_catalog_connection'] = 'Are you sure you want to delete this catalog connection?';
+$lang['url_validation_failed'] = 'URL validation failed';
+$lang['url_must_start_with_http'] = 'URL must start with https:// or http://';
+$lang['url_must_point_to_root'] = 'URL must point to the root of the catalog. Remove index.php or /api';
+$lang['url_is_invalid'] = 'URL is invalid';
+
 /* End of file general_lang.php */
 /* Location: ./application/language/base/general_lang.php */

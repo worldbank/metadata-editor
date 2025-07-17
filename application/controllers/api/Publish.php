@@ -9,6 +9,7 @@ class Publish extends MY_REST_Controller
 		parent::__construct();
 		$this->load->helper("date");
 		$this->load->model("Editor_model");
+		$this->load->model("Catalog_connections_model");
 		$this->load->model("Editor_resource_model");
 		$this->load->model("Editor_publish_model");
 		$this->load->model("Collection_model");
@@ -49,7 +50,7 @@ class Publish extends MY_REST_Controller
 				throw new Exception("User-login-required");
 			}
 
-			$connections=$this->Editor_model->catalog_connections($user_id);
+			$connections=$this->Catalog_connections_model->get_connections($user_id);
 			
 			$response=array(
 				'connections'=>$connections
@@ -86,7 +87,7 @@ class Publish extends MY_REST_Controller
 			$options=$this->raw_json_input();
 			$options['user_id']=$user_id;
 
-			$result=$this->Editor_model->catalog_connection_create($options);
+			$result=$this->Catalog_connections_model->create($options);
 			
 			$response=array(
 				'status'=>$result

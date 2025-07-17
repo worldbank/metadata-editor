@@ -64,6 +64,9 @@ tags:
   - name: Admin metadata templates
     description: Administrative Metadata templates
 
+  - name: Catalog connections
+    description: Manage catalog connections
+
 
 x-tagGroups:  
   - name: Projects
@@ -115,7 +118,9 @@ x-tagGroups:
     tags:
       - Admin metadata
       - Admin metadata templates
-
+  - name: Catalog connections
+    tags:
+      - Catalog connections 
 schemes:
   - http
 paths:
@@ -1801,6 +1806,112 @@ paths:
           - ApiKeyAuth: []
 
 
+  /catalog-connections:
+      get:
+        tags:
+          - Catalog connections
+        summary: List catalog connections
+        description: List all catalog connections
+        operationId: listCatalogConnections
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        responses:
+          '200':
+            description: successful operation
+
+      post:
+        tags:
+          - Catalog connections
+        summary: Create catalog connection
+        description: Create a new catalog connection
+        operationId: createCatalogConnection
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true  
+            schema:
+              $ref: "#/definitions/CatalogConnection"
+        responses:
+          '200':
+            description: successful operation
+        security:
+          - ApiKeyAuth: []
+
+  /catalog-connections/{id}:
+      get:
+        tags:
+          - Catalog connections
+        summary: Get catalog connection
+        description: Get a catalog connection
+        operationId: getCatalogConnection
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "id"
+            type: integer
+            description: Catalog connection ID
+            required: true
+        responses:
+          '200':
+            description: successful operation
+        security:
+          - ApiKeyAuth: []
+
+  /catalog-connections/delete:
+      post:
+        tags:
+          - Catalog connections
+        summary: Delete catalog connection
+        description: Delete a catalog connection
+        operationId: deleteCatalogConnection
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/CatalogConnectionDelete"
+        responses:
+          '200':
+            description: successful operation
+        security:
+          - ApiKeyAuth: []
+
+  /catalog-connections/update:
+      post:
+        tags:
+          - Catalog connections
+        summary: Update catalog connection
+        description: Update a catalog connection
+        operationId: updateCatalogConnection
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/CatalogConnection"
+        responses:
+          '200':
+            description: successful operation
+        security:
+
+
 
   
 ###############################################################
@@ -2157,6 +2268,30 @@ definitions:
         description: New IDNO for the project      
     xml:
       name: ProjectOptionsIDNO
+  CatalogConnection:
+    type: object
+    properties:
+      title:
+        type: string
+        required: true
+      url:  
+        type: string
+        required: true
+      api_key:
+        type: string
+        required: false
+    xml:
+      name: CatalogConnection
+
+  CatalogConnectionDelete:
+    type: object
+    properties:
+      catalog_id:
+        type: integer
+        required: true
+        description: Catalog connection ID
+    xml:
+      name: CatalogConnectionDelete
       
 
   

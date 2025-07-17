@@ -1400,54 +1400,7 @@ class Editor_model extends CI_Model {
 	}
 
 	
-	function catalog_connections($user_id)
-	{
-		$this->db->select("id,title,url,user_id");
-		$this->db->where("user_id",$user_id);
-		$result=$this->db->get("editor_catalogs")->result_array();
-		return $result;
-	}
 
-	function get_catalog_connection($user_id,$id)
-	{
-		$this->db->select("*");
-		$this->db->where("user_id",$user_id);
-		$this->db->where("id",$id);
-		$result=$this->db->get("editor_catalogs")->row_array();
-		return $result;
-	}
-
-	function catalog_connection_create($options=[])
-	{
-		$fields=array('title','url','api_key','user_id');
-
-		$data_options=[];
-		foreach($fields as $req_field){
-			if(!isset($options[$req_field])){
-				throw new Exception("Field is required: ".$req_field);
-			}
-			if (empty($options[$req_field])){
-				throw new Exception("Field is required: ".$req_field);
-			}
-
-			$data_options[$req_field]=$options[$req_field];
-		}
-
-		$this->db->insert("editor_catalogs",$data_options);
-		return $this->db->insert_id();
-	}
-
-
-	function catalog_connection_delete($catalog_id, $user_id)
-	{
-		$data_options=[
-			'user_id'=>$user_id,
-			'id'=>$catalog_id
-		];
-
-		$this->db->where("id",$catalog_id);
-		return $this->db->delete("editor_catalogs",$data_options);		
-	}
 
 	function delete_project($sid)
 	{
