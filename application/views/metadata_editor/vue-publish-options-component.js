@@ -81,8 +81,7 @@ Vue.component('publish-options', {
     },
     methods:{
         getProjectBasicInfo: function(){
-            //make ajax call to get project basic info
-            let url=CI.base_url + '/api/editor/basic_info/'+this.ProjectID;
+            let url=CI.site_url + '/api/editor/basic_info/'+this.ProjectID;
             let vm=this;
 
             axios.get(url)
@@ -190,7 +189,7 @@ Vue.component('publish-options', {
                 return false;
             }
 
-            let url=CI.base_url + '/api/publish/' +this.ProjectID +'/' + nada_catalog.id;
+            let url=CI.site_url + '/api/publish/' +this.ProjectID +'/' + nada_catalog.id;
             this.publish_responses.metadata.messages.push(this.$t("starting_metadata_publishing_to") + ": " + url);
         
             return axios.post(url,
@@ -236,8 +235,6 @@ Vue.component('publish-options', {
         },
         publishSingleResource: async function(resource)
         {
-
-            //let nada_catalog=this.catalog_connections[this.catalog];      
             let nada_catalog=this.getConnectionInfo(this.catalog);      
 
             if(!nada_catalog){
@@ -253,7 +250,7 @@ Vue.component('publish-options', {
             }
 
             vm=this;            
-            let url=CI.base_url + '/api/publish/external_resource/'+this.ProjectID +'/' + nada_catalog.id;
+            let url=CI.site_url + '/api/publish/external_resource/'+this.ProjectID +'/' + nada_catalog.id;
 
             return axios.post(url,
                 formData,
@@ -274,7 +271,7 @@ Vue.component('publish-options', {
             }
 
             vm=this;            
-            let url=CI.base_url + '/api/publish/thumbnail/'+this.ProjectID +'/' + nada_catalog.id;
+            let url=CI.site_url + '/api/publish/thumbnail/'+this.ProjectID +'/' + nada_catalog.id;
 
             return axios.post(url,
                 formData,
@@ -302,7 +299,7 @@ Vue.component('publish-options', {
             this.project_export_status="done";
         },
         async exportProjectJSON() {
-            let url=CI.base_url + '/api/editor/generate_json/'+this.ProjectID;
+            let url=CI.site_url + '/api/editor/generate_json/'+this.ProjectID;
             return axios
             .get(url)
             .then(function (response) {
@@ -316,7 +313,7 @@ Vue.component('publish-options', {
             });            
         },
         async exportProjectDDI() {
-            let url=CI.base_url + '/api/editor/generate_ddi/'+this.ProjectID;
+            let url=CI.site_url + '/api/editor/generate_ddi/'+this.ProjectID;
             return axios
             .get(url)
             .then(function (response) {
@@ -330,7 +327,7 @@ Vue.component('publish-options', {
             });            
         },
         async exportExternalResourcesJSON() {
-            let url=CI.base_url + '/api/resources/write_json/'+this.ProjectID;
+            let url=CI.site_url + '/api/resources/write_json/'+this.ProjectID;
             return axios
             .get(url)
             .then(function (response) {
@@ -344,7 +341,7 @@ Vue.component('publish-options', {
             });            
         },
         async exportExternalResourcesRDF() {
-            let url=CI.base_url + '/api/resources/write_rdf/'+this.ProjectID;
+            let url=CI.site_url + '/api/resources/write_rdf/'+this.ProjectID;
             return axios
             .get(url)
             .then(function (response) {
@@ -358,7 +355,7 @@ Vue.component('publish-options', {
             });            
         },
         async writeProjectZip() {
-            let url=CI.base_url + '/api/packager/generate_zip/'+this.ProjectID;
+            let url=CI.site_url + '/api/packager/generate_zip/'+this.ProjectID;
             return axios
             .get(url)
             .then(function (response) {
@@ -373,7 +370,7 @@ Vue.component('publish-options', {
         },
         loadCatalogConnections: function() {
             vm=this;
-            let url=CI.base_url + '/api/publish/catalog_connections';
+            let url=CI.site_url + '/api/publish/catalog_connections';
             axios.get(url)
             .then(function (response) {
                 if(response.data){

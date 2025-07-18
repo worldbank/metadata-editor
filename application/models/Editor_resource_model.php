@@ -440,14 +440,45 @@ class Editor_resource_model extends ci_model {
 		//check filenam is URL?
 		if (!is_url($filename))
 		{
+			//replace dots with underscores
+			$filename=$this->replace_dots_with_underscores($filename);
+
 			//clean file paths
 			$filename=unix_path($filename);
 			
 			//keep only the filename, remove path
-			return basename($filename);
+			$filename = basename($filename);
+			
+			//apply CodeIgniter's filename sanitization
+			$filename = $this->security->sanitize_filename($filename);
 		}
 
 		return $filename;
+	}
+
+	/**
+	 * 
+	 * Replace dots with underscores in filename to match uploaded file
+	 * 
+	 */
+	function replace_dots_with_underscores($filename)
+	{
+		if (is_url($filename)) {
+			return $filename;
+		}
+
+		$ext_pos = strrpos($filename, '.');
+		
+		if ($ext_pos === FALSE) {
+			// No extension, replace all dots
+			return str_replace('.', '_', $filename);
+		}
+
+		$name_part = substr($filename, 0, $ext_pos);
+		$ext_part = substr($filename, $ext_pos);
+		
+		// Replace dots only in the name part, keep extension intact
+		return str_replace('.', '_', $name_part) . $ext_part;
 	}
 
 
@@ -766,11 +797,7 @@ class Editor_resource_model extends ci_model {
 		$project_folder=$this->Editor_model->get_project_folder($sid);		
 		$resource_file=$project_folder.'/documentation/'.$filename;
 
-		if (file_exists($resource_file)){
-			return $resource_file;
-		}
-
-		return false;
+		return $resource_file;
 	}
 
 

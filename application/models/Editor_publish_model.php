@@ -79,11 +79,8 @@ class Editor_publish_model extends ci_model {
 			$metadata[$key]=$option;
 		}
 
-		//$metadata=array_merge($options,$metadata);
-			
 		try{
 			$api_response = $client->request('POST', '', [
-				//'auth' => [$username, $password],
 				'json' => $metadata,
 				['debug' => false]
 			]);
@@ -91,7 +88,6 @@ class Editor_publish_model extends ci_model {
 			$response=array(
 				'status'=>'success',
 				'folder_path'=>$metadata_json_path,
-				//'options'=>$body_options,
 				'code' => $api_response->getStatusCode(),// 200
 				'reason' => $api_response->getReasonPhrase(), // OK
 				'response_' =>$api_response->getBody()
@@ -104,9 +100,6 @@ class Editor_publish_model extends ci_model {
 				return $response_text;
 			}
 
-			/*if ($response_json["dataset"]){
-				return $response_json["dataset"];
-			}*/
 			return $response_json;
 
 		} catch (ClientException $e) {
@@ -218,9 +211,9 @@ class Editor_publish_model extends ci_model {
 				$catalog_url=$conn_info['url'].'/index.php/api/datasets/'.$project['study_idno'].'/files';
 				$output['resource_upload']=$this->make_post_file_request($catalog_url, $catalog_api_key, $file_field_name='file', $file_path=$resource_file_path);
 			}
-			/*else{
-				throw new Exception("Resource file not found" . ($resource_file_path));
-			}*/
+			else{
+				throw new Exception("Resource file not found: " . basename($resource_file_path));
+			}
 		}
 
 		return $output;
@@ -235,18 +228,9 @@ class Editor_publish_model extends ci_model {
 					
 		try{
 			$api_response = $client->request('POST', '', [
-				//'auth' => [$username, $password],
 				'json' => $post_body,
 				['debug' => false]
 			]);
-
-			/*$response=array(
-				'status'=>'success',				
-				//'options'=>$body_options,
-				'code' => $api_response->getStatusCode(),// 200
-				'reason' => $api_response->getReasonPhrase(), // OK
-				'response_' =>$api_response->getBody()
-			);*/
 
 			$response_text=(string) $api_response->getBody();
 			$response_json=json_decode($response_text,true);
@@ -255,19 +239,10 @@ class Editor_publish_model extends ci_model {
 				return $response_text;
 			}
 
-			/*if ($response_json["dataset"]){
-				return $response_json["dataset"];
-			}*/
-
 			return $response_json;
 		} catch (ClientException $e) {
 			$resp=$e->getResponse();
-			throw new Exception((string) $resp->getBody());
-			/*return;
-
-			http_response_code($resp->getStatusCode());
-			echo $resp->getBody();
-			die();			*/
+			throw new Exception((string) $resp->getBody());			
 		}
 		catch (Exception $e) {
 			throw new Exception("request failed: ". $e->getMessage());
@@ -294,37 +269,15 @@ class Editor_publish_model extends ci_model {
 			];
 
 			$api_response = $client->request('POST','', $body);
-
-			/*$response=array(
-				'status'=>'success',								
-				'code' => $api_response->getStatusCode(),// 200
-				'reason' => $api_response->getReasonPhrase(), // OK
-				'response_' =>$api_response->getBody()
-			);*/
-
 			$response_text=(string) $api_response->getBody();
 			$response_json=json_decode($response_text,true);
 
 			if(!$response_json){
 				return $response_text;
 			}
-
-			/*if ($response_json["dataset"]){
-				return $response_json["dataset"];
-			}*/
-
-			return $response_json;
-			//die();
-
-			//return $response;
 		} catch (ClientException $e) {
 			$resp=$e->getResponse();			
 			throw new Exception((string) $resp->getBody());
-			
-
-			/*http_response_code($resp->getStatusCode());
-			echo $resp->getBody();
-			die();			*/
 		}
 		catch (Exception $e) {
 			throw new Exception("request failed: ". $e->getMessage());
