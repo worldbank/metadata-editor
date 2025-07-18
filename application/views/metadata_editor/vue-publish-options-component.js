@@ -123,7 +123,7 @@ Vue.component('publish-options', {
         {
             this.resources_selected = [];
             if (this.toggle_resources_selected == true) {                
-                for (i = 0; i < this.ExternalResources.length; i++) {
+                for (let i = 0; i < this.ExternalResources.length; i++) {
                 this.resources_selected.push(i);
                 }
             }
@@ -386,7 +386,7 @@ Vue.component('publish-options', {
         },
         getConnectionInfo: function(id)
         {
-            for (i=0;i<this.catalog_connections.length;i++){
+            for (let i=0;i<this.catalog_connections.length;i++){
                 if (this.catalog_connections[i].id==id){
                     return this.catalog_connections[i];
                 }
@@ -492,7 +492,7 @@ Vue.component('publish-options', {
         {
             //add a new field connection_title [title + url]
             let connections=[];
-            for (i=0;i<this.catalog_connections.length;i++){
+            for (let i=0;i<this.catalog_connections.length;i++){
                 let connection=this.catalog_connections[i];
                 connection.connection_title=connection.title + ' - ' + connection.url;
                 connections.push(connection);
@@ -676,7 +676,7 @@ Vue.component('publish-options', {
 
                     
                     <div v-if="catalog!=false" class="mt-5 p-4 elevation-2 mb-5 bg-light" >
-                        <div><strong>{{$t('published_project_link')}}:</div>
+                        <div><strong>{{$t('published_project_link')}}:</strong></div>
                         <div><a :href="TargetCatalogPublishedUrl" target="_blank">{{TargetCatalogPublishedUrl}} <v-icon color="primary">mdi-open-in-new</v-icon></a></div>
                     </div>
 

@@ -18,7 +18,6 @@ class Publish extends MY_REST_Controller
 		$this->is_authenticated_or_die();
 	}
 
-	//override authentication to support both session authentication + api keys
 	function _auth_override_check()
 	{
 		if ($this->session->userdata('user_id')){
@@ -28,11 +27,6 @@ class Publish extends MY_REST_Controller
 	}
 
 	
-	
-
-
-	//catalogs connections for direct publishing from the editor
-
 	/**
 	 * 
 	 * list catalog connections by current logged-in user
@@ -123,6 +117,14 @@ class Publish extends MY_REST_Controller
 
 			$response=$this->Editor_publish_model->publish_to_catalog($sid,$user_id,$catalog_connection_id,$options);			
 			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(ApiRequestException $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage(),
+				'response'=>$e->getDetails()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}
 		catch(Exception $e){
 			$error_output=array(

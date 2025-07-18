@@ -271,3 +271,56 @@ class AclAccessDeniedException extends \Exception
     }
 }
 
+
+/**
+ * 
+ * Custom exception for API request errors
+ * 
+ */
+class ApiRequestException extends Exception
+{
+    protected $statusCode;
+    protected $details;
+    protected $debug;
+
+    public function __construct($message, $details = [], $debug = [])
+    {
+        $statusCode=500;
+        parent::__construct($message, $statusCode);
+        $this->statusCode = $statusCode;
+        $this->details = $details;
+        $this->debug = $debug;
+    }
+
+    public function getStatusCode()
+    {
+        return $this->statusCode;
+    }
+
+    public function getDetails()
+    {
+        return $this->details;
+    }
+
+    public function getDebug()
+    {
+        return $this->debug;
+    }
+
+    public function toArray($include_debug = false)
+    {
+        $response = [
+            'status' => 'error',
+            'code' => $this->statusCode,
+            'message' => $this->getMessage(),
+            'details' => $this->details
+        ];
+
+        if ($include_debug) {
+            $response['debug'] = $this->debug;
+        }
+
+        return $response;
+    }
+}
+

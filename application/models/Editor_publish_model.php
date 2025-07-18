@@ -104,7 +104,21 @@ class Editor_publish_model extends ci_model {
 
 		} catch (ClientException $e) {
 			$resp=$e->getResponse();
-			throw new Exception((string) $resp->getBody());
+			//throw new Exception((string) $resp->getBody());
+
+			//response is in json format, check if is valid json
+			$response_text=(string) $resp->getBody();
+			$response_json=json_decode($response_text,true);
+
+			throw new ApiRequestException(
+				$message = $response_text,
+				$details = [
+					'status' => $resp->getStatusCode(),// 200
+					'reason' => $resp->getReasonPhrase(), // OK
+					'response_' =>$response_json,
+					'api_url' => $catalog_url
+				]
+			);
 		}
 	}
 
