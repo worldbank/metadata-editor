@@ -46,6 +46,8 @@ class Datafile_export
             'character'=>'object'
         );
 
+        $missing_values=array();
+
         foreach($variables as $variable){
             if (isset($variable['var_wgt_id']) && $variable['var_wgt_id']>0 ){
                 $params['weights'][]=array(
@@ -58,15 +60,16 @@ class Datafile_export
             // we cannot export user defined missings
             // user defined missings should be added a as category value/labels
             // this is because STATA/SPSS, won't recognize user defined missings
+            */
 
-            if ($variable['user_missings']!=''){
+            if (trim($variable['user_missings'])!=''){
 				$missings=explode(",",$variable['user_missings']);
 				foreach($missings as $idx=>$missing){
-					if (is_numeric($missing)){												
-						$params['missings'][trim($variable['name'])][]=intval($missing);
-					}
+					//if (is_numeric($missing)){												
+						$params['missings'][trim($variable['name'])][]=$missing;
+					//}
 				}
-            }*/
+            }
 
             if ($variable['field_dtype']!=''){
                 if (isset($dtype_map[$variable['field_dtype']])){

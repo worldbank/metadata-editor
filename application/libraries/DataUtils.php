@@ -232,7 +232,7 @@ class DataUtils
 		]);
 
 		$request_body=$this->ci->datafile_export->get_export_params($sid,$file_id,$format);
-			
+
 		$api_response = $client->request('POST', '', [
 			'json' => 
 				$request_body
@@ -242,6 +242,7 @@ class DataUtils
 
 		$response=json_decode($api_response->getBody()->getContents(),true);
 		return [
+			'request'=>$request_body,
 			'response'=>$response,
 			'status_code'=>$api_response->getStatusCode() //e.g. 200
 		];
@@ -510,10 +511,10 @@ class DataUtils
 
             if ($variable['user_missings']!=''){
 				$missings=explode(",",$variable['user_missings']);
-				foreach($missings as $idx=>$missing){
-					if (is_numeric($missing)){												
-						$params['missings'][trim($variable['name'])][]=intval($missing);
-					}
+				foreach($missings as $missing){
+					if (!empty($missing)){
+						$params['missings'][trim($variable['name'])][]=$missing;
+					}					
 				}
             }
 

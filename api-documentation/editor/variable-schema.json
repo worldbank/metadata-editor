@@ -37,25 +37,25 @@
 			"description": "Number of decimal points in the variable"
 		},
 		"var_wgt": {
-			"type": "integer",
+			"type": "number",
 			"title": "Weight",
 			"description": "indicates whether the variable is a weight",
 			"default": 0
 		},
 		"loc_start_pos": {
-			"type": "integer",
+			"type": "number",
 			"title": "Variable start position"
 		},
 		"loc_end_pos": {
-			"type": "integer",
+			"type": "number",
 			"title": "Variable end position"
 		},
 		"loc_width": {
-			"type": "integer",
+			"type": "number",
 			"title": "Variable width"
 		},
 		"loc_rec_seg_no": {
-			"type": "integer",
+			"type": "number",
 			"title": "Record segment number, deck or card number the variable is located on"
 		},
 		"var_imputation": {
@@ -119,7 +119,7 @@
 					},
 					"value": {
 						"type": [
-							"integer",
+							"number",
 							"string"
 						],
 						"title": "Value"
@@ -164,7 +164,7 @@
 								},
 								"value": {
 									"type": [
-										"integer",
+										"number",
 										"string"
 									],
 									"title": "Value"

@@ -22,7 +22,15 @@ Vue.component('variable-edit', {
         }        
     },
     watch: {          
-        
+        'variable.sum_stats_options': {
+            handler(newVal, oldVal) {
+                // Ensure reactivity when sum_stats_options changes
+                if (newVal && typeof newVal === 'object') {
+                    this.$forceUpdate();
+                }
+            },
+            deep: true
+        }
     },    
     created: function () {
        if (this.variable.var_concept==undefined){
@@ -52,16 +60,22 @@ Vue.component('variable-edit', {
             this.variable.var_wgt_id=this.variable.var_wgt_id[0];
         }
 
-        //Vue.set(this.variable, 'sum_stats_options', JSON.parse(JSON.stringify(this.sum_stats_options)));
-        /*if (!this.variable.sum_stats_options){              
-            Vue.set(this.variable, 'sum_stats_options', this.sum_stats_options);
+        // Initialize sum_stats_options properly with Vue.set for reactivity
+        if (!this.variable.sum_stats_options){
+            Vue.set(this.variable, 'sum_stats_options', JSON.parse(JSON.stringify(this.sum_stats_options)));
+        } else {
+            // Ensure all required properties exist
+            const defaultOptions = JSON.parse(JSON.stringify(this.sum_stats_options));
+            for (const key in defaultOptions) {
+                if (!(key in this.variable.sum_stats_options)) {
+                    Vue.set(this.variable.sum_stats_options, key, defaultOptions[key]);
+                }
+            }
         }
-        if(!this.variable.sum_stats_options.min){        
-            Vue.set(this.variable, 'sum_stats_options', this.sum_stats_options);
-        }*/
-
-        
-        
+    },
+    mounted: function() {
+        // Ensure sum_stats_options are properly initialized after component is mounted
+        this.ensureSumStatsOptions();
     },
     computed: {
         localVariable: {
@@ -75,9 +89,6 @@ Vue.component('variable-edit', {
         },
         Variable:{
             get(){
-                if (!this.variable.sum_stats_options){              
-                    this.variable.sum_stats_options=JSON.parse(JSON.stringify(this.sum_stats_options));
-                }
                 return this.variable;
             },
             set(newValue){
@@ -340,8 +351,8 @@ Vue.component('variable-edit', {
             return 0;
         },
         variableSumStatEnabled: function (stat){
-            if (this.variable.sum_stats_options[stat]){
-                return this.variable.sum_stats_options[stat];
+            if (this.Variable.sum_stats_options[stat]){
+                return this.Variable.sum_stats_options[stat];
             }
             return false;
         },
@@ -373,12 +384,34 @@ Vue.component('variable-edit', {
 
             return value;
         },
-        OnWghtdStatsChange: function(e)
-        {
-            if (!this.Variable.sum_stats_options.wgt){
-                this.Variable.sum_stats_options.mean_wgt=false;
-                this.Variable.sum_stats_options.stdev_wgt=false
+
+        
+        ensureSumStatsOptions: function() {
+            // Ensure sum_stats_options exists and has all required properties
+            if (!this.variable.sum_stats_options) {
+                Vue.set(this.variable, 'sum_stats_options', JSON.parse(JSON.stringify(this.sum_stats_options)));
+            } else {
+                const defaultOptions = JSON.parse(JSON.stringify(this.sum_stats_options));
+                for (const key in defaultOptions) {
+                    if (!(key in this.variable.sum_stats_options)) {
+                        Vue.set(this.variable.sum_stats_options, key, defaultOptions[key]);
+                    }
+                }
             }
+        },
+        
+        onSumStatsOptionChange: function(option, value) {
+            // Handle changes to sum_stats_options with proper reactivity
+            Vue.set(this.Variable.sum_stats_options, option, value);
+            
+            // Special handling for weighted statistics
+            if (option === 'wgt' && !value) {
+                Vue.set(this.Variable.sum_stats_options, 'mean_wgt', false);
+                Vue.set(this.Variable.sum_stats_options, 'stdev_wgt', false);
+            }
+            
+            // Mark variable as needing update
+            Vue.set(this.variable, 'update_required', true);
         }
 
     },
@@ -399,21 +432,21 @@ Vue.component('variable-edit', {
 
                     <div class="row no-gutters">
                         <div class="col-md-3 v-checkbox-rm-styles v-checkbox-summary-stats">
-                            <div><v-checkbox @change="OnWghtdStatsChange" v-model="Variable.sum_stats_options.wgt" :indeterminate="Variable.sum_stats_options.wgt==null" :label="$t('weighted_statistics')"></v-checkbox></div>
-                            <div><v-checkbox v-model="Variable.sum_stats_options.freq" :indeterminate="Variable.sum_stats_options.freq==null" :label="$t('frequencies')"></v-checkbox></div>
-                            <div><v-checkbox v-model="Variable.sum_stats_options.missing" :indeterminate="Variable.sum_stats_options.missing==null" :label="$t('list_missings')"></v-checkbox></div>
+                            <div><v-checkbox @change="(value) => onSumStatsOptionChange('wgt', value)" v-model="Variable.sum_stats_options.wgt" :indeterminate="Variable.sum_stats_options.wgt==null" :label="$t('weighted_statistics')"></v-checkbox></div>
+                            <div><v-checkbox @change="(value) => onSumStatsOptionChange('freq', value)" v-model="Variable.sum_stats_options.freq" :indeterminate="Variable.sum_stats_options.freq==null" :label="$t('frequencies')"></v-checkbox></div>
+                            <div><v-checkbox @change="(value) => onSumStatsOptionChange('missing', value)" v-model="Variable.sum_stats_options.missing" :indeterminate="Variable.sum_stats_options.missing==null" :label="$t('list_missings')"></v-checkbox></div>
                             <div class="mt-3 mb-2 border-bottom w-50 ">{{$t('summary_stats')}}:</div>
-                            <div><v-checkbox v-model="Variable.sum_stats_options.vald" :indeterminate="Variable.sum_stats_options.vald==null"  :label="$t('valid')"></v-checkbox></div>
-                            <div><v-checkbox v-model="Variable.sum_stats_options.min" :indeterminate="Variable.sum_stats_options.min==null"  :label="$t('min')"></v-checkbox></div>
-                            <div><v-checkbox v-model="Variable.sum_stats_options.max" :indeterminate="Variable.sum_stats_options.max==null" :label="$t('max')"></v-checkbox></div>
-                            <div><v-checkbox v-model="Variable.sum_stats_options.mean" :indeterminate="Variable.sum_stats_options.mean==null" :label="$t('mean')"></v-checkbox></div>
-                            <div><v-checkbox v-model="Variable.sum_stats_options.mean_wgt" :indeterminate="Variable.sum_stats_options.mean_wgt==null" :label="$t('weighted_mean')"></v-checkbox></div>
-                            <div><v-checkbox v-model="Variable.sum_stats_options.stdev" :indeterminate="Variable.sum_stats_options.stdev==null" :label="$t('stddev')"></v-checkbox></div>
-                            <div><v-checkbox v-model="Variable.sum_stats_options.stdev_wgt" :indeterminate="Variable.sum_stats_options.stdev_wgt==null" :label="$t('weighted_stddev')"></v-checkbox></div>                            
+                            <div><v-checkbox @change="(value) => onSumStatsOptionChange('vald', value)" v-model="Variable.sum_stats_options.vald" :indeterminate="Variable.sum_stats_options.vald==null"  :label="$t('valid')"></v-checkbox></div>
+                            <div><v-checkbox @change="(value) => onSumStatsOptionChange('min', value)" v-model="Variable.sum_stats_options.min" :indeterminate="Variable.sum_stats_options.min==null"  :label="$t('min')"></v-checkbox></div>
+                            <div><v-checkbox @change="(value) => onSumStatsOptionChange('max', value)" v-model="Variable.sum_stats_options.max" :indeterminate="Variable.sum_stats_options.max==null" :label="$t('max')"></v-checkbox></div>
+                            <div><v-checkbox @change="(value) => onSumStatsOptionChange('mean', value)" v-model="Variable.sum_stats_options.mean" :indeterminate="Variable.sum_stats_options.mean==null" :label="$t('mean')"></v-checkbox></div>
+                            <div><v-checkbox @change="(value) => onSumStatsOptionChange('mean_wgt', value)" v-model="Variable.sum_stats_options.mean_wgt" :indeterminate="Variable.sum_stats_options.mean_wgt==null" :label="$t('weighted_mean')"></v-checkbox></div>
+                            <div><v-checkbox @change="(value) => onSumStatsOptionChange('stdev', value)" v-model="Variable.sum_stats_options.stdev" :indeterminate="Variable.sum_stats_options.stdev==null" :label="$t('stddev')"></v-checkbox></div>
+                            <div><v-checkbox @change="(value) => onSumStatsOptionChange('stdev_wgt', value)" v-model="Variable.sum_stats_options.stdev_wgt" :indeterminate="Variable.sum_stats_options.stdev_wgt==null" :label="$t('weighted_stddev')"></v-checkbox></div>                            
                         </div>
                         <div class="col-md-9">
 
-                            <div v-if="variable.var_catgry && variable.var_catgry.length>0 && variable.sum_stats_options.freq==true">
+                            <div v-if="variable.var_catgry && variable.var_catgry.length>0 && Variable.sum_stats_options.freq==true">
                             <h5>{{$t('frequencies')}}</h5>
                             
                             <table class="table table-sm variable-frequencies">
