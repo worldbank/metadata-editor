@@ -12,6 +12,7 @@ class Editor_DDI_Writer
         $this->ci =& get_instance();
         $this->ci->load->model('Editor_datafile_model');
         $this->ci->load->model("Editor_variable_model");
+        $this->ci->load->library("project_json_writer");
     }
 
 
@@ -216,6 +217,7 @@ class Editor_DDI_Writer
 
         //variables
         foreach($this->ci->Editor_variable_model->chunk_reader_generator($id) as $variable){
+            $variable=$this->ci->project_json_writer->transform_variable($variable);
             $writer->writeRaw($this->get_var_desc_xml($variable['metadata']));
             $writer->writeRaw("\n");
         }     
@@ -536,7 +538,14 @@ class Editor_DDI_Writer
 
         //catgry
         $categories=new \Adbar\Dot($var->get('var_catgry'));
-        $categories_value_labels=$this->get_var_categories_value_labels_indexed($var->get('var_catgry_labels'));
+        $var_catgry_labels=$var->get('var_catgry_labels');
+        $categories_value_labels=null;
+        
+        if ($var_catgry_labels){
+            $categories_value_labels=$this->get_var_categories_value_labels_indexed($var_catgry_labels);
+        }else{
+            $categories_value_labels=new \Adbar\Dot();
+        }
 
         foreach($categories->all() as $idx=>$cat){
             $output->set([

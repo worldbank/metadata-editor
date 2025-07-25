@@ -102,6 +102,7 @@ class Editor_variable_model extends ci_model {
 			
 		foreach($variables as $idx=>$variable)
         {
+            set_time_limit(30);            
 			$max_variable_id=$max_variable_id+1;
 			$variable['file_id']=$fileid;
 			$variable['vid']= 'V'.$max_variable_id;
