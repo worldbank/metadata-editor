@@ -1,6 +1,18 @@
-<?php
+<div class="accordion mb-3 border-bottom" id="accordionIni">
+  <div class="card">
+    <div class="card-header p-1 pt-2 pb-0" id="headingtwo">
+      <h2 class="mb-0">
+        <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#collapseIni" aria-expanded="true" aria-controls="collapseIni">
+			<?php echo t('other_php_settings');?>
+        </button>
+      </h2>
+    </div>
+
+    <div id="collapseIni" class="collapse collapse" aria-labelledby="headingtwo" data-parent="#accordionIni">
+      <div class="card-body">
+	  <?php
 	//other settings
-	echo '<h1>'.t('other_php_settings').'</h1>';
+	
 	echo '<table cellpadding="3" cellspacing="0" class="grid-table table table-sm table-striped table-bordered">';
 	
 	echo '<tr class="header">';
@@ -34,7 +46,7 @@
 	echo '</tr>';
 
 
-echo '<tr>';
+	echo '<tr>';
 	echo '<td>date.timezone</td>';
 	echo '<td>';
 	if (!ini_get('date.timezone'))
@@ -51,3 +63,8 @@ echo '<tr>';
 
 	echo '</table>';
 ?>
+      </div>
+    </div>
+  </div>
+</div>
+
