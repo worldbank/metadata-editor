@@ -319,7 +319,7 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
                         <div style="font-weight:normal">{{$t("Edit resource")}}</div>
 
                         <div>
-                            <v-btn color="primary" small @click="uploadFile" :disabled="file_exists==true || !isProjectEditable">{{$t("Save")}} <span v-if="is_dirty">*</span></v-btn>
+                            <v-btn color="primary" small @click="uploadFile" :disabled="!isProjectEditable">{{$t("Save")}} <span v-if="is_dirty">*</span></v-btn>
                             <v-btn @click="cancelSave" small>{{$t("cancel")}}</v-btn>
                         </div>
                     </v-card-title>
@@ -373,7 +373,9 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
                     </span>
                     <span v-else>No file attached</span>
 
-                    <div v-if="file_exists && file" class="border bg-danger text-light p-2 m-2"><strong>{{file.name}}</strong> File already exists, use a different file!</div>
+                    <div v-if="file_exists && file" class="border bg-warning text-dark p-2 m-2">
+                        <strong>{{file.name}}</strong> {{$t("file_already_exists_warning")}}
+                    </div>
                 </div>
 
                 <div class="form-check mt-2" >

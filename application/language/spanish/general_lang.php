@@ -284,6 +284,7 @@ $lang['url_validation_failed'] = 'Error de validación de URL';
 $lang['url_must_start_with_http'] = 'La URL debe comenzar con https:// o http://';
 $lang['url_must_point_to_root'] = 'La URL debe apuntar a la raíz del catálogo. Elimine index.php o /api';
 $lang['url_is_invalid'] = 'La URL no es válida';
+$lang['file_already_exists_warning'] = 'El archivo ya existe. Esto sobrescribirá el archivo existente.';
 
 /* End of file general_lang.php */
 /* Location: ./application/language/base/general_lang.php */

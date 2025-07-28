@@ -297,6 +297,7 @@ $lang['url_validation_failed'] = 'URL validation failed';
 $lang['url_must_start_with_http'] = 'URL must start with https:// or http://';
 $lang['url_must_point_to_root'] = 'URL must point to the root of the catalog. Remove index.php or /api';
 $lang['url_is_invalid'] = 'URL is invalid';
+$lang['file_already_exists_warning'] = 'File already exists. This will overwrite the existing file.';
 
 /* End of file general_lang.php */
 /* Location: ./application/language/base/general_lang.php */
