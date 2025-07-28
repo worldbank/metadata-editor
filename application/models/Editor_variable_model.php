@@ -85,6 +85,13 @@ class Editor_variable_model extends ci_model {
 
     function delete($sid,$uid_list)
     {
+        foreach($uid_list as $uid){
+            $weight_var_in_use=$this->check_weight_variable_usage($sid,$uid);
+            if ($weight_var_in_use){
+                throw new Exception("Cannot delete variable because it is being used as a weight variable: ".$uid);
+            }
+        }
+
         $this->db->where('sid',$sid);
         $this->db->where_in('uid',$uid_list);
         $this->db->delete('editor_variables');
@@ -94,6 +101,32 @@ class Editor_variable_model extends ci_model {
             'query'=>$this->db->last_query()
         ];
     }
+
+
+    /**
+     * 
+     * 
+     * Check if weight variable is in use
+     * 
+     * checks if var_wgt_id is set to the uid of the variable to be deleted
+     * 
+     * 
+     */
+    function check_weight_variable_usage($sid,$uid)
+    {
+        $this->db->select("uid,var_wgt_id");        
+        $this->db->where("sid",$sid);
+        $this->db->where("var_wgt_id",$uid);
+        $result=$this->db->get("editor_variables")->result_array();
+
+        if (count($result)>0){
+            return true;
+        }
+
+        return false;
+    }
+
+
 
     function bulk_upsert_dictionary($sid,$fileid,$variables)
     {

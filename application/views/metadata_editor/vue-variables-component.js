@@ -477,10 +477,15 @@ Vue.component('variables', {
                 vm.editVariable(newIdx);
             })
             .catch(function (error) {
-                alert(vm.$t("error_deleting_variables"));
+                if (error.response && error.response.data && error.response.data.message){
+                    alert(vm.$t("error_deleting_variables") + ": " + error.response.data.message);
+                }else{
+                    alert(vm.$t("error_deleting_variables"));
+                }
                 console.log("error deleting variables",error);
             });
         },
+        
         variableSelectedCount: function()
         {
             return this.edit_items.length;
