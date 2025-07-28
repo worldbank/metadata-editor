@@ -224,5 +224,22 @@ $lang['Variables']="Variables";
 $lang['Delete']="Supprimer";
 $lang['processing_please_wait']="Traitement en cours, veuillez patienter...";
 
+$lang['multiple_selected']="Sélection multiple";
+$lang['updating_progress']="Mise à jour {current} sur {total}";
+$lang['untitled']="sans titre";
+$lang['confirm_delete_variables']="Supprimer les variable(s) sélectionnée(s) ?";
+$lang['error_deleting_variables']="Erreur lors de la suppression des variables";
+$lang['duplicate_variables_count']="{count} doublons";
+$lang['character_variable_cannot_be_weighted']="La variable {variable_name} est de type caractère et ne peut pas être pondérée.";
+$lang['system_missing']="Manquant système";
+$lang['settings']="Paramètres";
+$lang['value']="Valeur";
+$lang['label']="Étiquette";
+$lang['numeric']="Numérique";
+$lang['fixed_string']="Chaîne fixe";
+$lang['create_categories']="Créer des catégories";
+$lang['clear_all']="Tout effacer";
+$lang['is_key_variable']="Est-ce une variable clé ?";
+
 /* End of file template_manager_lang.php */
 /* Location: ./application/language/base/template_manager_lang.php */

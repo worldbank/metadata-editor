@@ -313,5 +313,22 @@ $lang['Variables']="Variables";
 $lang['Delete']="Delete";
 $lang['processing_please_wait']="Processing, please wait...";
 
+$lang['multiple_selected']="Multiple selected";
+$lang['updating_progress']="Updating {current} of {total}";
+$lang['untitled']="untitled";
+$lang['confirm_delete_variables']="Delete selected variable(s)?";
+$lang['error_deleting_variables']="Error deleting variables";
+$lang['duplicate_variables_count']="{count} duplicates";
+$lang['character_variable_cannot_be_weighted']="Variable {variable_name} is a character type and cannot be weighted.";
+$lang['system_missing']="System missing";
+$lang['settings']="Settings";
+$lang['value']="Value";
+$lang['label']="Label";
+$lang['numeric']="Numeric";
+$lang['fixed_string']="Fixed string";
+$lang['create_categories']="Create categories";
+$lang['clear_all']="Clear all";
+$lang['is_key_variable']="Is key variable?";
+
 /* End of file project_lang.php */
 /* Location: ./application/language/base/project_lang.php */

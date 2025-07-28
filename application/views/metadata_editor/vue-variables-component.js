@@ -24,7 +24,7 @@ Vue.component('variables', {
             variableMultipleTemplate:{
                 "name": "NaN",
                 "fid":"",
-                "labl": "Multiple selected",
+                "labl": this.$t("multiple_selected"),
                 "var_valrng": {
                   "range": {                    
                   }
@@ -83,7 +83,8 @@ Vue.component('variables', {
             summaryStatsDialog:{
                 show:false                
             },
-            has_clicked_edit:true //to ignore watch from triggering on editVariable click
+            has_clicked_edit:true, //to ignore watch from triggering on editVariable click
+            is_initializing_multi:false //to ignore watch from triggering during multi-variable initialization
             
         }
     }, 
@@ -106,32 +107,39 @@ Vue.component('variables', {
                 }
 
                 if (this.has_clicked_edit){
-                    //console.log("user has clicked on a row",this.has_clicked_edit);
                     this.has_clicked_edit=false;
                     return;
                 }
 
-                //console.log("changes detected",JSON.stringify(val));
-                //console.log("old values",JSON.stringify(oldVal));
+                //don't save initializing multi-variable selection
+                if (this.is_initializing_multi){
+                    //console.log("Blocking save during multi-variable initialization");
+                    return;
+                }
+
+                //don't save if val is null/undefined
+                if (!val){
+                    return;
+                }
 
                 if (this.variableSelectedCount()>1){
-                    //console.log("multiple variables selcted", this.selectedVariables);
-                    if (JSON.stringify(val)==JSON.stringify(this.variableMultipleTemplate)){
+                    //console.log("multiple variables selected", this.selectedVariables.length);
+                    // For multi-variable, check if any actual changes were made
+                    if (this.hasMultiVariableDataChanged(val)) {
+                        //console.log("multi-variable CHANGE DETECTED");
+                        this.saveVariableDebounce(val);
+                    } else {
                         //console.log("multi-variable no change detected");
-                    }
-                    else{
-                      //console.log("multi-variable CHANGE DETECTED",val);
-                      this.saveVariableDebounce(val);
                     }
                     return;
                 }
 
+              // For single variable, compare with the original copy
               if (JSON.stringify(val)==JSON.stringify(this.variable_copy)){
-                  //console.log("no change detected");
+                  //console.log("no change detected for single variable");
               }
               else{                
-                if (!val){return;}
-                //console.log("CHANGE DETECTED saving variable",JSON.stringify(val),JSON.stringify(oldVal));
+                //console.log("CHANGE DETECTED saving single variable");
                 this.saveVariableDebounce(val);                
               }
             }
@@ -203,7 +211,7 @@ Vue.component('variables', {
                     }
                 }
 
-                this.changeCaseUpdateStatus="Updating " + (i + 1) + " of " + var_count;
+                this.changeCaseUpdateStatus=this.$t("updating_progress", {current: i + 1, total: var_count});
                 this.saveVariable(this.variables[i]);
             }
 
@@ -237,6 +245,8 @@ Vue.component('variables', {
                 }
             }
             if(this.edit_items.length>1){
+                this.page_action="edit";
+                this.has_clicked_edit=true;
                 this.initializeMultiVariable();
             }
         },
@@ -275,8 +285,8 @@ Vue.component('variables', {
                     "sid": this.dataset_id,
                     "file_id": this.fid,
                     "fid":this.fid,
-                    "name": "untitled",
-                    "labl": "untitled",
+                    "name": this.$t("untitled"),
+                    "labl": this.$t("untitled"),
                     "var_format":{
                         "type":''
                     },
@@ -321,15 +331,18 @@ Vue.component('variables', {
 
                         if (field_name=='sum_stats_options'){
                             let sum_stats_options_={}
-                            //Vue.set(variable_,'sum_stats_options',JSON.parse(JSON.stringify(this.variableMultiple[field_name])));
                             sum_stats_keys=Object.keys(this.variableMultiple[field_name]);
+                            console.log("Processing sum_stats_options for variable", variable_.name, "keys:", sum_stats_keys);
                             for(s=0;s<sum_stats_keys.length;s++){
                                 sum_stats_key=sum_stats_keys[s];
-                                if (this.variableMultiple[field_name][sum_stats_key]==true || this.variableMultiple[field_name][sum_stats_key]==false){
+                                // Only copy non-null values (null means the values differ across variables)
+                                if (this.variableMultiple[field_name][sum_stats_key] !== null){
                                     sum_stats_options_[sum_stats_key]=this.variableMultiple[field_name][sum_stats_key];
+                                    console.log("Copying", sum_stats_key, "=", this.variableMultiple[field_name][sum_stats_key]);
+                                } else {
+                                    console.log("Skipping", sum_stats_key, "because it's null (values differ across variables)");
                                 }
                             }
-                            //variable_.sum_stats_options=sum_stats_options_;
                             Vue.set(variable_,'sum_stats_options',JSON.parse(JSON.stringify(sum_stats_options_)));
                         }
                         else{
@@ -365,7 +378,6 @@ Vue.component('variables', {
 
             //single variable
             this.saveVariable(data);
-            this.variable_copy=_.cloneDeep(this.variables[this.edit_item]);
         }, 500),
         saveVariable: function(data){///_.debounce(function(data) {
             vm=this;
@@ -376,6 +388,10 @@ Vue.component('variables', {
             .then(function (response) {
                 //console.log("saveVariable", response);
                 EventBus.$emit('onSuccess', 'Variable saved!');
+                // Update variable_copy only after successful save
+                if (vm.edit_items.length === 1) {
+                    vm.variable_copy = _.cloneDeep(vm.variables[vm.edit_items[0]]);
+                }
             })
             .catch(function (error) {
                 console.log(error);
@@ -401,7 +417,18 @@ Vue.component('variables', {
             this.edit_items=[];
         },
         hasDataChanged: function(){
-            return JSON.stringify(this.variables[this.edit_item])!==JSON.stringify(this.variable_copy);
+            if (this.edit_items.length === 0) return false;
+            return JSON.stringify(this.variables[this.edit_items[0]])!==JSON.stringify(this.variable_copy);
+        },
+        hasMultiVariableDataChanged: function(val) {
+            // Check if any of the editable fields have been modified from template
+            for (let field of this.variableMultipleUpdateFields) {
+                if (val[field] !== null && val[field] !== undefined && 
+                    JSON.stringify(val[field]) !== JSON.stringify(this.variableMultipleTemplate[field])) {
+                    return true;
+                }
+            }
+            return false;
         },
         titleCase: function(str) {
             return str.replace(
@@ -413,7 +440,7 @@ Vue.component('variables', {
         },        
         deleteVariable: function()
         {
-            if (!confirm("Delete selected variable(s)?")){
+            if (!confirm(this.$t("confirm_delete_variables"))){
                 return;
             }
 
@@ -450,7 +477,7 @@ Vue.component('variables', {
                 vm.editVariable(newIdx);
             })
             .catch(function (error) {
-                alert("Error deleting variables");
+                alert(vm.$t("error_deleting_variables"));
                 console.log("error deleting variables",error);
             });
         },
@@ -469,6 +496,9 @@ Vue.component('variables', {
         },
         //on selection of multiple variables
         initializeMultiVariable: function(){
+            console.log("Initializing multi-variable selection");
+            this.is_initializing_multi = true;
+            
             this.variableMultiple=JSON.parse(JSON.stringify(this.variableMultipleTemplate));
 
             //console.log("initializeMultiVariable", this.variableMultiple);
@@ -484,7 +514,17 @@ Vue.component('variables', {
                 let field=fields[i];
                 //check if property is set for the first variable
                 if (first_variable[field]){
-                    this.variableMultiple[field]=first_variable[field];
+                    if (field === "sum_stats_options") {
+                        // Deep copy sum_stats_options to avoid reference issues
+                        if (first_variable[field]) {
+                            this.variableMultiple[field] = JSON.parse(JSON.stringify(first_variable[field]));
+                        } else {
+                            // If first variable doesn't have sum_stats_options, use template
+                            this.variableMultiple[field] = JSON.parse(JSON.stringify(this.variableMultipleTemplate[field]));
+                        }
+                    } else {
+                        this.variableMultiple[field] = first_variable[field];
+                    }
                 }        
             }
 
@@ -499,11 +539,21 @@ Vue.component('variables', {
                     let field=fields[k];
                     console.log("field",field);
                     if (field=="sum_stats_options"){
-                        //this.variableMultiple[field]=this.compareObjects(this.variableMultiple[field],variable[field]);                    
-                        for(p=0;p<sum_stats_props;p++){
-                            if (this.variableMultiple[field][sum_stats_props[p]]!==variable[field][sum_stats_props[p]]){
-                                this.variableMultiple[field][sum_stats_props[p]]=null;
+                        // Check if both variables have sum_stats_options
+                        if (variable[field] && this.variableMultiple[field]) {
+                            for(p=0;p<sum_stats_props.length;p++){
+                                let prop_name = sum_stats_props[p];
+                                // Compare values, handling undefined/null cases
+                                let current_val = this.variableMultiple[field][prop_name];
+                                let compare_val = variable[field][prop_name];
+                                
+                                if (current_val !== compare_val){
+                                    this.variableMultiple[field][prop_name] = null;
+                                }
                             }
+                        } else {
+                            // If one doesn't have sum_stats_options, set to null
+                            this.variableMultiple[field] = null;
                         }
                     }
                     else {
@@ -514,6 +564,12 @@ Vue.component('variables', {
                     }
                 }
             }
+
+            // Clear the flag after initialization is complete
+            this.$nextTick(() => {
+                console.log("Multi-variable initialization complete");
+                this.is_initializing_multi = false;
+            });
 
         },        
         variableActiveClass: function(idx,variable_name)
@@ -841,7 +897,7 @@ Vue.component('variables', {
                                     <div class="float-right" >
                                     
                                         <span v-if="duplicateVariableNamesCount>0">
-                                            <v-icon :title="duplicateVariableNamesCount + ' duplicates'" aria-hidden="false" class="var-icon" style="color:red">mdi-alert-box</v-icon>                                            
+                                            <v-icon :title="$t('duplicate_variables_count', {count: duplicateVariableNamesCount})" aria-hidden="false" class="var-icon" style="color:red">mdi-alert-box</v-icon>                                            
                                         </span>
 
                                         <span v-show="edit_items.length>0">

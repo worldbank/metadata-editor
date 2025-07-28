@@ -5,18 +5,18 @@ Vue.component('variable-info', {
         return {   
             //variable:this.value,            
             variable_formats:{
-                "numeric": "Numeric",
-                "character": "String",
-                "fixed": "Fixed string"
+                "numeric": this.$t("numeric"),
+                "character": this.$t("string"),
+                "fixed": this.$t("fixed_string")
             },
             variable_intervals:{
-                "contin": "Continuous",
-                "discrete": "Discrete"
+                "contin": this.$t("contin"),
+                "discrete": this.$t("discrete")
             },
             missing_template:[
                 {
                     "key": "value",
-                    "title": "Value",
+                    "title": this.$t("value"),
                     "type": "text"
                 }
             ],

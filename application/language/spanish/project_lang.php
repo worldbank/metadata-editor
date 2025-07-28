@@ -301,5 +301,22 @@ $lang['Variables']="Variables";
 $lang['Delete']="Eliminar";
 $lang['processing_please_wait']="Procesando, por favor espera...";
 
+$lang['multiple_selected']="Múltiple seleccionado";
+$lang['updating_progress']="Actualizando {current} de {total}";
+$lang['untitled']="sin título";
+$lang['confirm_delete_variables']="¿Eliminar variable(s) seleccionada(s)?";
+$lang['error_deleting_variables']="Error al eliminar variables";
+$lang['duplicate_variables_count']="{count} duplicados";
+$lang['character_variable_cannot_be_weighted']="La variable {variable_name} es de tipo carácter y no puede ser ponderada.";
+$lang['system_missing']="Faltante del sistema";
+$lang['settings']="Configuración";
+$lang['value']="Valor";
+$lang['label']="Etiqueta";
+$lang['numeric']="Numérico";
+$lang['fixed_string']="Cadena fija";
+$lang['create_categories']="Crear categorías";
+$lang['clear_all']="Limpiar todo";
+$lang['is_key_variable']="¿Es variable clave?";
+
 /* End of file project_lang.php */
 /* Location: ./application/language/base/project_lang.php */

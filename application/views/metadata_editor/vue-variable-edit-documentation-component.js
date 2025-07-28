@@ -215,7 +215,7 @@ Vue.component('variable-edit-documentation', {
                         :mini-variant.sync="drawer_mini" permanent bottom>
                         <v-list-item class="px-2">
                             <v-app-bar-nav-icon></v-app-bar-nav-icon>
-                                <v-list-item-title>Settings</v-list-item-title>                            
+                                <v-list-item-title>{{$t('settings')}}</v-list-item-title>                            
                                 <v-btn icon @click.stop="drawer_mini = !drawer_mini">
                                     <v-icon>mdi-chevron-left</v-icon>
                                 </v-btn>

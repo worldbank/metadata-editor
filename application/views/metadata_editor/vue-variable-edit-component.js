@@ -256,7 +256,7 @@ Vue.component('variable-edit', {
                 if (this.variable.var_format && this.variable.var_format.type){
                     if (this.variable.var_format.type=='character'){
                         Vue.delete(this.variable, 'var_wgt_id');
-                        alert("Variable " + this.variable.name + " is a character type and cannot be weighted.");                        
+                        alert(this.$t('character_variable_cannot_be_weighted', {variable_name: this.variable.name}));                        
                         return;
                     }
                 }
@@ -421,9 +421,9 @@ Vue.component('variable-edit', {
             <v-tabs v-model="active_tab">
                 <v-tab key="statistics" href="#statistics">{{$t('statistics')}}</v-tab>
                 <v-tab key="weights" href="#weights">
-                    Weights <span v-if="variable.var_wgt_id"><v-icon style="color:green;">mdi-circle-medium</v-icon></span></v-tab>
+                    {{$t('weights')}} <span v-if="variable.var_wgt_id"><v-icon style="color:green;">mdi-circle-medium</v-icon></span></v-tab>
                 <v-tab key="documentation" href="#documentation">{{$t('documentation')}}</v-tab>
-                <v-tab key="json" href="#json">JSON</v-tab>
+                <v-tab key="json" href="#json">{{$t('json')}}</v-tab>
 
                 <v-tab-item key="statistics" value="statistics">
                 
@@ -492,7 +492,7 @@ Vue.component('variable-edit', {
                                     </td>
                                 </tr>
                                 <tr v-if="variableStatsInValidCount(variable)>0 && Variable.sum_stats_options.missing">
-                                    <td>{{$t('sysmiss')}}</td>
+                                    <td>{{$t('system_missing')}}</td>
                                     <td></td>                                    
                                     <td>{{variableStatsInValidCount(variable)}}</td>
                                     <td v-if="isWeighted"></td>

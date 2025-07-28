@@ -7,19 +7,19 @@ Vue.component('variable-categories', {
             catgry_columns:[
                 {
                     "key": "value",
-                    "title": "Value",
+                    "title": this.$t("value"),
                     "type": "text",
                     "is_unique": true
                 },
                 {
                     "key": "labl",
-                    "title": "Label",
+                    "title": this.$t("label"),
                     "type": "text"
                 }
             ],
             variable_formats:{
-                "numeric": "Numeric",
-                "fixed": "Fixed string"
+                "numeric": this.$t("numeric"),
+                "fixed": this.$t("fixed_string")
             }
         }
     },
@@ -129,8 +129,8 @@ Vue.component('variable-categories', {
                         <strong>{{GetFieldTitle('variable.var_catgry',$t("categories"))}}</strong> <span v-if="variable.var_catgry && variable.var_catgry.length>0"><span class="badge badge-light">{{variable.var_catgry.length}}</span></span>
 
                         <div class="float-right">                           
-                            <span title="Create categories" @click="refreshCategories"><v-icon aria-hidden="false" class="var-icon">mdi-update</v-icon></span>
-                            <span title="Clear all" @click="clearCategories"><v-icon aria-hidden="false" class="var-icon">mdi-table-remove</v-icon></span>                                                                                
+                            <span :title="$t('create_categories')" @click="refreshCategories"><v-icon aria-hidden="false" class="var-icon">mdi-update</v-icon></span>
+                            <span :title="$t('clear_all')" @click="clearCategories"><v-icon aria-hidden="false" class="var-icon">mdi-table-remove</v-icon></span>                                                                                
                         </div>
                         </div>
                     </div>
