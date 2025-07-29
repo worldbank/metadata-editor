@@ -24,7 +24,7 @@ Vue.component('vue-project-share', {
             ],
         }
     },
-    created:function(){
+    mounted:function(){
         this.loadProjectUsers();
     },
     watch:{
@@ -52,6 +52,10 @@ Vue.component('vue-project-share', {
             }
         },
         loadProjectUsers: function(){
+            if (!this.project_id){
+                return;
+            }
+
             let vm = this;
             let url = CI.site_url + '/api/share/list/' + this.project_id;
             axios.get(url)

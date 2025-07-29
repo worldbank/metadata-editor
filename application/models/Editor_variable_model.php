@@ -555,6 +555,8 @@ class Editor_variable_model extends ci_model {
      */
     public function insert($sid,$options)
     {
+        $this->Editor_model->check_project_editable($sid);
+
         foreach($options as $key=>$value){
             if(!in_array($key,$this->fields)){
                 unset($options[$key]);
@@ -576,7 +578,9 @@ class Editor_variable_model extends ci_model {
     }
 
     public function update($sid,$uid,$options)
-    {
+    {        
+        $this->Editor_model->check_project_editable($sid);
+
         foreach($options as $key=>$value){
             if(!in_array($key,$this->fields)){
                 unset($options[$key]);

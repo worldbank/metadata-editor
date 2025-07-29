@@ -249,41 +249,50 @@ class Project_json_writer
 			}
 		}
 
-		//keep only enabled summary statistics (if sum_stats_options is set)
-		if (count($sum_stats_enabled_list) > 0){			
-			if (isset($variable['metadata']['var_sumstat']) && is_array($variable['metadata']['var_sumstat']) ){
+		//handle summary statistics - remove all if no options set, or filter by enabled options
+		if (isset($variable['metadata']['var_sumstat']) && is_array($variable['metadata']['var_sumstat']) ){
+			if (count($sum_stats_enabled_list) > 0){
+				//filter by enabled options
 				foreach($variable['metadata']['var_sumstat'] as $idx=>$sumstat){
 					if (!in_array($sumstat['type'], $sum_stats_enabled_list)){
 						unset($variable['metadata']['var_sumstat'][$idx]);
 					}
 				}
-				//fix to get a JSON array instead of Object
+			} else {
+				//remove all summary statistics if no options are set
+				unset($variable['metadata']['var_sumstat']);
+			}
+			//fix to get a JSON array instead of Object (only if var_sumstat still exists)
+			if (isset($variable['metadata']['var_sumstat'])){
 				$variable['metadata']['var_sumstat']=array_values((array)$variable['metadata']['var_sumstat']);
 			}
 		}
 
 		//value ranges [counts, min, max] - remove min and max if not enabled
 		if (isset($variable['metadata']['var_valrng']['range']) && is_array($variable['metadata']['var_valrng']['range']) ){
-			foreach($variable['metadata']['var_valrng']['range'] as $range_key=>$range){
-				//only check for min and max
-				if (!in_array($range_key, array("min", "max"))){
-					continue;
-				}
-
-				if (count($sum_stats_enabled_list) > 0){	
+			if (count($sum_stats_enabled_list) > 0){
+				//filter by enabled options
+				foreach($variable['metadata']['var_valrng']['range'] as $range_key=>$range){
+					//only check for min and max
+					if (!in_array($range_key, array("min", "max"))){
+						continue;
+					}
 					if (!in_array($range_key, $sum_stats_enabled_list)){
 						unset($variable['metadata']['var_valrng']['range'][$range_key]);
 					}
 				}
+			} else {
+				//remove all range statistics if no options are set
+				unset($variable['metadata']['var_valrng']['range']);
 			}
 		}
 
-		if (count($sum_stats_enabled_list) > 0){	
-			//remove category freq if not enabled
-			if (!in_array('freq', $sum_stats_enabled_list)){
-				if (isset($variable['metadata']['var_catgry']) && is_array($variable['metadata']['var_catgry']) ){
+		//handle category frequency statistics
+		if (isset($variable['metadata']['var_catgry']) && is_array($variable['metadata']['var_catgry']) ){
+			if (count($sum_stats_enabled_list) > 0){
+				//remove category freq if not enabled
+				if (!in_array('freq', $sum_stats_enabled_list)){
 					foreach($variable['metadata']['var_catgry'] as $idx=>$cat){
-
 						//remove freq if not enabled
 						if (isset($cat['stats']) && is_array($cat['stats']) ){
 							foreach($cat['stats'] as $stat_idx=>$stat){
@@ -292,6 +301,13 @@ class Project_json_writer
 								}
 							}						
 						}
+					}
+				}
+			} else {
+				//remove all category statistics if no options are set
+				foreach($variable['metadata']['var_catgry'] as $idx=>$cat){
+					if (isset($cat['stats']) && is_array($cat['stats']) ){
+						unset($variable['metadata']['var_catgry'][$idx]['stats']);
 					}
 				}
 			}
@@ -317,6 +333,16 @@ class Project_json_writer
 		//var_wgt_id field - replace UID with VID
 		if (isset($variable['metadata']['var_wgt_id']) && $variable['metadata']['var_wgt_id']!==''){
 			$variable['metadata']['var_wgt_id']=$this->ci->Editor_variable_model->vid_by_uid($sid,$variable['metadata']['var_wgt_id']);
+		}
+
+		//remove update_required field
+		if (isset($variable['metadata']['update_required'])){
+			unset($variable['metadata']['update_required']);
+		}
+
+		//remove sum_stats_options
+		if (isset($variable['metadata']['sum_stats_options'])){
+			unset($variable['metadata']['sum_stats_options']);
 		}
 
 		array_remove_empty($variable);

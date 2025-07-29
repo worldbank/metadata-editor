@@ -41,7 +41,8 @@ class Projects extends MY_Controller {
 				show_error('Project was not found');
 			}
 
-			$this->editor_acl->user_has_project_access($project['id'],$permission='view');
+			$project_id=isset($project['pid']) ? $project['pid'] : $project['id'];
+			$this->editor_acl->user_has_project_access($project_id,$permission='view');
 			$schema_path="application/schemas/{$project['type']}-schema.json";
 
 			if(!file_exists($schema_path)){
@@ -174,6 +175,12 @@ class Projects extends MY_Controller {
 	{
 		try{
 			$this->editor_acl->user_has_project_access($sid,$permission='edit');
+			
+			//locked?
+			if ($this->Editor_model->is_project_locked($sid)) {
+				return false;
+			}
+			
 			return true;
 		}
 		catch(Exception $e){

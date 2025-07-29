@@ -3,7 +3,7 @@
     <div class="pl-2" style="overflow:hidden;min-height:35px;margin-right:40px;">
         <div style="font-size:20px;" :title="Title" class="wrap-text">
             <v-icon style="font-size:x-large;">{{project_types_icons[dataset_type]}}</v-icon>
-            <strong>{{Title}}</strong>
+            <strong>{{Title}}</strong>            
         </div>
         <!--<div>{{ProjectMetadata.idno}} </div>-->        
     </div>
@@ -56,11 +56,11 @@
             <v-btn
                 color="red"
                 dark
-                   
                 outlined             
                 >
-                <v-icon left>mdi-content-save-off</v-icon>
-                {{$t('READ ONLY')}}
+                <v-icon left>mdi-lock</v-icon>
+                <span v-if="ProjectIsLocked">{{$t('locked')}}</span>
+                <span v-else>{{$t('read_only')}}</span>
             </v-btn>
         </template>
 

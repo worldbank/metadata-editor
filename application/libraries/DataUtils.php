@@ -273,82 +273,6 @@ class DataUtils
 	}
 
 
-	/**
-	 * 
-	 * 
-	 * Generate data dictionary from Data (SPSS, Stata, etc)
-	 * @filename - data file name
-	 * 
-	 */
-	public function generate_data_dictionary($sid=null,$filename=null)
-	{
-		$datafile_info=$this->ci->Editor_model->data_file_by_name($sid,$filename);
-
-		if ($datafile_info){
-			throw new Exception("Data file already exists: ".$filename);
-		}
-
-		//generate a new file ID e.g. F1...
-		$fileid=$this->ci->Editor_model->data_file_generate_fileid($sid);
-
-		//file type 
-		$filetype=$this->get_file_extension($filename);
-
-		if (!$this->is_allowed_data_type($filetype)){
-			throw  new Exception("Invalid data file type");
-		}			
-
-		$project_folder=$this->ci->Editor_model->get_project_folder($sid);
-	
-		if (!file_exists($project_folder)){
-			throw new Exception('PROJECT_FOLDER_NOT_FOUND: '. $project_folder);
-		}
-
-		$project_folder=realpath($project_folder);
-		$data_file_path=$project_folder.'/data/'.$filename;
-
-		if (!file_exists($data_file_path)){
-			throw new Exception("DATA_FILE_NOT_FOUND: ".$data_file_path);
-		}
-
-		$client = new Client([
-			'base_uri' => 'http://localhost:2121/ocpu/library/nadar/R/datafile_dictionary/json?force=true&auto_unbox=true&digits=22'
-		]);
-		
-		$request_body=[
-			"freqLimit"=>50,
-			"fileId"=>$fileid,
-			"type"=>$filetype,
-			"filepath"=> $data_file_path
-		];
-			
-		$api_response = $client->request('POST', '', [
-			//'auth' => [$username, $password],
-			'json' => 
-				$request_body
-			,
-			['debug' => false]
-		]);
-
-		$response=json_decode($api_response->getBody()->getContents(),true);
-
-		if (isset($response["result"]) && $response["result"]=="error"){
-			throw new Exception($response["message"]);
-		}
-
-		$response=array_merge(array(
-			'status'=>'success',
-			'folder_path'=>$project_folder,
-			'file_id'=>$fileid,
-			//'options'=>$body_options,
-			'code' => $api_response->getStatusCode(),// 200
-			'reason' => $api_response->getReasonPhrase() // OK
-		), $response);
-
-		return $response;		
-	}
-
-
 	function get_file_extension($name)
 	{		
 		$file_info=pathinfo($name);
@@ -385,16 +309,16 @@ class DataUtils
 	{
 		$options=array(
 			'file_id'=>$fileid,
-			'file_url'=>$filename,
-			'file_name'=>$this->ci->Editor_model->data_file_filename_part($filename)
+			'file_physical_name'=>$filename,
+			'file_name'=>$this->ci->Editor_datafile_model->data_file_filename_part($filename)
 		);
 
-		$data_file=$this->ci->Editor_model->data_file_by_name($sid,$options['file_name']);
+		$data_file=$this->ci->Editor_datafile_model->data_file_by_name($sid,$options['file_name']);
 
 		if (!$data_file){
-			$this->ci->Editor_model->data_file_insert($sid,$options);
+			$this->ci->Editor_datafile_model->data_file_insert($sid,$options);
 		}else{
-			$this->ci->Editor_model->data_file_update($data_file["id"],$options);
+			$this->ci->Editor_datafile_model->data_file_update($data_file["id"],$options);
 		}
 	}
 

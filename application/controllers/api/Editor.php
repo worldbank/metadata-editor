@@ -123,6 +123,9 @@ class Editor extends MY_REST_Controller
 	 * 
 	 * Get a single dataset
 	 * 
+	 * @params - querystring: version
+	 * 
+	 * 
 	 */
 	function single_get($sid=null)
 	{
@@ -130,11 +133,22 @@ class Editor extends MY_REST_Controller
 			$sid=$this->get_sid($sid);
 			$this->editor_acl->user_has_project_access($sid,$permission='view',$this->api_user);
 
+			$version_id=$this->input->get("version");
+			if ($version_id){
+				$version_sid=$this->Editor_model->find_version_by_number($sid, $version_id);
+				if ($version_sid){
+					$sid=$version_sid;
+				}
+				else{
+					throw new Exception("VERSION_NOT_FOUND");
+				}
+			}
+
 			$result=$this->Editor_model->get_row($sid);
 			array_walk($result, 'unix_date_to_gmt_row',array('created','changed'));
 				
 			if(!$result){
-				throw new Exception("DATASET_NOT_FOUND");
+				throw new Exception("PROJECT_NOT_FOUND");
 			}
 
 			$response=array(
@@ -726,6 +740,7 @@ class Editor extends MY_REST_Controller
 	 * Download project metadata as JSON
 	 * 
 	 * @exclude_private_fields - exclude private fields - 0 = include, 1 = exclude
+	 * @querystring params - version
 	 * 
 	 */
 	function json_get($sid=null,$exclude_private_fields=0)
@@ -741,6 +756,17 @@ class Editor extends MY_REST_Controller
 			$exclude_private_fields=0;
 			$inc_ext_resources=0;
 			$inc_adm_meta=0;
+
+			$version_id=$this->input->get("version");
+			if ($version_id){
+				$version_sid=$this->Editor_model->find_version_by_number($sid, $version_id);
+				if ($version_sid){
+					$sid=$version_sid;
+				}
+				else{
+					throw new Exception("VERSION_NOT_FOUND");
+				}
+			}
 
 			if ((int)$this->input->get("exclude_private_fields")===1){
 				$exclude_private_fields=1;
@@ -771,7 +797,11 @@ class Editor extends MY_REST_Controller
 			die();
 		}
 		catch(Exception $e){
-			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
+			$output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($output, REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
 
@@ -1402,6 +1432,67 @@ class Editor extends MY_REST_Controller
 		}
 		catch(Exception $e){
 			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * 
+	 * Get project lock status
+	 * 
+	 */
+	function lock_status_get($sid=null)
+	{
+		try{
+			$sid=$this->get_sid($sid);
+			$this->editor_acl->user_has_project_access($sid,$permission='view',$this->api_user);
+
+			$is_locked = $this->Editor_model->is_project_locked($sid);
+			$project_info = $this->Editor_model->get_basic_info($sid);
+				
+			if(!$project_info){
+				throw new Exception("DATASET_NOT_FOUND");
+			}
+
+			$response=array(
+				'status'=>'success',
+				'is_locked'=>$is_locked,
+				'project_id'=>$sid,
+				'project_title'=>$project_info['title'],
+				'project_idno'=>$project_info['idno']
+			);			
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	// get project version notes from metadata field
+	function metadata_version_notes_get($sid=null)
+	{
+		try{
+			$sid=$this->get_sid($sid);
+			$this->editor_acl->user_has_project_access($sid,$permission='view',$this->api_user);
+
+			$version_notes=$this->Editor_model->get_metadata_version_notes($sid);
+
+			$response=array(
+				'status'=>'success',
+				'version_notes'=>$version_notes
+			);
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
 

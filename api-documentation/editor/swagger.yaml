@@ -213,10 +213,44 @@ paths:
       parameters:
         - name: id
           in: path
-          title: Study unique ID
-          description: Study unique ID number
+          title: Project unique ID
+          description: Project unique ID number
           type: string
           required: true
+        - name: version
+          in: query
+          title: Version number
+          description: Get project by specific version number (e.g. 1.0.0)
+          type: string
+          required: false
+      responses:
+        '200':
+          description: successful operation
+
+  /editor/json{id}:
+    get:
+      tags:
+        - Projects
+      summary: Get project JSON
+      description: "Get study level metadata for a project as JSON"
+      operationId: singleProjectJSON
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: id
+          in: path
+          title: Project unique ID
+          description: Project unique ID number
+          type: string
+          required: true
+        - name: version
+          in: query
+          title: Version number
+          description: Get project by specific version number (e.g. 1.0.0)
+          type: string
+          required: false
       responses:
         '200':
           description: successful operation
@@ -1805,6 +1839,104 @@ paths:
         security:
           - ApiKeyAuth: []
 
+  /versions/{id}:
+      get:
+        tags:
+          - Projects
+        summary: Get project versions
+        description: Get a list of versions for a project
+        operationId: getProjectVersions
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "id"
+            type: string
+            description: Project ID or IDNO
+            required: true
+          - name: version
+            in: query
+            title: Version number
+            description: Get project by specific version number (e.g. 1.0.0)
+            type: string
+            required: false
+        responses:
+          '200':
+            description: successful operation
+        security:
+          - ApiKeyAuth: []
+
+  /versions/create:
+      post:
+        tags:
+          - Projects
+        summary: Create project version
+        description: Create a new version for a project
+        operationId: createProjectVersion
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/CreateProjectVersion"
+        responses:
+          '200':
+            description: successful operation
+        security:
+          - ApiKeyAuth: []
+
+  /versions/delete:
+      post:
+        tags:
+          - Projects
+        summary: Delete project version
+        description: Delete a version for a project
+        operationId: deleteProjectVersion
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/DeleteProjectVersion"
+        responses:
+          '200':
+            description: successful operation
+        security:
+          - ApiKeyAuth: []
+
+  /versions/delete_by_id:
+      post:
+        tags:
+          - Projects
+        summary: Delete project version by ID
+        description: Delete a version for a project by ID
+        operationId: deleteProjectVersionById
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/DeleteProjectVersionById"
+        responses:
+          '200':
+            description: successful operation
+        security:
+          - ApiKeyAuth: []
+
 
   /catalog-connections:
       get:
@@ -2292,6 +2424,63 @@ definitions:
         description: Catalog connection ID
     xml:
       name: CatalogConnectionDelete
+
+  CreateProjectVersion:
+    type: object
+    required:
+      - id
+      - version_type
+      - version_notes
+    properties:
+      id:
+        type: string
+        required: true
+        description: Project ID or IDNO
+      version_type:
+        type: string
+        required: true
+        description: Type of version to create
+        enum:
+          - major
+          - minor
+          - patch
+      version_notes:
+        type: string
+        required: true
+        description: Notes describing the version
+    xml:
+      name: CreateProjectVersion
+
+  DeleteProjectVersion:
+      type: object
+      required:
+        - id
+        - version
+      properties:
+        id:
+          type: string
+          required: true
+          description: Project ID or IDNO for the main project
+        version:
+          type: string
+          required: true
+          description: Version number to delete (e.g. 1.0.0)
+          
+      xml:
+        name: DeleteProjectVersion
+
+  DeleteProjectVersionById:
+    type: object
+    required:
+      - id
+      - version
+    properties:
+      id:
+        type: string
+        required: true
+        description: Project ID or IDNO for the version to delete      
+    xml:
+      name: DeleteProjectVersionById
       
 
   

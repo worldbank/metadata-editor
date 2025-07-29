@@ -38,6 +38,9 @@ Vue.component('summary-component', {
         projectTemplateUID(){
             return this.$store.state.formTemplate.uid;
         },
+        ProjectVersionInfo(){
+            return this.$store.state.project_version_info;
+        },
         projectTemplateSelectedIndex: {
             get: function () {
                 if (this.template_idx>-1){
@@ -169,6 +172,12 @@ Vue.component('summary-component', {
                                     <div class="mb-3">
                                         <strong>{{$t("Changed on")}}:</strong>
                                         <div>{{momentDate(project_edit_stats.changed)}}</div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <strong>{{$t("Version")}}:</strong>
+                                        <div v-if="ProjectVersionInfo && ProjectVersionInfo.version_number">{{ProjectVersionInfo.version_number}}</div>
+                                        <div v-else>{{$t('latest')}}</div>
                                     </div>
                                     
                                 </div>

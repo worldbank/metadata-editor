@@ -355,6 +355,8 @@
                     "F1":{}
                 },
                 project_isloading:false,
+                project_is_locked:false,
+                project_version_info:null,
                 variables_loaded:false,
                 variables_isloading:false,
                 variables_active_tab:"documentation",                
@@ -407,6 +409,12 @@
             getters: {
                 getUserHasEditAccess(state){
                     return state.user_has_edit_access;
+                },
+                getProjectIsLocked(state){
+                    return state.project_is_locked;
+                },
+                getProjectVersionInfo(state){
+                    return state.project_version_info;
                 },
                 getIDNO(state){
                     return state.idno;
@@ -576,6 +584,18 @@
                                 if (response.data.project.study_idno){
                                     store.state.metadata_idno=response.data.project.study_idno;
                                 }
+                                
+                                if (response.data.project.is_locked){
+                                    store.state.project_is_locked=response.data.project.is_locked;
+                                }
+
+                                store.state.project_version_info={
+                                    version_number:response.data.project.version_number,
+                                    version_created:response.data.project.version_created,
+                                    version_notes:response.data.project.version_notes,
+                                    version_created_by:response.data.project.version_created_by
+                                }
+                                
                             }else{
                                 alert("Error reading project metadata");
                                 console.log("Error reading project metadata",response.data);

@@ -20,6 +20,19 @@ class Editor_acl
 	}
 
 
+	function get_project_main_id($project_id)
+	{
+		$this->ci->db->select("pid");
+		$this->ci->db->where("id",$project_id);
+		$project=$this->ci->db->get("editor_projects")->row_array();
+		
+		if ($project && $project['pid'] && $project['pid'] != 0 && $project['pid'] != $project_id) {
+			return $project['pid'];
+		}
+
+		return $project_id;
+	}
+
 
 	function user_has_project_access($project_id,$permission=null,$user=null)
 	{
@@ -32,6 +45,8 @@ class Editor_acl
 			return true;
 		}
 
+		$project_id=$this->get_project_main_id($project_id);
+		
 		//check if user is project owner
 		if ($this->is_user_project_owner($project_id,$user)){
 			return true;
@@ -44,7 +59,6 @@ class Editor_acl
 
 		//check if user has access to the collection
 		if ($this->user_has_collection_access($permission,$project_id,$user)){
-
 			return true;
 		}
  

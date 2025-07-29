@@ -150,6 +150,24 @@ $lang['Metadata']="Metadata";
 $lang['shared']="Shared";
 $lang['update']="Update";
 $lang['all_fields']="All fields";
+$lang['locked']="Locked";
+$lang['read_only']="Read-only";
+$lang['project_locked']="Project is locked";
+$lang['project_locked_message']="This project is currently locked and cannot be edited. You can view the project data but cannot make any changes.";
+$lang['latest']="Latest";
+$lang['created_by']="Created by";
+$lang['create_version']="Create new version";
+$lang['version_information']="Version information";
+$lang['version_history']="Version history";
+$lang['version_type']="Version type";
+$lang['version_notes']="Version notes";
+$lang['version_type_help']="<p>For project versioning, <a href='https://semver.org/' target='_blank'>Semantic Versioning (SemVer)</a> is used:</p>                                            
+<ul class='ml-3'>
+    <li><strong>Major</strong>: for significant or structural changes to data files or core metadata </li>
+    <li><strong>Minor</strong>: for moderate updates to metadata or non-breaking changes to data</li>
+    <li><strong>Patch</strong>: for small, backward-compatible corrections or refinements</li>
+</ul>";
+$lang['version_created_successfully']="Version created successfully";
 
 $lang['Cancel changes']="Cancel changes";
 $lang['READ ONLY']="READ ONLY";
