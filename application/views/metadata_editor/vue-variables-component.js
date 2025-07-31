@@ -84,19 +84,20 @@ Vue.component('variables', {
                 show:false                
             },
             has_clicked_edit:true, //to ignore watch from triggering on editVariable click
-            is_initializing_multi:false //to ignore watch from triggering during multi-variable initialization
+            is_initializing_multi:false, //to ignore watch from triggering during multi-variable initialization
+            is_navigating:false //to ignore watch from triggering during navigation
             
         }
     }, 
     created: async function(){
         this.fid=this.$route.params.file_id;
-        //this.editVariable(0);
     },
     mounted: function () {
         setTimeout(() => {
-            this.editVariable(0);
+            if (this.variableSelectedCount() === 0) {
+                this.editVariable(0);
+            }
         }, 2000);
-        //this.initializeMultiVariable();
     },
     watch: {
         activeVariable: {            
@@ -113,6 +114,11 @@ Vue.component('variables', {
 
                 //don't save initializing multi-variable selection
                 if (this.is_initializing_multi){
+                    return;
+                }
+
+                //don't save if navigating to a variable
+                if (this.is_navigating){
                     return;
                 }
 
@@ -167,6 +173,7 @@ Vue.component('variables', {
         varNavigate: function(direction)
         {
             total_vars=this.variables.length-1;
+            this.is_navigating = true;
 
             switch(direction) {
                 case 'first':
@@ -188,6 +195,11 @@ Vue.component('variables', {
               }
             
             this.scrollToVariable();
+            
+            // Reset the navigation flag after a short delay
+            setTimeout(() => {
+                this.is_navigating=false;
+            }, 100);
         },
         spreadMetadata: function ()
         {
@@ -264,11 +276,18 @@ Vue.component('variables', {
         editVariable:function(index)
         {
             this.exitEditMode();
+            this.is_navigating = true;
             this.$nextTick().then(() => {
                 this.page_action="edit";
                 this.has_clicked_edit=true;
                 this.edit_items=[index];
                 this.variable_copy=_.cloneDeep(this.variables[index]);
+                
+                // Reset the flags after a short delay to ensure the watch doesn't trigger
+                setTimeout(() => {
+                    this.has_clicked_edit=false;
+                    this.is_navigating=false;
+                }, 100);
             });
         },
         addVariable:function()

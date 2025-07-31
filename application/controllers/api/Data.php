@@ -479,10 +479,21 @@ class Data extends MY_REST_Controller
 				throw new Exception("Job failed");
 			}
 
+			//update pyhsical data file to CSV
+			$csv_file_path=$this->Editor_datafile_model->check_csv_exists($sid, $file_id);
+
+			if ($csv_file_path){
+				$datafile=$this->Editor_datafile_model->data_file_by_id($sid,$file_id);
+				if ($datafile){
+					$this->Editor_datafile_model->update($datafile['id'],array('file_physical_name'=>basename($csv_file_path)));
+				}
+			}
+
 			$output=array(
 				'status'=>'success',
 				'api_response'=>$api_response,
-				'job_status'=>$job_status				
+				'job_status'=>$job_status,
+				'csv_file'=>basename($csv_file_path)
 			);
 						
 			$this->set_response($output, REST_Controller::HTTP_OK);			

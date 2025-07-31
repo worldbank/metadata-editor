@@ -64,6 +64,11 @@ class Editor_datafile_model extends CI_Model {
 		if ($overwrite==false && $datafile_info){
 			throw new Exception("Data file already exists. To overwrite, use the overwrite parameter.");
 		}
+		
+		// If overwrite is true and file exists, delete the physical file
+		if ($overwrite==true && $datafile_info){
+			$this->delete_physical_file($sid, $datafile_info['file_id']);
+		}
 
 		//upload file
 		$upload_result=$this->Editor_resource_model->upload_file($sid,$file_type='data',$file_field_name='file', $remove_spaces=false);
@@ -143,18 +148,26 @@ class Editor_datafile_model extends CI_Model {
 		$filename=$datafile['file_physical_name'];
 
 		if (empty($filename)){
-			//throw new Exception("Data file physical name not found: ");
-			return false;
+			throw new Exception("Data file physical name not found: ");
 		}
 
-		$filepath=$this->Editor_model->get_project_folder($sid).'/data/'.$filename;
+		$filename_csv=$this->filename_part($filename).'.csv';
+		$project_folder_path=$this->Editor_model->get_project_folder($sid).'/data/';
 
-		if (!file_exists($filepath)){
-			throw new Exception("Data file not found: ".$filepath);
+		$filepath=$project_folder_path.$filename;
+		$filepath_csv=$project_folder_path.$filename_csv;
+
+		if (file_exists($filepath)){
+			return $filepath;
 		}
-		
-		return $filepath;
+
+		if (file_exists($filepath_csv)){
+			return $filepath_csv;
+		}
+
+		throw new Exception("Data file not found: ".$filepath);
 	}
+
 
 	function get_file_csv_path($sid, $file_id)
 	{

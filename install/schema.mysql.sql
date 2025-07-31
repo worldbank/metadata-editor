@@ -427,6 +427,8 @@ CREATE TABLE `editor_variables` (
   PRIMARY KEY (`uid`)
 ) AUTO_INCREMENT=1;
 
+CREATE INDEX idx_sid_fid_name ON editor_variables (sid, fid, name);
+
 
 CREATE TABLE `editor_templates` (
   `id` int NOT NULL AUTO_INCREMENT,

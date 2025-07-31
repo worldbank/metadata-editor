@@ -345,6 +345,11 @@ class Project_json_writer
 			unset($variable['metadata']['sum_stats_options']);
 		}
 
+		//var_catgry_labels
+		if (isset($variable['metadata']['var_catgry_labels'])){
+			unset($variable['metadata']['var_catgry_labels']);
+		}
+
 		array_remove_empty($variable);
 		return $variable;
 	}

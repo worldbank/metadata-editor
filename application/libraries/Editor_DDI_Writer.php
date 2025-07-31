@@ -304,6 +304,15 @@ class Editor_DDI_Writer
      */
     function remove_empty_nodes(\DOMNode $node): void
     {
+        // check if node has attributes
+        if ($node->hasAttributes()) {
+            foreach (iterator_to_array($node->childNodes) as $child) {
+                $this->remove_empty_nodes($child);
+            }
+            return;
+        }
+
+        // node with no attributes and no children
         if (!$node->hasChildNodes() && trim($node->nodeValue) === '') {
             $node->parentNode->removeChild($node);
             return;
@@ -313,8 +322,8 @@ class Editor_DDI_Writer
             $this->remove_empty_nodes($child);
         }
 
-        // Remove the node if it has no children and no meaningful content
-        if (!$node->hasChildNodes() && trim($node->nodeValue) === '') {
+        // remove empty nodes with no attributes and no children
+        if (!$node->hasChildNodes() && trim($node->nodeValue) === '' && !$node->hasAttributes()) {
             $node->parentNode->removeChild($node);
         }
     }

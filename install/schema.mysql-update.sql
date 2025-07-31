@@ -154,4 +154,5 @@ ADD COLUMN `version_notes` VARCHAR(500) NULL AFTER `version_created_by`,
 ADD COLUMN `version_number` VARCHAR(15) NULL AFTER `study_idno`,
 ADD UNIQUE INDEX `unq_idno` (`idno` ASC, `version_number` ASC);
 
-
+# need this to optimize the search for variables
+CREATE INDEX idx_sid_fid_name ON editor_variables (sid, fid, name);
