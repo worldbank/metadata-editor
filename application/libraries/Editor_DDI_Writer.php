@@ -74,6 +74,11 @@ class Editor_DDI_Writer
         echo htmlspecialchars($this->get_el($path), ENT_QUOTES | ENT_XML1, 'UTF-8');
     }
 
+    function el_cdata($path)
+    {
+        echo (string)$this->get_el($path);
+    }
+
     function escape_text($value)
     {
         return htmlspecialchars($value, ENT_QUOTES | ENT_XML1, 'UTF-8'); 
