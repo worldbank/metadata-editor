@@ -71,24 +71,24 @@ class Editor_DDI_Writer
 
     function el($path)
     {
-        echo htmlspecialchars($this->get_el($path));
+        echo htmlspecialchars($this->get_el($path), ENT_QUOTES | ENT_XML1, 'UTF-8');
     }
 
     function escape_text($value)
     {
-        return htmlspecialchars($value); 
+        return htmlspecialchars($value, ENT_QUOTES | ENT_XML1, 'UTF-8'); 
     }
 
     function el_val($data, $el){
         if (isset($data[$el])){
-            return htmlspecialchars($data[$el]);
+            return htmlspecialchars($data[$el], ENT_QUOTES | ENT_XML1, 'UTF-8');
         }
     }
 
     function attr_val($data, $attr)
     {
         if (isset($data[$attr])){
-            return htmlspecialchars($data[$attr]);
+            return htmlspecialchars($data[$attr], ENT_QUOTES | ENT_XML1, 'UTF-8');
         }
     }
 
