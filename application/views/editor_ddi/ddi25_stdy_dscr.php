@@ -77,7 +77,7 @@ $ddi=$this->editor_ddi_writer;
      <verStmt>
         <version date="<?php $ddi->el('study_desc/version_statement/version_date');?>" ><?php $ddi->el('study_desc/version_statement/version');?></version>
         <verResp><?php $ddi->el('study_desc/version_statement/version_resp');?></verResp>
-        <notes><![CDATA[<?php $ddi->el_data('study_desc/version_statement/version_notes');?>]]></notes>
+        <notes><![CDATA[<?php $ddi->el_cdata('study_desc/version_statement/version_notes');?>]]></notes>
      </verStmt>
      
      <biblCit format="<?php $ddi->el('study_desc/bib_citation_format');?>"><![CDATA[<?php $ddi->el('study_desc/bib_citation');?>]]></biblCit>
@@ -87,7 +87,7 @@ $ddi=$this->editor_ddi_writer;
       <?php foreach($holdings as $holding):?>   
         <holdings location="<?php echo $ddi->attr_val($holding,'location');?>" callno="<?php echo $ddi->attr_val($holding,'callno');?>" URI="<?php echo $ddi->attr_val($holding,'uri');?>"><?php echo $ddi->el_val($holding,'name');?></holdings>
       <?php endforeach;?>
-      <notes><![CDATA[<?php $ddi->el_data('study_desc/study_notes');?>]]></notes>
+      <notes><![CDATA[<?php $ddi->el_cdata('study_desc/study_notes');?>]]></notes>
   </citation>
   
   <?php  /*
