@@ -946,7 +946,7 @@ class Editor_resource_model extends ci_model {
 		foreach($rows as $row)
 		{
 			$row=(object)$row;	
-			$rdf.=sprintf('<rdf:Description rdf:about="%s">',htmlentities($row->filename,ENT_QUOTES,'UTF-8'));
+			$rdf.=sprintf('<rdf:Description rdf:about="%s">',htmlspecialchars($row->filename, ENT_QUOTES | ENT_XML1, 'UTF-8'));
 			$rdf.='<rdf:label><![CDATA['.$row->title.']]></rdf:label>';
 			$rdf.='<dc:title><![CDATA['.$row->title.']]></dc:title>';
 			
@@ -1160,5 +1160,7 @@ class Editor_resource_model extends ci_model {
 		}
 		return $resources;
 	}
+
+
 
 }    
