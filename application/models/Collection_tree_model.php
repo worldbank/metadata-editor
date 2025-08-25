@@ -109,7 +109,7 @@ class Collection_tree_model extends CI_Model {
                     INNER JOIN 
                         editor_collections c2 ON ect2.child_id = c2.id
                     INNER JOIN 
-                        editor_collection_access eca ON eca.collection_id = c2.id
+                        		editor_collection_project_acl eca ON eca.collection_id = c2.id
                     WHERE 
                         eca.user_id = '. $this->db->escape($user_id) . '
                         AND c.pid IS NULL

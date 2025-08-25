@@ -512,13 +512,23 @@ create table editor_collection_projects (
   primary key (id)
 );
 
-create table editor_collection_access (
+create table editor_collection_project_acl (
   id int not null auto_increment,
   collection_id int not null,
   user_id int not null,
   permissions varchar(100),
   primary key (id)
 );
+
+CREATE TABLE `editor_collection_acl` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `collection_id` int NOT NULL,
+  `permissions` varchar(100) DEFAULT NULL,
+  `user_id` int NOT NULL,
+  `created` int DEFAULT NULL,
+  `changed` int DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1;
 
 
 create table editor_project_tags (

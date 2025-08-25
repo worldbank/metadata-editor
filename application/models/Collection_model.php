@@ -318,7 +318,7 @@ class Collection_model extends CI_Model {
     {
         $this->db->select('user_id');
         $this->db->where('collection_id',$collection_id);
-        return $this->db->count_all_results('editor_collection_access');
+        		return $this->db->count_all_results('editor_collection_project_acl');
     }
 
 
@@ -363,7 +363,7 @@ class Collection_model extends CI_Model {
     function get_collection_by_user($user_id)
     {
         $this->db->select('editor_collections.id,editor_collections.title');
-        $this->db->join('editor_collection_access','editor_collections.id=editor_collection_access.collection_id');
+        		$this->db->join('editor_collection_project_acl','editor_collections.id=editor_collection_project_acl.collection_id');
         $this->db->where('user_id',$user_id);
         $this->db->or_where('editor_collections.created_by',$user_id);
         $result=$this->db->get('editor_collections')->result_array();
@@ -483,7 +483,7 @@ class Collection_model extends CI_Model {
             $this->db->where('collection_id',$collection_id);
         }
 
-        $result=$this->db->get('editor_collection_access')->result_array();
+        		$result=$this->db->get('editor_collection_project_acl')->result_array();
         $output=array();
         foreach($result as $row){
             $output[$row['collection_id']]=$row['users'];
@@ -614,8 +614,8 @@ class Collection_model extends CI_Model {
             'select '.$target_id.' as collection_id,sid from editor_collection_projects where collection_id='.$source_id);
 
         //copy users from source to target
-        $this->db->query('insert into editor_collection_access (collection_id, user_id, permissions) '.
-            'select '.$target_id.' as collection_id,user_id,permissions from editor_collection_access where collection_id='.$source_id);
+        		$this->db->query('insert into editor_collection_project_acl (collection_id, user_id, permissions) '.
+		'select '.$target_id.' as collection_id,user_id,permissions from editor_collection_project_acl where collection_id='.$source_id);
 
         return true;
     }
@@ -657,6 +657,62 @@ class Collection_model extends CI_Model {
         //rebuild tree
         $this->Collection_tree_model->rebuild_tree();
         return true;
+    }
+
+    /**
+     * 
+     * Get all collections with user's permission levels
+     * Returns collections user can access with their permission levels
+     * 
+     * @param int $user_id User ID to check permissions for
+     * @return array Array of collections with permission information
+     */
+    function get_collections_with_user_permissions($user_id)
+    {
+        // Get all collections
+        $this->db->select('editor_collections.*, users.username as owner_username');
+        $this->db->from('editor_collections');
+        $this->db->join('users', 'users.id = editor_collections.created_by', 'left');
+        $this->db->order_by('editor_collections.title', 'ASC');
+        $collections = $this->db->get()->result_array();
+
+        // Get user's collection ACL permissions
+        $this->db->select('collection_id, permissions');
+        $this->db->from('editor_collection_acl');
+        $this->db->where('user_id', $user_id);
+        $user_permissions = $this->db->get()->result_array();
+
+        // Create lookup array for user permissions
+        $permission_lookup = array();
+        foreach ($user_permissions as $perm) {
+            $permission_lookup[$perm['collection_id']] = $perm['permissions'];
+        }
+
+        // Build result with permission information
+        $result = array();
+        foreach ($collections as $collection) {
+            $collection_id = $collection['id'];
+            $permissions = isset($permission_lookup[$collection_id]) ? $permission_lookup[$collection_id] : 'view';
+            
+            // Check if user is collection owner
+            if ($collection['created_by'] == $user_id) {
+                $permissions = 'admin';
+            }
+
+            $result[] = array(
+                'id' => $collection_id,
+                'title' => $collection['title'],
+                'description' => $collection['description'],
+                'pid' => $collection['pid'],
+                'created_by' => $collection['created_by'],
+                'created' => $collection['created'],
+                'changed' => $collection['changed'],
+                'owner_username' => $collection['owner_username'],
+                'permissions' => $permissions
+            );
+        }
+
+        return $result;
     }
 
 }

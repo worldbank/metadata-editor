@@ -980,6 +980,25 @@ paths:
         security:
           - ApiKeyAuth: []
 
+  /collections/permissions:
+      get:
+        tags:
+          - Collections
+        summary: Get user's collection permissions
+        description: Get all collections with user's permission levels for view, edit, and admin access
+        operationId: getUserCollectionPermissions
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              $ref: "#/definitions/UserCollectionPermissions"
+        security:
+          - ApiKeyAuth: []
+
   /collections/{id}:
       get:
         tags:
@@ -1096,13 +1115,13 @@ paths:
         security:
           - ApiKeyAuth: []
 
-  /collections/user_access/{collectionId}:
+  /collections/user_project_access/{collectionId}:
       get:
         tags:
           - Collections
-        summary: List users by collection
-        description: List of users who have access to a collection
-        operationId: UsersByCollection
+        summary: List users with project access in collection
+        description: List of users who have access to projects within a collection
+        operationId: UsersByCollectionProjectAccess
         consumes:
           - application/json
         produces:
@@ -1117,13 +1136,13 @@ paths:
             description: successful operation            
         security:
           - ApiKeyAuth: []
-  /collections/user_access:
+  /collections/user_project_access:
       post:
         tags:
           - Collections
-        summary: Add users to collection
-        description: Grant user access to a collection
-        operationId: AddUsersToCollection
+        summary: Add user project access to collection
+        description: Grant user access to projects within a collection
+        operationId: AddUserProjectAccessToCollection
         consumes:
           - application/json
         produces:
@@ -1139,13 +1158,13 @@ paths:
             description: successful operation            
         security:
           - ApiKeyAuth: []
-  /collections/remove_user_access:
+  /collections/remove_user_project_access:
       post:
         tags:
           - Collections
-        summary: Remove user from collection
-        description: Remove user access from a collection
-        operationId: RemoveUserFromCollection
+        summary: Remove user project access from collection
+        description: Remove user access to projects within a collection
+        operationId: RemoveUserProjectAccessFromCollection
         consumes:
           - application/json
         produces:
@@ -1184,6 +1203,125 @@ paths:
             description: successful operation            
         security:
           - ApiKeyAuth: []
+
+  /collections/user_acl/{collectionId}:
+      get:
+        tags:
+          - Collections
+        summary: List users with collection ACL access
+        description: List of users who have ACL access to a collection itself
+        operationId: UsersByCollectionACL
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "collectionId"
+            required: true
+            type: integer            
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+
+  /collections/user_acl:
+      post:
+        tags:
+          - Collections
+        summary: Add user ACL access to collection
+        description: Grant user ACL access to a collection itself
+        operationId: AddUserACLToCollection
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/UserCollectionAccess"
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+
+  /collections/user_acl_update:
+      post:
+        tags:
+          - Collections
+        summary: Update user ACL permissions for collection
+        description: Update user ACL permissions for a collection itself
+        operationId: UpdateUserACLForCollection
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/UserCollectionAccess"
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+
+  /collections/user_acl_remove:
+      post:
+        tags:
+          - Collections
+        summary: Remove user ACL access from collection
+        description: Remove user ACL access from a collection itself
+        operationId: RemoveUserACLFromCollection
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/RemoveUserCollectionAccess"
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+
+  /collections/user_acl_check/{collectionId}/{userId}:
+      get:
+        tags:
+          - Collections
+        summary: Check user ACL access to collection
+        description: Check if a user has ACL access to a collection itself
+        operationId: CheckUserACLForCollection
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "collectionId"
+            required: true
+            type: integer
+          - in: "path"
+            name: "userId"
+            required: false
+            type: integer
+            description: "User ID to check (defaults to current user if not provided)"
+        responses:
+          '200':
+            description: successful operation            
+        security:
+          - ApiKeyAuth: []
+
   /resources/{projectId}:
       get:
         tags:
@@ -2144,8 +2282,113 @@ definitions:
           type: string
           enum:
             - view
-            - edit
-            - admin
+
+  UserCollectionPermissions:
+    type: object
+    properties:
+      status:
+        type: string
+        description: Response status
+        example: "success"
+      user_id:
+        type: integer
+        format: int64
+        description: User ID requesting permissions
+        example: 123
+      is_admin:
+        type: boolean
+        description: Whether user has admin privileges
+        example: false
+      admin_type:
+        type: string
+        description: Type of admin access (global, collection, none)
+        enum:
+          - global
+          - collection
+          - none
+        example: "collection"
+      collections:
+        type: object
+        description: Collection permissions keyed by collection ID
+        additionalProperties:
+          $ref: "#/definitions/CollectionPermission"
+    xml:
+      name: UserCollectionPermissions
+
+  CollectionPermission:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+        description: Collection ID
+        example: 1
+      title:
+        type: string
+        description: Collection title
+        example: "Research Data 2024"
+      description:
+        type: string
+        description: Collection description
+        example: "Annual research data collection"
+      pid:
+        type: integer
+        format: int64
+        description: Parent collection ID
+        example: 0
+      created_by:
+        type: integer
+        format: int64
+        description: User ID who created the collection
+        example: 123
+      created:
+        type: string
+        format: date-time
+        description: Collection creation timestamp
+        example: "2024-01-15T10:00:00Z"
+      changed:
+        type: string
+        format: date-time
+        description: Collection last modified timestamp
+        example: "2024-03-20T14:30:00Z"
+      owner_username:
+        type: string
+        description: Username of collection owner
+        example: "john_doe"
+      permission_level:
+        type: string
+        description: User's permission level for this collection
+        enum:
+          - view
+          - edit
+          - admin
+        example: "edit"
+      can_edit:
+        type: boolean
+        description: Whether user can edit this collection
+        example: true
+      can_admin:
+        type: boolean
+        description: Whether user can administer this collection
+        example: false
+      can_delete:
+        type: boolean
+        description: Whether user can delete this collection
+        example: false
+      can_manage_access:
+        type: boolean
+        description: Whether user can manage access to this collection
+        example: false
+      can_add_projects:
+        type: boolean
+        description: Whether user can add projects to this collection
+        example: true
+            can_remove_projects:
+        type: boolean
+        description: Whether user can remove projects from this collection
+        example: true
+    xml:
+      name: CollectionPermission
   RemoveUserCollectionAccess:
     type: object
     properties:

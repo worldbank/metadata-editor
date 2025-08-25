@@ -181,32 +181,7 @@ class Editor_acl
 		}
 
 		return false;	
-	}
-
-
-	/*function user_has_collection_access($project_id,$user=null)
-	{
-		if (!$user){
-			$user=(object)$this->current_user();
-		}
-
-		//check user has access to the collection		
-		$this->ci->db->select("editor_collection_access.user_id");
-		$this->ci->db->join("editor_collection_access","editor_collection_projects.collection_id=editor_collection_access.collection_id");
-		$this->ci->db->where("editor_collection_projects.sid",$project_id);
-		$this->ci->db->where("editor_collection_access.user_id",$user->id);				
-		$collection_access=$this->ci->db->get("editor_collection_projects")->row_array();
-
-		if (!$collection_access){
-			return false;
-		}
-
-		if($collection_access['user_id']==$user->id){
-			return true;
-		}
-
-		return false;
-	}*/
+	}	
 
 	function user_collection_permissions($project_id,$user=null)
 	{
@@ -215,10 +190,10 @@ class Editor_acl
 		}
 
 		//check user has access to the collection		
-		$this->ci->db->select("editor_collection_access.*,editor_collection_projects.sid");
-		$this->ci->db->join("editor_collection_access","editor_collection_projects.collection_id=editor_collection_access.collection_id");
+		$this->ci->db->select("editor_collection_project_acl.*,editor_collection_projects.sid");
+		$this->ci->db->join("editor_collection_project_acl","editor_collection_projects.collection_id=editor_collection_project_acl.collection_id");
 		$this->ci->db->where("editor_collection_projects.sid",$project_id);
-		$this->ci->db->where("editor_collection_access.user_id",$user->id);				
+		$this->ci->db->where("editor_collection_project_acl.user_id",$user->id);				
 		$collection_access=$this->ci->db->get("editor_collection_projects")->result_array();
 
 		return $collection_access;
@@ -472,11 +447,16 @@ class Editor_acl
 		//get user roles
 		$user_roles=$this->get_user_roles($user->id);
 
+		// Debug: Log user roles
+		log_message('debug', 'Editor_acl: User ' . $user->id . ' has roles: ' . json_encode($user_roles));
+
 		//user has admin access
 		if($this->is_admin_role($user_roles)==true){
+			log_message('debug', 'Editor_acl: User ' . $user->id . ' is admin');
 			return true;
 		}
 
+		log_message('debug', 'Editor_acl: User ' . $user->id . ' is NOT admin');
 		return false;
 	}
 
@@ -663,18 +643,8 @@ class Editor_acl
      */
     function get_project_access_permissions_by_collections($sid)
     {
-
-	/*		SELECT editor_collections.id as collection_id,editor_collections.title, ca.user_id, ca.permissions, p.sid,
-				users.username, users.email
-				FROM editor_collections
-				inner join editor_collection_access ca on ca.collection_id=editor_collections.id
-				inner join editor_collection_projects p on p.collection_id= ca.collection_id 
-				inner join users on users.id=ca.user_id
-				LIMIT 0,100
-	*/
-
 		$this->ci->db->select("editor_collections.id as collection_id,editor_collections.title, ca.user_id, ca.permissions, p.sid,users.username, users.email");
-		$this->ci->db->join("editor_collection_access ca","ca.collection_id=editor_collections.id");
+		$this->ci->db->join("editor_collection_project_acl ca","ca.collection_id=editor_collections.id");
 		$this->ci->db->join("editor_collection_projects p","p.collection_id= ca.collection_id");
 		$this->ci->db->join("users","users.id=ca.user_id");
 		$this->ci->db->where("p.sid",$sid);
@@ -814,7 +784,6 @@ class Editor_acl
 	 */
 	private function user_has_shared_template_access_acl($privileges,$permission)
 	{
-
 		$acl = new Acl();
 
 		//base role/user
@@ -834,20 +803,205 @@ class Editor_acl
 		$acl->allow('user-view','template',array('view'));
 		$acl->allow('user-edit','template',array('edit'));
 		$acl->allow('user-admin','template',array('admin'));
-		
-		//add access
-		foreach($privileges as $priv)
+
+		//add access and test permissions
+		foreach($privileges as $privilege)
 		{
-			$role='user-'.$priv;
-			$acl->allow($role,'template',$privileges);
+			$role='user-'.$privilege;
+			$acl->allow($role,'template',array($privilege));
+
+			if ($acl->isAllowed($role,'template',$permission) ){
+				return true;
+			}
 		}
 
-		if ($acl->isAllowed($role,'template',$permission) ){
+		return false;		
+	}
+
+
+	/**
+	 * 
+	 * Test user has access to a collection via ACL
+	 * 
+	 */
+	function user_has_collection_acl_access($collection_id, $permission='view', $user=null)
+	{
+		if (!$user){
+			$user=(object)$this->current_user();
+		}
+
+		if (!$user){
+			throw new Exception("User not set");
+		}
+
+		//global admin role - check first for performance and security
+		if ($this->user_is_admin($user)){
+			// Debug: Log that admin access was granted
+			log_message('debug', 'Editor_acl: Admin access granted for user ' . $user->id . ' to collection ' . $collection_id);
 			return true;
 		}
 
-		return false;	
+		//check if user has global collection admin access
+		try{
+			if ($this->has_access('collection','admin', $user)){
+				return true;
+			}
+		}
+		catch(Exception $e){
+			//do nothing
+		}
 
+		//check if user is collection owner
+		if ($this->is_user_collection_owner($collection_id,$user)){
+			return true;
+		}
+
+		//check if user has collection ACL access from database
+		$this->ci->load->model("Collection_acl_model");
+		$user_permissions_result = $this->ci->Collection_acl_model->get_user_permissions($collection_id, $user->id);
+		
+		if ($user_permissions_result) {
+			$user_permissions = [];
+			foreach($user_permissions_result as $row) {
+				$user_permissions[] = $row['permissions'];
+			}
+			
+			if ($this->user_has_collection_acl_access_acl($user_permissions, $permission)) {
+				return true;
+			}
+		}
+		
+		// Debug: Log the failure
+		log_message('debug', 'Editor_acl: Access denied for user ' . $user->id . ' to collection ' . $collection_id . ' with permission ' . $permission);
+		throw new Exception("You don't have permissions to access this collection");
+	}
+
+	/**
+	 * 
+	 * Check if user can manage ACL for a collection
+	 * This is separate from access control to allow admins to manage ACL
+	 * 
+	 */
+	function user_can_manage_collection_acl($collection_id, $user=null)
+	{
+		if (!$user){
+			$user=(object)$this->current_user();
+		}
+
+		if (!$user){
+			return false;
+		}
+
+		//global admin role can manage all ACL - check first for performance
+		if ($this->user_is_admin($user)){
+			return true;
+		}
+
+		//check if user has global collection admin access
+		try{
+			if ($this->has_access('collection','admin', $user)){
+				return true;
+			}
+		}
+		catch(Exception $e){
+			//do nothing
+		}
+
+		//check if user is collection owner
+		if ($this->is_user_collection_owner($collection_id,$user)){
+			return true;
+		}
+
+		//check if user has collection ACL access from database
+		$this->ci->load->model("Collection_acl_model");
+		$user_permissions_result = $this->ci->Collection_acl_model->get_user_permissions($collection_id, $user->id);
+		
+		if ($user_permissions_result) {
+			foreach($user_permissions_result as $row) {
+				if ($row['permissions'] === 'admin') {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * 
+	 * Check if user is collection owner
+	 * 
+	 */
+	function is_user_collection_owner($collection_id,$user=null)
+	{
+		if (!$user){
+			$user=(object)$this->current_user();
+		}
+
+		if (!$user){
+			throw new Exception("User not set");
+		}
+
+		$this->ci->db->select("created_by");
+		$this->ci->db->where("id",$collection_id);
+		$collection=$this->ci->db->get("editor_collections")->row_array();
+		
+		if (!$collection){
+			return false;
+		}
+
+		//check if user is collection owner
+		if ($collection['created_by']==$user->id){
+			return true;
+		}
+
+		return false;
+	}
+
+
+
+	/**
+	 * 
+	 * Check if user has access to the collection via ACL
+	 * 
+	 * @privilege - array - view, edit, admin
+	 * @permission - permission - view, edit, admin
+	 * 
+	 */
+	private function user_has_collection_acl_access_acl($privileges,$permission)
+	{
+		$acl = new Acl();
+
+		//base role/user
+		$acl->addRole(new Role('user'));
+
+		$permissions_list=array('view','edit','admin');
+
+		//for each permission add a role
+		$acl->addRole(new Role('user-view'), 'user');
+		$acl->addRole(new Role('user-edit'), 'user-view');
+		$acl->addRole(new Role('user-admin'), 'user-edit');
+
+		//add resources
+		$acl->addResource(new Resource('collection'));
+
+		//allow access
+		$acl->allow('user-view','collection',array('view'));
+		$acl->allow('user-edit','collection',array('edit'));
+		$acl->allow('user-admin','collection',array('admin'));
+
+		//add access and test permissions
+		foreach($privileges as $privilege)
+		{
+			$role='user-'.$privilege;
+			$acl->allow($role,'collection',array($privilege));
+
+			if ($acl->isAllowed($role,'collection',$permission) ){
+				return true;
+			}
+		}
+
+		return false;		
 	}
 
 

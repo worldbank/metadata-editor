@@ -156,3 +156,21 @@ ADD UNIQUE INDEX `unq_idno` (`idno` ASC, `version_number` ASC);
 
 # need this to optimize the search for variables
 CREATE INDEX idx_sid_fid_name ON editor_variables (sid, fid, name);
+
+
+# 2025/08/24
+# collections ACL
+
+CREATE TABLE `editor_collection_acl` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `collection_id` int NOT NULL,
+  `permissions` varchar(100) DEFAULT NULL,
+  `user_id` int NOT NULL,
+  `created` int DEFAULT NULL,
+  `changed` int DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1;
+
+
+# rename editor_collection_access to editor_collection_project_acl
+ALTER TABLE `editor_collection_access` RENAME TO `editor_collection_project_acl`;

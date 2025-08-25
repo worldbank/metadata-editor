@@ -85,6 +85,41 @@
             background-color: #526bc7 !important;
             border-color: #526bc7 !important;
         }
+
+        /* Permission Indicator Styles */
+        .permission-indicator {
+            margin-left: 10px;
+            display: inline-block;
+        }
+
+        .permission-indicator .badge {
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .badge-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .collection-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .collection-title {
+            flex: 1;
+        }
     </style>
 </head>
 
@@ -137,7 +172,7 @@
         // 1. Define route components.
         // These can be imported from other files
         const Home = {
-            template: '<div><vue-collection/></div>'
+            template: '<div><vue-collections-component/></div>'
         }
 
         const EditCollection = {
@@ -145,7 +180,7 @@
         }
 
         const ManageAccess = {
-            template: '<div><vue-manage-users/></div>'
+            template: '<div><vue-collection-access-manager/></div>'
         }
 
         // 2. Define some routes

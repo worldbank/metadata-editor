@@ -1,5 +1,5 @@
 Vue.component('vue-tree-list', {
-    props: ['value','parent_path','path_level'],
+    props: ['value','parent_path','path_level','permissions','getPermissionsFunction'],
     data() {
         return {
             toggle_items: false,
@@ -45,6 +45,28 @@ Vue.component('vue-tree-list', {
                 return 1;
             }
             return this.path_level + 1;
+        },
+        PermissionBadge() {
+            if (!this.permissions) return '';
+            
+            if (this.permissions.permissions === 'admin') {
+                return '<span class="badge badge-success">Admin</span>';
+            } else if (this.permissions.permissions === 'edit') {
+                return '<span class="badge badge-warning">Edit</span>';
+            } else {
+                return '';
+            }
+        },
+        PermissionColor() {
+            if (!this.permissions) return 'text-muted';
+            
+            if (this.permissions.permissions === 'admin') {
+                return 'text-success';
+            } else if (this.permissions.permissions === 'edit') {
+                return 'text-warning';
+            } else {
+                return 'text-muted';
+            }
         }
     },
     template: `
@@ -62,11 +84,19 @@ Vue.component('vue-tree-list', {
                             <v-icon v-else>mdi-chevron-right</v-icon>                            
                             <v-icon>mdi-folder</v-icon>
                             <span class="collection-title">{{value.title}}</span>
+                            <div v-if="permissions && permissions.permissions !== 'view'" class="permission-indicator">
+                                <span v-if="permissions.permissions === 'admin'" class="badge badge-success">Admin</span>
+                                <span v-else-if="permissions.permissions === 'edit'" class="badge badge-warning">Edit</span>
+                            </div>
                             <div style="display:none;" class="text-secondary">{{value.description}}</div>
                         </div>
                         <div v-else :class="' collection-item item-level-'+PathLevel">                            
                             <v-icon class="collection-leaf">mdi-folder-outline</v-icon> 
                             <span class="collection-title">{{value.title}}</span>
+                            <div v-if="permissions && permissions.permissions !== 'view'" class="permission-indicator">
+                                <span v-if="permissions.permissions === 'admin'" class="badge badge-success">Admin</span>
+                                <span v-else-if="permissions.permissions === 'edit'" class="badge badge-warning">Edit</span>
+                            </div>
                             <div style="display:none;" class="text-secondary">{{value.description}}</div>
                         </div>    
                     </div>
@@ -93,6 +123,8 @@ Vue.component('vue-tree-list', {
                 :value="item" 
                 :parent_path="ParentPath" 
                 :path_level="PathLevel"
+                :permissions="getPermissionsFunction ? getPermissionsFunction(item.id) : null"
+                :getPermissionsFunction="getPermissionsFunction"
                 v-on:show-menu="onShowMenu"
             >
             </vue-tree-list>

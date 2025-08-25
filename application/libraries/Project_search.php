@@ -189,8 +189,8 @@ class Project_search
 
 			//projects user can access via collections
 			$collection_query='select sid from editor_collection_projects 
-					inner join editor_collection_access on editor_collection_access.collection_id=editor_collection_projects.collection_id
-					where editor_collection_access.user_id='.(int)$project_owners[0];
+							inner join editor_collection_project_acl on editor_collection_project_acl.collection_id=editor_collection_projects.collection_id
+		where editor_collection_project_acl.user_id='.(int)$project_owners[0];
 			
 			$query='(editor_projects.created_by='.(int)$project_owners[0]
 				.' OR editor_projects.id in( '. $subquery.') OR editor_projects.id in ('.$collection_query.')) ';

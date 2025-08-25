@@ -2,7 +2,7 @@
 
 
 /*
-CREATE TABLE editor_collection_access(  
+CREATE TABLE editor_collection_project_acl(  
     id int NOT NULL PRIMARY KEY AUTO_INCREMENT,
     collection_id int NOT NULL,
     user_id int NOT NULL,
@@ -12,10 +12,10 @@ CREATE TABLE editor_collection_access(
 
 /**
  * 
- * Collections access model
+ * Collections project ACL model - manages access to projects within collections
  * 
  */
-class Collection_access_model extends CI_Model {
+class Collection_project_acl_model extends CI_Model {
 
 
     private $fields=array(
@@ -40,29 +40,29 @@ class Collection_access_model extends CI_Model {
 
     /**
      * 
-     * Get list of users with access to a collection
+     * Get list of users with access to projects in a collection
      * 
      * 
      */
     function select_all($collection_id)
     {
-        $this->db->select('editor_collection_access.*,users.username,users.email');
-        $this->db->join('users','users.id=editor_collection_access.user_id');
+        $this->db->select('editor_collection_project_acl.*,users.username,users.email');
+        $this->db->join('users','users.id=editor_collection_project_acl.user_id');
         $this->db->where('collection_id',$collection_id);
-        return $this->db->get('editor_collection_access')->result_array();
+        return $this->db->get('editor_collection_project_acl')->result_array();
     }
 
     function delete($id)
     {
         $this->db->where('id',$id);
-        $this->db->delete('editor_collection_access');
+        $this->db->delete('editor_collection_project_acl');
     }
 
     function delete_user($collection_id,$user_id)
     {
         $this->db->where('collection_id',$collection_id);
         $this->db->where('user_id',$user_id);
-        $this->db->delete('editor_collection_access');
+        $this->db->delete('editor_collection_project_acl');
     }
 
     function permission_exists($collection_id,$user_id)
@@ -70,7 +70,7 @@ class Collection_access_model extends CI_Model {
         $this->db->select('id');
         $this->db->where('collection_id',$collection_id);
         $this->db->where('user_id',$user_id);        
-        return $this->db->count_all_results('editor_collection_access');
+        return $this->db->count_all_results('editor_collection_project_acl');
     }
 
     function get_permission_id($collection_id,$user_id)
@@ -78,7 +78,7 @@ class Collection_access_model extends CI_Model {
         $this->db->select('id');
         $this->db->where('collection_id',$collection_id);
         $this->db->where('user_id',$user_id);        
-        $result=$this->db->get('editor_collection_access')->row_array();
+        $result=$this->db->get('editor_collection_project_acl')->row_array();
 
         if($result){
             return $result['id'];
@@ -90,7 +90,7 @@ class Collection_access_model extends CI_Model {
     function insert($data)
     {
         if ($this->permission_exists($data['collection_id'],$data['user_id'])){
-            throw new Exception("User already has access to this collection");
+            throw new Exception("User already has access to projects in this collection");
         }
 
         $data=array_intersect_key($data,array_flip($this->fields));
@@ -99,7 +99,7 @@ class Collection_access_model extends CI_Model {
             unset($data['id']);
         }
 
-        $this->db->insert('editor_collection_access',$data);
+        $this->db->insert('editor_collection_project_acl',$data);
         return $this->db->insert_id();
     }
 
@@ -112,7 +112,7 @@ class Collection_access_model extends CI_Model {
         }
 
         $this->db->where('id',$id);
-        $this->db->update('editor_collection_access',$data);
+        $this->db->update('editor_collection_project_acl',$data);
     }
 
     function upsert($data)

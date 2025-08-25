@@ -1,8 +1,10 @@
-Vue.component('vue-collection', {
+Vue.component('vue-collections-component', {
     props: ['value'],
     data() {
         return {     
             collections: [],
+            collection_permissions: {}, // Store user permissions for collections
+            user_permissions: null, // Store overall user permission data
             edit_collection: {},
             dialog_edit: false,
             dialog_copy_collection: false,
@@ -17,11 +19,23 @@ Vue.component('vue-collection', {
     },
     
     created: function() {
+        this.loadUserPermissions();
         this.loadCollections();
     },
     computed: {
         Collections() {
+            console.log("Collections computed property called, collections:", this.collections);
             return this.collections;
+        },
+        canCreateCollections() {
+            // Only allow creation if user has admin permissions
+            if (this.user_permissions && this.user_permissions.admin_type === 'global') {
+                return true;
+            }
+            if (this.user_permissions && this.user_permissions.admin_type === 'collection' && this.user_permissions.global_permission === 'admin') {
+                return true;
+            }
+            return false;
         }
     },
     methods: {
@@ -44,31 +58,56 @@ Vue.component('vue-collection', {
             return moment.utc(date).format("MMM d, YYYY")
         },
         refreshCollectionsTree: function() {
-            vm = this;
             let url = CI.site_url + '/api/collections/tree_refresh/';
 
             axios.get(url)
-                .then(function(response) {
-                    vm.loadCollections();
+                .then((response) => {
+                    this.loadCollections();
                 })
-                .catch(function(error) {
+                .catch((error) => {
                     console.log("error", error);
-                    alert(vm.$t("failed") + ": " +  vm.errorResponseMessage(error));
+                    alert(this.$t("failed") + ": " +  this.errorResponseMessage(error));
+                });
+        },
+        loadUserPermissions: function() {
+            let url = CI.site_url + '/api/collections/permissions';
+            console.log("loading user permissions from:", url);
+            return axios
+                .get(url)
+                .then((response) => {
+                    this.user_permissions = response.data;
+                    
+                    // Convert array to object for easy lookup by collection ID
+                    this.collection_permissions = {};
+                    if (response.data.collections) {
+                        response.data.collections.forEach((collection) => {
+                            this.collection_permissions[collection.id] = {
+                                permissions: collection.permissions
+                            };
+                        });
+                    }
+                    
+                    console.log("user permissions loaded", this.user_permissions);
+                    console.log("collection permissions mapped:", this.collection_permissions);
+                })
+                .catch((error) => {
+                    console.log("error loading permissions", error);
+                    // Don't show alert for permissions - just log error
+                    this.collection_permissions = {};
                 });
         },
         loadCollections: function() {
-            vm = this;
             let url = CI.site_url + '/api/collections/tree';
             console.log("loading collections");
             return axios
                 .get(url)
-                .then(function(response) {
-                    vm.collections = response.data.collections;
-                    console.log("loading collections",vm.collections);
+                .then((response) => {
+                    this.collections = response.data.collections;
+                    console.log("loading collections", this.collections);
                 })
-                .catch(function(error) {
+                .catch((error) => {
                     console.log("error", error);
-                    alert(vm.$t("failed") + ": " +  vm.errorResponseMessage(error));
+                    alert(this.$t("failed") + ": " +  this.errorResponseMessage(error));
                 });
         },
         findByCollectionId: function(id) {
@@ -88,6 +127,53 @@ Vue.component('vue-collection', {
             search(this.collections);
             return collection;
         },
+        getCollectionPermissions: function(collection_id) {
+            // If user is global admin, grant all permissions to all collections
+            if (this.user_permissions && this.user_permissions.admin_type === 'global') {
+                return {
+                    permissions: 'admin',
+                    can_edit: true,
+                    can_admin: true,
+                    can_delete: true,
+                    can_manage_access: true
+                };
+            }
+            
+            // If user has global collection admin role, grant admin permissions to all collections
+            if (this.user_permissions && this.user_permissions.admin_type === 'collection' && this.user_permissions.global_permission === 'admin') {
+                return {
+                    permissions: 'admin',
+                    can_edit: true,
+                    can_admin: true,
+                    can_delete: true,
+                    can_manage_access: true
+                };
+            }
+            
+            // If user has global collection edit role, grant edit permissions to all collections
+            if (this.user_permissions && this.user_permissions.admin_type === 'collection' && this.user_permissions.global_permission === 'edit') {
+                return {
+                    permissions: 'edit',
+                    can_edit: true,
+                    can_admin: false,
+                    can_delete: false,
+                    can_manage_access: false
+                };
+            }
+            
+            // For collection-specific admins or regular users, derive permissions from permissions
+            const collection_perms = this.collection_permissions[collection_id] || { permissions: 'view' };
+            
+            return {
+                permissions: collection_perms.permissions,
+                can_edit: ['edit', 'admin'].includes(collection_perms.permissions),
+                can_admin: collection_perms.permissions === 'admin',
+                can_delete: collection_perms.permissions === 'admin',
+                can_manage_access: collection_perms.permissions === 'admin'
+            };
+        },
+
+
         editCollectionById: function(id) {
             let collection = this.findByCollectionId(id);
             if (collection) {
@@ -122,19 +208,18 @@ Vue.component('vue-collection', {
             }
 
             let form_data = collection;
-            let vm=this;
 
             axios.post(url,
                     form_data
                 )
-                .then(function(response) {
+                .then((response) => {
                     console.log(response);
-                    vm.loadCollections();
-                    vm.dialog_edit = false;
+                    this.loadCollections();
+                    this.dialog_edit = false;
                 })
-                .catch(function(error) {
+                .catch((error) => {
                     console.log("error", error);
-                    alert(vm.$t("failed") + ": " +  vm.errorResponseMessage(error));
+                    alert(this.$t("failed") + ": " +  this.errorResponseMessage(error));
                 });
         },
         errorResponseMessage: function(error) {
@@ -153,16 +238,15 @@ Vue.component('vue-collection', {
                 return false;
             }
 
-            vm = this;
             let url = CI.site_url + '/api/collections/delete/' + id;
 
             axios.post(url)
-                .then(function(response) {
-                    vm.loadCollections();
+                .then((response) => {
+                    this.loadCollections();
                 })
-                .catch(function(error) {
+                .catch((error) => {
                     console.log("error", error);
-                    alert(vm.$t("failed") + ": " +  vm.errorResponseMessage(error));
+                    alert(this.$t("failed") + ": " +  this.errorResponseMessage(error));
                 });
         },
         ManageCollectionAccess: function(id) {
@@ -171,7 +255,14 @@ Vue.component('vue-collection', {
     },
     template: `
     <div class="vue-collection-component">
-            <section class="container">
+        <!-- Debug: Component is loading -->
+        <div v-if="!collections || collections.length === 0" class="p-3 text-center">
+            <p>Loading collections...</p>
+            <p>Collections count: {{collections ? collections.length : 'undefined'}}</p>
+            <p>User permissions: {{user_permissions ? 'loaded' : 'not loaded'}}</p>
+        </div>
+        
+        <section class="container">
 
                     <div class="row">
 
@@ -188,22 +279,18 @@ Vue.component('vue-collection', {
                                     <h3 class="mt-3 mb-1">{{$t('Collections')}}</h3>                                
                                 </div>
                                 <div class="justify-content-end">
-                                    <v-btn color="primary"  @click="createCollection">{{$t('Create new collection')}}</v-btn>
+                                    <v-btn color="primary" v-if="canCreateCollections" @click="createCollection">{{$t('Create new collection')}}</v-btn>
                                 </div>
                             </div>
 
                             <div class="bg-light p-3 shadow mt-2" >
-                                <div class="p-3 border text-center text-danger" v-if="!Collections || Collections.found<1"> {{$t('No projects found')}}!</div>
+                                <div class="p-3 border text-center text-danger" v-if="!collections || collections.length<1"> {{$t('No collections found')}}!</div>
 
-                                <div v-if="!Collections || Collections.found>0" class="row mb-2 border-bottom  mt-3">
-                                    <div class="col-md-6">
-                                        <div class="p-2" v-if="Collections">
-                                            <strong>{{parseInt(collections.found)}}</strong> {{$t('collections')}}
-                                        </div>
-                                    </div>
-                                </div>
 
-                                <template v-if="Collections.length>0">
+
+
+
+                                <template v-if="collections && collections.length>0">
                                 <div class="row border-bottom">
                                     <div class="col-1">
                                         #
@@ -244,8 +331,13 @@ Vue.component('vue-collection', {
                                 </div>
 
 
-                                <div v-for="(collection,index) in Collections" >
-                                    <vue-tree-list :value="collection" v-on:show-menu="showMenu"></vue-tree-list>
+                                <div v-for="(collection,index) in collections" >
+                                    <vue-tree-list 
+                                        :value="collection" 
+                                        :permissions="getCollectionPermissions(collection.id)"
+                                        :getPermissionsFunction="getCollectionPermissions"
+                                        v-on:show-menu="showMenu"
+                                    ></vue-tree-list>
                                 </div>
                                 </template>
 
@@ -269,23 +361,27 @@ Vue.component('vue-collection', {
                     offset-y
                 >
                     <v-list>
-                        <v-list-item>
+                        <v-list-item v-if="getCollectionPermissions(action_menu_id).can_edit">
                             <v-list-item-title @click="editCollectionById(action_menu_id)"><v-btn text>{{$t('edit')}}</v-btn></v-list-item-title>
                         </v-list-item>
-                        <v-list-item>    
+                        <v-list-item v-if="getCollectionPermissions(action_menu_id).can_admin">    
                             <v-list-item-title @click="addChildCollectionById(action_menu_id)"><v-btn text>{{$t('Add sub-collection')}}</v-btn></v-list-item-title>
                         </v-list-item>
-                        <v-list-item>
+                        <v-list-item v-if="getCollectionPermissions(action_menu_id).can_manage_access">
                             <v-list-item-title @click="ManageCollectionAccess(action_menu_id)"><v-btn text>{{$t('Manage access')}}</v-btn></v-list-item-title>
                         </v-list-item>
-                        <v-list-item>
+                        <v-list-item v-if="getCollectionPermissions(action_menu_id).can_delete">
                             <v-list-item-title @click="DeleteCollection(action_menu_id)"><v-btn text>{{$t('delete')}}</v-btn></v-list-item-title>
-                        </v-list-item>          
+                        </v-list-item>
+          
                     </v-list>
                 </v-menu>
             </template>
 
-
+            <!-- Collections count at bottom -->
+            <div v-if="collections && collections.length > 0" class="mt-4 p-3 text-center text-muted">
+                <small>{{collections.length}} {{$t('collections')}}</small>
+            </div>
 
         </div>
                 
