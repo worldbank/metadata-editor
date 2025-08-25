@@ -318,5 +318,54 @@ $lang['create_categories']="Crear categorías";
 $lang['clear_all']="Limpiar todo";
 $lang['is_key_variable']="¿Es variable clave?";
 
+$lang['export_csv']="Exportar CSV";
+$lang['generate_csv_file']="Generar archivo CSV";
+$lang['csv_generated_success']="Archivo CSV generado con éxito";
+$lang['confirm_remove_data']="¿Estás seguro de que quieres eliminar los datos de este archivo?";
+$lang['Has data']="Tiene datos";
+$lang['More options']="Más opciones";
+$lang['select_export_format']="Seleccionar formato de exportación";
+
+// Collections management - missing translations
+$lang['No collections found']="No se encontraron colecciones";
+$lang['Users']="Usuarios";
+$lang['Projects']="Proyectos";
+
+// User actions - missing translations
+$lang['add']="Agregar";
+$lang['user']="Usuario";
+$lang['role']="Rol";
+$lang['actions']="Acciones";
+
+// User management - missing translations
+$lang['Manage Collection Access Control']="Gestionar control de acceso a colecciones";
+$lang['Manage Project Access']="Gestionar acceso a proyectos";
+$lang['type_user_name_or_email']="Escriba nombre de usuario o email";
+$lang['error']="Error";
+
+// Copy/Move operations - missing translations
+$lang['copy_collection']="Copiar colección";
+$lang['copy_projects_and_users']="Copiar proyectos y usuarios";
+$lang['source']="Fuente";
+$lang['target']="Destino";
+$lang['collection_copied_successfully']="Colección copiada exitosamente";
+$lang['collection_moved_successfully']="Colección movida exitosamente";
+
+// Additional missing translations
+$lang['Control which users can access this collection and manage its settings']="Controlar qué usuarios pueden acceder a esta colección y gestionar su configuración";
+$lang['Control which users can access projects within this collection']="Controlar qué usuarios pueden acceder a proyectos dentro de esta colección";
+$lang['Select the source and target collections to move the collection']="Seleccionar las colecciones de origen y destino para mover la colección";
+
+// Additional collection translations
+$lang['Create new collection']="Crear nueva colección";
+$lang['Add sub-collection']="Agregar sub-colección";
+$lang['Copy collection']="Copiar colección";
+$lang['Move collection']="Mover colección";
+$lang['Edit collection']="Editar colección";
+$lang['Refresh tree']="Actualizar árbol";
+$lang['Return to collections']="Volver a colecciones";
+$lang['Collection']="Colección";
+$lang['About']="Acerca de";
+
 /* End of file project_lang.php */
-/* Location: ./application/language/base/project_lang.php */
+/* Location: ./application/language/spanish/project_lang.php */

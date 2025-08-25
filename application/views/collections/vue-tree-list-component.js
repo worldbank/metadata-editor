@@ -85,17 +85,17 @@ Vue.component('vue-tree-list', {
                             <v-icon>mdi-folder</v-icon>
                             <span class="collection-title">{{value.title}}</span>
                             <div v-if="permissions && permissions.permissions !== 'view'" class="permission-indicator">
-                                <span v-if="permissions.permissions === 'admin'" class="badge badge-success">Admin</span>
-                                <span v-else-if="permissions.permissions === 'edit'" class="badge badge-warning">Edit</span>
+                                <span v-if="permissions.permissions === 'admin'" class="badge badge-success">{{$t('admin')}}</span>
+                                <span v-else-if="permissions.permissions === 'edit'" class="badge badge-warning">{{$t('edit')}}</span>
                             </div>
                             <div style="display:none;" class="text-secondary">{{value.description}}</div>
                         </div>
-                        <div v-else :class="' collection-item item-level-'+PathLevel">                            
+                                                    <div v-else :class="' collection-item item-level-'+PathLevel">                            
                             <v-icon class="collection-leaf">mdi-folder-outline</v-icon> 
                             <span class="collection-title">{{value.title}}</span>
                             <div v-if="permissions && permissions.permissions !== 'view'" class="permission-indicator">
-                                <span v-if="permissions.permissions === 'admin'" class="badge badge-success">Admin</span>
-                                <span v-else-if="permissions.permissions === 'edit'" class="badge badge-warning">Edit</span>
+                                <span v-if="permissions.permissions === 'admin'" class="badge badge-success">{{$t('admin')}}</span>
+                                <span v-else-if="permissions.permissions === 'edit'" class="badge badge-warning">{{$t('edit')}}</span>
                             </div>
                             <div style="display:none;" class="text-secondary">{{value.description}}</div>
                         </div>    

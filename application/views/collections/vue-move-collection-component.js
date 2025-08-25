@@ -102,7 +102,7 @@ Vue.component('vue-move-collection', {
                     
 
                     <v-card-text> 
-                        <div class="text-muted text-small">Select the source and target collections to move the collection</div>
+                        <div class="text-muted text-small">{{$t('Select the source and target collections to move the collection')}}</div>
 
                         <div class="form-group mt-3">
                             <label>Source</label>

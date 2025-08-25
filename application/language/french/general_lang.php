@@ -230,3 +230,4 @@ $lang['url_must_start_with_http'] = 'L’URL doit commencer par https:// ou http
 $lang['url_must_point_to_root'] = 'L’URL doit pointer vers la racine du catalogue. Supprimez index.php ou /api';
 $lang['url_is_invalid'] = 'L\'URL est invalide';
 $lang['file_already_exists_warning'] = 'Le fichier existe déjà. Cela écrasera le fichier existant.';
+$lang['About'] = 'À propos';

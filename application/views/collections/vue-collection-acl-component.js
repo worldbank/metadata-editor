@@ -9,20 +9,20 @@ Vue.component('vue-collection-acl', {
             search: null,
             users: [], // Available users for selection
             shared_users: [], // users with collection-level access
-            user_roles: [
-                {
-                    'value': 'view',
-                    'text': 'View'
-                },
-                {
-                    'value': 'edit',
-                    'text': 'Edit'
-                },
-                {
-                    'value': 'admin',
-                    'text': 'Admin'
-                }
-            ],
+                    user_roles: [
+            {
+                'value': 'view',
+                'text': this.$t('view')
+            },
+            {
+                'value': 'edit',
+                'text': this.$t('edit')
+            },
+            {
+                'value': 'admin',
+                'text': this.$t('admin')
+            }
+        ],
         }
     },
     mounted: function() {

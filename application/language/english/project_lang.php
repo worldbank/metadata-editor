@@ -330,5 +330,43 @@ $lang['create_categories']="Create categories";
 $lang['clear_all']="Clear all";
 $lang['is_key_variable']="Is key variable?";
 
+$lang['export_csv']="Export CSV";
+$lang['generate_csv_file']="Generate CSV file";
+$lang['csv_generated_success']="CSV file generated successfully";
+$lang['confirm_remove_data']="Are you sure you want to remove the data from this file?";
+$lang['Has data']="Has data";
+$lang['More options']="More options";
+$lang['select_export_format']="Select export format";
+
+// Collections management - missing translations
+$lang['No collections found']="No collections found";
+$lang['Users']="Users";
+$lang['Projects']="Projects";
+
+// User actions - missing translations
+$lang['add']="Add";
+$lang['user']="User";
+$lang['role']="Role";
+$lang['actions']="Actions";
+
+// User management - missing translations
+$lang['Manage Collection Access Control']="Manage Collection Access Control";
+$lang['Manage Project Access']="Manage Project Access";
+$lang['type_user_name_or_email']="Type user name or email";
+$lang['error']="Error";
+
+// Copy/Move operations - missing translations
+$lang['copy_collection']="Copy Collection";
+$lang['copy_projects_and_users']="Copy projects and users";
+$lang['source']="Source";
+$lang['target']="Target";
+$lang['collection_copied_successfully']="Collection copied successfully";
+$lang['collection_moved_successfully']="Collection moved successfully";
+
+// Additional missing translations
+$lang['Control which users can access this collection and manage its settings']="Control which users can access this collection and manage its settings";
+$lang['Control which users can access projects within this collection']="Control which users can access projects within this collection";
+$lang['Select the source and target collections to move the collection']="Select the source and target collections to move the collection";
+
 /* End of file project_lang.php */
 /* Location: ./application/language/base/project_lang.php */

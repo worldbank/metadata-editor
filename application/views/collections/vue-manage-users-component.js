@@ -353,7 +353,7 @@ Vue.component('vue-collection-access-manager', {
             <div v-else>
                 <div class="border-round border-light p-3 mb-5 shadow bg-light">
                     <h5>{{$t('Manage Collection Access Control')}}</h5>
-                    <p class="text-muted">Control which users can access this collection and manage its settings</p>
+                                            <p class="text-muted">{{$t('Control which users can access this collection and manage its settings')}}</p>
                     <div class="row">
                         <div class="col-6">
                         
@@ -458,7 +458,7 @@ Vue.component('vue-collection-access-manager', {
             <div v-else>
                 <div class="border-round border-light p-3 mb-5 shadow bg-light">
                     <h5>{{$t('Manage Project Access')}}</h5>
-                    <p class="text-muted">Control which users can access projects within this collection</p>
+                                            <p class="text-muted">{{$t('Control which users can access projects within this collection')}}</p>
                 <div class="row">
                     <div class="col-6">
                     
