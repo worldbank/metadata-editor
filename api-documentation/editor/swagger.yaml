@@ -75,7 +75,6 @@ x-tagGroups:
   - name: Microdata
     tags:
       - Microdata
-      - data file
   - name: Timeseries
     tags:
       - Timeseries
@@ -138,12 +137,12 @@ paths:
         - application/json
       parameters:
         - name: keywords
-          in: path
+          in: query
           title: Project search keywords
           description: Keywords for searching project by title and IDNO
           type: string
         - name: type
-          in: path
+          in: query
           title: Project data type
           description: Project data type e.g. Microdata, Document, Table, ...
           type: string
@@ -159,31 +158,31 @@ paths:
           - video
 
         - name: date_start
-          in: path
+          in: query
           title: Start date
           description: Search for projects changed on or after this date. Use the date format `YYYY-MM-DD` e.g. 2020-01-01
           type: string
           format: date
         - name: date_end
-          in: path
+          in: query
           title: End date
           description: Search for projects changed on or before this date. Use the date format `YYYY-MM-DD` e.g. 2020-01-20
           type: string
           format: date
         - name: offset
-          in: path
+          in: query
           title: Offset
           description: Offset for pagination e.g. 10 to skip first 10 records
-          type: int
+          type: integer
 
         - name: limit
-          in: path
+          in: query
           title: Page size
           description: Page size e.g. 10 to show 10 records
-          type: int
+          type: integer
         
         - name: sort_by
-          in: path
+          in: query
           title: Sort results
           description: Sort results
           type: string
@@ -348,6 +347,7 @@ paths:
         '200':
           description: successful operation
           schema:
+            type: object
 
   /editor/sdmx/{id}:
       post:
@@ -1058,7 +1058,7 @@ paths:
         produces:
           - application/json
         parameters:
-          - in: "url"
+          - in: "query"
             name: "collection_id"
             required: true
             type: integer
@@ -1596,7 +1596,7 @@ paths:
               $ref: "resource-schema.json"
         security:
           - ApiKeyAuth: []
-  /resources/delete/{projectId}/{resourceId}}:
+  /resources/delete/{projectId}/{resourceId}:
       post:
         tags:
           - External resources
@@ -2383,7 +2383,7 @@ definitions:
         type: boolean
         description: Whether user can add projects to this collection
         example: true
-            can_remove_projects:
+      can_remove_projects:
         type: boolean
         description: Whether user can remove projects from this collection
         example: true
@@ -2432,7 +2432,7 @@ definitions:
         format: int64
         readOnly: true
       user_id:
-        type: int      
+        type: integer      
       username:
         type: string
       api-keys:
@@ -2738,3 +2738,10 @@ definitions:
         type: string
       message:
         type: string
+
+securityDefinitions:
+  ApiKeyAuth:
+    type: apiKey
+    in: header
+    name: X-API-Key
+    description: API key for authentication
