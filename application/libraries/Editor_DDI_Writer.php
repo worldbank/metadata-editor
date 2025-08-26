@@ -291,8 +291,23 @@ class Editor_DDI_Writer
         $xmlDoc->preserveWhiteSpace = false;
         $xpath = new DOMXPath($xmlDoc);
 
-        while (($notNodes = $xpath->query('//*[not(node())]')) && ($notNodes->length)) {
-            foreach($notNodes as $node) {
+        // Remove empty attributes first
+        $nodesWithAttributes = $xpath->query('//*[@*]');
+        foreach ($nodesWithAttributes as $node) {
+            $attributesToRemove = [];
+            foreach ($node->attributes as $attr) {
+                if (trim($attr->value) === '') {
+                    $attributesToRemove[] = $attr;
+                }
+            }
+            foreach ($attributesToRemove as $attr) {
+                $node->removeAttributeNode($attr);
+            }
+        }
+
+        // Find elements with no child nodes and no attributes
+        while (($emptyNodes = $xpath->query('//*[not(node()) and not(@*)]')) && ($emptyNodes->length)) {
+            foreach($emptyNodes as $node) {
                 $node->parentNode->removeChild($node);
             }
         }
