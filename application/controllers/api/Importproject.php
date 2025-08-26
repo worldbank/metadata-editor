@@ -67,7 +67,6 @@ class ImportProject extends MY_REST_Controller
 
 			$result=$file_info;
 
-
 			//validate & create dataset
 			$sid=$this->Editor_model->create_project($type,$options);
 
@@ -95,6 +94,7 @@ class ImportProject extends MY_REST_Controller
 				}
 				else if ($file_ext=='zip')
 				{
+					set_time_limit(0);
 					$result=$this->import_zip_package($sid,$zip_path=$uploaded_filepath);
 
 					if (isset($result['project_info']['idno'])){
