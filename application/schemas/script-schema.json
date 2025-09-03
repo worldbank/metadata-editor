@@ -181,6 +181,16 @@
                 "title": "DOI",
                 "description": "Digital Object Identifier (DOI) of the output",
                 "type": "string"
+              },
+              "license": {
+                "title": "License",
+                "description": "License of the output",
+                "type": "string"
+              },
+              "license_uri": {
+                "title": "License URI",
+                "description": "URI of the license of the output",
+                "type": "string"
               }
             },
             "required": [
