@@ -34,6 +34,18 @@ $config['survey'][]=array(
     "created"=>"1687445920"
 );
 
+$config['survey'][]=array(
+    'template' => 'metadata_editor/metadata_editor_templates/survey_template_es.json',
+    'lang'=>'es',
+    'uid'=>'microdata-system-es',
+    'name'=>'Microdatos DDI 2.5 ES',
+    "version"=> "1.0",
+    "organization"=> "IHSN \/ Banque mondiale, Development Data Group",
+    "author"=> "MA TB OD MW",
+    "description"=> "Un modèle basé sur le standard DDI 2.5 (DDI Codebook), recommandé par le IHSN pour la documentation de données d'enquêtes ou de recensements. ",
+    "created"=>"2025-09-03"
+);
+
 
 $config['survey'][]=array(
     'template' => 'metadata_editor/metadata_editor_templates/survey_template_ihsn_2.5_v1.json',
