@@ -131,6 +131,23 @@
             "title"
           ]
         },
+        "reproducibility_status": {
+          "type": "object",
+          "title": "Reproducibility status",
+          "description": "Information on the reproducibility status of the project, using a controlled vocabulary",
+          "properties": {
+            "status": {
+              "type": "string",
+              "title": "status",
+              "description": "Status"
+            },
+            "note": {
+              "type": "string",
+              "title": "Note",
+              "description": "Note"
+            }
+          }
+        },
         "abstract": {
           "type": "string",
           "title": "Abstract"
@@ -264,10 +281,7 @@
         "production_date": {
           "title": "Date of production (YYYY-MM-DD)",
           "description": "Date in ISO format when the dissemination-ready version of the research project was produced. It can be a year (YYYY), year-month (YYYY-MM), or year-month-day (YYYY-MM-DD)",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+          "type": "string"
         },
         "version_statement": {
           "type": "object",
