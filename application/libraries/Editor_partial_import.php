@@ -30,12 +30,21 @@ class Editor_partial_import
     /**
 	 * 
 	 * 	 
-	 * import_options - [ "doc_desc", "study_desc", "data_files", "variable_info", "variable_categories", "variable_questions", "variable_weights", "variable_groups" ]
+	 * import_options - [ "doc_desc", "study_desc", "data_files", "variable_info", "variable_categories", "variable_questions", "variable_weights", "variable_groups", "import_new_data" ]
 	 * 
 	 * 
 	 */
 	function import_ddi($sid, $ddi_path, $options=array(), $import_options=array())
 	{
+		//import new data files and variables. if set to false,
+		//only update existing data files and variables. 
+		//no new data files or variables will be created.		
+		$import_new_data = in_array("import_new_data", $import_options);
+
+		if (!$import_new_data){
+			$import_new_data=true;
+		}
+
 		$parser_params=array(
 			'file_type'=>'survey',
 			'file_path'=>$ddi_path
@@ -70,61 +79,102 @@ class Editor_partial_import
 			//update project study level metadata
 			$this->ci->Editor_model->update_project($type='survey',$sid,$project_db['metadata'],$validate=true);
 		}
+
+		if (in_array("data_files",$import_options)){
 					
-		//get list of data files
-        $files=(array)$parser->get_data_files();
+			//get list of data files
+			$files=(array)$parser->get_data_files();
 
-        //check if data file is empty
-        foreach($files as $idx =>$file){
-            $is_null=true;
-            foreach(array_keys($file) as $file_field){
-                if(!empty($file[$file_field])){
-                    $is_null=false;
-                }
-            }
-            if($is_null){
-                //remove empty data file
-                unset($files[$idx]);
-            }
-        }
-
-
-		// update data files		
-		// - match by data file name
-		// - update only the description field
-
-        $data_files=array();
-        foreach($files as $file){
-            if(trim($file['id'])=='' && trim($file['file_id'])!='' ){
-                $file['id']=$file['file_id'];
-            }
-            $data_file=array(
-                'file_id'       =>$file['id'],
-                'file_name'     =>str_replace(".NSDstat","",$file['filename']),
-				'file_type'		=>$file['filetype'],
-                'description'   =>$file['fileCont'],
-                'case_count'    =>$file['caseQnty'],
-                'var_count'     =>$file['varQnty']
-            );
-			$data_files[$file['id']]=$data_file;
-
-			$update_options=array(
-				'description'=>$data_file['description'],
-			);
-
-			if (in_array("data_files",$import_options)){
-				$this->ci->Editor_datafile_model->update_by_filename($sid,$data_file['file_name'],$update_options);
+			//check if data file is empty
+			foreach($files as $idx =>$file){
+				$is_null=true;
+				foreach(array_keys($file) as $file_field){
+					if(!empty($file[$file_field])){
+						$is_null=false;
+					}
+				}
+				if($is_null){
+					//remove empty data file
+					unset($files[$idx]);
+				}
 			}
-        }
-        
+
+			// import data files		
+			// - match by data file name
+			// - if exists: update only the description field
+			// - if not exists: create new data file entry (only if $import_new_data is true)
+
+			$data_files=array();
+			foreach($files as $file){
+				if(trim($file['id'])=='' && trim($file['file_id'])!='' ){
+					$file['id']=$file['file_id'];
+				}
+				$data_file=array(
+					'file_id'       =>$file['id'],
+					'file_name'     =>str_replace(".NSDstat","",$file['filename']),
+					'file_type'		=>$file['filetype'],
+					'description'   =>$file['fileCont'],
+					'case_count'    =>$file['caseQnty'],
+					'var_count'     =>$file['varQnty']
+				);
+				$data_files[$file['id']]=$data_file;
+
+				// Skip if file_name is empty
+				if (empty($data_file['file_name'])) {
+					continue;
+				}
+
+				// Check if data file exists
+				$existing_file = $this->ci->Editor_datafile_model->data_file_by_name($sid, $data_file['file_name']);
+				
+				if ($existing_file) {
+					// Update only description field for existing files
+					$update_options = array(
+						'description' => $data_file['description'],
+					);
+					try {
+						$this->ci->Editor_datafile_model->update_by_filename($sid, $data_file['file_name'], $update_options);
+					} catch (Exception $e) {
+						log_message('error', "Failed to update data file '{$data_file['file_name']}': " . $e->getMessage());
+						throw new Exception("Failed to update data file '{$data_file['file_name']}': " . $e->getMessage());
+					}
+				} else {
+					// Only create new data file if $import_new_data is true
+					if ($import_new_data) {
+						// Create new data file entry
+						$insert_options = array(
+							'file_id' => $data_file['file_id'],
+							'file_name' => $data_file['file_name'],
+							'file_type' => $data_file['file_type'],
+							'description' => $data_file['description'],
+							'case_count' => $data_file['case_count'],
+							'var_count' => $data_file['var_count'],
+							'created_by' => isset($options['changed_by']) ? $options['changed_by'] : null,
+							'changed_by' => isset($options['changed_by']) ? $options['changed_by'] : null,
+						);
+						try {
+							$this->ci->Editor_datafile_model->insert($sid, $insert_options);
+						} catch (Exception $e) {
+							log_message('error', "Failed to create data file '{$data_file['file_name']}': " . $e->getMessage());
+							throw new Exception("Failed to create data file '{$data_file['file_name']}': " . $e->getMessage());
+						}
+					} else {
+						// Skip creating new data file when $import_new_data is false
+						log_message('debug', "Skipping creation of new data file '{$data_file['file_name']}' - import_new_data is false");
+					}
+				}
+			}
+		}
 
         //import variables
 		// - match data files by file name
-		// - update only
+		// - if exists: update variable metadata based on import options
+		// - if not exists: create new variable entry (only if $import_new_data is true)
 		// - "variable_info", "variable_categories", "variable_questions", "variable_weights"
         
 		//list with file name as key and fid as value
 		$db_datafiles_names_map=$this->ci->Editor_datafile_model->file_id_name_list($sid);
+		
 
 		$variable_iterator=$parser->get_variable_iterator();
 
@@ -152,18 +202,61 @@ class Editor_partial_import
 			//get variable from db
 			$variable_db=$this->ci->Editor_variable_model->get_variable_by_filename($sid,$data_file_name,$variable['name']);
 
-			//skip
-			if (!$variable_db){
+			// Skip if variable name is empty
+			if (empty($variable['name'])) {
 				continue;
 			}
 
             $variable['var_catgry_labels']=$this->get_variable_category_value_labels($variable);
             
-			//update/merge variable metadata
-			$variable_db['metadata']=$this->update_variable_metadata($variable_db['metadata'], $variable, $import_options);
+			if ($variable_db) {
+				// Update existing variable metadata
+				$variable_db['metadata']=$this->update_variable_metadata($variable_db['metadata'], $variable, $import_options);
 
-			//update db
-			$this->ci->Editor_variable_model->update($sid,$variable_db['uid'],$variable_db);
+				//update db
+				try {
+					$this->ci->Editor_variable_model->update($sid,$variable_db['uid'],$variable_db);
+				} catch (Exception $e) {
+					log_message('error', "Failed to update variable '{$variable['name']}': " . $e->getMessage());
+					throw new Exception("Failed to update variable '{$variable['name']}': " . $e->getMessage());
+				}
+			} else {
+				// Only create new variable if $import_new_data is true
+				if ($import_new_data) {
+					// Create new variable
+					$fid = $db_datafiles_names_map[$data_file_name];
+					if (!$fid) {
+						log_message('error', "Data file '{$data_file_name}' not found in database for variable '{$variable['name']}'");
+						continue;
+					}
+
+					// Generate new variable ID
+					$max_vid = $this->ci->Editor_variable_model->get_max_vid($sid);
+					$new_vid = 'V' . ($max_vid + 1);
+
+					$new_variable = array(
+						'fid' => $fid,
+						'vid' => $new_vid,
+						'name' => $variable['name'],
+						'labl' => isset($variable['labl']) ? $variable['labl'] : '',
+						'field_dtype' => isset($variable['field_dtype']) ? $variable['field_dtype'] : 'numeric',
+						'sort_order' => 0,
+						'metadata' => $variable,
+						'created_by' => isset($options['changed_by']) ? $options['changed_by'] : null,
+						'changed_by' => isset($options['changed_by']) ? $options['changed_by'] : null,
+					);
+
+					try {
+						$this->ci->Editor_variable_model->insert($sid, $new_variable);
+					} catch (Exception $e) {
+						log_message('error', "Failed to create variable '{$variable['name']}': " . $e->getMessage());
+						throw new Exception("Failed to create variable '{$variable['name']}': " . $e->getMessage());
+					}
+				} else {
+					// Skip creating new variable when $import_new_data is false
+					log_message('debug', "Skipping creation of new variable '{$variable['name']}' - import_new_data is false");
+				}
+			}
 		}
 
 
