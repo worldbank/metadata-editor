@@ -289,5 +289,27 @@ $lang['Refresh tree']="Actualiser l'arborescence";
 $lang['Return to collections']="Retour aux collections";
 $lang['Collection']="Collection";
 
+// Import options translations
+$lang['import_project_metadata'] = 'Importer les métadonnées du projet';
+$lang['choose_ddi_xml_or_json_file'] = 'Choisir un fichier DDI/XML ou JSON';
+$lang['choose_json_file'] = 'Choisir un fichier JSON';
+$lang['import_options'] = 'Options d\'importation';
+$lang['import_file'] = 'Importer le fichier';
+$lang['errors'] = 'Erreurs';
+$lang['update_completed'] = 'Mise à jour terminée';
+$lang['view_documentation'] = 'voir la documentation';
+$lang['processing_please_wait'] = 'Traitement en cours, veuillez patienter...';
+$lang['project_level_metadata'] = 'Métadonnées au niveau du projet';
+$lang['data_files'] = 'Fichiers de données';
+$lang['variable_information'] = 'Informations sur les variables';
+$lang['document_description'] = 'Description du document';
+$lang['study_description'] = 'Description de l\'étude';
+$lang['file_description'] = 'Description du fichier';
+$lang['variable_documentation'] = 'Documentation des variables';
+$lang['variable_categories'] = 'Catégories de variables';
+$lang['variable_questions'] = 'Questions des variables';
+$lang['variable_weights'] = 'Poids des variables';
+$lang['variable_groups'] = 'Groupes de variables';
+
 /* End of file project_lang.php */
 /* Location: ./application/language/french/project_lang.php */

@@ -368,5 +368,27 @@ $lang['Control which users can access this collection and manage its settings']=
 $lang['Control which users can access projects within this collection']="Control which users can access projects within this collection";
 $lang['Select the source and target collections to move the collection']="Select the source and target collections to move the collection";
 
+// Import options translations
+$lang['import_project_metadata'] = 'Import project metadata';
+$lang['choose_ddi_xml_or_json_file'] = 'Choose DDI/XML or a JSON file';
+$lang['choose_json_file'] = 'Choose a JSON file';
+$lang['import_options'] = 'Import options';
+$lang['import_file'] = 'Import file';
+$lang['errors'] = 'Errors';
+$lang['update_completed'] = 'Update completed';
+$lang['view_documentation'] = 'view documentation';
+$lang['processing_please_wait'] = 'Processing, please wait...';
+$lang['project_level_metadata'] = 'Project-level metadata';
+$lang['data_files'] = 'Data files';
+$lang['variable_information'] = 'Variable information';
+$lang['document_description'] = 'Document description';
+$lang['study_description'] = 'Study description';
+$lang['file_description'] = 'File description';
+$lang['variable_documentation'] = 'Variable documentation';
+$lang['variable_categories'] = 'Variable categories';
+$lang['variable_questions'] = 'Variable questions';
+$lang['variable_weights'] = 'Variable weights';
+$lang['variable_groups'] = 'Variable groups';
+
 /* End of file project_lang.php */
 /* Location: ./application/language/base/project_lang.php */

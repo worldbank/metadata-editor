@@ -23,6 +23,11 @@ Vue.component('datafiles', {
                 message_error:'',
                 is_loading:false
             },
+            export_dialog:{
+                show:false,
+                file_index:null,
+                selected_format:''
+            },
             attrs: {}
             
         }
@@ -42,7 +47,7 @@ Vue.component('datafiles', {
             return moment.unix(date).format("YYYY-MM-DD")
         },
         removeData: async function(data_file){
-            if (!confirm("Are you sure you want to remove the data from this file?")){
+            if (!confirm(this.$t("confirm_remove_data"))){
                 data_file.store_data=1;
                 return false;
             }
@@ -60,7 +65,7 @@ Vue.component('datafiles', {
             })
             .catch(function(response){
                 console.log(response);
-                alert("Failed to remove data: "+ response.message);
+                alert(vm.$t("failed")+": "+ response.message);
             });
         },
 
@@ -99,7 +104,7 @@ Vue.component('datafiles', {
                 }else{
                     message=error.message;
                 }
-                alert("Failed: "+ message);
+                alert(vm.$t("failed")+": "+ message);
             })
             .then(function () {
                 console.log("request completed");
@@ -120,7 +125,7 @@ Vue.component('datafiles', {
             })
             .catch(function (error) {
                 console.log("failed to update datafiles sequence",error);
-                alert("Failed: "+ error.message);
+                alert(vm.$t("failed")+": "+ error.message);
             })            
         },
         getRowSequence: function(rows){
@@ -250,7 +255,7 @@ Vue.component('datafiles', {
             })
             .catch(function (error) {
                 console.log(error);
-                alert("Failed to delete: "+ error.message);
+                alert(vm.$t("failed")+": "+ error.message);
             });                        
         },
         exitEditMode: function()
@@ -351,8 +356,8 @@ Vue.component('datafiles', {
         {
             this.dialog={
                 show:true,
-                title:'Generate CSV file',
-                loading_message:'Please wait while the CSV file is being generated...',
+                title:this.$t('generate_csv_file'),
+                loading_message:this.$t('processing_please_wait'),
                 message_success:'',
                 message_error:'',
                 is_loading:true
@@ -380,8 +385,8 @@ Vue.component('datafiles', {
             }
 
             this.dialog.is_loading=true;
-            this.dialog.title="Generate CSV file";
-            this.dialog.loading_message="Please wait while the CSV file is being generated...";
+            this.dialog.title=this.$t('generate_csv_file');
+            this.dialog.loading_message=this.$t('processing_please_wait');
             try{
                 await this.sleep(5000);
                 let result=await this.$store.dispatch('generateCsvQueueStatusCheck',{file_id:file_id, job_id:job_id});
@@ -392,13 +397,13 @@ Vue.component('datafiles', {
                     this.generateCsvQueueStatusCheck(file_id,job_id);
                 }else if (result.data.job_status==='done'){
                     this.dialog.is_loading=false;
-                    this.dialog.message_success="Finished generating CSV file";                
+                    this.dialog.message_success=this.$t('csv_generated_success');                
                 }
                 
             }catch(e){
                 console.log("failed",e);
                 this.dialog.is_loading=false;
-                this.dialog.message_error="Failed to generate CSV file: "+e.response.data.message;
+                this.dialog.message_error=this.$t("failed")+": "+e.response.data.message;
             }
         },
         toggleFilesSelection: function()
@@ -413,6 +418,18 @@ Vue.component('datafiles', {
         onDatafileReplaced: function(event){
             this.dialog_datafile_import=false;            
             this.importSummaryStatistics(this.dialog_datafile_import_fid);
+        },
+        openExportDialog: function(file_index){
+            this.export_dialog.file_index = file_index;
+            this.export_dialog.selected_format = '';
+            this.export_dialog.show = true;
+        },
+        confirmExport: function(){
+            if (!this.export_dialog.selected_format) {
+                return;
+            }
+            this.exportFile(this.export_dialog.file_index, this.export_dialog.selected_format);
+            this.export_dialog.show = false;
         }
     },
     computed: {
@@ -434,7 +451,7 @@ Vue.component('datafiles', {
 
                 <v-row>
                     <v-col md="8">
-                    <button v-if="selected_files.length>0" type="button" class="btn btn-sm btn-outline-danger" @click="batchDelete">Delete {{selected_files.length}} selected</button>
+                    <button v-if="selected_files.length>0" type="button" class="btn btn-sm btn-outline-danger" @click="batchDelete">{{$t("Delete")}} {{selected_files.length}} {{$t("selected")}}</button>
                     
                     </v-col>
                     <v-col md="4" align="right" class="mb-2">
@@ -453,21 +470,7 @@ Vue.component('datafiles', {
                         <th>{{$t("variables")}}</th>
                         <th>{{$t("cases")}}</th>
                         <th>{{$t("Modified")}}</th>
-                        <th>{{$t("Data")}} 
-                       <v-tooltip top max-width="300" color="primary">
-                            <template v-slot:activator="{ on, attrs }">
-                                <span
-                                v-bind="attrs"
-                                v-on="on"
-                                >
-                                <v-icon color="primary" >mdi-help-circle-outline</v-icon>
-                                </span>
-                            </template>
-                            <span>{{$t("note_data_stored_on_server")}}</span>
-                        </v-tooltip>
-                        
-                        </th>                        
-                        <th></th>
+                        <th style="width: 50px;">{{$t("Actions")}}</th>
                     </tr>
                     </thead>
                     <tbody is="draggable" :list="data_files" tag="tbody" handle=".handle" >
@@ -477,8 +480,22 @@ Vue.component('datafiles', {
                         <td><v-icon color="primary" >mdi-file-document</v-icon> {{data_file.file_id}}</td>
                         <td>
                             <div>
-                                <div style="cursor:pointer;color:#0D47A1"  @click="editFile(index)">{{data_file.file_name}}</div>                                
-                                <div class="text-secondary text-small" v-if="data_file.file_info.original">                                                                
+                                <div class="d-flex align-center">
+                                    <div v-if="hasCsvFile(data_file.file_id) || data_file.store_data==1" 
+                                         class="mr-2" 
+                                         style="width: 8px; height: 8px; border-radius: 50%; background-color: #4CAF50;"
+                                         :title="$t('Has data')">
+                                    </div>
+                                    <div v-else 
+                                         class="mr-2" 
+                                         style="width: 8px; height: 8px; border-radius: 50%; background-color: #9E9E9E;"
+                                         :title="$t('No data')">
+                                    </div>
+                                    <div style="cursor:pointer;color:#0D47A1;font-weight:500" @click="editFile(index)">
+                                        {{data_file.file_name}}
+                                    </div>
+                                </div>
+                                <div class="text-secondary text-small mt-1" v-if="data_file.file_info.original">                                                                
                                     <span v-if="hasCsvFile(data_file.file_id)" >
                                     <v-chip small outlined>{{data_file.file_info.csv.filename}} {{data_file.file_info.csv.file_size}}</v-chip>
                                     </span>
@@ -489,102 +506,113 @@ Vue.component('datafiles', {
                         <td>{{data_file.case_count}}</td>                       
                         <td>{{momentDate(data_file.changed)}}</td>
                         <td>
-                            <v-btn 
-                                v-if="hasCsvFile(data_file.file_id) || data_file.store_data==1" 
-                                small text color="primary" 
-                                @click="removeData(data_file)" 
-                                >
-                                {{$t("clear_data")}}
-                            </v-btn>
-                            <v-btn v-else small text color="primary" disabled>{{$t("No data")}}</v-btn>                            
-                        </td>
-                        <td>
                             <div class="zxaction-buttons-hover">
-                                <router-link 
-                                    :title="$t('Variables')"
-                                    :to="'/variables/' + data_file.file_id">
-                                        <v-btn small text><v-icon>mdi-table</v-icon> </v-btn>
-                                </router-link>
-                                <router-link v-if="hasCsvFile(data_file.file_id) || data_file.store_data==1" 
-                                    :to="'/data-explorer/' + data_file.file_id"
-                                    :title="$t('data')"
-                                    ><v-btn small text><v-icon>mdi-table-eye</v-icon> </v-btn>
-                                </router-link>
-                                <v-btn v-else small text disabled
-                                    :title="$t('data')"
-                                    ><v-icon>mdi-table-eye</v-icon> 
-                                </v-btn>
-                                <v-btn color="red" text small 
-                                    title="$t('Delete')"
-                                    @click="deleteFile(index)"
-                                    ><v-icon>mdi-delete-outline</v-icon> 
-                                </v-btn>
-                                
-                                <v-menu offset-y v-if="hasCsvFile(data_file.file_id) || data_file.store_data==1"  >
-                                    <template v-slot:activator="{ on, attrs }">
-                                        <v-btn small text  v-bind="attrs" v-on="on">
-                                            <v-icon title="More options">mdi-database-export</v-icon> {{$t("export")}}
-                                        </v-btn>
-                                    </template>
-                                    <v-list>
-                                        <v-list-item @click="exportFile(index,'sav')">
-                                            <v-list-item-icon>
-                                                <v-icon>mdi-file</v-icon>
-                                            </v-list-item-icon>
-                                            <v-list-item-title>SPSS</v-list-item-title>
-                                        </v-list-item>
-                                        <v-list-item  @click="exportFile(index,'dta')">
-                                            <v-list-item-icon>
-                                                <v-icon>mdi-file</v-icon>
-                                            </v-list-item-icon>
-                                            <v-list-item-title>Stata</v-list-item-title>
-                                        </v-list-item>
-                                        <v-list-item  @click="exportFile(index,'csv')">
-                                            <v-list-item-icon>
-                                                <v-icon>mdi-file</v-icon>
-                                            </v-list-item-icon>
-                                            <v-list-item-title>CSV</v-list-item-title>
-                                        </v-list-item>
-                                        <v-list-item  @click="exportFile(index,'json')">
-                                            <v-list-item-icon>
-                                                <v-icon>mdi-file</v-icon>
-                                            </v-list-item-icon>
-                                            <v-list-item-title>JSON</v-list-item-title>
-                                        </v-list-item>
-                                        <v-list-item  @click="exportFile(index,'xpt')">
-                                            <v-list-item-icon>
-                                                <v-icon>mdi-file</v-icon>
-                                            </v-list-item-icon>
-                                            <v-list-item-title>SAS</v-list-item-title>
-                                        </v-list-item>
-                                    </v-list>
-                                </v-menu>
-                                <v-btn v-else disabled small text >
-                                    <v-icon title="More options">mdi-database-export</v-icon> {{$t("export")}}
-                                </v-btn>
-
                                 <v-menu offset-y>
                                     <template v-slot:activator="{ on, attrs }">                                        
-                                            <v-btn small icon v-on="on"><v-icon>mdi-dots-vertical</v-icon></v-btn>
+                                            <v-btn small icon v-on="on" v-bind="attrs" 
+                                                   :title="$t('More options')" 
+                                                   color="primary">
+                                                <v-icon>mdi-dots-vertical</v-icon>
+                                            </v-btn>
                                     </template>
                                                                     
-                                    <v-list>
+                                    <v-list dense>
+                                        <!-- View/Edit Options -->
+                                        <v-list-item @click="editFile(index)">
+                                            <v-list-item-icon>
+                                                <v-icon>mdi-file-edit</v-icon>
+                                            </v-list-item-icon>
+                                            <v-list-item-title>{{$t("edit")}}</v-list-item-title>
+                                        </v-list-item>
+                                        
+                                        <v-list-item 
+                                            :to="'/variables/' + data_file.file_id"
+                                            :title="$t('Variables')">
+                                            <v-list-item-icon>
+                                                <v-icon>mdi-table</v-icon>
+                                            </v-list-item-icon>
+                                            <v-list-item-title>{{$t("Variables")}}</v-list-item-title>
+                                        </v-list-item>
+                                        
+                                        <v-list-item v-if="hasCsvFile(data_file.file_id) || data_file.store_data==1" 
+                                            :to="'/data-explorer/' + data_file.file_id"
+                                            :title="$t('data')">
+                                            <v-list-item-icon>
+                                                <v-icon>mdi-table-eye</v-icon>
+                                            </v-list-item-icon>
+                                            <v-list-item-title>{{$t("data")}}</v-list-item-title>
+                                        </v-list-item>
+                                        
+                                        <v-list-item v-else disabled
+                                            :title="$t('data')">
+                                            <v-list-item-icon>
+                                                <v-icon>mdi-table-eye</v-icon>
+                                            </v-list-item-icon>
+                                            <v-list-item-title>{{$t("data")}} ({{$t("No data")}})</v-list-item-title>
+                                        </v-list-item>
+                                        
+                                        <v-divider></v-divider>
+                                        
+                                        <!-- Data Management -->
+                                        <v-list-item v-if="hasCsvFile(data_file.file_id) || data_file.store_data==1" 
+                                            @click="removeData(data_file)">
+                                            <v-list-item-icon>
+                                                <v-icon>mdi-database-remove</v-icon>
+                                            </v-list-item-icon>
+                                            <v-list-item-title>{{$t("clear_data")}}</v-list-item-title>
+                                        </v-list-item>
+                                        
+                                        <v-list-item v-else disabled>
+                                            <v-list-item-icon>
+                                                <v-icon>mdi-database-remove</v-icon>
+                                            </v-list-item-icon>
+                                            <v-list-item-title>{{$t("clear_data")}} ({{$t("No data")}})</v-list-item-title>
+                                        </v-list-item>
+                                        
                                         <v-list-item @click="importSummaryStatistics(data_file.file_id)">
                                             <v-list-item-icon>
                                                 <v-icon>mdi-update</v-icon>
                                             </v-list-item-icon>
                                             <v-list-item-title>{{$t("Refresh summary statistics")}}</v-list-item-title>
                                         </v-list-item>
-                                        <v-list-item  @click="replaceFile(index)">
+                                        
+                                        <v-list-item @click="replaceFile(index)">
                                             <v-list-item-icon>
                                                 <v-icon>mdi-file-upload-outline</v-icon>
                                             </v-list-item-icon>
                                             <v-list-item-title>{{$t("Replace file")}}</v-list-item-title>
                                         </v-list-item>
                                         
+                                        <v-divider></v-divider>
+                                        
+                                        <!-- Export Options -->
+                                        <v-list-item v-if="hasCsvFile(data_file.file_id) || data_file.store_data==1" 
+                                            @click="openExportDialog(index)">
+                                            <v-list-item-icon>
+                                                <v-icon>mdi-file-export</v-icon>
+                                            </v-list-item-icon>
+                                            <v-list-item-title>{{$t("export")}}</v-list-item-title>
+                                        </v-list-item>
+                                        
+                                        <v-list-item v-else disabled>
+                                            <v-list-item-icon>
+                                                <v-icon>mdi-file-export</v-icon>
+                                            </v-list-item-icon>
+                                            <v-list-item-title>{{$t("export")}} ({{$t("No data")}})</v-list-item-title>
+                                        </v-list-item>
+                                        
+                                        <v-divider></v-divider>
+                                        
+                                        <!-- Delete Option -->
+                                        <v-list-item @click="deleteFile(index)" class="red--text">
+                                            <v-list-item-icon>
+                                                <v-icon color="red">mdi-delete-outline</v-icon>
+                                            </v-list-item-icon>
+                                            <v-list-item-title class="red--text">{{$t("Delete")}}</v-list-item-title>
+                                        </v-list-item>
                                     </v-list>
                                 </v-menu>
-                                </div>
+                            </div>
                         </td>
                     </tr>
                     </tbody>
@@ -645,7 +673,7 @@ Vue.component('datafiles', {
                     <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn color="primary" text @click="dialog.show=false" v-if="dialog.is_loading==false">
-                        Close
+                        {{$t("close")}}
                     </v-btn>
                     </v-card-actions>
                 </v-card>
@@ -656,7 +684,40 @@ Vue.component('datafiles', {
                 v-model="dialog_datafile_import" 
                 :file_id="dialog_datafile_import_fid"
                 v-on:file-replaced="onDatafileReplaced"
-            ></dialog-datafile-replace>            
+            ></dialog-datafile-replace>
+
+            <!-- Export Dialog -->
+            <v-dialog v-model="export_dialog.show" width="400" persistent>
+                <v-card>
+                    <v-card-title class="text-h5 grey lighten-2">
+                        {{$t("export")}}
+                    </v-card-title>
+
+                    <v-card-text>
+                        <div class="mb-4">
+                            <p>{{$t("select_export_format")}}</p>
+                        </div>
+                        
+                        <v-radio-group v-model="export_dialog.selected_format" mandatory>
+                            <v-radio value="sav" label="SPSS (.sav)"></v-radio>
+                            <v-radio value="dta" label="Stata (.dta)"></v-radio>
+                            <v-radio value="csv" :label="$t('export_csv')"></v-radio>
+                            <v-radio value="json" label="JSON"></v-radio>
+                            <v-radio value="xpt" label="SAS (.xpt)"></v-radio>
+                        </v-radio-group>
+                    </v-card-text>
+
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn color="grey" text @click="export_dialog.show=false">
+                            {{$t("cancel")}}
+                        </v-btn>
+                        <v-btn color="primary" text @click="confirmExport" :disabled="!export_dialog.selected_format">
+                            {{$t("export")}}
+                        </v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
         
         </div>
     `

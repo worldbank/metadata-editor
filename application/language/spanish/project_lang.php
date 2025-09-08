@@ -367,5 +367,27 @@ $lang['Return to collections']="Volver a colecciones";
 $lang['Collection']="Colección";
 $lang['About']="Acerca de";
 
+// Import options translations
+$lang['import_project_metadata'] = 'Importar metadatos del proyecto';
+$lang['choose_ddi_xml_or_json_file'] = 'Elegir archivo DDI/XML o JSON';
+$lang['choose_json_file'] = 'Elegir archivo JSON';
+$lang['import_options'] = 'Opciones de importación';
+$lang['import_file'] = 'Importar archivo';
+$lang['errors'] = 'Errores';
+$lang['update_completed'] = 'Actualización completada';
+$lang['view_documentation'] = 'ver documentación';
+$lang['processing_please_wait'] = 'Procesando, por favor espere...';
+$lang['project_level_metadata'] = 'Metadatos a nivel de proyecto';
+$lang['data_files'] = 'Archivos de datos';
+$lang['variable_information'] = 'Información de variables';
+$lang['document_description'] = 'Descripción del documento';
+$lang['study_description'] = 'Descripción del estudio';
+$lang['file_description'] = 'Descripción del archivo';
+$lang['variable_documentation'] = 'Documentación de variables';
+$lang['variable_categories'] = 'Categorías de variables';
+$lang['variable_questions'] = 'Preguntas de variables';
+$lang['variable_weights'] = 'Pesos de variables';
+$lang['variable_groups'] = 'Grupos de variables';
+
 /* End of file project_lang.php */
 /* Location: ./application/language/spanish/project_lang.php */
