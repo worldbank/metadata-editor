@@ -11,15 +11,30 @@ Vue.component('import-options', {
             is_processing:false,
             import_options:{
                 "survey":{
-                    'document_description':'Document description',
-                    'study_description':'Study description',
-                    'data_files':'File description',
-                    'variable_info':'Variable information',
-                    'variable_documentation':'Variable documentation',
-                    'variable_categories':'Variable categories',
-                    'variable_questions':'Variable questions',
-                    'variable_weights':'Variable weights',                    
-                    'variable_groups':'Variable groups'
+                    'project_metadata': {
+                        'title': 'project_level_metadata',
+                        'options': {
+                            'document_description':'document_description',
+                            'study_description':'study_description'
+                        }
+                    },
+                    'data_files': {
+                        'title': 'data_files',
+                        'options': {
+                            'data_files':'file_description'
+                        }
+                    },
+                    'variable_info': {
+                        'title': 'variable_information',
+                        'options': {
+                            'variable_info':'variable_information',
+                            'variable_documentation':'variable_documentation',
+                            'variable_categories':'variable_categories',
+                            'variable_questions':'variable_questions',
+                            'variable_weights':'variable_weights',
+                            'variable_groups':'variable_groups'
+                        }
+                    }
                 }
             },
             import_options_selected:[]
@@ -32,9 +47,15 @@ Vue.component('import-options', {
         defaultOptionsSelection: function(){
             this.import_options_selected=[];
             if (this.import_options[this.ProjectType]){
-                for (let opt in this.import_options[this.ProjectType]){
-                    console.log(opt);
-                    this.import_options_selected.push(opt);
+                // Iterate through each group
+                for (let groupKey in this.import_options[this.ProjectType]){
+                    let group = this.import_options[this.ProjectType][groupKey];
+                    if (group.options) {
+                        // Add all options from each group by default
+                        for (let opt in group.options){
+                            this.import_options_selected.push(opt);
+                        }
+                    }
                 }
             }
         },
@@ -70,8 +91,8 @@ Vue.component('import-options', {
         onCancel: function(){
             router.push('/study/study_desc');
         },
-        handleFileUpload( event ){
-            this.file = event.target.files[0];
+        handleFileUpload( file ){
+            this.file = file;
         }
     },
     
@@ -89,7 +110,7 @@ Vue.component('import-options', {
             
                 <v-card>
                     <v-card-title>
-                        Import project metadata
+                        {{$t("import_project_metadata")}}
                     </v-card-title>
                     <v-card-text>
 
@@ -97,43 +118,76 @@ Vue.component('import-options', {
 
                     <div class="form-container-x" >
 
-                        <div class="file-group form-field mb-3" style="max-width:600px;">
-                            <label class="l" for="customFile">
-                                <span v-if="ProjectType=='survey'">Choose DDI/XML or a JSON file</span></label>
-                                <span v-if="ProjectType!='survey'">Choose a JSON file</span></label>
-                            <input type="file" class="form-control" id="customFile" @change="handleFileUpload( $event )">                
+                        <div class="file-group mb-3" style="max-width:600px;">
+                            <label class="form-label mb-2">
+                                <span v-if="ProjectType=='survey'">{{$t("choose_ddi_xml_or_json_file")}}</span>
+                                <span v-if="ProjectType!='survey'">{{$t("choose_json_file")}}</span>
+                            </label>
+                            <v-file-input
+                                v-model="file"
+                                label=""
+                                accept=".xml,.json"                                
+                                append-icon="mdi-file-upload"
+                                @change="handleFileUpload"
+                                outlined
+                                dense
+                            ></v-file-input>
                         </div>
 
-                        <div>
+                        <div v-if="ProjectType=='survey'">
 
-                            <strong>Options</strong>
+                            <strong>{{$t("import_options")}}</strong>
 
-                            <div v-if="ProjectType=='survey'" class="ml-2">
-                                <div class="form-group form-check mb-0" v-for="(opt,opt_key) in import_options.survey" :key="opt_key">
-                                    <input type="checkbox" class="form-check-input" :id="opt_key" :value="opt_key" v-model="import_options_selected">
-                                    <label class="form-check-label" :for="opt_key">{{opt}}</label>
-                                </div>                                
+                            <div class="mt-3">
+                                <div v-for="(group, groupKey) in import_options.survey" :key="groupKey" class="mb-4">
+                                    <h6 class="mb-2">{{$t(group.title)}}</h6>
+                                    <p v-if="group.description" class="text-muted small mb-2 ml-3">{{$t(group.description)}}</p>
+                                    <ul class="list-unstyled ml-3">
+                                        <li class="form-group form-check mb-2" v-for="(opt, opt_key) in group.options" :key="opt_key">
+                                            <input type="checkbox" class="form-check-input" :id="opt_key" :value="opt_key" v-model="import_options_selected">
+                                            <label class="form-check-label" :for="opt_key">
+                                                {{$t(opt)}}
+                                            </label>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         
                         </div>
                         
-                        <div v-if="!is_processing" class="mt-5" >
-                        <button type="button" :disabled="!file" class="btn btn-sm btn-primary" @click="importDDI">Import file</button>
-                        <button type="button" :disabled="!file" class="btn btn-sm btn-danger" @click="onCancel">{{$t("cancel")}}</button>
+                        <div v-if="!is_processing" class="mt-5 d-flex" >
+                            <v-btn
+                                color="primary"
+                                :disabled="!file"
+                                @click="importDDI"
+                                small
+                                class="mr-3"
+                            >
+                                {{$t("import_file")}}
+                            </v-btn>
+                            <v-btn
+                                color="error"
+                                :disabled="!file"
+                                @click="onCancel"
+                                small
+                                outlined
+                            >
+                                {{$t("cancel")}}
+                            </v-btn>
                         </div>
 
                     </div>
 
                     <div v-if="errors" class="p-3 mt-3 border" style="color:red">
-                        <div><strong>Errors</strong></div>
+                        <div><strong>{{$t("errors")}}</strong></div>
                         {{errors}}
                         <div v-if="errors.response">{{errors.response.data.message}}</div>
                     </div>
 
                     <v-row class="mt-3 text-center" v-if="update_status=='completed' && errors==''">
                         <v-col class="text-center" >
-                            <i class="far fa-check-circle" style="font-size:24px;color:green;"></i> Update completed,
-                            <router-link :to="'/study/study_description/'">view documentation</router-link>
+                            <i class="far fa-check-circle" style="font-size:24px;color:green;"></i> {{$t("update_completed")}},
+                            <router-link :to="'/study/study_description/'">{{$t("view_documentation")}}</router-link>
                         </v-col>
                     </v-row>
             
@@ -146,7 +200,7 @@ Vue.component('import-options', {
                             :size="20"
                             color="primary"
                             ></v-progress-circular>
-                            Processing, please wait... 
+                            {{$t("processing_please_wait")}} 
 
                     </div>
 
