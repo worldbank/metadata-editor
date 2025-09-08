@@ -487,9 +487,27 @@ class Editor_datafile_model extends CI_Model {
 		//get project folder
 		$project_folder=$this->Editor_model->get_project_folder($sid);
 
-		$output=array();
+		$output=array(
+			'processed' => 0,
+			'deleted' => 0,
+			'skipped' => 0,
+			'files' => array()
+		);
 
 		foreach($files as $file){
+			$output['processed']++;
+
+			// Skip if file_physical_name is empty
+			if (empty($file['file_physical_name'])) {
+				$output['skipped']++;
+				$output['files'][] = [
+					'file_id' => $file['file_id'],
+					'file_name' => $file['file_name'],
+					'file_physical_name' => $file['file_physical_name'],
+					'status' => 'skipped',
+				];
+				continue;
+			}
 
 			//is csv file?
 			$is_csv=strtolower($this->get_file_extension($file['file_physical_name']))=='csv';
@@ -507,40 +525,91 @@ class Editor_datafile_model extends CI_Model {
 			//remove original + csv file
 			if ($file['store_data']==0){
 				
-				//remove original file
-				if (file_exists($original_path)){
+				//remove original file - only if it's a file, not a directory
+				if (file_exists($original_path) && is_file($original_path)){
 					unlink($original_path);
-
-					$output[]=[
-						'file_id'=>$file['file_id'],
-						'file_name'=>$file['file_physical_name'],
-						//'file_path'=>$original_path,
-						'status'=>'deleted'
+					$output['deleted']++;
+					$output['files'][] = [
+						'file_id' => $file['file_id'],
+						'file_name' => $file['file_physical_name'],
+						'file_physical_name' => $file['file_physical_name'],
+						'status' => 'deleted',
+						'type' => 'original'
+					];
+				} else {
+					$output['skipped']++;
+					$reason = 'Original file not deleted: ';
+					if (!file_exists($original_path)) {
+						$reason .= 'file does not exist';
+					} else if (!is_file($original_path)) {
+						$reason .= 'path is a directory, not a file';
+					}
+					$output['files'][] = [
+						'file_id' => $file['file_id'],
+						'file_name' => $file['file_physical_name'],
+						'file_physical_name' => $file['file_physical_name'],
+						'status' => 'skipped',
 					];
 				}
 
-				//remove csv file
-				if (file_exists($csv_path)){
+				//remove csv file - only if it's a file, not a directory
+				if (file_exists($csv_path) && is_file($csv_path)){
 					unlink($csv_path);
-
-					$output[]=[
-						'file_id'=>$file['file_id'],
-						'file_name'=>$filename_csv,
-						//'file_path'=>$csv_path,
-						'status'=>'deleted'
+					$output['deleted']++;
+					$output['files'][] = [
+						'file_id' => $file['file_id'],
+						'file_name' => $filename_csv,
+						'file_physical_name' => $filename_csv,
+						'status' => 'deleted',
+						'type' => 'csv'
+					];
+				} else {
+					$output['skipped']++;
+					$reason = 'CSV file not deleted: ';
+					if (!file_exists($csv_path)) {
+						$reason .= 'file does not exist';
+					} else if (!is_file($csv_path)) {
+						$reason .= 'path is a directory, not a file';
+					}
+					$output['files'][] = [
+						'file_id' => $file['file_id'],
+						'file_name' => $filename_csv,
+						'file_physical_name' => $filename_csv,
+						'status' => 'skipped',
 					];
 				}
 			}
 			else{
 				//remove original file (non-csv) if csv exists
-				if (!$is_csv && file_exists($original_path)){
+				if (!$is_csv && file_exists($original_path) && is_file($original_path) && file_exists($csv_path) && is_file($csv_path)){
 					unlink($original_path);
-
-					$output[]=[
-						'file_id'=>$file['file_id'],
-						'file_name'=>$file['file_physical_name'],
-						//'file_path'=>$original_path,
-						'status'=>'deleted'
+					$output['deleted']++;
+					$output['files'][] = [
+						'file_id' => $file['file_id'],
+						'file_name' => $file['file_physical_name'],
+						'file_physical_name' => $file['file_physical_name'],
+						'status' => 'deleted',
+						'type' => 'original',
+					];
+				} else {
+					$output['skipped']++;
+					$reason = 'Original file not deleted: ';
+					if ($is_csv) {
+						$reason .= 'file is already CSV, no conversion needed';
+					} else if (!file_exists($original_path)) {
+						$reason .= 'original file does not exist';
+					} else if (!is_file($original_path)) {
+						$reason .= 'original file is a directory';
+					} else if (!file_exists($csv_path)) {
+						$reason .= 'CSV file does not exist';
+					} else if (!is_file($csv_path)) {
+						$reason .= 'CSV file is a directory';
+					}
+					$output['files'][] = [
+						'file_id' => $file['file_id'],
+						'file_name' => $file['file_physical_name'],
+						'file_physical_name' => $file['file_physical_name'],
+						'status' => 'skipped',
 					];
 				}
 			}
@@ -553,6 +622,10 @@ class Editor_datafile_model extends CI_Model {
 
 	private function get_file_extension($filename)
 	{
+		if (empty($filename)){
+			return '';
+		}
+
 		$info=pathinfo($filename);
 		return $info['extension'];
 	}
@@ -991,6 +1064,7 @@ class Editor_datafile_model extends CI_Model {
 		
 		return TRUE;
 	}
+
 
 	function data_files_get_varcount($sid)
 	{

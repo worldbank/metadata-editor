@@ -479,10 +479,11 @@ class Data extends MY_REST_Controller
 				throw new Exception("Job failed");
 			}
 
-			//update pyhsical data file to CSV
 			$csv_file_path=$this->Editor_datafile_model->check_csv_exists($sid, $file_id);
 
 			if ($csv_file_path){
+				$cleanup_result = $this->Editor_datafile_model->cleanup($sid, $file_id);
+				
 				$datafile=$this->Editor_datafile_model->data_file_by_id($sid,$file_id);
 				if ($datafile){
 					$this->Editor_datafile_model->update($datafile['id'],array('file_physical_name'=>basename($csv_file_path)));

@@ -103,15 +103,20 @@ Vue.component('datafile-import', {
                 return false;    
             }
 
+            let csvJobs = [];
 
             for(i=0;i<this.files.length;){                
-                await this.processFile(i);
+                let result = await this.processFile(i);
+                if (result && result.csvJob) {
+                    csvJobs.push(result.csvJob);
+                }
                 i++;
             }
 
-            //clean up - remove uploaded files that are not stored
-            this.update_status="Cleaning up ...";
-            let cleanup=await this.cleanUpData();
+            if (csvJobs.length > 0) {
+                this.update_status="Waiting for CSV generation to complete...";
+                await this.waitForAllCsvJobs(csvJobs);
+            }
 
             this.update_status="completed";
             this.is_processing=false;
@@ -150,26 +155,22 @@ Vue.component('datafile-import', {
          */
         processFile: async function(fileIdx)
         {
-            console.log("processing file",fileIdx);
             try{
-                //upload file
                 let resp=await this.uploadFile(fileIdx);
                 let fileid=resp.result.file_id;
                 
                 if (!fileid){
-                    console.log("failed uploading file",resp);
                     throw new Error('File upload failed for file ' + this.files[fileIdx].name);
                 }
 
-                //import summary statistics
                 this.update_status="Generating summary statistics and frequencies " + this.files[fileIdx].name;
                 let stats_resp=await this.importDataFileSummaryStatistics(fileIdx, fileid);
 
-                //generate csv, only if data is stored
+                let csvJob = null;
                 if (this.keep_data=='store'){
                     if (!this.files[fileIdx].type.match('csv.*')) {
                         this.update_status="Exporting data to CSV " + this.files[fileIdx].name;
-                        let csv_resp=await this.generateCSV(fileIdx,fileid);                    
+                        csvJob = await this.generateCSV(fileIdx,fileid);                    
                     }
                 }
 
@@ -180,6 +181,12 @@ Vue.component('datafile-import', {
                     }
                 );
 
+                return {
+                    fileIdx: fileIdx,
+                    fileid: fileid,
+                    csvJob: csvJob
+                };
+
             } catch (error) {
                 this.has_errors=true;
                 this.errors="failed uploading file "  + fileIdx + ' with error: ' + JSON.stringify(error) ;
@@ -188,6 +195,12 @@ Vue.component('datafile-import', {
                         'status': 'error',
                         'error': error
                 });
+                return {
+                    fileIdx: fileIdx,
+                    fileid: null,
+                    csvJob: null,
+                    error: error
+                };
             }
         },
         uploadFile: async function (fileIdx)
@@ -236,8 +249,11 @@ Vue.component('datafile-import', {
         generateCSV: async function(fileIdx,file_id)
         {
             let result=await this.$store.dispatch('generateCsvQueue',{file_id:file_id});
-            let status=await this.generateCsvQueueStatusCheck(file_id,result.data.job_id);
-            return status;
+            return {
+                file_id: file_id,
+                job_id: result.data.job_id,
+                file_name: this.files[fileIdx].name
+            };
         },         
         generateCsvQueueStatusCheck: async function(file_id,job_id){
             await this.sleep(this.sleep_time);
@@ -248,6 +264,18 @@ Vue.component('datafile-import', {
             }else if (result.data.job_status==='done'){
                 return true;
             }                
+        },
+        waitForAllCsvJobs: async function(csvJobs)
+        {
+            for (let i = 0; i < csvJobs.length; i++) {
+                const job = csvJobs[i];
+                
+                try {
+                    await this.generateCsvQueueStatusCheck(job.file_id, job.job_id);
+                } catch (error) {
+                    // Continue with other jobs even if one fails
+                }
+            }
         },
         cleanUpData:async function()
         {
