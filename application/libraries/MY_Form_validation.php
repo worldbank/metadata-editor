@@ -226,6 +226,26 @@ class MY_Form_validation extends CI_Form_validation {
         return FALSE;
     }
 
+    /**
+     * Callback function to validate file name using validate_filename
+     */
+    public function validate_file_name($file_name)
+    {
+        try {
+            // Load the helper if not already loaded
+            $this->CI =& get_instance();
+            $this->CI->load->helper('file_helper');
+            
+            // Create a test filename with a common extension for validation
+            $test_filename = $file_name . '.csv';
+            validate_filename($test_filename, 200);
+            return TRUE;
+        } catch (Exception $e) {
+            $this->set_message('validate_file_name', $e->getMessage());
+            return FALSE;
+        }
+    }
+
 
 }//end class
 

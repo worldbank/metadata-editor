@@ -17,9 +17,9 @@ Vue.component('datafile-import', {
             sleep_counter:0,
             overwrite_if_exists:false,
             file_types:{
-                "DTA": "Stata (DTA)",
-                "SAV": "SPSS (SAV)",
-                "CSV": "CSV"
+                "DTA": this.$t("Stata (DTA)"),
+                "SAV": this.$t("SPSS (SAV)"),
+                "CSV": this.$t("CSV")
             },
             allowed_file_types:["dta","sav","csv"],
             dialog_process:false,
@@ -96,7 +96,7 @@ Vue.component('datafile-import', {
                 this.has_errors=true;
 
                 this.upload_report.push({
-                    'file_name': "Data service error",
+                    'file_name': this.$t("Data service error"),
                     'status': 'error',
                     'error': error
                 });
@@ -114,7 +114,7 @@ Vue.component('datafile-import', {
             }
 
             if (csvJobs.length > 0) {
-                this.update_status="Waiting for CSV generation to complete...";
+                this.update_status=this.$t("Waiting for CSV generation to complete...");
                 await this.waitForAllCsvJobs(csvJobs);
             }
 
@@ -163,13 +163,13 @@ Vue.component('datafile-import', {
                     throw new Error('File upload failed for file ' + this.files[fileIdx].name);
                 }
 
-                this.update_status="Generating summary statistics and frequencies " + this.files[fileIdx].name;
+                this.update_status=this.$t("Generating summary statistics and frequencies") + " " + this.files[fileIdx].name;
                 let stats_resp=await this.importDataFileSummaryStatistics(fileIdx, fileid);
 
                 let csvJob = null;
                 if (this.keep_data=='store'){
                     if (!this.files[fileIdx].type.match('csv.*')) {
-                        this.update_status="Exporting data to CSV " + this.files[fileIdx].name;
+                        this.update_status=this.$t("Exporting data to CSV") + " " + this.files[fileIdx].name;
                         csvJob = await this.generateCSV(fileIdx,fileid);                    
                     }
                 }
@@ -189,7 +189,7 @@ Vue.component('datafile-import', {
 
             } catch (error) {
                 this.has_errors=true;
-                this.errors="failed uploading file "  + fileIdx + ' with error: ' + JSON.stringify(error) ;
+                this.errors=this.$t("failed uploading file") + " " + fileIdx + ' with error: ' + JSON.stringify(error) ;
                 this.upload_report.push({
                         'file_name':this.files[fileIdx].name,
                         'status': 'error',
@@ -338,7 +338,7 @@ Vue.component('datafile-import', {
 
             try {
                 const resp = await axios.get(url);                
-                vm.errors="File with the name already exists.";
+                vm.errors=this.$t("File with the name already exists.");
                 return false;
             } catch (err) {
                 console.error(err);
@@ -380,10 +380,10 @@ Vue.component('datafile-import', {
                                 <thead>
                                     <tr>
                                     <th class="text-left">
-                                        File
+                                        {{$t("File")}}
                                     </th>
                                     <th class="text-left">
-                                        Size
+                                        {{$t("Size")}}
                                     </th>
                                     <th>
                                     </th>
@@ -393,7 +393,7 @@ Vue.component('datafile-import', {
                                     <tr v-for="(file,file_index) in files" :key="file.name">
                                     <td>{{ file.name }}</td>
                                     <td>{{ file.size | kbmb }}</td>
-                                    <td><button class="float-right" @click="removeFile(file_index)" title="Remove"><i class="fas fa-trash"></i></button></td>
+                                    <td><button class="float-right" @click="removeFile(file_index)" :title="$t('Remove')"><i class="fas fa-trash"></i></button></td>
                                     </tr>
                                 </tbody>
                                 </template>

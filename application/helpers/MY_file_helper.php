@@ -435,7 +435,43 @@ if ( ! function_exists('get_zip_archive_list'))
 	}
 }
 
+/**
+ * Validate a file name against security rules.
+ *
+ * @param string $filename The filename to validate
+ * @param int    $maxLength Maximum length (default 255)
+ * @return bool TRUE if valid
+ * @throws Exception if validation fails
+ */
+function validate_filename(string $filename, int $maxLength = 255): bool
+{
+    // Must not be empty
+    if ($filename === '.' || $filename === '..') {
+        throw new Exception('File name cannot be empty, "." or ".."');
+    }
 
+    // Remove path info (if filename includes directories, reject)
+    if ($filename !== basename($filename)) {
+        throw new Exception('File name cannot contain directory separators');
+    }
+
+    // Check length
+    if (strlen($filename) > $maxLength) {
+        throw new Exception("File name exceeds maximum length of {$maxLength} characters");
+    }
+
+	//check for spaces before and after the filename
+	if ($filename !== trim($filename)) {
+     	throw new Exception('File name cannot contain leading or trailing spaces');
+	}
+
+	// Allow letters, numbers, spaces, underscores, hyphens, dots, parentheses
+	if (!preg_match('/^[A-Za-z0-9\s._()\-]+$/', $filename)) {
+        throw new Exception('File name contains invalid characters. Only letters, numbers, dots, hyphens, and underscores are allowed');
+    }
+
+    return true;
+}
 
 // ------------------------------------------------------------------------
 /* End of file MY_file_helper.php */

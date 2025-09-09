@@ -389,5 +389,32 @@ $lang['variable_questions'] = 'Preguntas de variables';
 $lang['variable_weights'] = 'Pesos de variables';
 $lang['variable_groups'] = 'Grupos de variables';
 
+// Data storage options
+$lang['Store data'] = "Almacenar datos";
+$lang['Do not store data'] = "No almacenar datos";
+
+// File overwrite option
+$lang['Overwrite (if file already exists)'] = "Sobrescribir (si el archivo ya existe)";
+
+// Table headers
+$lang['File'] = "Archivo";
+$lang['Size'] = "Tamaño";
+
+// Button tooltips
+$lang['Remove'] = "Eliminar";
+
+// Status messages
+$lang['Data service error'] = "Error del servicio de datos";
+$lang['Waiting for CSV generation to complete...'] = "Esperando que se complete la generación CSV...";
+$lang['Generating summary statistics and frequencies'] = "Generando estadísticas resumidas y frecuencias";
+$lang['Exporting data to CSV'] = "Exportando datos a CSV";
+$lang['failed uploading file'] = "falló la subida del archivo";
+$lang['File with the name already exists.'] = "Ya existe un archivo con ese nombre.";
+
+// File type labels
+$lang['Stata (DTA)'] = "Stata (DTA)";
+$lang['SPSS (SAV)'] = "SPSS (SAV)";
+$lang['CSV'] = "CSV";
+
 /* End of file project_lang.php */
 /* Location: ./application/language/spanish/project_lang.php */

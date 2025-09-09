@@ -84,7 +84,11 @@ const VueDatafileEdit= Vue.component('datafile-edit', {
                 router.push('/datafiles/');
             })
             .catch(function(response){
-                vm.errors=response;
+                if (response.response && response.response.data && response.response.data.message) {
+                    alert('Error: ' + response.response.data.message);
+                } else {
+                    vm.errors=response;
+                }
             });
         }
     },
@@ -124,7 +128,7 @@ const VueDatafileEdit= Vue.component('datafile-edit', {
 
                             <div class="form-group form-field">
                                 <label for="filename">File name</label> 
-                                <span><input readonly type="text" id="filename" class="form-control" v-model="form_local.file_name"/></span> 
+                                <span><input type="text" id="filename" class="form-control" v-model="form_local.file_name"/></span> 
                             </div>
 
                             <div class="form-group form-field">

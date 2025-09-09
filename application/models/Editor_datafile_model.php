@@ -75,6 +75,9 @@ class Editor_datafile_model extends CI_Model {
 		$uploaded_file_name=$upload_result['file_name'];
 		$uploaded_path=$upload_result['full_path'];
 
+		// Validate uploaded file name
+		validate_filename($uploaded_file_name, 200);
+
 		if ($store_data=='store'){
 			$store_data=1;
 		}else {
@@ -1003,6 +1006,11 @@ class Editor_datafile_model extends CI_Model {
 		//filename
 		if ($data['file_name']){
 			$data['file_name']=$this->filename_part($data['file_name']);
+			
+			// Validate file name if physical name is provided
+			if (isset($data['file_physical_name'])) {
+				validate_filename($data['file_physical_name'], 200);
+			}
 		}
 
 		$data['sid']=$sid;		
@@ -1050,9 +1058,26 @@ class Editor_datafile_model extends CI_Model {
 
 		$data['changed']=date("U");
 
-		//filename
+		// Handle file name change - rename physical files
 		if (isset($data['file_name'])){
-			$data['file_name']=$this->filename_part($data['file_name']);
+			$new_file_name = $this->filename_part($data['file_name']);
+			$old_data_file = $this->data_file_by_pk_id($id, $data_file['sid']);
+			
+			if ($old_data_file && $old_data_file['file_name'] != $new_file_name) {
+				// Validate the new file name
+				validate_filename($new_file_name, 200);
+				
+				// Check if new file name already exists
+				$existing_file = $this->data_file_by_name($data_file['sid'], $new_file_name);
+				if ($existing_file && $existing_file['id'] != $id) {
+					throw new Exception("Data file name '{$new_file_name}' already exists");
+				}
+				
+				$extension = $this->get_file_extension($old_data_file['file_physical_name']);
+				$new_physical_name = $new_file_name . ($extension ? '.' . $extension : '');
+				$this->rename_physical_files($data_file['sid'], $id, $old_data_file['file_physical_name'], $new_physical_name);
+				$data['file_physical_name'] = $new_physical_name;
+			}
 		}
 		
 		$this->db->where('id',$id);
@@ -1065,6 +1090,38 @@ class Editor_datafile_model extends CI_Model {
 		return TRUE;
 	}
 
+	/**
+	 * Rename physical files when data file name changes
+	 */
+	private function rename_physical_files($sid, $file_id, $old_physical_name, $new_physical_name)
+	{
+		$project_folder = $this->Editor_model->get_project_folder($sid);
+		$data_folder = $project_folder . '/data/';
+		
+		// Get logical names for CSV file renaming
+		$old_logical_name = $this->filename_part($old_physical_name);
+		$new_logical_name = $this->filename_part($new_physical_name);
+		
+		// Paths for original and CSV files
+		$old_original_path = $data_folder . $old_physical_name;
+		$new_original_path = $data_folder . $new_physical_name;
+		$old_csv_path = $data_folder . $old_logical_name . '.csv';
+		$new_csv_path = $data_folder . $new_logical_name . '.csv';
+		
+		// Rename original file if it exists
+		if (file_exists($old_original_path) && is_file($old_original_path)) {
+			if (!rename($old_original_path, $new_original_path)) {
+				throw new Exception("Failed to rename original file from {$old_physical_name} to {$new_physical_name}");
+			}
+		}
+		
+		// Rename CSV file if it exists
+		if (file_exists($old_csv_path) && is_file($old_csv_path)) {
+			if (!rename($old_csv_path, $new_csv_path)) {
+				throw new Exception("Failed to rename CSV file from " . basename($old_csv_path) . " to " . basename($new_csv_path));
+			}
+		}
+	}
 
 	function data_files_get_varcount($sid)
 	{
@@ -1092,10 +1149,9 @@ class Editor_datafile_model extends CI_Model {
 		if($is_new){				
 			#$this->form_validation->set_rules('surveyid', 'IDNO', 'xss_clean|trim|max_length[255]|required');
 			//$this->form_validation->set_rules('file_id', 'File ID', 'required|xss_clean|trim|max_length[50]');	
-			$this->form_validation->set_rules('file_name', 'File name', 'required|xss_clean|trim|max_length[200]');	
+			$this->form_validation->set_rules('file_name', 'File name', 'required|xss_clean|trim|max_length[200]|validate_file_name');	
 			$this->form_validation->set_rules('case_count', 'Case count', 'xss_clean|trim|max_length[10]');	
 			$this->form_validation->set_rules('var_count', 'Variable count', 'xss_clean|trim|max_length[10]');	
-
 			
 			//file id
 			$this->form_validation->set_rules(
@@ -1112,7 +1168,7 @@ class Editor_datafile_model extends CI_Model {
 			);
 
 		}
-		
+				
 		if ($this->form_validation->run() == TRUE){
 			return TRUE;
 		}
@@ -1122,6 +1178,7 @@ class Editor_datafile_model extends CI_Model {
 		$error_str=$this->form_validation->error_array_to_string($errors);
 		throw new ValidationException("VALIDATION_ERROR: ".$error_str, $errors);
 	}
+
 
 	
 }//end-class
