@@ -159,6 +159,7 @@
             echo $this->load->view("metadata_editor/vue-datafile-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-datafile-import-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-datafile-data-explorer-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-dialog-datafile-export-component.js",null,true);
 
             echo $this->load->view("metadata_editor/vue-variable-edit-documentation-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-variables-component.js",null,true);
@@ -731,6 +732,17 @@
                 {
                     let url=CI.base_url + '/api/data/generate_csv_job_status/'+getters.getProjectID + '/' + options.file_id + '/' +  options.job_id;
                     let resp = await axios.get(url);
+                    return resp;                
+                },
+                async validateValueLabels({commit,getters}, options)
+                {
+                    let url=CI.base_url + '/api/data/validate_value_labels/'+getters.getProjectID + '/' + options.file_id;
+                    let params = {
+                        "format": options.format,
+                        "show_all_errors": options.show_all_errors || false
+                    }
+
+                    let resp = await axios.get(url, {params: params});
                     return resp;                
                 },
                 async exportDatafileQueue({commit,getters}, options)

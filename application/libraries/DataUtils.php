@@ -178,6 +178,7 @@ class DataUtils
 		$response=json_decode($api_response->getBody()->getContents(),true);
 		return [
 			'response'=>$response,
+			'request_url'=>$client->getConfig('base_uri'),
 			//'request'=>$request_body,
 			'status_code'=>$api_response->getStatusCode() //e.g. 200
 		];
@@ -404,7 +405,7 @@ class DataUtils
         }
 		
 		//get variables data types, missing, weights info
-        $this->ci->db->select("name,field_dtype,user_missings,is_weight,var_wgt_id");
+        $this->ci->db->select("name,field_dtype,user_missings,is_weight,var_wgt_id, interval_type");
         $this->ci->db->where("sid",$sid);
         $this->ci->db->where("fid",$fid);        
         $variables=$this->ci->db->get("editor_variables")->result_array();
@@ -447,6 +448,11 @@ class DataUtils
                     $params['dtypes'][$variable['name']]= $dtype_map[$variable['field_dtype']];
                 }
             }
+
+			//interval type [categorical - for enabling frequencies]
+			if ($variable['interval_type']!='' && $variable['interval_type']=='discrete'){
+				$params['categorical'][]=$variable['name'];
+			}
         }
 
         return $params;

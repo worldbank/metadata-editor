@@ -25,8 +25,8 @@ Vue.component('datafiles', {
             },
             export_dialog:{
                 show:false,
-                file_index:null,
-                selected_format:''
+                file_id:null,
+                file_name:''
             },
             attrs: {}
             
@@ -144,65 +144,12 @@ Vue.component('datafiles', {
             this.dialog_datafile_import_fid=data_file.file_id;
             this.dialog_datafile_import=true;
         },
-        exportFile: async function(file_idx,format){
-            let data_file=this.data_files[file_idx];
-
-            this.dialog={
-                show:true,
-                title:this.$t('export_file') + '[' + format + ']',
-                loading_message:this.$t('processing_please_wait'),
-                message_success:'',
-                message_error:'',
-                is_loading:true
-            }
-
-            try{
-                //add to queue
-                let result=await this.$store.dispatch('exportDatafileQueue',{file_id:data_file.file_id, format:format});
-                console.log("queued for export",result);
-                this.exportFileStatusCheck(data_file.file_id,result.data.job_id,format);
-            }catch(e){
-                console.log("failed",e);
-                this.dialog.is_loading=false;
-                this.dialog.message_error=this.$t("failed")+": "+e.response.data.message;                
-            }
+        exportFile: function(file_idx, format){
+            let data_file = this.data_files[file_idx];
+            this.export_dialog.file_id = data_file.file_id;
+            this.export_dialog.file_name = data_file.file_name;
+            this.export_dialog.show = true;
         },        
-        exportFileStatusCheck: async function(file_id,job_id,format){
-                this.dialog={
-                    show:true,
-                    title:'',
-                    loading_message:'',
-                    message_success:'',
-                    message_error:'',
-                    is_loading:false
-                }
-    
-                this.dialog.is_loading=true;
-                this.dialog.title=this.$t('export_file');
-                this.dialog.loading_message=this.$t('processing_please_wait');
-                try{
-                    await this.sleep(5000);
-                    let result=await this.$store.dispatch('getJobStatus',{job_id:job_id});
-                    
-                    this.dialog.is_loading=true;
-                    this.dialog.loading_message="Job status: " + result.data.job_status;
-                    if (result.data.job_status!=='done'){
-                        this.exportFileStatusCheck(file_id,job_id,format);
-                    }else if (result.data.job_status==='done'){
-                        this.dialog.is_loading=false;                        
-                        let download_url=CI.base_url + '/api/datafiles/download_tmp_file/'+this.dataset_id + '/' + file_id + '/' + format;
-                        this.dialog.message_success=this.$t('file_generated_success');
-                        this.dialog.download_links=[];
-                        this.dialog.download_links.push({url:download_url,title:this.$t('download_file') + ' [' + format + ']'});
-                        //window.open(download_url, '_blank').focus();
-                    }
-                    
-                }catch(e){
-                    console.log("failed",e);
-                    this.dialog.is_loading=false;
-                    this.dialog.message_error=this.$t("failed")+": "+e.response.data.message;
-                }
-        },
         batchDelete: async function() {
             if (!confirm(this.$t("confirm_delete_selected"))) {
                 return;
@@ -420,17 +367,14 @@ Vue.component('datafiles', {
             this.importSummaryStatistics(this.dialog_datafile_import_fid);
         },
         openExportDialog: function(file_index){
-            this.export_dialog.file_index = file_index;
-            this.export_dialog.selected_format = '';
+            let data_file = this.data_files[file_index];
+            this.export_dialog.file_id = data_file.file_id;
+            this.export_dialog.file_name = data_file.file_name;
             this.export_dialog.show = true;
         },
         confirmExport: function(){
-            if (!this.export_dialog.selected_format) {
-                return;
-            }
-            this.exportFile(this.export_dialog.file_index, this.export_dialog.selected_format);
-            this.export_dialog.show = false;
-        }
+            // This function is no longer needed as the export dialog handles everything
+        },
     },
     computed: {
         data_files(){
@@ -687,37 +631,11 @@ Vue.component('datafiles', {
             ></dialog-datafile-replace>
 
             <!-- Export Dialog -->
-            <v-dialog v-model="export_dialog.show" width="400" persistent>
-                <v-card>
-                    <v-card-title class="text-h5 grey lighten-2">
-                        {{$t("export")}}
-                    </v-card-title>
-
-                    <v-card-text>
-                        <div class="mb-4">
-                            <p>{{$t("select_export_format")}}</p>
-                        </div>
-                        
-                        <v-radio-group v-model="export_dialog.selected_format" mandatory>
-                            <v-radio value="sav" label="SPSS (.sav)"></v-radio>
-                            <v-radio value="dta" label="Stata (.dta)"></v-radio>
-                            <v-radio value="csv" :label="$t('export_csv')"></v-radio>
-                            <v-radio value="json" label="JSON"></v-radio>
-                            <v-radio value="xpt" label="SAS (.xpt)"></v-radio>
-                        </v-radio-group>
-                    </v-card-text>
-
-                    <v-card-actions>
-                        <v-spacer></v-spacer>
-                        <v-btn color="grey" text @click="export_dialog.show=false">
-                            {{$t("cancel")}}
-                        </v-btn>
-                        <v-btn color="primary" text @click="confirmExport" :disabled="!export_dialog.selected_format">
-                            {{$t("export")}}
-                        </v-btn>
-                    </v-card-actions>
-                </v-card>
-            </v-dialog>
+            <dialog-datafile-export 
+                v-model="export_dialog.show" 
+                :file_id="export_dialog.file_id"
+                :file_name="export_dialog.file_name">
+            </dialog-datafile-export>
         
         </div>
     `

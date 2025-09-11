@@ -212,7 +212,8 @@ class Data extends MY_REST_Controller
 				'status'=>'success',
 				'params'=>$dict_params,
 				'file'=>realpath($datafile_path),
-				'request'=> isset($api_response['request']) ? $api_response['request'] :''
+				'request'=> isset($api_response['request']) ? $api_response['request'] :'',
+				'request_url'=>$api_response['request_url']
 				//'job_id'=>$api_response['job_id']
 			);
 			$output=array_merge($output,$api_response['response']);
@@ -270,7 +271,6 @@ class Data extends MY_REST_Controller
 				'status'=>'success',
 				//'result'=>realpath($datafile_path),
 				'variables_imported'=>count($variable_import_result),
-				//'api_response'=>$api_response,
 				'job_status'=>$job_status				
 				#'variables'=>$response['variables']
 			);
@@ -684,6 +684,96 @@ class Data extends MY_REST_Controller
 		$file->seek(PHP_INT_MAX);
 
 		return $file->key();
+	}
+
+	/**
+	 * Validate value labels for export formats
+	 * 
+	 * GET /api/data/validate_value_labels/{sid}/{file_id}?format=dta&show_all_errors=true
+	 * 
+	 * Validates that value labels are compatible with the specified export format
+	 * 
+	 * Query Parameters:
+	 * - format: Export format (dta, sav)
+	 * - show_all_errors: Show all errors instead of stopping on first (true/false, default: false)
+	 * 
+	 */
+	function validate_value_labels_get($sid, $file_id)
+	{
+		try{
+			$exists=$this->Editor_model->check_id_exists($sid);
+
+			if(!$exists){
+				throw new Exception("Project not found");
+			}
+
+			$format = $this->input->get('format');						
+			$show_all_errors = $this->input->get('show_all_errors') === 'true' || $this->input->get('show_all_errors') === '1';
+			$stop_on_first_error = !$show_all_errors;
+
+			$supported_formats = ['dta', 'sav'];
+			if (!in_array($format, $supported_formats)) {
+				throw new Exception("Unsupported format '{$format}'. Supported formats: " . implode(', ', $supported_formats));
+			}
+
+			$this->editor_acl->user_has_project_access($sid,$permission='edit',$this->api_user());
+
+			$this->load->library("Datafile_export");
+			$validation_result = $this->datafile_export->validate_datafile_value_labels($sid, $file_id, $format, $stop_on_first_error);
+			
+			if ($validation_result['valid']) {
+				$response = array(
+					'status' => 'success',
+					'message' => "Value labels are valid for {$format} export",
+					'data' => array(
+						'file_id' => $file_id,
+						'project_id' => $sid,
+						'format' => $format,
+						'validation_passed' => true,
+						'variables_checked' => $validation_result['variables_checked'],
+						'variables_with_labels' => $validation_result['variables_with_labels']
+					)
+				);
+			} else {
+				$error_messages = array();
+				foreach ($validation_result['errors'] as $error) {
+					$error_messages[] = "Variable '{$error['variable_name']}': {$error['error']}";
+				}
+				$combined_error = implode('; ', $error_messages);
+				
+				$response = array(
+					'status' => 'failed',
+					'message' => $combined_error,
+					'data' => array(
+						'file_id' => $file_id,
+						'project_id' => $sid,
+						'format' => $format,
+						'validation_passed' => false,
+						'variables_checked' => $validation_result['variables_checked'],
+						'variables_with_labels' => $validation_result['variables_with_labels'],
+						'errors' => $validation_result['errors']
+					)
+				);
+			}
+			
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$format = $this->input->get('format') ?: 'unknown';
+			$response = array(
+				'status' => 'failed',
+				'message' => $e->getMessage(),
+				'data' => array(
+					'file_id' => $file_id,
+					'project_id' => $sid,
+					'format' => $format,
+					'validation_passed' => false,
+					'variables_checked' => 0,
+					'variables_with_labels' => 0
+				)
+			);
+			$this->set_response($response, REST_Controller::HTTP_BAD_REQUEST);
+		}
 	}
 
 }

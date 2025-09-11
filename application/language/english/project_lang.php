@@ -412,10 +412,34 @@ $lang['Exporting data to CSV'] = "Exporting data to CSV";
 $lang['failed uploading file'] = "failed uploading file";
 $lang['File with the name already exists.'] = "File with the name already exists.";
 
+// Data explorer translations
+$lang['loading_please_wait'] = "Loading, please wait...";
+$lang['showing_records_range'] = "Showing records {start} - {end} of {total}";
+
 // File type labels
 $lang['Stata (DTA)'] = "Stata (DTA)";
 $lang['SPSS (SAV)'] = "SPSS (SAV)";
 $lang['CSV'] = "CSV";
+
+// Value label validation
+$lang['validating_value_labels'] = "Validating value labels...";
+$lang['value_label_validation_failed'] = "Value label validation failed. The following issues were found:";
+$lang['continue_export_anyway'] = "Do you want to continue with the export anyway?";
+$lang['export_warning'] = "Export Warning";
+$lang['value_labels_not_exportable'] = "The data file includes value labels with string codes, which are not supported in Stata and will be excluded from the exported file.";
+
+// Export dialog
+$lang['select_export_format'] = "Select export format";
+$lang['cancel'] = "Cancel";
+$lang['export'] = "Export";
+$lang['download_files'] = "Download files";
+$lang['download'] = "Download";
+$lang['file_generated_success'] = "File generated successfully";
+$lang['file'] = "file";
+$lang['validation_issues_found'] = "Validation issues found";
+$lang['continue_export'] = "Continue Export";
+$lang['failed'] = "Failed";
+$lang['job_status'] = "Job status";
 
 /* End of file project_lang.php */
 /* Location: ./application/language/base/project_lang.php */
