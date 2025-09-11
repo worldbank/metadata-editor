@@ -46,6 +46,10 @@ h2{font-size:1.2em;font-weight:bold;border-bottom:1px solid gainsboro;padding-bo
 <fieldset class="field-expanded  ">
         <legend><i class="fas fa-cogs mr-3" style="color:#007bff;"></i><?php echo t('general_site_settings');?></legend>
     <div class="field">
+            <label for="<?php echo 'website_title'; ?>"><?php echo t('website_title');?></label>
+            <input class="form-control" name="website_title" type="text" id="website_title"  value="<?php echo get_form_value('website_title',isset($website_title) ? $website_title : ''); ?>"/>
+    </div>    
+    <div class="field">
             <label for="<?php echo 'website_webmaster_name'; ?>"><?php echo t('webmaster_name');?></label>
             <input class="form-control" name="website_webmaster_name" type="text" id="website_webmaster_name"  value="<?php echo get_form_value('website_webmaster_name',isset($website_webmaster_name) ? $website_webmaster_name : ''); ?>"/>
     </div>    

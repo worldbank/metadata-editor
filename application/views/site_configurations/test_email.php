@@ -163,7 +163,7 @@ function send_mail(){
     data=$("#email-form").serialize();
     url=CI.base_url+'/admin/configurations/send_test_email';
     $.post(url,data,function (data){
-        $("#email_output").html('<div>'+data+'</div>');
+        $("#email_output").text(data);
     });
 }
 
