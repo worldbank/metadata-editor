@@ -165,28 +165,35 @@ class Ion_auth_model extends CI_Model
 		$result=FALSE;
 	    if ($code != false) 
 	    {  
-		    $query = $this->db->select($this->identity_column)
-	        	->where('activation_code', $code)
-	        	->limit(1)
-	        	->get($this->tables['users']);
-
-			$result = $query->row();
-
-			if ($query->num_rows() !== 1)
-			{
-				log_message('error', "account activate failed: id=$id, code=$code");
-				return FALSE;
-			}
+		    $user_check = $this->db->select('active, activation_code, ' . $this->identity_column)
+		        ->where('id', $id)
+		        ->limit(1)
+		        ->get($this->tables['users']);
+		        
+		    if ($user_check->num_rows() !== 1) {
+		        log_message('error', "User not found for activation: id=$id");
+		        return FALSE;
+		    }
 		    
-			$identity = $result->{$this->identity_column};
-			
-			$data = array(
-				'activation_code' => '',
-				'active'          => 1
-			);
+		    $user_data = $user_check->row();
+		    
+		    if ($user_data->active == 1) {
+		        log_message('info', "User already activated: id=$id");
+		        return TRUE;
+		    }
+		    
+		    if (empty($user_data->activation_code) || $user_data->activation_code !== $code) {
+		        log_message('error', "Invalid activation code: id=$id, code=$code");
+		        return FALSE;
+		    }
+		    
+		    $data = array(
+		        'activation_code' => '',
+		        'active'          => 1
+		    );
 
-			$this->db->where($this->ion_auth->_extra_where);
-			$result=$this->db->update($this->tables['users'], $data, array($this->identity_column => $identity));
+		    $this->db->where($this->ion_auth->_extra_where);
+		    $result = $this->db->update($this->tables['users'], $data, array('id' => $id));
 	    }
 	    else 
 	    {
