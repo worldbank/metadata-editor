@@ -424,6 +424,7 @@ CREATE TABLE `editor_variables` (
   `field_format` varchar(50) DEFAULT NULL,
   `var_wgt_id` int DEFAULT NULL,
   `is_key` int DEFAULT NULL,
+  `interval_type` enum('discrete','contin') DEFAULT NULL,
   PRIMARY KEY (`uid`)
 ) AUTO_INCREMENT=1;
 
@@ -664,3 +665,5 @@ CREATE TABLE `admin_metadata_projects` (
   `template_id` int DEFAULT NULL,
   PRIMARY KEY (`id`)
 );
+
+

@@ -20,6 +20,7 @@ class Editor_variable_model extends ci_model {
         'user_missings',
         'field_dtype',
         'var_wgt_id',
+        'interval_type',
         'metadata'
     );
  
@@ -126,7 +127,73 @@ class Editor_variable_model extends ci_model {
         return false;
     }
 
-
+    /**
+     * Parse sum_stats_options based on variable data type
+     */
+    private function parse_sum_stats_options($variable)
+    {
+        $data_type = isset($variable['var_format']['type']) ? $variable['var_format']['type'] : '';
+        $is_discrete = isset($variable['metadata']['var_intrvl']) && $variable['metadata']['var_intrvl'] === 'discrete';
+        
+        switch ($data_type) {
+            case 'numeric':
+                return array(
+                    'wgt' => true,
+                    'freq' => true,
+                    'missing' => true,
+                    'vald' => true,
+                    'min' => true,
+                    'max' => true,
+                    'mean' => true,
+                    'mean_wgt' => true,
+                    'stdev' => true,
+                    'stdev_wgt' => true
+                );
+                
+            case 'character':
+            case 'fixed':
+                return array(
+                    'wgt' => false,
+                    'freq' => true,
+                    'missing' => true,
+                    'vald' => true,
+                    'min' => false,
+                    'max' => false,
+                    'mean' => false,
+                    'mean_wgt' => false,
+                    'stdev' => false,
+                    'stdev_wgt' => false
+                );
+                
+            case 'date':
+                return array(
+                    'wgt' => false,
+                    'freq' => true,
+                    'missing' => true,
+                    'vald' => true,
+                    'min' => true,
+                    'max' => true,
+                    'mean' => false,
+                    'mean_wgt' => false,
+                    'stdev' => false,
+                    'stdev_wgt' => false
+                );
+                
+            default:
+                return array(
+                    'wgt' => false,
+                    'freq' => $is_discrete ? true : false,
+                    'missing' => true,
+                    'vald' => true,
+                    'min' => false,
+                    'max' => false,
+                    'mean' => false,
+                    'mean_wgt' => false,
+                    'stdev' => false,
+                    'stdev_wgt' => false
+                );
+        }
+    }
 
     function bulk_upsert_dictionary($sid,$fileid,$variables)
     {
@@ -149,14 +216,18 @@ class Editor_variable_model extends ci_model {
 
 			$variable['fid']=$fileid;
 
+			//extract interval type [categorical - for enabling frequencies]
+			if (isset($variable['var_intrvl'])) {
+				$variable['interval_type'] = $variable['var_intrvl'];
+			}
+
 			$this->validate($variable);
-			#$variable['metadata']=$variable;
 
 			if($variable_info){
                 // for existing variables, merge metadata with existing metadata
                 // update only few fields e.g. sum_stats, catgry, etc
                 $variable_info['metadata']=$this->update_summary_stats($sid,$variable_info['uid'],$variable_info['metadata'],$variable);
-                #$variable_info['metadata']=$variable_info;
+                
                 if (!isset($variable_info['uid'])){
                     var_dump($variable_info);
                     die();
@@ -170,6 +241,12 @@ class Editor_variable_model extends ci_model {
 			}
 			else{
                 $variable['metadata']=$variable;
+                
+                // Set sum_stats_options based on data type for new variables
+                if (!isset($variable['metadata']['sum_stats_options'])) {
+                    $variable['metadata']['sum_stats_options'] = $this->parse_sum_stats_options($variable);
+                }
+                
 				$this->insert($sid,$variable);
 			}
 
@@ -195,38 +272,12 @@ class Editor_variable_model extends ci_model {
         {
             if (isset($stats[$element])){
                 $variable[$element]=$stats[$element];
+                
+                if ($element === 'var_intrvl') {
+                    $variable['interval_type'] = $stats[$element];
+                }
             }
         }
-
-        /*
-        //update var_catgry stats keeping the value/labl pairs        
-        if (isset($stats['var_catgry'])){
-            $new_cat=array();
-            foreach($stats['var_catgry'] as $idx=>$val){
-                if (isset($val['value'])){
-                    $new_cat[$val['value']]=$val;
-                }
-            }
-
-            //apply to existing categories
-            if (isset($variable['var_catgry'])){
-                foreach($variable['var_catgry'] as $idx=>$val){
-                    if (isset($val['value']) && isset($new_cat[$val['value']])){
-                        $variable['var_catgry'][$idx]=$new_cat[$val['value']];
-                    }
-                }
-
-                //replace categories stats
-                foreach($variable['var_catgry'] as $idx=>$catgry){
-                    if (array_key_exists($catgry['value'], $new_cat)){
-                        if (isset($new_cat[$idx]['stats'])){
-                            $variable['var_catgry'][$idx]['stats']=$new_cat[$idx]['stats'];
-                        }
-                    }
-                }
-            }
-        }*/
-
         return $variable;
      }
 
@@ -250,13 +301,23 @@ class Editor_variable_model extends ci_model {
 			$uid=$this->uid_by_name($sid,$variable['file_id'],$variable['name']);
 			$variable['fid']=$variable['file_id'];
 
+			// Extract interval_type from metadata if present
+			if (isset($variable['var_intrvl'])) {
+				$variable['interval_type'] = $variable['var_intrvl'];
+			}
+
 			$this->validate($variable);
 			$variable['metadata']=$variable;
 
 			if($uid){
 				$this->update($sid,$uid,$variable);
 			}
-			else{						
+			else{
+				//set sum_stats_options based on data type
+				if (!isset($variable['metadata']['sum_stats_options'])) {
+					$variable['metadata']['sum_stats_options'] = $this->parse_sum_stats_options($variable);
+				}
+						
 				$this->insert($sid,$variable);
 			}
 
@@ -610,6 +671,7 @@ class Editor_variable_model extends ci_model {
         $missings=(array)array_data_get($variable,'var_invalrng.values','');
         $missings=implode(",",$missings);
         $dtype=array_data_get($variable,'var_format.type','');
+        $interval_type=array_data_get($variable,'var_intrvl','');
 
         $core_fields=array(
             'fid'=>$variable['fid'],
@@ -619,7 +681,8 @@ class Editor_variable_model extends ci_model {
             'user_missings'=>$missings,
             'is_weight'=> isset($variable['var_wgt']) ? (int)$variable['var_wgt'] : 0,
             'is_key'=> isset($variable['is_key']) ? (int)$variable['is_key'] : 0,
-            'field_dtype'=>$dtype
+            'field_dtype'=>$dtype,
+            'interval_type'=>$interval_type
             //'field_format'=>$variable['field_format'],
         );
 
