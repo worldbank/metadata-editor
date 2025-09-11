@@ -255,12 +255,6 @@ Vue.component('vue-collections-component', {
     },
     template: `
     <div class="vue-collection-component">
-        <!-- Debug: Component is loading -->
-        <div v-if="!collections || collections.length === 0" class="p-3 text-center">
-            <p>Loading collections...</p>
-            <p>Collections count: {{collections ? collections.length : 'undefined'}}</p>
-            <p>User permissions: {{user_permissions ? 'loaded' : 'not loaded'}}</p>
-        </div>
         
         <section class="container">
 
