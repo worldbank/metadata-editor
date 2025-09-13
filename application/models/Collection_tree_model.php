@@ -87,35 +87,71 @@ class Collection_tree_model extends CI_Model {
 
     function collections_tree_by_user_access($user_id)
     {
-        $sql='SELECT 
-                ect.parent_id, 
-                ect.child_id, 
-                ect.depth, 
-                c.*
-            FROM 
-                editor_collections_tree ect
-            INNER JOIN 
-                editor_collections c ON ect.child_id = c.id
-            WHERE 
-                ect.parent_id IN (
-                    SELECT 
-                        t.parent_id
-                    FROM 
-                        editor_collections c
-                    INNER JOIN 
-                        editor_collections_tree t ON c.id = t.parent_id
-                    INNER JOIN 
-                        editor_collections_tree ect2 ON t.child_id = ect2.child_id
-                    INNER JOIN 
-                        editor_collections c2 ON ect2.child_id = c2.id
-                    INNER JOIN 
-                        		editor_collection_project_acl eca ON eca.collection_id = c2.id
-                    WHERE 
-                        eca.user_id = '. $this->db->escape($user_id) . '
-                        AND c.pid IS NULL
-                )
-            ORDER BY 
-                c.title, ect.child_id, ect.parent_id, ect.id, ect.depth;';
+        //get user info
+        $user = $this->ion_auth->get_user($user_id);
+
+        if ($user && $this->editor_acl->user_is_admin($user)) {
+            // Admin user - return all collections with projects without ACL filtering
+            $sql='SELECT 
+                    ect.parent_id, 
+                    ect.child_id, 
+                    ect.depth, 
+                    c.*
+                FROM 
+                    editor_collections_tree ect
+                INNER JOIN 
+                    editor_collections c ON ect.child_id = c.id
+                WHERE 
+                    ect.parent_id IN (
+                        SELECT 
+                            t.parent_id
+                        FROM 
+                            editor_collections c
+                        INNER JOIN 
+                            editor_collections_tree t ON c.id = t.parent_id
+                        WHERE 
+                            c.pid IS NULL
+                    )
+                    AND ect.child_id IN (
+                        SELECT DISTINCT 
+                            ecp.collection_id
+                        FROM 
+                            editor_collection_projects ecp
+                    )
+                ORDER BY 
+                    c.title, ect.child_id, ect.parent_id, ect.id, ect.depth;';
+        } else {
+            // Non-admin user - apply ACL filtering
+            $sql='SELECT 
+                    ect.parent_id, 
+                    ect.child_id, 
+                    ect.depth, 
+                    c.*
+                FROM 
+                    editor_collections_tree ect
+                INNER JOIN 
+                    editor_collections c ON ect.child_id = c.id
+                WHERE 
+                    ect.parent_id IN (
+                        SELECT 
+                            t.parent_id
+                        FROM 
+                            editor_collections c
+                        INNER JOIN 
+                            editor_collections_tree t ON c.id = t.parent_id
+                        INNER JOIN 
+                            editor_collections_tree ect2 ON t.child_id = ect2.child_id
+                        INNER JOIN 
+                            editor_collections c2 ON ect2.child_id = c2.id
+                        INNER JOIN 
+                            		editor_collection_project_acl eca ON eca.collection_id = c2.id
+                        WHERE 
+                            eca.user_id = '. $this->db->escape($user_id) . '
+                            AND c.pid IS NULL
+                    )
+                ORDER BY 
+                    c.title, ect.child_id, ect.parent_id, ect.id, ect.depth;';
+        }
 
         $items=$this->db->query($sql)->result_array();
         
