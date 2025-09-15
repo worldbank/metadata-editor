@@ -286,5 +286,23 @@ $lang['url_must_point_to_root'] = 'La URL debe apuntar a la raíz del catálogo.
 $lang['url_is_invalid'] = 'La URL no es válida';
 $lang['file_already_exists_warning'] = 'El archivo ya existe. Esto sobrescribirá el archivo existente.';
 
+// External Resources
+$lang['external_resources']="Recursos externos";
+$lang['create_resource']="Crear recurso";
+$lang['import_resources']="Importar recursos";
+$lang['deleting']="Eliminando...";
+$lang['delete_selected']="Eliminar seleccionados";
+$lang['resource']="Recurso";
+$lang['resource_type']="Tipo";
+$lang['actions']="Acciones";
+$lang['confirm_bulk_delete']="¿Está seguro de que desea eliminar {count} recurso(s) seleccionado(s)?";
+$lang['failed_to_delete_resources']="Error al eliminar algunos recursos";
+$lang['failed_operation']="Error";
+$lang['more_options']="Más opciones";
+$lang['duplicate']="Duplicar";
+$lang['duplicate_resource']="Duplicar recurso";
+$lang['resource_duplicated_successfully']="Recurso duplicado exitosamente";
+$lang['modified']="Modificado";
+
 /* End of file general_lang.php */
 /* Location: ./application/language/base/general_lang.php */

@@ -171,6 +171,23 @@ $lang['version_type_help']="<p>For project versioning, <a href='https://semver.o
 </ul>";
 $lang['version_created_successfully']="Version created successfully";
 
+// External Resources
+$lang['external_resources']="External resources";
+$lang['create_resource']="Create resource";
+$lang['import_resources']="Import resources";
+$lang['deleting']="Deleting...";
+$lang['delete_selected']="Delete Selected";
+$lang['resource']="Resource";
+$lang['resource_type']="Type";
+$lang['actions']="Actions";
+$lang['confirm_bulk_delete']="Are you sure you want to delete {count} selected resource(s)?";
+$lang['failed_to_delete_resources']="Failed to delete some resources";
+$lang['failed_operation']="Failed";
+$lang['more_options']="More options";
+$lang['duplicate']="Duplicate";
+$lang['duplicate_resource']="Duplicate resource";
+$lang['resource_duplicated_successfully']="Resource duplicated successfully";
+$lang['modified']="Modified";
 
 /* End of file general_lang.php */
 /* Location: ./application/language/base/general_lang.php */

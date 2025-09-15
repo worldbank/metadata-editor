@@ -231,3 +231,21 @@ $lang['url_must_point_to_root'] = 'L’URL doit pointer vers la racine du catalo
 $lang['url_is_invalid'] = 'L\'URL est invalide';
 $lang['file_already_exists_warning'] = 'Le fichier existe déjà. Cela écrasera le fichier existant.';
 $lang['About'] = 'À propos';
+
+// External Resources
+$lang['external_resources']="Ressources externes";
+$lang['create_resource']="Créer une ressource";
+$lang['import_resources']="Importer des ressources";
+$lang['deleting']="Suppression...";
+$lang['delete_selected']="Supprimer la sélection";
+$lang['resource']="Ressource";
+$lang['resource_type']="Type";
+$lang['actions']="Actions";
+$lang['confirm_bulk_delete']="Êtes-vous sûr de vouloir supprimer {count} ressource(s) sélectionnée(s) ?";
+$lang['failed_to_delete_resources']="Échec de la suppression de certaines ressources";
+$lang['failed_operation']="Échec";
+$lang['more_options']="Plus d'options";
+$lang['duplicate']="Dupliquer";
+$lang['duplicate_resource']="Dupliquer la ressource";
+$lang['resource_duplicated_successfully']="Ressource dupliquée avec succès";
+$lang['modified']="Modifié";

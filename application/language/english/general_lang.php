@@ -36,6 +36,8 @@ $lang['duplicate']="Duplicate";
 $lang['export']="Export";
 $lang['import']="Import";
 $lang['cancel']="Cancel";
+$lang['loading']="Loading";
+$lang['no_records_found']="No records found";
 
 $lang['edit']="Edit";
 $lang['delete']="Delete";
@@ -317,6 +319,24 @@ $lang['url_must_point_to_root'] = 'URL must point to the root of the catalog. Re
 $lang['url_is_invalid'] = 'URL is invalid';
 $lang['file_already_exists_warning'] = 'File already exists. This will overwrite the existing file.';
 $lang['About'] = 'About';
+
+// External Resources
+$lang['external_resources']="External resources";
+$lang['create_resource']="Create resource";
+$lang['import_resources']="Import resources";
+$lang['deleting']="Deleting...";
+$lang['delete_selected']="Delete Selected";
+$lang['resource']="Resource";
+$lang['resource_type']="Type";
+$lang['actions']="Actions";
+$lang['confirm_bulk_delete']="Are you sure you want to delete {count} selected resource(s)?";
+$lang['failed_to_delete_resources']="Failed to delete some resources";
+$lang['failed_operation']="Failed";
+$lang['more_options']="More options";
+$lang['duplicate']="Duplicate";
+$lang['duplicate_resource']="Duplicate resource";
+$lang['resource_duplicated_successfully']="Resource duplicated successfully";
+$lang['modified']="Modified";
 
 /* End of file general_lang.php */
 /* Location: ./application/language/base/general_lang.php */
