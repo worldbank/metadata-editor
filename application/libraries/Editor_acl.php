@@ -460,6 +460,39 @@ class Editor_acl
 		return false;
 	}
 
+	/**
+	 * 
+	 * Check if user is a collection admin (global admin or collection admin)
+	 * 
+	 */
+	function is_collection_admin($user=null)
+	{
+		if(empty($user)){
+			$user=$this->current_user();
+		}
+
+		if(!$user){
+			throw new Exception("editor_acl::User not set");
+		}
+
+		if($this->user_is_admin($user)){
+			return true;
+		}
+
+		// Check if user has global collection admin role
+		try {
+			if($this->has_access('collection', 'admin', $user)){
+				return true;
+			}
+		} catch (Exception $e) {
+			
+		}
+
+		return false;
+	}
+
+	
+
 	private function is_admin_role($roles)
 	{
 		foreach($roles as $role){

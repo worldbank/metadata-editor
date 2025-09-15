@@ -34,6 +34,7 @@ class ImportProject extends MY_REST_Controller
 		try{			
 			$user_id=$this->get_api_user_id();
 			$type=$this->input->post('type');
+			$idno=$this->input->post('idno'); // Accept idno from POST data
 			
 			if (!$type){
 				throw new Exception("TYPE not specified");
@@ -43,8 +44,18 @@ class ImportProject extends MY_REST_Controller
 				throw new Exception("File not uploaded");
 			}
 
-			//temporary uuid
-			$idno=(string)$this->Editor_model->generate_uuid();			
+			// Use provided idno or generate a temporary uuid if not provided
+			if (!$idno){
+				$idno=(string)$this->Editor_model->generate_uuid();
+			} else {
+				// Validate idno format
+				$this->Editor_model->validate_idno_format($idno);
+				
+				// Check if idno already exists (pass null for new project)
+				if ($this->Editor_model->idno_exists($idno, null)){
+					throw new Exception("Project IDNO already exists: " . $idno);
+				}
+			}			
 			
 			$options['created_by']=$user_id;
 			$options['changed_by']=$user_id;
@@ -52,7 +63,7 @@ class ImportProject extends MY_REST_Controller
 			$options['changed']=date("U");
 			$options['title']='untitled';
 			$options['type']=$type;
-			//$options['idno']=$idno;	
+			$options['idno']=$idno;	
 			
 			//upload file and import metadata
 			$allowed_file_types="json|xml|zip";

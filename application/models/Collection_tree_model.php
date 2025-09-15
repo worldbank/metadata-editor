@@ -90,8 +90,9 @@ class Collection_tree_model extends CI_Model {
         //get user info
         $user = $this->ion_auth->get_user($user_id);
 
-        if ($user && $this->editor_acl->user_is_admin($user)) {
-            // Admin user - return all collections with projects without ACL filtering
+        // Check if user is collection admin (global admin or collection admin)
+        if ($user && $this->editor_acl->is_collection_admin($user)) {
+            // Global admin or collection admin - return all collections with projects without ACL filtering
             $sql='SELECT 
                     ect.parent_id, 
                     ect.child_id, 

@@ -510,7 +510,7 @@ class Editor_model extends CI_Model {
 		}
 
 		//idno
-		if (isset($options['idno']) && $this->idno_exists($options['idno'])){
+		if (isset($options['idno']) && $this->idno_exists($options['idno'], $sid)){
 			throw new Exception("IDNO_EXISTS: ". $options['idno']);
 		}
 
