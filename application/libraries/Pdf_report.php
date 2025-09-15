@@ -10,6 +10,7 @@ class PDF_Report{
 	
 	var $ci;
 	var $project;
+	var $options;
 	
     //constructor
 	function __construct($params=NULL)
@@ -28,12 +29,18 @@ class PDF_Report{
 		//to use core fonts only - works only for latin languages
 		//$this->ci->load->library('my_mpdf',array('codepage'=>$codepage, 'mode'=>'c'));
 
-		$this->ci->lang->load("ddi_report");
+		// Set image resolution to 300 DPI
+		$this->ci->my_mpdf->img_dpi = 300;
+
+		// Load language file for PDF reports - use current language setting
+		$current_lang = $this->ci->config->item('language');
+		$this->ci->lang->load("ddi_report", $current_lang);
 		$this->ci->load->model("Editor_model");
 		$this->ci->load->library("Pagepreview");
 		$this->ci->load->helper("pdf_html_helper");
 		$this->ci->load->model("Editor_datafile_model"); 
 		$this->ci->load->helper('metadata_view_helper');
+		$this->ci->load->library('Latex_processor');
 		
     }
 
@@ -45,13 +52,23 @@ class PDF_Report{
 			throw new Exception("Project not found");
 		}
 
-		if (isset($options['exclude_private_fields']) && $options['exclude_private_fields']==1){
+		// Handle private fields option - if include_private_fields is false, exclude them
+		if (isset($options['include_private_fields']) && $options['include_private_fields']==false){
 			$this->ci->project_json_writer->json_remove_private_fields($sid,$this->project['metadata']);
 		}
+
+		// Store options for use in generate method
+		$this->options = $options;
 	}
 	
 	function generate($output_filename='trash/test.pdf',$options=array())
-    {
+	{
+		// Increase memory limit for PDF generation
+		ini_set('memory_limit', '512M');
+		#ignore deprecation warnings
+		error_reporting(E_ALL & ~E_DEPRECATED);
+		
+
 		if (!$this->project){
 			throw new Exception("Project not initialized");
 		}
@@ -59,6 +76,16 @@ class PDF_Report{
 		if ($this->project['type']=='survey'){
 			//return $this->generate_pdf_ddi($sid,$output_filename,$options);
 		}
+
+		if ($this->project['type']=='timeseries'){
+			$latex_elements=$this->ci->latex_processor->get_latex_elements($this->project['metadata']);
+			
+			if (count($latex_elements)>0){
+				// Process LaTeX content before PDF generation
+				$this->ci->latex_processor->process_latex_content($this->project['metadata']);
+			}
+		}
+
 
         $mpdf=$this->ci->my_mpdf;
 
@@ -76,12 +103,17 @@ class PDF_Report{
 		$coverpage=$this->ci->load->view('pdf_reports/coverpage',array('project'=>$this->project),TRUE);
 		$mpdf->AddPage();
 		$mpdf->Bookmark(t("cover"),0);
-		$mpdf->WriteHTML( $coverpage );		
+		$mpdf->WriteHTML( $coverpage );
 		
 		//study description
         $mpdf->AddPage();
 		$mpdf->Bookmark(t("overview"),0);
-		$mpdf->WriteHTML($this->project_metadata_html());
+		$project_metadata_html = $this->project_metadata_html();
+		$this->writeHTMLInChunks($mpdf, $project_metadata_html);
+		
+		// Clear memory after processing project metadata
+		unset($project_metadata_html);
+
 
 		if ($this->project['type']=='survey'){
 			$sid=$this->project['id'];
@@ -90,41 +122,134 @@ class PDF_Report{
 			//data files list
 			$data_files_html=$this->datafiles_html($this->project['id']);
 
-			if ($data_files_html){
-				$mpdf->AddPage();
-				$mpdf->Bookmark(t("file_description"),0);
-				$mpdf->WriteHTML($data_files_html);
-			}
+				if ($data_files_html){
+					$mpdf->AddPage();
+					$mpdf->Bookmark(t("file_description"),0);
+					$this->writeHTMLInChunks($mpdf, $data_files_html);
+				}
 
 			foreach($data_files as $data_file){
 				set_time_limit(0);
+				
+				// Force garbage collection before processing each data file
+				gc_collect_cycles();
 
 				//data file variable list
 				$mpdf->AddPage();
 				$mpdf->Bookmark($data_file['file_name'],0);
 				$mpdf->Bookmark(t("variable_list"),1);
-				$mpdf->WriteHTML($this->data_file_variables_list($sid, $data_file['file_id']));
+				$variables_html = $this->data_file_variables_list($sid, $data_file['file_id']);
+				$this->writeHTMLInChunks($mpdf, $variables_html);
+				
+				// Clear memory after processing each data file
+				unset($variables_html);
 
 				//data file variables detailed
 				$mpdf->AddPage();
 				$mpdf->Bookmark(t("variable_description"),1);
-				$mpdf->WriteHTML($this->variables_html($sid, $data_file['file_id']));
+				$variables_detailed_html = $this->variables_html($sid, $data_file['file_id']);
+				$this->writeHTMLInChunks($mpdf, $variables_detailed_html);
+				
+				// Clear memory after processing detailed variables
+				unset($variables_detailed_html);
 			}		
 
 
-			//ext_resources_html
-			/*if(isset($options['ext_resources']) && $options['ext_resources']===1)
+			//external resources
+			if(isset($this->options['include_external_resources']) && $this->options['include_external_resources']==1)
 			{
-				$mpdf->AddPage();
-				$mpdf->Bookmark(t("external_resources"),0);
-				$mpdf->WriteHTML( $options['ext_resources_html']);
-			}*/
+				$ext_resources_html = $this->external_resources_html($this->project['id']);
+				if ($ext_resources_html) {
+					$mpdf->AddPage();
+					$mpdf->Bookmark(t("external_resources"),0);
+					$this->writeHTMLInChunks($mpdf, $ext_resources_html);
+					
+					// Clear memory after processing external resources
+					unset($ext_resources_html);
+				}
+			}
 
 		}
+		
+		// Final memory cleanup before output
+		gc_collect_cycles();
 		
         $mpdf->Output($output_filename,"F");
 		return true;
     }
+
+	/**
+	 * Write HTML content in smaller chunks to avoid PCRE backtrack limit
+	 * 
+	 * @param object $mpdf The mPDF object
+	 * @param string $html The HTML content to write
+	 * @param int $chunk_size Maximum chunk size (default: 500000 characters)
+	 */
+	private function writeHTMLInChunks($mpdf, $html, $chunk_size = 500000)
+	{
+		if (empty($html)) {
+			return;
+		}
+		
+		// If HTML is small enough, write it directly
+		if (strlen($html) <= $chunk_size) {
+			$mpdf->WriteHTML($html);
+			return;
+		}
+		
+		// Split HTML into chunks, trying to break at logical points
+		$chunks = $this->splitHTMLIntoChunks($html, $chunk_size);
+		
+		foreach ($chunks as $chunk) {
+			if (!empty(trim($chunk))) {
+				$mpdf->WriteHTML($chunk);
+			}
+		}
+	}
+
+	/**
+	 * Split HTML into chunks at logical break points
+	 * 
+	 * @param string $html The HTML content
+	 * @param int $chunk_size Maximum chunk size
+	 * @return array Array of HTML chunks
+	 */
+	private function splitHTMLIntoChunks($html, $chunk_size)
+	{
+		$chunks = array();
+		$current_pos = 0;
+		$html_length = strlen($html);
+		
+		while ($current_pos < $html_length) {
+			$chunk_end = $current_pos + $chunk_size;
+			
+			// If this is the last chunk, take everything remaining
+			if ($chunk_end >= $html_length) {
+				$chunks[] = substr($html, $current_pos);
+				break;
+			}
+			
+			// Try to find a good break point (end of tag, paragraph, etc.)
+			$break_points = array('</div>', '</p>', '</table>', '</tr>', '</td>', '</th>', '<br>', '<br/>');
+			$best_break = $chunk_end;
+			
+			foreach ($break_points as $break_point) {
+				$break_pos = strrpos(substr($html, $current_pos, $chunk_size), $break_point);
+				if ($break_pos !== false) {
+					$break_pos += $current_pos + strlen($break_point);
+					if ($break_pos > $current_pos && $break_pos <= $chunk_end) {
+						$best_break = $break_pos;
+						break;
+					}
+				}
+			}
+			
+			$chunks[] = substr($html, $current_pos, $best_break - $current_pos);
+			$current_pos = $best_break;
+		}
+		
+		return $chunks;
+	}
 
 	/**
 	 * 
@@ -134,8 +259,22 @@ class PDF_Report{
 	 */
 	private function project_metadata_html()
 	{
-		$template=$this->ci->pagepreview->get_template_project_type($this->project['type']);
-		$this->ci->pagepreview->initialize($this->project,$template['template']);
+		// Use selected template if provided, otherwise use default
+		if (isset($this->options['template_uid']) && !empty($this->options['template_uid'])) {
+			$template = $this->ci->Editor_template_model->get_template_by_uid($this->options['template_uid']);
+			if (!$template) {
+				throw new Exception("Template not found: " . $this->options['template_uid']);
+			}
+			// Ensure template has the correct structure
+			if (!isset($template['template'])) {
+				throw new Exception("Template structure invalid: " . $this->options['template_uid']);
+			}
+		} else {
+			$template = $this->ci->pagepreview->get_template_project_type($this->project['type']);
+		}
+		
+		
+		$this->ci->pagepreview->initialize($this->project, $template['template']);
 
 		return $this->ci->load->view('project_preview/index',
 			array(					
@@ -162,6 +301,39 @@ class PDF_Report{
 		$content=$this->ci->load->view('pdf_reports/microdata/data_files',$options,TRUE);
 		//$content=$this->load->view('survey_info/data_dictionary_layout',$options,TRUE);
         return $content;
+    }
+
+	/**
+	 * 
+	 * Return external resources HTML
+	 * 
+	 */
+	function external_resources_html($sid=NULL)
+    {        
+		$this->ci->load->model('Editor_resource_model');
+		
+		// Get all external resources or specific ones if selected
+		if (isset($this->options['external_resource_ids']) && !empty($this->options['external_resource_ids'])) {
+			$resources = array();
+			foreach ($this->options['external_resource_ids'] as $resource_id) {
+				$resource = $this->ci->Editor_resource_model->select_single($sid, $resource_id);
+				if ($resource) {
+					$resources[] = $resource;
+				}
+			}
+		} else {
+			$resources = $this->ci->Editor_resource_model->select_all($sid);
+		}
+
+		if (empty($resources)) {
+			return false;
+		}
+
+		$options['resources'] = $resources;
+		$options['sid'] = $sid;
+		
+		$content = $this->ci->load->view('pdf_reports/external_resources', $options, TRUE);
+		return $content;
     }
 
 
@@ -319,6 +491,8 @@ class PDF_Report{
 
 		return $output;
 	}
+
+
 
 }// END PDF_Report Class
 

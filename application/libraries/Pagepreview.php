@@ -37,7 +37,8 @@ class Pagepreview{
         $output=array();
 
         foreach($items as $idx=>$item){            
-            switch($item['type'])
+            $item_type = isset($item['type']) ? $item['type'] : 'string';
+            switch($item_type)
             {
                 case 'section_container':
                     $output[]= $this->render_section_container($item);

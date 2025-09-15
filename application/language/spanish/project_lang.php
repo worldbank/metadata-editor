@@ -43,7 +43,9 @@ $lang['actions']="Acciones";
 $lang['replace_file']="Reemplazar archivo";
 $lang['confirm_import_summary_statistics']="¿Estás seguro de que quieres importar estadísticas resumidas para este archivo? Esto sobrescribirá cualquier estadística resumida existente.";
 $lang['summary_stats']="Estadísticas resumidas";
+
 $lang['sum_stats_imported_success']="Estadísticas resumidas importadas con éxito";
+
 $lang['failed_to_import_stats']="Error al importar estadísticas resumidas";
 $lang['change_case']="Cambiar caso";
 $lang['spread_metadata']="Distribuir metadatos";
@@ -58,68 +60,73 @@ $lang['statistics']="Estadísticas";
 $lang['documentation']="Documentación";
 $lang['weighted_statistics']="Estadísticas ponderadas";
 $lang['frequencies']="Frecuencias";
-$lang['list_missings']="Listar faltantes";
+$lang['list_missings']="Listar valores faltantes";
 $lang['valid']="Válido";
-$lang['min']="Mínimo";
-$lang['max']="Máximo";
+$lang['min']="Mín";
+$lang['max']="Máx";
 $lang['mean']="Media";
 $lang['weighted_mean']="Media ponderada";
-$lang['stddev']="Desviación estándar";
-$lang['weighted_stddev']="Desviación estándar ponderada";
+$lang['stddev']="DesvEst";
+$lang['weighted_stddev']="DesvEst ponderada";
 $lang['value']="Valor";
 $lang['missing']="Faltante";
 $lang['categories']="Categorías";
 $lang['is_weight_variable']="¿Es variable de peso?";
+$lang['variable_is_a_key']="Variable clave";
 $lang['interval_type']="Tipo de intervalo";
 $lang['format']="Formato";
 $lang['decimals']="Decimales";
 
+
 $lang['statistics']="Estadísticas";
 $lang['no_weight_variable_found']="No se encontraron variables de peso";
+
+
 $lang['character']="Carácter";
 $lang['numeric']="Numérico";
 $lang['weight_variable']="Variable de peso";
-$lang['confirm_clear_categories']="¿Estás seguro de que quieres borrar todas las categorías?";
-$lang['confirm_reload_categories']="Esto recargará las categorías del archivo de datos. ¿Estás seguro?";
+$lang['confirm_clear_categories']="¿Estás seguro de que quieres limpiar todas las categorías?";
+$lang['confirm_reload_categories']="Esto recargará las categorías desde el archivo de datos. ¿Estás seguro?";
 $lang['only_for_discrete_variables']="Solo disponible para variables discretas";
 
 $lang['copy']="Copiar";
 $lang['paste']="Pegar";
 $lang['paste_replace']="Pegar (Reemplazar)";
-$lang['paste_append']="Pegar (Añadir)";
+$lang['paste_append']="Pegar (Agregar)";
 $lang['undo_paste']="Deshacer pegado";
 
-$lang['variable_information']="Información de la variable";
+$lang['variable_information']="Información de variable";
 $lang['string']="Cadena";
-$lang['contin']="Continua";
-$lang['discrete']="Discreta";
-$lang['fixed']="Fija";
+$lang['contin']="Continuo";
+$lang['discrete']="Discreto";
+$lang['fixed']="Fijo";
+
 
 $lang['import_data_files']="Importar archivos de datos";
-$lang['upload_one_or_more_data_files']="Subir uno o más archivos de datos. Los tipos de archivos soportados son: Stata(.dta), SPSS(.sav) y CSV";
+$lang['upload_one_or_more_data_files']="Sube uno o más archivos de datos. Los tipos de archivo soportados son: Stata(.dta), SPSS(.sav) y CSV";
 $lang['drag_drop_data_files']="Arrastra y suelta archivos de datos aquí";
 $lang['or']="O";
 $lang['choose_files']="Elegir archivos";
-$lang['browse']="Navegar";
+$lang['browse']="Examinar";
 $lang['import_completed']="Importación completada";
 
 $lang['project']="Proyecto";
-$lang['export_package_zip']="Exportar paquete (ZIP)";
+$lang['export_package_zip']="Paquete de exportación (ZIP)";
 $lang['publish_to_nada']="Publicar en NADA";
 $lang['pdf_documentation']="Documentación PDF";
 $lang['project_package']="Paquete de proyecto";
-$lang['download_zip_package']="Descargar paquete zip";
+$lang['download_zip_package']="Descargar paquete ZIP";
 $lang['exporting_to_json']="Exportando metadatos a JSON";
 $lang['exporting_ddi']="Exportando metadatos a DDI";
-$lang['writing_zip']="Escribiendo archivo zip";
+$lang['writing_zip']="Escribiendo archivo ZIP";
 $lang['select_atleast_one_project']="Selecciona al menos un proyecto";
-$lang['project_package_note']="Crear paquete zip con toda la documentación";
+$lang['project_package_note']="Crear paquete ZIP con toda la documentación";
 $lang['confirm_remove_project__from_collection']="¿Estás seguro de que quieres eliminar este proyecto de la colección?";
 
 $lang['metadata']="Metadatos";
 $lang['import_project_metadata']="Importar metadatos del proyecto";
 $lang['import_external_resources']="Importar recursos externos";
-$lang['export_ddi']="Exportar DDI Codebook";
+$lang['export_ddi']="Exportar código DDI";
 $lang['export_json']="Exportar JSON";
 $lang['export_external_resources']="Exportar recursos externos";
 $lang['publish_to_nada_note']="Publicar proyecto directamente en un catálogo NADA";
@@ -145,39 +152,52 @@ $lang['publish_project']="Publicar proyecto";
 $lang['publish_thumbnail']="Publicar miniatura";
 $lang['published_project_link']="Enlace del proyecto publicado";
 
+
 $lang['download_pdf']="Descargar PDF";
 $lang['generate_pdf']="Generar PDF";
 $lang['pdf_documentation_note']="Generar documentación PDF para el proyecto";
 
+
 $lang['Share']="Compartir";
 $lang['View access']="Ver acceso";
 $lang['Export JSON']="Exportar JSON";
-$lang['Export package (ZIP)']="Exportar paquete (ZIP)";
+$lang['Export package (ZIP)']="Paquete de exportación (ZIP)";
 $lang['ownership']="Propiedad";
 $lang['Project owner']="Propietario del proyecto";
-$lang['Last changed by']="Última modificación por";
+$lang['Last changed by']="Último cambio por";
 $lang['Project IDNO']="IDNO del proyecto";
-$lang['Created on']="Creado en";
-$lang['Changed on']="Modificado en";
+$lang['Created on']="Creado el";
+$lang['Changed on']="Cambiado el";
 $lang['Project info']="Información del proyecto";
 $lang['Template']="Plantilla";
 $lang['close']="Cerrar";
 $lang['upload']="Subir";
-$lang['Disk usage']="Uso del disco";
-$lang['Schema validation']="Validación del esquema";
+$lang['Disk usage']="Uso de disco";
+$lang['Schema validation']="Validación de esquema";
 $lang['Requires project to be saved']="Requiere que el proyecto sea guardado";
-$lang['Template validation']="Validación de la plantilla";
+$lang['Template validation']="Validación de plantilla";
 $lang['Collaborators']="Colaboradores";
 $lang['Collections']="Colecciones";
-$lang['apply_template_defaults']="Aplicar valores predeterminados de la plantilla";
-$lang['apply_template_defaults_description']="Aplicar valores predeterminados definidos en la plantilla a los metadatos";
+$lang['apply_template_defaults']="Aplicar valores por defecto de la plantilla";
+$lang['apply_template_defaults_description']="Aplicar valores por defecto definidos en la plantilla a los metadatos";
 $lang['update_empty_fields']="Actualizar solo campos vacíos";
 $lang['update_all_fields']="Actualizar todos los campos (sobrescribir valores existentes)";
 $lang['items_updated']="Elementos actualizados";
 $lang['no_items_updated']="No se actualizaron elementos";
 $lang['Change log']="Registro de cambios";
 
-$lang['exclude_private_fields']="Excluir campos marcados como 'privados' en la plantilla";
+$lang['include_private_fields']="Incluir campos privados";
+$lang['include_private_fields_desc']="Los campos marcados como privados en la plantilla se incluirán en el PDF";
+$lang['include_external_resources']="Incluir recursos externos";
+$lang['include_external_resources_desc']="Agregar sección de recursos externos a la documentación PDF";
+$lang['select_template']="Seleccionar plantilla";
+$lang['use_default_template']="Usar plantilla por defecto";
+$lang['select_external_resources']="Seleccionar recursos externos";
+$lang['select_all']="Seleccionar todo";
+$lang['deselect_all']="Deseleccionar todo";
+$lang['pdf_available']="PDF Disponible";
+$lang['created']="Creado";
+$lang['file_size']="Tamaño del archivo";
 $lang['export']="Exportar";
 $lang['export_all_fields']="Exportar todos los campos";
 $lang['export_project_json']="Exportar metadatos del proyecto como JSON";
@@ -191,7 +211,7 @@ $lang['download_file']="Descargar archivo";
 $lang['no_projects_found']="No se encontraron proyectos";
 $lang['transfer_ownership']="Transferir propiedad";
 $lang['select_user_to_transfer_ownership']="Seleccionar usuario para transferir propiedad";
-$lang['type_user_name_or_email']="Escriba el nombre de usuario o correo electrónico para buscar un usuario";
+$lang['type_user_name_or_email']="Escribir nombre de usuario o email para buscar un usuario";
 $lang['search_user']="Buscar usuario";
 $lang['no_permissions_to_share']="No tienes permisos para compartir este proyecto";
 $lang['select_project_type']="Seleccionar tipo de proyecto";
@@ -207,7 +227,7 @@ $lang['access_by_collections']="Acceso por colecciones";
 $lang['confirm_remove_user_access']="¿Estás seguro de que quieres eliminar el acceso del usuario?";
 $lang['view']='Ver';
 $lang['edit']='Editar';
-$lang['admin']='Administrador';
+$lang['admin']='Admin';
 $lang['role']='Rol';
 $lang['share_project']='Compartir proyecto';
 $lang['Link to remote repository']='Enlace al repositorio remoto';
@@ -215,11 +235,10 @@ $lang['Data and Documentation']="Datos y Documentación";
 $lang['No metadata templates available']="No hay plantillas de metadatos disponibles";
 
 $lang['Create new collection']="Crear nueva colección";
-$lang['Add sub-collection']="Agregar subcolección";
-$lang['Manage access']="Administrar acceso";
+$lang['Add sub-collection']="Agregar sub-colección";
+$lang['Manage access']="Gestionar acceso";
 $lang['Collection']="Colección";
 $lang['Users']="Usuarios";
-$lang['user']="Usuario";
 $lang['Projects']="Proyectos";
 $lang['Copy collection']="Copiar colección";
 $lang['Move collection']="Mover colección";
@@ -229,17 +248,21 @@ $lang['Edit collection']="Editar colección";
 $lang['Search users']="Buscar usuarios";
 $lang['Return to collections']="Volver a colecciones";
 
+$lang['export_rdf_xml']="Exportar RDF/XML";
+$lang['export_rdf_json']="Exportar RDF/JSON";
+$lang['project_template']="Plantilla de proyecto";
+
 $lang['Edit']="Editar";
 $lang['Create new resource']="Crear nuevo recurso";
 $lang['Edit resource']="Editar recurso";
 $lang['project_validation']="Validación del proyecto";
 $lang['no_validation_errors']="No se encontraron errores de validación";
 $lang['project_package']="Paquete de proyecto";
-$lang['project_package_note']="Crear paquete zip con toda la documentación";
-$lang['download_zip_package']="Descargar paquete zip";
+$lang['project_package_note']="Crear paquete ZIP con toda la documentación";
+$lang['download_zip_package']="Descargar paquete ZIP";
 $lang['exporting_to_json']="Exportando metadatos a JSON";
 $lang['exporting_ddi']="Exportando metadatos a DDI";
-$lang['writing_zip']="Escribiendo archivo zip";
+$lang['writing_zip']="Escribiendo archivo ZIP";
 $lang['Collections']="Colecciones";
 $lang['None']="Ninguno";
 $lang['Name']="Nombre";
@@ -263,14 +286,13 @@ $lang['require_stats_update']="El cambio requiere actualizar las estadísticas r
 $lang['variable_is_a_key']="Variable clave";
 $lang['export_project_json']="Exportar metadatos del proyecto como JSON";
 $lang['export_all_fields']="Exportar todos los campos";
-$lang['exclude_private_fields']="Excluir campos marcados como 'privados' en la plantilla";
 $lang['Project owner']="Propietario del proyecto";
-$lang['Last changed by']="Última modificación por";
+$lang['Last changed by']="Último cambio por";
 $lang['Project IDNO']="IDNO del proyecto";
-$lang['Created on']="Creado en";
-$lang['Changed on']="Modificado en";
+$lang['Created on']="Creado el";
+$lang['Changed on']="Cambiado el";
 $lang['Data and Documentation']="Datos y Documentación";
-$lang['Disk usage']="Uso del disco";
+$lang['Disk usage']="Uso de disco";
 $lang['Template']="Plantilla";
 $lang['upload_thumbnail']="Subir miniatura";
 $lang['allowed_file_types']="Tipos de archivo permitidos";
@@ -280,9 +302,9 @@ $lang['UID']="UID";
 $lang['Description']="Descripción";
 $lang['Actions']="Acciones";
 $lang['Administrative metadata']="Metadatos administrativos";
-$lang['Schema validation']="Validación del esquema";
+$lang['Schema validation']="Validación de esquema";
 $lang['Requires project to be saved']="Requiere que el proyecto sea guardado";
-$lang['Template validation']="Validación de la plantilla";
+$lang['Template validation']="Validación de plantilla";
 $lang['export_file']="Exportar archivo";
 $lang['file_generated_success']="El archivo se ha generado con éxito";
 $lang['download_file']="Descargar archivo";
@@ -301,7 +323,7 @@ $lang['Variables']="Variables";
 $lang['Delete']="Eliminar";
 $lang['processing_please_wait']="Procesando, por favor espera...";
 
-$lang['multiple_selected']="Múltiple seleccionado";
+$lang['multiple_selected']="Múltiples seleccionados";
 $lang['updating_progress']="Actualizando {current} de {total}";
 $lang['untitled']="sin título";
 $lang['confirm_delete_variables']="¿Eliminar variable(s) seleccionada(s)?";
@@ -309,7 +331,7 @@ $lang['error_deleting_variables']="Error al eliminar variables";
 $lang['duplicate_variables_count']="{count} duplicados";
 $lang['character_variable_cannot_be_weighted']="La variable {variable_name} es de tipo carácter y no puede ser ponderada.";
 $lang['system_missing']="Faltante del sistema";
-$lang['settings']="Configuración";
+$lang['settings']="Configuraciones";
 $lang['value']="Valor";
 $lang['label']="Etiqueta";
 $lang['numeric']="Numérico";
@@ -338,34 +360,23 @@ $lang['role']="Rol";
 $lang['actions']="Acciones";
 
 // User management - missing translations
-$lang['Manage Collection Access Control']="Gestionar control de acceso a colecciones";
-$lang['Manage Project Access']="Gestionar acceso a proyectos";
-$lang['type_user_name_or_email']="Escriba nombre de usuario o email";
+$lang['Manage Collection Access Control']="Gestionar Control de Acceso de Colección";
+$lang['Manage Project Access']="Gestionar Acceso al Proyecto";
+$lang['type_user_name_or_email']="Escribir nombre de usuario o email";
 $lang['error']="Error";
 
 // Copy/Move operations - missing translations
-$lang['copy_collection']="Copiar colección";
+$lang['copy_collection']="Copiar Colección";
 $lang['copy_projects_and_users']="Copiar proyectos y usuarios";
 $lang['source']="Fuente";
 $lang['target']="Destino";
-$lang['collection_copied_successfully']="Colección copiada exitosamente";
-$lang['collection_moved_successfully']="Colección movida exitosamente";
+$lang['collection_copied_successfully']="Colección copiada con éxito";
+$lang['collection_moved_successfully']="Colección movida con éxito";
 
 // Additional missing translations
-$lang['Control which users can access this collection and manage its settings']="Controlar qué usuarios pueden acceder a esta colección y gestionar su configuración";
+$lang['Control which users can access this collection and manage its settings']="Controlar qué usuarios pueden acceder a esta colección y gestionar sus configuraciones";
 $lang['Control which users can access projects within this collection']="Controlar qué usuarios pueden acceder a proyectos dentro de esta colección";
-$lang['Select the source and target collections to move the collection']="Seleccionar las colecciones de origen y destino para mover la colección";
-
-// Additional collection translations
-$lang['Create new collection']="Crear nueva colección";
-$lang['Add sub-collection']="Agregar sub-colección";
-$lang['Copy collection']="Copiar colección";
-$lang['Move collection']="Mover colección";
-$lang['Edit collection']="Editar colección";
-$lang['Refresh tree']="Actualizar árbol";
-$lang['Return to collections']="Volver a colecciones";
-$lang['Collection']="Colección";
-$lang['About']="Acerca de";
+$lang['Select the source and target collections to move the collection']="Seleccionar las colecciones fuente y destino para mover la colección";
 
 // Import options translations
 $lang['import_project_metadata'] = 'Importar metadatos del proyecto';
@@ -376,18 +387,18 @@ $lang['import_file'] = 'Importar archivo';
 $lang['errors'] = 'Errores';
 $lang['update_completed'] = 'Actualización completada';
 $lang['view_documentation'] = 'ver documentación';
-$lang['processing_please_wait'] = 'Procesando, por favor espere...';
+$lang['processing_please_wait'] = 'Procesando, por favor espera...';
 $lang['project_level_metadata'] = 'Metadatos a nivel de proyecto';
 $lang['data_files'] = 'Archivos de datos';
-$lang['variable_information'] = 'Información de variables';
+$lang['variable_information'] = 'Información de variable';
 $lang['document_description'] = 'Descripción del documento';
 $lang['study_description'] = 'Descripción del estudio';
 $lang['file_description'] = 'Descripción del archivo';
-$lang['variable_documentation'] = 'Documentación de variables';
-$lang['variable_categories'] = 'Categorías de variables';
-$lang['variable_questions'] = 'Preguntas de variables';
-$lang['variable_weights'] = 'Pesos de variables';
-$lang['variable_groups'] = 'Grupos de variables';
+$lang['variable_documentation'] = 'Documentación de variable';
+$lang['variable_categories'] = 'Categorías de variable';
+$lang['variable_questions'] = 'Preguntas de variable';
+$lang['variable_weights'] = 'Pesos de variable';
+$lang['variable_groups'] = 'Grupos de variable';
 
 // Data storage options
 $lang['Store data'] = "Almacenar datos";
@@ -405,14 +416,14 @@ $lang['Remove'] = "Eliminar";
 
 // Status messages
 $lang['Data service error'] = "Error del servicio de datos";
-$lang['Waiting for CSV generation to complete...'] = "Esperando que se complete la generación CSV...";
+$lang['Waiting for CSV generation to complete...'] = "Esperando que se complete la generación de CSV...";
 $lang['Generating summary statistics and frequencies'] = "Generando estadísticas resumidas y frecuencias";
 $lang['Exporting data to CSV'] = "Exportando datos a CSV";
-$lang['failed uploading file'] = "falló la subida del archivo";
+$lang['failed uploading file'] = "error al subir archivo";
 $lang['File with the name already exists.'] = "Ya existe un archivo con ese nombre.";
 
 // Data explorer translations
-$lang['loading_please_wait'] = "Cargando, por favor espere...";
+$lang['loading_please_wait'] = "Cargando, por favor espera...";
 $lang['showing_records_range'] = "Mostrando registros {start} - {end} de {total}";
 
 // File type labels
@@ -421,11 +432,11 @@ $lang['SPSS (SAV)'] = "SPSS (SAV)";
 $lang['CSV'] = "CSV";
 
 // Value label validation
-$lang['validating_value_labels'] = "Validando etiquetas de valores...";
-$lang['value_label_validation_failed'] = "La validación de etiquetas de valores falló. Se encontraron los siguientes problemas:";
+$lang['validating_value_labels'] = "Validando etiquetas de valor...";
+$lang['value_label_validation_failed'] = "La validación de etiquetas de valor falló. Se encontraron los siguientes problemas:";
 $lang['continue_export_anyway'] = "¿Quieres continuar con la exportación de todos modos?";
 $lang['export_warning'] = "Advertencia de Exportación";
-$lang['value_labels_not_exportable'] = "El archivo de datos incluye etiquetas de valores con códigos de cadena, que no son compatibles con Stata y serán excluidas del archivo exportado.";
+$lang['value_labels_not_exportable'] = "El archivo de datos incluye etiquetas de valor con códigos de cadena, que no son compatibles con Stata y serán excluidas del archivo exportado.";
 
 // Export dialog
 $lang['select_export_format'] = "Seleccionar formato de exportación";
@@ -433,9 +444,9 @@ $lang['cancel'] = "Cancelar";
 $lang['export'] = "Exportar";
 $lang['download_files'] = "Descargar archivos";
 $lang['download'] = "Descargar";
-$lang['file_generated_success'] = "Archivo generado exitosamente";
+$lang['file_generated_success'] = "Archivo generado con éxito";
 $lang['file'] = "archivo";
-$lang['validation_issues_found'] = "Problemas de validación encontrados";
+$lang['validation_issues_found'] = "Se encontraron problemas de validación";
 $lang['continue_export'] = "Continuar Exportación";
 $lang['failed'] = "Falló";
 $lang['job_status'] = "Estado del trabajo";

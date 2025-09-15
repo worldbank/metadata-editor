@@ -194,7 +194,8 @@ class Editor_template_model extends ci_model {
 
 				return json_decode($template_content,true);
 			}
-		}		
+		}
+		throw new Exception("Core template not found: " . $uid);
 	}
 
     /**

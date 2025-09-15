@@ -31,7 +31,7 @@ if ( ! function_exists('render_field'))
 							$field_output.='<div class="fld-inline">';
 								$field_output.='<span class="fld-name">'. t($field).': </span>';
 								if (!is_array($variable[$field])){
-									$field_output.='<span class="fld-value">'. t($variable[$field]).'</span>';
+									$field_output.='<span class="fld-value">'. $variable[$field].'</span>';
 								}else{
 									$field_output.='<pre>';
 									$field_output.='<span class="fld-value">'. var_dump($variable[$field]).'</span>';
