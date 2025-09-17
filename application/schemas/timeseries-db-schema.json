@@ -709,6 +709,19 @@
 						"name"
 					]
 				},
+				"confidentiality": {
+					"type": "string",
+					"title": "Confidentiality statement",
+					"description": "Confidentiality statement"
+				},
+				"confidentiality_status": {
+					"type": "string",
+					"title": "Confidentiality status"
+				},
+				"confidentiality_note": {
+					"type": "string",
+					"title": "Confidentiality note"
+				},
 				"citation": {
 					"title": "Citation",
 					"type": "string"
