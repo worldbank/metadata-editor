@@ -123,7 +123,7 @@
         $fields=array(
             "var_txt"=>'text',
             "var_universe"=>'text',
-            "var_resp_unit"=>'text'
+            "var_respunit"=>'text'
         ),
         $variable);
     ?>

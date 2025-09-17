@@ -7,7 +7,7 @@
 ?>
 <?php if ( (isset($data) && $data !='') || $show_empty==true ):?>
 <div class="field field-<?php echo $template['title'];?>" id="<?php echo escape_html_attribute($template['key']);?>">
-    <h4 class="xfield-caption"><?php echo t($template['title']);?></h4>
+    <h4 class="xfield-caption"><?php echo $template['title'];?></h4>
     <div class="field-value">
         <?php if (is_array($data)):?>
         <?php foreach($data as $value):?>

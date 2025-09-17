@@ -303,6 +303,12 @@ $lang['duplicate']="Duplicar";
 $lang['duplicate_resource']="Duplicar recurso";
 $lang['resource_duplicated_successfully']="Recurso duplicado exitosamente";
 $lang['modified']="Modificado";
+$lang['var_format']='Formato';
+$lang['vald']='Válido';
+$lang['stdev']='Desviación estándar';
+$lang['overview']='Resumen';
+$lang['questions_n_instructions']='Preguntas e instrucciones';
+$lang['others']='Otros';
 
 /* End of file general_lang.php */
-/* Location: ./application/language/base/general_lang.php */
+/* Location: ./application/language/spanish/general_lang.php */

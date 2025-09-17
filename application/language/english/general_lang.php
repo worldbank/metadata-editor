@@ -337,6 +337,22 @@ $lang['duplicate']="Duplicate";
 $lang['duplicate_resource']="Duplicate resource";
 $lang['resource_duplicated_successfully']="Resource duplicated successfully";
 $lang['modified']="Modified";
+$lang['value']="Value";
+$lang['category']="Category";
+$lang['cases']="Cases";
+$lang['weighted']="Weighted";
+$lang['percentage']="Percentage";
+$lang['total']="Total";
+$lang['variable']="Variable";
+$lang['warning_figures_indicate_number_of_cases_found']="Warning: these figures indicate the number of cases found in the data file. They cannot be interpreted as summary statistics of the population of interest.";
+$lang['concept']="Concept";
+$lang['imputation_n_derivation']="Imputation and derivation";
+$lang['var_format']='Format';
+$lang['vald']='Valid';
+$lang['stdev']='Standard deviation';
+$lang['overview']='Overview';
+$lang['questions_n_instructions']='Questions and instructions';
+$lang['others']='Others';
 
 /* End of file general_lang.php */
-/* Location: ./application/language/base/general_lang.php */
+/* Location: ./application/language/english/general_lang.php */

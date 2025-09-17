@@ -249,3 +249,12 @@ $lang['duplicate']="Dupliquer";
 $lang['duplicate_resource']="Dupliquer la ressource";
 $lang['resource_duplicated_successfully']="Ressource dupliquée avec succès";
 $lang['modified']="Modifié";
+$lang['var_format']='Format';
+$lang['vald']='Valide';
+$lang['stdev']='Écart-type';
+$lang['overview']='Aperçu';
+$lang['questions_n_instructions']='Questions et instructions';
+$lang['others']='Autres';
+
+/* End of file general_lang.php */
+/* Location: ./application/language/french/general_lang.php */

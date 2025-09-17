@@ -893,5 +893,97 @@ class Editor_template_model extends ci_model {
 
 		return $this->get_template_by_uid($uid);
 	}
+
+	/**
+	 * 
+	 * 
+	 * Get translation keys for a template
+	 * 
+	 * Returns a flat array of all key, prop_key and title from all items for a template
+	 * 
+	 * @param string $uid Template UID
+	 * @param string $format Format: 'compact' for key:value pairs, 'full' for detailed array (default)
+	 * 
+	 */
+	function get_template_translation_keys($uid, $format='full')
+	{
+		$template=$this->get_template_by_uid($uid);
+
+		if(!$template){
+			return false;
+		}
+
+		$translation_keys=array();
+		$this->extract_translation_keys($template['template']['items'], $translation_keys);
+		
+		if($format === 'compact'){
+			return $this->format_translation_keys_compact($translation_keys);
+		}
+		
+		return $translation_keys;
+	}
+
+	/**
+	 * 
+	 * 
+	 * Recursively extract translation keys from template items
+	 * 
+	 */
+	private function extract_translation_keys($items, &$translation_keys)
+	{
+		if (!is_array($items)){
+			return;
+		}
+
+		foreach ($items as $item) {
+			// Extract key and title from main item
+			if (isset($item['key']) && isset($item['title'])) {
+				$translation_keys[] = array(
+					'key' => $item['key'],
+					'title' => $item['title'],
+					'prop_key' => null
+				);
+			}
+
+			// Extract keys from props array
+			if (isset($item['props']) && is_array($item['props'])) {
+				foreach ($item['props'] as $prop) {
+					if (isset($prop['key']) && isset($prop['title'])) {
+						$translation_keys[] = array(
+							'key' => $prop['key'],
+							'title' => $prop['title'],
+							'prop_key' => isset($prop['prop_key']) ? $prop['prop_key'] : null
+						);
+					}
+				}
+			}
+
+			// Recursively process nested items
+			if (isset($item['items']) && is_array($item['items'])) {
+				$this->extract_translation_keys($item['items'], $translation_keys);
+			}
+		}
+	}
+
+	/**
+	 * 
+	 * 
+	 * Format translation keys into compact key:value format
+	 * 
+	 * Uses prop_key if available, otherwise uses key
+	 * 
+	 */
+	private function format_translation_keys_compact($translation_keys)
+	{
+		$compact_translations = array();
+		
+		foreach ($translation_keys as $translation_key) {
+			// Use prop_key if set, otherwise use key
+			$key = !empty($translation_key['prop_key']) ? $translation_key['prop_key'] : $translation_key['key'];
+			$compact_translations[$key] = $translation_key['title'];
+		}
+		
+		return $compact_translations;
+	}
     
 }

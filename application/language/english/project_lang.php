@@ -452,4 +452,4 @@ $lang['failed'] = "Failed";
 $lang['job_status'] = "Job status";
 
 /* End of file project_lang.php */
-/* Location: ./application/language/base/project_lang.php */
+/* Location: ./application/language/english/project_lang.php */

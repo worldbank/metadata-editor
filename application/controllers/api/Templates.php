@@ -597,5 +597,54 @@ class Templates extends MY_REST_Controller
 			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
+
+	/**
+	 * 
+	 * 
+	 * Get translation keys for a template
+	 * 
+	 * Returns a flat array of all key, prop_key and title from all items for a template
+	 * 
+	 * @param string $uid Template UID
+	 * @param string $format Optional format parameter: 'compact' for key:value format, 'full' for detailed format (default)
+	 * 
+	 */
+	function translation_keys_get($uid=null, $format='full')
+	{
+		try{
+			$this->has_access($resource_='template_manager',$privilege='view');
+
+			if(!$uid){
+				throw new Exception("Missing parameter for `UID`");
+			}
+
+			$result=$this->Editor_template_model->get_template_translation_keys($uid, $format);
+				
+			if(!$result){
+				throw new Exception("TEMPLATE_NOT_FOUND");
+			}
+
+			if($format === 'compact'){
+				$response=array(
+					'status'=>'success',
+					'translations'=>$result
+				);
+			} else {
+				$response=array(
+					'status'=>'success',
+					'translation_keys'=>$result
+				);
+			}
+			
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
 	
 }

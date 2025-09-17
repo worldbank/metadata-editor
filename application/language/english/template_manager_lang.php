@@ -38,4 +38,4 @@ $lang['external-resource']="External resource";
 $lang['administrative_metadata']="Administrative metadata";
 
 /* End of file template_manager_lang.php */
-/* Location: ./application/language/base/template_manager_lang.php */
+/* Location: ./application/language/english/template_manager_lang.php */

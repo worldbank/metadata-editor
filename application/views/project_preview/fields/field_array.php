@@ -9,14 +9,21 @@
  *  - hide_column_headings - hide column headings 
  */
 
-$columns=$template['props'];
+$columns = isset($template['props']) ? $template['props'] : (isset($template['items']) ? $template['items'] : array());
 $name=$template['title'];
 $hide_field_title=isset($template['hide_field_title']) ? $template['hide_field_title'] : false;
 $hide_column_headings=isset($template['hide_column_headings']) ? $template['hide_column_headings'] : false;
 
+if (empty($columns) || !is_array($columns)) {
+    return false;
+}
+
 //remove empty columns
 $non_empty_columns=array();            
 foreach($columns as $column){
+    if (!isset($column['key'])) {
+        continue; // Skip columns without key
+    }
     $column_data=array_filter(array_column($data, $column['key']));
     if(!empty($column_data)){
         $non_empty_columns[]=$column;

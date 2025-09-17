@@ -38,4 +38,4 @@ $lang['changed_at']="Mis à jour le";
 $lang['changed_by']="Dernière mise à jour par";
 
 /* End of file template_manager_lang.php */
-/* Location: ./application/language/base/template_manager_lang.php */
+/* Location: ./application/language/french/template_manager_lang.php */

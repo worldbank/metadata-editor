@@ -2,7 +2,7 @@
 class Translate extends MY_Controller {
  
  	//base/template language
-	var $base_lang='base';
+	var $base_lang='english';
 	
  
     public function __construct()
@@ -54,7 +54,7 @@ class Translate extends MY_Controller {
 		$data['languages']=$this->translator->get_languages_array();
 		$data['language']=$language;
 		$data['rtl_languages']=array('arabic');
-		$data['files']=$this->translator->get_language_files_array(APPPATH.'/language/base');
+		$data['files']=$this->translator->get_language_files_array(APPPATH.'/language/english');
 		
 		//check if base translation file exists
 		$data['template_file']=$this->translator->load($this->base_lang.'/'.$translation_file);				
