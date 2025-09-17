@@ -24,7 +24,7 @@ class MY_Session extends CI_Session {
 		$new_sessid .= $this->CI->input->ip_address();
 
 		// Turn it into a hash
-		$new_sessid = md5(uniqid($new_sessid, TRUE));
+		$new_sessid = nada_random_hash();
 
 		// Update the session data in the session data array
 		$this->userdata['session_id'] = $new_sessid;

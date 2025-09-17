@@ -121,7 +121,7 @@ s.flex-textarea{height:35px;}
 				}					
 			?>
             <?php //echo form_textarea(md5($key), set_value(NULL, $slave_value),'class="flex-textarea" rows="'.$lines.'"');?>
-			<textarea name="<?php echo md5($key);?>" class="flex-textarea flex" rows="<?php echo $lines;?>"><?php echo set_value(NULL, htmlspecialchars_decode($slave_value)); ?></textarea>
+			<textarea name="<?php echo nada_hash($key);?>" class="flex-textarea flex" rows="<?php echo $lines;?>"><?php echo set_value(NULL, htmlspecialchars_decode($slave_value)); ?></textarea>
         </td>
         </tr>
         <?php //break;?>

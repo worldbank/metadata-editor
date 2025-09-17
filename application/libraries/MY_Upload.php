@@ -29,7 +29,7 @@ class MY_Upload extends CI_Upload {
 		{
 			mt_srand();
 			//$filename = md5(uniqid(mt_rand())).$this->file_ext; //original
-			$filename = md5(uniqid(mt_rand())).$this->file_ext."_";
+			$filename = nada_random_hash().$this->file_ext."_";
 		}
 
 		return parent::set_filename($path,$filename);

@@ -10,13 +10,6 @@
 |
 */
 
-$hook['pre_system'][] = array(
-                                'class'    => '',
-                                'function' => 'pre_system_url_check',
-                                'filename' => '',
-                                'filepath' => 'hooks',
-                                'params'   => array()
-                                );
 
 $hook['post_controller_constructor'][] = array(
                                 'class'    => '',
@@ -52,120 +45,8 @@ $hook['post_controller'] = array(
 );
 */
 
-/*
-//automatically login
-$hook['post_controller_constructor'][] = array(
-                                'class'    => '',
-                                'function' => 'admin_auto_login',
-                                'filename' => '',
-                                'filepath' => 'hooks',
-                                'params'   => array()
-                                );
-*/
 
-/**
-*
-* Force SSL for urls under /auth if Server has 
-* SSL Support
-*
-*
-**/
-function pre_system_url_check()
-{
-	//load configurations
-    include APPPATH.'config/config.php';
-	
-	if (!$config)
-	{
-		return FALSE;
-	}
-	
-	$http_port=(int)$config["http_port"];
-	$enable_ssl=(bool)$config["enable_ssl"];
-	$proxy_ssl=(bool)$config['proxy_ssl'];
-	$proxy_ssl_header=$config["proxy_ssl_header"];
-	$proxy_ssl_header_value=$config["proxy_ssl_header_value"];
-	
-	if (!$enable_ssl && !$proxy_ssl)
-	{
-		return FALSE;
-	}
 
-	$path_info='';
-	if(isset($_SERVER["PATH_INFO"]))
-	{
-		$path_info=$_SERVER["PATH_INFO"];
-	}
-	
-	$segments= array_filter(explode("/",$path_info));
-	
-	$url="https://".$_SERVER['HTTP_HOST']._request_uri();
-
-	//build url for redirect to https page
-	$redirect= "https://".$_SERVER['HTTP_HOST']._request_uri();
-		
-	//remove http port
-	if ($http_port>0 && $http_port!=80)
-	{
-		$redirect=str_replace(':'.$http_port,'',$redirect);
-	}
-
-	//if page is served using HTTPS
-	$is_https=FALSE;
-	
-	//check if using SSL/Proxy/Headers
-	if ($proxy_ssl===TRUE && $proxy_ssl_header!='')
-	{		
-		//see if the variable is set
-		if (isset($_SERVER[$proxy_ssl_header]))
-		{
-			if ($_SERVER[$proxy_ssl_header]==$proxy_ssl_header_value)
-			{
-				$is_https=TRUE;
-			}
-		}
-		else
-		{
-			//avoid redirect loop
-			return FALSE; 
-		}		
-	}
-	//check SSL using server HTTPS variablbe
-	else if (isset($_SERVER['HTTPS']))
-	{
-		if($_SERVER['HTTPS']=="on")
-		{
-			$is_https=TRUE;
-		}	
-	}
-	
-	//page is not viewed using HTTPS
-	if($is_https===FALSE)
-	{	
-		//if url first segment has AUTH redirect to HTTPS		
-		//if (current($segments)=='auth'){
-			//redirect to SSL page
-			header("Location:$redirect");
-		//}		
-	}
-}
-
-/**
-*
-* Returns the URI for the current page
-**/
-function _request_uri()
-{
-	//on IIS 6 request_uri is not available
-	if (!empty($_SERVER['REQUEST_URI']))
-	{
-		return $_SERVER['REQUEST_URI'];
-	}
-	else
-	{
-		return $_SERVER['PHP_SELF'];
-	}
-}
 
 /**
 *
@@ -236,16 +117,6 @@ function disable_admin_access($params)
 }
 
 
-function admin_auto_login()
-{
-		$CI =& get_instance();		
-        $CI->load->helper('url'); // to be on the safe side
-			
-		if (!$CI->ion_auth->logged_in()) 
-		{
-			$CI->ion_auth->login('', '');
-		}
-}
 
 /* End of file hooks.php */
 /* Location: ./system/application/config/hooks.php */

@@ -95,9 +95,9 @@ class Translate extends MY_Controller {
 		//reload data from POST for language
 		foreach($data['template_file'] as $key=>$value)
 		{
-			if ($this->input->post(md5($key)))
+			if ($this->input->post(nada_hash($key)))
 			{
-				$post_data[$key]=$this->input->post(md5($key));
+				$post_data[$key]=$this->input->post(nada_hash($key));
 			}
 		}				
 		

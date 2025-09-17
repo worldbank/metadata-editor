@@ -109,7 +109,7 @@ class MY_Form_validation extends CI_Form_validation {
      */
     function create_nonce()
     {
-        $nonce = md5('nonce' . $this->CI->input->ip_address() . microtime());
+        $nonce = nada_hash('nonce' . $this->CI->input->ip_address() . microtime());
         $this->CI->session->set_userdata('nonce', $nonce);
 		log_message('error', 'create_nonce: '.$nonce);
         return $nonce;

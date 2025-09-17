@@ -892,7 +892,7 @@ class Editor_resource_model extends ci_model {
 			}
 		}
 
-		$filename=trim($project['idno'])!=='' ? trim($project['idno']) : md5($project['id']);
+		$filename=trim($project['idno'])!=='' ? trim($project['idno']) : nada_hash($project['id']);
 		$filename.='.rdf.json';
 
 		$path = $this->Editor_model->get_project_folder($sid);
@@ -916,7 +916,7 @@ class Editor_resource_model extends ci_model {
 			throw new Exception("write_rdf::Project folder not found");
 		}
 
-		$filename=trim($project['idno'])!=='' ? trim($project['idno']) : md5($project['id']);
+		$filename=trim($project['idno'])!=='' ? trim($project['idno']) : nada_hash($project['id']);
 		$filename.='.rdf';
 		$resource_file=$path.'/'.$filename;
 

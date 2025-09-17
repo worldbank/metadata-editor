@@ -127,7 +127,7 @@ class Editor_model extends CI_Model {
 		}
 
 		$storage_root=$this->get_storage_path();
-		$project_folder=$storage_root.'/'.md5($sid);
+		$project_folder=$storage_root.'/'.nada_hash($sid);
 
         //create the repo folder and survey folder
         @mkdir($project_folder, 0777, $recursive=true);
@@ -142,13 +142,13 @@ class Editor_model extends CI_Model {
 
 		//update db with project folder path
 		$options=array(
-			'dirpath'=>md5($sid)
+			'dirpath'=>nada_hash($sid)
 		);
 
 		$this->db->where("id",$sid);
 		$this->db->update("editor_projects",$options);
 
-        return md5($sid);
+        return nada_hash($sid);
 	}
 	
 	
@@ -1171,7 +1171,7 @@ class Editor_model extends CI_Model {
 			throw new Exception("download_project_ddi::Project folder not found");
 		}
 
-		$filename=trim($project['idno'])!=='' ? trim($project['idno']) : md5($project['id']);
+		$filename=trim($project['idno'])!=='' ? trim($project['idno']) : nada_hash($project['id']);
 
 		$ddi_path=$project_folder.'/'.$filename.'.xml';
 
@@ -1223,7 +1223,7 @@ class Editor_model extends CI_Model {
 			throw new Exception("Project folder not found");
 		}
 
-		$filename=md5($sid);
+		$filename=nada_hash($sid);
 
 		$pdf_path=$project_folder.'/'.$filename.'.pdf';
 		return $pdf_path;

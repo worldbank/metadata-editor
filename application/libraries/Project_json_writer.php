@@ -131,7 +131,7 @@ class Project_json_writer
 			throw new Exception("download_project_json::Project folder not found");
 		}
 
-		$filename=trim((string)$project['idno'])!=='' ? trim($project['idno']) : md5($project['id']);
+		$filename=trim((string)$project['idno'])!=='' ? trim($project['idno']) : nada_hash($project['id']);
 		$output_file=$project_folder.'/'.$filename.'.json';
 
 		$fp = fopen($output_file, 'w');

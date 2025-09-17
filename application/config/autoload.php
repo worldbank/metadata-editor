@@ -73,7 +73,7 @@ $autoload['libraries'] = array(
 |	$autoload['helper'] = array('url', 'file');
 */
 
-$autoload['helper'] = array('security','url','language','form_input_helper','querystring_helper','file_helper','debug_helper','json_helper');
+$autoload['helper'] = array('security','url','language','form_input_helper','querystring_helper','file_helper','debug_helper','json_helper','hash_helper');
 
 
 

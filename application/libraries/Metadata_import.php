@@ -167,7 +167,7 @@ class Metadata_Import{
 		$ddi_filename=$idno.".xml";
 
         //generate survey folder name hash
-        $survey_folder_hash=md5($repositoryid.':'.$idno);
+        $survey_folder_hash=nada_hash($repositoryid.':'.$idno);
 
 		//survey folder path
         $survey_folder_path=$this->setup_folder($repositoryid,$survey_folder_hash);

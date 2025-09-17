@@ -137,7 +137,7 @@ class AzureOauth2
         else
         {				
             //register user if not already registered
-            $this->ci->ion_auth_model->register($user->fname, md5(date("U")), $user->email, $additional_data, $group_name='user', $auth_type="AAD");
+            $this->ci->ion_auth_model->register($user->fname, nada_random_hash(), $user->email, $additional_data, $group_name='user', $auth_type="AAD");
 
             //login to site			
             $this->login_user($user->email);            

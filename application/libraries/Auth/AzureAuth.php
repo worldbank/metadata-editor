@@ -25,7 +25,7 @@ class AzureAuth extends DefaultAuth implements AuthInterface {
 			}
 
 			$azure_auth_configs=$this->ci->config->item("azure_auth");
-			$redirect_url=$azure_auth_configs['authorize_endpoint'].'?client_id='.$azure_auth_configs['client_id'].'&response_mode=form_post&response_type=code%20id_token&nonce='.md5(time());
+			$redirect_url=$azure_auth_configs['authorize_endpoint'].'?client_id='.$azure_auth_configs['client_id'].'&response_mode=form_post&response_type=code%20id_token&nonce='.nada_random_hash();
 			redirect($redirect_url,'refresh');
 		}
 

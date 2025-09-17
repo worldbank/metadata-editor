@@ -1,16 +1,14 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php
+
+if (! defined('BASEPATH')) {
+    exit('No direct script access allowed');
+}
 /**
  * CodeIgniter
  *
- * An open source application development framework for PHP 4.3.2 or newer
- *
- * @package		CodeIgniter
- * @author		ExpressionEngine Dev Team
- * @copyright	Copyright (c) 2008 - 2009, EllisLab, Inc.
- * @license		http://codeigniter.com/user_guide/license.html
- * @link		http://codeigniter.com
- * @since		Version 1.0
- * @filesource
+ * @package    CodeIgniter
+ * @subpackage Helpers
+ * @category   Helpers
  */
 
 // ------------------------------------------------------------------------
@@ -18,11 +16,9 @@
 /**
  * CodeIgniter Download Helpers
  *
- * @package		CodeIgniter
- * @subpackage	Helpers
- * @category	Helpers
- * @author		ExpressionEngine Dev Team
- * @link		http://codeigniter.com/user_guide/helpers/download_helper.html
+ * @package    CodeIgniter
+ * @subpackage Helpers
+ * @category   Helpers
  */
 
 // ------------------------------------------------------------------------
@@ -32,164 +28,293 @@
  *
  * Generates headers that force a download to happen
  *
- * @access	public
- * @param	string	filename
- * @param	mixed	the data to be downloaded
- * @return	void
- */	
-if ( ! function_exists('force_download2'))
-{
-function force_download2($filename = '', $data = false, $enable_partial = true, $speedlimit = 0)
+ * @param  string       $filename       Filename (display name) or full file path if $data === false
+ * @param  string|false $data           Binary string to send; false to read from disk path in $filename
+ * @param  bool         $enable_partial Enable HTTP Range / resumable downloads
+ * @param  int          $speedlimit     KB/sec (0 = unlimited)
+ * @return bool
+ */
+if (! function_exists('force_download2')) {
+    function force_download2($filename = '', $data = false, $enable_partial = true, $speedlimit = 0)
     {
-        if ($filename == '')
-        {
-            return FALSE;
+        if ($filename === '') {
+            return false;
         }
-        
-        if($data === false && !file_exists($filename))
-            return FALSE;
 
-        // Try to determine if the filename includes a file extension.
-        // We need it in order to set the MIME type
-        if (FALSE === strpos($filename, '.'))
-        {
-            return FALSE;
-        }
-    
-        // Grab the file extension
-        $x = explode('.', $filename);
-        $extension = end($x);
+        $reading_from_disk = ($data === false);
 
-        // Load the mime types
-        @include(APPPATH.'config/mimes'.EXT);
-    
-        // Set a default mime if we can't find it
-        if ( ! isset($mimes[$extension]))
-        {
-			if (strpos($_SERVER['HTTP_USER_AGENT'],'Opera')!==FALSE) 
-			{
-				$UserBrowser = "Opera"; 
-			}
-			elseif (strpos($_SERVER['HTTP_USER_AGENT'],'MSIE')!==FALSE)
-			{
-				$UserBrowser = "IE";
-			}	
-			else
-			{
-				$UserBrowser = 'not matched';
-			}	
-            
-            $mime = ($UserBrowser == 'IE' || $UserBrowser == 'Opera') ? 'application/octetstream' : 'application/octet-stream';
+        if ($reading_from_disk && !is_file($filename)) {
+            return false;
         }
-        else
-        {
-            $mime = (is_array($mimes[$extension])) ? $mimes[$extension][0] : $mimes[$extension];
+
+        // Determine extension (best-effort; not required)
+        $extension = '';
+        $dotpos = strrpos($filename, '.');
+        if ($dotpos !== false) {
+            $extension = substr($filename, $dotpos + 1);
         }
-        
-        $size = $data === false ? filesize($filename) : strlen($data);
-        
-        if($data === false)
-        {
-            $info = pathinfo($filename);
-            $name = $info['basename'];
+
+        // Load known mimes
+        $mimes = [];
+        if (defined('APPPATH')) {
+            @include APPPATH . 'config/mimes.php';
         }
-        else
-        {
-            $name = $filename;
+        if (!is_array($mimes)) {
+            $mimes = [];
         }
-        
-        // Clean data in cache if exists
-        //@ob_end_clean();
-        
-        // Check for partial download
-        if(isset($_SERVER['HTTP_RANGE']) && $enable_partial)
-        {
-            list($a, $range) = explode("=", $_SERVER['HTTP_RANGE']);
-            list($fbyte, $lbyte) = explode("-", $range);
-            
-            if(!$lbyte)
-                $lbyte = $size - 1;
-            
-            $new_length = $lbyte - $fbyte;
-            
-            header("HTTP/1.1 206 Partial Content", true);
-            header("Content-Length: $new_length", true);
-            header("Content-Range: bytes $fbyte-$lbyte/$size", true);
-        }
-        else
-        {
-            header("Content-Length: " . $size);
-        }
-        
-        // Common headers
-        header('Content-Type: ' . $mime, true);
-        header('Content-Disposition: attachment; filename="' . $name . '"', true);
-        header("Expires: Mon, 26 Jul 1997 05:00:00 GMT", true);
-        header('Accept-Ranges: bytes', true);
-        header("Cache-control: private", true);
-        header('Pragma: private', true);
-        
-        // Open file
-        if($data === false) {
-            $file = fopen($filename, 'r');
-            
-            if(!$file)
-                return FALSE;
-        }
-        
-        // Cut data for partial download
-        if(isset($_SERVER['HTTP_RANGE']) && $enable_partial)
-            if($data === false)
-                fseek($file, $range);
-            else
-                $data = substr($data, $range);
-        
-        // Disable script time limit
-        @set_time_limit(0);
-        
-        // Check for speed limit or file optimize
-        if($speedlimit > 0 || $data === false)
-        {
-            if($data === false)
-            {
-                $chunksize = $speedlimit > 0 ? $speedlimit * 1024 : 512 * 1024;
-            
-                while(!feof($file) and (connection_status() == 0))
-                {
-                    $buffer = fread($file, $chunksize);
-                    echo $buffer;
-                    flush();
-                    
-                    if($speedlimit > 0)
-                        sleep(1);
+
+        // Pick MIME (prefer finfo over extension)
+        $mime = null;
+
+        if (function_exists('finfo_open')) {
+            $f = finfo_open(FILEINFO_MIME_TYPE);
+            if ($f) {
+                if ($reading_from_disk) {
+                    $try = @finfo_file($f, $filename);
+                } else {
+                    $try = @finfo_buffer($f, $data);
                 }
-                
-                fclose($file);
+                if ($try) {
+                    $mime = $try;
+                }
+                finfo_close($f);
             }
-            else
-            {
-                $index = 0;
-                $speedlimit *= 1024; //convert to kb
-                
-                while($index < $size and (connection_status() == 0))
-                {
-                    $left = $size - $index;
-                    $buffersize = min($left, $speedlimit);
-                    
-                    $buffer = substr($data, $index, $buffersize);
-                    $index += $buffersize;
-                    
-                    echo $buffer;
-                    flush();
+        }
+
+        if ($mime === null) {
+            // fallback to extension map
+            $mime_entry = $extension !== '' ? ($mimes[$extension] ?? null) : null;
+            if ($mime_entry !== null) {
+                $mime = is_array($mime_entry) ? $mime_entry[0] : $mime_entry;
+            } else {
+                // conservative default
+                $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
+                $is_ie_or_opera = (strpos($ua, 'MSIE') !== false) || (strpos($ua, 'Opera') !== false);
+                $mime = $is_ie_or_opera ? 'application/octetstream' : 'application/octet-stream';
+            }
+        }
+
+        // Determine size and download name
+        $size = $reading_from_disk ? @filesize($filename) : strlen($data);
+        if ($size === false) {
+            // Could not stat file
+            return false;
+        }
+        $name = $reading_from_disk ? basename($filename) : $filename;
+
+        // Sanitize filename for header and add UTF-8 fallback
+        $downloadName = basename($name);
+        // strip CR/LF/quotes to avoid header injection
+        $downloadName = str_replace(["\r", "\n", '"'], '_', $downloadName);
+        $disposition = 'attachment; filename="' . $downloadName . '"';
+        if (function_exists('mb_detect_encoding') && mb_detect_encoding($downloadName, 'UTF-8', true)) {
+            $disposition .= "; filename*=UTF-8''" . rawurlencode($downloadName);
+        }
+
+        // Clear output buffers and disable compression/buffering to avoid corruption
+        while (ob_get_level() > 0) { @ob_end_clean(); 
+        }
+        @ini_set('zlib.output_compression', 'Off');
+        @ini_set('output_buffering', 'Off');
+
+        // Zero-byte files: send headers and finish cleanly
+        if ((int)$size === 0) {
+            if (headers_sent()) {
+                error_log('Headers already sent; cannot start zero-byte download');
+                return false;
+            }
+            header('Content-Type: ' . $mime, true);
+            header('X-Content-Type-Options: nosniff', true);
+            header('Content-Disposition: ' . $disposition, true);
+            header('Accept-Ranges: bytes', true);
+            header('Content-Length: 0', true);
+            header('Cache-Control: private, no-transform, max-age=0', true);
+            header('Pragma: private', true);
+            header('Expires: Mon, 26 Jul 1997 05:00:00 GMT', true);
+            return true;
+        }
+
+        // Range defaults
+        $start = 0;
+        $end   = $size - 1; // inclusive
+        $length = $size;
+        $is_partial = false;
+
+        // Parse HTTP Range header (bytes=start-end | start- | -suffix)
+        if ($enable_partial && isset($_SERVER['HTTP_RANGE'])) {
+            if (preg_match('/bytes=(\d*)-(\d*)/i', $_SERVER['HTTP_RANGE'], $m)) {
+                $s = $m[1];
+                $e = $m[2];
+
+                if ($s === '' && $e === '') {
+                    // Invalid
+                    if (!headers_sent()) {
+                        header('HTTP/1.1 416 Range Not Satisfiable');
+                        header("Content-Range: bytes */{$size}");
+                    }
+                    return false;
+                }
+
+                if ($s === '') {
+                    // last N bytes: "-SUFFIX"
+                    $suffix = (int)$e;
+                    if ($suffix <= 0) { $suffix = 0;
+                    }
+                    if ($suffix >= $size) {
+                        $start = 0;
+                    } else {
+                        $start = $size - $suffix;
+                    }
+                } else {
+                    $start = (int)$s;
+                }
+
+                if ($e !== '') {
+                    $end = (int)$e;
+                } else {
+                    $end = $size - 1;
+                }
+
+                // bounds check
+                if ($start > $end || $start >= $size || $end >= $size) {
+                    if (!headers_sent()) {
+                        header('HTTP/1.1 416 Range Not Satisfiable');
+                        header("Content-Range: bytes */{$size}");
+                    }
+                    return false;
+                }
+
+                $length = $end - $start + 1;
+                $is_partial = true;
+            }
+        }
+
+        // Before sending any headers, ensure we still can
+        if (headers_sent()) {
+            error_log('Headers already sent; cannot start download');
+            return false;
+        }
+
+        // Send headers
+        if ($is_partial) {
+            header('HTTP/1.1 206 Partial Content', true);
+            header("Content-Range: bytes {$start}-{$end}/{$size}", true);
+            header('Content-Length: ' . $length, true);
+        } else {
+            header('Content-Length: ' . $size, true);
+        }
+        header('Content-Type: ' . $mime, true);
+        header('X-Content-Type-Options: nosniff', true);
+        header('Content-Disposition: ' . $disposition, true);
+        header('Accept-Ranges: bytes', true);
+        header('Cache-Control: private, no-transform, max-age=0', true);
+        header('Pragma: private', true);
+        header('Expires: Mon, 26 Jul 1997 05:00:00 GMT', true);
+
+        // Open output stream once
+        $out = fopen('php://output', 'wb');
+        if ($out === false) {
+            error_log('Cannot open php://output');
+            return false;
+        }
+
+        @set_time_limit(0);
+        ignore_user_abort(true);
+
+        // Chunk size (KB/s -> bytes)
+        $chunk_bytes = ($speedlimit > 0) ? max(1024, (int)$speedlimit * 1024) : (512 * 1024);
+
+        if ($reading_from_disk) {
+            $fp = fopen($filename, 'rb');
+            if ($fp === false) {
+                fclose($out);
+                return false;
+            }
+
+            if ($is_partial && $start > 0) {
+                if (fseek($fp, $start, SEEK_SET) !== 0) {
+                    fclose($fp);
+                    fclose($out);
+                    error_log("Cannot seek to {$start}");
+                    return false;
+                }
+            }
+
+            $remaining = $length;
+
+            while ($remaining > 0 && connection_status() === 0) {
+                $to_read = min($remaining, $chunk_bytes);
+                $buffer  = fread($fp, $to_read);
+                if ($buffer === false || $buffer === '') {
+                    break; // read error or EOF
+                }
+                $written = fwrite($out, $buffer);
+                if ($written === false) {
+                    break;
+                }
+                $remaining -= $written;
+                fflush($out);
+
+                if ($speedlimit > 0) {
+                    // throttle roughly once per second
                     sleep(1);
                 }
             }
+
+            fclose($fp);
+            fclose($out);
+
+            if (function_exists('fastcgi_finish_request')) {
+                @fastcgi_finish_request();
+            }
+
+            return true;
         }
-        else
-        {
-            echo $data;
+
+        // String/buffer mode
+        if ($is_partial) {
+            $slice = substr($data, $start, $length);
+            $send_len = strlen($slice);
+            if ($speedlimit > 0) {
+                $idx = 0;
+                while ($idx < $send_len && connection_status() === 0) {
+                    $to_write = min($chunk_bytes, $send_len - $idx);
+                    $written  = fwrite($out, substr($slice, $idx, $to_write));
+                    if ($written === false) { break;
+                    }
+                    $idx += $to_write;
+                    fflush($out);
+                    sleep(1);
+                }
+            } else {
+                fwrite($out, $slice);
+            }
+        } else {
+            if ($speedlimit > 0) {
+                $send_len = $size;
+                $idx = 0;
+                while ($idx < $send_len && connection_status() === 0) {
+                    $to_write = min($chunk_bytes, $send_len - $idx);
+                    $written  = fwrite($out, substr($data, $idx, $to_write));
+                    if ($written === false) { break;
+                    }
+                    $idx += $to_write;
+                    fflush($out);
+                    sleep(1);
+                }
+            } else {
+                fwrite($out, $data);
+            }
         }
-    } 
+
+        fclose($out);
+
+        if (function_exists('fastcgi_finish_request')) {
+            @fastcgi_finish_request();
+        }
+
+        return true;
+    }
 }
 
 /* End of file download_helper.php */

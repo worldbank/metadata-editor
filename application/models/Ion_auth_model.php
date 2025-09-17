@@ -66,6 +66,7 @@ class Ion_auth_model extends CI_Model
 		$this->load->helper('cookie');
         $this->load->library('session');
 		$this->load->library('password_hasher');
+		$this->load->helper('hash');
 		$this->tables  = $this->config->item('tables');
 		$this->columns = $this->config->item('columns');
 		$this->load->helper('date');
@@ -229,7 +230,7 @@ class Ion_auth_model extends CI_Model
 	        return FALSE;
 	    }
 	    
-		$activation_code       = sha1(md5(microtime()));
+		$activation_code       = nada_random_hash(40);
 		$this->activation_code = $activation_code;
 		
 		$data = array(
@@ -303,22 +304,8 @@ class Ion_auth_model extends CI_Model
 
         if ($query->num_rows() == 1)
         {
-            $password_validated=FALSE;
-			
-			//using MD5?
-			if (strlen($result->password)==32)
-			{
-				//use MD5 for old accounts
-				$password_validated=$result->password === md5($password);
-				
-				//upgrade account password				
-				$this->set_password($identity,$this->hash_password($password));
-			}
-			else
-			{
-				//use default mroe complex password hashing
-				$password_validated=$this->password_hasher->check_password($password,$hash=$result->password);
-			}
+            //use secure password hashing only
+            $password_validated=$this->password_hasher->check_password($password,$hash=$result->password);
 			
 			if ($password_validated)
     		{
@@ -723,25 +710,8 @@ class Ion_auth_model extends CI_Model
 
         if ($query->num_rows() == 1)
         {
-            $password_validated=FALSE;
-			
-			//using MD5?
-			if (strlen($result->password)==32)
-			{
-				//use MD5 for old accounts
-				$password_validated=$result->password === md5($password);
-				
-				//upgrade account password				
-				$this->set_password($identity,$this->hash_password($password));
-			}
-			else
-			{
-				//use default mroe complex password hashing
-				$password_validated=$this->password_hasher->check_password($password,$hash=$result->password);
-			}
-			
-			//$password = $this->hash_password_db($identity, $password);
-    		//if ($result->password === $password)
+            //use secure password hashing only
+            $password_validated=$this->password_hasher->check_password($password,$hash=$result->password);
 			
 			if ($password_validated)
     		{
@@ -1188,7 +1158,7 @@ class Ion_auth_model extends CI_Model
 			return FALSE;
 		}
 		
-		$salt = sha1(md5(microtime()));
+		$salt = nada_random_hash(40);
 		
 		$is_updated=$this->db->update($this->tables['users'], array('remember_code' => $salt), array('id' => $id));
 		
@@ -1548,7 +1518,7 @@ class Ion_auth_model extends CI_Model
 	function set_api_key($user_id,$key=NULL)
 	{
 		if(!$key || strlen(trim($key))<10 ){
-			$key=md5(uniqid(rand(),true));
+			$key=nada_random_hash(32);
 		}
 
 		$options=array(

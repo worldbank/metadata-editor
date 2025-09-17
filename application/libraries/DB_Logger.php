@@ -43,8 +43,8 @@ class DB_Logger{
 			}
 		}
 		
-		$username='guest';
-		
+		$username='';
+
 		//check if user is logged in
 		if ($this->ci->ion_auth->logged_in()) 
 		{

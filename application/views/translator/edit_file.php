@@ -41,7 +41,7 @@
 			?>
 			<?php //echo form_textarea(md5($key), set_value(NULL, $slave_value),'class="flex-textarea" rows="'.$lines.'"');?>
 			<?php //echo set_value('text', htmlspecialchars_decode($edit_value)); ?>
-			<textarea name="<?php echo md5($key);?>" class="form-control flex-textarea flex" rows="<?php echo $lines;?>"><?php echo set_value(md5($key), htmlspecialchars_decode($edit_value)); ?></textarea>
+			<textarea name="<?php echo nada_hash($key);?>" class="form-control flex-textarea flex" rows="<?php echo $lines;?>"><?php echo set_value(nada_hash($key), htmlspecialchars_decode($edit_value)); ?></textarea>
         </td>
         </tr>
         <?php //break;?>

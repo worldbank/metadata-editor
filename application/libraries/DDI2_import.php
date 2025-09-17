@@ -135,7 +135,7 @@ class DDI2_Import{
             $survey_folder_rel_path =$this->ci->Dataset_model->get_dirpath($sid);            
 
             if(!$survey_target_filepath){
-                $survey_folder_hash=md5($repositoryid.':'.$idno);
+                $survey_folder_hash=nada_hash($repositoryid.':'.$idno); 
                 $this->setup_folder($repositoryid,$survey_folder_hash);
             }
 
@@ -144,7 +144,7 @@ class DDI2_Import{
             $ddi_filename=$this->sanitize_filename($idno).".xml";
 
             //generate survey folder name hash
-            $survey_folder_hash=md5($repositoryid.':'.$idno);
+            $survey_folder_hash=nada_hash($repositoryid.':'.$idno);
 
             //survey folder path
             $survey_folder_path=$this->setup_folder($repositoryid,$survey_folder_hash);

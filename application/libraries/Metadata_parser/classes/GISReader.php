@@ -84,7 +84,7 @@ class GISReader implements ReaderInterface{
             
             if ($title)
             {
-                return md5($title);
+                return nada_hash($title);
             }
         }
         

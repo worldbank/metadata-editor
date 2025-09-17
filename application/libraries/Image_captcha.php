@@ -66,7 +66,7 @@ class Image_captcha{
 
 		$cap = create_captcha($vals);
 
-		$answer=base64_encode(md5($word));
+		$answer=base64_encode(nada_hash($word));
 
 		$output=sprintf('<div class="image_captcha field mb-3">%s 
 						<label class="desc">%s</label>
@@ -100,7 +100,7 @@ class Image_captcha{
 	*/
 	function validate_captcha()
 	{
-		$question=base64_encode(md5($this->ci->input->get_post('captcha_question')));
+		$question=base64_encode(nada_hash($this->ci->input->get_post('captcha_question')));
 		$answer=$this->ci->input->get_post('cqa');
 
 		if ($question!==$answer)

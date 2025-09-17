@@ -463,7 +463,7 @@ class Editor_template_model extends ci_model {
 		}
 
 		if (!isset($template_options['uid'])){
-			$template_options["uid"]=md5($template_options['data_type'].'-'.mt_rand());
+			$template_options["uid"]=nada_random_hash();
 		}
 		else{
 			$exists=$this->check_uid_exists($template_options['uid']);
@@ -535,7 +535,7 @@ class Editor_template_model extends ci_model {
 
 		//create template
 		$template_options=array(
-			"uid"=>md5($template['data_type'].'-'.mt_rand()),
+			"uid"=>nada_random_hash(),
 			"data_type"=>$template['data_type'],
 			"lang"=>'en', 
 			"name"=>$template['name']. ' - copy', 

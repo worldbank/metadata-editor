@@ -495,11 +495,30 @@ abstract class REST_Controller extends CI_Controller {
         $this->request->body = NULL;
 
         if (in_array($this->request->method, $this->allowed_http_methods, true)) {
-            $method = '_parse_' . $this->request->method;
-            if (method_exists($this, $method)) {
-                $this->$method();
-            } else {
-                throw new BadMethodCallException("Method $method does not exist");
+            switch ($this->request->method) {
+                case 'get':
+                    $this->_parse_get();
+                    break;
+                case 'post':
+                    $this->_parse_post();
+                    break;
+                case 'put':
+                    $this->_parse_put();
+                    break;
+                case 'delete':
+                    $this->_parse_delete();
+                    break;
+                case 'options':
+                    $this->_parse_options();
+                    break;
+                case 'patch':
+                    $this->_parse_patch();
+                    break;
+                case 'head':
+                    $this->_parse_head();
+                    break;
+                default:
+                    throw new BadMethodCallException("Method _parse_{$this->request->method} does not exist");
             }
         } else {
             throw new InvalidArgumentException('Invalid request method');
@@ -804,7 +823,47 @@ abstract class REST_Controller extends CI_Controller {
                     throw new Exception("invalid_method");
                 }
 
-                call_user_func_array([$this, $controller_method], $arguments);
+                if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $controller_method)) {
+                    throw new Exception("invalid_method_name");
+                }
+
+                switch ($controller_method) {
+                    case 'index_get':
+                        $this->index_get(...$arguments);
+                        break;
+                    case 'index_post':
+                        $this->index_post(...$arguments);
+                        break;
+                    case 'index_put':
+                        $this->index_put(...$arguments);
+                        break;
+                    case 'index_delete':
+                        $this->index_delete(...$arguments);
+                        break;
+                    case 'index_options':
+                        $this->index_options(...$arguments);
+                        break;
+                    case 'index_patch':
+                        $this->index_patch(...$arguments);
+                        break;
+                    case 'index_head':
+                        $this->index_head(...$arguments);
+                        break;
+                    default:
+                        if (preg_match('/^([a-zA-Z_][a-zA-Z0-9_]*)_(get|post|put|delete|options|patch|head)$/', $controller_method, $matches)) {
+                            $method_name = $matches[1];
+                            $http_method = $matches[2];
+                            
+                            if (method_exists($this, $controller_method) && is_callable([$this, $controller_method])) {
+                                $this->$controller_method(...$arguments);
+                            } else {
+                                throw new Exception("method_not_callable");
+                            }
+                        } else {
+                            throw new Exception("invalid_method_pattern");
+                        }
+                        break;
+                }
             }
         }
         catch (Exception $ex)
@@ -857,7 +916,8 @@ abstract class REST_Controller extends CI_Controller {
             	if (method_exists($this->format, 'to_' . $this->response->format))
             	{
                 	// Set the format header
-                	$this->output->set_content_type($this->_supported_formats[$this->response->format], strtolower($this->config->item('charset')));
+                	$charset = $this->config->item('charset') ?: 'utf-8';
+                	$this->output->set_content_type($this->_supported_formats[$this->response->format], strtolower($charset));
                 	$output = $this->format->factory($data)->{'to_' . $this->response->format}();
 
                 	// An array must be parsed as a string, so as not to cause an array to string error

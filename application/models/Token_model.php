@@ -10,7 +10,7 @@ class Token_model extends CI_Model {
 	function create_token(){
 		
 		//create new token
-		$token=md5(uniqid());
+		$token=nada_random_hash();
 		
 		$data=array(
 				'tokenid'=>$token,
