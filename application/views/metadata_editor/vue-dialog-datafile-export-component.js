@@ -22,6 +22,9 @@ Vue.component('dialog-datafile-export', {
             validation_dialog: {
                 show: false,
                 errors: [],
+                missing_value_errors: [],
+                value_label_errors: [],
+                error_summary: {},
                 format: ''
             }
         }
@@ -49,11 +52,11 @@ Vue.component('dialog-datafile-export', {
             };
 
             try {
-                // First validate value labels for STATA/SPSS exports
+                // First validate export compatibility for STATA/SPSS exports
                 if (this.selected_format === 'dta' || this.selected_format === 'sav') {
-                    this.export_dialog.loading_message = this.$t('validating_value_labels');
+                    this.export_dialog.loading_message = this.$t('validating_export_compatibility');
                     
-                    let validationResult = await this.$store.dispatch('validateValueLabels', {
+                    let validationResult = await this.$store.dispatch('validateExport', {
                         file_id: this.file_id, 
                         format: this.selected_format,
                         show_all_errors: true
@@ -83,7 +86,10 @@ Vue.component('dialog-datafile-export', {
         
         showValidationWarning: function(validationData) {
             // Store validation data and show dialog
-            this.validation_dialog.errors = validationData.errors || [];
+            this.validation_dialog.errors = validationData.all_errors || [];
+            this.validation_dialog.missing_value_errors = validationData.missing_value_errors || [];
+            this.validation_dialog.value_label_errors = validationData.value_label_errors || [];
+            this.validation_dialog.error_summary = validationData.error_summary || {};
             this.validation_dialog.format = this.selected_format;
             this.validation_dialog.show = true;
         },
@@ -296,21 +302,52 @@ Vue.component('dialog-datafile-export', {
 
                     <v-card-text class="py-3">
                         <div class="mb-3" style="color: #e65100; font-weight: 500;">
-                            {{$t('value_labels_not_exportable')}}
+                            {{$t('export_compatibility_issues')}}
                         </div>
                         
-                        <div class="text-caption text--secondary mb-2">{{$t('validation_issues_found')}}:</div>
+                        <div class="text-caption text--secondary mb-2">
+                            {{$t('validation_issues_found')}}: 
+                            <span class="font-weight-medium">{{validation_dialog.error_summary.total_errors || 0}} total</span>
+                            <span v-if="validation_dialog.error_summary.missing_value_errors > 0" class="ml-2">
+                                ({{validation_dialog.error_summary.missing_value_errors}} missing value issues, 
+                                {{validation_dialog.error_summary.value_label_errors}} value label issues)
+                            </span>
+                        </div>
                         
-                        <div class="validation-issues-container" style="max-height: 200px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 4px; padding: 8px;">
-                            <ul class="text-body-2 mb-0" style="padding-left: 16px;">
-                                <li 
-                                    v-for="(error, index) in validation_dialog.errors" 
-                                    :key="index"
-                                    class="mb-1"
-                                >
-                                    <span class="font-weight-medium">{{error.variable_name}}:</span> {{error.error}}
-                                </li>
-                            </ul>
+                        <!-- Missing Value Errors -->
+                        <div v-if="validation_dialog.missing_value_errors.length > 0" class="mb-3">
+                            <div class="text-subtitle-2 font-weight-medium mb-2" style="color: #d32f2f;">
+                                {{$t('missing_value_issues')}} ({{validation_dialog.missing_value_errors.length}})
+                            </div>
+                            <div class="validation-issues-container" style="max-height: 150px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 4px; padding: 8px; background-color: #ffebee;">
+                                <ul class="text-body-2 mb-0" style="padding-left: 16px;">
+                                    <li 
+                                        v-for="(error, index) in validation_dialog.missing_value_errors" 
+                                        :key="'missing-' + index"
+                                        class="mb-1"
+                                    >
+                                        <span class="font-weight-medium">{{error.variable_name}}:</span> {{error.error}}
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <!-- Value Label Errors -->
+                        <div v-if="validation_dialog.value_label_errors.length > 0">
+                            <div class="text-subtitle-2 font-weight-medium mb-2" style="color: #d32f2f;">
+                                {{$t('value_label_issues')}} ({{validation_dialog.value_label_errors.length}})
+                            </div>
+                            <div class="validation-issues-container" style="max-height: 150px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 4px; padding: 8px; background-color: #fff3e0;">
+                                <ul class="text-body-2 mb-0" style="padding-left: 16px;">
+                                    <li 
+                                        v-for="(error, index) in validation_dialog.value_label_errors" 
+                                        :key="'label-' + index"
+                                        class="mb-1"
+                                    >
+                                        <span class="font-weight-medium">{{error.variable_name}}:</span> {{error.error}}
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                     </v-card-text>
 

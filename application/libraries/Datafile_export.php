@@ -65,12 +65,36 @@ class Datafile_export
             */
 
             if (trim($variable['user_missings'])!=''){
-				$missings=explode(",",$variable['user_missings']);
-				foreach($missings as $idx=>$missing){
-					//if (is_numeric($missing)){												
-						$params['missings'][trim($variable['name'])][]=$missing;
-					//}
-				}
+                // Validate user_missings for Stata export
+                if ($this->validate_user_missings_for_stata($variable, $format)) {
+                    $missings=explode(",",$variable['user_missings']);
+                    foreach($missings as $idx=>$missing){
+                        $missing = trim($missing);
+                        
+                        // For Stata export, only include valid missing values
+                        if ($format === 'dta') {
+                            if ($this->is_valid_stata_missing_value($missing)) {
+                                // Convert numeric missing values to proper format for Stata
+                                if ($missing === '.') {
+                                    $params['missings'][trim($variable['name'])][] = '.';
+                                } else {
+                                    // Single letters a-z are already valid
+                                    $params['missings'][trim($variable['name'])][] = $missing;
+                                }
+                            }
+                        } else {
+                            // For other formats, use original logic
+                            if ($variable['field_dtype']!='character'){
+                                if (!$this->is_string_value($missing)){
+                                    $params['missings'][trim($variable['name'])][]=$missing+0;
+                                }
+                            }else{	
+                                $params['missings'][trim($variable['name'])][]=$missing;
+                            }
+                        }
+                    }
+                }
+                // For character field_dtype in Stata, user_missings are excluded
             }
 
             if ($variable['field_dtype']!=''){
@@ -116,7 +140,7 @@ class Datafile_export
     }
 
     /**
-     * Validate value labels for export formats
+     * Comprehensive validation for export formats - checks both user_missings and value_labels
      * 
      * @param int $sid - project ID
      * @param int $fid - file ID
@@ -124,7 +148,7 @@ class Datafile_export
      * @param bool $stop_on_first_error - if true, stops on first validation error; if false, collects all errors
      * @return array - validation result
      */
-    function validate_datafile_value_labels($sid, $fid, $format, $stop_on_first_error = true)
+    function validate_datafile_export($sid, $fid, $format, $stop_on_first_error = true)
     {
         $this->ci->db->select("name,field_dtype,user_missings,is_weight,var_wgt_id,metadata");
         $this->ci->db->where("sid", $sid);
@@ -135,42 +159,91 @@ class Datafile_export
             'valid' => true,
             'errors' => array(),
             'variables_checked' => 0,
-            'variables_with_labels' => 0
+            'variables_with_missings' => 0,
+            'variables_with_labels' => 0,
+            'missing_value_errors' => array(),
+            'value_label_errors' => array()
         );
 
         foreach ($variables as $variable) {
             $validation_results['variables_checked']++;            
             $variable['metadata'] = $this->ci->Editor_model->decode_metadata($variable['metadata']);
 
-            if (isset($variable['metadata']['var_catgry_labels']) && 
-                is_array($variable['metadata']['var_catgry_labels']) && 
-                count($variable['metadata']['var_catgry_labels']) > 0) {
+            // Validate user_missings
+            if (trim($variable['user_missings']) != '') {
+                $validation_results['variables_with_missings']++;
                 
-                $validation_results['variables_with_labels']++;
-                
-                $catgry_labels = (array)$variable['metadata']['var_catgry_labels'];
-                $tmp_code_labels = new stdClass();
-                $has_code_labels = false;
-                
-                foreach ($catgry_labels as $cat_value_label) {
-                    if (isset($cat_value_label['labl']) && trim($cat_value_label['labl']) != '') {
-                        $has_code_labels = true;
-                        $tmp_code_labels->{$cat_value_label['value']} = $cat_value_label['labl'];
+                if (!$this->validate_user_missings_for_stata($variable, $format)) {
+                    $validation_results['valid'] = false;
+                    
+                    if ($variable['field_dtype'] === 'character') {
+                        $error_message = "Variable '{$variable['name']}' has field_dtype 'character' and contains user_missings which are not allowed for Stata export.";
+                    } else {
+                        $invalid_missings = array();
+                        $missings = explode(",", $variable['user_missings']);
+                        foreach ($missings as $missing) {
+                            $missing = trim($missing);
+                            if (!$this->is_valid_stata_missing_value($missing)) {
+                                $invalid_missings[] = $missing;
+                            }
+                        }
+                        $invalid_missings_str = implode(', ', $invalid_missings);
+                        $error_message = "Variable '{$variable['name']}' contains invalid missing values [{$invalid_missings_str}] for Stata export. Only '.' and single letters 'a' to 'z' are allowed.";
+                    }
+                    
+                    $error_data = array(
+                        'variable_name' => $variable['name'],
+                        'field_dtype' => $variable['field_dtype'],
+                        'error' => $error_message,
+                        'error_type' => 'missing_values'
+                    );
+                    
+                    $validation_results['errors'][] = $error_data;
+                    $validation_results['missing_value_errors'][] = $error_data;
+                    
+                    if ($stop_on_first_error) {
+                        break;
                     }
                 }
+            }
 
-                if ($has_code_labels) {
-                    try {
-                        $this->validate_variable_value_labels($variable, $tmp_code_labels, $format, $stop_on_first_error);
-                    } catch (Exception $e) {
-                        $validation_results['valid'] = false;
-                        $validation_results['errors'][] = array(
-                            'variable_name' => $variable['name'],
-                            'error' => $e->getMessage()
-                        );
-                        
-                        if ($stop_on_first_error) {
-                            break;
+            // Validate value labels
+            if ($validation_results['valid'] || !$stop_on_first_error) {
+                if (isset($variable['metadata']['var_catgry_labels']) && 
+                    is_array($variable['metadata']['var_catgry_labels']) && 
+                    count($variable['metadata']['var_catgry_labels']) > 0) {
+                    
+                    $validation_results['variables_with_labels']++;
+                    
+                    $catgry_labels = (array)$variable['metadata']['var_catgry_labels'];
+                    $tmp_code_labels = new stdClass();
+                    $has_code_labels = false;
+                    
+                    foreach ($catgry_labels as $cat_value_label) {
+                        if (isset($cat_value_label['labl']) && trim($cat_value_label['labl']) != '') {
+                            $has_code_labels = true;
+                            $tmp_code_labels->{$cat_value_label['value']} = $cat_value_label['labl'];
+                        }
+                    }
+
+                    if ($has_code_labels) {
+                        try {
+                            $this->validate_variable_value_labels($variable, $tmp_code_labels, $format, $stop_on_first_error);
+                        } catch (Exception $e) {
+                            $validation_results['valid'] = false;
+                            
+                            $error_data = array(
+                                'variable_name' => $variable['name'],
+                                'error' => $e->getMessage(),
+                                'error_type' => 'value_labels'
+                            );
+                            
+                            $validation_results['errors'][] = $error_data;
+                            $validation_results['value_label_errors'][] = $error_data;
+                            
+                            if ($stop_on_first_error) {
+                                break;
+                            }
                         }
                     }
                 }
@@ -179,6 +252,7 @@ class Datafile_export
 
         return $validation_results;
     }
+
 
 
 
@@ -254,6 +328,78 @@ class Datafile_export
         }
         
         return false;
+    }
+
+    /**
+     * Validate user_missings for Stata export
+     * 
+     * For Stata export:
+     * 1. Variables with field_dtype "character" cannot have user_missings
+     * 2. Only valid Stata missing values are allowed: "." and letters "a" to "z"
+     * 
+     * @param array $variable - variable array containing field_dtype and user_missings
+     * @param string $format - export format (dta, sav)
+     * @return bool - true if user_missings are valid for the format, false otherwise
+     */
+    private function validate_user_missings_for_stata($variable, $format)
+    {
+        if ($format !== 'dta') {
+            return true; // Only validate for Stata export
+        }
+        
+        // If field_dtype is "character", user_missings should be excluded for Stata
+        if ($variable['field_dtype'] === 'character') {
+            return false;
+        }
+        
+        // Validate individual missing values for Stata compatibility
+        if (trim($variable['user_missings']) != '') {
+            $missings = explode(",", $variable['user_missings']);
+            foreach ($missings as $missing) {
+                $missing = trim($missing);
+                if (!$this->is_valid_stata_missing_value($missing)) {
+                    return false;
+                }
+            }
+        }
+        
+        return true;
+    }
+
+    /**
+     * Check if a missing value is valid for Stata export
+     * 
+     * Stata only accepts:
+     * - "." (dot) for numeric missing values
+     * - Single letters "a" to "z" for extended missing values
+     * 
+     * @param string $value - the missing value to check
+     * @return bool - true if valid Stata missing value, false otherwise
+     */
+    private function is_valid_stata_missing_value($value)
+    {
+        // Stata accepts "." for numeric missing values
+        if ($value === '.') {
+            return true;
+        }
+        
+        // Stata accepts single letters a-z for extended missing values
+        if (strlen($value) === 1 && preg_match('/^[a-z]$/', $value)) {
+            return true;
+        }
+        
+        return false;
+    }
+
+    private function is_valid_missing_value($value, $format)
+    {
+        if ($format === 'dta') {
+            //
+
+            return $this->is_string_value($value);
+        }
+        
+        return true;
     }
 }
 

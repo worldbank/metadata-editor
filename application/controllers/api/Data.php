@@ -687,18 +687,18 @@ class Data extends MY_REST_Controller
 	}
 
 	/**
-	 * Validate value labels for export formats
+	 * Comprehensive validation for export formats - checks both user_missings and value_labels
 	 * 
-	 * GET /api/data/validate_value_labels/{sid}/{file_id}?format=dta&show_all_errors=true
+	 * GET /api/data/validate_export/{sid}/{file_id}?format=dta&show_all_errors=true
 	 * 
-	 * Validates that value labels are compatible with the specified export format
+	 * Validates that both user_missings and value_labels are compatible with the specified export format
 	 * 
 	 * Query Parameters:
 	 * - format: Export format (dta, sav)
 	 * - show_all_errors: Show all errors instead of stopping on first (true/false, default: false)
 	 * 
 	 */
-	function validate_value_labels_get($sid, $file_id)
+	function validate_export_get($sid, $file_id)
 	{
 		try{
 			$exists=$this->Editor_model->check_id_exists($sid);
@@ -719,39 +719,59 @@ class Data extends MY_REST_Controller
 			$this->editor_acl->user_has_project_access($sid,$permission='edit',$this->api_user());
 
 			$this->load->library("Datafile_export");
-			$validation_result = $this->datafile_export->validate_datafile_value_labels($sid, $file_id, $format, $stop_on_first_error);
+			$validation_result = $this->datafile_export->validate_datafile_export($sid, $file_id, $format, $stop_on_first_error);
 			
 			if ($validation_result['valid']) {
 				$response = array(
 					'status' => 'success',
-					'message' => "Value labels are valid for {$format} export",
+					'message' => "Data file is valid for {$format} export",
 					'data' => array(
 						'file_id' => $file_id,
 						'project_id' => $sid,
 						'format' => $format,
 						'validation_passed' => true,
 						'variables_checked' => $validation_result['variables_checked'],
-						'variables_with_labels' => $validation_result['variables_with_labels']
+						'variables_with_missings' => $validation_result['variables_with_missings'],
+						'variables_with_labels' => $validation_result['variables_with_labels'],
+						'missing_value_errors' => array(),
+						'value_label_errors' => array()
 					)
 				);
 			} else {
-				$error_messages = array();
-				foreach ($validation_result['errors'] as $error) {
-					$error_messages[] = "Variable '{$error['variable_name']}': {$error['error']}";
+				// Create summary error message
+				$missing_value_count = count($validation_result['missing_value_errors']);
+				$value_label_count = count($validation_result['value_label_errors']);
+				$total_errors = $missing_value_count + $value_label_count;
+				
+				$summary_parts = array();
+				if ($missing_value_count > 0) {
+					$summary_parts[] = "{$missing_value_count} variable(s) with invalid missing values";
 				}
-				$combined_error = implode('; ', $error_messages);
+				if ($value_label_count > 0) {
+					$summary_parts[] = "{$value_label_count} variable(s) with invalid value labels";
+				}
+				
+				$summary_message = "Export validation failed: " . implode(' and ', $summary_parts) . " for {$format} format.";
 				
 				$response = array(
 					'status' => 'failed',
-					'message' => $combined_error,
+					'message' => $summary_message,
 					'data' => array(
 						'file_id' => $file_id,
 						'project_id' => $sid,
 						'format' => $format,
 						'validation_passed' => false,
 						'variables_checked' => $validation_result['variables_checked'],
+						'variables_with_missings' => $validation_result['variables_with_missings'],
 						'variables_with_labels' => $validation_result['variables_with_labels'],
-						'errors' => $validation_result['errors']
+						'error_summary' => array(
+							'total_errors' => $total_errors,
+							'missing_value_errors' => $missing_value_count,
+							'value_label_errors' => $value_label_count
+						),
+						'missing_value_errors' => $validation_result['missing_value_errors'],
+						'value_label_errors' => $validation_result['value_label_errors'],
+						'all_errors' => $validation_result['errors']
 					)
 				);
 			}
@@ -767,13 +787,13 @@ class Data extends MY_REST_Controller
 					'file_id' => $file_id,
 					'project_id' => $sid,
 					'format' => $format,
-					'validation_passed' => false,
-					'variables_checked' => 0,
-					'variables_with_labels' => 0
+					'validation_passed' => false
 				)
 			);
 			$this->set_response($response, REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
+
+
 
 }

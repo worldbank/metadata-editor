@@ -431,12 +431,16 @@ $lang['Stata (DTA)'] = "Stata (DTA)";
 $lang['SPSS (SAV)'] = "SPSS (SAV)";
 $lang['CSV'] = "CSV";
 
-// Value label validation
+// Export validation
+$lang['validating_export_compatibility'] = "Validating export compatibility...";
 $lang['validating_value_labels'] = "Validating value labels...";
 $lang['value_label_validation_failed'] = "Value label validation failed. The following issues were found:";
 $lang['continue_export_anyway'] = "Do you want to continue with the export anyway?";
 $lang['export_warning'] = "Export Warning";
+$lang['export_compatibility_issues'] = "Export compatibility issues found";
 $lang['value_labels_not_exportable'] = "The data file includes value labels with string codes, which are not supported in Stata and will be excluded from the exported file.";
+$lang['missing_value_issues'] = "Missing Value Issues";
+$lang['value_label_issues'] = "Value Label Issues";
 
 // Export dialog
 $lang['select_export_format'] = "Select export format";

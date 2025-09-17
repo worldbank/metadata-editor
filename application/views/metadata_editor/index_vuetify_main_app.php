@@ -734,9 +734,9 @@
                     let resp = await axios.get(url);
                     return resp;                
                 },
-                async validateValueLabels({commit,getters}, options)
+                async validateExport({commit,getters}, options)
                 {
-                    let url=CI.base_url + '/api/data/validate_value_labels/'+getters.getProjectID + '/' + options.file_id;
+                    let url=CI.base_url + '/api/data/validate_export/'+getters.getProjectID + '/' + options.file_id;
                     let params = {
                         "format": options.format,
                         "show_all_errors": options.show_all_errors || false
