@@ -1750,6 +1750,71 @@ paths:
             description: successful operation            
         security:
           - ApiKeyAuth: []
+  /templates/translation_keys/{uid}:
+      get:
+        tags:
+          - Templates
+        summary: Get template translation keys
+        description: Get translation keys for a specific template. Returns all translatable text keys found in the template structure.
+        operationId: getTemplateTranslationKeys
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: "path"
+            name: "uid"
+            type: string
+            description: Template UID
+            required: true
+          - in: "query"
+            name: "format"
+            type: string
+            description: Response format - 'full' for detailed array, 'compact' for key:value pairs
+            enum: ["full", "compact"]
+            default: "full"
+        responses:
+          '200':
+            description: successful operation
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: "success"
+                translation_keys:
+                  type: array
+                  description: Array of translation keys (when format=full)
+                  items:
+                    type: object
+                    properties:
+                      key:
+                        type: string
+                        description: Translation key
+                      title:
+                        type: string
+                        description: Default title text
+                      prop_key:
+                        type: string
+                        description: Property key if different from main key
+                translations:
+                  type: object
+                  description: Key-value pairs of translations (when format=compact)
+                  additionalProperties:
+                    type: string
+          '400':
+            description: Bad request - missing UID parameter or template not found
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: "failed"
+                message:
+                  type: string
+                  example: "Missing parameter for `UID`"
+        security:
+          - ApiKeyAuth: []
   /editor/options/{id}:
       post:
         tags:
