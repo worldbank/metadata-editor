@@ -102,7 +102,7 @@ $config['timeseries-db'][]=array(
     'template' => 'metadata_editor/metadata_editor_templates/timeseries-db_form_template.json',
     'lang'=>'en',
     'uid'=>'timeseries-db-system-en',
-    'name'=>'Database IHSN Schema 1.0 EN'
+    'name'=>'Database Schema 1.0 EN'
 ); 
 
 

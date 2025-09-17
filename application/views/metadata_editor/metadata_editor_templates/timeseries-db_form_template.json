@@ -1002,6 +1002,54 @@
                             "help_text": "This set of elements is used to describe the access license(s) attached to the database."
                         },
                         {
+                            "key": "database_description.confidentiality",
+                            "type": "string",
+                            "title": "Confidentiality statement",
+                            "help_text": "A statement of confidentiality for the database.",
+                            "display_type": "textarea"
+                        },
+                        {
+                            "key": "database_description.confidentiality_status",
+                            "type": "string",
+                            "title": "Confidentiality status",
+                            "help_text": "This indicates a confidentiality status for the series. A controlled vocabulary should be used with possible options “public”, “official use only”, “confidential”, “strictly confidential”, \"unknown\". When all series are made publicly available, and belong to a database that has an open or public access policy, this element can be ignored.",
+                            "enum": [
+                                {
+                                    "code": "pub",
+                                    "label": "Public"
+                                },
+                                {
+                                    "code": "off",
+                                    "label": "Official use only"
+                                },
+                                {
+                                    "label": "Restricted",
+                                    "code": "res"
+                                },
+                                {
+                                    "code": "con",
+                                    "label": "Confidential"
+                                },
+                                {
+                                    "code": "sco",
+                                    "label": "Strictly confidential"
+                                },
+                                {
+                                    "code": "unk",
+                                    "label": "Unknown"
+                                }
+                            ],
+                            "display_type": "text"
+                        },
+                        {
+                            "key": "database_description.confidentiality_note",
+                            "type": "string",
+                            "title": "Confidentiality note",
+                            "enum": [],
+                            "help_text": "This element is reserved for additional notes regarding confidentiality of the data. This could involve references to specific laws and circumstances regarding the use of data.",
+                            "display_type": "textarea"
+                        },
+                        {
                             "key": "database_description.disclaimer",
                             "type": "string",
                             "title": "Disclaimer",
