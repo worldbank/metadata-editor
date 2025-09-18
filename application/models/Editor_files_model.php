@@ -40,42 +40,53 @@ class Editor_files_model extends ci_model {
 
 	/**
 	 * 
-	 * Delete a file by path
+	 * Delete a file by path (files only, not directories)
 	 * 
+	 * @param int $sid Project ID
+	 * @param string $file_path Relative file path within project
+	 * @return bool True on success
+	 * @throws Exception If file is not found, is a directory, or deletion fails
 	 * 
 	 */
 	public function delete_by_path($sid, $file_path)
 	{
 		$project_folder = $this->Editor_model->get_project_folder($sid);
-		$full_path = $project_folder . DIRECTORY_SEPARATOR . $file_path;
-		//convert to absolute path
-		$full_path = realpath($full_path);
 		$project_folder = realpath($project_folder);
 
-		if (!$full_path) {
-			throw new Exception("Invalid file_path") ;
+		if ($project_folder === false || !is_dir($project_folder)) {
+			throw new Exception("Invalid project folder");
+		}
+		
+		$full_path = realpath($project_folder . DIRECTORY_SEPARATOR . $file_path);
+
+		if ($full_path === false) {
+			throw new Exception("Invalid file_path");
 		}
 
-		//if the file path is not in the project folder, throw an exception
-		if (strpos($full_path, $project_folder) !== 0) {
-			throw new Exception("Invalid file_path" . $full_path) ;
+		//check path is inside project folder
+		if (strpos($full_path, $project_folder . DIRECTORY_SEPARATOR) !== 0) {
+			throw new Exception("Invalid path");
 		}
-
-		//if the file does not exist, throw an exception
+		
 		if (!file_exists($full_path)) {
 			throw new Exception("File not found");
 		}
 
-		//if the file is a directory, throw an exception
 		if (is_dir($full_path)) {
-			//delete folder recursively
-			return delete_files($full_path, $del_dir = true);
-		} else {
-			//delete file
-			return unlink($full_path);
+			throw new Exception("Directory deletion not allowed - use delete_folder method instead");
 		}
 
+		if (!is_file($full_path)) {
+			throw new Exception("Invalid file type - not a regular file");
+		}
+
+		if (!unlink($full_path)) {
+			throw new Exception("Failed to delete file: " . $full_path);
+		}
+
+		return true;
 	}
+
 
 
 
