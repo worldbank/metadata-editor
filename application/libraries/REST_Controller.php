@@ -855,7 +855,13 @@ abstract class REST_Controller extends CI_Controller {
                             $http_method = $matches[2];
                             
                             if (method_exists($this, $controller_method) && is_callable([$this, $controller_method])) {
-                                $this->$controller_method(...$arguments);
+                                
+                                $reflection = new ReflectionMethod($this, $controller_method);
+                                if ($reflection->isPublic()) {
+                                    $reflection->invokeArgs($this, $arguments);
+                                } else {
+                                    throw new Exception("method_not_allowed");
+                                }
                             } else {
                                 throw new Exception("method_not_callable");
                             }
