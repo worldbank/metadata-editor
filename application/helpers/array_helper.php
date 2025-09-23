@@ -154,6 +154,12 @@ if ( ! function_exists('array_remove_empty'))
                 unset($array[$key]);
             }
         }
+
+        //reindex if numeric array
+        if (!empty($array) && ctype_digit(implode('', array_keys($array)))) {
+            $array = array_values($array);
+        }
+
         return $array;
     }
 }
