@@ -1013,6 +1013,22 @@
                                     "prop_key": "project_desc.output.doi",
                                     "help_text": "The Digital Object Identifier (DOI) of the output, if available.",
                                     "display_type": "text"
+                                },
+                                {
+                                    "key": "license",
+                                    "type": "string",
+                                    "title": "License",
+                                    "prop_key": "project_desc.output.license",
+                                    "help_text": "The license of the output.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "license_uri",
+                                    "type": "string",
+                                    "title": "License URI",
+                                    "prop_key": "project_desc.output.license_uri",
+                                    "help_text": "The URI of the license of the output.",
+                                    "display_type": "text"
                                 }
                             ]
                         },
