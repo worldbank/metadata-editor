@@ -64,6 +64,14 @@
     .font-small{
       font-size:small;
     }
+    
+    .search-field {
+      font-size: 0.875rem;
+    }
+    
+    .search-field .v-input__control {
+      min-height: 32px !important;
+    }
   </style>
 
 
@@ -161,10 +169,23 @@
 
             <div class="row no-gutters border-right pt-2" style="height:100vh;overflow:auto;">
               <div class="col-md-11" style="height:100vh;">
+                <div class="px-3 pb-2 pt-2">
+                  <v-text-field
+                    v-model="treeSearchQuery"
+                    prepend-inner-icon="mdi-magnify"
+                    placeholder="Search fields..."
+                    hide-details
+                    dense
+                    outlined
+                    clearable
+                    class="search-field"
+                  ></v-text-field>
+                </div>
+                
                 <div @click="isEditingDescription=true" style="padding:5px;padding-left:38px;cursor:pointer;" class="pb-2" :class="{isactive: isEditingDescription}"><v-icon>mdi-ballot-outline</v-icon>{{$t('description')}}</div>
                 <div @click="isEditingDescription=false">
                   <nada-treeview 
-                      v-model="UserTreeItems" 
+                      v-model="filteredUserTreeItems" 
                       :cut_fields="cut_fields" 
                       :initially_open="initiallyOpen" 
                       :tree_active_items="tree_active_items"
@@ -531,6 +552,7 @@
           initiallyOpen: [],
           tree_active_items: [],
           is_dirty: false,
+          treeSearchQuery: '',
           files: {
             html: 'mdi-language-html5',
             js: 'mdi-nodejs',
@@ -1020,12 +1042,84 @@
             return element.help_text;
           }
           return '';
+        },
+        filterTreeItems: function(items, searchQuery) {
+          if (!items || !Array.isArray(items)) {
+            return [];
+          }
+          
+          return items.filter(item => {
+            // Check if current item matches search query
+            const titleMatch = item.title && item.title.toLowerCase().includes(searchQuery);
+            const keyMatch = item.key && item.key.toLowerCase().includes(searchQuery);
+            const helpTextMatch = item.help_text && item.help_text.toLowerCase().includes(searchQuery);
+            
+            // If current item matches, include it
+            if (titleMatch || keyMatch || helpTextMatch) {
+              return true;
+            }
+            
+            // If item has children, recursively check them
+            if (item.items && item.items.length > 0) {
+              const filteredChildren = this.filterTreeItems(item.items, searchQuery);
+              if (filteredChildren.length > 0) {
+                // Return item with filtered children
+                return {
+                  ...item,
+                  items: filteredChildren
+                };
+              }
+            }
+            
+            return false;
+          }).map(item => {
+            // If item has children and doesn't match directly, but has matching children
+            if (item.items && item.items.length > 0) {
+              const filteredChildren = this.filterTreeItems(item.items, searchQuery);
+              if (filteredChildren.length > 0) {
+                return {
+                  ...item,
+                  items: filteredChildren
+                };
+              }
+            }
+            return item;
+          });
+        },
+        expandAllForSearch: function() {
+          // Collect all keys that should be expanded
+          const keysToExpand = [];
+          this.collectAllKeys(this.filteredUserTreeItems, keysToExpand);
+          this.initiallyOpen = keysToExpand;
+        },
+        collectAllKeys: function(items, keyArray) {
+          if (!items || !Array.isArray(items)) {
+            return;
+          }
+          
+          items.forEach(item => {
+            if (item.key) {
+              keyArray.push(item.key);
+            }
+            if (item.items && item.items.length > 0) {
+              this.collectAllKeys(item.items, keyArray);
+            }
+          });
         }
       },
       watch: {
         isEditingDescription: function(val) {
           if (val == true) {
             this.tree_active_items = new Array();
+          }
+        },
+        treeSearchQuery: function(newQuery) {
+          if (newQuery && newQuery.length > 0) {
+            // Auto-expand all items when searching to show results
+            this.expandAllForSearch();
+          } else {
+            // Reset to original state when clearing search
+            this.initiallyOpen = [];
           }
         },
         user_template_info: {
@@ -1076,6 +1170,13 @@
         },
         UserTreeItems() {
           return this.$store.state.user_tree_items;
+        },
+        filteredUserTreeItems() {
+          if (!this.treeSearchQuery) {
+            return this.UserTreeItems;
+          }
+          
+          return this.filterTreeItems(this.UserTreeItems, this.treeSearchQuery.toLowerCase());
         },
         coreTreeKeys() {
           return this.$store.state.core_tree_keys;
