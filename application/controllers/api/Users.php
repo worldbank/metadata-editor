@@ -32,6 +32,8 @@ class Users extends MY_REST_Controller
 	function index_get($userId=null)
 	{
 		try{
+			$this->is_project_sharing_enabled_or_die();
+
 			if($userId){
 				return $this->user_get($userId);
 			}
@@ -96,6 +98,7 @@ class Users extends MY_REST_Controller
 	function search_get()
 	{
 		try{
+			$this->is_project_sharing_enabled_or_die();
 			$keywords=$this->get('keywords');
 
 			if(!$keywords){

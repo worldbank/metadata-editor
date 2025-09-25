@@ -255,4 +255,25 @@ abstract class MY_REST_Controller extends REST_Controller {
 		return $sid;
 	}
 
+	/**
+	 * 
+	 * Disable project sharing
+	 * 
+	 */
+	protected function is_project_sharing_enabled_or_die()
+	{
+		if ($this->config->item('project_sharing')===false) {
+			$error_output = array(
+				'status' => 'failed',
+				'message' => 'Project sharing is disabled'
+			);
+			
+			$this->output->set_status_header(400);
+			$this->output->set_content_type('application/json');
+			$this->output->set_output(json_encode($error_output));
+			$this->output->_display();
+			die();
+		}
+	}
+
 }

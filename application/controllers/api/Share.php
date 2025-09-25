@@ -10,6 +10,9 @@ class Share extends MY_REST_Controller
 		$this->load->model("editor_owners_model");
 		$this->load->library("Editor_acl");
 		$this->is_authenticated_or_die();
+		
+		// Check if project sharing is enabled
+		$this->is_project_sharing_enabled_or_die();
 	}
 
 	//override authentication to support both session authentication + api keys
@@ -246,5 +249,4 @@ class Share extends MY_REST_Controller
 	{
 		return $this->index_delete($sid,$userId);
 	}
-	
 }

@@ -24,7 +24,7 @@ Vue.component('vue-transfer-ownership', {
         transferOwnership: function() {
             
             vm=this;
-            let url=CI.base_url + '/api/editor/transfer_ownership/';
+            let url=CI.site_url + '/api/editor/transfer_ownership/';
             let options={
                 "projects":vm.projects,
                 "owner_id":vm.selected_user.id
@@ -44,7 +44,7 @@ Vue.component('vue-transfer-ownership', {
         },    
         searchUsers: _.debounce(function(val) {
             let vm=this;
-            axios.get(CI.base_url + '/api/users/search?keywords='+val)
+            axios.get(CI.site_url + '/api/users/search?keywords='+val)
             .then(response => {
                 vm.users = response.data.users;
                 console.log("users",vm.users);
