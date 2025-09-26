@@ -11,6 +11,7 @@ class Sdmx extends MY_REST_Controller
 		$this->load->model("Editor_model");
 		$this->load->library("SDMX/MsdWriter");
 		$this->load->library("SDMX/MsdWriter21");
+		$this->load->library("SDMX/CsvWriter");
 		$this->load->library("Editor_acl");
 		$this->is_authenticated_or_die();
 		$this->api_user=$this->api_user();
@@ -175,6 +176,85 @@ class Sdmx extends MY_REST_Controller
 		}
 	}
 
+	/**
+	 * 
+	 * Export project as SDMX CSV
+	 * 
+	 *  - inline: boolean (default: false)
+	 *  - structure_type: string
+	 *  - structure_id: string 
+	 *  - action: string (default: "I")
+	 *  - dimensions: array of key-value pairs (example: ['INDICATOR' => "INDICATOR-ID-NO"])
+	 * 
+	 * 
+	 */
+	function csv_post($sid=null)
+	{
+		try{
+			$sid = $this->get_sid($sid);
+			$this->editor_acl->user_has_project_access($sid, $permission='view', $this->api_user);
+
+			$project_data = $this->Editor_model->get_row($sid);
+
+			if(!$project_data){
+				throw new Exception("PROJECT_NOT_FOUND");
+			}
+
+			$options = $this->raw_json_input();
+			$inline = isset($options['inline']) ? (bool)$options['inline'] : false;
+			$dimensions = isset($options['dimensions']) ? $options['dimensions'] : array();
+
+			$required_params=["structure_type","structure_id","action"];
+
+			foreach($required_params as $param){
+				if (!isset($options[$param])){
+					throw new Exception("Parameter [$param] is required");
+				}
+				if (empty($options[$param])){
+					throw new Exception("Parameter [$param] is empty");
+				}
+			}
+						
+			$metadata = $project_data['metadata'];
+
+			if(empty($metadata)){
+				throw new Exception("NO_METADATA_FOUND");
+			}
+
+			$csv=$this->csvwriter->generate_csv(
+				$options['structure_type'],
+				$options['structure_id'],
+				$options['action'],
+				$dimensions,
+				$metadata);
+
+		
+			if($inline){				
+				header('Content-Type: text/plain');
+				header('Cache-Control: no-cache, must-revalidate');
+				header('Pragma: no-cache');
+				echo $csv;
+				die();
+			} else {
+				//download csv file
+				$filename = 'sdmx_export_' . $sid . '_'. $project_data['idno'] . '_' . date('Y-m-d_H-i-s') . '.csv';
+				header('Content-Type: text/csv');
+				header('Content-Disposition: attachment; filename="' . $filename . '"');
+				header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+				header('Pragma: public');
+				
+				echo $csv;
+				die();
+			}							
+		}
+		catch(Exception $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
 	
 	
 }

@@ -148,6 +148,15 @@
                                 </v-list-item-title>
                             </v-list-item>
 
+                            <v-list-item v-if="dataset_type=='timeseries'" @click="onRouterLinkClick('/sdmx-csv-export')">
+                                <v-list-item-icon>
+                                    <v-icon>mdi-file-document-arrow-right-outline</v-icon>
+                                </v-list-item-icon>
+                                <v-list-item-title>                                    
+                                    <?php echo t("Export SDMX CSV"); ?>
+                                </v-list-item-title>
+                            </v-list-item>
+
 
 
                             <v-list-item @click="onRouterLinkClick('/publish')">

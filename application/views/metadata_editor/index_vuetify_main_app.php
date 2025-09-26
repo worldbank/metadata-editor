@@ -187,6 +187,7 @@
 
             echo $this->load->view("metadata_editor/vue-import-options-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-publish-options-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-sdmx-csv-export-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-project-package-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-external-resources-import-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-configure-catalog-component.js",null,true);
@@ -270,11 +271,10 @@
         //const ResourcesEditComp ={props: ['index'],template: '<div><external-resources-edit /></div>'}
         const ResourcesEditComp =VueExternalResourcesEdit;
         const ResourcesCreateComp =VueExternalResourcesCreate;
-        const GeoFeatures ={props: ['index'],template: '<div>Geo-features</div>'}
-        const GeoFeature ={props: ['feature_name'],template: '<div><geospatial-feature/></div>'}
         const PagePreview ={template: '<div><page-preview/></div>'}
         const GeoGallery ={template: '<div><geospatial-gallery/></div>'}
         const ProjectHistory ={template: '<div><project-history/></div>'}
+        const SdmxCsvExport = {template: '<div><sdmx-csv-export-options/></div>'}
         
         const AdminMetadataEdit= VueAdminMetadataEdit;
         //const MetadataTypeEditComp=VueMetadataTypeEdit;
@@ -302,9 +302,9 @@
             { path: '/external-resources/:index', component: ResourcesEditComp, props: true, name: 'external-resources-edit'},            
             { path: '/files', component: FileManager, props: true},
             { path: '/geospatial-features', component: GeoFeatures, props: true},
-            { path: '/geospatial-feature/:feature_name', component: GeoFeature, props: true },
             { path: '/geospatial-gallery', component: GeoGallery, props: true },
             { path: '/change-log', component: ProjectHistory },
+            { path: '/sdmx-csv-export', component: SdmxCsvExport },
             { path: '/metadata-types', component: MetadataTypesComp, name:'metadata-types', props: true },
             //{ path: '/metadata-types/:type_id', component: MetadataTypeEditComp, name:'metadata-type', props: true }
             { path: '/metadata-types/:type_id', component: AdminMetadataEdit, name:'metadata-type', props: true }
@@ -352,6 +352,7 @@
                 metadata_types:[],//business/application/other metadata
                 data_files:[],
                 variable_groups:[],
+                geospatial_features:[],
                 variables:{
                     "F1":{}
                 },
