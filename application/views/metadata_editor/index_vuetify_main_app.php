@@ -301,7 +301,6 @@
             { path: '/external-resources/import', component: ResourcesImport},
             { path: '/external-resources/:index', component: ResourcesEditComp, props: true, name: 'external-resources-edit'},            
             { path: '/files', component: FileManager, props: true},
-            { path: '/geospatial-features', component: GeoFeatures, props: true},
             { path: '/geospatial-gallery', component: GeoGallery, props: true },
             { path: '/change-log', component: ProjectHistory },
             { path: '/sdmx-csv-export', component: SdmxCsvExport },
