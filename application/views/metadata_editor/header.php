@@ -71,7 +71,7 @@
         -->
 
     <template>
-    <div class="text-center" v-if="UserHasEditAccess">
+    <div class="text-center">
         <v-menu min-width="600px">
         <template v-slot:activator="{ on, attrs }">
             
@@ -189,10 +189,10 @@
                 <v-col cols="6">
                     
                     <v-list dense>
-                        <v-subheader>{{$t('Metadata')}}</v-subheader>
+                        <v-subheader v-if="UserHasEditAccess">{{$t('Metadata')}}</v-subheader>
                         <v-list-item-group color="primary">
                         
-                        <v-list-item @click="templateApplyDefaults">
+                        <v-list-item v-if="UserHasEditAccess" @click="templateApplyDefaults">
                             <v-list-item-icon>
                                 <v-icon>mdi-checkbox-multiple-marked-circle</v-icon>
                             </v-list-item-icon>
@@ -200,7 +200,7 @@
                                 <?php echo t("apply_template_defaults"); ?>                            
                             </v-list-item-title>
                         </v-list-item>
-                        <v-list-item @click="onRouterLinkClick('/import')">
+                        <v-list-item v-if="UserHasEditAccess" @click="onRouterLinkClick('/import')">
                             <v-list-item-icon>
                                 <v-icon>mdi-import</v-icon>
                             </v-list-item-icon>
@@ -208,7 +208,7 @@
                                 <?php echo t("import_project_metadata"); ?>                            
                             </v-list-item-title>
                         </v-list-item>
-                        <v-list-item @click="onRouterLinkClick('/external-resources/import')">
+                        <v-list-item v-if="UserHasEditAccess" @click="onRouterLinkClick('/external-resources/import')">
                             <v-list-item-icon>
                                 <v-icon>mdi-file-import</v-icon>
                             </v-list-item-icon>
