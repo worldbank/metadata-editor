@@ -424,6 +424,7 @@ $lang['File with the name already exists.'] = "Ya existe un archivo con ese nomb
 
 // Data explorer translations
 $lang['loading_please_wait'] = "Cargando, por favor espera...";
+$lang['loading_projects'] = "Cargando proyectos...";
 $lang['showing_records_range'] = "Mostrando registros {start} - {end} de {total}";
 
 // File type labels
@@ -450,6 +451,51 @@ $lang['validation_issues_found'] = "Se encontraron problemas de validación";
 $lang['continue_export'] = "Continuar Exportación";
 $lang['failed'] = "Falló";
 $lang['job_status'] = "Estado del trabajo";
+
+// Missing translations for project home page
+$lang['search'] = "Buscar...";
+$lang['compare_projects'] = "Comparar Proyectos";
+$lang['more'] = "más";
+$lang['versions'] = "Versiones";
+$lang['select'] = "Seleccionar";
+$lang['projects_not_found'] = "Uno o ambos proyectos no encontrados.";
+$lang['cannot_compare_different_types'] = "No se pueden comparar proyectos de tipos diferentes.";
+
+// Compare page translations
+$lang['diff_options'] = "Opciones de Diferencia";
+$lang['differ_options'] = "Opciones del Diferenciador";
+$lang['show_modifications'] = "Mostrar Modificaciones";
+$lang['ignore_case'] = "Ignorar Mayúsculas";
+$lang['ignore_case_for_keys'] = "Ignorar Mayúsculas para Claves";
+$lang['array_diff_method'] = "Método de Diferencia de Array";
+$lang['lcs_longest_common_subsequence'] = "LCS (Subsecuencia Común Más Larga)";
+$lang['unorder_normal'] = "Desordenado Normal";
+$lang['unorder_array'] = "Array Desordenado";
+$lang['viewer_options'] = "Opciones del Visor";
+$lang['show_line_numbers'] = "Mostrar Números de Línea";
+$lang['highlight_inline_diff'] = "Resaltar Diferencia Inline";
+$lang['hide_unchanged_lines'] = "Ocultar Líneas Sin Cambios";
+$lang['syntax_highlighting'] = "Resaltado de Sintaxis";
+$lang['virtual_scrolling'] = "Desplazamiento Virtual";
+$lang['reset_to_defaults'] = "Restablecer a Valores por Defecto";
+$lang['apply_and_compare'] = "Aplicar y Comparar";
+$lang['select_projects_to_compare'] = "Seleccionar Proyectos para Comparar";
+$lang['enter_project_id_placeholder'] = "Ingrese ID del proyecto (ej: 123)";
+$lang['validating_projects'] = "Validando proyectos...";
+$lang['project_comparison'] = "Comparación de Proyectos";
+$lang['select_projects'] = "Seleccionar proyectos";
+$lang['missing_project_parameters'] = "Parámetros de Proyecto Faltantes";
+$lang['provide_both_project_parameters'] = "Por favor proporcione los parámetros project1 y project2 en la URL.";
+$lang['example'] = "Ejemplo";
+$lang['project_comparison_error'] = "Error de Comparación de Proyectos";
+$lang['select_different_projects'] = "Seleccionar Proyectos Diferentes";
+$lang['project_1_not_found'] = "Proyecto 1 (ID: {id}) no encontrado";
+$lang['project_2_not_found'] = "Proyecto 2 (ID: {id}) no encontrado";
+$lang['comparing_projects'] = "Comparando Proyectos...";
+$lang['modifications'] = "Modificaciones";
+$lang['deletions'] = "Eliminaciones";
+$lang['additions'] = "Adiciones";
+$lang['project_validation_failed'] = "Falló la validación del proyecto";
 
 /* End of file project_lang.php */
 /* Location: ./application/language/spanish/project_lang.php */

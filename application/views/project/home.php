@@ -76,8 +76,6 @@
 
     <div class="wrapper">
 
-      <?php //echo $this->load->view('editor_common/global-header', null, true); ?>
-
       <vue-global-site-header></vue-global-site-header>
 
 
@@ -89,7 +87,7 @@
             <div class="row">
 
               <!--sidebar -->
-              <div class="sidebar col-md-3 col-sm-3">
+              <div class="sidebar col-md-3 col-sm-4">
 
                 <div class="mr-4 mt-5">
                   <v-expansion-panels v-model="facet_panel" multiple class="">
@@ -127,7 +125,7 @@
               </div>
               <!-- end sidebar -->
 
-              <div class="projects col">
+              <div class="projects col-md-9 col-sm-8">
                 <div class="mt-5 mb-5">                  
 
                       <div class="mb-5">
@@ -139,8 +137,8 @@
                     <h3 class="mt-3">{{$t("my_projects")}}</h3>                      
                     </div>
                     <div class="">
-                      <v-btn color="primary"  @click="dialog_create_project=true">{{$t("create_project")}}</v-btn>        
-                      <v-btn color="primary"  @click="dialog_import_project=true">{{$t("import")}}</v-btn>
+                      <v-btn small color="primary"  @click="dialog_create_project=true">{{$t("create_project")}}</v-btn>        
+                      <v-btn small color="primary"  @click="dialog_import_project=true">{{$t("import")}}</v-btn>
                     </div>
                   </div>
 
@@ -159,11 +157,13 @@
                               <v-text-field 
                                 background-color="white"
                                 v-model="search_keywords" 
-                                prepend-inner-icon="mdi-magnify" 
-                                label="Search..." 
+                                :prepend-inner-icon="is_searching ? 'mdi-loading mdi-spin' : 'mdi-magnify'"
+                                :label="$t('search')"
                                 single-line dense outlined clearable 
+                                :loading="is_searching"
                                 @click:append="search" 
                                 @keyup.enter="search" 
+                                @input="onSearchInput"
                                 @click:clear="clearSearch">
                               </v-text-field>                            
                         </div>
@@ -205,7 +205,11 @@
 
                   <div class="bg-white shadow rounded p-3 pt-1 mt-2" elevation="10">
 
-                      <div class="mt-5 mb-3 p-3 border text-center text-danger" v-if="!errors && !Projects || projects.found<1"> {{$t('no_projects_found')}}</div>
+                      <div v-if="is_loading" class="mt-5 mb-3 p-3 text-center">
+                        <v-progress-circular indeterminate color="primary" class="mr-2"></v-progress-circular>
+                        <span>{{$t('loading_projects') || 'Loading projects...'}}</span>
+                      </div>
+                      <div class="mt-5 mb-3 p-3 border text-center text-danger" v-if="!errors && !is_loading && (!Projects || projects.found<1)"> {{$t('no_projects_found')}}</div>
 
                       <div v-if="!Projects || projects.found>0" class="row mb-2 mt-3">
                         <div class="col-md-5">
@@ -241,7 +245,13 @@
                                 </v-btn>
                               </template>
                               <v-list>
-                                <v-list-item @click="addProjectsToCollection">{{$t('add_to_collection')}}</v-list-item>                                
+                                <v-list-item @click="addProjectsToCollection">
+                                  <v-icon left small>mdi-folder-plus</v-icon>
+                                  {{$t('add_to_collection')}}</v-list-item>
+                                <v-list-item v-if="selected_projects.length === 2" @click="compareSelectedProjects">
+                                  <v-icon left small>mdi-compare</v-icon>
+                                  {{$t('compare_projects')}}
+                                </v-list-item>                                
                               </v-list>
                             </v-menu>
                           </th>
@@ -269,7 +279,7 @@
                             <div class="project-title">
                               <a :href="'editor/edit/' + project.id" :title="project.title" class="d-flex xtext-title" @click.prevent="EditProject(project.id)">                                
                                 <span v-if="project.title.length>1">{{project.title}}</span>
-                                <span v-else>Untitled</span>
+                                <span v-else>{{$t('untitled')}}</span>
                               </a>
                             </div>
                             <div class="text-secondary text-small">
@@ -285,14 +295,14 @@
                               </template>
                               <template v-if="project.collections.length>3">
                                 <v-chip outlined small color="primary" class="mr-1" @click.stop="manageProjectCollections(project.id)">
-                                  +{{project.collections.length-3}} more
+                                  +{{project.collections.length-3}} {{$t('more')}}
                                 </v-chip>
                               </template>
                             </div>
 
                             <div class="mt-2" v-if="project.versions && project.versions.length>0">
                               <v-btn color="primary" outlined x-small dark @click.stop="toggleRevisions(project.id)" :title="project.versions.length">
-                                <v-icon x-small left>mdi-content-copy</v-icon> Versions <span class="ml-1">{{project.versions.length}}</span>
+                                <v-icon x-small left>mdi-content-copy</v-icon> {{$t('versions')}} <span class="ml-1">{{project.versions.length}}</span>
                               </v-btn>
                             </div>
 
@@ -354,6 +364,7 @@
     <vue-create-revision-dialog v-model="dialog_project_revision" v-bind="dialog_project_revision_options" v-on:revision-created="search" :key="dialog_project_revision_key">
     </vue-create-revision-dialog>
 
+
     
 
     <template class="create-new-project">
@@ -410,7 +421,7 @@
                     label=""
                     item-text="text"
                     item-value="value"
-                    label="Select"
+                    :label="$t('select')"
                     persistent-hint
                     return-object                    
                     dense
@@ -509,7 +520,6 @@
           <v-list-item>
             <v-list-item-title @click="createProjectRevision(menu_active_project_id)"><v-btn text>{{$t('Create version')}}</v-btn></v-list-item-title>
           </v-list-item>
-
 
           <v-list-item>
             <v-list-item-title @click="transferOwnership(menu_active_project_id)" ><v-btn text>{{$t('transfer_ownership')}}</v-btn></v-list-item-title>
@@ -697,6 +707,8 @@
         search_keywords: '',
         search_filters: {},
         collapsible_list: [], //show/hide project details
+        search_debounce_timer: null,
+        is_searching: false,
         show_project_menu: false,        
         menu_x: 0,
         menu_y: 0,
@@ -728,7 +740,7 @@
         collections_flat_list:[],
         dialog_project_revision: false,
         dialog_project_revision_options: {},
-        dialog_project_revision_key: 0
+        dialog_project_revision_key: 0,
       },
       created: async function() {
         //reload projects on window focus
@@ -836,8 +848,29 @@
           this.dialog_project_revision = true;
         },
 
+
         pageLink: function(page) {
           window.location.href = CI.site_url + '/' + page;
+        },
+        compareSelectedProjects: function() {
+          if (this.selected_projects.length === 2) {
+            // Find the selected projects in the existing Projects array
+            const project1 = this.Projects.find(p => p.id == this.selected_projects[0]);
+            const project2 = this.Projects.find(p => p.id == this.selected_projects[1]);
+            
+            if (!project1 || !project2) {
+              alert(this.$t('projects_not_found'));
+              return;
+            }
+            
+            if (project1.type !== project2.type) {
+              alert(this.$t('cannot_compare_different_types'));
+              return;
+            }
+            
+            // If types match, proceed with comparison
+            window.open(CI.site_url + '/editor/compare?project1=' + this.selected_projects[0] + '&project2=' + this.selected_projects[1], '_blank');
+          }
         },
         showProjectMenu (e, projectId) {
           e.preventDefault()
@@ -946,6 +979,21 @@
             self.search()
           }, 1000)
         },
+        onSearchInput: function() {
+          // Show immediate feedback that search is being prepared
+          this.is_searching = true;
+          
+          // Clear existing timer
+          if (this.search_debounce_timer) {
+            clearTimeout(this.search_debounce_timer);
+          }
+          
+          // Set new timer for debounced search
+          var self = this;
+          this.search_debounce_timer = setTimeout(function() {
+            self.search();
+          }, 500); // 500ms delay
+        },
         getFacetTitleById: function(facet_name, facet_id) {
           if (!this.facets[facet_name]) {
             return '';
@@ -1034,7 +1082,8 @@
             url += '&keywords=' + keywords;
           }
 
-          this.loading_status = "Loading projects...";
+          this.loading_status = this.$t('loading_projects');
+          this.is_searching = true;
           this.errors = [];
 
           return axios
@@ -1053,7 +1102,9 @@
               console.log("error", error);
             })
             .then(function() {
-              this.loading_status = "";
+              vm.loading_status = "";
+              vm.is_searching = false;
+              vm.is_loading = false;
             });
         },
         createProject: function(type) {

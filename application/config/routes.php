@@ -57,6 +57,8 @@ $route['about'] = "page/about";
 
 $route['editor'] = "projects";
 $route['editor/(.*)'] = "projects/$1";
+$route['api/geospatial-features'] = "api/geospatial_features";
+$route['api/geospatial-features/(.*)'] = "api/geospatial_features/$1";
 
 
 //admin paths
@@ -72,6 +74,10 @@ $route['api/editor/versions'] = "api/versions";
 $route['api/editor/(.*)/versions'] = "api/versions/$1";
 $route['api/editor/(.*)/versions/(.*)'] = "api/versions/index/$1/$2";
 $route['api/editor/versions/(.*)'] = "api/versions/$1";
+
+//project comparison
+$route['api/editor/compare'] = "api/compare";
+$route['api/editor/compare/(.*)'] = "api/compare/$1";
 
 
 /* End of file routes.php */

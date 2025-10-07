@@ -10,6 +10,9 @@ Vue.component('vue-list-revisions', {
         },
         DeleteProject(id){
             this.$emit('delete-project', id);
+        },
+        CompareWithParent(versionId, parentId){
+            window.open(CI.site_url + '/editor/compare?project1=' + parentId + '&project2=' + versionId, '_blank');
         }
     },   
     template: `
@@ -41,8 +44,16 @@ Vue.component('vue-list-revisions', {
                                 </div>
                                                                     
                                 <div class="border-top pt-2">
-                                    <v-btn color="primary" outlined x-small @click="EditProject(revision.id)">{{$t('view')}}</v-btn>
-                                    <v-btn color="primary" outlined x-small @click="DeleteProject(revision.id)">{{$t('delete')}}</v-btn>
+                                    <v-btn color="primary" outlined x-small @click="EditProject(revision.id)"> <v-icon small left>mdi-eye</v-icon> {{$t('view')}}</v-btn>
+                                    <v-btn color="primary" outlined x-small @click="DeleteProject(revision.id)"> <v-icon small left>mdi-delete</v-icon> {{$t('delete')}}</v-btn>
+                                    <v-btn v-if="revision.pid && revision.pid > 0" 
+                                           color="primary" 
+                                           outlined x-small 
+                                           @click="CompareWithParent(revision.id, revision.pid)"
+                                           :title="$t('Compare with parent project')">
+                                        <v-icon small left>mdi-compare</v-icon>
+                                        {{$t('Compare')}}
+                                    </v-btn>
                                 </div>                        
                             </div>                        
                         </v-expansion-panel-content>

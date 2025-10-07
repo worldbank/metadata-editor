@@ -188,6 +188,20 @@ class Projects extends MY_Controller {
 		}
 	}
 
+	/**
+	 * 
+	 * Project comparison page
+	 * 
+	 */
+	function compare()
+	{
+		$this->editor_acl->has_access_or_die($resource_='editor',$privilege='view');
+		$this->lang->load("project");
+		$this->template->set_template('default');
+		$options['translations']=$this->lang->language;
+		echo $this->load->view('project/compare',$options,true);
+	}
+
 	
 }
 /* End of file projects.php */
