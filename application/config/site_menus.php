@@ -41,6 +41,13 @@ $menu[]=array(
 		array(
 			'title'	=>'Translate',
 			'url'	=>'admin/translate'
+		),
+		array(
+			'type'	=>'divider'
+		),
+		array(
+			'title'	=>'Audit Logs',
+			'url'	=>'admin/audit_logs'
 		)
 	)
 );
