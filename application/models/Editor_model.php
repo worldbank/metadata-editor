@@ -489,6 +489,28 @@ class Editor_model extends CI_Model {
 		return $options['metadata'];
 	}
 
+	/**
+	 * 
+	 * Update project changed timestamp
+	 * 
+	 */
+	function update_project_changed_timestamp($sid, $changed_by=null, $changed=null)
+	{
+		$options=array();
+		if ($changed){
+			$options['changed']=$changed;
+		}
+		if ($changed_by){
+			$options['changed_by']=$changed_by;
+		}
+		return $this->set_project_options($sid,$options);
+	}
+
+	/**
+	 * 
+	 * Set project options
+	 * 
+	 */	
 	function set_project_options($sid,$options=array())
 	{
 		$this->check_project_editable($sid);
@@ -1241,10 +1263,25 @@ class Editor_model extends CI_Model {
 		$project = $this->get_basic_info($sid);
 		if (!$project) {
 			throw new Exception("Project not found");
-		}
+		}		
 
 		// Check if this is a main project (pid is 0, NULL, or equals the project id)
 		$is_main_project = ($project['pid'] == 0 || $project['pid'] == null || $project['pid'] == $sid);
+
+		// log deletion
+		$metadata = array(
+			'project_title' => isset($project['title']) ? $project['title'] : '',
+			'project_idno' => isset($project['idno']) ? $project['idno'] : '',
+			'project_type' => isset($project['type']) ? $project['type'] : '',
+			'is_main_project' => $is_main_project
+		);
+		
+		$this->audit_log->log_event(
+			$obj_type = 'project',
+			$obj_id = $sid,
+			$action = 'delete',
+			$metadata = $metadata
+		);
 
 		if ($is_main_project) {
 			// Delete all versions first
@@ -1263,12 +1300,28 @@ class Editor_model extends CI_Model {
 	function delete_project_versions($main_project_id)
 	{
 		// Get all versions for this main project
-		$this->db->select('id, dirpath');
+		$this->db->select('id, dirpath, title, idno, type');
 		$this->db->where('pid', $main_project_id);
 		$this->db->where('id !=', $main_project_id); // Exclude the main project itself
 		$versions = $this->db->get('editor_projects')->result_array();
 
 		foreach ($versions as $version) {
+			// Log each version deletion
+			$metadata = array(
+				'project_title' => isset($version['title']) ? $version['title'] : '',
+				'project_idno' => isset($version['idno']) ? $version['idno'] : '',
+				'project_type' => isset($version['type']) ? $version['type'] : '',
+				'is_version' => true,
+				'main_project_id' => $main_project_id
+			);
+			
+			$this->audit_log->log_event(
+				$obj_type = 'project',
+				$obj_id = $version['id'],
+				$action = 'delete',
+				$metadata = $metadata
+			);
+			
 			$this->delete_single_project($version['id']);
 		}
 	}
@@ -1548,6 +1601,8 @@ class Editor_model extends CI_Model {
 
 		return $version_notes;
 	}
+
+	
 	
 }//end-class
 	
