@@ -3,8 +3,8 @@ Vue.component('confirm-dialog', {
   template: `
     <v-dialog v-model="dialogVisible" persistent max-width="600">
       <v-card>
-        <v-card-title class="text-h1 border-bottom">Confirmation</v-card-title>
-        <v-card-text class="text-center pt-5 pb-5" ><span class="h5 p-3">{{ message }}</span></v-card-text>
+        <v-card-title class="text-h5 border-bottom">Confirmation</v-card-title>
+        <v-card-text class="text-center pt-5 pb-5"><span class="h5">{{ message }}</span></v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="green darken-1" text @click="confirm">Confirm</v-btn>
@@ -29,11 +29,15 @@ Vue.component('confirm-dialog', {
       this.reject = reject;
     },
     confirm() {
-      this.resolve(true);
+      if (this.resolve) {
+        this.resolve(true);
+      }
       this.closeDialog();
     },
     cancel() {
-      this.resolve(false);
+      if (this.resolve) {
+        this.resolve(false);
+      }
       this.closeDialog();
     },
     closeDialog() {
@@ -45,5 +49,8 @@ Vue.component('confirm-dialog', {
   },
   mounted() {
     EventBus.$on('confirm', this.showConfirmDialog);
+  },
+  beforeDestroy() {
+    EventBus.$off('confirm', this.showConfirmDialog);
   },
 });
