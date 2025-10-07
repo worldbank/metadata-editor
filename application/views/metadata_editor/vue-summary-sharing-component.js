@@ -35,6 +35,8 @@ Vue.component('vue-summary-sharing-stats', {
             })
             .catch(function (error) {
                 console.log(error);
+                let message = vm.$extractErrorMessage(error);
+                vm.$alert(message, { color: 'error'});
             });            
         },
     },    

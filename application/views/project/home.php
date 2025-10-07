@@ -74,6 +74,9 @@
   <div id="app" data-app >    
     <v-app >
 
+    <alert-dialog></alert-dialog>
+    <confirm-dialog></confirm-dialog>
+
     <div class="wrapper">
 
       <vue-global-site-header></vue-global-site-header>
@@ -569,6 +572,9 @@
   <script>
 
     <?php
+    echo $this->load->view("vue/vue-global-eventbus.js", null, true);
+    echo $this->load->view("vue/vue-alert-dialog-component.js", null, true);
+    echo $this->load->view("vue/vue-confirm-dialog-component.js", null, true);
     echo $this->load->view("project/vue-project-share-component.js", null, true);
     echo $this->load->view("project/vue-collection-remove-component.js", null, true);
     echo $this->load->view("project/vue-collection-share-component.js", null, true);
@@ -852,19 +858,19 @@
         pageLink: function(page) {
           window.location.href = CI.site_url + '/' + page;
         },
-        compareSelectedProjects: function() {
+        compareSelectedProjects: async function() {
           if (this.selected_projects.length === 2) {
             // Find the selected projects in the existing Projects array
             const project1 = this.Projects.find(p => p.id == this.selected_projects[0]);
             const project2 = this.Projects.find(p => p.id == this.selected_projects[1]);
             
             if (!project1 || !project2) {
-              alert(this.$t('projects_not_found'));
+              await this.$alert(this.$t('projects_not_found'), { color: 'error' });
               return;
             }
             
             if (project1.type !== project2.type) {
-              alert(this.$t('cannot_compare_different_types'));
+              await this.$alert(this.$t('cannot_compare_different_types'), { color: 'warning' });
               return;
             }
             
@@ -1107,29 +1113,26 @@
               vm.is_loading = false;
             });
         },
-        createProject: function(type) {
+        createProject: async function(type) {
           vm = this;
           let form_data = {};
           let url = CI.site_url + '/api/editor/create/' + type;
           this.loading_status = this.$t("processing_please_wait");
           this.dialog_create_project = false;
 
-          axios.post(url,
-              form_data
-            )
-            .then(function(response) {
-              if (response.data.id) {
-                vm.EditProject(response.data.id);
-              }
-              vm.loadProjects();
-            })
-            .catch(function(error) {
-              alert("Failed: " + error);
-            })
-            .then(function() {
-              // always executed
-              console.log("request completed");
+          try {
+            let response = await axios.post(url, form_data);
+            if (response.data.id) {
+              vm.EditProject(response.data.id);
+            }
+            vm.loadProjects();
+          } catch (error) {
+            console.log("error", error);
+            await vm.$alert(vm.$extractErrorMessage(error), { 
+              title: "Failed to create project",
+              color: 'error' 
             });
+          }
         },
         EditProject: function(id) 
         {
@@ -1162,10 +1165,11 @@
         },
         ShareProject: async function(id) { 
           try {
+            let vm = this;
             let hasPermissionsToShare = await this.hasProjectAdminAccess(id);
 
             if (!hasPermissionsToShare){
-              alert(this.$t("no_permissions_to_share"));
+              await this.$alert(this.$t("no_permissions_to_share"), { color: 'error'});              
               return false;
             }
 
@@ -1183,28 +1187,33 @@
 
           } catch (e) {
             console.log("shareProject error", e);
-            alert("Failed", JSON.stringify(e));
+            let message = vm.$extractErrorMessage(e);
+            await vm.$alert(message, { color: 'error'});
           }
         },
-        DeleteProject: function(id) {
-          if (!confirm(this.$t("confirm_delete"))) {
+        DeleteProject: async function(id) {
+          let confirmed = await this.$confirm(this.$t("confirm_delete"));
+          if (!confirmed) {
             return false;
           }
 
           vm = this;
           let url = CI.site_url + '/api/editor/delete/' + id;
 
-          axios.post(url)
-            .then(function(response) {
-              vm.loadProjects();
-            })
-            .catch(function(error) {
-              console.log("error", error);
-              alert("Failed", error);
+          try {
+            await axios.post(url);
+            vm.loadProjects();
+          } catch (error) {
+            console.log("error", error);
+            await vm.$alert(vm.$extractErrorMessage(error), { 
+              title: "Failed to delete",
+              color: 'error' 
             });
+          }
         },
-        DeleteProjectRevision: function(id) {
-          if (!confirm(this.$t("confirm_delete"))) {
+        DeleteProjectRevision: async function(id) {
+          let confirmed = await this.$confirm(this.$t("confirm_delete"));
+          if (!confirmed) {
             return false;
           }
 
@@ -1214,19 +1223,16 @@
             id: id
           };
 
-          axios.post(url, options)
-          .then(function(response) {
+          try {
+            await axios.post(url, options);
             vm.loadProjects();
-          })
-          .catch(function(error) {
+          } catch (error) {
             console.log("error", error);
-            if (error.response.data.message){                
-              alert("Failed: " + error.response.data.message);
-            }
-            else{
-              alert("Failed: " + JSON.stringify(error));
-            }
-          });            
+            await vm.$alert(vm.$extractErrorMessage(error), { 
+              title: "Failed to delete",
+              color: 'error' 
+            });
+          }
         },
         getProjectIcon: function(type) {
           projectIcon = this.project_types_icons[type];
@@ -1322,10 +1328,13 @@
             this.dialog_share_collection = true;
           } catch (e) {
             console.log("shareProject error", e);
-            alert("Failed", JSON.stringify(e));
+            await this.$alert(this.$extractErrorMessage(e), { 
+              title: "Failed",
+              color: 'error' 
+            });
           }
         },
-        manageProjectCollections: function(project_id) 
+        manageProjectCollections: async function(project_id) 
         {
           //get collections for the project
           let project = this.Projects.find(x => x.id == project_id);
@@ -1334,7 +1343,7 @@
           }
 
           if (!project.collections){
-            alert("No collections found for this project");
+            await this.$alert("No collections found for this project", { color: 'info' });
             return false;
           }
 
@@ -1347,7 +1356,7 @@
         addProjectsToCollection: async function() {
           try {
             if (this.selected_projects.length == 0) {
-              alert(this.$t("select_atleast_one_project"));
+              await this.$alert(this.$t("select_atleast_one_project"), { color: 'warning' });
               return false;
             }
 
@@ -1363,7 +1372,10 @@
 
           } catch (e) {
             console.log("shareProject error", e);
-            alert("Failed", JSON.stringify(e));
+            await this.$alert(this.$extractErrorMessage(e), { 
+              title: "Failed",
+              color: 'error' 
+            });
           }
         },
         getCollectionsList: async function() {
@@ -1392,17 +1404,15 @@
             this.loadProjects();
           } catch (e) {
             console.log("addProjectsToCollection error", e);
-            if (e.response.data.message) {
-              alert("Failed: " + e.response.data.message);
-            } else if (e.response.data.error) {
-              alert("Failed: " + JSON.stringify(e.response.data.error));
-            } else {
-              alert("Failed: " + JSON.stringify(e.response));
-            }            
+            await this.$alert(this.$extractErrorMessage(e), { 
+              title: "Failed to add projects",
+              color: 'error' 
+            });
           }
         },
         removeFromCollection: async function(project_id, collection_id) {
-          if (!confirm(this.$t("confirm_remove_project_from_collection"))) {
+          let confirmed = await this.$confirm(this.$t("confirm_remove_project_from_collection"));
+          if (!confirmed) {
             return false;
           }
 
@@ -1422,11 +1432,13 @@
             this.loadProjects();
           } catch (e) {
             console.log("removeCollection error", e);
-            let message = (e.response.data.message) ? e.response.data.message : JSON.stringify(e.response.data);
-            alert("Failed: " + message);
+            await this.$alert(this.$extractErrorMessage(e), { 
+              title: "Failed to remove",
+              color: 'error' 
+            });
           }
         },
-        importProject: function(){
+        importProject: async function(){
             let formData = new FormData();
             formData.append('file', this.import_file);
             
@@ -1434,13 +1446,13 @@
               formData.append('type', this.import_project_type.value);
             }
             else{
-              alert(this.$t("select_project_type"));
+              await this.$alert(this.$t("select_project_type"), { color: 'warning' });
               return false;
             }
 
             if (!this.import_file)
             {
-                alert(this.$t("select_file_to_import"));
+                await this.$alert(this.$t("select_file_to_import"), { color: 'warning' });
                 return false;
             }
 

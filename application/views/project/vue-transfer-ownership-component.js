@@ -21,7 +21,7 @@ Vue.component('vue-transfer-ownership', {
         }          
     },
     methods: {        
-        transferOwnership: function() {
+        transferOwnership: async function() {
             
             vm=this;
             let url=CI.site_url + '/api/editor/transfer_ownership/';
@@ -30,17 +30,19 @@ Vue.component('vue-transfer-ownership', {
                 "owner_id":vm.selected_user.id
             }
 
-            axios.post( url,
-                options
-            ).then(function(response){
+            try {
+                let response = await axios.post(url, options);
                 vm.selected_user=[];
                 vm.dialog=false;
                 vm.$emit('transfer-ownership','updated');
-            })
-            .catch(function(response){
-                vm.errors=response;
-                alert(vm.errorResponseMessage(response));
-            });                    
+            } catch (error) {
+                console.log("transfer ownership error", error);
+                vm.errors=error;
+                await vm.$alert(vm.$extractErrorMessage(error), { 
+                    title: "Transfer Failed",
+                    color: 'error' 
+                });
+            }
         },    
         searchUsers: _.debounce(function(val) {
             let vm=this;
@@ -53,18 +55,7 @@ Vue.component('vue-transfer-ownership', {
                 console.log(error);
             })
             .finally(() => (this.is_loading = false));
-        },300),    
-        errorResponseMessage: function(error) {
-        if (error.response.data.error) {
-            return error.response.data.error;
-        }
-
-        if (error.response){
-            return JSON.stringify(error.response.data);
-        }
-
-        return JSON.stringify(error);
-    },
+        },300),
     },
     computed:{
         dialog: {

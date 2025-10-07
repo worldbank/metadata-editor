@@ -4,6 +4,8 @@
     <vue-global-site-header></vue-global-site-header>
     <!--end-header-->
 
+    <alert-dialog></alert-dialog>
+
     <?php /* <div class="row no-gutters">
         <div class="col-md-3 col-xl-2 col-xs-4 "> */?>
     <splitpanes class="default-theme splitpanes splitpanes--vertical editor-split-panes" style="min-height: 100px"> 

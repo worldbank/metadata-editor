@@ -86,10 +86,13 @@ Vue.component('vue-project-share', {
             })
             .catch(function (error) {
                 console.log(error);
+                let message = vm.$extractErrorMessage(error);
+                vm.$alert(message, { color: 'error'});
             })
             .finally(() => (this.is_loading = false));
         },        
         updateAccess: function(index){
+            let vm = this;
             let form_data={
                 'users': Array(this.shared_users[index]['user_id']),
                 'permissions':this.shared_users[index]['permissions']
@@ -105,6 +108,8 @@ Vue.component('vue-project-share', {
             })
             .catch(function (error) {
                 console.log(error);
+                let message = vm.$extractErrorMessage(error);
+                vm.$alert(message, { color: 'error'});
             });
             
         },

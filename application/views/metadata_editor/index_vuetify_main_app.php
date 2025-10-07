@@ -3,7 +3,6 @@
         Vue.use(VueDeepSet)     
 
         window.bus = new Vue();//todo remove?
-        const EventBus = new Vue();
 
         Vue.mixin({
             methods: {
@@ -135,7 +134,9 @@
             }
         })
         
-        <?php 
+        <?php
+            echo $this->load->view("vue/vue-global-eventbus.js",null,true);
+            echo $this->load->view("vue/vue-alert-dialog-component.js",null,true);
             echo $this->load->view("editor_common/global-site-header-component.js", null, true);
             echo $this->load->view("metadata_editor/vue-project-export-json-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-template-validation-component.js",null,true);
@@ -227,8 +228,7 @@
             echo $this->load->view("metadata_editor/vue-admin-metadata-edit-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-dialog-admin-metadata-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-summary-templates-component.js",null,true);
-            echo $this->load->view("metadata_editor/vue-json-edit-component.js",null,true);
-
+            echo $this->load->view("metadata_editor/vue-json-edit-component.js",null,true);            
         ?>
 
         <?php if (empty($metadata)):?>

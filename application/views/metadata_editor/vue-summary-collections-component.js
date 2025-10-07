@@ -34,8 +34,11 @@ Vue.component('vue-summary-collections', {
             .then(response => {
                 vm.project_collections = response.data.collections;
             })
-            .catch(function (error) {
-                console.log(error);
+            .catch(function (e) {
+                console.log(e);
+
+                let message = vm.$extractErrorMessage(e);
+                vm.$alert(message, { color: 'error'});
             });            
         },
         getCollectionsList: async function() {
@@ -51,15 +54,18 @@ Vue.component('vue-summary-collections', {
         },
         addProjectToCollection: async function() {
             try {
+                let vm = this;
                 let collections = await this.getCollectionsList();
+
                 this.dialog_share_collection_options = {
-                'collections': collections,
-                'projects': [this.ProjectID]
+                    'collections': collections,
+                    'projects': [this.ProjectID]
                 };
                 this.dialog_share_collection = true;
             } catch (e) {
                 console.log("shareProject error", e);
-                alert("Failed", JSON.stringify(e));
+                let message = vm.$extractErrorMessage(e);
+                vm.$alert(message, { color: 'error'});
             }
         },  
         onAddProjectsToCollection: async function(obj) {
@@ -74,12 +80,12 @@ Vue.component('vue-summary-collections', {
                 form_data
               );
   
-              console.log("completed addprojectstocollections", response);
               this.dialog_share_collection = false;              
               this.loadProjectCollections();
             } catch (e) {
-              console.log("addProjectsToCollection error", e);
-              alert("Failed", JSON.stringify(e));
+                console.log("addProjectsToCollection error", e);
+                let message = vm.$extractErrorMessage(e);
+                vm.$alert(message, { color: 'error'});
             }
           },
           removeFromCollection: async function(collection_id) {
@@ -104,8 +110,14 @@ Vue.component('vue-summary-collections', {
               this.loadProjectCollections();
             } catch (e) {
               console.log("removeCollection error", e);
-              let message = (e.response.data.message) ? e.response.data.message : JSON.stringify(e.response.data);
-              alert("Failed: " + message);
+              if(e.response && e.response.data && e.response.data.message){
+                await vm.$alert(e.response.data.message, { color: 'error'});
+              }
+              else if(e.response && e.response.data){
+                await vm.$alert(JSON.stringify(e.response.data), { color: 'error'});
+              }
+              
+              await vm.$alert("Failed to remove collection", { color: 'error'});
             }
           },
     },    

@@ -462,6 +462,12 @@
           let recursive_keyword_search=function(items){
             let filtered_items=[];
             for (let item of items){
+                // Always include the home node in search results
+                if (item.type === 'home') {
+                  filtered_items.push(item);
+                  continue;
+                }
+                
                 if (item.items){
                   let children=recursive_keyword_search(item.items);
                   if (children.length>0){
@@ -623,15 +629,24 @@
         },
         setTreeActiveNode: function(path)
         {
+          console.log("setTreeActiveNode called with path:", path);
           this.tree_active_items=[];
           this.tree_active_items.push(path);
           let path_arr=path.split("/");
 
           //expand datafile
-          if(path_arr[0]=='variables'){
-            this.initiallyOpen.push("datasets");
-            this.initiallyOpen.push("datafile/"+path_arr[1]);
+          if(path.startsWith("/datafile/")){
+            this.initiallyOpen.push("datafiles");
+            this.initiallyOpen.push("datafile/"+path_arr[2]); // path_arr[2] is the file_id
           }
+          else if(path.startsWith("/variables/")){
+            this.initiallyOpen.push("datafiles");
+            this.initiallyOpen.push("datafile/"+path_arr[2]); // path_arr[2] is the file_id
+          }
+          else if(path.startsWith("/data-explorer/")){
+            this.initiallyOpen.push("datafiles");
+            this.initiallyOpen.push("datafile/"+path_arr[2]); // path_arr[2] is the file_id
+          }                    
 
           if (path==""){
             this.tree_active_items.push("home");
@@ -862,19 +877,18 @@
 
           this.items=tree_data;
           if (this.$route.path.startsWith("/datafile/")){
-            this.initiallyOpen=["datafiles"];
-            this.initiallyOpen.push(this.$route.path.substr(1,this.$route.path.length));
             this.setTreeActiveNode(this.$route.path);
           }
           else if (this.$route.path.startsWith("/variables/")){
-            this.initiallyOpen=["datafiles"];
-            this.initiallyOpen.push(this.$route.path.substr(1,this.$route.path.length));
+            this.setTreeActiveNode(this.$route.path);
+          }
+          else if (this.$route.path.startsWith("/data-explorer/")){
             this.setTreeActiveNode(this.$route.path);
           }
           else if (this.$route.path.startsWith("/external-resources")){
             this.initiallyOpen=["external-resources"];
             this.setTreeActiveNode("external-resources");
-          }
+          }          
           else{
             let active_node_name=this.$route.path;
             active_node_name=active_node_name.slice(active_node_name.lastIndexOf("/")+1);
