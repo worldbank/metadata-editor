@@ -307,7 +307,28 @@ class Install extends CI_Controller {
 		{
 			show_error('You have not setup database settings');
 		}
-		
+
+		//check db errors
+		if($this->db->error())
+		{
+			$db_error = $this->db->error();
+			if (isset($db_error['code']))
+			{
+
+				if ($db_error['code'] == 1049)
+				{
+					$this->_create_database_if_not_exists();
+					return false;
+				}
+
+				//1045 - Access denied
+				if ($db_error['code'] == 1045)
+				{
+					show_error('Access denied to database. Check your database credentials.');
+				}
+			}
+		}
+
 		//test reading from database tables
 		$this->db->select("name");	
 		$this->db->where("name", "app_installed");
@@ -319,18 +340,22 @@ class Install extends CI_Controller {
 			
 			if (isset($result['name']))
 			{
-				//Application is already installed, exit the installer
-				show_error(t('page_not_found').' - <a href="'.site_url().'">'.t('return_to_site').'</a>');
-				exit;
+				// Database and tables exist, check if admin user exists
+				if ($this->_is_user_account_created())
+				{
+					// Admin user exists - installation is complete
+					show_error(t('page_not_found').' - <a href="'.site_url().'">'.t('return_to_site').'</a>');
+					exit;
+				}
+				// No admin user exists - allow installer to continue for user creation
 			}
 		}
-				
+
 		//test database connection only if everything else above has failed
 		$connected=$this->_test_connection();
 
 		if (!$connected) 
         {
-            //cannot connect to database server
 			show_error('Failed to connect to database, check database settings');
         } 
 	}
@@ -352,9 +377,17 @@ class Install extends CI_Controller {
 			case 'mysql':
 				$conn_id = @mysql_connect($this->db->hostname, $this->db->username, $this->db->password, TRUE);
 			break;
-			case 'mysqli':
-			$conn_id = @mysqlI_connect($this->db->hostname, $this->db->username, $this->db->password);
-			break;
+		case 'mysqli':
+			// Try to connect to the specific database first
+			$conn_id = @mysqli_connect($this->db->hostname, $this->db->username, $this->db->password, $this->db->database);
+			
+			// If that fails, try to create the database
+			if (!$conn_id) {
+				$this->_create_database_if_not_exists();
+				// Try connecting again after creating the database
+				$conn_id = @mysqli_connect($this->db->hostname, $this->db->username, $this->db->password, $this->db->database);
+			}
+		break;
 			case 'postgre':
 				$conn_id=@pg_connect("host={$this->db->hostname} user={$this->db->username} password={$this->db->password} connect_timeout=5 dbname=postgres");
 			break;
@@ -449,6 +482,47 @@ class Install extends CI_Controller {
 		}
 	}
 	
+	/**
+	 * Create database if it doesn't exist (mysqli only)
+	 * This method is called when we can connect to the MySQL server
+	 * but the specific database doesn't exist
+	 */
+	private function _create_database_if_not_exists()
+	{
+		$dbName = $this->db->database;
+		
+		// Connect to MySQL server without selecting a database
+		$mysqli = @new mysqli($this->db->hostname, $this->db->username, $this->db->password, '');
+		
+		if ($mysqli->connect_error) {
+			log_message('error', 'MySQL connection failed: ' . $mysqli->connect_error);
+			return; // Don't show error, let the normal flow handle it
+		}
+		
+		// Create the database if it doesn't exist
+		$query = "CREATE DATABASE IF NOT EXISTS `$dbName` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci";
+		
+		if ($mysqli->query($query)) {
+			log_message('info', "Database '$dbName' created successfully");
+		} else {
+			log_message('error', 'Database creation failed: ' . $mysqli->error);
+		}
+		
+		$mysqli->close();
+	}
+
+	/**
+	 * Check if a user account has been created
+	 * 
+	 * @return bool TRUE if user account exists, FALSE otherwise
+	 */
+	private function _is_user_account_created()
+	{
+		$this->db->select("id");
+		$this->db->limit(1);
+		$admin_query = $this->db->get("users");
+		return ($admin_query && $admin_query->num_rows() > 0);
+	}
 
 }
 
