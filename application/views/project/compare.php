@@ -7,7 +7,6 @@
   <link href="<?php echo base_url();?>vue-app/assets/vuetify.min.css" rel="stylesheet">
 
   <script src="<?php echo base_url();?>vue-app/assets/moment-with-locales.min.js"></script>
-  <script src="<?php echo base_url();?>vue-app/assets/vue-i18n.min.js"></script>
 
   <link href="<?php echo base_url();?>vue-app/assets/styles.css" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
@@ -554,11 +553,14 @@
 
   <script>
     // Vue i18n setup
-    const messages = <?php echo json_encode($translations); ?>;
+    const translation_messages = {
+      default: <?php echo json_encode($translations, JSON_HEX_APOS); ?>
+    };
+    
     const i18n = new VueI18n({
-      locale: 'en',
-      fallbackLocale: 'en',
-      messages: messages
+      locale: 'default',
+      fallbackLocale: 'default',
+      messages: translation_messages
     });
 
 
@@ -637,8 +639,6 @@
       mounted() {
         if (this.project1_id && this.project2_id) {
           this.loadProjects();
-          // Validate projects on page load
-          this.validateProjectsOnLoad();
         }
       },
       watch: {
@@ -915,47 +915,6 @@
           if (this.project1Id && this.project2Id) {
             this.validateProjects();
           }
-        },
-        
-        validateProjectsOnLoad() {
-          // Validate projects when page loads with URL parameters
-          this.validationErrors.sameId = '';
-          this.validationErrors.differentTypes = '';
-          
-          // Check if IDs are the same
-          if (this.project1_id === this.project2_id) {
-            this.validationErrors.sameId = 'Cannot compare a project with itself. Please enter different project IDs.';
-            return;
-          }
-          
-          // Fetch project information for type validation
-          this.isValidating = true;
-          const vm = this;
-          
-          Promise.all([
-            this.fetchProjectInfo(this.project1_id),
-            this.fetchProjectInfo(this.project2_id)
-          ])
-          .then(([project1Info, project2Info]) => {
-            vm.project1Info = project1Info;
-            vm.project2Info = project2Info;
-            
-            // Check if both projects exist
-            if (!project1Info) {
-              vm.validationErrors.differentTypes = 'Project 1 not found.';
-            } else if (!project2Info) {
-              vm.validationErrors.differentTypes = 'Project 2 not found.';
-            } else if (project1Info.type !== project2Info.type) {
-              vm.validationErrors.differentTypes = `Cannot compare projects of different types. Project 1 is "${project1Info.type}" and Project 2 is "${project2Info.type}".`;
-            }
-            
-            vm.isValidating = false;
-          })
-          .catch(error => {
-            console.error('Error validating projects on load:', error);
-            vm.validationErrors.differentTypes = 'Error validating projects. Please check the project IDs.';
-            vm.isValidating = false;
-          });
         },
         
         validateProjects() {
