@@ -233,7 +233,6 @@ Vue.component('file-manager', {
                                 <v-icon>mdi-delete</v-icon> 
                             </v-btn>
                             <span v-if="ProjectType=='geospatial'">
-                                <v-btn primary text  v-if="isTypeGeospatial(file.name)" @click="importGeospatialMetadata(file)"><i class="fas fa-edit"></i> Extract metadata</v-btn>
                                 <v-btn primary text v-if="isZip(file.name)" @click="extractZip(file)"><i class="fas fa-edit"></i> Extract zip</v-btn>
                             </span>
                         </td>
