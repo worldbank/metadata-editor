@@ -1119,3 +1119,91 @@ tr .action-buttons-hover {
     background:#e9edf8;
 }
 
+
+/* Geospatial Feature Characteristics - Row Selection */
+.geospatial-feature-characteristics .selected-row {
+    background-color: #dee2e6 !important;       
+}
+
+.geospatial-feature-characteristics .selected-row:hover,
+.geospatial-feature-characteristics .char_row:hover {
+    background-color: #bfc0c1 !important;
+    cursor: pointer;
+}
+
+.truncate-table-td-lines-3 td {
+    max-width: 250px;         /* adjust width as needed */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  }
+
+/* v-input label */
+.v-font-weight-normal .v-label {
+    font-weight: normal;
+}
+
+#app .treeview-collection-filter .v-treeview-node__children .v-treeview-node__level {
+    border: none;
+}
+
+.text-xs {
+    font-size: small;
+    color: gray;
+  }
+
+  .cursor-pointer {
+    cursor: pointer;
+  }
+
+  .v-text-field--filled.v-input--dense.v-text-field--single-line .v-label, .v-text-field--full-width.v-input--dense.v-text-field--single-line .v-label
+  {
+    font-weight:normal;
+  }
+
+  .exclude-collections-filter-switch .v-label,
+  .facet-checkbox .v-label{
+    font-weight: normal;
+  }
+
+  .overflow-auto {
+    overflow: auto;
+  }
+
+  .custom-xs.v-input.v-input--dense.v-text-field.v-text-field--outlined {
+    --v-text-field-padding-y: 0px;
+    font-size: 0.75rem;
+    min-height: 26px !important;
+    height: 26px !important;
+  }
+
+  /* shrink the inner slot (outlined box) */
+  .custom-xs.v-input .v-input__slot {
+    min-height: 26px !important;
+    height: 26px !important;
+    padding: 0 4px !important;
+  }
+
+  /* shrink the input element itself */
+  .custom-xs.v-input input {
+    height: 22px !important;
+    line-height: 22px !important;
+    font-size: 0.75rem !important;
+    padding: 0 4px !important;
+  }
+
+  /* shrink the outline fieldset */
+  .custom-xs.v-input fieldset {
+    top: 0 !important;
+    min-height: 26px !important;
+  }
+
+  /* adjust the magnify icon size and alignment */
+  .custom-xs.v-input .v-input__icon--prepend-inner i {
+    font-size: 16px !important;
+    line-height: 22px !important;
+  }
+
+  .custom-xs .v-input__prepend-inner{
+    margin-top: 2px !important;
+  }

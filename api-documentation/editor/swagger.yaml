@@ -191,6 +191,38 @@ paths:
           - title_desc
           - updated_asc
           - updated_desc
+        
+        - name: collection
+          in: query
+          title: Collections
+          description: Filter by collections. Provide comma-separated collection IDs e.g. 1,2,3
+          type: string
+        
+        - name: exclude_collections
+          in: query
+          title: Exclude collections
+          description: When set to 'true', negates the collection filter to exclude the selected collections instead of including them
+          type: string
+          enum:
+          - 'true'
+          - 'false'
+        
+        - name: ownership
+          in: query
+          title: Ownership filter
+          description: Filter by project ownership
+          type: string
+          enum:
+          - self
+          - shared
+          - self,shared
+        
+        - name: users
+          in: query
+          title: Users filter
+          description: Filter projects by users who created or modified them. Provide comma-separated user IDs e.g. 1,2,3
+          type: string
+      
       responses:
         '200':
           description: successful operation

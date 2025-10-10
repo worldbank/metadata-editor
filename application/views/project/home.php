@@ -30,21 +30,7 @@
 
 </head>
 
-<style>
-  .text-xs {
-    font-size: small;
-    color: gray;
-  }
-
-  .cursor-pointer {
-    cursor: pointer;
-  }
-
-  .v-text-field--filled.v-input--dense.v-text-field--single-line .v-label, .v-text-field--full-width.v-input--dense.v-text-field--single-line .v-label
-  {
-    font-weight:normal;
-  }
-
+<style>  
   table th {
     white-space: nowrap;
   }
@@ -57,8 +43,7 @@
 
   .v-treeview-node.v-treeview-node--leaf {
     margin-left: 14px;
-  }
-
+  }  
 </style>
 
 <body class="layout-top-nav">
@@ -85,25 +70,51 @@
       <div class="content-wrapperx" v-cloak>
         <section class="content">
 
-          <div class="container-fluid" >
+          <div class="container-fluid vh-100 d-flex flex-row overflow-hidden">
 
             <div class="row">
 
               <!--sidebar -->
-              <div class="sidebar col-md-3 col-sm-4">
+              <div class="sidebar col-md-3 col-sm-4 overflow-auto" style="height: 100%;padding-bottom: 120px;">
 
                 <div class="mr-4 mt-5">
                   <v-expansion-panels v-model="facet_panel" multiple class="">
 
                     <v-expansion-panel v-for="(facet_values,facet_key) in facets" :key="facet_key">
                       <v-expansion-panel-header class="capitalize">
-                        {{$t(facet_key)}}
+                        <div v-if="facet_key=='collection'" style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding-right: 12px;">
+                          <span>{{$t(facet_key)}}</span>
+                          <v-switch
+                              v-model="exclude_collections_filter"
+                              :label="exclude_collections_filter ? 'Exclude' : 'Include'"
+                              dense
+                              small
+                              hide-details
+                              color="warning"
+                              class="mt-0 pt-0 exclude-collections-filter-switch"
+                              style="flex-grow: 0;font-weight: normal;"
+                              @click.stop
+                          ></v-switch>
+                        </div>
+                        <span v-else>{{$t(facet_key)}}</span>
                       </v-expansion-panel-header>
                       <v-expansion-panel-content>
                         <div v-if="facet_key=='collection'">
                           
+                          <v-text-field
+                              v-model="collection_search"
+                              placeholder="Search..."
+                              dense
+                              outlined
+                              clearable
+                              hide-details
+                              class="mt-0 mb-3 collection-search-small custom-xs"
+                              prepend-inner-icon="mdi-magnify"
+                          ></v-text-field>
+                          
                           <v-treeview
                               :items="facet_values"
+                              :search="collection_search"
                               item-children="items"
                               activatable
                               item-key="id"
@@ -111,14 +122,47 @@
                               v-model="search_filters[facet_key]"                              
                               selectable
                               selection-type="independent"
+                              class="treeview-collection-filter tree-with-lines"
                               >
-                                                          
+                              <template v-slot:label="{ item }">
+                                <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; gap: 8px;">
+                                  <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;">{{ item.title }}</span>
+                                  <span v-if="item.projects" class="text-muted" style="font-size: 0.85em; padding-left: 5px; padding-right: 5px; border-radius: 3px; flex-shrink: 0;">{{ item.projects }}</span>
+                                </div>
+                              </template>
                           </v-treeview>
 
                         </div>
-                        <div v-else class="form-check" v-for="facet in facet_values">
-                          <input class="form-check-input" @click="onFilterClick(facet_key,facet)" type="checkbox" v-model="search_filters[facet_key]" :value="facet.id" :id="facet_key+facet.id">
-                          <label class="form-check-label" :for="facet_key+facet.id">{{$t(facet.title)}}</label>
+                        <div v-else>
+                          <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px;" v-for="facet in facet_values">
+                            <v-checkbox
+                                v-model="search_filters[facet_key]"
+                                :value="facet.id"
+                                hide-details
+                                dense
+                                class="mt-0 pt-0 facet-checkbox"
+                                style="flex: 1; min-width: 0;"
+                            >
+                              <template v-slot:label>
+                                <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{$t(facet.title)}}</span>
+                              </template>
+                            </v-checkbox>
+                            <span v-if="facet.count !== undefined" class="text-muted" style="font-size: 0.7em; padding-left: 5px; padding-right: 5px; border-radius: 3px; flex-shrink: 0;">{{ facet.count }}</span>
+                          </div>
+                          
+                          <!-- Add user button for users_filter facet -->
+                          <div v-if="facet_key=='users_filter'" class="mt-2">
+                            <v-btn
+                                @click="openUserFilterDialog"
+                                small
+                                outlined
+                                color="primary"
+                                block
+                            >
+                              <v-icon small left>mdi-account-plus</v-icon>
+                              {{$t('add_user')}}
+                            </v-btn>
+                          </div>
                         </div>
                       </v-expansion-panel-content>
                     </v-expansion-panel>
@@ -128,7 +172,10 @@
               </div>
               <!-- end sidebar -->
 
-              <div class="projects col-md-9 col-sm-8">
+              <!-- User filter dialog component -->
+              <vue-user-filter v-model="dialog_user_filter" @apply="onApplyUserFilter"></vue-user-filter>
+
+              <div class="projects col-md-9 col-sm-8 overflow-auto" style="height: 100%;padding-bottom: 120px;">
                 <div class="mt-5 mb-5">                  
 
                       <div class="mb-5">
@@ -187,14 +234,25 @@
                   </div>                    
                   </div>
 
-                  <div v-if="SearchFiltersQuerystring" class="mt-3 mb-5">                    
+                  <div v-if="SearchFiltersQuerystring" class="mt-3 mb-5">
+                    <!-- Show exclude mode indicator if enabled -->
+                    <v-chip v-if="exclude_collections_filter && search_filters.collection && search_filters.collection.length > 0" 
+                            @click:close="exclude_collections_filter = false"
+                            small 
+                            color="warning" 
+                            text-color="white"
+                            close
+                            class="mr-1 mb-1">
+                      Exclude Collections
+                    </v-chip>
+                    
                     <template v-for="(filter_values, filter_type) in search_filters">
                       <template v-for="(filter_value,idx) in filter_values">                        
-                        <v-chip @click:close="removeFilter(filter_type,idx)" small color="primary" close class="mr-1">
+                        <v-chip @click:close="removeFilter(filter_type,idx)" small :color="getFilterChipColor(filter_type)" close class="mr-1 mb-1">
                         {{getFacetTitleById(filter_type,filter_value)}}                                     
                         </v-chip>
                       </template>
-                    </template>                    
+                    </template>
                   </div>
 
                   <div class="mt-5 p-3 border  text-danger" v-if="errors && errors.length>0"> 
@@ -583,7 +641,8 @@
     echo $this->load->view("editor_common/navigation-tabs-component.js", null, true);
     echo $this->load->view("editor_common/global-site-header-component.js", null, true);
     echo $this->load->view("project/vue-create-revision-component.js", null, true);
-    echo $this->load->view("project/vue-list-revisions-component.js", null, true);    
+    echo $this->load->view("project/vue-list-revisions-component.js", null, true);
+    echo $this->load->view("project/vue-user-filter-component.js", null, true);
 
     ?>
 
@@ -687,6 +746,10 @@
         form_errors: [],
         facets: [],
         facet_panel: [0,1,2,3,4,5],
+        collection_search: '',
+        exclude_collections_filter: false,
+        dialog_user_filter: false,
+        updating_route: false,
         pagination_page: 0,
         dialog_create_project: false,
         dialog_import_project: false,
@@ -828,9 +891,18 @@
         sort_by: function(new_, old_) {
             this.search();
         },
+        exclude_collections_filter: function(newVal, oldVal) {
+            this.search();
+        },
         $route: {
-          handler: function(newRouteValue){
-            this.ReadFilterQS();            
+          handler: function(newRouteValue, oldRouteValue){
+            // Only read filters if route actually changed (not programmatic update)
+            if (!oldRouteValue || newRouteValue.fullPath !== oldRouteValue.fullPath) {
+              // Don't reload if we just updated the route ourselves
+              if (!this.updating_route) {
+                this.ReadFilterQS();
+              }
+            }
           },
           deep: true
         }
@@ -934,7 +1006,22 @@
 
           //keyword search
           search_filters.keywords=this.search_keywords;
-          this.$router.push({ path: '', query: search_filters})
+
+          //exclude collections filter
+          if(this.exclude_collections_filter){
+            search_filters.exclude_collections='true';
+          }
+
+          //users filter (now using users_filter facet)
+          if(this.search_filters.users_filter && this.search_filters.users_filter.length > 0){
+            search_filters.users=this.search_filters.users_filter.join(",");
+          }
+
+          this.updating_route = true;
+          this.$router.replace({ path: '', query: search_filters}).catch(() => {});
+          this.$nextTick(() => {
+            this.updating_route = false;
+          });
         },
         ReadFilterQS: function()
         {
@@ -959,6 +1046,11 @@
 
           //keyword search
           this.search_keywords=urlParams.get('keywords');
+
+          //exclude collections filter
+          let exclude_param = urlParams.get('exclude_collections');
+          this.exclude_collections_filter = (exclude_param === 'true');
+
 
           //set sort
           let sort_=urlParams.get('sort_by');
@@ -1044,7 +1136,11 @@
         },
         loadFacets: function() {
           vm = this;
-          let url = CI.site_url + '/api/editor/facets';
+          
+          // Build URL with current query parameters to get filter_users
+          let urlParams = new URLSearchParams(window.location.search);
+          let url = CI.site_url + '/api/editor/facets?' + urlParams.toString();
+          
           return axios
             .get(url)
             .then(function(response) {
@@ -1055,6 +1151,7 @@
                 let facet_name = facet_types[i];
                 Vue.set(vm.search_filters, facet_name, []);
               }
+              
               vm.ReadFilterQS();
             })
             .catch(function(error) {
@@ -1087,6 +1184,15 @@
           if (keywords && keywords.length>0){
             url += '&keywords=' + keywords;
           }
+
+          // Ensure exclude_collections parameter is passed
+          if (this.exclude_collections_filter) {
+            if (url.indexOf('exclude_collections') === -1) {
+              url += '&exclude_collections=true';
+            }
+          }
+
+          console.log('Loading projects with URL:', url);
 
           this.loading_status = this.$t('loading_projects');
           this.is_searching = true;
@@ -1243,6 +1349,40 @@
         },
         removeFilter: function(filter_type, value_idx) {
          this.$delete(this.search_filters[filter_type], value_idx);
+        },
+        getFilterChipColor: function(filter_type) {
+          const colorMap = {
+            'collection': '#c6d4ff',
+            'type': '#b0bec5',
+            'ownership': '#98d7c2',
+            'users_filter': '#68bbe3'
+          };
+          return colorMap[filter_type] || '#526bc7';
+        },
+        onApplyUserFilter: function(selected_users) {
+            if (!this.facets.users_filter) {
+                Vue.set(this.facets, 'users_filter', []);
+            }
+            
+            if (!this.search_filters.users_filter) {
+                Vue.set(this.search_filters, 'users_filter', []);
+            }
+            
+            selected_users.forEach(user => {
+                if (!this.facets.users_filter.find(u => u.id === user.id)) {
+                    this.facets.users_filter.push({
+                        id: user.id,
+                        title: user.username
+                    });
+                }
+                
+                if (!this.search_filters.users_filter.includes(user.id)) {
+                    this.search_filters.users_filter.push(user.id);
+                }
+            });
+        },
+        openUserFilterDialog: function() {
+            this.dialog_user_filter = true;
         },
         getUsersList: async function() {
           vm = this;
