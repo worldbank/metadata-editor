@@ -70,12 +70,12 @@
       <div class="content-wrapperx" v-cloak>
         <section class="content">
 
-          <div class="container-fluid vh-100 d-flex flex-row overflow-hidden">
+          <div class="container-fluid">
 
             <div class="row">
 
               <!--sidebar -->
-              <div class="sidebar col-md-3 col-sm-4 overflow-auto" style="height: 100%;padding-bottom: 120px;">
+              <div class="sidebar col-md-3 col-sm-4">
 
                 <div class="mr-4 mt-5">
                   <v-expansion-panels v-model="facet_panel" multiple class="">
@@ -134,7 +134,7 @@
 
                         </div>
                         <div v-else>
-                          <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px;" v-for="facet in facet_values" v-if="facet_key !== 'type' || facet.count > 0">
+                          <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px;" v-for="facet in facet_values">
                             <v-checkbox
                                 v-model="search_filters[facet_key]"
                                 :value="facet.id"
@@ -175,7 +175,7 @@
               <!-- User filter dialog component -->
               <vue-user-filter v-model="dialog_user_filter" @apply="onApplyUserFilter"></vue-user-filter>
 
-              <div class="projects col-md-9 col-sm-8 overflow-auto" style="height: 100%;padding-bottom: 120px;">
+              <div class="projects col-md-9 col-sm-8">
                 <div class="mt-5 mb-5">                  
 
                       <div class="mb-5">
