@@ -257,6 +257,15 @@ class Project_search
 			$applied_filters['changed_by']=$changed_by;
 		}
 
+		//filter by specific users (created_by OR changed_by)
+		$users_filter=$this->parse_filter_values_as_int($this->get_search_filter($search_options,'users'));
+		if ($users_filter){
+			$users_filter = array_map('intval', $users_filter);
+			$users_query = '(editor_projects.created_by IN ('.implode(',',$users_filter).') OR editor_projects.changed_by IN ('.implode(',',$users_filter).'))';
+			$this->ci->db->where($users_query, null, false);
+			$applied_filters['users']=$users_filter;
+		}
+
 		//filter by date start and end range [must be in format YYYY-MM-DD]
 		$date_start=$this->get_search_filter($search_options,'date_start');
 		$date_end=$this->get_search_filter($search_options,'date_end');
@@ -289,13 +298,23 @@ class Project_search
 
 		//filter by collection
 		$collection_filters=$this->parse_filter_values_as_int($this->get_search_filter($search_options,'collection'));
+		$exclude_collections = isset($search_options['exclude_collections']) && $search_options['exclude_collections'] === 'true';
 		
 		if ($collection_filters){
-
-			$subquery='select sid from editor_collection_projects where collection_id in ('.implode(",",$collection_filters).')';			
-			$query='(editor_projects.id in( '. $subquery.')) ';
+			$collection_filters = array_map('intval', $collection_filters);
+			$subquery='select sid from editor_collection_projects where collection_id in ('.implode(",",$collection_filters).')';
+			
+			if ($exclude_collections) {
+				// Exclude mode: show projects NOT in selected collections
+				$query='(editor_projects.id NOT in( '. $subquery.')) ';
+			} else {
+				// Include mode: show projects in selected collections
+				$query='(editor_projects.id in( '. $subquery.')) ';
+			}
+			
 			$this->ci->db->where($query,null, false);
 			$applied_filters['collection']=$collection_filters;
+			$applied_filters['exclude_collections']=$exclude_collections;
 		}
 
 
@@ -364,7 +383,7 @@ class Project_search
 		}
 
 		foreach($values as $idx=>$value){
-			if (is_numeric($value)){
+			if (is_int($value) || (is_string($value) && ctype_digit($value))){
 				$parsed_values[]=(int)$value;
 			}
 		}
@@ -399,11 +418,11 @@ class Project_search
 		return $values;
 	}
 
-	function get_facets($user_id=null)
+	function get_facets($user_id=null, $options=array())
 	{
 		$facets=array();
 
-		//data types
+		//data types with counts
 		$facets['type']=array(
 			array("id"=>"survey","title"=>"microdata"),
 			array("id"=>"timeseries","title"=>"timeseries"),
@@ -416,6 +435,16 @@ class Project_search
 			array("id"=>"video","title"=>"video"),
 		);
 
+		// Get project counts by type
+		$project_counts = $this->get_project_counts_by_type($user_id);
+		
+		// Add counts to each type
+		foreach($facets['type'] as $key => $type){
+			$facets['type'][$key]['count'] = isset($project_counts[$type['id']]) 
+				? $project_counts[$type['id']] 
+				: 0;
+		}
+
 		//collections
 		$facets['collection']=$this->ci->Collection_tree_model->collections_tree_by_user_access($user_id);
 
@@ -424,8 +453,70 @@ class Project_search
 			array("id"=>"shared","title"=>"shared"),
 			array("id"=>"self","title"=>"my_projects"),
 		);
+
+		// Get user details if users filter is set
+		$facets['users_filter'] = array();
+		if (isset($options['users']) && !empty($options['users'])) {
+			$user_ids = $this->parse_filter_values_as_int(explode(',', $options['users']));
+			if (!empty($user_ids)) {
+				$this->ci->db->select('users.id as id, users.username as title');
+				$this->ci->db->from('users');
+				$this->ci->db->where_in('users.id', $user_ids);
+				$facets['users_filter'] = $this->ci->db->get()->result_array();
+			}
+		}
 		
 		return $facets;
+	}
+
+
+	/**
+	 * Get project counts grouped by type for a specific user
+	 * 
+	 * @param int $user_id User ID to filter projects
+	 * @return array Array of counts indexed by project type
+	 */
+	function get_project_counts_by_type($user_id=null)
+	{
+		// If user is admin, count all projects
+		$user = $this->ci->ion_auth->get_user($user_id);
+		$is_admin = $user && $this->ci->editor_acl->user_is_admin($user);
+
+		if ($is_admin) {
+			// Admin: count all projects by type
+			$this->ci->db->select('type, COUNT(*) as count');
+			$this->ci->db->from('editor_projects');
+			$this->ci->db->where('pid is null'); // Only parent projects
+			$this->ci->db->group_by('type');
+			$result = $this->ci->db->get()->result_array();
+		} else {
+			// Non-admin: count only accessible projects
+			// Projects user owns by direct sharing
+			$subquery = 'select sid from editor_project_owners where user_id='.(int)$user_id;
+
+			// Projects user can access via collections
+			$collection_query = 'select sid from editor_collection_projects 
+								inner join editor_collection_project_acl on editor_collection_project_acl.collection_id=editor_collection_projects.collection_id
+			where editor_collection_project_acl.user_id='.(int)$user_id;
+			
+			$query = '(editor_projects.created_by='.(int)$user_id
+				.' OR editor_projects.id in( '. $subquery.') OR editor_projects.id in ('.$collection_query.')) ';
+
+			$this->ci->db->select('type, COUNT(*) as count');
+			$this->ci->db->from('editor_projects');
+			$this->ci->db->where('pid is null'); // Only parent projects
+			$this->ci->db->where($query, null, false);
+			$this->ci->db->group_by('type');
+			$result = $this->ci->db->get()->result_array();
+		}
+
+		// Convert to associative array indexed by type
+		$counts = array();
+		foreach($result as $row){
+			$counts[$row['type']] = (int)$row['count'];
+		}
+
+		return $counts;
 	}
 
 

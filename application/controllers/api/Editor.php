@@ -1142,7 +1142,8 @@ class Editor extends MY_REST_Controller
 			$user_id=$this->get_api_user_id();
 			$this->has_access($resource_='editor',$privilege='view');
 
-			$result=$this->project_search->get_facets($user_id);
+			$options = $this->input->get();
+			$result=$this->project_search->get_facets($user_id, $options);
 
 			$response=array(
 				'status'=>'success',
