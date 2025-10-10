@@ -93,6 +93,7 @@ class Collection_tree_model extends CI_Model {
         // Check if user is collection admin (global admin or collection admin)
         if ($user && $this->editor_acl->is_collection_admin($user)) {
             // Global admin or collection admin - return all collections with projects without ACL filtering
+            // Use closure table to get all ancestors of collections with projects
             $sql='SELECT 
                     ect.parent_id, 
                     ect.child_id, 
@@ -113,17 +114,20 @@ class Collection_tree_model extends CI_Model {
                         WHERE 
                             c.pid IS NULL
                     )
-                    AND ect.child_id IN (
-                        SELECT DISTINCT 
-                            ecp.collection_id
-                        FROM 
-                            editor_collection_projects ecp
+                    AND c.id IN (
+                        -- Get all ancestors (including self) of collections with projects via closure table
+                        SELECT DISTINCT ect2.parent_id
+                        FROM editor_collections_tree ect2
+                        WHERE ect2.child_id IN (
+                            SELECT DISTINCT collection_id 
+                            FROM editor_collection_projects
+                        )
                     )
                 ORDER BY 
                     c.title, ect.child_id, ect.parent_id, ect.id, ect.depth;';
         } else {
             // Non-admin user - apply ACL filtering with implied access
-            // Collection ACL access implies ability to see projects in that collection
+            // Use closure table to get all ancestors of accessible collections with projects
             $sql='SELECT 
                     ect.parent_id, 
                     ect.child_id, 
@@ -134,36 +138,7 @@ class Collection_tree_model extends CI_Model {
                 INNER JOIN 
                     editor_collections c ON ect.child_id = c.id
                 WHERE 
-                    -- Only show collections that have projects
-                    ect.child_id IN (
-                        SELECT DISTINCT 
-                            ecp.collection_id
-                        FROM 
-                            editor_collection_projects ecp
-                    )
-                    -- AND user has access via Collection ACL, Project ACL, or ownership
-                    AND ect.child_id IN (
-                        -- Collections accessible via Collection ACL (NEW system)
-                        SELECT collection_id 
-                        FROM editor_collection_acl 
-                        WHERE user_id = '. $this->db->escape($user_id) . '
-                        
-                        UNION
-                        
-                        -- Collections accessible via Project ACL (OLD system)
-                        SELECT DISTINCT collection_id
-                        FROM editor_collection_project_acl
-                        WHERE user_id = '. $this->db->escape($user_id) . '
-                        
-                        UNION
-                        
-                        -- Collections owned by user
-                        SELECT id as collection_id
-                        FROM editor_collections
-                        WHERE created_by = '. $this->db->escape($user_id) . '
-                    )
-                    -- AND show root level collections
-                    AND ect.parent_id IN (
+                    ect.parent_id IN (
                         SELECT 
                             t.parent_id
                         FROM 
@@ -172,6 +147,36 @@ class Collection_tree_model extends CI_Model {
                             editor_collections_tree t ON c.id = t.parent_id
                         WHERE 
                             c.pid IS NULL
+                    )
+                    AND c.id IN (
+                        -- Get all ancestors (including self) of accessible collections with projects
+                        SELECT DISTINCT ect2.parent_id
+                        FROM editor_collections_tree ect2
+                        WHERE ect2.child_id IN (
+                            -- Collections that have projects
+                            SELECT DISTINCT collection_id 
+                            FROM editor_collection_projects
+                        )
+                        AND ect2.child_id IN (
+                            -- AND user has access via Collection ACL (NEW system)
+                            SELECT collection_id 
+                            FROM editor_collection_acl 
+                            WHERE user_id = '. $this->db->escape($user_id) . '
+                            
+                            UNION
+                            
+                            -- OR via Project ACL (OLD system)
+                            SELECT DISTINCT collection_id
+                            FROM editor_collection_project_acl
+                            WHERE user_id = '. $this->db->escape($user_id) . '
+                            
+                            UNION
+                            
+                            -- OR collections owned by user
+                            SELECT id as collection_id
+                            FROM editor_collections
+                            WHERE created_by = '. $this->db->escape($user_id) . '
+                        )
                     )
                 ORDER BY 
                     c.title, ect.child_id, ect.parent_id, ect.id, ect.depth;';
