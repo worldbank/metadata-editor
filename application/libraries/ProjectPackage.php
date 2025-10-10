@@ -54,7 +54,7 @@ class ProjectPackage
                 ->close();					
         }
         catch(\PhpZip\Exception\ZipException $e){
-            throw new Exception("Failed to generate zip file". $e->getMessage());
+            throw new Exception("Failed to generate zip file: ". $e->getMessage());
         }
         finally{
             $zipFile->close();
