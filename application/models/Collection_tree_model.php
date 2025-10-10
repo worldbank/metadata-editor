@@ -122,7 +122,8 @@ class Collection_tree_model extends CI_Model {
                 ORDER BY 
                     c.title, ect.child_id, ect.parent_id, ect.id, ect.depth;';
         } else {
-            // Non-admin user - apply ACL filtering
+            // Non-admin user - apply ACL filtering with implied access
+            // Collection ACL access implies ability to see projects in that collection
             $sql='SELECT 
                     ect.parent_id, 
                     ect.child_id, 
@@ -133,28 +134,60 @@ class Collection_tree_model extends CI_Model {
                 INNER JOIN 
                     editor_collections c ON ect.child_id = c.id
                 WHERE 
-                    ect.parent_id IN (
+                    -- Only show collections that have projects
+                    ect.child_id IN (
+                        SELECT DISTINCT 
+                            ecp.collection_id
+                        FROM 
+                            editor_collection_projects ecp
+                    )
+                    -- AND user has access via Collection ACL, Project ACL, or ownership
+                    AND ect.child_id IN (
+                        -- Collections accessible via Collection ACL (NEW system)
+                        SELECT collection_id 
+                        FROM editor_collection_acl 
+                        WHERE user_id = '. $this->db->escape($user_id) . '
+                        
+                        UNION
+                        
+                        -- Collections accessible via Project ACL (OLD system)
+                        SELECT DISTINCT collection_id
+                        FROM editor_collection_project_acl
+                        WHERE user_id = '. $this->db->escape($user_id) . '
+                        
+                        UNION
+                        
+                        -- Collections owned by user
+                        SELECT id as collection_id
+                        FROM editor_collections
+                        WHERE created_by = '. $this->db->escape($user_id) . '
+                    )
+                    -- AND show root level collections
+                    AND ect.parent_id IN (
                         SELECT 
                             t.parent_id
                         FROM 
                             editor_collections c
                         INNER JOIN 
                             editor_collections_tree t ON c.id = t.parent_id
-                        INNER JOIN 
-                            editor_collections_tree ect2 ON t.child_id = ect2.child_id
-                        INNER JOIN 
-                            editor_collections c2 ON ect2.child_id = c2.id
-                        INNER JOIN 
-                            		editor_collection_project_acl eca ON eca.collection_id = c2.id
                         WHERE 
-                            eca.user_id = '. $this->db->escape($user_id) . '
-                            AND c.pid IS NULL
+                            c.pid IS NULL
                     )
                 ORDER BY 
                     c.title, ect.child_id, ect.parent_id, ect.id, ect.depth;';
         }
 
         $items=$this->db->query($sql)->result_array();
+        
+        // Add project counts to collections
+        $this->load->model('Collection_model');
+        $collection_projects_count = $this->Collection_model->get_projects_count_all();
+        
+        foreach($items as $key => $item){
+            $items[$key]['projects'] = isset($collection_projects_count[$item['id']]) 
+                ? $collection_projects_count[$item['id']] 
+                : 0;
+        }
         
         //create tree
         $tree=$this->build_collection_tree($items);
@@ -302,6 +335,90 @@ class Collection_tree_model extends CI_Model {
         $this->db->select('ect.parent_id,ect.child_id,ect.depth,c.*');
         $this->db->from('editor_collections_tree ect');
         $this->db->join('editor_collections c','ect.child_id=c.id');
+
+        if ($parent_id){
+            $this->db->where('ect.parent_id',$parent_id);
+        }else{
+            $this->db->where('ect.parent_id in (select id from editor_collections where pid is null)');
+        }
+        
+        $this->db->order_by('ect.depth','asc');
+        $this->db->order_by('c.title','asc');
+
+        $result=$this->db->get()->result_array();
+        return $result;        
+    }
+
+
+    /**
+     * Get flat tree list filtered by user access
+     * Users can see collections they have access to and their parent chain
+     * 
+     * @param int $user_id User ID
+     * @param int $parent_id Optional parent collection ID
+     * @return array Filtered flat tree list
+     */
+    function get_tree_flat_by_user($user_id, $parent_id=null)
+    {
+        // Get collections user has access to
+        $this->db->select('collection_id');
+        $this->db->from('editor_collection_acl');
+        $this->db->where('user_id', $user_id);
+        $user_access = $this->db->get()->result_array();
+        
+        $accessible_ids = array();
+        foreach ($user_access as $access) {
+            $accessible_ids[] = $access['collection_id'];
+        }
+        
+        // Add collections owned by user
+        $this->db->select('id');
+        $this->db->from('editor_collections');
+        $this->db->where('created_by', $user_id);
+        $owned_collections = $this->db->get()->result_array();
+        foreach ($owned_collections as $owned) {
+            if (!in_array($owned['id'], $accessible_ids)) {
+                $accessible_ids[] = $owned['id'];
+            }
+        }
+        
+        // If no access to any collections, return empty array
+        if (empty($accessible_ids)) {
+            return array();
+        }
+        
+        // Get all collections to find parent chains
+        $this->db->select('id, pid, created_by');
+        $all_collections = $this->db->get('editor_collections')->result_array();
+        
+        // Build lookup for parent chain
+        $collection_lookup = array();
+        foreach ($all_collections as $col) {
+            $collection_lookup[$col['id']] = $col;
+        }
+        
+        // Get parent chain for accessible collections
+        $ids_to_include = $accessible_ids;
+        foreach ($accessible_ids as $cid) {
+            $current_id = $cid;
+            while (isset($collection_lookup[$current_id])) {
+                $current = $collection_lookup[$current_id];
+                if (!in_array($current_id, $ids_to_include)) {
+                    $ids_to_include[] = $current_id;
+                }
+                if ($current['pid'] !== null && $current['pid'] != 0) {
+                    $current_id = $current['pid'];
+                } else {
+                    break;
+                }
+            }
+        }
+        
+        // Now get the flat tree with filtering
+        $this->db->select('ect.parent_id,ect.child_id,ect.depth,c.*');
+        $this->db->from('editor_collections_tree ect');
+        $this->db->join('editor_collections c','ect.child_id=c.id');
+        $this->db->where_in('c.id', $ids_to_include);
 
         if ($parent_id){
             $this->db->where('ect.parent_id',$parent_id);

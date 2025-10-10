@@ -134,7 +134,7 @@
 
                         </div>
                         <div v-else>
-                          <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px;" v-for="facet in facet_values">
+                          <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px;" v-for="facet in facet_values" v-if="facet_key !== 'type' || facet.count > 0">
                             <v-checkbox
                                 v-model="search_filters[facet_key]"
                                 :value="facet.id"
@@ -270,7 +270,7 @@
                         <v-progress-circular indeterminate color="primary" class="mr-2"></v-progress-circular>
                         <span>{{$t('loading_projects') || 'Loading projects...'}}</span>
                       </div>
-                      <div class="mt-5 mb-3 p-3 border text-center text-danger" v-if="!errors && !is_loading && (!Projects || projects.found<1)"> {{$t('no_projects_found')}}</div>
+                      <div class="mt-5 mb-3 p-3 border text-center text-danger" v-if="errors.length === 0 && !is_loading && (!Projects || projects.found<1)"> {{$t('no_projects_found')}}</div>
 
                       <div v-if="!Projects || projects.found>0" class="row mb-2 mt-3">
                         <div class="col-md-5">

@@ -39,6 +39,7 @@ class Collections extends MY_REST_Controller
 	 * 
 	 * 
 	 * Return all Collections
+	 * Filtered by user access - users only see collections they have access to
 	 * 
 	 */
 	function index_get($uid=null)
@@ -49,7 +50,15 @@ class Collections extends MY_REST_Controller
 			}
 
 			$this->has_access($resource_='collection',$privilege='view');
-			$result=$this->Collection_model->select_all();
+		
+			// Collection admins unrestricted acess
+			if ($this->editor_acl->is_collection_admin($this->api_user)) {
+				$result = $this->Collection_model->select_all();
+			} else {
+				// Regular users see only collections they have access to
+				$result = $this->Collection_model->get_collections_with_user_permissions($this->user_id);
+			}
+			
 			array_walk($result, 'unix_date_to_gmt',array('created','changed'));
 			
 			$response=array(
@@ -783,13 +792,22 @@ class Collections extends MY_REST_Controller
 	 * 
 	 * 
 	 * Return all Collections as Tree
+	 * Filtered by user access - users only see collections they have access to
+	 * and their parent chains (but not siblings without access)
 	 * 
 	 */
 	function tree_get($id=null)
 	{
 		try{
 			$this->has_access($resource_='collection',$privilege='view');
-			$result=$this->Collection_model->get_collection_tree($id);
+			
+			// Collection admins unrestricted acess
+			if ($this->editor_acl->is_collection_admin($this->api_user)) {
+				$result = $this->Collection_model->get_collection_tree($id);
+			} else {
+				// Regular users see only collections they have access to
+				$result = $this->Collection_model->get_collection_tree_by_user($this->user_id, $id);
+			}
 			
 			$response=array(
 				'status'=>'success',
@@ -812,7 +830,14 @@ class Collections extends MY_REST_Controller
 	{
 		try{
 			$this->has_access($resource_='collection',$privilege='view');
-			$result=$this->Collection_model->get_collection_flatten_tree($id);
+			
+			// Collection admins unrestricted acess
+			if ($this->editor_acl->is_collection_admin($this->api_user)) {
+				$result = $this->Collection_model->get_collection_flatten_tree($id);
+			} else {
+				// Regular users see only collections they have access to
+				$result = $this->Collection_model->get_collection_flatten_tree_by_user($this->user_id, $id);
+			}
 			
 			$response=array(
 				'status'=>'success',
@@ -866,14 +891,19 @@ class Collections extends MY_REST_Controller
 		try{
 			$this->has_access($resource_='collection',$privilege='view');
 			$this->load->model("Collection_tree_model");
-			$result=$this->Collection_tree_model->get_tree_flat();
 			
-			$response=array(
-				'status'=>'success',
-				'collections'=>$result
-			);
-						
-			$this->set_response($response, REST_Controller::HTTP_OK);
+			if ($this->editor_acl->is_collection_admin($this->api_user)) {
+				$result = $this->Collection_tree_model->get_tree_flat();
+			} else {
+				$result = $this->Collection_tree_model->get_tree_flat_by_user($this->user_id);
+			}
+				
+				$response=array(
+					'status'=>'success',
+					'collections'=>$result
+				);
+							
+				$this->set_response($response, REST_Controller::HTTP_OK);
 		}
 		catch(Exception $e){
 			$error_output=array(

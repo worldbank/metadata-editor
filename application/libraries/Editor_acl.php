@@ -479,9 +479,10 @@ class Editor_acl
 			return true;
 		}
 
-		// Check if user has global collection admin role
+		// Check if user has global collection admin or edit role
 		try {
-			if($this->has_access('collection', 'admin', $user)){
+			if($this->has_access('collection', 'admin', $user) || 
+			   $this->has_access('collection', 'edit', $user)){
 				return true;
 			}
 		} catch (Exception $e) {

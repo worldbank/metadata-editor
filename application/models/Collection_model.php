@@ -525,6 +525,24 @@ class Collection_model extends CI_Model {
     }
 
 
+    /**
+     * Get flattened collection tree filtered by user access
+     * 
+     * @param int $user_id User ID
+     * @param int $id Optional collection ID to get specific subtree
+     * @return array Flattened filtered collection tree
+     */
+    function get_collection_flatten_tree_by_user($user_id, $id=null)
+    {
+        $tree=$this->get_collection_tree_by_user($user_id, $id);
+
+        $output=array();
+        $this->flatten_collection_tree($tree,$parent='',$output);
+
+        return $output;
+    }
+
+
     
     /**
      * 
@@ -550,6 +568,117 @@ class Collection_model extends CI_Model {
         }
 
         return $tree;
+    }
+
+
+    /**
+     * Get collection tree filtered by user access
+     * Users can see collections they have access to and their parent chain
+     * but NOT siblings they don't have access to
+     * 
+     * @param int $user_id User ID
+     * @param int $id Optional collection ID to get specific subtree
+     * @return array Filtered collection tree
+     */
+    function get_collection_tree_by_user($user_id, $id=null)
+    {
+        // Get all collections
+        $collections=$this->select_all();
+        $collection_projects_count=$this->get_projects_count_all();
+        $collection_users_count=$this->get_users_count_all();
+
+        foreach($collections as &$collection){
+            $collection['projects']=isset($collection_projects_count[$collection['id']]) ? $collection_projects_count[$collection['id']] : 0;
+            $collection['users']=isset($collection_users_count[$collection['id']]) ? $collection_users_count[$collection['id']] : 0;
+        }
+
+        // Get collections the user has explicit access to
+        $this->db->select('collection_id, permissions');
+        $this->db->from('editor_collection_acl');
+        $this->db->where('user_id', $user_id);
+        $user_access = $this->db->get()->result_array();
+
+        // Create set of accessible collection IDs
+        $accessible_ids = array();
+        foreach ($user_access as $access) {
+            $accessible_ids[$access['collection_id']] = $access['permissions'];
+        }
+
+        // If user is the owner of any collection, add it to accessible IDs with admin permission
+        foreach ($collections as $collection) {
+            if ($collection['created_by'] == $user_id) {
+                $accessible_ids[$collection['id']] = 'admin';
+            }
+        }
+
+        // If no access to any collections, return empty array
+        if (empty($accessible_ids)) {
+            return array();
+        }
+
+        // Get parent chain for all accessible collections
+        $ids_to_include = $this->get_parent_chain_for_collections(array_keys($accessible_ids), $collections);
+
+        // Filter collections to only those that should be visible
+        $filtered_collections = array();
+        foreach ($collections as $collection) {
+            if (in_array($collection['id'], $ids_to_include)) {
+                $filtered_collections[] = $collection;
+            }
+        }
+
+        // Build tree from filtered collections
+        $tree=$this->build_collection_tree($filtered_collections);
+
+        if ($id){
+            $tree=$this->get_collection_tree_by_id($tree,$id);
+        }
+
+        return $tree;
+    }
+
+
+    /**
+     * Get all parent collections for a set of collection IDs
+     * This ensures we can show the hierarchy path to accessible collections
+     * 
+     * @param array $collection_ids Array of collection IDs
+     * @param array $all_collections All collections array
+     * @return array Array of collection IDs including parents
+     */
+    private function get_parent_chain_for_collections($collection_ids, $all_collections)
+    {
+        $ids_to_include = $collection_ids;
+        
+        // Create lookup array for quick parent finding
+        $collection_lookup = array();
+        foreach ($all_collections as $collection) {
+            $collection_lookup[$collection['id']] = $collection;
+        }
+
+        // For each accessible collection, walk up to find all parents
+        foreach ($collection_ids as $cid) {
+            $current_id = $cid;
+            
+            // Walk up the parent chain
+            while (isset($collection_lookup[$current_id])) {
+                $current = $collection_lookup[$current_id];
+                
+                // Add current collection to the list
+                if (!in_array($current_id, $ids_to_include)) {
+                    $ids_to_include[] = $current_id;
+                }
+                
+                // Move to parent
+                if ($current['pid'] !== null && $current['pid'] != 0) {
+                    $current_id = $current['pid'];
+                } else {
+                    break; // Reached root
+                }
+            }
+        }
+
+        return $ids_to_include;
     }
 
 
