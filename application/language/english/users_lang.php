@@ -100,7 +100,56 @@ $lang['profile']="Profile";
 $lang['password']="Password";
 $lang['logout']="Logout";
 
+// Bulk operations
+$lang['bulk_actions']="Bulk Actions";
+$lang['select_all']="Select All";
+$lang['clear_selection']="Clear Selection";
+$lang['activate_users']="Activate Users";
+$lang['deactivate_users']="Deactivate Users";
+$lang['assign_roles']="Assign Roles";
+$lang['remove_roles']="Remove Roles";
+$lang['delete_users']="Delete Users";
+$lang['bulk_assign_roles']="Bulk Assign Roles";
+$lang['bulk_remove_roles']="Bulk Remove Roles";
+$lang['selected_users']="Selected Users";
+$lang['please_select_users']="Please select at least one user.";
+$lang['operation_completed']="Operation completed successfully.";
+$lang['operation_failed']="Operation failed.";
+$lang['error_occurred']="An error occurred while performing the operation.";
 
+// Filters
+$lang['advanced_filters']="Advanced Filters";
+$lang['all_users']="All Users";
+$lang['all_roles']="All Roles";
+$lang['active']="Active";
+$lang['inactive']="Inactive";
+$lang['registered_from']="Registered From";
+$lang['last_login']="Last Login";
+$lang['today']="Today";
+$lang['this_week']="This Week";
+$lang['this_month']="This Month";
+$lang['never']="Never";
+$lang['apply_filters']="Apply Filters";
+$lang['clear_all_filters']="Clear All Filters";
+$lang['active_filters']="Active Filters";
+$lang['clear_all']="Clear All";
+$lang['status']="Status";
+$lang['role']="Role";
+
+// Role assignment
+$lang['assign_role_to_users']="Assign Role to Users";
+$lang['remove_role_from_users']="Remove Role from Users";
+$lang['select_roles_to_assign']="Select roles to assign to the selected users:";
+$lang['select_roles_to_remove']="Select roles to remove from the selected users:";
+$lang['users_with_role']="users with this role";
+$lang['no_roles_selected']="No roles selected";
+$lang['roles_assigned_successfully']="Roles assigned successfully";
+$lang['roles_removed_successfully']="Roles removed successfully";
+$lang['roles_assignment_failed']="Role assignment failed";
+$lang['roles_removal_failed']="Role removal failed";
+
+// User roles
+$lang['user_roles']="User Roles";
 
 /* End of file users_lang.php */
 /* Location: ./application/language/english/users_lang.php */

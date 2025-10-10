@@ -47,6 +47,10 @@ class Users extends MY_Controller {
 				
 		//get user groups 
 		$result['user_groups']=$this->User_model->get_user_roles($user_id_arr);
+		
+		//get available roles for filter dropdown
+		$this->load->library('Acl_manager');
+		$result['roles'] = $this->acl_manager->get_roles();
 
 		$content=$this->load->view('users/index', $result,true);
 		$this->template->write('content', $content,true);
@@ -74,12 +78,40 @@ class Users extends MY_Controller {
 
 		//filter
 		$filter=NULL;
+		$filter_count = 0;
 
 		//simple search
 		if ($this->input->get_post("keywords") )
 		{
-			$filter[0]['field']=$this->input->get_post('field');
-			$filter[0]['keywords']=$this->input->get_post('keywords');			
+			$filter[$filter_count]['field']=$this->input->get_post('field');
+			$filter[$filter_count]['keywords']=$this->input->get_post('keywords');
+			$filter_count++;			
+		}
+		
+		// Status filter
+		if ($this->input->get('status_filter') !== '') {
+			$filter[$filter_count]['field'] = 'active';
+			$filter[$filter_count]['value'] = $this->input->get('status_filter');
+			$filter_count++;
+		}
+		
+		// Role filter - handled separately due to join requirement
+		$role_filter = $this->input->get('role_filter');
+		
+		// Registration date filter
+		if ($this->input->get('date_from')) {
+			$filter[$filter_count]['field'] = 'created_on';
+			$filter[$filter_count]['operator'] = '>=';
+			$filter[$filter_count]['value'] = $this->input->get('date_from');
+			$filter_count++;
+		}
+		
+		// Last login filter
+		if ($this->input->get('last_login_filter')) {
+			$filter[$filter_count]['field'] = 'last_login';
+			$filter[$filter_count]['operator'] = $this->_get_login_filter_operator($this->input->get('last_login_filter'));
+			$filter[$filter_count]['value'] = $this->_get_login_filter_value($this->input->get('last_login_filter'));
+			$filter_count++;
 		}		
 		
 		if ($this->input->get('user_group')) {
@@ -87,18 +119,28 @@ class Users extends MY_Controller {
 
 			$total = $this->User_model->search_count();
 		} else {
-			//records
-			$rows=$this->User_model->search($per_page, $offset,$filter, $sort_by, $sort_order);
+			// Handle role filter separately
+			if ($role_filter) {
+				$rows=$this->User_model->get_users_by_role((int)$role_filter, $per_page, $offset,$filter, $sort_by, $sort_order);
+				$total = $this->User_model->get_users_by_role_count((int)$role_filter, $filter);
+			} else {
+				//records
+				$rows=$this->User_model->search($per_page, $offset,$filter, $sort_by, $sort_order);
 
-			//total records in the db
-			$total = $this->User_model->search_count();
+				//total records in the db
+				$total = $this->User_model->search_count($filter);
+			}
 
 			if ($offset>$total)
 			{
 				$offset=$total-$per_page;
 			
 				//search again
-				$rows=$this->User_model->search($per_page, $offset,$filter, $sort_by, $sort_order);
+				if ($role_filter) {
+					$rows=$this->User_model->get_users_by_role((int)$role_filter, $per_page, $offset,$filter, $sort_by, $sort_order);
+				} else {
+					$rows=$this->User_model->search($per_page, $offset,$filter, $sort_by, $sort_order);
+				}
 			}
 		}
 		
@@ -109,7 +151,7 @@ class Users extends MY_Controller {
 		$config['per_page'] = $per_page;
 		$config['query_string_segment']="offset"; 
 		$config['page_query_string'] = TRUE;
-		$config['additional_querystring']=get_querystring( array('keywords', 'field','sort_by','sort_order'));//pass any additional querystrings
+		$config['additional_querystring']=get_querystring( array('keywords', 'field','sort_by','sort_order','status_filter','role_filter','date_from','last_login_filter'));//pass any additional querystrings
 		$config['num_links'] = 1;
 		$config['full_tag_open'] = '<span class="page-nums">' ;
 		$config['full_tag_close'] = '</span>';
@@ -687,6 +729,331 @@ class Users extends MY_Controller {
 		$this->template->render();		
 	}
 	
+	/**
+	 * Bulk actions handler
+	 */
+	function bulk_action()
+	{
+		$this->acl_manager->has_access_or_die('user', 'edit');
+		
+		$action = $this->input->post('action');
+		$user_ids = json_decode($this->input->post('user_ids'), true);
+		
+		if (empty($user_ids) || !is_array($user_ids)) {
+			echo json_encode(['success' => false, 'message' => 'No users selected']);
+			return;
+		}
+		
+		$result = false;
+		$message = '';
+		
+		switch ($action) {
+			case 'delete':
+				$result = $this->_bulk_delete($user_ids);
+				$message = $result ? 'Users deleted successfully' : 'Failed to delete users';
+				break;
+				
+			case 'activate':
+				$result = $this->_bulk_activate($user_ids, 1);
+				$message = $result ? 'Users activated successfully' : 'Failed to activate users';
+				break;
+				
+			case 'deactivate':
+				$result = $this->_bulk_activate($user_ids, 0);
+				$message = $result ? 'Users deactivated successfully' : 'Failed to deactivate users';
+				break;
+				
+			default:
+				$message = 'Invalid action';
+		}
+		
+		echo json_encode(['success' => $result, 'message' => $message]);
+	}
+	
+	/**
+	 * Bulk delete users
+	 */
+	private function _bulk_delete($user_ids)
+	{
+		$success_count = 0;
+		
+		foreach ($user_ids as $user_id) {
+			if (is_numeric($user_id)) {
+				if ($this->User_model->delete($user_id)) {
+					$success_count++;
+				}
+			}
+		}
+		
+		return $success_count > 0;
+	}
+	
+	/**
+	 * Bulk activate/deactivate users
+	 */
+	private function _bulk_activate($user_ids, $status)
+	{
+		$success_count = 0;
+		
+		foreach ($user_ids as $user_id) {
+			if (is_numeric($user_id)) {
+				if ($this->_update_user_status($user_id, $status)) {
+					$success_count++;
+				}
+			}
+		}
+		
+		return $success_count > 0;
+	}
+	
+	/**
+	 * Update user status
+	 */
+	private function _update_user_status($user_id, $status)
+	{
+		$this->db->where('id', $user_id);
+		return $this->db->update('users', ['active' => $status]);
+	}
+	
+	/**
+	 * Bulk assign roles page
+	 */
+	function bulk_assign_roles()
+	{
+		$this->acl_manager->has_access_or_die('user', 'edit');
+		
+		$user_ids = $this->input->get('user_ids');
+		
+		if (empty($user_ids)) {
+			$this->session->set_flashdata('error', 'No users selected');
+			redirect('admin/users');
+		}
+		
+		$user_ids_array = explode(',', $user_ids);
+		
+		// Get user details
+		$users = [];
+		foreach ($user_ids_array as $user_id) {
+			if (is_numeric($user_id)) {
+				$user = $this->User_model->getSingle($user_id);
+				if ($user && $user->num_rows() > 0) {
+					$users[] = $user->row();
+				}
+			}
+		}
+		
+		// Get available roles
+		$this->load->library('Acl_manager');
+		$roles = $this->acl_manager->get_roles();
+		
+		$data = [
+			'users' => $users,
+			'roles' => $roles,
+			'user_ids' => $user_ids
+		];
+		
+		// Check if this is an AJAX request for modal content
+		if ($this->input->is_ajax_request()) {
+			// Return just the form content for the modal
+			$form_content = $this->load->view('users/bulk_assign_roles_modal', $data, true);
+			echo $form_content;
+			return;
+		}
+		
+		// For non-AJAX requests, render full page (fallback)
+		$content = $this->load->view('users/bulk_assign_roles_page', $data, true);
+		$this->template->write('content', $content, true);
+		$this->template->write('title', 'Bulk Assign Roles', true);
+		$this->template->render();
+	}
+	
+	/**
+	 * Process bulk role assignment
+	 */
+	function process_bulk_assign_roles()
+	{
+		$this->acl_manager->has_access_or_die('user', 'edit');
+		
+		$user_ids = $this->input->post('user_ids');
+		$role_ids = $this->input->post('role_ids');
+		
+		if (empty($user_ids) || empty($role_ids)) {
+			$this->session->set_flashdata('error', 'No users or roles selected');
+			redirect('admin/users');
+		}
+		
+		$user_ids_array = explode(',', $user_ids);
+		$success_count = 0;
+		
+		foreach ($user_ids_array as $user_id) {
+			if (is_numeric($user_id)) {
+				// Add new roles (don't remove existing ones)
+				foreach ($role_ids as $role_id) {
+					if (is_numeric($role_id)) {
+						// Check if user already has this role
+						$this->db->where('user_id', $user_id);
+						$this->db->where('role_id', $role_id);
+						$existing = $this->db->get('user_roles');
+						
+						// Only add if user doesn't already have this role
+						if ($existing->num_rows() == 0) {
+							$data = [
+								'user_id' => $user_id,
+								'role_id' => $role_id
+							];
+							if ($this->db->insert('user_roles', $data)) {
+								$success_count++;
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		if ($success_count > 0) {
+			$this->session->set_flashdata('message', 'Roles added successfully to users');
+		} else {
+			$this->session->set_flashdata('error', 'No new roles were added (users may already have these roles)');
+		}
+		
+		redirect('admin/users');
+	}
+	
+	/**
+	 * Show bulk role removal form
+	 */
+	function bulk_remove_roles()
+	{
+		$this->acl_manager->has_access_or_die('user', 'edit');
+		
+		$user_ids = $this->input->get('user_ids');
+		
+		if (empty($user_ids)) {
+			$this->session->set_flashdata('error', 'No users selected');
+			redirect('admin/users');
+		}
+		
+		$user_ids_array = explode(',', $user_ids);
+		
+		// Get user details and their current roles
+		$users = [];
+		$user_roles = [];
+		foreach ($user_ids_array as $user_id) {
+			if (is_numeric($user_id)) {
+				$user = $this->User_model->getSingle($user_id);
+				if ($user && $user->num_rows() > 0) {
+					$users[] = $user->row();
+					
+					// Get user's current roles
+					$this->db->select('ur.role_id, r.name, r.description');
+					$this->db->from('user_roles ur');
+					$this->db->join('roles r', 'ur.role_id = r.id');
+					$this->db->where('ur.user_id', $user_id);
+					$roles_query = $this->db->get();
+					$user_roles[$user_id] = $roles_query->result_array();
+				}
+			}
+		}
+		
+		$data = [
+			'users' => $users,
+			'user_roles' => $user_roles,
+			'user_ids' => $user_ids
+		];
+		
+		// Check if this is an AJAX request for modal content
+		if ($this->input->is_ajax_request()) {
+			// Return just the form content for the modal
+			$form_content = $this->load->view('users/bulk_remove_roles_modal', $data, true);
+			echo $form_content;
+			return;
+		}
+		
+		// For non-AJAX requests, render full page (fallback)
+		$content = $this->load->view('users/bulk_remove_roles_page', $data, true);
+		$this->template->write('content', $content, true);
+		$this->template->write('title', 'Bulk Remove Roles', true);
+		$this->template->render();
+	}
+	
+	/**
+	 * Process bulk role removal
+	 */
+	function process_bulk_remove_roles()
+	{
+		$this->acl_manager->has_access_or_die('user', 'edit');
+		
+		$user_ids = $this->input->post('user_ids');
+		$role_ids = $this->input->post('role_ids');
+		
+		if (empty($user_ids) || empty($role_ids)) {
+			$this->session->set_flashdata('error', 'No users or roles selected');
+			redirect('admin/users');
+		}
+		
+		$user_ids_array = explode(',', $user_ids);
+		$success_count = 0;
+		
+		foreach ($user_ids_array as $user_id) {
+			if (is_numeric($user_id)) {
+				// Remove selected roles from user
+				foreach ($role_ids as $role_id) {
+					if (is_numeric($role_id)) {
+						$this->db->where('user_id', $user_id);
+						$this->db->where('role_id', $role_id);
+						if ($this->db->delete('user_roles')) {
+							$success_count++;
+						}
+					}
+				}
+			}
+		}
+		
+		if ($success_count > 0) {
+			$this->session->set_flashdata('message', 'Roles removed successfully from users');
+		} else {
+			$this->session->set_flashdata('error', 'No roles were removed (users may not have had these roles)');
+		}
+		
+		redirect('admin/users');
+	}
+	
+	/**
+	 * Helper method to get login filter operator
+	 */
+	private function _get_login_filter_operator($filter_value)
+	{
+		switch ($filter_value) {
+			case 'today':
+			case 'week':
+			case 'month':
+				return '>=';
+			case 'never':
+				return 'NEVER';
+			default:
+				return '>=';
+		}
+	}
+	
+	/**
+	 * Helper method to get login filter value
+	 */
+	private function _get_login_filter_value($filter_value)
+	{
+		switch ($filter_value) {
+			case 'today':
+				return strtotime('today');
+			case 'week':
+				return strtotime('-1 week');
+			case 'month':
+				return strtotime('-1 month');
+			case 'never':
+				return null;
+			default:
+				return strtotime('today');
+		}
+	}
+
 	function _do_batch_import($csv_data,$seperator=',')
 	{
 		$this->load->library('csvreader');		
