@@ -30,7 +30,7 @@ CREATE TABLE `editor_template_acl` (
   `user_id` int NOT NULL,
   `created` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 
 
@@ -69,7 +69,7 @@ CREATE TABLE `edit_history` (
   `created` INT DEFAULT NULL,
   `metadata` json DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 
 ALTER TABLE `editor_data_files` 
@@ -104,7 +104,7 @@ CREATE TABLE `admin_metadata` (
   `changed` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `meta_unq` (`template_id`,`sid`)
-) ENGINE=InnoDB AUTO_INCREMENT=1;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `admin_metadata_acl` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -113,7 +113,7 @@ CREATE TABLE `admin_metadata_acl` (
   `user_id` int NOT NULL,
   `created` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 # 2025/02/15
 CREATE TABLE `admin_metadata_projects` (
@@ -121,7 +121,7 @@ CREATE TABLE `admin_metadata_projects` (
   `sid` int DEFAULT NULL,
   `template_id` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-);
+) DEFAULT CHARSET=utf8mb4;
 
 # 2025/03/31
 ALTER TABLE `audit_logs` 
@@ -169,7 +169,7 @@ CREATE TABLE `editor_collection_acl` (
   `created` int DEFAULT NULL,
   `changed` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 
 # rename editor_collection_access to editor_collection_project_acl
@@ -179,3 +179,34 @@ ALTER TABLE `editor_collection_access` RENAME TO `editor_collection_project_acl`
 # 2025/09/10
 # Add interval_type field to editor_variables table
 ALTER TABLE `editor_variables` ADD COLUMN `interval_type` varchar(20) DEFAULT NULL;
+
+
+# 2025/09/17
+# audit_logs indexes
+ALTER TABLE `audit_logs` ADD INDEX `idx_audit_logs_created` (`created` DESC);
+
+-- Index on user_id for filtering
+ALTER TABLE `audit_logs` ADD INDEX `idx_audit_logs_user_id` (`user_id`);
+
+-- Index on obj_type for filtering
+ALTER TABLE `audit_logs` ADD INDEX `idx_audit_logs_obj_type` (`obj_type`);
+
+-- Index on action_type for filtering
+ALTER TABLE `audit_logs` ADD INDEX `idx_audit_logs_action_type` (`action_type`);
+
+-- Composite index for common query patterns (user_id + created)
+ALTER TABLE `audit_logs` ADD INDEX `idx_audit_logs_user_created` (`user_id`, `created` DESC);
+
+-- Composite index for object type queries (obj_type + created)
+ALTER TABLE `audit_logs` ADD INDEX `idx_audit_logs_obj_type_created` (`obj_type`, `created` DESC);
+
+-- Composite index for action type queries (action_type + created)
+ALTER TABLE `audit_logs` ADD INDEX `idx_audit_logs_action_created` (`action_type`, `created` DESC);
+
+
+-- collection indexes
+CREATE INDEX idx_eca_user_collection ON editor_collection_acl(user_id, collection_id);
+CREATE INDEX idx_ecpa_user_collection ON editor_collection_project_acl(user_id, collection_id);
+CREATE INDEX idx_collections_created_by ON editor_collections(created_by);
+CREATE INDEX idx_collection_id ON editor_collection_projects(collection_id);
+

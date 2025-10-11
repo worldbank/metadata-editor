@@ -4,7 +4,7 @@
 
 DROP TABLE IF EXISTS `meta`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `meta` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) DEFAULT NULL,
@@ -14,7 +14,7 @@ CREATE TABLE `meta` (
   `phone` varchar(20) DEFAULT NULL,
   `country` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+) DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 
@@ -24,14 +24,14 @@ CREATE TABLE `meta` (
 
 DROP TABLE IF EXISTS `login_attempts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `login_attempts` (
   `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
   `ip_address` varchar(30) NOT NULL,
   `login` varchar(100) NOT NULL,
   `time` int(11) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 
@@ -43,12 +43,12 @@ CREATE TABLE `login_attempts` (
 
 DROP TABLE IF EXISTS `dcformats`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `dcformats` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) AUTO_INCREMENT=22 DEFAULT CHARSET=utf8;
+) AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -68,12 +68,12 @@ UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `dctypes`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `dctypes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) AUTO_INCREMENT=17 DEFAULT CHARSET=utf8;
+) AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -114,7 +114,7 @@ INSERT INTO `dctypes` (`title`) VALUES ('Data, Document [dat/doc]');
 
 DROP TABLE IF EXISTS `users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users` (
   `id` mediumint(8) NOT NULL AUTO_INCREMENT,
   `ip_address` char(16) NOT NULL,
@@ -132,7 +132,7 @@ CREATE TABLE `users` (
   `otp_code` varchar(45) DEFAULT NULL,
   `otp_expiry` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 
@@ -142,7 +142,7 @@ CREATE TABLE `users` (
 
 DROP TABLE IF EXISTS `ci_sessions`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `ci_sessions` (
   `id` varchar(128) NOT NULL,
   `ip_address` varchar(45) NOT NULL,
@@ -150,7 +150,7 @@ CREATE TABLE `ci_sessions` (
   `data` blob NOT NULL,
   PRIMARY KEY (`id`),
   KEY `ci_sessions_timestamp` (`timestamp`)
-);
+) DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 
@@ -162,7 +162,7 @@ CREATE TABLE `ci_sessions` (
 
 DROP TABLE IF EXISTS `sitelogs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `sitelogs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `sessionid` varchar(255) NOT NULL DEFAULT '',
@@ -176,7 +176,7 @@ CREATE TABLE `sitelogs` (
   `username` varchar(100) DEFAULT NULL,
    `useragent` varchar(300) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 
@@ -187,7 +187,7 @@ CREATE TABLE `sitelogs` (
 
 DROP TABLE IF EXISTS `configurations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `configurations` (
   `name` varchar(200) NOT NULL,
   `value` varchar(5000) NOT NULL,
@@ -195,7 +195,7 @@ CREATE TABLE `configurations` (
   `helptext` varchar(255) DEFAULT NULL,
   `item_group` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`name`)
-) DEFAULT CHARSET=utf8;
+) DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -208,8 +208,6 @@ INSERT INTO `configurations` VALUES ('app_version','1.0.0','Application version'
 INSERT INTO `configurations` VALUES ('cache_default_expires','7200','Cache expiry (in mili seconds)',NULL,NULL);
 INSERT INTO `configurations` VALUES ('cache_disabled','1','Enable/disable site caching',NULL,NULL);
 INSERT INTO `configurations` VALUES ('cache_path','cache/','Site cache folder',NULL,NULL);
-INSERT INTO `configurations` VALUES ('catalog_records_per_page','15','Catalog search page - records per page',NULL,NULL);
-INSERT INTO `configurations` VALUES ('catalog_root','datafiles','Survey catalog folder',NULL,NULL);
 INSERT INTO `configurations` VALUES ('default_home_page','home','Default home page','Default home page',NULL);
 INSERT INTO `configurations` VALUES ('html_folder','/pages',NULL,NULL,NULL);
 INSERT INTO `configurations` VALUES ('lang','en-us','Site Language','Site Language code',NULL);
@@ -227,11 +225,11 @@ INSERT INTO `configurations` VALUES ('topics_vocab','1','Vocabulary ID for Topic
 INSERT INTO `configurations` VALUES ('topic_search','no','Topic search',NULL,NULL);
 INSERT INTO `configurations` VALUES ('topic_search_weight','6',NULL,NULL,NULL);
 INSERT INTO `configurations` VALUES ('use_html_editor','yes','Use HTML editor for entering HTML for static pages',NULL,NULL);
-INSERT INTO `configurations` VALUES ('website_footer','Powered by NADA 4.0 and DDI','Website footer text',NULL,NULL);
-INSERT INTO `configurations` VALUES ('website_title','National Data Archive','Website title','Provide the title of the website','website');
+INSERT INTO `configurations` VALUES ('website_footer','',NULL,NULL);
+INSERT INTO `configurations` VALUES ('website_title','Metadata Editor','Website title','Provide the title of the website','website');
 INSERT INTO `configurations` VALUES ('website_url','','Website URL','URL of the website','website');
 INSERT INTO `configurations` VALUES ('website_webmaster_email','','Site webmaster email address','-','website');
-INSERT INTO `configurations` VALUES ('website_webmaster_name','noreply','Webmaster name','-','website');
+INSERT INTO `configurations` VALUES ('website_webmaster_name','','Webmaster name','-','website');
 /*!40000 ALTER TABLE `configurations` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -251,7 +249,7 @@ CREATE TABLE `api_keys` (
   `is_private_key` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `key_UNIQUE` (`api_key`)
-) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 --
 -- API Logs table
@@ -269,7 +267,7 @@ CREATE TABLE `api_logs` (
   `authorized` varchar(1) NOT NULL,
   `response_code` smallint(3) DEFAULT '0',
   PRIMARY KEY (`id`)
-) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 
 CREATE TABLE `roles` (
@@ -280,7 +278,7 @@ CREATE TABLE `roles` (
   `is_admin` tinyint(4) DEFAULT '0',
   `is_locked` tinyint(4) DEFAULT '0',
   PRIMARY KEY (`id`)
-) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 LOCK TABLES `roles` WRITE;
 /*!40000 ALTER TABLE `roles` DISABLE KEYS */;
@@ -297,7 +295,7 @@ CREATE TABLE `role_permissions` (
   `resource` varchar(45) DEFAULT NULL,
   `permissions` varchar(500) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) AUTO_INCREMENT=1;
+) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 
 CREATE TABLE `user_roles` (
@@ -305,7 +303,7 @@ CREATE TABLE `user_roles` (
   `user_id` int(11) DEFAULT NULL,
   `role_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) AUTO_INCREMENT=1;
+) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 
 
@@ -316,7 +314,7 @@ CREATE TABLE `editor_catalogs` (
   `api_key` varchar(200) DEFAULT NULL,
   `user_id` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-) AUTO_INCREMENT=1;
+) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 
 CREATE TABLE `editor_data_files` (
@@ -342,7 +340,7 @@ CREATE TABLE `editor_data_files` (
   `changed_by` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
-) AUTO_INCREMENT=1;
+) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 
 
@@ -379,7 +377,7 @@ CREATE TABLE `editor_projects` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `unq_idno` (`idno`,`version_number`),
   FULLTEXT KEY `ft_projects` (`title`)
-) AUTO_INCREMENT=1;
+) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 
 
@@ -397,16 +395,16 @@ CREATE TABLE `editor_resources` (
   `contributor` varchar(255) DEFAULT NULL,
   `publisher` varchar(255) DEFAULT NULL,
   `rights` varchar(255) DEFAULT NULL,
-  `description` text CHARACTER SET utf8,
-  `abstract` text CHARACTER SET utf8,
-  `toc` text CHARACTER SET utf8,
+  `description` text CHARACTER SET utf8mb4,
+  `abstract` text CHARACTER SET utf8mb4,
+  `toc` text CHARACTER SET utf8mb4,
   `subjects` varchar(45) DEFAULT NULL,
   `filename` varchar(255) DEFAULT NULL,
   `dcformat` varchar(255) DEFAULT NULL,
   `changed` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
-) AUTO_INCREMENT=1;
+) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 
 CREATE TABLE `editor_variables` (
@@ -426,7 +424,7 @@ CREATE TABLE `editor_variables` (
   `is_key` int DEFAULT NULL,
   `interval_type` enum('discrete','contin') DEFAULT NULL,
   PRIMARY KEY (`uid`)
-) AUTO_INCREMENT=1;
+) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 CREATE INDEX idx_sid_fid_name ON editor_variables (sid, fid, name);
 
@@ -455,7 +453,7 @@ CREATE TABLE `editor_templates` (
   `deleted_at` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uid_UNIQUE` (`uid`)
-) AUTO_INCREMENT=1;
+) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 
 CREATE TABLE `editor_templates_default` (
@@ -463,7 +461,7 @@ CREATE TABLE `editor_templates_default` (
   `data_type` varchar(30) NOT NULL,
   `template_uid` varchar(255) NOT NULL,  
   PRIMARY KEY (`id`)
-);
+) DEFAULT CHARSET=utf8mb4;
 
 
 insert into `editor_templates_default` (data_type, template_uid)
@@ -488,7 +486,7 @@ create table editor_project_owners (
   user_id int not null,
   created int,
   primary key (id)
-);
+) DEFAULT CHARSET=utf8mb4;
 
 
 CREATE TABLE `editor_collections` (
@@ -503,7 +501,7 @@ CREATE TABLE `editor_collections` (
   `wgt` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `title` (`title`,`pid`)
-) AUTO_INCREMENT=1;
+) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 
 create table editor_collection_projects (
@@ -511,7 +509,7 @@ create table editor_collection_projects (
   collection_id int not null,
   sid int not null,
   primary key (id)
-);
+) DEFAULT CHARSET=utf8mb4;
 
 create table editor_collection_project_acl (
   id int not null auto_increment,
@@ -519,7 +517,7 @@ create table editor_collection_project_acl (
   user_id int not null,
   permissions varchar(100),
   primary key (id)
-);
+) DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `editor_collection_acl` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -529,7 +527,7 @@ CREATE TABLE `editor_collection_acl` (
   `created` int DEFAULT NULL,
   `changed` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 
 create table editor_project_tags (
@@ -537,20 +535,20 @@ create table editor_project_tags (
   sid int not null,
   tag_id int not null,
   primary key (id)
-);
+) DEFAULT CHARSET=utf8mb4;
 
 
 CREATE TABLE editor_tags(  
     id int NOT NULL PRIMARY KEY AUTO_INCREMENT,    
     tag VARCHAR(255) not null
-);
+) DEFAULT CHARSET=utf8mb4;
 
 
 CREATE TABLE editor_project_tags(  
     id int NOT NULL PRIMARY KEY AUTO_INCREMENT,
     sid int not null,
     tag_id int not null
-);
+) DEFAULT CHARSET=utf8mb4;
 
 
 CREATE TABLE `editor_variable_groups` (
@@ -558,7 +556,7 @@ CREATE TABLE `editor_variable_groups` (
   `sid` int(11) DEFAULT NULL,
   `metadata` MEDIUMTEXT,
   PRIMARY KEY (`id`)
-) AUTO_INCREMENT=1;
+) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 
 
@@ -567,7 +565,7 @@ CREATE TABLE editor_variables_sort_tmp(
     sid int not null,
     var_uid int not null,
     sort_order int not null
-);
+) DEFAULT CHARSET=utf8mb4;
 
 
 CREATE TABLE `audit_logs` (
@@ -580,7 +578,7 @@ CREATE TABLE `audit_logs` (
   `metadata` json DEFAULT NULL,
   `obj_ref_id` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-) AUTO_INCREMENT=1;
+) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 
 
@@ -593,7 +591,7 @@ CREATE TABLE `edit_history` (
   `created` datetime NOT NULL,
   `metadata` json DEFAULT NULL,
   PRIMARY KEY (`id`)
-) AUTO_INCREMENT=1;
+) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 
 
@@ -610,7 +608,7 @@ CREATE TABLE editor_code_lists(
     changed_by int default null,    
     PRIMARY KEY (`pk_id`),
     UNIQUE KEY `cl_id` (`id`,`agency_id`, `version`)
-);
+) DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE editor_code_list_items(  
     pk_id int NOT NULL AUTO_INCREMENT,
@@ -624,7 +622,7 @@ CREATE TABLE editor_code_list_items(
     changed_by int default null,    
     PRIMARY KEY (`pk_id`),
     UNIQUE KEY `cl_item_id` (`id`,`cl_id`)
-);
+) DEFAULT CHARSET=utf8mb4;
 
 
 CREATE TABLE `editor_collections_tree` (
@@ -634,7 +632,7 @@ CREATE TABLE `editor_collections_tree` (
   `depth` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idx_closure` (`parent_id`,`child_id`,`depth`)
-) AUTO_INCREMENT=1;
+) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 
 CREATE TABLE `admin_metadata` (
@@ -648,7 +646,7 @@ CREATE TABLE `admin_metadata` (
   `changed` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `meta_unq` (`template_id`,`sid`)
-) AUTO_INCREMENT=1;
+) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `admin_metadata_acl` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -657,13 +655,19 @@ CREATE TABLE `admin_metadata_acl` (
   `user_id` int NOT NULL,
   `created` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-) AUTO_INCREMENT=1;
+) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `admin_metadata_projects` (
   `id` int NOT NULL AUTO_INCREMENT,
   `sid` int DEFAULT NULL,
   `template_id` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-);
+) DEFAULT CHARSET=utf8mb4;
 
+
+-- collection indexes
+CREATE INDEX idx_eca_user_collection ON editor_collection_acl(user_id, collection_id);
+CREATE INDEX idx_ecpa_user_collection ON editor_collection_project_acl(user_id, collection_id);
+CREATE INDEX idx_collections_created_by ON editor_collections(created_by);
+CREATE INDEX idx_collection_id ON editor_collection_projects(collection_id);
 
