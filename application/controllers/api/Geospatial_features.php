@@ -784,12 +784,31 @@ class Geospatial_features extends MY_REST_Controller
 			$project_dir = $this->Editor_model->get_project_folder($sid);
 			$file_path = $project_dir . '/geospatial/' . $feature['file_name'];
 			
+			// Verify file exists and get absolute path
+			$absolute_file_path = realpath($file_path);
+			if (!$absolute_file_path) {
+				throw new Exception("Could not resolve input file path: {$file_path}");
+			}
+			
 			// Get the output CSV path from the feature's data_file field
 			$output_csv_path = $project_dir . '/geospatial/' . $feature['data_file'];
 			
-			// Start CSV generation job
-			$csv_result = $api_client->start_csv_job($file_path, $feature['layer_name'], $output_csv_path);
+			// Ensure output directory exists and get absolute path
+			$output_dir = dirname($output_csv_path);
+			if (!file_exists($output_dir)) {
+				@mkdir($output_dir, 0777, true);
+			}
 			
+			// Convert output path to absolute path
+			$absolute_output_dir = realpath($output_dir);
+			if (!$absolute_output_dir) {
+				throw new Exception("Could not resolve output directory path: {$output_dir}");
+			}
+			$output_csv_path = $absolute_output_dir . '/' . basename($output_csv_path);
+			
+			// Start CSV generation job
+			$csv_result = $api_client->start_csv_job($absolute_file_path, $feature['layer_name'], $output_csv_path);
+				
 			if (!$csv_result['success']) {
 				throw new Exception("Failed to start CSV generation: " . ($csv_result['message'] ?? 'Unknown error'));
 			}
