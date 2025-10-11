@@ -542,5 +542,22 @@ $lang['deletions'] = "Deletions";
 $lang['additions'] = "Additions";
 $lang['project_validation_failed'] = "Project validation failed";
 
+$lang['matches'] = "matches";
+$lang['no_matches_found'] = "No matches found";
+$lang['fid'] = "FID";
+$lang['dataset'] = "Dataset";
+$lang['variable'] = "Variable";
+$lang['type_match'] = "Type match";
+$lang['spread_metadata_options'] = "Spread metadata options";
+$lang['variable_information_labels'] = "Variable information - Labels";
+$lang['variable_documentation_desc'] = "Variable documentation - Texts, notes, universe, etc.";
+$lang['question_texts_desc'] = "Question texts - Pre, post, literal, etc.";
+$lang['no_variables_selected'] = "No variables selected";
+$lang['target_variables'] = "target variables";
+$lang['spreading_metadata'] = "Spreading metadata...";
+$lang['failed_to_spread_metadata'] = "Failed to spread metadata";
+$lang['source_variable_not_found'] = "Source variable not found";
+$lang['discrete'] = "Discrete";
+
 /* End of file project_lang.php */
 /* Location: ./application/language/english/project_lang.php */
