@@ -76,7 +76,21 @@ class Files extends MY_REST_Controller
 
 			if ($file_type=='thumbnail'){
 				$output=$this->Editor_resource_model->upload_thumbnail($sid,$file_field_name='file');
-				$this->Editor_model->set_project_options($sid,$options=array('thumbnail'=>$output['thumbnail_filename']));
+				$this->Editor_model->set_project_options($sid,$options=array(
+					'thumbnail'=>$output['thumbnail_filename'],
+					'changed_by'=>$user_id,
+					'changed'=>date("U")
+					)
+				);
+				$this->audit_log->log_event(
+					$obj_type='project',
+					$obj_id=$sid,
+					$action='thumbnail', 
+					$metadata=array(
+						'thumbnail'=>basename($output['thumbnail_filename'])
+					),
+					$user_id
+				);
 			}else{
 				$result=$this->Editor_resource_model->upload_file($sid,$file_type,$file_field_name='file', $remove_spaces=false);
 				$uploaded_file_name=$result['file_name'];
