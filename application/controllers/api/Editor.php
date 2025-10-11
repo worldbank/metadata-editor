@@ -1147,7 +1147,7 @@ class Editor extends MY_REST_Controller
 
 			$response=array(
 				'status'=>'success',
-				'facets'=>$result
+				'facets'=>$result,
 			);
 						
 			$this->set_response($response, REST_Controller::HTTP_OK);
