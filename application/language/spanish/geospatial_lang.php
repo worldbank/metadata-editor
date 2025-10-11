@@ -1,0 +1,88 @@
+<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+
+$lang['geospatial_features']="Características geoespaciales";
+$lang['geospatial_features_only_available_for_geospatial_projects']="Las características geoespaciales solo están disponibles para proyectos geoespaciales";
+$lang['no_geospatial_features']="No se encontraron características geoespaciales";
+$lang['geospatial_upload_notice']="Suba uno o más archivos geoespaciales para crear características";
+$lang['Upload one or more geospatial files to create features']="Suba uno o más archivos geoespaciales para crear características";
+$lang['Drag and drop geospatial files here']="Arrastre y suelte archivos geoespaciales aquí";
+$lang['Choose files']="Elegir archivos";
+$lang['Supported formats']="Formatos soportados";
+$lang['selected']="seleccionado";
+$lang['Clear All']="Limpiar todo";
+$lang['File']="Archivo";
+$lang['Type']="Tipo";
+$lang['Size']="Tamaño";
+$lang['Status']="Estado";
+$lang['Actions']="Acciones";
+$lang['Pending']="Pendiente";
+$lang['Processing']="Procesando";
+$lang['Completed']="Completado";
+$lang['Failed']="Falló";
+$lang['Note']="Nota";
+$lang['Files will be stored in the project temp folder and features will be created with basic metadata. File processing will be handled by the backend FastAPI service.']="Los archivos se almacenarán en la carpeta temporal del proyecto y las características se crearán con metadatos básicos. El procesamiento de archivos será manejado por el servicio backend FastAPI.";
+$lang['Shapefiles must be uploaded as ZIP files containing .shp, .shx, .dbf, and .prj files. ZIP files can also contain other geospatial formats.']="Los shapefiles deben subirse como archivos ZIP que contengan archivos .shp, .shx, .dbf y .prj. Los archivos ZIP también pueden contener otros formatos geoespaciales.";
+$lang['ZIP Files']="Archivos ZIP";
+$lang['ZIP files will be extracted during processing. For shapefiles, ensure the ZIP contains all required files (.shp, .shx, .dbf, .prj).']="Los archivos ZIP se extraerán durante el procesamiento. Para shapefiles, asegúrese de que el ZIP contenga todos los archivos requeridos (.shp, .shx, .dbf, .prj).";
+$lang['Modern Formats']="Formatos modernos";
+$lang['GPKG (GeoPackage) is a modern, single-file alternative to shapefiles that supports multiple layers and is more efficient.']="GPKG (GeoPackage) es una alternativa moderna a los shapefiles en un solo archivo que admite múltiples capas y es más eficiente.";
+$lang['Import Files']="Importar archivos";
+$lang['Back to Features']="Volver a características";
+$lang['Import completed successfully']="Importación completada exitosamente";
+$lang['Upload Report']="Reporte de carga";
+$lang['Feature created']="Característica creada";
+$lang['Edit Geospatial Feature']="Editar característica geoespacial";
+$lang['Feature Name']="Nombre de la característica";
+$lang['Feature Code']="Código de la característica";
+$lang['Metadata']="Metadatos";
+$lang['Enter JSON metadata']="Ingrese metadatos JSON";
+$lang['create_feature']="Crear característica";
+$lang['feature']="Característica";
+$lang['feature_name']="Nombre de la característica";
+$lang['file']="Archivo";
+$lang['file_type']="Tipo de archivo";
+$lang['file_size']="Tamaño del archivo";
+$lang['status']="Estado";
+$lang['Modified']="Modificado";
+$lang['no_file']="Sin archivo";
+$lang['More options']="Más opciones";
+$lang['Image Gallery']="Galería de imágenes";
+
+$lang['Formatted Metadata']="Metadatos formateados";
+$lang['Feature Characteristics']="Características de la característica";
+$lang['characteristics']="Características";
+$lang['Search characteristics']="Buscar características";
+$lang['No characteristics found']="No se encontraron características";
+$lang['This feature has no characteristics data.']="Esta característica no tiene datos de características.";
+$lang['Select a characteristic']="Seleccionar una característica";
+$lang['Click on a row in the table to view details.']="Haga clic en una fila de la tabla para ver los detalles.";
+$lang['Characteristic Details']="Detalles de la característica";
+$lang['Enter label']="Ingresar etiqueta";
+$lang['Refresh']="Actualizar";
+$lang['Please select features to delete']="Por favor seleccione características para eliminar";
+$lang['Data']="Datos";
+$lang['Loading data...']="Cargando datos...";
+$lang['Error loading data:']="Error al cargar datos:";
+$lang['No data available']="No hay datos disponibles";
+$lang['Export']="Exportar";
+$lang['Export Data']="Exportar datos";
+$lang['Export data for feature:']="Exportar datos para la característica:";
+$lang['File:']="Archivo:";
+$lang['Close']="Cerrar";
+
+$lang['Extracted from']="Extraído de";
+$lang['Select Layers to Import']="Seleccionar capas para importar";
+$lang['Multiple layers detected in uploaded files']="Se detectaron múltiples capas en los archivos cargados";
+$lang['Select All']="Seleccionar todo";
+$lang['Deselect All']="Deseleccionar todo";
+$lang['Type']="Tipo";
+$lang['Features']="Características";
+$lang['Bounds']="Límites";
+$lang['Each selected layer will create a separate geospatial feature. You can also cancel to create features for all files without layer selection.']="Cada capa seleccionada creará una característica geoespacial separada. También puede cancelar para crear características para todos los archivos sin selección de capa.";
+$lang['Import Selected Layers']="Importar capas seleccionadas";
+$lang['Please select at least one layer']="Por favor seleccione al menos una capa";
+$lang['Error creating features: ']="Error al crear características: ";
+
+
+/* End of file geospatial_lang.php */
+/* Location: ./application/language/spanish/geospatial_lang.php */

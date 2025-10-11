@@ -1,0 +1,88 @@
+<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+
+$lang['geospatial_features']="Fonctionnalités géospatiales";
+$lang['geospatial_features_only_available_for_geospatial_projects']="Les fonctionnalités géospatiales ne sont disponibles que pour les projets géospatiaux";
+$lang['no_geospatial_features']="Aucune fonctionnalité géospatiale trouvée";
+$lang['geospatial_upload_notice']="Téléchargez un ou plusieurs fichiers géospatiaux pour créer des fonctionnalités";
+$lang['Upload one or more geospatial files to create features']="Téléchargez un ou plusieurs fichiers géospatiaux pour créer des fonctionnalités";
+$lang['Drag and drop geospatial files here']="Glissez-déposez les fichiers géospatiaux ici";
+$lang['Choose files']="Choisir des fichiers";
+$lang['Supported formats']="Formats supportés";
+$lang['selected']="sélectionné";
+$lang['Clear All']="Tout effacer";
+$lang['File']="Fichier";
+$lang['Type']="Type";
+$lang['Size']="Taille";
+$lang['Status']="Statut";
+$lang['Actions']="Actions";
+$lang['Pending']="En attente";
+$lang['Processing']="Traitement";
+$lang['Completed']="Terminé";
+$lang['Failed']="Échoué";
+$lang['Note']="Note";
+$lang['Files will be stored in the project temp folder and features will be created with basic metadata. File processing will be handled by the backend FastAPI service.']="Les fichiers seront stockés dans le dossier temporaire du projet et les fonctionnalités seront créées avec des métadonnées de base. Le traitement des fichiers sera géré par le service backend FastAPI.";
+$lang['Shapefiles must be uploaded as ZIP files containing .shp, .shx, .dbf, and .prj files. ZIP files can also contain other geospatial formats.']="Les shapefiles doivent être téléchargés sous forme de fichiers ZIP contenant les fichiers .shp, .shx, .dbf et .prj. Les fichiers ZIP peuvent également contenir d'autres formats géospatiaux.";
+$lang['ZIP Files']="Fichiers ZIP";
+$lang['ZIP files will be extracted during processing. For shapefiles, ensure the ZIP contains all required files (.shp, .shx, .dbf, .prj).']="Les fichiers ZIP seront extraits pendant le traitement. Pour les shapefiles, assurez-vous que le ZIP contient tous les fichiers requis (.shp, .shx, .dbf, .prj).";
+$lang['Modern Formats']="Formats modernes";
+$lang['GPKG (GeoPackage) is a modern, single-file alternative to shapefiles that supports multiple layers and is more efficient.']="GPKG (GeoPackage) est une alternative moderne aux shapefiles en un seul fichier qui prend en charge plusieurs couches et est plus efficace.";
+$lang['Import Files']="Importer des fichiers";
+$lang['Back to Features']="Retour aux fonctionnalités";
+$lang['Import completed successfully']="Importation terminée avec succès";
+$lang['Upload Report']="Rapport de téléchargement";
+$lang['Feature created']="Fonctionnalité créée";
+$lang['Edit Geospatial Feature']="Modifier la fonctionnalité géospatiale";
+$lang['Feature Name']="Nom de la fonctionnalité";
+$lang['Feature Code']="Code de la fonctionnalité";
+$lang['Metadata']="Métadonnées";
+$lang['Enter JSON metadata']="Entrer les métadonnées JSON";
+$lang['create_feature']="Créer une fonctionnalité";
+$lang['feature']="Fonctionnalité";
+$lang['feature_name']="Nom de la fonctionnalité";
+$lang['file']="Fichier";
+$lang['file_type']="Type de fichier";
+$lang['file_size']="Taille du fichier";
+$lang['status']="Statut";
+$lang['Modified']="Modifié";
+$lang['no_file']="Aucun fichier";
+$lang['More options']="Plus d'options";
+$lang['Image Gallery']="Galerie d'images";
+
+$lang['Formatted Metadata']="Métadonnées formatées";
+$lang['Feature Characteristics']="Caractéristiques de la fonctionnalité";
+$lang['characteristics']="Caractéristiques";
+$lang['Search characteristics']="Rechercher des caractéristiques";
+$lang['No characteristics found']="Aucune caractéristique trouvée";
+$lang['This feature has no characteristics data.']="Cette fonctionnalité n'a pas de données de caractéristiques.";
+$lang['Select a characteristic']="Sélectionner une caractéristique";
+$lang['Click on a row in the table to view details.']="Cliquez sur une ligne du tableau pour voir les détails.";
+$lang['Characteristic Details']="Détails de la caractéristique";
+$lang['Enter label']="Entrer l'étiquette";
+$lang['Refresh']="Actualiser";
+$lang['Please select features to delete']="Veuillez sélectionner les fonctionnalités à supprimer";
+$lang['Data']="Données";
+$lang['Loading data...']="Chargement des données...";
+$lang['Error loading data:']="Erreur de chargement des données:";
+$lang['No data available']="Aucune donnée disponible";
+$lang['Export']="Exporter";
+$lang['Export Data']="Exporter les données";
+$lang['Export data for feature:']="Exporter les données pour la fonctionnalité:";
+$lang['File:']="Fichier:";
+$lang['Close']="Fermer";
+
+$lang['Extracted from']="Extrait de";
+$lang['Select Layers to Import']="Sélectionner les couches à importer";
+$lang['Multiple layers detected in uploaded files']="Plusieurs couches détectées dans les fichiers téléchargés";
+$lang['Select All']="Tout sélectionner";
+$lang['Deselect All']="Tout désélectionner";
+$lang['Type']="Type";
+$lang['Features']="Fonctionnalités";
+$lang['Bounds']="Limites";
+$lang['Each selected layer will create a separate geospatial feature. You can also cancel to create features for all files without layer selection.']="Chaque couche sélectionnée créera une fonctionnalité géospatiale séparée. Vous pouvez également annuler pour créer des fonctionnalités pour tous les fichiers sans sélection de couche.";
+$lang['Import Selected Layers']="Importer les couches sélectionnées";
+$lang['Please select at least one layer']="Veuillez sélectionner au moins une couche";
+$lang['Error creating features: ']="Erreur lors de la création des fonctionnalités: ";
+
+
+/* End of file geospatial_lang.php */
+/* Location: ./application/language/french/geospatial_lang.php */

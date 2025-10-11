@@ -671,3 +671,51 @@ CREATE INDEX idx_ecpa_user_collection ON editor_collection_project_acl(user_id, 
 CREATE INDEX idx_collections_created_by ON editor_collections(created_by);
 CREATE INDEX idx_collection_id ON editor_collection_projects(collection_id);
 
+
+CREATE TABLE `geospatial_features` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `sid` int NOT NULL,
+  `code` varchar(100) DEFAULT NULL,
+  `name` varchar(255) NOT NULL,
+  `metadata` json DEFAULT NULL,
+  `created` datetime DEFAULT CURRENT_TIMESTAMP,
+  `changed` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `created_by` int DEFAULT NULL,
+  `changed_by` int DEFAULT NULL,
+  `file_name` varchar(255) DEFAULT NULL,
+  `file_type` varchar(50) DEFAULT NULL,
+  `file_size` bigint DEFAULT NULL,
+  `upload_status` enum('pending','processing','completed','failed') DEFAULT 'pending',
+  `processing_notes` text,
+  `layer_name` varchar(255) DEFAULT NULL,
+  `layer_type` enum('point','line','polygon','raster','mixed','unknown') DEFAULT 'unknown',
+  `feature_count` int DEFAULT '0',
+  `geometry_type` varchar(100) DEFAULT NULL,
+  `bounds` json DEFAULT NULL,
+  `data_file` varchar(500) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE `geospatial_feature_chars` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `sid` int NOT NULL,
+  `feature_id` int NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `label` varchar(255) DEFAULT NULL,
+  `data_type` varchar(30) DEFAULT NULL,
+  `metadata` json DEFAULT NULL,
+  `created` datetime DEFAULT CURRENT_TIMESTAMP,
+  `changed` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `created_by` int DEFAULT NULL,
+  `changed_by` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_feature_char` (`sid`,`feature_id`,`name`),
+  KEY `idx_feature_chars_feature_id` (`feature_id`),
+  CONSTRAINT `geospatial_feature_chars_ibfk_1` FOREIGN KEY (`feature_id`) REFERENCES `geospatial_features` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+
+CREATE INDEX idx_feature_chars_feature_id ON geospatial_feature_chars(feature_id);
+
+

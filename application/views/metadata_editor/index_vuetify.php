@@ -10,6 +10,8 @@
   <script src="<?php echo base_url();?>vue-app/assets/bootstrap.bundle.min.js"></script>
   
   <link href="<?php echo base_url();?>vue-app/assets/splitpanes.css" rel="stylesheet">
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="<?php echo base_url();?>vue-app/assets/leaflet.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
 </head>
 
@@ -104,6 +106,8 @@
 
   <script src="<?php echo base_url(); ?>vue-app/assets/vue-json-pretty.min.js"></script>
   <link rel="stylesheet" href="<?php echo base_url(); ?>vue-app/assets/vue-json-pretty.min.css">
+  <!-- Leaflet JS -->
+  <script src="<?php echo base_url();?>vue-app/assets/leaflet.js"></script>
   <link href="<?php echo base_url();?>vue-app/assets/styles.css" rel="stylesheet">
 
 
@@ -510,34 +514,34 @@
         },
         GeospatialFeatures(){
           if (this.dataset_type!='geospatial'){
-            return false;
+            return [];
           }
 
-          let features=_.get(this.ProjectMetadata,'description.feature_catalogue.featureType');
-          if (!features){
+          let features = this.$store.state.geospatial_features;
+          if (!features || features.length === 0){
             return [];
           }
 
           let feature_list=[];
           for (let feature of features){
             feature_list.push({
-              title:feature.typeName,
+              title: feature.name || feature.file_name || 'Unnamed Feature',
               type:'geospatial-feature',
-              key:'feature/'+feature.typeName,
+              key:'geospatial-features/'+feature.id,
               file:'datafile',
               feature:feature,
               items:[{
-                    title:this.$t('feature-attributes'),
-                    type: 'feature-attribute',
+                    title:this.$t('characteristics'),
+                    type: 'geospatial-feature-characteristics',
                     file: 'variable',                    
-                    key:'feature-attributes/'+feature.typeName,
+                    key:'geospatial-features/'+feature.id+'/characteristics',
                     feature:feature,
-                },
-                {
-                    title:this.$t('data'),
-                    type: 'feature-data',
-                    file: 'table',
-                    key:'feature-data'+feature.typeName
+                },{
+                    title:this.$t('Data'),
+                    type: 'geospatial-feature-data',
+                    file: 'datafile',                    
+                    key:'geospatial-features/'+feature.id+'/data',
+                    feature:feature,
                 }]
             });
           }
@@ -555,8 +559,11 @@
         '$store.state.external_resources': function() {
             this.update_tree();
         },
+        '$store.state.geospatial_features': function() {
+            this.update_tree();
+        },
         $route(to, from) {
-          console.log("route changed to", to, from);
+          console.log("route changed to", to.path, "from", from.path);
           this.setTreeActiveNode(to.path);
         },
         ProjectMetadata: 
@@ -646,7 +653,42 @@
           else if(path.startsWith("/data-explorer/")){
             this.initiallyOpen.push("datafiles");
             this.initiallyOpen.push("datafile/"+path_arr[2]); // path_arr[2] is the file_id
-          }                    
+          }
+          
+          // Handle geospatial features
+          if (path.startsWith("/geospatial-features")) {
+            console.log("Handling geospatial features route:", path);
+            
+            // Always expand the geospatial-features parent node
+            if (!this.initiallyOpen.includes("geospatial-features")) {
+              this.initiallyOpen.push("geospatial-features");
+            }
+            
+            // Handle different geospatial feature routes
+            if (path.includes("/edit/") || path.includes("/characteristics") || path.includes("/data")) {
+              // Extract feature ID from path
+              const pathParts = path.split("/");
+              const featureId = pathParts[pathParts.length - 1];
+              const featureNodeKey = "geospatial-features/" + featureId;
+              
+              console.log("Setting active node to:", featureNodeKey);
+              
+              // Expand the specific feature node to show its children
+              if (!this.initiallyOpen.includes(featureNodeKey)) {
+                this.initiallyOpen.push(featureNodeKey);
+              }
+              
+              // Set active node to the specific feature (matching the key format from GeospatialFeatures)
+              this.tree_active_items = [featureNodeKey];
+            } else {
+              console.log("Setting active node to: geospatial-features");
+              // Just the main geospatial features page
+              this.tree_active_items = ["geospatial-features"];
+            }
+            console.log("Final tree_active_items:", this.tree_active_items);
+            console.log("Final initiallyOpen:", this.initiallyOpen);
+            return;
+          }
 
           if (path==""){
             this.tree_active_items.push("home");
@@ -888,7 +930,11 @@
           else if (this.$route.path.startsWith("/external-resources")){
             this.initiallyOpen=["external-resources"];
             this.setTreeActiveNode("external-resources");
-          }          
+          }
+          else if (this.$route.path.startsWith("/geospatial-features")){
+            // Handle geospatial features initialization on page load
+            this.setTreeActiveNode(this.$route.path);
+          }
           else{
             let active_node_name=this.$route.path;
             active_node_name=active_node_name.slice(active_node_name.lastIndexOf("/")+1);
@@ -921,6 +967,10 @@
 
             if (this.items[k]["key"]=="external-resources"){
               this.items[k]["items"]=this.ExternalResourcesTreeNodes;
+            }
+
+            if (this.items[k]["key"]=="geospatial-features"){
+              this.items[k]["items"]=this.GeospatialFeatures;
             }
             
           }
@@ -986,6 +1036,31 @@
 
           if (node.type=='files'){
             router.push('/files');
+            return;
+          }
+
+          if (node.type=='geospatial-features'){
+            router.push('/geospatial-features');
+            return;
+          }
+
+          if (node.type=='geospatial-gallery'){
+            router.push('/geospatial-gallery');
+            return;
+          }
+
+          if (node.type=='geospatial-feature'){
+            router.push('/geospatial-features/'+node.feature.id);
+            return;
+          }
+
+          if (node.type=='geospatial-feature-characteristics'){
+            router.push('/geospatial-features/'+node.feature.id+'/characteristics');
+            return;
+          }
+
+          if (node.type=='geospatial-feature-data'){
+            router.push('/geospatial-features/'+node.feature.id+'/data');
             return;
           }
 

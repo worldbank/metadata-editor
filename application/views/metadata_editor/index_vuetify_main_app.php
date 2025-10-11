@@ -228,7 +228,13 @@
             echo $this->load->view("metadata_editor/vue-admin-metadata-edit-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-dialog-admin-metadata-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-summary-templates-component.js",null,true);
-            echo $this->load->view("metadata_editor/vue-json-edit-component.js",null,true);            
+            echo $this->load->view("metadata_editor/vue-json-edit-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-geospatial-features-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-geospatial-feature-edit-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-geospatial-feature-import-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-geospatial-feature-characteristics-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-geospatial-feature-data-component.js",null,true);
+
         ?>
 
         <?php if (empty($metadata)):?>
@@ -271,6 +277,11 @@
         //const ResourcesEditComp ={props: ['index'],template: '<div><external-resources-edit /></div>'}
         const ResourcesEditComp =VueExternalResourcesEdit;
         const ResourcesCreateComp =VueExternalResourcesCreate;
+        const GeoFeatures ={props: ['index'],template: '<div><geospatial-features/></div>'}
+        const GeoFeaturesImport ={props: ['index'],template: '<div><geospatial-feature-import/></div>'}
+        const GeoFeature ={props: ['id'],template: '<div><geospatial-feature-edit :feature_id="id"/></div>'}
+        const GeoFeatureCharacteristics ={props: ['feature_id'],template: '<div><geospatial-feature-characteristics :feature_id="feature_id"/></div>'}
+        const GeoFeatureData ={props: ['feature_id'],template: '<div><geospatial-feature-data :feature_id="feature_id"/></div>'}
         const PagePreview ={template: '<div><page-preview/></div>'}
         const GeoGallery ={template: '<div><geospatial-gallery/></div>'}
         const ProjectHistory ={template: '<div><project-history/></div>'}
@@ -301,6 +312,12 @@
             { path: '/external-resources/import', component: ResourcesImport},
             { path: '/external-resources/:index', component: ResourcesEditComp, props: true, name: 'external-resources-edit'},            
             { path: '/files', component: FileManager, props: true},
+            { path: '/geospatial-features', component: GeoFeatures, props: true},
+            { path: '/geospatial-features/import', component: GeoFeaturesImport, props: true},
+            { path: '/geospatial-features/edit/:id', component: GeoFeature, props: true },
+            { path: '/geospatial-features/:feature_id/characteristics', component: GeoFeatureCharacteristics, props: true },
+            { path: '/geospatial-features/:feature_id/data', component: GeoFeatureData, props: true },
+            { path: '/geospatial-features/:id', component: GeoFeature, props: true },
             { path: '/geospatial-gallery', component: GeoGallery, props: true },
             { path: '/change-log', component: ProjectHistory },
             { path: '/sdmx-csv-export', component: SdmxCsvExport },
@@ -540,6 +557,12 @@
                     await store.dispatch('loadExternalResources',{dataset_id:options.dataset_id});
                     await store.dispatch('loadVariableGroups',{dataset_id:options.dataset_id});
                     await store.dispatch('loadMetadataTypesList',{});
+                    
+                    // Load geospatial features for geospatial projects
+                    if (store.state.project_type === 'geospatial') {
+                        await store.dispatch('loadGeospatialFeatures',{dataset_id:options.dataset_id});
+                    }
+                    
                     store.state.variables_loaded=true;
                     store.state.variables_isloading=false;
                     store.state.project_isloading=false;
@@ -623,6 +646,19 @@
                     })
                     .catch(function (error) {
                         console.log("error loading datafiles", error);
+                    });                    
+                },
+                async loadGeospatialFeatures({commit},options) {                    
+                    let url=CI.base_url + '/api/geospatial-features/'+options.dataset_id;
+                    return axios
+                    .get(url)
+                    .then(function (response) {
+                        if(response.data.status === 'success'){
+                            commit('setGeospatialFeatures',response.data.features);
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log("error loading geospatial features", error);
                     });                    
                 },
                 async loadAllVariables({commit,state},options) {                    
@@ -798,6 +834,9 @@
                 data_files_add(state,newFile){
                     let new_idx=state.data_files.push(newFile)-1;
                     return new_idx;
+                },
+                setGeospatialFeatures(state,data){
+                    state.geospatial_features=data;                    
                 },
                 variables(state,data){
                     Vue.set(state.variables, data.fid, data.variables);
