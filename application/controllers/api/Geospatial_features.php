@@ -1463,23 +1463,37 @@ class Geospatial_features extends MY_REST_Controller
 			$all_files_for_analysis = array();
 			
 			foreach ($processing_result['processed_files'] as $file) {
+				// Convert to absolute path for API calls
+				$absolute_path = realpath($file['path']);
+				if (!$absolute_path) {
+					log_message('warning', 'Could not resolve absolute path for: ' . $file['path']);
+					$absolute_path = $file['path']; // Fallback to original path
+				}
+				
 				$file_info[] = array(
 					'name' => $file['original_name'],
-					'path' => $file['path'],
+					'path' => $absolute_path,
 					'type' => 'direct'
 				);
-				$all_files_for_analysis[] = $file['path'];
+				$all_files_for_analysis[] = $absolute_path;
 			}
 			
 			// add extracted files
 			foreach ($processing_result['extracted_files'] as $file) {
+				// Convert to absolute path for API calls
+				$absolute_path = realpath($file['path']);
+				if (!$absolute_path) {
+					log_message('warning', 'Could not resolve absolute path for: ' . $file['path']);
+					$absolute_path = $file['path']; // Fallback to original path
+				}
+				
 				$file_info[] = array(
 					'name' => $file['extracted_file'],
-					'path' => $file['path'],
+					'path' => $absolute_path,
 					'type' => 'extracted',
 					'original_zip' => $file['original_zip']
 				);
-				$all_files_for_analysis[] = $file['path'];
+				$all_files_for_analysis[] = $absolute_path;
 			}
 			
 			$output['files'] = $file_info;			
