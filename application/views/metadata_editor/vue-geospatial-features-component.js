@@ -13,6 +13,15 @@ Vue.component('geospatial-features', {
                 message_error: '',
                 is_loading: false
             },
+            refresh_dialog: {
+                show: false,
+                feature_name: '',
+                is_refreshing: false,
+                status_message: '',
+                error_message: '',
+                job_id: null,
+                feature_id: null
+            },
             search_keywords: '',
             sort_by: 'name',
             sort_order: 'ASC'
@@ -66,6 +75,104 @@ Vue.component('geospatial-features', {
             .catch(function (error) {
                 console.error('Failed to delete geospatial feature:', error);
             });
+        },
+        
+        refreshFeatureMetadata: function(index) {
+            const feature = this.geospatialFeatures[index];
+            
+            if (!feature || !feature.id) {
+                return;
+            }
+            
+            if (!feature.file_name) {
+                alert(this.$t('Cannot refresh metadata: Feature has no associated file'));
+                return;
+            }
+            
+            if (!confirm(this.$t('Refresh metadata for') + ' "' + feature.name + '"? ' + this.$t('This will reload all metadata and characteristics from the geospatial file.'))) {
+                return;
+            }
+            
+            // Show refresh dialog
+            this.refresh_dialog.show = true;
+            this.refresh_dialog.feature_name = feature.name;
+            this.refresh_dialog.is_refreshing = true;
+            this.refresh_dialog.status_message = this.$t('Starting metadata refresh...');
+            this.refresh_dialog.error_message = '';
+            this.refresh_dialog.feature_id = feature.id;
+            this.refresh_dialog.job_id = null;
+            
+            // Start metadata refresh job
+            this.startMetadataRefresh(feature.id);
+        },
+        
+        startMetadataRefresh: function(featureId) {
+            const vm = this;
+            const url = CI.base_url + '/api/geospatial_features/metadata_refresh/' + this.ProjectID;
+            
+            axios.post(url, { feature_id: featureId })
+            .then(function (response) {
+                if (response.data.status === 'success') {
+                    vm.refresh_dialog.job_id = response.data.job_id;
+                    vm.refresh_dialog.status_message = vm.$t('Metadata extraction in progress...');
+                    
+                    // Start polling for completion
+                    vm.pollRefreshStatus();
+                } else {
+                    vm.refresh_dialog.is_refreshing = false;
+                    vm.refresh_dialog.error_message = response.data.message || vm.$t('Failed to start metadata refresh');
+                }
+            })
+            .catch(function (error) {
+                console.error('Failed to start metadata refresh:', error);
+                vm.refresh_dialog.is_refreshing = false;
+                vm.refresh_dialog.error_message = error.response?.data?.message || vm.$t('Failed to start metadata refresh');
+            });
+        },
+        
+        pollRefreshStatus: function() {
+            const vm = this;
+            const url = CI.base_url + '/api/geospatial_features/metadata_refresh_status/' + this.ProjectID + 
+                       '?job_id=' + this.refresh_dialog.job_id + 
+                       '&feature_id=' + this.refresh_dialog.feature_id;
+            
+            axios.get(url)
+            .then(function (response) {
+                if (response.data.status === 'success') {
+                    // Refresh completed successfully
+                    vm.refresh_dialog.is_refreshing = false;
+                    vm.refresh_dialog.status_message = vm.$t('Metadata refreshed successfully!') + ' ' + 
+                                                       vm.$t('Characteristics updated') + ': ' + 
+                                                       response.data.characteristics_updated;
+                    
+                    // Reload features list
+                    vm.loadGeospatialFeatures();
+                } else if (response.data.status === 'processing') {
+                    // Still processing, poll again after 2 seconds
+                    vm.refresh_dialog.status_message = vm.$t('Processing metadata...') + ' (' + response.data.job_status + ')';
+                    setTimeout(function() {
+                        vm.pollRefreshStatus();
+                    }, 2000);
+                } else {
+                    // Error occurred
+                    vm.refresh_dialog.is_refreshing = false;
+                    vm.refresh_dialog.error_message = response.data.message || vm.$t('Metadata refresh failed');
+                }
+            })
+            .catch(function (error) {
+                console.error('Failed to check refresh status:', error);
+                vm.refresh_dialog.is_refreshing = false;
+                vm.refresh_dialog.error_message = error.response?.data?.message || vm.$t('Failed to check refresh status');
+            });
+        },
+        
+        closeRefreshDialog: function() {
+            this.refresh_dialog.show = false;
+            this.refresh_dialog.is_refreshing = false;
+            this.refresh_dialog.status_message = '';
+            this.refresh_dialog.error_message = '';
+            this.refresh_dialog.job_id = null;
+            this.refresh_dialog.feature_id = null;
         },
         
         batchDelete: function() {
@@ -143,7 +250,27 @@ Vue.component('geospatial-features', {
                 'csv': 'mdi-table',
                 'json': 'mdi-code-json',
                 'zip': 'mdi-folder-zip',
-                'gpkg': 'mdi-database'
+                'gpkg': 'mdi-database',
+                'nc': 'mdi-grid',
+                'hdf': 'mdi-grid',
+                'hdf5': 'mdi-grid',
+                'grib': 'mdi-weather-cloudy',
+                'grb': 'mdi-weather-cloudy',
+                'jpg': 'mdi-image',
+                'jpeg': 'mdi-image',
+                'png': 'mdi-image',
+                'img': 'mdi-image',
+                'ecw': 'mdi-image',
+                'sid': 'mdi-image',
+                'jp2': 'mdi-image',
+                'asc': 'mdi-elevation-rise',
+                'dem': 'mdi-elevation-rise',
+                'bil': 'mdi-image',
+                'bip': 'mdi-image',
+                'bsq': 'mdi-image',
+                'dt0': 'mdi-elevation-rise',
+                'dt1': 'mdi-elevation-rise',
+                'dt2': 'mdi-elevation-rise'
             };
             return iconMap[fileType] || 'mdi-file-document';
         },
@@ -161,7 +288,27 @@ Vue.component('geospatial-features', {
                 'csv': 'teal',
                 'json': 'indigo',
                 'zip': 'amber',
-                'gpkg': 'deep-purple'
+                'gpkg': 'deep-purple',
+                'nc': 'cyan',
+                'hdf': 'cyan',
+                'hdf5': 'cyan',
+                'grib': 'light-blue',
+                'grb': 'light-blue',
+                'jpg': 'orange',
+                'jpeg': 'orange',
+                'png': 'orange',
+                'img': 'deep-orange',
+                'ecw': 'deep-orange',
+                'sid': 'deep-orange',
+                'jp2': 'orange',
+                'asc': 'brown',
+                'dem': 'brown',
+                'bil': 'orange',
+                'bip': 'orange',
+                'bsq': 'orange',
+                'dt0': 'brown',
+                'dt1': 'brown',
+                'dt2': 'brown'
             };
             return colorMap[fileType] || 'grey';
         },
@@ -355,6 +502,18 @@ Vue.component('geospatial-features', {
                                                         
                                                         <v-divider></v-divider>
                                                         
+                                                        <v-list-item v-if="feature.file_name" 
+                                                                   @click="refreshFeatureMetadata(index)"
+                                                                   :disabled="!isProjectEditable"
+                                                                   :title="$t('Refresh metadata from file')">
+                                                            <v-list-item-icon>
+                                                                <v-icon color="blue">mdi-refresh</v-icon>
+                                                            </v-list-item-icon>
+                                                            <v-list-item-title class="blue--text">{{$t("Refresh")}}</v-list-item-title>
+                                                        </v-list-item>
+                                                        
+                                                        <v-divider></v-divider>
+                                                        
                                                         <v-list-item @click="deleteFeature(index)" class="red--text">
                                                             <v-list-item-icon>
                                                                 <v-icon color="red">mdi-delete-outline</v-icon>
@@ -412,6 +571,65 @@ Vue.component('geospatial-features', {
                         <v-spacer></v-spacer>
                         <v-btn color="primary" text @click="dialog.show=false" v-if="dialog.is_loading==false">
                             {{$t("close")}}
+                        </v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
+
+            <!-- Refresh Metadata Dialog -->
+            <v-dialog v-model="refresh_dialog.show" width="600" persistent>
+                <v-card>
+                    <v-card-title class="text-h5 blue lighten-4">
+                        <v-icon left color="blue">mdi-refresh</v-icon>
+                        {{$t("Refresh Metadata")}}
+                    </v-card-title>
+
+                    <v-card-text class="pt-4">
+                        <div>
+                            <div class="mb-3">
+                                <strong>{{$t("Feature")}}:</strong> {{refresh_dialog.feature_name}}
+                            </div>
+                            
+                            <!-- Loading State -->
+                            <div v-if="refresh_dialog.is_refreshing" class="text-center py-4">
+                                <v-progress-circular indeterminate color="blue" size="64"></v-progress-circular>
+                                <div class="mt-3 text-body-1">{{refresh_dialog.status_message}}</div>
+                            </div>
+                            
+                            <!-- Success State -->
+                            <v-alert v-if="!refresh_dialog.is_refreshing && !refresh_dialog.error_message && refresh_dialog.status_message" 
+                                   type="success" 
+                                   outlined 
+                                   class="mt-3">
+                                <div class="d-flex align-center">
+                                    <v-icon left color="success" large>mdi-check-circle</v-icon>
+                                    <div>{{refresh_dialog.status_message}}</div>
+                                </div>
+                            </v-alert>
+                            
+                            <!-- Error State -->
+                            <v-alert v-if="refresh_dialog.error_message" 
+                                   type="error" 
+                                   outlined 
+                                   class="mt-3">
+                                <div class="d-flex align-center">
+                                    <v-icon left color="error" large>mdi-alert-circle</v-icon>
+                                    <div>
+                                        <div class="text-h6">{{$t("Error")}}</div>
+                                        <div class="mt-2">{{refresh_dialog.error_message}}</div>
+                                    </div>
+                                </div>
+                            </v-alert>
+                        </div>
+                    </v-card-text>
+
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn color="primary" 
+                               text 
+                               @click="closeRefreshDialog" 
+                               :disabled="refresh_dialog.is_refreshing">
+                            {{$t("Close")}}
                         </v-btn>
                     </v-card-actions>
                 </v-card>

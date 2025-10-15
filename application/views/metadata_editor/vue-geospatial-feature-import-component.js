@@ -10,7 +10,7 @@ Vue.component('geospatial-feature-import', {
             has_errors: false,
             dialog_process: false,
             upload_report: [],
-            supported_formats: ['geojson', 'shp', 'tiff', 'geotiff', 'tif', 'kml', 'kmz', 'gpx', 'csv', 'json', 'zip', 'gpkg'],
+            supported_formats: ['geojson', 'shp', 'tiff', 'geotiff', 'tif', 'kml', 'kmz', 'gpx', 'csv', 'json', 'zip', 'gpkg', 'nc', 'hdf', 'hdf5', 'grib', 'grb', 'jpg', 'jpeg', 'png', 'img', 'ecw', 'sid', 'jp2', 'asc', 'dem', 'bil', 'bip', 'bsq', 'dt0', 'dt1', 'dt2'],
             project_id: null,
             show_layer_dialog: false,
             pendingLayerData: null,
@@ -60,6 +60,12 @@ Vue.component('geospatial-feature-import', {
             return filename.split('.').pop().toLowerCase();
         },
         
+        isRasterFile: function(filename) {
+            const extension = this.getFileExtension(filename);
+            const rasterExtensions = ['tif', 'tiff', 'jpg', 'jpeg', 'png', 'img', 'hdf', 'nc', 'grib', 'grb', 'ecw', 'sid', 'jp2', 'asc', 'dem', 'bil', 'bip', 'bsq', 'dt0', 'dt1', 'dt2'];
+            return rasterExtensions.includes(extension);
+        },
+        
         formatFileSize: function(bytes) {
             if (bytes === 0) return '0 Bytes';
             const k = 1024;
@@ -81,7 +87,27 @@ Vue.component('geospatial-feature-import', {
                 'csv': 'mdi-table',
                 'json': 'mdi-code-json',
                 'zip': 'mdi-folder-zip',
-                'gpkg': 'mdi-database'
+                'gpkg': 'mdi-database',
+                'nc': 'mdi-grid',
+                'hdf': 'mdi-grid',
+                'hdf5': 'mdi-grid',
+                'grib': 'mdi-weather-cloudy',
+                'grb': 'mdi-weather-cloudy',
+                'jpg': 'mdi-image',
+                'jpeg': 'mdi-image',
+                'png': 'mdi-image',
+                'img': 'mdi-image',
+                'ecw': 'mdi-image',
+                'sid': 'mdi-image',
+                'jp2': 'mdi-image',
+                'asc': 'mdi-elevation-rise',
+                'dem': 'mdi-elevation-rise',
+                'bil': 'mdi-image',
+                'bip': 'mdi-image',
+                'bsq': 'mdi-image',
+                'dt0': 'mdi-elevation-rise',
+                'dt1': 'mdi-elevation-rise',
+                'dt2': 'mdi-elevation-rise'
             };
             return iconMap[fileType] || 'mdi-file-document';
         },
@@ -99,7 +125,27 @@ Vue.component('geospatial-feature-import', {
                 'csv': 'teal',
                 'json': 'indigo',
                 'zip': 'amber',
-                'gpkg': 'deep-purple'
+                'gpkg': 'deep-purple',
+                'nc': 'cyan',
+                'hdf': 'cyan',
+                'hdf5': 'cyan',
+                'grib': 'light-blue',
+                'grb': 'light-blue',
+                'jpg': 'orange',
+                'jpeg': 'orange',
+                'png': 'orange',
+                'img': 'deep-orange',
+                'ecw': 'deep-orange',
+                'sid': 'deep-orange',
+                'jp2': 'orange',
+                'asc': 'brown',
+                'dem': 'brown',
+                'bil': 'orange',
+                'bip': 'orange',
+                'bsq': 'orange',
+                'dt0': 'brown',
+                'dt1': 'brown',
+                'dt2': 'brown'
             };
             return colorMap[fileType] || 'grey';
         },
@@ -601,13 +647,26 @@ Vue.component('geospatial-feature-import', {
                                 layer_name: layer.name
                             });
                             
-                            // Start CSV generation for the created feature
-                            try {
-                                const csvJobResult = await this.startCsvGeneration(importResult.feature_id);
-                                await this.pollCsvJobStatus(csvJobResult.job_id, importResult.feature_id);
-                            } catch (csvError) {
-                                console.error(`CSV generation failed for feature ${importResult.feature_id}:`, csvError);
+                            // CSV generation disabled for geospatial features
+                            
+                            /* DISABLED: CSV Generation
+                            // Check if file is a raster - skip CSV generation for raster files
+                            const fileName = layer.file_path ? layer.file_path.split('/').pop() : '';
+                            const isRaster = this.isRasterFile(fileName);
+                            
+                            if (!isRaster) {
+                                // Start CSV generation only for vector files
+                                try {
+                                    console.log(`Starting CSV generation for vector file: ${fileName}`);
+                                    const csvJobResult = await this.startCsvGeneration(importResult.feature_id);
+                                    await this.pollCsvJobStatus(csvJobResult.job_id, importResult.feature_id);
+                                } catch (csvError) {
+                                    console.error(`CSV generation failed for feature ${importResult.feature_id}:`, csvError);
+                                }
+                            } else {
+                                console.log(`Skipping CSV generation for raster file: ${fileName}`);
                             }
+                            */
                         } else {
                             this.upload_report.push({
                                 file_name: layer.name,

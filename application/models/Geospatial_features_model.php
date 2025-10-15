@@ -488,42 +488,92 @@ class Geospatial_features_model extends CI_Model {
                 throw new Exception("Invalid data structure returned from job");
             }
 
-            // Extract layer information from analytics
+            // Extract metadata object
             $metadata_obj = $data[1];
             if (!$metadata_obj || !isset($metadata_obj['analytics'])) {
                 throw new Exception("No analytics data found in job result");
             }
 
+            // Determine file type (vector or raster)
+            $file_type = $info['file_type'] ?? 'vector';
+            $is_raster = ($file_type === 'raster');
+
             // Get analytics data
             $analytics = $metadata_obj['analytics'];
-            $layer_info = $analytics['layer'] ?? [];
 
-            // Prepare feature metadata
-            $metadata_field = array();
-            $metadata_field['crs'] = isset($metadata_obj['crs']) ? $metadata_obj['crs'] : null;
-            $metadata_field['layer_info'] = isset($metadata_obj['analytics']['layer']) ? $metadata_obj['analytics']['layer'] : null;
+            // Process based on file type
+            if ($is_raster) {
+                // Raster structure: analytics.feature_statistics contains band data directly
+                $layer_info = array();
+                $feature_stats = $analytics['feature_statistics'] ?? array();
+                
+                // Extract raster-specific data
+                if (isset($metadata_obj['raster_stats'])) {
+                    $layer_info['rows'] = $metadata_obj['raster_stats']['rows'] ?? 0;
+                    $layer_info['columns'] = $metadata_obj['raster_stats']['cols'] ?? 0;
+                    $layer_info['bands'] = $metadata_obj['raster_stats']['bands'] ?? 1;
+                }
+                
+                // Extract bounding box from raster structure
+                if (isset($metadata_obj['bounding_box']['geographicBoundingBox'])) {
+                    $layer_info['geographicBoundingBox'] = $metadata_obj['bounding_box']['geographicBoundingBox'];
+                    $layer_info['geohash'] = $metadata_obj['bounding_box']['geohash'] ?? null;
+                }
+                
+                // Store CRS - raster uses 'projection' (WKT string) instead of 'crs' (PROJ JSON)
+                $metadata_field = array();
+                if (isset($metadata_obj['projection'])) {
+                    $metadata_field['projection'] = $metadata_obj['projection'];
+                }
+                if (isset($metadata_obj['crs'])) {
+                    $metadata_field['crs'] = $metadata_obj['crs'];
+                }
+                $metadata_field['raster_stats'] = $metadata_obj['raster_stats'] ?? null;
+                $metadata_field['layer_info'] = $layer_info;
+                
+            } else {
+                // Vector structure: analytics.layer contains layer information
+                $layer_info = $analytics['layer'] ?? array();
+                
+                // Prepare metadata field for vector
+                $metadata_field = array();
+                $metadata_field['crs'] = isset($metadata_obj['crs']) ? $metadata_obj['crs'] : null;
+                $metadata_field['layer_info'] = $layer_info;
+            }
 
             // Create feature data
             $file_path = $info['file_path'] ?? '';
             $file_name = basename($file_path);
             $file_extension = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+            $file_name_without_ext = pathinfo($file_name, PATHINFO_FILENAME);
 
-            // Generate safe CSV filename based on layer name
-            $layer_name = $info['layer_name_or_band_index'] ?? $file_name;
-            $csv_filename = $this->generate_csv_filename($layer_name, $sid);
+            // Determine feature name and layer name
+            if ($is_raster) {
+                // For raster files: use filename as the display name
+                $feature_name = $file_name_without_ext;
+                // Store band index internally for processing
+                $layer_name = $info['layer_name_or_band_index'] ?? 1;
+            } else {
+                // For vector files: use layer name
+                $layer_name = $info['layer_name_or_band_index'] ?? $file_name_without_ext;
+                $feature_name = $layer_name;
+            }
+
+            // Generate safe CSV filename based on feature name
+            $csv_filename = $this->generate_csv_filename($feature_name, $sid);
 
             $feature_data = array(
                 'sid' => $sid,
-                'name' => $layer_name,
-                'code' => $this->generate_feature_code($layer_name),
+                'name' => $feature_name,
+                'code' => $this->generate_feature_code($feature_name),
                 'file_name' => $file_name,
                 'file_type' => $file_extension,
                 'file_size' => filesize($file_path) ?: 0,
                 'upload_status' => 'completed',
                 'layer_name' => $layer_name,
-                'layer_type' => $info['file_type'] ?? 'vector',
+                'layer_type' => $file_type,
                 'feature_count' => $layer_info['rows'] ?? 0,
-                'geometry_type' => isset($layer_info['geographicBoundingBox']) ? 'vector' : 'raster',
+                'geometry_type' => $is_raster ? 'raster' : 'vector',
                 'bounds' => isset($layer_info['geographicBoundingBox']) ? json_encode($layer_info['geographicBoundingBox']) : null,
                 'data_file' => $csv_filename,
                 'metadata' => json_encode($metadata_field),
@@ -538,8 +588,8 @@ class Geospatial_features_model extends CI_Model {
                 throw new Exception("Failed to create geospatial feature in database");
             }
 
-            // Process feature characteristics
-            $characteristics_created = $this->create_feature_characteristics($sid, $feature_id, $analytics, $user_id);
+            // Process feature characteristics (only for vector files)
+            $characteristics_created = $this->create_feature_characteristics($sid, $feature_id, $analytics, $file_type, $user_id);
 
             return array(
                 'feature_id' => $feature_id,
@@ -559,52 +609,87 @@ class Geospatial_features_model extends CI_Model {
      * @param int $sid Project ID
      * @param int $feature_id Feature ID
      * @param array $analytics Analytics data from job
+     * @param string $file_type File type (vector or raster)
      * @param int $user_id User ID for audit trail
      * @return int Number of characteristics created
      */
-    private function create_feature_characteristics($sid, $feature_id, $analytics, $user_id)
+    private function create_feature_characteristics($sid, $feature_id, $analytics, $file_type, $user_id)
     {
         $characteristics_created = 0;
-
-        if (!isset($analytics['feature_types']) || !is_array($analytics['feature_types'])) {
-            return $characteristics_created;
-        }
 
         // Load the geospatial feature characteristics model
         $this->load->model('Geospatial_feature_chars_model');
 
-        foreach ($analytics['feature_types'] as $field_name => $data_type) {
-            try {
-                // Check if characteristic already exists
-                if ($this->Geospatial_feature_chars_model->characteristic_name_exists($field_name, $sid, $feature_id)) {
-                    log_message('info', 'Characteristic ' . $field_name . ' already exists for feature ' . $feature_id . ', skipping');
-                    continue;
+        if ($file_type === 'raster') {
+            // Raster files: create a characteristic for the band statistics
+            $feature_stats = $analytics['feature_statistics'] ?? null;
+            
+            if ($feature_stats && isset($feature_stats['band_index'])) {
+                try {
+                    $band_index = $feature_stats['band_index'];
+                    $char_name = 'Band ' . $band_index;
+                    
+                    // Check if characteristic already exists
+                    if (!$this->Geospatial_feature_chars_model->characteristic_name_exists($char_name, $sid, $feature_id)) {
+                        // Prepare characteristic data for raster band
+                        $char_data = array(
+                            'sid' => $sid,
+                            'feature_id' => $feature_id,
+                            'name' => $char_name,
+                            'label' => 'Band ' . $band_index . ' Statistics',
+                            'data_type' => 'raster_band',
+                            'metadata' => $feature_stats,
+                            'created_by' => $user_id,
+                            'changed_by' => $user_id
+                        );
+
+                        $this->Geospatial_feature_chars_model->insert($char_data);
+                        $characteristics_created++;
+                    }
+                } catch (Exception $e) {
+                    log_message('error', 'Failed to create raster band characteristic: ' . $e->getMessage());
                 }
+            }
+            
+        } else {
+            // Vector files: create characteristics from feature_types
+            if (!isset($analytics['feature_types']) || !is_array($analytics['feature_types'])) {
+                return $characteristics_created;
+            }
 
-                // Get statistics for this field if available
-                $field_statistics = null;
-                if (isset($analytics['feature_statistics'][$field_name])) {
-                    $field_statistics = $analytics['feature_statistics'][$field_name];
+            foreach ($analytics['feature_types'] as $field_name => $data_type) {
+                try {
+                    // Check if characteristic already exists
+                    if ($this->Geospatial_feature_chars_model->characteristic_name_exists($field_name, $sid, $feature_id)) {
+                        log_message('info', 'Characteristic ' . $field_name . ' already exists for feature ' . $feature_id . ', skipping');
+                        continue;
+                    }
+
+                    // Get statistics for this field if available
+                    $field_statistics = null;
+                    if (isset($analytics['feature_statistics'][$field_name])) {
+                        $field_statistics = $analytics['feature_statistics'][$field_name];
+                    }
+
+                    // Prepare characteristic data
+                    $char_data = array(
+                        'sid' => $sid,
+                        'feature_id' => $feature_id,
+                        'name' => $field_name,
+                        'label' => null, // Will be populated by user
+                        'data_type' => $data_type,
+                        'metadata' => $field_statistics,
+                        'created_by' => $user_id,
+                        'changed_by' => $user_id
+                    );
+
+                    $this->Geospatial_feature_chars_model->insert($char_data);
+                    $characteristics_created++;
+
+                } catch (Exception $e) {
+                    // Log the error but continue processing other characteristics
+                    log_message('error', 'Failed to create characteristic ' . $field_name . ': ' . $e->getMessage());
                 }
-
-                // Prepare characteristic data
-                $char_data = array(
-                    'sid' => $sid,
-                    'feature_id' => $feature_id,
-                    'name' => $field_name,
-                    'label' => null, // Will be populated by user
-                    'data_type' => $data_type,
-                    'metadata' => $field_statistics,
-                    'created_by' => $user_id,
-                    'changed_by' => $user_id
-                );
-
-                $this->Geospatial_feature_chars_model->insert($char_data);
-                $characteristics_created++;
-
-            } catch (Exception $e) {
-                // Log the error but continue processing other characteristics
-                log_message('error', 'Failed to create characteristic ' . $field_name . ': ' . $e->getMessage());
             }
         }
 

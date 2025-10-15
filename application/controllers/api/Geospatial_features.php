@@ -590,8 +590,18 @@ class Geospatial_features extends MY_REST_Controller
 				throw new Exception("Missing parameter: file_path");
 			}
 			
-			if (!$layer_name) {
+			if (!$layer_name && $layer_name !== 0 && $layer_name !== '0') {
 				throw new Exception("Missing parameter: layer_name");
+			}
+
+			// Determine if this is a raster file based on extension
+			$file_extension = strtolower(pathinfo($file_path, PATHINFO_EXTENSION));
+			$raster_extensions = array('tif', 'tiff', 'jpg', 'jpeg', 'png', 'img', 'hdf', 'nc', 'grib', 'grb', 'ecw', 'sid', 'jp2', 'asc', 'dem', 'bil', 'bip', 'bsq', 'dt0', 'dt1', 'dt2');
+			$is_raster = in_array($file_extension, $raster_extensions);
+
+			// Convert layer_name to integer for raster files if it's numeric
+			if ($is_raster && is_numeric($layer_name)) {
+				$layer_name = (int)$layer_name;
 			}
 
 			$api_client = $this->geospatial_api_client;
@@ -636,10 +646,27 @@ class Geospatial_features extends MY_REST_Controller
 			}
 
 			$api_client = $this->geospatial_api_client;
+			$this->load->library('Geospatial_processor');
+			$processor = $this->geospatial_processor;
 
 			// Start analysis jobs for each file
 			$job_results = array();
+			$skipped_files = array();
+			
 			foreach ($file_paths as $file_path) {
+				// Check if file is a primary geospatial format that can be processed
+				if (!$processor->is_primary_geospatial_file($file_path)) {
+					// Skip non-primary geospatial files (e.g., .txt, .xml, .prj, etc.)
+					$skipped_files[] = array(
+						'file_path' => $file_path,
+						'file_name' => basename($file_path),
+						'extension' => strtolower(pathinfo($file_path, PATHINFO_EXTENSION)),
+						'reason' => 'Not a primary geospatial file format (may be a supporting file)'
+					);
+					log_message('info', 'Skipping non-primary geospatial file: ' . basename($file_path));
+					continue;
+				}
+				
 				try {
 					$job_result = $api_client->start_layer_analysis_job($file_path);
 					$job_results[] = array(
@@ -661,6 +688,7 @@ class Geospatial_features extends MY_REST_Controller
 			$output = array(
 				'status' => 'success',
 				'jobs' => $job_results,
+				'skipped_files' => $skipped_files,
 				'message' => 'Layer analysis jobs started'
 			);
 
@@ -721,7 +749,8 @@ class Geospatial_features extends MY_REST_Controller
 			}
 
 			// Job is completed, create feature from job data
-			$data = $status_data['data'];
+			$job_data = $status_data['data'];
+			$data = array(null, $job_data); // Model expects data[1] to contain the metadata
 			$info = $status_data['info'];
 			
 			// import feature metadata
@@ -732,7 +761,311 @@ class Geospatial_features extends MY_REST_Controller
 				'message' => 'Feature created successfully',
 				'feature_id' => $result['feature_id'],
 				'characteristics_created' => $result['characteristics_created'],
-				'feature_data' => $result['feature_data']
+				'feature_data' => $result['feature_data'],
+				'job_id' => $job_id,
+				'job_data' => $job_data
+			);
+
+			$this->set_response($output, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output = array(
+				'status' => 'failed',
+				'message' => $e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * Start metadata refresh job for an existing geospatial feature
+	 */
+	function metadata_refresh_post($sid=null)
+	{
+		try{
+			$sid=$this->get_sid($sid);
+			$exists=$this->Editor_model->check_id_exists($sid);
+			$user_id=$this->get_api_user_id();
+			$user=$this->api_user();
+
+			if(!$exists){
+				throw new Exception("Project not found");
+			}
+
+			$this->editor_acl->user_has_project_access($sid,$permission='edit',$user);
+
+			$options = $this->raw_json_input();
+			
+			if (!isset($options['feature_id'])) {
+				throw new Exception("Missing parameter: feature_id");
+			}
+
+			// Get feature details
+			$feature = $this->Geospatial_features_model->select_single($options['feature_id']);
+			if (!$feature) {
+				throw new Exception("Geospatial feature not found");
+			}
+
+			$this->editor_acl->user_has_project_access($feature['sid'], 'edit', $user);
+
+			// Check if feature has a file
+			if (!$feature['file_name']) {
+				throw new Exception("Feature has no associated file");
+			}
+
+			// Get the full file path
+			$project_dir = $this->Editor_model->get_project_folder($feature['sid']);
+			$file_path = $project_dir . '/geospatial/' . $feature['file_name'];
+			
+			// Verify file exists
+			if (!file_exists($file_path)) {
+				throw new Exception("Geospatial file not found: " . $feature['file_name']);
+			}
+
+			// Determine if this is a raster file
+			$file_extension = strtolower(pathinfo($feature['file_name'], PATHINFO_EXTENSION));
+			$raster_extensions = array('tif', 'tiff', 'jpg', 'jpeg', 'png', 'img', 'hdf', 'nc', 'grib', 'grb', 'ecw', 'sid', 'jp2', 'asc', 'dem', 'bil', 'bip', 'bsq', 'dt0', 'dt1', 'dt2');
+			$is_raster = in_array($file_extension, $raster_extensions);
+
+			// Get layer name or band index
+			if ($is_raster) {
+				// For raster files, use band index (integer)
+				// If layer_name is numeric, use it; otherwise default to band 1
+				if (!empty($feature['layer_name']) && is_numeric($feature['layer_name'])) {
+					$layer_name_or_band = (int)$feature['layer_name'];
+				} else {
+					$layer_name_or_band = 1; // Default to first band
+				}
+			} else {
+				// For vector files, use layer name (string)
+				$layer_name_or_band = $feature['layer_name'] ?: basename($feature['file_name'], '.' . pathinfo($feature['file_name'], PATHINFO_EXTENSION));
+			}
+
+			// Start metadata extraction job
+			$api_client = $this->geospatial_api_client;
+			$result = $api_client->start_metadata_job($file_path, $layer_name_or_band);
+
+			// Store feature_id with job for later retrieval
+			$output = array(
+				'status' => 'success',
+				'job_id' => $result['job_id'],
+				'feature_id' => $options['feature_id'],
+				'message' => 'Metadata refresh job started'
+			);
+
+			$this->set_response($output, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$error_output = array(
+				'status' => 'failed',
+				'message' => $e->getMessage()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * Check metadata refresh job status and update existing feature when completed
+	 */
+	function metadata_refresh_status_get($sid=null)
+	{
+		try{
+			$sid=$this->get_sid($sid);
+			$exists=$this->Editor_model->check_id_exists($sid);
+			$user_id=$this->get_api_user_id();
+			$user=$this->api_user();
+
+			if(!$exists){
+				throw new Exception("Project not found");
+			}
+
+			$this->editor_acl->user_has_project_access($sid,$permission='edit',$user);
+
+			$job_id = $this->input->get('job_id');
+			if (!$job_id) {
+				throw new Exception("Missing parameter: job_id");
+			}
+
+			$feature_id = $this->input->get('feature_id');
+			if (!$feature_id) {
+				throw new Exception("Missing parameter: feature_id");
+			}
+
+			// Verify feature exists
+			$feature = $this->Geospatial_features_model->select_single($feature_id);
+			if (!$feature) {
+				throw new Exception("Geospatial feature not found");
+			}
+
+			$api_client = $this->geospatial_api_client;
+			$job_status = $api_client->get_job_status($job_id);
+			
+			if (!$job_status['success']) {
+				throw new Exception("Failed to get job status: " . ($job_status['message'] ?? 'Unknown error'));
+			}
+
+			$status_data = $job_status['data'];
+			
+			if ($status_data['status'] !== 'done') {
+				// Job not completed yet
+				$output = array(
+					'status' => 'processing',
+					'job_status' => $status_data['status'],
+					'message' => 'Job is still processing'
+				);
+				$this->set_response($output, REST_Controller::HTTP_OK);
+				return;
+			}
+
+			// Job is completed, update feature metadata
+			$job_data = $status_data['data'];
+			$info = $status_data['info'];
+			
+			// Determine file type (vector or raster)
+			$file_type = $info['file_type'] ?? 'vector';
+			$is_raster = ($file_type === 'raster');
+			
+			// Extract metadata from job result
+			$analytics = isset($job_data['analytics']) ? $job_data['analytics'] : null;
+			
+			// Process based on file type
+			if ($is_raster) {
+				// Raster structure
+				$layer_info = array();
+				if (isset($job_data['raster_stats'])) {
+					$layer_info['rows'] = $job_data['raster_stats']['rows'] ?? 0;
+					$layer_info['columns'] = $job_data['raster_stats']['cols'] ?? 0;
+					$layer_info['bands'] = $job_data['raster_stats']['bands'] ?? 1;
+				}
+				
+				// Extract bounding box from raster structure
+				if (isset($job_data['bounding_box']['geographicBoundingBox'])) {
+					$layer_info['geographicBoundingBox'] = $job_data['bounding_box']['geographicBoundingBox'];
+					$layer_info['geohash'] = $job_data['bounding_box']['geohash'] ?? null;
+				}
+				
+				// Store CRS - raster uses 'projection' (WKT string)
+				$metadata_field = array();
+				if (isset($job_data['projection'])) {
+					$metadata_field['projection'] = $job_data['projection'];
+				}
+				if (isset($job_data['crs'])) {
+					$metadata_field['crs'] = $job_data['crs'];
+				}
+				$metadata_field['raster_stats'] = $job_data['raster_stats'] ?? null;
+				$metadata_field['layer_info'] = $layer_info;
+			} else {
+				// Vector structure
+				$layer_info = isset($analytics['layer']) ? $analytics['layer'] : [];
+				
+				// Prepare metadata field for vector
+				$metadata_field = array();
+				$metadata_field['crs'] = isset($job_data['crs']) ? $job_data['crs'] : null;
+				$metadata_field['layer_info'] = $layer_info;
+			}
+
+			// Prepare update data
+			$update_data = array(
+				'layer_type' => $file_type,
+				'feature_count' => $layer_info['rows'] ?? 0,
+				'geometry_type' => $is_raster ? 'raster' : 'vector',
+				'bounds' => isset($layer_info['geographicBoundingBox']) ? json_encode($layer_info['geographicBoundingBox']) : null,
+				'metadata' => json_encode($metadata_field),
+				'changed_by' => $user_id
+			);
+
+			// Update the feature
+			$this->Geospatial_features_model->update($feature_id, $update_data);
+
+			// Update project timestamp
+			$this->Editor_model->set_project_options($sid, array(
+				'changed_by' => $user_id,
+				'changed' => date("U")
+			));
+
+			// Delete existing characteristics before recreating them
+			$this->load->model('Geospatial_feature_chars_model');
+			$this->Geospatial_feature_chars_model->delete_by_feature_id($feature_id);
+
+			// Create new characteristics from updated metadata
+			$characteristics_created = 0;
+			
+			if ($is_raster) {
+				// Raster files: create a characteristic for the band statistics
+				$feature_stats = $analytics['feature_statistics'] ?? null;
+				
+				if ($feature_stats && isset($feature_stats['band_index'])) {
+					try {
+						$band_index = $feature_stats['band_index'];
+						$char_name = 'Band ' . $band_index;
+						
+						// Prepare characteristic data for raster band
+						$char_data = array(
+							'sid' => $sid,
+							'feature_id' => $feature_id,
+							'name' => $char_name,
+							'label' => 'Band ' . $band_index . ' Statistics',
+							'data_type' => 'raster_band',
+							'metadata' => $feature_stats,
+							'created_by' => $user_id,
+							'changed_by' => $user_id
+						);
+
+						$this->Geospatial_feature_chars_model->insert($char_data);
+						$characteristics_created++;
+					} catch (Exception $e) {
+						log_message('error', 'Failed to create raster band characteristic: ' . $e->getMessage());
+					}
+				}
+			} else {
+				// Vector files: create characteristics from feature_types
+				if ($analytics && isset($analytics['feature_types']) && is_array($analytics['feature_types'])) {
+					foreach ($analytics['feature_types'] as $field_name => $data_type) {
+						try {
+							// Get statistics for this field if available
+							$field_statistics = null;
+							if (isset($analytics['feature_statistics'][$field_name])) {
+								$field_statistics = $analytics['feature_statistics'][$field_name];
+							}
+
+							// Prepare characteristic data
+							$char_data = array(
+								'sid' => $sid,
+								'feature_id' => $feature_id,
+								'name' => $field_name,
+								'label' => null,
+								'data_type' => $data_type,
+								'metadata' => $field_statistics,
+								'created_by' => $user_id,
+								'changed_by' => $user_id
+							);
+
+							$this->Geospatial_feature_chars_model->insert($char_data);
+							$characteristics_created++;
+						} catch (Exception $e) {
+							log_message('error', 'Failed to create characteristic ' . $field_name . ': ' . $e->getMessage());
+						}
+					}
+				}
+			}
+
+			// Log the refresh action
+			$this->audit_log->log_event(
+				$obj_type = 'geospatial_feature',
+				$obj_id = $feature_id,
+				$action = 'metadata_refresh', 
+				$metadata = array(
+					'job_id' => $job_id,
+					'characteristics_updated' => $characteristics_created
+				),
+				$user_id
+			);
+
+			$output = array(
+				'status' => 'success',
+				'message' => 'Feature metadata refreshed successfully',
+				'feature_id' => $feature_id,
+				'characteristics_updated' => $characteristics_created
 			);
 
 			$this->set_response($output, REST_Controller::HTTP_OK);
@@ -770,15 +1103,23 @@ class Geospatial_features extends MY_REST_Controller
 				throw new Exception("Missing parameter: feature_id");
 			}
 			
-			// Get feature details
-			$feature = $this->Geospatial_features_model->select_single($options['feature_id']);
-			if (!$feature) {
-				throw new Exception("Geospatial feature not found");
-			}
+		// Get feature details
+		$feature = $this->Geospatial_features_model->select_single($options['feature_id']);
+		if (!$feature) {
+			throw new Exception("Geospatial feature not found");
+		}
 
-			$this->editor_acl->user_has_project_access($feature['sid'], 'edit', $user);
+		$this->editor_acl->user_has_project_access($feature['sid'], 'edit', $user);
 
-			$api_client = $this->geospatial_api_client;
+		// Check if file is a raster format - CSV generation not supported for rasters
+		$file_extension = strtolower(pathinfo($feature['file_name'], PATHINFO_EXTENSION));
+		$raster_extensions = array('tif', 'tiff', 'jpg', 'jpeg', 'png', 'img', 'hdf', 'nc', 'grib', 'grb', 'ecw', 'sid', 'jp2', 'asc', 'dem', 'bil', 'bip', 'bsq', 'dt0', 'dt1', 'dt2');
+		
+		if (in_array($file_extension, $raster_extensions)) {
+			throw new Exception("CSV generation is not supported for raster files (." . $file_extension . "). This feature is only available for vector data formats.");
+		}
+
+		$api_client = $this->geospatial_api_client;
 
 			// Get the full file path for the feature
 			$project_dir = $this->Editor_model->get_project_folder($sid);

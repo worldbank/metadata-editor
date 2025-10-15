@@ -43,10 +43,21 @@ Vue.component('geospatial-feature-edit', {
             ];
         },
         crsInfo() {
-            if (!this.form_data.metadata || !this.form_data.metadata.crs) {
+            if (!this.form_data.metadata) {
                 return null;
             }
-            return this.form_data.metadata.crs;
+            
+            // Check for PROJ JSON format (vector files)
+            if (this.form_data.metadata.crs) {
+                return this.form_data.metadata.crs;
+            }
+            
+            // Check for WKT format (raster files)
+            if (this.form_data.metadata.projection) {
+                return this.parseWKT(this.form_data.metadata.projection);
+            }
+            
+            return null;
         },
         hasMapData() {
             return this.boundingBox !== null;
@@ -228,6 +239,117 @@ Vue.component('geospatial-feature-edit', {
             }
         },
         
+        /**
+         * Parse WKT (Well-Known Text) format CRS string into a structured format
+         * similar to PROJ JSON for consistent display
+         */
+        parseWKT: function(wktString) {
+            if (!wktString || typeof wktString !== 'string') {
+                return null;
+            }
+            
+            try {
+                const result = {
+                    type: 'WKT',
+                    name: null,
+                    id: null,
+                    datum: null,
+                    units: null,
+                    area: null,
+                    scope: null,
+                    original_wkt: wktString
+                };
+                
+                // Extract CRS name (first quoted string after GEOGCS or PROJCS)
+                const nameMatch = wktString.match(/^(GEOGCS|PROJCS)\["([^"]+)"/);
+                if (nameMatch) {
+                    result.name = nameMatch[2];
+                    result.type = nameMatch[1] === 'GEOGCS' ? 'GeographicCRS' : 'ProjectedCRS';
+                }
+                
+                // Extract EPSG code from AUTHORITY sections
+                const authorityMatch = wktString.match(/AUTHORITY\["EPSG","(\d+)"\]\s*\]$/);
+                if (authorityMatch) {
+                    result.id = {
+                        authority: 'EPSG',
+                        code: parseInt(authorityMatch[1])
+                    };
+                }
+                
+                // Extract datum name
+                const datumMatch = wktString.match(/DATUM\["([^"]+)"/);
+                if (datumMatch) {
+                    result.datum = datumMatch[1];
+                }
+                
+                // Extract units
+                const unitMatch = wktString.match(/UNIT\["([^"]+)",([^,\]]+)/);
+                if (unitMatch) {
+                    result.units = {
+                        name: unitMatch[1],
+                        conversion_factor: parseFloat(unitMatch[2])
+                    };
+                }
+                
+                // Extract spheroid/ellipsoid information
+                const spheroidMatch = wktString.match(/SPHEROID\["([^"]+)",([^,]+),([^,\]]+)/);
+                if (spheroidMatch) {
+                    result.ellipsoid = {
+                        name: spheroidMatch[1],
+                        semi_major_axis: parseFloat(spheroidMatch[2]),
+                        inverse_flattening: parseFloat(spheroidMatch[3])
+                    };
+                }
+                
+                // Add helpful descriptions based on common EPSG codes
+                if (result.id && result.id.code) {
+                    const epsgDescriptions = {
+                        4326: {
+                            area: 'World.',
+                            scope: 'Horizontal component of 3D system. Used by GPS satellite navigation system.'
+                        },
+                        3857: {
+                            area: 'World between 85.06°S and 85.06°N.',
+                            scope: 'Web mapping and visualization. Used by Google Maps, OpenStreetMap, and other web mapping services.'
+                        },
+                        32601: {
+                            area: 'Between 180°W and 174°W, northern hemisphere between equator and 84°N.',
+                            scope: 'Navigation and medium accuracy spatial referencing.'
+                        }
+                        // Add more as needed
+                    };
+                    
+                    // For UTM zones (32601-32660 for North, 32701-32760 for South)
+                    const code = result.id.code;
+                    if (code >= 32601 && code <= 32660) {
+                        const zone = code - 32600;
+                        const westLon = (zone - 1) * 6 - 180;
+                        const eastLon = zone * 6 - 180;
+                        result.area = `Between ${westLon}°E and ${eastLon}°E, northern hemisphere between equator and 84°N.`;
+                        result.scope = 'Navigation and medium accuracy spatial referencing.';
+                    } else if (code >= 32701 && code <= 32760) {
+                        const zone = code - 32700;
+                        const westLon = (zone - 1) * 6 - 180;
+                        const eastLon = zone * 6 - 180;
+                        result.area = `Between ${westLon}°E and ${eastLon}°E, southern hemisphere between 80°S and equator.`;
+                        result.scope = 'Navigation and medium accuracy spatial referencing.';
+                    } else if (epsgDescriptions[code]) {
+                        result.area = epsgDescriptions[code].area;
+                        result.scope = epsgDescriptions[code].scope;
+                    }
+                }
+                
+                return result;
+            } catch (error) {
+                console.error('Error parsing WKT:', error);
+                return {
+                    type: 'WKT',
+                    name: 'Unknown CRS',
+                    original_wkt: wktString,
+                    parse_error: error.message
+                };
+            }
+        },
         
         saveFeature: function() {
             this.loading = true;
@@ -528,6 +650,72 @@ Vue.component('geospatial-feature-edit', {
                                                             <v-text-field
                                                                 :value="crsInfo.id.authority"
                                                                 label="Authority"
+                                                                readonly
+                                                                outlined
+                                                                dense
+                                                            ></v-text-field>
+                                                        </v-col>
+                                                    </v-row>
+                                                    
+                                                    <!-- WKT-specific fields: Datum -->
+                                                    <v-row v-if="crsInfo.datum">
+                                                        <v-col cols="12">
+                                                            <v-text-field
+                                                                :value="crsInfo.datum"
+                                                                label="Datum"
+                                                                readonly
+                                                                outlined
+                                                                dense
+                                                            ></v-text-field>
+                                                        </v-col>
+                                                    </v-row>
+                                                    
+                                                    <!-- WKT-specific fields: Ellipsoid -->
+                                                    <v-row v-if="crsInfo.ellipsoid">
+                                                        <v-col cols="12" md="4">
+                                                            <v-text-field
+                                                                :value="crsInfo.ellipsoid.name"
+                                                                label="Ellipsoid"
+                                                                readonly
+                                                                outlined
+                                                                dense
+                                                            ></v-text-field>
+                                                        </v-col>
+                                                        <v-col cols="12" md="4">
+                                                            <v-text-field
+                                                                :value="crsInfo.ellipsoid.semi_major_axis"
+                                                                label="Semi-Major Axis (m)"
+                                                                readonly
+                                                                outlined
+                                                                dense
+                                                            ></v-text-field>
+                                                        </v-col>
+                                                        <v-col cols="12" md="4">
+                                                            <v-text-field
+                                                                :value="crsInfo.ellipsoid.inverse_flattening"
+                                                                label="Inverse Flattening"
+                                                                readonly
+                                                                outlined
+                                                                dense
+                                                            ></v-text-field>
+                                                        </v-col>
+                                                    </v-row>
+                                                    
+                                                    <!-- WKT-specific fields: Units -->
+                                                    <v-row v-if="crsInfo.units">
+                                                        <v-col cols="12" md="6">
+                                                            <v-text-field
+                                                                :value="crsInfo.units.name"
+                                                                label="Units"
+                                                                readonly
+                                                                outlined
+                                                                dense
+                                                            ></v-text-field>
+                                                        </v-col>
+                                                        <v-col cols="12" md="6">
+                                                            <v-text-field
+                                                                :value="crsInfo.units.conversion_factor"
+                                                                label="Conversion Factor"
                                                                 readonly
                                                                 outlined
                                                                 dense

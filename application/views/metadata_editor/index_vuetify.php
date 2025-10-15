@@ -536,13 +536,14 @@
                     file: 'variable',                    
                     key:'geospatial-features/'+feature.id+'/characteristics',
                     feature:feature,
-                },{
+                }
+                /*{
                     title:this.$t('Data'),
                     type: 'geospatial-feature-data',
                     file: 'datafile',                    
                     key:'geospatial-features/'+feature.id+'/data',
                     feature:feature,
-                }]
+                }*/]
             });
           }
 
