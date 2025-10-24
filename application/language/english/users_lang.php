@@ -151,5 +151,17 @@ $lang['roles_removal_failed']="Role removal failed";
 // User roles
 $lang['user_roles']="User Roles";
 
+// Pending activation
+$lang['pending_activation']="Pending Activation";
+$lang['back_to_users']="Back to Users";
+$lang['registered']="Registered";
+$lang['days_waiting']="Days Waiting";
+$lang['actions']="Actions";
+$lang['resend_activation_email']="Resend Activation Email";
+$lang['activate_now']="Activate Now";
+$lang['user_already_active']="User is already active";
+$lang['user_not_found']="User not found";
+$lang['activation_code_generation_failed']="Failed to generate activation code";
+
 /* End of file users_lang.php */
 /* Location: ./application/language/english/users_lang.php */

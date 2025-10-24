@@ -463,6 +463,167 @@ class User_model extends CI_Model {
 		}
 		
 		return $output;
-	}	
+	}
+	
+	/**
+	 * Get users pending activation (inactive with activation code)
+	 *
+	 * @param int $limit
+	 * @param int $offset
+	 * @param array $filter
+	 * @param string $sort_by
+	 * @param string $sort_order
+	 * @return array
+	 */
+	function get_pending_activation($limit = NULL, $offset = NULL, $filter=NULL, $sort_by=NULL, $sort_order=NULL)
+	{
+		$this->db->flush_cache();
+		
+		//columns
+		$columns=sprintf('%s.id,username,email,active,created_on,last_login,country,company,activation_code',
+							$this->tables['users']);
+		
+		//select columns for output
+		$this->db->select($columns);
+		
+		//allowed_fields for searching or sorting
+		$db_fields=array(
+					'username'=>'username',
+					'first_name'=>'first_name',
+					'last_name'=>'last_name',
+					'email'=>'email',
+					'country'=>'country',
+					'company'=>'company',
+					'created_on'=>'created_on'
+					);
+		
+		//set where
+		if ($filter)
+		{			
+			$has_keyword_search = false;
+			$keyword_field = '';
+			$keyword_value = '';
+			
+			// First pass: handle keyword searches
+			foreach($filter as $f)
+			{
+				if (isset($f['keywords'])) {
+					$has_keyword_search = true;
+					$keyword_field = $f['field'];
+					$keyword_value = $f['keywords'];
+					break;
+				}
+			}
+			
+			// Handle keyword search with proper grouping
+			if ($has_keyword_search) {
+				if ($keyword_field == 'all') {
+					$this->db->group_start();
+					foreach($db_fields as $field)
+					{
+						$this->db->or_like($field, $keyword_value); 
+					}
+					$this->db->group_end();
+				} else if (in_array($keyword_field, $db_fields)) {
+					$this->db->like($keyword_field, $keyword_value);
+				}
+			}
+		}
+		
+		// Only get inactive users with activation code
+		$this->db->where('active', 0);
+		$this->db->where('activation_code !=', '');
+		$this->db->where('activation_code IS NOT NULL');
+		
+		$this->db->join($this->tables['meta'], sprintf('%s.user_id = %s.id',$this->tables['meta'],$this->tables['users']));
+		
+		//set order by
+		if ($sort_by!='' && $sort_order!='')
+		{
+			if ( array_key_exists($sort_by,$db_fields))
+			{
+				$this->db->order_by($db_fields[$sort_by], $sort_order); 
+			}	
+		}
+		else
+		{
+			// Default: newest first
+			$this->db->order_by('created_on', 'DESC');
+		}
+		
+		//set Limit clause
+		if ($limit)
+		{
+			$this->db->limit($limit, $offset);
+		}
+		
+		$this->db->from($this->tables['users']);
+		
+		$result= $this->db->get()->result_array();
+		return $result;
+	}
+	
+	/**
+	 * Count users pending activation
+	 *
+	 * @param array $filter
+	 * @return int
+	 */
+	function get_pending_activation_count($filter=NULL)
+	{
+		$this->db->flush_cache();
+		
+		//allowed_fields for searching
+		$db_fields=array(
+					'username'=>'username',
+					'first_name'=>'first_name',
+					'last_name'=>'last_name',
+					'email'=>'email',
+					'country'=>'country',
+					'company'=>'company',
+					'created_on'=>'created_on'
+					);
+		
+		//set where
+		if ($filter)
+		{			
+			$has_keyword_search = false;
+			$keyword_field = '';
+			$keyword_value = '';
+			
+			foreach($filter as $f)
+			{
+				if (isset($f['keywords'])) {
+					$has_keyword_search = true;
+					$keyword_field = $f['field'];
+					$keyword_value = $f['keywords'];
+					break;
+				}
+			}
+			
+			if ($has_keyword_search) {
+				if ($keyword_field == 'all') {
+					$this->db->group_start();
+					foreach($db_fields as $field)
+					{
+						$this->db->or_like($field, $keyword_value); 
+					}
+					$this->db->group_end();
+				} else if (in_array($keyword_field, $db_fields)) {
+					$this->db->like($keyword_field, $keyword_value);
+				}
+			}
+		}
+		
+		// Only get inactive users with activation code
+		$this->db->where('active', 0);
+		$this->db->where('activation_code !=', '');
+		$this->db->where('activation_code IS NOT NULL');
+		
+		$this->db->join($this->tables['meta'], sprintf('%s.user_id = %s.id',$this->tables['meta'],$this->tables['users']));
+		$this->db->from($this->tables['users']);
+		
+		return $this->db->count_all_results();
+	}
 }
 ?>

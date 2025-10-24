@@ -948,5 +948,87 @@ class Ion_auth
 		return true;	
 	}
 
+	/**
+	 * Resend activation email
+	 * 
+	 * @param int $user_id - User ID
+	 * @return bool - True on success, false on failure
+	 */
+	function resend_activation_email($user_id)
+	{
+		// Get user information
+		$user = $this->ci->ion_auth_model->get_user($user_id);
+		
+		if (!$user) {
+			$this->set_error('user_not_found');
+			return FALSE;
+		}
+		
+		// Check if user is already active
+		if ($user->active == 1) {
+			$this->set_error('user_already_active');
+			return FALSE;
+		}
+		
+		// Check if user has an activation code
+		if (empty($user->activation_code)) {
+			$this->set_error('activation_code_generation_failed');
+			return FALSE;
+		}
+		
+		$activation_code = $user->activation_code;
+		$identity = $this->ci->config->item('identity');
+		
+		// Prepare email data
+		$data = array(
+			'identity'   => $user->{$identity},
+			'id'         => $user->id,
+			'email'      => $user->email,
+			'activation' => $activation_code
+		);
+		
+		// Load email template
+		try {
+			$message = $this->ci->load->view(
+				$this->ci->config->item('email_templates') . $this->ci->config->item('email_activate'),
+				$data,
+				true
+			);
+		} catch (Exception $e) {
+			$this->set_error('Email template error: ' . $e->getMessage());
+			return FALSE;
+		}
+		
+		// Send email
+		try {
+			$email_sent = $this->ci->mailer->send($email_options = array(
+				'subject' => $this->ci->config->item('website_title') . ' - ' . t('account_activation'),
+				'message' => $message,
+				'to'      => $user->email
+			));
+		} catch (Exception $e) {
+			$this->set_error('Email send error: ' . $e->getMessage());
+			return FALSE;
+		}
+		
+		if ($email_sent) {
+			$this->set_message('activation_email_successful');
+			return TRUE;
+		}
+		else {
+			// Try to get debug info from email library
+			$debug_msg = 'Activation email was not sent';
+			if (method_exists($this->ci->email, 'print_debugger')) {
+				$debug_info = $this->ci->email->print_debugger();
+				if (!empty($debug_info)) {
+					log_message('error', 'Email debug: ' . $debug_info);
+					$debug_msg .= ' (check error logs for details)';
+				}
+			}
+			$this->set_error($debug_msg);
+			return FALSE;
+		}
+	}
+
 
 }

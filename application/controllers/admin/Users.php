@@ -1134,6 +1134,263 @@ class Users extends MY_Controller {
 		*/
 	}
 	
+	/**
+	 * Display users pending activation
+	 */
+	function pending_activation()
+	{
+		$this->acl_manager->has_access_or_die('user', 'view');
+		
+		//load text helper for character_limiter function
+		$this->load->helper('text');
+		
+		//records to show per page
+		$per_page = 15;
+		
+		//current page
+		$offset=$this->input->get('offset');
+		
+		//sort order
+		$sort_order=$this->input->get('sort_order') ? $this->input->get('sort_order') : 'desc';
+		$sort_by=$this->input->get('sort_by') ? $this->input->get('sort_by') : 'created_on';
+		
+		//filter
+		$filter=NULL;
+		$filter_count = 0;
+		
+		//simple search
+		if ($this->input->get_post("keywords"))
+		{
+			$filter[$filter_count]['field']=$this->input->get_post('field');
+			$filter[$filter_count]['keywords']=$this->input->get_post('keywords');
+			$filter_count++;			
+		}
+		
+		//records
+		$rows=$this->User_model->get_pending_activation($per_page, $offset, $filter, $sort_by, $sort_order);
+		
+		//total records in the db
+		$total = $this->User_model->get_pending_activation_count($filter);
+		
+		if ($offset>$total)
+		{
+			$offset=$total-$per_page;
+			//search again
+			$rows=$this->User_model->get_pending_activation($per_page, $offset, $filter, $sort_by, $sort_order);
+		}
+		
+		//set pagination options
+		$base_url = site_url('admin/users/pending_activation');
+		$config['base_url'] = $base_url;
+		$config['total_rows'] = $total;
+		$config['per_page'] = $per_page;
+		$config['query_string_segment']="offset"; 
+		$config['page_query_string'] = TRUE;
+		$config['additional_querystring']=get_querystring(array('keywords', 'field','sort_by','sort_order'));
+		$config['num_links'] = 1;
+		$config['full_tag_open'] = '<span class="page-nums">' ;
+		$config['full_tag_close'] = '</span>';
+		
+		//intialize pagination
+		$this->pagination->initialize($config);
+		
+		$result['rows']=$rows;
+		$result['total']=$total;
+		
+		$content=$this->load->view('users/pending_activation', $result, true);
+		$this->template->write('content', $content, true);
+		$this->template->write('title', t('pending_activation'), true);
+		$this->template->render();
+	}
+	
+	/**
+	 * Resend activation email to selected users
+	 */
+	function resend_activation_email()
+	{
+		$this->acl_manager->has_access_or_die('user', 'edit');
+		
+		$user_ids = $this->input->post('user_ids');
+		
+		if (empty($user_ids)) {
+			echo json_encode(['success' => false, 'message' => 'No users selected']);
+			return;
+		}
+		
+		// If user_ids is a JSON string, decode it
+		if (is_string($user_ids)) {
+			$user_ids = json_decode($user_ids, true);
+		}
+		
+		if (!is_array($user_ids)) {
+			echo json_encode(['success' => false, 'message' => 'Invalid user selection']);
+			return;
+		}
+		
+		$success_count = 0;
+		$error_count = 0;
+		$error_messages = array();
+		
+		foreach ($user_ids as $user_id) {
+			if (is_numeric($user_id)) {
+				if ($this->ion_auth->resend_activation_email($user_id)) {
+					$success_count++;
+				} else {
+					$error_count++;
+					// Capture the error message
+					$errors = $this->ion_auth->errors();
+					if (!empty($errors)) {
+						$error_messages[] = strip_tags($errors);
+					}
+				}
+			}
+		}
+		
+		if ($success_count > 0) {
+			$message = sprintf('Activation email sent to %d user(s)', $success_count);
+			if ($error_count > 0) {
+				$message .= sprintf(', failed for %d user(s)', $error_count);
+				if (!empty($error_messages)) {
+					$message .= '. Errors: ' . implode('; ', array_unique($error_messages));
+				}
+			}
+			echo json_encode(['success' => true, 'message' => $message]);
+		} else {
+			$error_msg = 'Failed to send activation emails';
+			if (!empty($error_messages)) {
+				$error_msg .= ': ' . implode('; ', array_unique($error_messages));
+			}
+			echo json_encode(['success' => false, 'message' => $error_msg]);
+		}
+	}
+	
+	/**
+	 * Manually activate selected users
+	 */
+	function manual_activate()
+	{
+		$this->acl_manager->has_access_or_die('user', 'edit');
+		
+		$user_ids = $this->input->post('user_ids');
+		
+		if (empty($user_ids)) {
+			echo json_encode(['success' => false, 'message' => 'No users selected']);
+			return;
+		}
+		
+		// If user_ids is a JSON string, decode it
+		if (is_string($user_ids)) {
+			$user_ids = json_decode($user_ids, true);
+		}
+		
+		if (!is_array($user_ids)) {
+			echo json_encode(['success' => false, 'message' => 'Invalid user selection']);
+			return;
+		}
+		
+		$success_count = 0;
+		$error_count = 0;
+		
+		foreach ($user_ids as $user_id) {
+			if (is_numeric($user_id)) {
+				// Activate without code (admin override)
+				if ($this->ion_auth->activate($user_id)) {
+					$success_count++;
+				} else {
+					$error_count++;
+				}
+			}
+		}
+		
+		if ($success_count > 0) {
+			$message = sprintf('%d user(s) activated successfully', $success_count);
+			if ($error_count > 0) {
+				$message .= sprintf(', failed for %d user(s)', $error_count);
+			}
+			echo json_encode(['success' => true, 'message' => $message]);
+		} else {
+			echo json_encode(['success' => false, 'message' => 'Failed to activate users']);
+		}
+	}
+	
+	/**
+	 * Delete pending activation users
+	 */
+	function delete_pending()
+	{
+		$this->acl_manager->has_access_or_die('user', 'delete');
+		
+		$user_ids = $this->input->post('user_ids');
+		
+		if (empty($user_ids)) {
+			echo json_encode(['success' => false, 'message' => 'No users selected']);
+			return;
+		}
+		
+		// If user_ids is a JSON string, decode it
+		if (is_string($user_ids)) {
+			$user_ids = json_decode($user_ids, true);
+		}
+		
+		if (!is_array($user_ids)) {
+			echo json_encode(['success' => false, 'message' => 'Invalid user selection']);
+			return;
+		}
+		
+		$success_count = 0;
+		
+		foreach ($user_ids as $user_id) {
+			if (is_numeric($user_id)) {
+				if ($this->User_model->delete($user_id)) {
+					$success_count++;
+				}
+			}
+		}
+		
+		if ($success_count > 0) {
+			echo json_encode(['success' => true, 'message' => sprintf('%d user(s) deleted', $success_count)]);
+		} else {
+			echo json_encode(['success' => false, 'message' => 'Failed to delete users']);
+		}
+	}
+	
+	/**
+	 * Export pending activation users' email addresses
+	 */
+	function export_pending_emails()
+	{
+		$this->acl_manager->has_access_or_die('user', 'view');
+		
+		// Get all pending activation users (no limit)
+		$rows = $this->User_model->get_pending_activation(NULL, NULL, NULL, 'created_on', 'DESC');
+		
+		if (empty($rows)) {
+			// Return empty response
+			header('Content-Type: text/plain');
+			echo '';
+			return;
+		}
+		
+		// Extract email addresses
+		$emails = array();
+		foreach ($rows as $row) {
+			if (!empty($row['email'])) {
+				$emails[] = $row['email'];
+			}
+		}
+		
+		// Join with semicolon
+		$email_list = implode('; ', $emails);
+		
+		// Set headers for download
+		header('Content-Type: text/plain');
+		header('Content-Disposition: attachment; filename="pending_activation_emails_' . date('Y-m-d') . '.txt"');
+		header('Cache-Control: no-cache, must-revalidate');
+		header('Expires: 0');
+		
+		echo $email_list;
+	}
+	
 	
 	
 }
