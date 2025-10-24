@@ -664,7 +664,7 @@ $config['site_user_register']='yes';
 |
 | allowed_resource_types	comma seperated list of file extensions that are allowed for uploading external resources
 */
-$config['allowed_resource_types']='jpg,gif,png,zip,doc,docx,pdf,sav,dta,txt,xls,xlsx,ppt,csv,rar,do,r,pptx,geojson,shp,shx,dbf,prj,gpkg,tiff,geotiff,tif,kml,kmz,gpx';
+$config['allowed_resource_types']='jpg,gif,png,zip,doc,docx,pdf,sav,dta,txt,xls,xlsx,ppt,csv,rar,do,r,pptx,geojson,shp,shx,dbf,prj,gpkg,tiff,geotiff,tif,kml,kmz,gpx,nc,hdf,hdf5,grib,grb,jpeg,img,ecw,sid,jp2,asc,dem,bil,bip,bsq,dt0,dt1,dt2,xml,cpg,sbn,sbx,qmd,qpj';
 
 
 /*
