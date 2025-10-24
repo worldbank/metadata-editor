@@ -1262,7 +1262,11 @@ abstract class REST_Controller extends CI_Controller {
      * @return bool TRUE the data was inserted; otherwise, FALSE
      */
     protected function _log_request($authorized = FALSE)
-    {        
+    {
+        // Only log requests that use an API key
+        if (empty($this->rest->key)) {
+            return FALSE;
+        }        
         // Insert the request into the log table
         $is_inserted = $this->rest->db
             ->insert(
