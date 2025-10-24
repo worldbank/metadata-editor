@@ -149,6 +149,8 @@ Vue.component('vue-project-share', {
             })
             .catch(function (error) {
                 console.log(error);
+                let message = vm.$extractErrorMessage(error);
+                vm.$alert(message, { color: 'error'});
             })
             .finally(() => (this.is_loading = false));
         },300)
