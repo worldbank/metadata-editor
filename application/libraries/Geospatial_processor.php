@@ -9,6 +9,7 @@ class Geospatial_processor {
 
     private $allowed_extensions = array(
         'shp', 'shx', 'dbf', 'prj', 'xml', 'cpg', 'txt', 'sbn', 'sbx',  // Shapefile components
+        'qmd', 'qpj',               // QGIS metadata and projection files
         'gpkg',                      // GeoPackage
         'geojson', 'json',           // GeoJSON
         'kml', 'kmz',               // KML/KMZ
@@ -27,7 +28,7 @@ class Geospatial_processor {
 
     private $required_shapefile_extensions = array('shp', 'shx', 'dbf');
     
-    private $shapefile_associated_extensions = array('shx', 'dbf', 'prj', 'xml', 'cpg', 'sbn', 'sbx', 'shp.xml', 'txt');
+    private $shapefile_associated_extensions = array('shx', 'dbf', 'prj', 'xml', 'cpg', 'sbn', 'sbx', 'shp.xml', 'txt', 'qmd', 'qpj');
     
     // Extensions that are primary geospatial formats (can be processed standalone)
     private $primary_geospatial_extensions = array(
@@ -227,20 +228,35 @@ class Geospatial_processor {
             
             // Get just the filename without any path
             $flat_filename = basename($file_name);
+            $target_path = $destination . '/' . $flat_filename;
             
-            // Extract file content
-            $file_content = $zip->getFromIndex($i);
-            if ($file_content === false) {
-                $result['errors'][] = "Failed to extract file: {$file_name}";
+            // Extract file using streaming to avoid memory issues with large files
+            // Open the file in the ZIP as a stream
+            $fp_in = $zip->getStream($file_name);
+            if ($fp_in === false) {
+                $result['errors'][] = "Failed to open stream for file: {$file_name}";
                 continue;
             }
             
-            // Write file to destination (flattened - no folders)
-            $target_path = $destination . '/' . $flat_filename;
-            if (file_put_contents($target_path, $file_content) !== false) {
+            // Open destination file for writing
+            $fp_out = fopen($target_path, 'wb');
+            if ($fp_out === false) {
+                fclose($fp_in);
+                $result['errors'][] = "Failed to create file: {$flat_filename}";
+                continue;
+            }
+            
+            // Stream copy to avoid loading entire file into memory
+            $bytes_written = stream_copy_to_stream($fp_in, $fp_out);
+            
+            fclose($fp_in);
+            fclose($fp_out);
+            
+            if ($bytes_written !== false && $bytes_written > 0) {
                 $result['extracted_files'][] = $flat_filename;
             } else {
                 $result['errors'][] = "Failed to write file: {$flat_filename}";
+                @unlink($target_path); // Clean up failed extraction
             }
         }
         
@@ -320,10 +336,18 @@ class Geospatial_processor {
                         continue;
                     }
                     
+                    // Build absolute path
+                    $file_path = $extract_destination . '/' . $extracted_file;
+                    $absolute_path = realpath($file_path);
+                    if (!$absolute_path) {
+                        error_log("Warning: Could not resolve absolute path for: {$file_path}");
+                        $absolute_path = $file_path; // Fallback to constructed path
+                    }
+                    
                     $result['extracted_files'][] = array(
                         'original_zip' => $file_name,
                         'extracted_file' => $extracted_file,
-                        'path' => $extract_destination . '/' . $extracted_file
+                        'path' => $absolute_path
                     );
                 }
 
@@ -345,9 +369,16 @@ class Geospatial_processor {
                 }
                 
                 if (rename($file_path, $destination)) {
+                    // Get absolute path for the moved file
+                    $absolute_path = realpath($destination);
+                    if (!$absolute_path) {
+                        error_log("Warning: Could not resolve absolute path for: {$destination}");
+                        $absolute_path = $destination; // Fallback to constructed path
+                    }
+                    
                     $result['processed_files'][] = array(
                         'original_name' => $file_name,
-                        'path' => $destination
+                        'path' => $absolute_path
                     );
                 } else {
                     $result['errors'][] = "Failed to move file '{$file_name}' to project folder";

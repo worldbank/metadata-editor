@@ -187,13 +187,39 @@ Vue.component('geospatial-feature-import', {
                         fileData.status = 'failed';
                         fileData.error = uploadResult.message || 'Upload failed';
                         this.has_errors = true;
+                        this.errors = uploadResult.message || 'Upload failed';
+                        this.update_status = 'Upload failed';
+                        this.is_processing = false;
+                        
+                        // Add to upload report for visibility
+                        this.upload_report.push({
+                            file_name: fileData.name,
+                            status: 'failed',
+                            error: uploadResult.message || 'Upload failed',
+                            context: 'File Upload'
+                        });
                     }
                     completedFiles++;
                 })
                 .catch(error => {
+                    console.error('Upload error:', error);
                     fileData.status = 'failed';
-                    fileData.error = error.message;
+                    // Extract error message from axios error response
+                    const errorMessage = error.response?.data?.message || error.message || 'Upload failed';
+                    fileData.error = errorMessage;
                     this.has_errors = true;
+                    this.errors = errorMessage;
+                    this.update_status = 'Upload failed';
+                    this.is_processing = false;
+                    
+                    // Add to upload report for visibility
+                    this.upload_report.push({
+                        file_name: fileData.name,
+                        status: 'failed',
+                        error: errorMessage,
+                        context: 'File Upload'
+                    });
+                    
                     completedFiles++;
                 });
             });
