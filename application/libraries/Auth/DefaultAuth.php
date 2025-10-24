@@ -340,7 +340,7 @@ class DefaultAuth implements AuthInterface
         $change = $this->ci->ion_auth->change_password($identity, $this->ci->input->post('old'), $this->ci->input->post('new'));
 
 		if ($change) {
-			$this->ci->session->set_flashdata('message', t('password_changed_success'));
+			$this->ci->session->set_flashdata('message', t('password_change_success'));
 			redirect('auth/change_password', 'refresh');
 		}
 		else {
