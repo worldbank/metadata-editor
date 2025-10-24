@@ -1,3 +1,21 @@
+<style>
+    .error {
+        color: red;
+        font-size: 14px;
+        padding: 10px;
+        border: 1px solid red;
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }
+    .success {
+        color: green;
+        font-size: 14px;
+        padding: 10px;
+        border: 1px solid green;
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }
+</style>
 <div class="container">
 
   <h1><?php echo t('change_password'); ?></h1>

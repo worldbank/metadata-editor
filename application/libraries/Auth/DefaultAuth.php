@@ -335,19 +335,19 @@ class DefaultAuth implements AuthInterface
 			$this->ci->template->write('title', t('change_password'),true);
 			$this->ci->template->render();
 	    }
-	    else{
-	        $identity = $this->ci->session->userdata($this->ci->config->item('identity'));
-	        $change = $this->ci->ion_auth->change_password($identity, $this->ci->input->post('old'), $this->ci->input->post('new'));
+    else{
+        $identity = $this->ci->session->userdata($this->ci->config->item('identity'));
+        $change = $this->ci->ion_auth->change_password($identity, $this->ci->input->post('old'), $this->ci->input->post('new'));
 
-    		if ($change) {
-    			$this->ci->session->set_flashdata('message', t('password_changed_success'));
-    			$this->logout();
-    		}
-    		else {
-    			$this->ci->session->set_flashdata('error', t('password_change_failed'));
-    			redirect('auth/change_password', 'refresh');
-    		}
-	    }
+		if ($change) {
+			$this->ci->session->set_flashdata('message', t('password_changed_success'));
+			redirect('auth/change_password', 'refresh');
+		}
+		else {
+			$this->ci->session->set_flashdata('error', t('password_change_failed'));
+			redirect('auth/change_password', 'refresh');
+		}
+    }
 	}
 
 
