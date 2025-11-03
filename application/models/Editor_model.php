@@ -946,8 +946,12 @@ class Editor_model extends CI_Model {
 
 	/**
 	 * 
+	 * Import DDI from uploaded file
 	 * 
-	 * @parseOnly true|false - if true, no data import is done
+	 * @param int $sid - Project ID
+	 * @param bool $parseOnly - If true, no data import is done
+	 * @param array $options - Additional options
+	 * @return array - Import result
 	 */
 	function importDDI($sid, $parseOnly=false, $options=array())
 	{
@@ -988,11 +992,28 @@ class Editor_model extends CI_Model {
 			//get uploaded file information
 			$uploaded_ddi_path = $this->upload->data();
 			$uploaded_ddi_path=$uploaded_ddi_path['full_path'];
-		}		
+		}
 
+		// Use centralized import method
+		return $this->import_ddi_from_path($sid, $uploaded_ddi_path, $parseOnly, $options);
+	}
+
+
+	/**
+	 * 
+	 * Import DDI from file path (centralized method to avoid duplication)
+	 * 
+	 * @param int $sid - Project ID
+	 * @param string $ddi_file_path - Path to DDI XML file
+	 * @param bool $parseOnly - If true, no data import is done
+	 * @param array $options - Additional options
+	 * @return array - Import result
+	 */
+	function import_ddi_from_path($sid, $ddi_file_path, $parseOnly=false, $options=array())
+	{
 		$parser_params=array(
 			'file_type'=>'survey',
-			'file_path'=>$uploaded_ddi_path
+			'file_path'=>$ddi_file_path
 		);
 
 		$this->load->library('DDI2_import');
@@ -1078,7 +1099,7 @@ class Editor_model extends CI_Model {
         $this->create_update_variable_groups($sid,$parser->get_variable_groups());
 		*/
 	
-		//return $output;
+		return $output;
 		
 	}
 

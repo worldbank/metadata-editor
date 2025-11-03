@@ -178,81 +178,19 @@ class ImportProject extends MY_REST_Controller
 	}
 
 
+	/**
+	 * 
+	 * Import ZIP package containing project metadata and resources
+	 * 
+	 * @param int $sid - Project ID
+	 * @param string $zip_path - Path to ZIP file
+	 * @return array - Import results
+	 * 
+	 */
 	private function import_zip_package($sid,$zip_path)
 	{
-		$this->load->library('ImportJsonMetadata');
-
-		//extract zip
-		$project_path=$this->extract_zip_package($sid,$zip_path);
-
-		//read project info.json
-		$project_info=$project_path.'/info.json';
-
-		if (!file_exists($project_info)){
-			throw new Exception("Project info.json not found: " .$project_info);
-		}
-
-		$project_info=json_decode(file_get_contents($project_info),true);
-
-		$metadata_json_path=$project_path.'/'.$project_info['json_file'];
-
-		if (!file_exists($metadata_json_path)){
-			throw new Exception("Metadata json file not found: ". $metadata_json_path);
-		}
-
-		$options=array();
-
-		//import project metadata
-		$result=$this->importjsonmetadata->import($sid,$metadata_json_path,$validate=false,$options);
-
-		//import external resources
-		$rdf_json=$project_path.'/'.$project_info['rdf_json_file'];
-
-		$resources_imported=0;
-		if (file_exists($rdf_json)){			
-			$resources_imported=$this->Editor_resource_model->import_json($sid,$rdf_json);
-		}
-
-		//set thumbnail
-		$thumbnail=$project_info['thumbnail'];
-
-		if ($thumbnail){
-			$this->Editor_model->set_project_options($sid,$options=array(
-				'thumbnail'=>$thumbnail
-			));
-		}
-
-		return array(
-			'project_imported'=>$result,
-			'resources_imported'=>$resources_imported,
-			'thumbnail'=>$thumbnail,
-			'project_info'=>$project_info
-		);
-	}
-
-	private function extract_zip_package($sid,$zip_path)
-	{
-		$project_folder_path=$this->Editor_model->get_project_folder($sid);
-
-		if (!file_exists($project_folder_path)){
-			throw new Exception("Project folder not found");
-		}
-
-		//extract zip
-		$zipFile = new \PhpZip\ZipFile();
-		try{
-			$zipFile
-				->openFile($zip_path)
-				->extractTo($project_folder_path);
-		}
-		catch(\PhpZip\Exception\ZipException $e){
-			throw new Exception("Failed to extract zip file");
-		}
-		finally{
-			$zipFile->close();
-		}
-
-		return $project_folder_path;
+		$this->load->library('ImportPackage');
+		return $this->importpackage->import($sid,$zip_path);
 	}
 
 
