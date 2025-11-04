@@ -482,7 +482,7 @@
                     label=""
                     item-text="text"
                     item-value="value"
-                    :label="$t('select')"
+                    label=""
                     persistent-hint
                     return-object                    
                     dense

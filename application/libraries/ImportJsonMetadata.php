@@ -114,6 +114,17 @@ class ImportJsonMetadata
         // Merge options into JSON data
         $json_data=array_merge($json_data, $options);
 
+        // Use template if set [template_uid]
+        if (isset($json_data['template_uid'])){
+
+            //get template by uid
+            $template=$this->ci->Editor_template_model->get_template_by_uid($json_data['template_uid']);
+            
+            if (!$template){
+                $json_data['template_uid']=null;
+            }
+        }        
+
         //fix for geospatial - flatten identificationInfo array
         if ($type=='geospatial'){
 			if (isset($json_data['description']['identificationInfo']) && 
@@ -365,7 +376,7 @@ class ImportJsonMetadata
         }
 
         return $labels;
-    }
+    }    
 
 }
 
