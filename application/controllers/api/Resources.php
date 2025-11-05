@@ -326,4 +326,51 @@ class Resources extends MY_REST_Controller
 			$this->set_response($e->getMessage(), REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
+
+
+
+	/**
+	 * 
+	 * Get resource file information
+	 * 
+	 */
+	function file_get($sid=null,$resource_id=null)
+	{
+		try{
+			$sid=$this->get_sid($sid);
+			$user=$this->api_user();
+
+			if (!$sid){
+				throw new Exception("Missing parameter: sid");
+			}
+
+			if (!$resource_id){
+				throw new Exception("Missing parameter: resource_id");
+			}
+			
+			$this->editor_acl->user_has_project_access($sid,$permission='edit',$user);
+			$exists=$this->Editor_model->check_id_exists($sid);
+
+			if(!$exists){
+				throw new Exception("Project not found");
+			}
+
+			$result=$this->Editor_resource_model->get_file_info($sid,$resource_id);
+
+			$output=array(
+				'status'=>'success',
+				'file_info'=>$result
+			);
+
+			$this->set_response($output, REST_Controller::HTTP_OK);			
+		}
+		catch(Exception $e){
+			$output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
 }

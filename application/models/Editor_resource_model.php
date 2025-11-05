@@ -1163,4 +1163,39 @@ class Editor_resource_model extends ci_model {
 
 
 
+	/**
+	 * 
+	 * Return resource file information
+	 * 
+	 */
+	function get_file_info($sid,$resource_id)
+	{
+		$resource=$this->select_single($sid,$resource_id);
+
+		if (!$resource || !$resource['filename']){
+			throw new Exception("Resource not found or filename not set");
+		}
+
+		$project_folder=$this->Editor_model->get_project_folder($sid);
+		$resource_file=$project_folder.'/documentation/'.$resource['filename'];
+
+		$file_exists=file_exists($resource_file);
+
+		$result = [
+			'filename'=>$resource['filename'],
+			'full_path'=>$resource_file,
+			'exists'=>$file_exists,
+		];
+
+		if ($file_exists){
+			$result['size']=filesize($resource_file);
+			$result['type']=mime_content_type($resource_file);
+			$result['extension']=pathinfo($resource_file, PATHINFO_EXTENSION);
+			$result['modified_date']=date("Y-m-d H:i:s", filemtime($resource_file));
+		}
+
+		return $result;
+	}
+
+
 }    

@@ -10,7 +10,8 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
             attachment_url:'',
             resource_template:'',
             resource_template_custom_fields:[ "filename" ], //fields not to render
-            file_exists:false,
+            file_exists:null, // null = unknown, true = exists, false = missing
+            file_info:null,
             dc_types:{                
                 "doc/adm":"Document, Administrative [doc/adm]",
                 "doc/anl":"Document, Analytical [doc/anl]",
@@ -37,10 +38,15 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
     watch: {
         Resource: {
             handler: function (val, oldVal) {
-                if (!oldVal){return;}
+                if (!oldVal){
+                    // Resource just loaded, check file status
+                    this.checkExistingResourceFile();
+                    return;
+                }
                 this.is_dirty=true;
             },
-            deep: true
+            deep: true,
+            immediate: true
         },
         attachment_url: function(val){
             this.is_dirty=true;
@@ -232,9 +238,36 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
                 }
             ).then(function(response){
                 vm.Resource.filename='';
+                vm.file_exists=null;
+                vm.file_info=null;
             })
             .catch(function(response){
                 console.log("resourceFileDeleted",response);
+            });    
+        },
+        checkExistingResourceFile: function()
+        {
+            // Only check for file attachments, not URLs
+            if (!this.Resource || !this.Resource.filename || this.isValidUrl(this.Resource.filename)) {
+                this.file_exists=null;
+                this.file_info=null;
+                return;
+            }
+
+            vm=this;
+            let url=CI.base_url + '/api/resources/file/'+ this.ProjectID + '/' + this.Resource['id'];
+
+            axios.get(url)
+            .then(function(response){
+                if (response.data.status=='success'){
+                    vm.file_info=response.data.file_info;
+                    vm.file_exists=response.data.file_info.exists;
+                }
+            })
+            .catch(function(response){
+                console.log("checkExistingResourceFile",response);
+                vm.file_exists=false;
+                vm.file_info=null;
             });    
         },
         findTemplateByItemKey: function (items,key){
@@ -265,6 +298,13 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
                 delete this.Resource[obj.key];
             }
             Vue.set(this.Resource,obj.key,obj.value);
+        },
+        formatFileSize: function(bytes) {
+            if (!bytes || bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
         },
     },
     computed: {
@@ -367,13 +407,45 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
                 <div class="bg-light border p-2 text-small" style="font-size:12px;">
                     <span v-if="ResourceAttachmentType=='file'">File:</span>
                     <span v-if="ResourceAttachmentType=='url'">Link:</span>
-                    {{Resource.filename}}
+                    
+                    <!-- File status indicator icon before filename -->
+                    <v-icon 
+                        v-if="ResourceAttachmentType=='file' && Resource.filename && file_exists===true" 
+                        small 
+                        color="success" 
+                        title="File exists"
+                        style="margin-right:4px;">
+                        mdi-check-circle
+                    </v-icon>
+                    <v-icon 
+                        v-if="ResourceAttachmentType=='file' && Resource.filename && file_exists===false" 
+                        small 
+                        color="error" 
+                        title="File not found on server"
+                        style="margin-right:4px;">
+                        mdi-alert-circle
+                    </v-icon>
+                    
+                    <!-- Filename with color based on file status -->
+                    <span :style="ResourceAttachmentType=='file' && Resource.filename && file_exists===true ? 'color: green;' : (ResourceAttachmentType=='file' && Resource.filename && file_exists===false ? 'color: red;' : '')">
+                        {{Resource.filename}}
+                    </span>
+                    
                     <span v-if="Resource.filename">
                         <button type="button" class="btn btn-link btn-sm" @click="resourceDeleteFile">{{$t("remove")}}</button>
                     </span>
-                    <span v-else>No file attached</span>
+                    <span v-else class="text-muted">No file attached</span>
 
-                    <div v-if="file_exists && file" class="border bg-warning text-dark p-2 m-2">
+                    <!-- File info when exists -->
+                    <div v-if="ResourceAttachmentType=='file' && Resource.filename && file_exists===true && file_info" 
+                         class="small text-muted mt-1">
+                        <span v-if="file_info.size">{{formatFileSize(file_info.size)}}</span>
+                        <span v-if="file_info.size && file_info.modified_date"> • </span>
+                        <span v-if="file_info.modified_date">{{file_info.modified_date}}</span>
+                    </div>
+
+                    <!-- Warning for duplicate upload -->
+                    <div v-if="file_exists && file" class="alert alert-warning mt-2 mb-0" role="alert">
                         <strong>{{file.name}}</strong> {{$t("file_already_exists_warning")}}
                     </div>
                 </div>
