@@ -5,11 +5,24 @@ const VueExternalResources = Vue.component('external-resources', {
         return {
             selectedResources: [],
             showBulkActions: false,
-            isDeleting: false
+            isDeleting: false,
+            projectFiles: [],
+            filesLoaded: false
         }
     }, 
     created () {
-        //this.loadDataFiles();
+        this.loadProjectFiles();
+    },
+    watch: {
+        ExternalResources: {
+            handler: function() {
+                // Reload files when resources change (e.g., after adding/editing)
+                if (this.filesLoaded) {
+                    this.loadProjectFiles();
+                }
+            },
+            deep: true
+        }
     },
     methods: {
         editResource: function(id) {
@@ -33,6 +46,7 @@ const VueExternalResources = Vue.component('external-resources', {
             axios.post(url)
                 .then(function(response) {
                     vm.$store.dispatch('loadExternalResources', {dataset_id: vm.ProjectID});
+                    vm.loadProjectFiles(); // Reload files after deletion
                 })
                 .catch(function(response) {
                     vm.errors = response;
@@ -89,6 +103,7 @@ const VueExternalResources = Vue.component('external-resources', {
             Promise.all(deletePromises)
                 .then(function(responses) {
                     vm.$store.dispatch('loadExternalResources', {dataset_id: vm.ProjectID});
+                    vm.loadProjectFiles(); // Reload files after deletion
                     vm.selectedResources = [];
                     vm.showBulkActions = false;
                     vm.isDeleting = false;
@@ -141,6 +156,48 @@ const VueExternalResources = Vue.component('external-resources', {
             }
             
             return moment.unix(timestamp).format("YYYY-MM-DD HH:mm");
+        },
+        loadProjectFiles: function() {
+            const vm = this;
+            const url = CI.base_url + '/api/files/' + this.ProjectID;
+
+            axios.get(url)
+                .then(function(response) {
+                    if (response.data && response.data.files) {
+                        vm.projectFiles = response.data.files;
+                        vm.filesLoaded = true;
+                    }
+                })
+                .catch(function(error) {
+                    console.log("Failed to load project files", error);
+                    vm.filesLoaded = true; // Mark as loaded even on error
+                });
+        },
+        isValidUrl: function(string) {
+            if (!string) return false;
+            
+            let url;
+            try {
+                url = new URL(string);
+            } catch (_) {
+                return false;  
+            }
+            
+            return url.protocol === "http:" || url.protocol === "https:";
+        },
+        fileExists: function(filename) {
+            if (!filename || this.isValidUrl(filename)) {
+                return null; // null means not applicable (URL or empty)
+            }
+
+            // Check if file exists in the documentation folder
+            const found = this.projectFiles.find(file => 
+                file.dir_path === 'documentation' && 
+                file.name === filename && 
+                file.is_dir === false
+            );
+
+            return found !== undefined;
         },
     },
     computed: {
@@ -225,7 +282,28 @@ const VueExternalResources = Vue.component('external-resources', {
                                 <td>
                                     <i class="fas fa-file-alt"></i> 
                                     <router-link :key="resource.id" class="nav-item" :to="'/external-resources/' + resource.id">{{resource.title}}</router-link>
-                                    <div class="text-small text-secondary">{{resource.filename}}</div>
+                                    <div class="text-small text-secondary">
+                                        <!-- File status icon -->
+                                        <v-icon 
+                                            v-if="!isValidUrl(resource.filename) && resource.filename && fileExists(resource.filename) === true" 
+                                            x-small 
+                                            color="success" 
+                                            title="File exists"
+                                            style="margin-right:4px;">
+                                            mdi-check-circle
+                                        </v-icon>
+                                        <v-icon 
+                                            v-if="!isValidUrl(resource.filename) && resource.filename && fileExists(resource.filename) === false" 
+                                            x-small 
+                                            color="error" 
+                                            title="File not found"
+                                            style="margin-right:4px;">
+                                            mdi-alert-circle
+                                        </v-icon>
+                                        <span :style="!isValidUrl(resource.filename) && resource.filename && fileExists(resource.filename) === true ? 'color: green;' : (!isValidUrl(resource.filename) && resource.filename && fileExists(resource.filename) === false ? 'color: red;' : '')">
+                                            {{resource.filename}}
+                                        </span>
+                                    </div>
                                 </td>
                                 <td>{{resource.dctype}}</td>
                                 <td>{{momentDateUnix(resource.changed)}}</td>

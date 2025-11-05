@@ -223,7 +223,7 @@ class Resources extends MY_REST_Controller
 			}
 
 			//validate resource
-			if ($this->Editor_resource_model->validate_resource($options)){
+			if ($this->Editor_resource_model->validate_resource($options, !$resource_id, $resource_id)){
 
 				$upload_result=null;
 
@@ -236,11 +236,11 @@ class Resources extends MY_REST_Controller
 					$options['filename']=$uploaded_file_name;
 				}
 
-				if(!isset($options['filename'])){
-					$options['filename']=null;
-				}				
+			if(!isset($options['filename'])){
+				$options['filename']=null;
+			}				
 
-				if($resource_id){
+			if($resource_id){
 					$resource=$this->Editor_resource_model->select_single($sid,$resource_id);
 					if (!$resource){
 						throw new Exception("Resource not found");

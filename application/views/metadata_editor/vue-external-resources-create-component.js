@@ -7,12 +7,13 @@ const VueExternalResourcesCreate= Vue.component('external-resources-create', {
             errors:[],
             errors_file_upload:[],
             is_dirty:false,
+            is_saving:false,
             attachment_type:'',
             resource:{},
             attachment_url:'',
             resource_template:'',
             resource_template_custom_fields:[ "filename" ], //fields not to render
-            file_exists:false,
+            upload_file_exists:false,
             dc_types:{                
                 "doc/adm":"Document, Administrative [doc/adm]",
                 "doc/anl":"Document, Analytical [doc/anl]",
@@ -41,14 +42,17 @@ const VueExternalResourcesCreate= Vue.component('external-resources-create', {
             handler: function (val, oldVal) {
                 if (!oldVal){return;}
                 this.is_dirty=true;
+                this.errors='';
             },
             deep: true
         },
         attachment_url: function(val){
             this.is_dirty=true;
+            this.errors=''; 
         },
         file: function(val){
             this.is_dirty=true;
+            this.errors=''; 
         }
     },
     beforeRouteLeave(to, from, next) {
@@ -139,10 +143,12 @@ const VueExternalResourcesCreate= Vue.component('external-resources-create', {
             ).then(function(response){
                 vm.$store.dispatch('loadExternalResources',{dataset_id:vm.ProjectID});
                 vm.is_dirty=false;
+                vm.is_saving=false;
                 router.push('/external-resources/');
             })
             .catch(function(response){
-                vm.errors=response;                
+                vm.errors=response;
+                vm.is_saving=false;
             });    
         },
         cancelSave: function(){
@@ -151,6 +157,9 @@ const VueExternalResourcesCreate= Vue.component('external-resources-create', {
         },
         uploadFile: function ()
         {
+            this.is_saving=true;
+            this.errors='';
+            
             if (this.attachment_type!='file' || !this.file){
                 this.saveResource();
                 return;
@@ -177,13 +186,14 @@ const VueExternalResourcesCreate= Vue.component('external-resources-create', {
             })
             .catch(function(response){
                 vm.errors_file_upload=response;
+                vm.is_saving=false;
                 alert("Failed to upload file");
             });            
         }, 
         handleFileUpload( event ){
             this.file = event;
             this.errors='';
-            this.resourceFileExists();            
+            this.resourceFileExists();
         },
         isValidUrl: function(string) {
             let url;
@@ -199,6 +209,7 @@ const VueExternalResourcesCreate= Vue.component('external-resources-create', {
         resourceFileExists: function()
         {
             if (!this.file){
+                this.upload_file_exists = false;
                 return false;
             }
 
@@ -217,12 +228,11 @@ const VueExternalResourcesCreate= Vue.component('external-resources-create', {
                     }
                 }
             ).then(function(response){
-                if (response.data.exists){
-                    vm.file_exists=response.data.exists;
-                }
+                vm.upload_file_exists = response.data.exists ? true : false;
             })
             .catch(function(response){
                 console.log("resourceFileExists",response);
+                vm.upload_file_exists = false;
             });    
         },
         resourceDeleteFile: function()
@@ -352,13 +362,30 @@ const VueExternalResourcesCreate= Vue.component('external-resources-create', {
                         <div style="font-weight:normal">{{$t("Create new resource")}}</div>
 
                         <div>
-                            <v-btn color="primary" small @click="uploadFile" :disabled="!isProjectEditable">{{$t("Save")}} <span v-if="is_dirty">*</span></v-btn>
-                            <v-btn @click="cancelSave" small>{{$t("cancel")}}</v-btn>
+                            <v-btn 
+                                color="primary" 
+                                small 
+                                @click="uploadFile" 
+                                :disabled="!isProjectEditable || is_saving"
+                                :loading="is_saving">
+                                {{$t("Save")}} <span v-if="is_dirty">*</span>
+                            </v-btn>
+                            <v-btn @click="cancelSave" small :disabled="is_saving">{{$t("cancel")}}</v-btn>
                         </div>
                     </v-card-title>
 
                     <v-card-text v-if="errors && errors.response">
-                        <v-alert type="error" v-if="errors.response.data && errors.response.data.errors">{{errors.response.data.errors}}</v-alert>
+                        <v-alert type="error" v-if="errors.response.data && errors.response.data.errors">
+                            <div v-if="typeof errors.response.data.errors === 'object'">
+                                <div v-for="(error, key) in errors.response.data.errors" :key="key">
+                                    {{ error }}
+                                </div>
+                            </div>
+                            <div v-else>{{errors.response.data.errors}}</div>
+                        </v-alert>
+                        <v-alert type="error" v-else-if="errors.response.data && errors.response.data.message">
+                            {{errors.response.data.message}}
+                        </v-alert>
                         <v-alert type="error" v-else>{{errors.response}}</v-alert>
                     </v-card-text>
 
@@ -409,7 +436,7 @@ const VueExternalResourcesCreate= Vue.component('external-resources-create', {
                     </span>
                     <span v-else>No file attached</span>
 
-                    <div v-if="file_exists && file" class="border bg-warning text-dark p-2 m-2">
+                    <div v-if="upload_file_exists && file" class="border bg-warning text-dark p-2 m-2">
                         <strong>{{file.name}}</strong> {{$t("file_already_exists_warning")}}
                     </div>
                 </div>

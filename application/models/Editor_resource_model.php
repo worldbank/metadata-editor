@@ -720,7 +720,7 @@ class Editor_resource_model extends ci_model {
 	 * @options - array of resource fields
 	 * 
 	 **/
-	function validate_resource($options,$is_new=true)
+	function validate_resource($options,$is_new=true,$resource_id=null)
 	{		
 		$this->load->library("form_validation");
 		$this->form_validation->reset_validation();
@@ -738,6 +738,14 @@ class Editor_resource_model extends ci_model {
 		}
 
         if ($this->form_validation->run() == TRUE){
+			// Check if filename is already attached to another resource
+			if (!empty($options['filename']) && !empty($options['sid'])) {
+				$existing_resource = $this->check_filename_in_use($options['sid'], $options['filename'], $resource_id);
+				if ($existing_resource) {
+					$errors = array('filename' => "File '" . $options['filename'] . "' is already attached to resource: " . $existing_resource['title'] . " (ID: " . $existing_resource['id'] . ")");
+					throw new ValidationException("VALIDATION_ERROR", $errors);
+				}
+			}
 			return TRUE;
 		}
 		
@@ -1195,6 +1203,35 @@ class Editor_resource_model extends ci_model {
 		}
 
 		return $result;
+	}
+
+
+	/**
+	 * 
+	 * Check if filename is already attached to another resource
+	 * 
+	 * @param $sid - Project ID
+	 * @param $filename - Filename to check
+	 * @param $current_resource_id - Current resource ID to exclude from check (for updates)
+	 * @return array|false - Returns resource info if found, false otherwise
+	 */
+	function check_filename_in_use($sid, $filename, $current_resource_id = null)
+	{
+		if (empty($filename)) {
+			return false;
+		}
+
+		$this->db->select('id, title, dctype');
+		$this->db->where('sid', $sid);
+		$this->db->where('filename', $filename);
+		
+		// Exclude current resource when updating
+		if ($current_resource_id) {
+			$this->db->where('id !=', $current_resource_id);
+		}
+		
+		$result = $this->db->get('editor_resources')->row_array();
+		return $result ? $result : false;
 	}
 
 
