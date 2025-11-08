@@ -54,6 +54,35 @@ class DataUtils
 		}
 	}
 
+
+	/**
+	 * 
+	 * 
+	 * Get list of jobs
+	 * 
+	 * 
+	 */
+	public function get_jobs()
+	{
+		try {
+			$client = new Client([
+				'base_uri' => $this->DataApiUrl . 'jobs'
+			]);
+
+			$api_response = $client->request('GET');
+			$response = json_decode($api_response->getBody()->getContents(), true);
+			return $response;
+		}
+		catch(Exception $e){
+			return [
+				'success' => false,
+				'error' => $e->getMessage()
+			];
+		}
+	}
+
+
+
 	public function import_file_meta($datafile_path)
 	{
 		$client = new Client([
