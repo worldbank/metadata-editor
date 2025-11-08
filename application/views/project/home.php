@@ -1195,19 +1195,21 @@
           console.log('Loading projects with URL:', url);
 
           // Track search/filter event
+          let searchData = null;
           if (typeof Analytics !== 'undefined') {
             const searchParams = new URLSearchParams(window.location.search);
-            const searchData = {};
+            const collectedParams = {};
             
             // Only include non-empty parameters
-            if (searchParams.get('type')) searchData.types = searchParams.get('type');
-            if (searchParams.get('keywords')) searchData.keywords = searchParams.get('keywords');
-            if (searchParams.get('collection')) searchData.collection = searchParams.get('collection');
-            if (searchParams.get('ownership')) searchData.ownership = searchParams.get('ownership');
-            if (searchParams.get('sort_by')) searchData.sort_by = searchParams.get('sort_by');
+            if (searchParams.get('type')) collectedParams.types = searchParams.get('type');
+            if (searchParams.get('keywords')) collectedParams.keywords = searchParams.get('keywords');
+            if (searchParams.get('collection')) collectedParams.collection = searchParams.get('collection');
+            if (searchParams.get('ownership')) collectedParams.ownership = searchParams.get('ownership');
+            if (searchParams.get('sort_by')) collectedParams.sort_by = searchParams.get('sort_by');
             
             // Track if there are any filters/search
-            if (Object.keys(searchData).length > 0) {
+            if (Object.keys(collectedParams).length > 0) {
+              searchData = collectedParams;
               Analytics.trackSearch(searchData);
             }
           }
@@ -1229,7 +1231,7 @@
               vm.pagination_page = vm.PaginationCurrentPage;
               
               // Track search results count
-              if (typeof Analytics !== 'undefined' && Object.keys(searchData).length > 0) {
+              if (typeof Analytics !== 'undefined' && searchData) {
                 Analytics.trackEvent('search_results', {
                   results_count: response.data.found || 0
                 });
