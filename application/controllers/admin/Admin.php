@@ -15,7 +15,7 @@ class Admin extends MY_Controller {
 	{
 		$this->editor_acl->has_access_or_die($resource_='admin_dashboard',$privilege='view');
 		$data['title']=t('Dashboard');
-		$content="...";
+		$content=$this->load->view('admin/dashboard/index', $data, true);
 		$this->template->write('title', $data['title'],TRUE);
 		$this->template->write('content', $content,TRUE);
 	  	$this->template->render();

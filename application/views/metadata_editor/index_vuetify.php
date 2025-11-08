@@ -1133,5 +1133,7 @@
       resize_variable_list();
     });
   </script>
+
+  <?php $this->load->view('common/analytics'); ?>
 </body>
 </html>

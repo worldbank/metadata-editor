@@ -210,3 +210,86 @@ CREATE INDEX idx_ecpa_user_collection ON editor_collection_project_acl(user_id, 
 CREATE INDEX idx_collections_created_by ON editor_collections(created_by);
 CREATE INDEX idx_collection_id ON editor_collection_projects(collection_id);
 
+
+-- analytics
+-- 2025/11/07
+CREATE TABLE `api_logs_daily` (
+  `stat_date` date NOT NULL,
+  `uri` varchar(255) NOT NULL,
+  `method` varchar(10) NOT NULL,
+  `total_requests` int NOT NULL DEFAULT 0,
+  `success_count` int NOT NULL DEFAULT 0,
+  `error_count` int NOT NULL DEFAULT 0,
+  `avg_response_time` float DEFAULT NULL,
+  `avg_runtime` float DEFAULT NULL,
+  PRIMARY KEY (`stat_date`,`uri`,`method`)
+) DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `api_logs_ip_daily` (
+  `stat_date` date NOT NULL,
+  `ip_address` varchar(45) NOT NULL,
+  `total_requests` int NOT NULL DEFAULT 0,
+  `error_count` int NOT NULL DEFAULT 0,
+  `avg_response_time` float DEFAULT NULL,
+  PRIMARY KEY (`stat_date`,`ip_address`)
+) DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE `api_logs_user_daily` (
+  `stat_date` date NOT NULL,
+  `user_id` int NOT NULL DEFAULT 0,
+  `api_key` varchar(40) NOT NULL DEFAULT '',
+  `total_requests` int NOT NULL DEFAULT 0,
+  `error_count` int NOT NULL DEFAULT 0,
+  `avg_response_time` float DEFAULT NULL,
+  PRIMARY KEY (`stat_date`,`user_id`,`api_key`)
+) DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `analytics_events` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_id` int DEFAULT NULL COMMENT 'User ID if logged in, NULL for anonymous',
+  `session_id` varchar(255) NOT NULL COMMENT 'Client-generated session ID',
+  `browser_id` varchar(255) DEFAULT NULL COMMENT 'Persistent browser fingerprint',
+  `event_type` varchar(50) NOT NULL COMMENT 'Event type: page_view, click, error, slow_page, etc.',
+  `page` varchar(255) NOT NULL COMMENT 'Page URL/path (clean, no query params)',
+  `ip_address` varchar(45) NOT NULL COMMENT 'User IP address',
+  `user_agent` varchar(100) DEFAULT NULL COMMENT 'Compact user agent: Browser-OS-Device',
+  `obj_type` varchar(50) DEFAULT NULL COMMENT 'Object type: project, collection, template (for fast queries)',
+  `obj_value` varchar(255) DEFAULT NULL COMMENT 'Object ID/value (for fast queries)',
+  `data` json DEFAULT NULL COMMENT 'Additional event data (flexible JSON)',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'When event was recorded',
+  PRIMARY KEY (`id`),
+  KEY `idx_user_id` (`user_id`),
+  KEY `idx_session_id` (`session_id`),
+  KEY `idx_browser_id` (`browser_id`),
+  KEY `idx_event_type` (`event_type`),
+  KEY `idx_page` (`page`),
+  KEY `idx_ip_address` (`ip_address`),
+  KEY `idx_created_at` (`created_at`),
+  KEY `idx_obj_type_value` (`obj_type`, `obj_value`),
+  KEY `idx_event_obj` (`event_type`, `obj_type`, `obj_value`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Daily aggregated analytics stats
+CREATE TABLE IF NOT EXISTS `analytics_daily` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `stat_date` date NOT NULL COMMENT 'Date for this stat record',
+  `page` varchar(255) NOT NULL COMMENT 'Page URL/path',
+  `obj_type` varchar(50) DEFAULT NULL COMMENT 'Object type: project, collection, template (for object-level aggregation)',
+  `obj_value` varchar(255) DEFAULT NULL COMMENT 'Object ID/value (for object-level aggregation)',
+  `total_views` int NOT NULL DEFAULT 0 COMMENT 'Total page views',
+  `unique_users` int NOT NULL DEFAULT 0 COMMENT 'Unique logged-in users',
+  `unique_ips` int NOT NULL DEFAULT 0 COMMENT 'Unique IP addresses',
+  `unique_sessions` int NOT NULL DEFAULT 0 COMMENT 'Unique session IDs',
+  `avg_time_on_page` int DEFAULT NULL COMMENT 'Average time on page (seconds)',
+  `total_clicks` int NOT NULL DEFAULT 0 COMMENT 'Total click events',
+  `total_errors` int NOT NULL DEFAULT 0 COMMENT 'Total error events',
+  `avg_load_time` int DEFAULT NULL COMMENT 'Average page load time (ms)',
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `date_page_obj_UNIQUE` (`stat_date`, `page`, `obj_type`, `obj_value`),
+  KEY `idx_stat_date` (`stat_date`),
+  KEY `idx_page` (`page`),
+  KEY `idx_obj_type_value` (`obj_type`, `obj_value`),
+  KEY `idx_date_obj` (`stat_date`, `obj_type`, `obj_value`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

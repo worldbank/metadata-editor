@@ -1194,6 +1194,24 @@
 
           console.log('Loading projects with URL:', url);
 
+          // Track search/filter event
+          if (typeof Analytics !== 'undefined') {
+            const searchParams = new URLSearchParams(window.location.search);
+            const searchData = {};
+            
+            // Only include non-empty parameters
+            if (searchParams.get('type')) searchData.types = searchParams.get('type');
+            if (searchParams.get('keywords')) searchData.keywords = searchParams.get('keywords');
+            if (searchParams.get('collection')) searchData.collection = searchParams.get('collection');
+            if (searchParams.get('ownership')) searchData.ownership = searchParams.get('ownership');
+            if (searchParams.get('sort_by')) searchData.sort_by = searchParams.get('sort_by');
+            
+            // Track if there are any filters/search
+            if (Object.keys(searchData).length > 0) {
+              Analytics.trackSearch(searchData);
+            }
+          }
+
           this.loading_status = this.$t('loading_projects');
           this.is_searching = true;
           this.errors = [];
@@ -1209,6 +1227,13 @@
 
               vm.projects = response.data;
               vm.pagination_page = vm.PaginationCurrentPage;
+              
+              // Track search results count
+              if (typeof Analytics !== 'undefined' && Object.keys(searchData).length > 0) {
+                Analytics.trackEvent('search_results', {
+                  results_count: response.data.found || 0
+                });
+              }
             })
             .catch(function(error) {
               console.log("error", error);
@@ -1648,6 +1673,8 @@
       }
     })
   </script>
+
+  <?php $this->load->view('common/analytics'); ?>
 </body>
 
 </html>

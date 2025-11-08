@@ -235,7 +235,7 @@ if ( ! function_exists('anchor'))
  */
 if ( ! function_exists('base_url'))
 {
-	function base_url()
+	function base_url($uri = '')
 	{
 		$CI =& get_instance();
 		$base_url=$CI->config->slash_item('base_url');
@@ -244,7 +244,13 @@ if ( ! function_exists('base_url'))
 			//&& is_ssl_protected(current_url())==TRUE
 		)
 		{
-			return $url=str_replace("http:","https:",$base_url);
+			$base_url=str_replace("http:","https:",$base_url);
+		}
+		
+		// Append URI if provided
+		if ($uri !== '')
+		{
+			$base_url .= ltrim($uri, '/');
 		}
 		
 		return $base_url;
