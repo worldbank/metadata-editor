@@ -2,7 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 /**
- * Analytics Model
+ * Analytics - page views, performance, errors, idle time
  * Handles storage, aggregation, and retrieval of analytics data
  */
 class Analytics_model extends CI_Model
