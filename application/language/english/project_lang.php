@@ -308,6 +308,7 @@ $lang['Return to collections']="Return to collections";
 $lang['export_rdf_xml']="Export RDF/XML";
 $lang['export_rdf_json']="Export RDF/JSON";
 $lang['project_template']="Project template";
+$lang['template_structure_invalid']="The project template is missing or invalid, select another template.";
 
 $lang['Edit']="Edit";
 $lang['Create new resource']="Create new resource";

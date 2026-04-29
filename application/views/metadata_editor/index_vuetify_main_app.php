@@ -268,6 +268,10 @@
         let project_type='<?php echo isset($type) ? $type : '';?>';
         let user_has_edit_access=<?php echo $user_has_edit_access ? 'true' : 'false';?>;
 
+        function editorTemplateHasItems(ft) {
+            return !!(ft && ft.template && Array.isArray(ft.template.items));
+        }
+
         // DSD features
         var dsd_temporary_features_enabled = false;
 
@@ -367,6 +371,11 @@
             route_path=to.path.replace('/study/','');
 
             console.log("route path",route_path);
+
+            if (!store.state.template_structure_valid && to.path !== '/' && to.path !== '/page-preview') {
+                next({ path: '/', replace: true });
+                return;
+            }
             
             if (!store.state.treeActiveNode){
                 console.log("no active node");
@@ -406,6 +415,7 @@
                 project_isloading:false,
                 project_is_locked:false,
                 project_version_info:null,
+                template_structure_valid: (typeof template_structure_valid !== 'undefined' ? template_structure_valid : true),
                 variables_loaded:false,
                 variables_isloading:false,
                 variables_active_tab:"documentation",
@@ -567,7 +577,9 @@
                         return item;
                     }
 
-                    //search nested formTemplate
+                    if (!editorTemplateHasItems(store.state.formTemplate)) {
+                        return null;
+                    }
                     let items=store.state.formTemplate.template.items;
                     let item=findTemplateByItemKey(items,route_path);
 
@@ -596,7 +608,11 @@
                     store.state.project_isloading=false;
                 },
                 async initTreeItems({commit},options) {               
-                    store.state.treeItems=store.state.formTemplate.template.items;    
+                    if (editorTemplateHasItems(store.state.formTemplate)) {
+                        store.state.treeItems=store.state.formTemplate.template.items;
+                    } else {
+                        store.state.treeItems=[];
+                    }
                 },
                 async loadTemplatesList({commit},options) {
                     let url=CI.base_url + '/api/templates/list/'+store.state.project_type;
@@ -616,6 +632,7 @@
                     .then(function (response) {                        
                         if (response.data.template){
                             store.state.formTemplate=response.data;
+                            store.state.template_structure_valid = editorTemplateHasItems(response.data);
                         }else{
                             console.log("error load template", response.data);
                             alert("error loading template");

@@ -321,6 +321,7 @@ $lang['Return to collections']="Volver a colecciones";
 $lang['export_rdf_xml']="Exportar RDF/XML";
 $lang['export_rdf_json']="Exportar RDF/JSON";
 $lang['project_template']="Plantilla de proyecto";
+$lang['template_structure_invalid']="La plantilla del proyecto falta o no es válida, seleccione otra plantilla.";
 
 $lang['Edit']="Editar";
 $lang['Create new resource']="Crear nuevo recurso";

@@ -35,9 +35,13 @@
       }
     }
   } 
-  
-  
-  get_template_keys($metadata_template_arr['items'],$template_keys);
+
+  $template_keys = array();
+  if (is_array($metadata_template_arr)
+    && isset($metadata_template_arr['items'])
+    && is_array($metadata_template_arr['items'])) {
+    get_template_keys($metadata_template_arr['items'],$template_keys);
+  }
   function get_template_keys($items,&$output)
   {
     foreach($items as $item){
@@ -79,6 +83,7 @@
         let sid='<?php echo $sid;?>';
         let form_template=<?php echo $metadata_template;?>;
         let form_template_parts= <?php echo json_encode($template_parts,JSON_PRETTY_PRINT); ?>;
+        var template_structure_valid=<?php echo (!isset($template_structure_valid) || $template_structure_valid) ? 'true' : 'false'; ?>;
     </script>
 
   <div id="app" data-app>
@@ -877,20 +882,26 @@
         },
         init_tree_data: function() {
           this.items=[];
-          let tree_data=this.filterRecursiveSearch(this.cloneObject(this.form_template.template.items),'');
+          let tree_data=[];
 
-          if (this.show_fields_recommended){
-            tree_data=this.filterRecursiveSearch(tree_data,'recommended');
-          }
-          if (this.show_fields_mandatory && this.show_fields_recommended==false){
-            tree_data=this.filterRecursiveSearch(tree_data,'mandatory');
-          }
-          
-          if (this.show_fields_empty){
-            tree_data=this.filterRecursiveSearch(tree_data,'empty');
-          }
-          if (this.show_fields_nonempty){
-            tree_data=this.filterRecursiveSearch(tree_data,'nonempty');
+          if (this.$store.state.template_structure_valid
+              && this.form_template && this.form_template.template
+              && Array.isArray(this.form_template.template.items)) {
+            tree_data=this.filterRecursiveSearch(this.cloneObject(this.form_template.template.items),'');
+
+            if (this.show_fields_recommended){
+              tree_data=this.filterRecursiveSearch(tree_data,'recommended');
+            }
+            if (this.show_fields_mandatory && this.show_fields_recommended==false){
+              tree_data=this.filterRecursiveSearch(tree_data,'mandatory');
+            }
+            
+            if (this.show_fields_empty){
+              tree_data=this.filterRecursiveSearch(tree_data,'empty');
+            }
+            if (this.show_fields_nonempty){
+              tree_data=this.filterRecursiveSearch(tree_data,'nonempty');
+            }
           }
 
           tree_data.unshift({
@@ -907,6 +918,13 @@
                 }
               ]
             });
+
+          if (!this.$store.state.template_structure_valid) {
+            this.initiallyOpen=['home'];
+            this.tree_active_items=['home'];
+            this.items=tree_data;
+            return;
+          }
 
           if (this.dataset_type=='survey' || this.dataset_type=='microdata'){
             tree_data.push({
