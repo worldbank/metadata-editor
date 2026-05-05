@@ -775,6 +775,11 @@
 				"tag"
 			]
 		},
+		"datacite": {
+			"type": "object",
+			"description": "DataCite metadata for generating DOI",
+			"$ref": "datacite-schema.json"
+		},
 		"provenance": {
 			"type": "array",
 			"description": "Provenance",

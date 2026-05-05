@@ -430,6 +430,35 @@
 						]
 					}
 				},
+				"tabulations": {
+					"type": "array",
+					"title": "Tabulations",
+					"description": "Cross-tabulations",
+					"items": {
+						"type": "object",
+						"properties": {
+							"id": {
+								"type": "string",
+								"title": "Id"
+							},
+							"name": {
+								"type": "string",
+								"title": "Name"
+							},
+							"uri": {
+								"type": "string",
+								"title": "Uri"
+							},
+							"note": {
+								"type": "string",
+								"title": "Note"
+							}
+						},
+						"required": [
+							"name"
+						]
+					}
+				},
 				"ref_country": {
 					"type": "array",
 					"title": "Reference country",
@@ -803,6 +832,11 @@
 			"required": [
 				"tag"
 			]
+		},
+		"datacite": {
+			"type": "object",
+			"description": "DataCite metadata for generating DOI",
+			"$ref": "datacite-schema.json"
 		},
 		"provenance": {
 			"type": "array",
