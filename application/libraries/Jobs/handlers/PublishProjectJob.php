@@ -16,6 +16,7 @@ class PublishProjectJob implements JobHandlerInterface
         // Get CodeIgniter instance
         $this->ci =& get_instance();
         $this->ci->load->model('Editor_publish_model');
+        $this->ci->load->model('Editor_model');
     }
 
     /**
@@ -106,6 +107,17 @@ class PublishProjectJob implements JobHandlerInterface
         } catch (Exception $e) {
             $errors['export'] = $e->getMessage();
             throw new Exception("Failed to prepare project for publishing (JSON generation): " . $e->getMessage());
+        }
+
+        // DDI used when JSON publish fails and NADA falls back to import_ddi (survey/microdata only).
+        $proj_row = $this->ci->Editor_model->get_basic_info($project_id);
+        if ($proj_row && ($proj_row['type'] === 'microdata' || $proj_row['type'] === 'survey')) {
+            try {
+                $this->ci->Editor_model->generate_project_ddi($project_id);
+                $results['export_ddi'] = 'Project DDI generated for publish fallback';
+            } catch (Exception $e) {
+                $results['export_ddi_warning'] = $e->getMessage();
+            }
         }
 
         if ($publish_metadata) {

@@ -2,6 +2,9 @@
 
 require(APPPATH.'/libraries/MY_REST_Controller.php');
 
+use Swaggest\JsonDiff\JsonPointer;
+use Swaggest\JsonDiff\JsonPointerException;
+
 class Editor extends MY_REST_Controller
 {
 	private $api_user;
@@ -187,6 +190,8 @@ class Editor extends MY_REST_Controller
 			if(!$result){
 				throw new Exception("DATASET_NOT_FOUND");
 			}
+
+			$result['has_thumbnail'] = (bool) $this->Editor_model->get_thumbnail_file($sid);
 
 			$response=array(
 				'status'=>'success',
@@ -864,6 +869,117 @@ class Editor extends MY_REST_Controller
 
 
 	/**
+	 * Get a single value from project export JSON by JSON Pointer (RFC 6901), same document shape as GET /editor/json/{id}.
+	 *
+	 * Query: path (required) — e.g. /idno or /identification/title
+	 */
+	function json_field_get($sid=null)
+	{
+		try{
+			$sid=$this->get_sid($sid);
+			$exists=$this->Editor_model->check_id_exists($sid);
+
+			if(!$exists){
+				throw new Exception("Project not found");
+			}
+
+			$path=$this->input->get('path');
+			if ($path===null || $path===''){
+				throw new Exception("Query parameter `path` is required (JSON Pointer, e.g. /identification/title)");
+			}
+
+			$version_id=$this->input->get("version");
+			if ($version_id){
+				$version_sid=$this->Editor_model->find_version_by_number($sid, $version_id);
+				if ($version_sid){
+					$sid=$version_sid;
+				}
+				else{
+					throw new Exception("VERSION_NOT_FOUND");
+				}
+			}
+
+			$exclude_private_fields=0;
+			if ((int)$this->input->get("exclude_private_fields")===1){
+				$exclude_private_fields=1;
+			}
+			elseif ((int)$this->input->get("exc_private")===1){
+				$exclude_private_fields=1;
+			}
+
+			$inc_ext_resources=0;
+			if ((int)$this->input->get("external_resources")===1){
+				$inc_ext_resources=1;
+			}
+
+			$inc_adm_meta=0;
+			if ((int)$this->input->get("admin_metadata")===1){
+				$inc_adm_meta=1;
+			}
+
+			$exclude_variables=0;
+			if ((int)$this->input->get("exclude_variables")===1){
+				$exclude_variables=1;
+			}
+
+			$options=array(
+				'exclude_private_fields'=>$exclude_private_fields,
+				'external_resources'=>$inc_ext_resources,
+				'admin_metadata'=>$inc_adm_meta,
+				'exclude_variables'=>$exclude_variables,
+				'user_id'=>$this->get_api_user_id()
+			);
+
+			$this->editor_acl->user_has_project_access($sid,$permission='view',$this->api_user);
+
+			$json_file=$this->project_json_writer->generate_project_json($sid,$options);
+			if (!is_readable($json_file)){
+				throw new Exception("Failed to read project JSON export");
+			}
+
+			$json_raw=file_get_contents($json_file);
+			$doc=json_decode($json_raw,true);
+			if ($doc===null && json_last_error()!==JSON_ERROR_NONE){
+				throw new Exception("Invalid JSON export for project");
+			}
+
+			try{
+				$value=JsonPointer::getByPointer($doc,$path);
+				$response=array(
+					'status'=>'success',
+					'path'=>$path,
+					'found'=>true,
+					'value'=>$value
+				);
+			}
+			catch(JsonPointerException $e){
+				$msg=$e->getMessage();
+				if (strpos($msg,'Key not found')!==false){
+					$response=array(
+						'status'=>'success',
+						'path'=>$path,
+						'found'=>false,
+						'value'=>null
+					);
+				}
+				else{
+					throw new Exception("INVALID_JSON_POINTER: ".$msg);
+				}
+			}
+
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	/**
 	 * 
 	 * Generate project metadata as JSON
 	 * 
@@ -1140,6 +1256,14 @@ class Editor extends MY_REST_Controller
 
 			$response=$this->Editor_publish_model->publish_to_catalog($sid,$user_id,$catalog_connection_id,$options);			
 			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(ApiRequestException $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage(),
+				'response'=>$e->getDetails()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}
 		catch(Exception $e){
 			$error_output=array(

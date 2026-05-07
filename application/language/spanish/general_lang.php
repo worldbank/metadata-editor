@@ -241,6 +241,11 @@ $lang['no_users_have_access_to_template'] = 'Ningún usuario tiene acceso a esta
 $lang['add_user'] = 'Agregar usuario';
 $lang['filter_by_user'] = 'Filtrar por usuario';
 $lang['users_filter'] = 'Usuarios';
+$lang['add_tag'] = 'Añadir etiqueta';
+$lang['filter_by_tag'] = 'Filtrar por etiqueta';
+$lang['search_tag'] = 'Buscar etiqueta';
+$lang['type_to_search_tags'] = 'Escriba para buscar etiquetas';
+$lang['tags'] = 'Etiquetas';
 $lang['change_template_uid'] = 'Cambiar UID de plantilla';
 $lang['template_uid'] = 'UID de plantilla';
 $lang['new_uid'] = 'Nuevo UID';
@@ -376,6 +381,10 @@ $lang['login_opens_new_tab']='Iniciar sesión (Abre una nueva pestaña)';
 // File manager
 $lang['file_manager']='Administrador de archivos';
 $lang['files']='archivos';
+$lang['All files']='Todos los archivos';
+$lang['Project root']='Raíz del proyecto';
+$lang['No files in this folder']='No hay archivos en esta carpeta';
+$lang['selected']='seleccionado';
 $lang['Documentation']='Documentación';
 $lang['temporary']='TEMPORAL';
 $lang['extract_zip']='Extraer zip';
@@ -494,7 +503,73 @@ $lang['file_not_found_on_server']='Archivo no encontrado en el servidor';
 $lang['confirm_delete_file_resource']='¿Está seguro de que desea eliminar este archivo?';
 
 // Dashboard
+$lang['Dashboard']='Panel';
+$lang['Last updated']='Última actualización';
+$lang['Refresh']='Actualizar';
 
+// Disk Space
+$lang['Disk Space']='Espacio en disco';
+$lang['Total Capacity']='Capacidad total';
+$lang['Used']='Usado';
+$lang['Free']='Libre';
+$lang['Used Percentage']='Porcentaje usado';
+$lang['Storage Path']='Ruta de almacenamiento';
+$lang['Unavailable']='No disponible';
+$lang['Critical']='Crítico';
+$lang['Warning']='Advertencia';
+$lang['Healthy']='Correcto';
+$lang['Disk space information unavailable']='Información de espacio en disco no disponible';
+
+// Analytics
+$lang['Analytics']='Analítica';
+$lang['Page Views Today']='Visitas hoy';
+$lang['Page Views']='Visitas';
+$lang['Traffic Overview']='Resumen de tráfico';
+$lang['Today\'s Traffic']='Tráfico de hoy';
+$lang['By Hour']='Por hora';
+$lang['Live']='En vivo';
+$lang['Updates every minute']='Se actualiza cada minuto';
+$lang['Active Users']='Usuarios activos';
+$lang['Sessions']='Sesiones';
+$lang['Errors Today']='Errores hoy';
+$lang['Top Pages']='Páginas principales';
+$lang['Top Users']='Usuarios principales';
+$lang['No user activity tracked']='Sin actividad de usuario registrada';
+$lang['Browser & Device']='Navegador y dispositivo';
+$lang['Page']='Página';
+$lang['Views']='Visitas';
+$lang['Today']='Hoy';
+$lang['Last hour']='Última hora';
+$lang['Last 30 days']='Últimos 30 días';
+$lang['No data available']='No hay datos disponibles';
+$lang['showing %d-%d of %d']='Mostrando %s-%s de %s';
+
+// Translator / Translation editor
+$lang['base_language'] = 'Idioma base';
+$lang['select_language_to_translate'] = 'Seleccionar idioma para traducir';
+$lang['translator_help_title'] = 'Cómo usar el editor de traducciones';
+$lang['translator_help_text'] = 'Use el panel izquierdo para elegir el idioma y el archivo de traducción y empezar a editar.';
+$lang['files_missing'] = 'archivos faltantes';
+$lang['keys_translated'] = 'claves traducidas';
+$lang['completion'] = 'Finalización';
+$lang['source'] = 'Origen';
+$lang['lang_official'] = 'Oficial';
+$lang['lang_official_title'] = 'Incluido en la aplicación. Sus cambios se guardarán aparte y no modificarán los archivos oficiales.';
+$lang['lang_modified'] = 'Modificado';
+$lang['lang_modified_title'] = 'Idioma oficial con personalizaciones guardadas en la carpeta userdata.';
+$lang['lang_custom'] = 'Personalizado';
+$lang['lang_custom_title'] = 'Idioma creado por el usuario, no incluido oficialmente en la aplicación.';
+$lang['create_new_language'] = 'Crear nuevo idioma';
+$lang['language_name'] = 'Nombre del idioma';
+$lang['language_name_hint'] = 'Solo minúsculas, dígitos y guiones bajos (p. ej. arabic, pt_br).';
+$lang['editing_user_copy'] = 'Está editando su copia guardada. El archivo original no cambia.';
+$lang['first_edit_notice'] = 'Aún no hay copia guardada — al guardar se creará su copia en userdata sin tocar los archivos de la aplicación.';
+$lang['all_languages'] = 'Todos los idiomas';
+$lang['all_files'] = 'Todos los archivos';
+$lang['import_language'] = 'Importar idioma';
+$lang['import_language_hint'] = 'Suba un zip exportado desde esta aplicación. El zip debe tener una carpeta superior con el nombre del idioma (p. ej. french/) con archivos JSON dentro (p. ej. general_lang.json). Solo se importan claves conocidas de los archivos en inglés y los valores se validan antes de guardar.';
+$lang['import_zip_label'] = 'Archivo zip del idioma';
+$lang['url']='URL';
 
 /* End of file general_lang.php */
 /* Location: ./application/language/spanish/general_lang.php */

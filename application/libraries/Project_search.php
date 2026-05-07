@@ -2,6 +2,9 @@
 
 class Project_search
 {
+	// limit for listing versions to avoid huge query load
+	private $versions_max_page_size = 100;
+
 	private $listing_fields=array(
 		'id',
 		'pid',
@@ -99,10 +102,20 @@ class Project_search
 				}
 			}
 
-			//add versions info
-			foreach($result as $idx=>$row){
-				$versions=$this->ci->project_versions->get_versions($row['id']);
-				$result[$idx]['versions']=$versions;				
+			// add versions: batch when page size is small; skip entirely for large pages
+			if ($limit > $this->versions_max_page_size || $limit <= 0) {
+				foreach ($result as $idx => $row) {
+					$result[$idx]['versions'] = array();
+				}
+			} else {
+				$main_ids = array_map('intval', array_column($result, 'id'));
+				$versions_by_parent = $this->ci->project_versions->get_versions_batch_for_main_projects($main_ids);
+				foreach ($result as $idx => $row) {
+					$sid = (int) $row['id'];
+					$result[$idx]['versions'] = isset($versions_by_parent[$sid])
+						? $versions_by_parent[$sid]
+						: array();
+				}
 			}
 
 		}
@@ -110,7 +123,6 @@ class Project_search
 
 		return array(
 			'result'=>$result,
-			//'db_query'=>$this->ci->db->last_query(),
 			'filters'=>$search_filters
 		);
 	}

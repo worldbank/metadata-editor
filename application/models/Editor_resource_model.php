@@ -857,6 +857,44 @@ class Editor_resource_model extends ci_model {
 	}
 
 
+	/**
+	 * Whether the client requested overwriting an existing resource that uses the same stored filename.
+	 * Prefer JSON booleans true/false; multipart forms typically send strings "true"/"false" or "1"/"0".
+	 * Legacy yes/no is still accepted.
+	 *
+	 * @param array $options Request fields (may contain overwrite)
+	 * @return bool
+	 */
+	function overwrite_flag_is_true($options)
+	{
+		if (!isset($options['overwrite'])) {
+			return false;
+		}
+		$v = $options['overwrite'];
+		if (is_bool($v)) {
+			return $v;
+		}
+		if (is_numeric($v)) {
+			return ((float)$v) != 0.0;
+		}
+		$s = strtolower(trim((string)$v));
+		if ($s === 'true' || $s === '1') {
+			return true;
+		}
+		if ($s === 'false' || $s === '0' || $s === '') {
+			return false;
+		}
+		if ($s === 'yes') {
+			return true;
+		}
+		if ($s === 'no') {
+			return false;
+		}
+		$f = filter_var($v, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+		return $f === true;
+	}
+
+
     /**
 	 * 
 	 * 
@@ -882,12 +920,14 @@ class Editor_resource_model extends ci_model {
 		}
 
         if ($this->form_validation->run() == TRUE){
-			// Check if filename is already attached to another resource
+			// Check if filename is already attached to another resource (unless overwrite=true)
 			if (!empty($options['filename']) && !empty($options['sid'])) {
 				$existing_resource = $this->check_filename_in_use($options['sid'], $options['filename'], $resource_id);
 				if ($existing_resource) {
-					$errors = array('filename' => "File '" . $options['filename'] . "' is already attached to resource: " . $existing_resource['title'] . " (ID: " . $existing_resource['id'] . ")");
-					throw new ValidationException("VALIDATION_ERROR", $errors);
+					if (!$this->overwrite_flag_is_true($options)) {
+						$errors = array('filename' => "File '" . $options['filename'] . "' is already attached to resource: " . $existing_resource['title'] . " (ID: " . $existing_resource['id'] . ")");
+						throw new ValidationException("VALIDATION_ERROR", $errors);
+					}
 				}
 			}
 			return TRUE;

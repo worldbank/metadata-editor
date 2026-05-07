@@ -811,16 +811,12 @@ class Project_versions
 			throw new Exception("Project not found");
 		}
 
-		if ($this->is_main_project($project_id)) {
-			return $project_id;
+		$pid = isset($project['pid']) ? $project['pid'] : null;
+		if ($pid == 0 || ! $pid || $pid == $project_id) {
+			return (int) $project_id;
 		}
 
-		$main_project_id = $project['pid'];
-		if (!$main_project_id) {
-			throw new Exception("Invalid project structure: version has no parent");
-		}
-
-		return $main_project_id;
+		return (int) $pid;
 	}
 
 	/**
@@ -849,6 +845,54 @@ class Project_versions
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Load version rows for many main projects in one query.
+	 * Caller must pass main study ids (parent rows where pid IS NULL in normal listings).
+	 *
+	 * @param array $main_project_ids list of integer editor_projects.id
+	 * @return array map of main project id => list of version rows (same shape as get_versions), ordered by version_created DESC
+	 */
+	function get_versions_batch_for_main_projects(array $main_project_ids)
+	{
+		$main_project_ids = array_values(array_unique(array_map('intval', $main_project_ids)));
+		$main_project_ids = array_filter($main_project_ids);
+		if (count($main_project_ids) === 0) {
+			return array();
+		}
+
+		$this->ci->db->select('editor_projects.id, type, idno, version_number, pid, title, created, changed, created_by, changed_by, thumbnail, is_locked, version_notes, version_created, users.username as version_created_by_name, version_created_by');
+		$this->ci->db->from('editor_projects');
+		$this->ci->db->join('users', 'users.id=editor_projects.version_created_by');
+		$this->ci->db->where_in('pid', $main_project_ids);
+		$this->ci->db->order_by('pid', 'asc');
+		$this->ci->db->order_by('version_created', 'desc');
+		$query = $this->ci->db->get();
+
+		if ( ! $query) {
+			$error = $this->ci->db->error();
+			throw new Exception(implode(', ', $error));
+		}
+
+		$rows = $query->result_array();
+		$by_parent = array();
+		foreach ($main_project_ids as $id) {
+			$by_parent[$id] = array();
+		}
+		foreach ($rows as $row) {
+			$pid = (int) $row['pid'];
+			if ( ! isset($by_parent[$pid])) {
+				$by_parent[$pid] = array();
+			}
+			$by_parent[$pid][] = $row;
+		}
+		foreach ($by_parent as &$list) {
+			array_walk($list, 'unix_date_to_gmt', array('version_created'));
+		}
+		unset($list);
+
+		return $by_parent;
 	}
 
 	/**

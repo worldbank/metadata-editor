@@ -122,7 +122,9 @@ class Editor_variable_model extends ci_model {
 
     /**
      * Parse sum_stats_options based on variable data type.
-     * Defaults: freq only true for discrete variables; false for continuous numeric,
+     * Defaults: freq false unless user explicitly enables it in the UI,
+     * with value-label based frequencies still handled by the import pipeline.
+     * Frequency defaults stay false for continuous numeric,
      * string (character/fixed), and non-discrete date. User choices in the UI are
      * always preserved (not overwritten on re-import).
      */
@@ -136,7 +138,7 @@ class Editor_variable_model extends ci_model {
             case 'numeric':
                 return array(
                     'wgt' => true,
-                    'freq' => $is_discrete,
+                    'freq' => false,
                     'missing' => true,
                     'vald' => true,
                     'invd' => true,
@@ -167,7 +169,7 @@ class Editor_variable_model extends ci_model {
             case 'date':
                 return array(
                     'wgt' => false,
-                    'freq' => $is_discrete,
+                    'freq' => false,
                     'missing' => true,
                     'vald' => true,
                     'invd' => true,
@@ -182,7 +184,7 @@ class Editor_variable_model extends ci_model {
             default:
                 return array(
                     'wgt' => false,
-                    'freq' => $is_discrete ? true : false,
+                    'freq' => false,
                     'missing' => true,
                     'vald' => true,
                     'invd' => true,

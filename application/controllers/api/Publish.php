@@ -185,6 +185,14 @@ class Publish extends MY_REST_Controller
 
 			$this->set_response($response, REST_Controller::HTTP_OK);
 		}
+		catch(ApiRequestException $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage(),
+				'response'=>$e->getDetails()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
 		catch(Exception $e){
 			$error_output=array(
 				'status'=>'failed',
@@ -208,6 +216,14 @@ class Publish extends MY_REST_Controller
 
 			$response=$this->Editor_publish_model->publish_external_resources($sid,$user_id,$connection_id,$options);			
 			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(ApiRequestException $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage(),
+				'response'=>$e->getDetails()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}
 		catch(Exception $e){
 			$error_output=array(
@@ -251,6 +267,14 @@ class Publish extends MY_REST_Controller
 
 			$response=$this->Editor_publish_model->publish_external_resource($sid,$user_id,$options['catalog_id'],$options['resource_id'],$options['overwrite']);
 			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(ApiRequestException $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage(),
+				'response'=>$e->getDetails()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}
 		catch(Exception $e){
 			$error_output=array(

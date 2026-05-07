@@ -254,8 +254,16 @@ class Resources extends MY_REST_Controller
 					$resource_id=$this->Editor_resource_model->update($resource_id,$options);
 				}				
 				else{
-					//insert new resource
-					$resource_id=$this->Editor_resource_model->insert($options);
+					// Insert new resource, or replace existing row when overwrite=true and filename matches
+					$existing_by_filename = null;
+					if (!empty($options['filename']) && !empty($options['sid'])) {
+						$existing_by_filename = $this->Editor_resource_model->check_filename_in_use($options['sid'], $options['filename'], null);
+					}
+					if ($existing_by_filename && $this->Editor_resource_model->overwrite_flag_is_true($options)) {
+						$resource_id = $this->Editor_resource_model->update($existing_by_filename['id'], $options);
+					} else {
+						$resource_id = $this->Editor_resource_model->insert($options);
+					}
 				}
 
 				$resource=$this->Editor_resource_model->select_single($sid,$resource_id);

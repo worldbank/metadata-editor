@@ -325,6 +325,88 @@ paths:
           description: successful operation
         "400":
           description: Bad request - project not found or access denied
+  "/editor/json-field/{id}":
+    get:
+      tags:
+        - Projects
+      summary: Get project JSON field by JSON Pointer
+      description: >
+        Returns a single value from the same project JSON document produced by
+        Get project JSON (`/editor/json/{id}`), addressed by a JSON Pointer (RFC 6901).
+        Examples: `/idno`, `/type`, `/identification/title`, `/variables/0/name` (when
+        variables are included in the export).
+      operationId: projectJsonField
+      parameters:
+        - name: id
+          in: path
+          description: Project ID or IDNO
+          required: true
+          schema:
+            type: string
+        - name: path
+          in: query
+          description: >
+            JSON Pointer (RFC 6901) to the value, starting with `/`. Must be URL-encoded
+            if it contains reserved characters (e.g. `~0`, `~1` for `~` and `/` in keys).
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: query
+          description: Use metadata for a specific version number (e.g. 1.0.0)
+          required: false
+          schema:
+            type: string
+        - name: exclude_variables
+          in: query
+          description: Same as Get project JSON; when `1`, `/variables/...` is not available.
+          required: false
+          schema:
+            type: integer
+            enum: [0, 1]
+            default: 0
+        - name: exclude_private_fields
+          in: query
+          required: false
+          schema:
+            type: integer
+            enum: [0, 1]
+            default: 0
+        - name: external_resources
+          in: query
+          required: false
+          schema:
+            type: integer
+            enum: [0, 1]
+            default: 0
+        - name: admin_metadata
+          in: query
+          required: false
+          schema:
+            type: integer
+            enum: [0, 1]
+            default: 0
+      responses:
+        "200":
+          description: Value resolved or path missing in document
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [success]
+                  path:
+                    type: string
+                  found:
+                    type: boolean
+                  value:
+                    description: Present when found is true; null when found is false
+        "400":
+          description: Bad request — missing path, invalid pointer syntax, project not found, or access denied
+      security:
+        - ApiKeyAuth: []
   "/editor/generate_pdf/{id}":
     get:
       tags:
@@ -2117,6 +2199,15 @@ paths:
 
                     This is separate from the 'file' parameter - use 'file' to upload a file, or 'filename' to specify a filename/URL.
                   type: string
+                overwrite:
+                  description: >
+                    When creating a resource, if another resource already uses the same
+                    stored filename for this project, set to `true` to replace that row
+                    instead of failing validation. Use `false` or omit to keep the
+                    duplicate-filename error. With `multipart/form-data`, send the literal
+                    strings `true` or `false` if your client cannot encode JSON booleans.
+                  type: boolean
+                  default: false
               required:
                 - dctype
                 - title
@@ -3470,11 +3561,13 @@ components:
           type: integer
           format: int64
         permissions:
-          type: array
-          items:
-            type: string
-            enum:
-              - view
+          type: string
+          description: Single collection ACL role per grant (stored as one value in `editor_collection_acl.permissions`).
+          enum:
+            - view
+            - edit
+            - admin
+          example: admin
     UserCollectionPermissions:
       type: object
       properties:

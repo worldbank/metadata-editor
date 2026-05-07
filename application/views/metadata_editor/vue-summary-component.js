@@ -108,7 +108,6 @@ Vue.component('summary-component', {
             };
 
             store.dispatch('loadTemplateByUID',{template_uid:this.ProjectTemplates[this.template_idx]["uid"]}).then(function(){
-                //store.dispatch('initTreeItems');
                 let url=CI.base_url + '/api/editor/options/'+ vm.ProjectID;
 
                 axios.post( url,
@@ -117,7 +116,12 @@ Vue.component('summary-component', {
                     console.log("template updated",response);
                     vm.dialog_template=false;
                     vm.template_updating=false;
-                    return false;
+                    return store.dispatch('initTreeItems');
+                })
+                .then(function(){
+                    if (typeof vue_app !== 'undefined' && vue_app.init_tree_data) {
+                        vue_app.init_tree_data();
+                    }
                 })
                 .catch(function(response){
                     vm.errors=response;

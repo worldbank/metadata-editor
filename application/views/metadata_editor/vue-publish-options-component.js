@@ -10,8 +10,8 @@ Vue.component('publish-options', {
             resources_overwrite:"no",
             publish_metadata:true,
             dialog_process:false,
-            publish_thumbnail:true,
-            publish_resources:true,
+            publish_thumbnail:false,
+            publish_resources:false,
             catalog_connections:[],
             panels: [0, 1,2],
             catalog:false,
@@ -90,6 +90,10 @@ Vue.component('publish-options', {
             .then(function (response) {
                 if (response.data.project){                    
                     vm.project_info=response.data.project;
+                    vm.publish_thumbnail = !!(response.data.project.has_thumbnail);
+                    if (!vm.resources_selected || vm.resources_selected.length === 0) {
+                        vm.publish_resources = false;
+                    }
                 }
                 else{
                     alert(vm.$t("project_metadata_not_found"));
@@ -120,6 +124,111 @@ Vue.component('publish-options', {
                     //"error_response"
                 }
             };
+        },
+        /**
+         * Classify a string body from a failed HTTP response (JSON vs HTML vs plain text).
+         */
+        detectErrorBodyFormat: function (s) {
+            if (typeof s !== 'string') {
+                return 'text';
+            }
+            var t = s.trim();
+            if (/^<!DOCTYPE/i.test(t) || /^<html/i.test(t)) {
+                return 'html';
+            }
+            if (t.charAt(0) === '<' && t.indexOf('>') > 1) {
+                return 'html';
+            }
+            if (t.charAt(0) === '{' || t.charAt(0) === '[') {
+                try {
+                    JSON.parse(t);
+                    return 'json';
+                } catch (e) {
+                    return 'text';
+                }
+            }
+            return 'text';
+        },
+        formatJsonForDisplay: function (obj) {
+            try {
+                return JSON.stringify(obj, null, 2);
+            } catch (e) {
+                return String(obj);
+            }
+        },
+        /**
+         * Normalize axios errors from /api/publish/* for safe UI (escape via {{ }}, no v-html).
+         * Handles JSON and HTML bodies from NADA or the editor API.
+         */
+        normalizePublishError: function (error) {
+            var out = {
+                summary: 'Request failed',
+                httpStatus: null,
+                appStatus: null,
+                bodyFormat: null,
+                message: '',
+                nada: null,
+                rawBody: '',
+                jsonDetail: null,
+                ddiFallback: null
+            };
+            if (!error || !error.response) {
+                out.summary = (error && error.message) ? error.message : 'Network error — no response from server.';
+                return out;
+            }
+            out.httpStatus = error.response.status;
+            var d = error.response.data;
+            if (d == null) {
+                out.summary = 'Empty error response (HTTP ' + out.httpStatus + ')';
+                return out;
+            }
+            if (typeof d === 'string') {
+                out.bodyFormat = this.detectErrorBodyFormat(d);
+                out.rawBody = d.length > 20000 ? d.substring(0, 20000) + '\n…' : d;
+                if (out.bodyFormat === 'json') {
+                    try {
+                        out.jsonDetail = JSON.parse(d);
+                    } catch (e) {}
+                }
+                out.summary = out.bodyFormat === 'html'
+                    ? 'Server returned HTML (HTTP ' + out.httpStatus + ')'
+                    : (out.bodyFormat === 'json' ? 'Server returned JSON (HTTP ' + out.httpStatus + ')' : 'Server returned text (HTTP ' + out.httpStatus + ')');
+                return out;
+            }
+            out.appStatus = d.status;
+            out.message = typeof d.message === 'string' ? d.message : '';
+            out.nada = d.response && typeof d.response === 'object' ? d.response : null;
+            if (out.nada && out.nada.ddi_fallback_error) {
+                out.ddiFallback = out.nada.ddi_fallback_error;
+            }
+            if (out.nada && out.nada.body_format) {
+                out.bodyFormat = out.nada.body_format;
+            } else if (out.message) {
+                out.bodyFormat = this.detectErrorBodyFormat(out.message);
+            }
+            if (out.nada && out.nada.raw_body) {
+                out.rawBody = out.nada.raw_body;
+            } else if (out.message && (out.bodyFormat === 'html' || out.bodyFormat === 'text')) {
+                out.rawBody = out.message;
+            }
+            if (out.nada && out.nada.response_ != null) {
+                out.jsonDetail = out.nada.response_;
+            } else if (out.message && out.bodyFormat === 'json') {
+                try {
+                    out.jsonDetail = JSON.parse(out.message);
+                } catch (e) {}
+            }
+            if (out.nada && out.nada.status) {
+                out.summary = 'Catalog HTTP ' + out.nada.status;
+                if (out.message && out.message.length < 400) {
+                    out.summary += ': ' + out.message;
+                }
+            } else if (out.message) {
+                out.summary = out.message.length > 400 ? out.message.substring(0, 400) + '…' : out.message;
+            } else {
+                out.summary = 'Failed (HTTP ' + out.httpStatus + ')';
+            }
+            return out;
         },
         toggleSelectedResources: function()
         {
@@ -165,7 +274,7 @@ Vue.component('publish-options', {
                     this.publish_responses.thumbnail.messages.push(this.$t("thumbnail_published_successfully"));
                 }catch(error){
                     console.log("publishing thumbnail failed", error);
-                    this.publish_responses.thumbnail.errors.push(error.response.data);
+                    this.publish_responses.thumbnail.errors.push(this.normalizePublishError(error));
                 }
             }
 
@@ -202,7 +311,7 @@ Vue.component('publish-options', {
             })
             .catch(function(error){
                 console.log("publishing project failed", error);
-                vm.publish_responses.metadata.errors.push(error.response.data);
+                vm.publish_responses.metadata.errors.push(vm.normalizePublishError(error));
             }); 
         },
         publishExternalResoures:  async function() 
@@ -222,16 +331,12 @@ Vue.component('publish-options', {
                         vm.ExternalResources[idx].title + ' ' + vm.$t("published_successfully")
                     );
                 } catch (error) {
-                    console.error(`Request ${idx+1} failed:`, error.response);
-                    vm.publish_responses.external_resources.errors.push({
-                        'resource_id':vm.ExternalResources[idx].id,
-                        'resource_title':vm.ExternalResources[idx].title,
-                        'error':{
-                            'status_code': error.response.status,
-                            'status_text': error.response.statusText,
-                            'data': error.response.data
-                        }
-                    });
+                    console.error('Request ' + (idx + 1) + ' failed:', error.response);
+                    var base = vm.normalizePublishError(error);
+                    vm.publish_responses.external_resources.errors.push(Object.assign({}, base, {
+                        resource_id: vm.ExternalResources[idx].id,
+                        resource_title: vm.ExternalResources[idx].title
+                    }));
                 }
             }
         },
@@ -296,8 +401,6 @@ Vue.component('publish-options', {
             await this.exportExternalResourcesJSON();
             this.project_export_status=this.$t("exporting_external_resources_as_rdf_xml");
             await this.exportExternalResourcesRDF();
-            this.project_export_status=this.$t("creating_project_zip_file");
-            await this.writeProjectZip();
             this.project_export_status="done";
         },
         async exportProjectJSON() {
@@ -355,20 +458,6 @@ Vue.component('publish-options', {
             .then(function () {
                 console.log("writing JSON done");
             });            
-        },
-        async writeProjectZip() {
-            let url=CI.site_url + '/api/packager/generate_zip/'+this.ProjectID;
-            return axios
-            .get(url)
-            .then(function (response) {
-                console.log(response);
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
-            .then(function () {
-                console.log("writing ZIP done");
-            });
         },
         loadCatalogConnections: function() {
             vm=this;
@@ -477,7 +566,16 @@ Vue.component('publish-options', {
                 });
         }
     },
-    
+    watch: {
+        resources_selected: {
+            handler: function (val) {
+                if (!val || val.length === 0) {
+                    this.publish_resources = false;
+                }
+            },
+            deep: true
+        }
+    },
     computed: {        
         ProjectID(){
             return this.$store.state.project_id;
@@ -546,6 +644,18 @@ Vue.component('publish-options', {
         },
         catalogSelected(){
             return this.catalog !== false && this.catalog !== null;
+        },
+        /** True when a thumbnail file exists on the project (from basic_info). */
+        hasProjectThumbnail(){
+            var p = this.project_info;
+            if (!p || typeof p.has_thumbnail === 'undefined') {
+                return false;
+            }
+            return p.has_thumbnail === true || p.has_thumbnail === 1 || p.has_thumbnail === '1';
+        },
+        /** At least one external resource row is selected for publishing. */
+        hasExternalResourcesPublishSelection(){
+            return Array.isArray(this.resources_selected) && this.resources_selected.length > 0;
         }
     },  
     template: `
@@ -766,12 +876,14 @@ Vue.component('publish-options', {
                             <v-switch
                                 v-model="publish_thumbnail"
                                 :value="true"
+                                :disabled="!hasProjectThumbnail"
                                 :label="$t('publish_thumbnail')"
                             ></v-switch>
                             
                             <v-switch
                                 v-model="publish_resources"
                                 :value="true"
+                                :disabled="!hasExternalResourcesPublishSelection"
                                 :label="$t('external_resources') + (resources_selected.length>0?' ('+resources_selected.length+')':'')"
                             ></v-switch>                            
                     </div>
@@ -825,8 +937,15 @@ Vue.component('publish-options', {
                                     <div v-if="publish_responses.metadata.errors.length>0">
                                         <span class="mdi mdi-alert text-danger"></span>
                                         <span>Failed to publish project metadata</span>
-                                        <div class="border-bottom m-1 text-danger" v-for="(response,response_index) in publish_responses.metadata.errors">
-                                            <div>{{response.message}} - {{response.status}}</div>
+                                        <div class="border rounded p-2 mb-2 mt-2 text-left text-body" v-for="(err, response_index) in publish_responses.metadata.errors" :key="'pub-meta-err-' + response_index">
+                                            <div class="text-danger font-weight-bold">{{ err.summary }}</div>
+                                            <div v-if="err.httpStatus != null" class="text-muted small">Editor API: HTTP {{ err.httpStatus }}</div>
+                                            <div v-if="err.nada && err.nada.api_url" class="text-muted small text-break">URL: {{ err.nada.api_url }}</div>
+                                            <div v-if="err.bodyFormat" class="text-muted small">Catalog response: {{ err.bodyFormat }}</div>
+                                            <div v-if="err.ddiFallback" class="text-warning small mt-1">DDI fallback: {{ err.ddiFallback }}</div>
+                                            <pre v-if="err.jsonDetail != null" class="bg-light border rounded p-2 mt-1 small text-dark" style="max-height:240px;overflow:auto;white-space:pre-wrap;">{{ formatJsonForDisplay(err.jsonDetail) }}</pre>
+                                            <pre v-if="err.nada && err.nada.ddi_fallback_details" class="bg-light border rounded p-2 mt-1 small text-dark" style="max-height:200px;overflow:auto;white-space:pre-wrap;">DDI import details: {{ formatJsonForDisplay(err.nada.ddi_fallback_details) }}</pre>
+                                            <pre v-if="err.rawBody && err.jsonDetail == null" class="bg-light border rounded p-2 mt-1 small text-dark" style="max-height:240px;overflow:auto;white-space:pre-wrap;">{{ err.rawBody }}</pre>
                                         </div>    
                                     </div>
                                     <div v-else>
@@ -844,8 +963,13 @@ Vue.component('publish-options', {
                                     <div v-if="publish_responses.thumbnail.errors.length>0">
                                         <span class="mdi mdi-alert text-danger"></span>
                                         <span>Failed to publish thumbnail</span>
-                                        <div class="border m-1 text-danger" v-for="(response,response_index) in publish_responses.thumbnail.errors">
-                                            <div>{{response.message}} - {{response.status}}</div>
+                                        <div class="border rounded p-2 mb-2 mt-2 text-left text-body" v-for="(err, response_index) in publish_responses.thumbnail.errors" :key="'pub-thumb-err-' + response_index">
+                                            <div class="text-danger font-weight-bold">{{ err.summary }}</div>
+                                            <div v-if="err.httpStatus != null" class="text-muted small">Editor API: HTTP {{ err.httpStatus }}</div>
+                                            <div v-if="err.nada && err.nada.api_url" class="text-muted small text-break">URL: {{ err.nada.api_url }}</div>
+                                            <div v-if="err.bodyFormat" class="text-muted small">Catalog response: {{ err.bodyFormat }}</div>
+                                            <pre v-if="err.jsonDetail != null" class="bg-light border rounded p-2 mt-1 small text-dark" style="max-height:240px;overflow:auto;white-space:pre-wrap;">{{ formatJsonForDisplay(err.jsonDetail) }}</pre>
+                                            <pre v-if="err.rawBody && err.jsonDetail == null" class="bg-light border rounded p-2 mt-1 small text-dark" style="max-height:240px;overflow:auto;white-space:pre-wrap;">{{ err.rawBody }}</pre>
                                         </div>    
                                     </div>
                                     <div v-if="publish_responses.thumbnail.messages.length>0" >                            
@@ -867,10 +991,14 @@ Vue.component('publish-options', {
                                         </div>    
                                     </div>
                                     <div v-if="publish_responses.external_resources.errors.length>0" >
-                                        <div class="border-bottom m-1" v-for="(response,response_index) in publish_responses.external_resources.errors">
-                                            <div><span class="mdi mdi-alert text-danger"></span>
-                                            {{response.resource_title}}</div>
-                                            <div class="text-danger">Error: {{response.error.data.message}}</div>                            
+                                        <div class="border rounded p-2 mb-2 text-left text-body" v-for="(err, response_index) in publish_responses.external_resources.errors" :key="'pub-res-err-' + response_index">
+                                            <div><span class="mdi mdi-alert text-danger"></span> {{ err.resource_title }}</div>
+                                            <div class="text-danger font-weight-bold small mt-1">{{ err.summary }}</div>
+                                            <div v-if="err.httpStatus != null" class="text-muted small">Editor API: HTTP {{ err.httpStatus }}</div>
+                                            <div v-if="err.nada && err.nada.api_url" class="text-muted small text-break">URL: {{ err.nada.api_url }}</div>
+                                            <div v-if="err.bodyFormat" class="text-muted small">Catalog response: {{ err.bodyFormat }}</div>
+                                            <pre v-if="err.jsonDetail != null" class="bg-light border rounded p-2 mt-1 small text-dark" style="max-height:200px;overflow:auto;white-space:pre-wrap;">{{ formatJsonForDisplay(err.jsonDetail) }}</pre>
+                                            <pre v-if="err.rawBody && err.jsonDetail == null" class="bg-light border rounded p-2 mt-1 small text-dark" style="max-height:200px;overflow:auto;white-space:pre-wrap;">{{ err.rawBody }}</pre>
                                         </div>    
                                     </div>
                                 </div>                    

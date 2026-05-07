@@ -241,6 +241,11 @@ $lang['no_users_have_access_to_template'] = 'Aucun utilisateur n\'a accès à ce
 $lang['add_user'] = 'Ajouter un utilisateur';
 $lang['filter_by_user'] = 'Filtrer par utilisateur';
 $lang['users_filter'] = 'Utilisateurs';
+$lang['add_tag'] = 'Ajouter un tag';
+$lang['filter_by_tag'] = 'Filtrer par tag';
+$lang['search_tag'] = 'Rechercher un tag';
+$lang['type_to_search_tags'] = 'Tapez pour rechercher des tags';
+$lang['tags'] = 'Tags';
 $lang['change_template_uid'] = 'Changer l\'UID du modèle';
 $lang['template_uid'] = 'UID du modèle';
 $lang['new_uid'] = 'Nouvel UID';
@@ -376,6 +381,10 @@ $lang['login_opens_new_tab']='Connexion (Ouvre un nouvel onglet)';
 // File manager
 $lang['file_manager']='Gestionnaire de fichiers';
 $lang['files']='fichiers';
+$lang['All files']='Tous les fichiers';
+$lang['Project root']='Racine du projet';
+$lang['No files in this folder']='Aucun fichier dans ce dossier';
+$lang['selected']='sélectionné';
 $lang['Documentation']='Documentation';
 $lang['temporary']='TEMPORAIRE';
 $lang['extract_zip']='Extraire le zip';
@@ -409,6 +418,8 @@ $lang['schema_fields_description']='Ces champs existent dans vos métadonnées m
 $lang['extra_fields_count']='Champs Supplémentaires ({count})';
 $lang['move_selected_to_additional']='Déplacer la Sélection vers Supplémentaire';
 $lang['remove_selected']='Supprimer la Sélection';
+$lang['remove_field']='Supprimer';
+$lang['remove_this_field']='Supprimer ce champ';
 $lang['click_to_navigate_to_variables_page']='Cliquer pour naviguer vers la page des variables';
 $lang['navigate_to_variables_page']='Naviguer vers la page des variables';
 $lang['constraint']='Contrainte';
@@ -492,7 +503,73 @@ $lang['file_not_found_on_server']='Fichier introuvable sur le serveur';
 $lang['confirm_delete_file_resource']='Êtes-vous sûr de vouloir supprimer ce fichier?';
 
 // Dashboard
+$lang['Dashboard']='Tableau de bord';
+$lang['Last updated']='Dernière mise à jour';
+$lang['Refresh']='Actualiser';
 
+// Disk Space
+$lang['Disk Space']='Espace disque';
+$lang['Total Capacity']='Capacité totale';
+$lang['Used']='Utilisé';
+$lang['Free']='Libre';
+$lang['Used Percentage']='Pourcentage utilisé';
+$lang['Storage Path']='Chemin de stockage';
+$lang['Unavailable']='Indisponible';
+$lang['Critical']='Critique';
+$lang['Warning']='Avertissement';
+$lang['Healthy']='Sain';
+$lang['Disk space information unavailable']='Informations sur l\'espace disque indisponibles';
+
+// Analytics
+$lang['Analytics']='Analytique';
+$lang['Page Views Today']='Pages vues aujourd\'hui';
+$lang['Page Views']='Pages vues';
+$lang['Traffic Overview']='Vue d\'ensemble du trafic';
+$lang['Today\'s Traffic']='Trafic du jour';
+$lang['By Hour']='Par heure';
+$lang['Live']='Temps réel';
+$lang['Updates every minute']='Mis à jour chaque minute';
+$lang['Active Users']='Utilisateurs actifs';
+$lang['Sessions']='Sessions';
+$lang['Errors Today']='Erreurs aujourd\'hui';
+$lang['Top Pages']='Pages les plus consultées';
+$lang['Top Users']='Utilisateurs les plus actifs';
+$lang['No user activity tracked']='Aucune activité utilisateur enregistrée';
+$lang['Browser & Device']='Navigateur et appareil';
+$lang['Page']='Page';
+$lang['Views']='Vues';
+$lang['Today']='Aujourd\'hui';
+$lang['Last hour']='Dernière heure';
+$lang['Last 30 days']='30 derniers jours';
+$lang['No data available']='Aucune donnée disponible';
+$lang['showing %d-%d of %d']='Affichage %s-%s sur %s';
+
+// Translator / Translation editor
+$lang['base_language'] = 'Langue de référence';
+$lang['select_language_to_translate'] = 'Choisir la langue à traduire';
+$lang['translator_help_title'] = 'Utiliser l\'éditeur de traduction';
+$lang['translator_help_text'] = 'Utilisez le volet gauche pour choisir la langue et le fichier de traduction, puis commencez à modifier.';
+$lang['files_missing'] = 'fichiers manquants';
+$lang['keys_translated'] = 'clés traduites';
+$lang['completion'] = 'Progression';
+$lang['source'] = 'Source';
+$lang['lang_official'] = 'Officiel';
+$lang['lang_official_title'] = 'Fourni avec l\'application. Vos modifications sont enregistrées à part et ne modifient pas les fichiers officiels.';
+$lang['lang_modified'] = 'Modifié';
+$lang['lang_modified_title'] = 'Langue officielle avec personnalisations enregistrées dans le dossier userdata.';
+$lang['lang_custom'] = 'Personnalisé';
+$lang['lang_custom_title'] = 'Langue créée par l\'utilisateur, absente des fichiers officiels.';
+$lang['create_new_language'] = 'Créer une langue';
+$lang['language_name'] = 'Nom de la langue';
+$lang['language_name_hint'] = 'Lettres minuscules, chiffres et underscores uniquement (ex. arabic, pt_br).';
+$lang['editing_user_copy'] = 'Vous modifiez votre copie enregistrée. Le fichier d\'origine reste inchangé.';
+$lang['first_edit_notice'] = 'Pas encore de copie enregistrée — l\'enregistrement créera votre copie dans userdata sans toucher aux fichiers de l\'application.';
+$lang['all_languages'] = 'Toutes les langues';
+$lang['all_files'] = 'Tous les fichiers';
+$lang['import_language'] = 'Importer une langue';
+$lang['import_language_hint'] = 'Téléversez une archive zip exportée depuis cette application. Le zip doit contenir un dossier racine nommé comme la langue (ex. french/) avec des fichiers JSON (ex. general_lang.json). Seules les clés connues des fichiers anglais sont importées et les valeurs sont validées avant enregistrement.';
+$lang['import_zip_label'] = 'Fichier zip de langue';
+$lang['url']='URL';
 
 /* End of file general_lang.php */
 /* Location: ./application/language/french/general_lang.php */
