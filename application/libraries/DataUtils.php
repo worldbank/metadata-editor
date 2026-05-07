@@ -655,15 +655,17 @@ class DataUtils
                 }
             }
 
-			//interval type [categorical - for enabling frequencies]; skip if user disabled freq
-			$include_categorical = true;
+			//interval type [categorical - for enabling frequencies]
+			// Strict opt-in: include only when user explicitly enabled freq.
+			$include_categorical = false;
 			if (!empty($variable['metadata'])) {
 				$meta = $this->ci->Editor_model->decode_metadata($variable['metadata']);
-				if (isset($meta['sum_stats_options']['freq']) && $meta['sum_stats_options']['freq'] === false) {
-					$include_categorical = false;
+				if (isset($meta['sum_stats_options']['freq']) && $meta['sum_stats_options']['freq'] === true) {
+					$include_categorical = true;
 				}
 			}
-			if ($include_categorical && $variable['interval_type']!='' && $variable['interval_type']=='discrete'){
+			// If user explicitly enables frequencies, include regardless of variable type.
+			if ($include_categorical){
 				$params['categorical'][]=$variable['name'];
 			}
         }
