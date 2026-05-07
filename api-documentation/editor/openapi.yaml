@@ -2199,6 +2199,15 @@ paths:
 
                     This is separate from the 'file' parameter - use 'file' to upload a file, or 'filename' to specify a filename/URL.
                   type: string
+                overwrite:
+                  description: >
+                    When creating a resource, if another resource already uses the same
+                    stored filename for this project, set to `true` to replace that row
+                    instead of failing validation. Use `false` or omit to keep the
+                    duplicate-filename error. With `multipart/form-data`, send the literal
+                    strings `true` or `false` if your client cannot encode JSON booleans.
+                  type: boolean
+                  default: false
               required:
                 - dctype
                 - title
