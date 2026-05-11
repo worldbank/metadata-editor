@@ -12,8 +12,33 @@ class DDI_Utils
     function __construct() 
 	{
 		$this->ci =& get_instance();
-		$this->ci->load->model("Catalog_model");
+		//Note: Catalog_model is required only by strip_ddi_parts() / reload_ddi().
+		//It is loaded lazily inside those methods so that callers using the
+		//static helpers (e.g. DDI_Utils::split_file_ids) do not fail in
+		//codebases that do not ship Catalog_model.
     }
+
+
+	/**
+	 * Split a DDI <var> @files attribute value into individual file ID tokens.
+	 *
+	 * Per DDI 2.x, @files is declared as IDREFS (whitespace-separated list of
+	 * file IDs) so a single variable can reference multiple files (e.g. shared
+	 * household/person columns in hierarchical IPUMS datasets).
+	 *
+	 * @param string|null $value Raw @files attribute value, e.g. "H P" or "F1".
+	 * @return array Ordered list of non-empty tokens. Empty input returns [].
+	 */
+	public static function split_file_ids($value)
+	{
+		if ($value === null || $value === '') {
+			return array();
+		}
+
+		$tokens = preg_split('/\s+/', trim((string)$value), -1, PREG_SPLIT_NO_EMPTY);
+		return is_array($tokens) ? $tokens : array();
+	}
+
 	
 
 
@@ -152,7 +177,8 @@ class DDI_Utils
 	 * 
      */
 	function strip_ddi_parts($sid, $xpath_array=array(),$keep_original=true)
-	{		
+	{
+		$this->ci->load->model("Catalog_model");
 		$ddi_file=$this->ci->Catalog_model->get_survey_ddi_path($sid);
 
 		if 	(!file_exists($ddi_file)){
@@ -208,10 +234,11 @@ class DDI_Utils
 	*
 	**/
 	function reload_ddi($id=NULL,$user_id=null, $partial=false)
-	{		
+	{
 		$this->ci->load->model("Catalog_model");
 		$this->ci->load->library('DDI2_import');
 		$this->ci->load->library('Dataset_manager');
+
 
 		//get survey ddi file path by id
 		$ddi_file=$this->ci->Catalog_model->get_survey_ddi_path($id);

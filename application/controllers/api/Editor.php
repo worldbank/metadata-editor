@@ -686,6 +686,12 @@ class Editor extends MY_REST_Controller
 				'status'=>'success'
 			);
 
+			//Surface any non-fatal warnings raised during DDI parsing/import
+			//(e.g. <var @files="H P"> fan-out across hierarchical files).
+			if (is_array($result) && !empty($result['variable_warnings'])){
+				$output['variable_warnings']=$result['variable_warnings'];
+			}
+
 			$this->set_response($output, REST_Controller::HTTP_OK);			
 		}
 		catch(Exception $e){
