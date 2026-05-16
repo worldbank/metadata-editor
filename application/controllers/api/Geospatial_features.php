@@ -1575,7 +1575,7 @@ class Geospatial_features extends MY_REST_Controller
 				// Convert to absolute path for API calls
 				$absolute_path = realpath($file['path']);
 				if (!$absolute_path) {
-					log_message('warning', 'Could not resolve absolute path for: ' . $file['path']);
+					log_message('info', 'Could not resolve absolute path for: ' . $file['path']);
 					$absolute_path = $file['path']; // Fallback to original path
 				}
 				
@@ -1592,7 +1592,7 @@ class Geospatial_features extends MY_REST_Controller
 				// Convert to absolute path for API calls
 				$absolute_path = realpath($file['path']);
 				if (!$absolute_path) {
-					log_message('warning', 'Could not resolve absolute path for: ' . $file['path']);
+					log_message('info', 'Could not resolve absolute path for: ' . $file['path']);
 					$absolute_path = $file['path']; // Fallback to original path
 				}
 				

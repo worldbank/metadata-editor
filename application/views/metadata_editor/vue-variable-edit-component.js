@@ -146,12 +146,15 @@ Vue.component('variable-edit', {
                 const value = cat.value;
                 categoryValueSet.add(String(value));
 
-                categories.push({
+                const row = {
                     value: value,
                     labl: cat.labl || null,
-                    stats: cat.stats || null,
-                    is_missing: cat.is_missing || null
-                });
+                    stats: cat.stats || null
+                };
+                if (cat.is_missing !== undefined && cat.is_missing !== null && cat.is_missing !== '') {
+                    row.is_missing = cat.is_missing;
+                }
+                categories.push(row);
             }
 
             // If no labels, return early

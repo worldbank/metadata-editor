@@ -121,24 +121,37 @@ class Editor_variable_model extends ci_model {
     }
 
     /**
-     * Parse sum_stats_options based on variable data type.
-     * Defaults: freq false unless user explicitly enables it in the UI,
-     * with value-label based frequencies still handled by the import pipeline.
-     * Frequency defaults stay false for continuous numeric,
-     * string (character/fixed), and non-discrete date. User choices in the UI are
-     * always preserved (not overwritten on re-import).
+     * Parse sum_stats_options based on variable data type and interval type.
+     *
+     * Key rule (takes precedence over everything else): if a variable has
+     * value/labels (var_catgry_labels, or var_catgry entries that carry a
+     * non-empty labl), frequencies are enabled regardless of the variable's
+     * data type (numeric, character, fixed, date) or interval type (discrete
+     * or continuous). This covers Stata, SPSS and similar imports where any
+     * variable with attached value labels should default to showing
+     * frequencies in the UI.
+     *
+     * As a secondary signal, frequencies are also enabled when the variable's
+     * interval type is 'discrete'. Otherwise frequencies default to false.
+     * The data type still controls defaults for the other options (wgt, mean,
+     * stdev, etc.) because those are not meaningful for non-numeric data.
+     *
+     * User choices in the UI are always preserved (not overwritten on
+     * re-import) by bulk_upsert_dictionary().
      */
     private function parse_sum_stats_options($variable)
     {
         $data_type = isset($variable['var_format']['type']) ? $variable['var_format']['type'] : '';
         $var_intrvl = isset($variable['var_intrvl']) ? $variable['var_intrvl'] : (isset($variable['metadata']['var_intrvl']) ? $variable['metadata']['var_intrvl'] : null);
         $is_discrete = ($var_intrvl === 'discrete');
+        $has_value_labels = $this->variable_has_value_labels($variable);
+        $enable_freq = $has_value_labels || $is_discrete;
 
         switch ($data_type) {
             case 'numeric':
                 return array(
                     'wgt' => true,
-                    'freq' => false,
+                    'freq' => $enable_freq,
                     'missing' => true,
                     'vald' => true,
                     'invd' => true,
@@ -154,7 +167,7 @@ class Editor_variable_model extends ci_model {
             case 'fixed':
                 return array(
                     'wgt' => false,
-                    'freq' => false,
+                    'freq' => $enable_freq,
                     'missing' => true,
                     'vald' => true,
                     'invd' => true,
@@ -169,7 +182,7 @@ class Editor_variable_model extends ci_model {
             case 'date':
                 return array(
                     'wgt' => false,
-                    'freq' => false,
+                    'freq' => $enable_freq,
                     'missing' => true,
                     'vald' => true,
                     'invd' => true,
@@ -184,7 +197,7 @@ class Editor_variable_model extends ci_model {
             default:
                 return array(
                     'wgt' => false,
-                    'freq' => false,
+                    'freq' => $enable_freq,
                     'missing' => true,
                     'vald' => true,
                     'invd' => true,
@@ -196,6 +209,42 @@ class Editor_variable_model extends ci_model {
                     'stdev_wgt' => false
                 );
         }
+    }
+
+    /**
+     * Detect whether a variable carries value/labels.
+     *
+     * Returns true when var_catgry_labels contains at least one entry with a
+     * non-empty labl, or when var_catgry contains at least one entry with a
+     * non-empty labl. Checks both the top-level keys and the nested metadata
+     * payload so it works in every code path that calls parse_sum_stats_options.
+     *
+     * @param array $variable
+     * @return bool
+     */
+    private function variable_has_value_labels($variable)
+    {
+        $candidates = array();
+
+        foreach (array('var_catgry_labels', 'var_catgry') as $key) {
+            if (isset($variable[$key]) && is_array($variable[$key])) {
+                $candidates[] = $variable[$key];
+            }
+            if (isset($variable['metadata'][$key]) && is_array($variable['metadata'][$key])) {
+                $candidates[] = $variable['metadata'][$key];
+            }
+        }
+
+        foreach ($candidates as $entries) {
+            foreach ($entries as $entry) {
+                $entry = is_array($entry) ? $entry : (array)$entry;
+                if (isset($entry['labl']) && trim((string)$entry['labl']) !== '') {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     function bulk_upsert_dictionary($sid,$fileid,$variables)
@@ -945,7 +994,7 @@ class Editor_variable_model extends ci_model {
      * Sync var_invalrng.values and is_missing on categories
      *      
      * 1. var_invalrng.values is populated from categories with is_missing=1
-     * 2. is_missing on categories is set based on var_invalrng.values
+     * 2. is_missing on each category is set from var_invalrng.values (omitted when not missing)
      * 
      * @param array $variable Variable metadata array
      * @return array Variable with synced var_invalrng.values and is_missing
@@ -969,7 +1018,7 @@ class Editor_variable_model extends ci_model {
             $missing_from_categories = array();
             foreach($variable['var_catgry'] as $cat) {
                 if (isset($cat['is_missing']) && 
-                    ($cat['is_missing'] == '1' || $cat['is_missing'] == 'Y' || $cat['is_missing'] == 1)) {
+                    ($cat['is_missing'] == '1' || $cat['is_missing'] == 'Y' || $cat['is_missing'] == 1 || $cat['is_missing'] === true)) {
                     if (isset($cat['value']) && $cat['value'] !== null && $cat['value'] !== '') {
                         $missing_from_categories[] = (string)$cat['value'];
                     }
@@ -981,10 +1030,20 @@ class Editor_variable_model extends ci_model {
             }
         }
 
-        // Step 2: Remove is_missing from all categories
+        // Step 2: Set is_missing on each category from var_invalrng.values (omit key when not missing)
         if (isset($variable['var_catgry']) && is_array($variable['var_catgry'])) {
+            $missing_vals = array();
+            if (isset($variable['var_invalrng']['values']) && is_array($variable['var_invalrng']['values'])) {
+                $missing_vals = array_map('strval', $variable['var_invalrng']['values']);
+            }
             foreach($variable['var_catgry'] as &$cat) {
-                if (isset($cat['is_missing'])) {
+                if (!isset($cat['value'])) {
+                    continue;
+                }
+                $cv = (string)$cat['value'];
+                if (in_array($cv, $missing_vals, true)) {
+                    $cat['is_missing'] = '1';
+                } else {
                     unset($cat['is_missing']);
                 }
             }

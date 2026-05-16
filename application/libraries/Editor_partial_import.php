@@ -220,6 +220,9 @@ class Editor_partial_import
 				$variable['file_id']=$fid_token;
 				$variable['fid']=$fid_token;
 
+				$this->ci->load->library('ImportJsonMetadata');
+				$this->ci->importjsonmetadata->sanitize_variable_categories_for_import($variable);
+
 				//update variable info
 				// - match by variable name
 				// - match by data file name [ db requires fid, get fid from db using data_file_name]

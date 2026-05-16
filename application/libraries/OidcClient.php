@@ -543,7 +543,7 @@ class OidcClient
                     }
                 }
                 
-                log_message('warning', 'Could not process JWK for kid: ' . $kid . '. Key type: ' . (isset($key_data['kty']) ? $key_data['kty'] : 'unknown'));
+                log_message('info', 'Could not process JWK for kid: ' . $kid . '. Key type: ' . (isset($key_data['kty']) ? $key_data['kty'] : 'unknown'));
             } catch (Exception $e) {
                 log_message('error', 'Error processing JWK for kid ' . $kid . ': ' . $e->getMessage());
             }
