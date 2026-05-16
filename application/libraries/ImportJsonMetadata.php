@@ -607,7 +607,7 @@ class ImportJsonMetadata
                     } else {
                         // For non-survey/microdata projects, only process the first line
                         // If encounter more lines, log a warning but continue
-                        log_message('warning', "JSONL file contains additional lines after first line for non-survey/microdata project. Line " . $line_number . " will be ignored.");
+                        log_message('info', "JSONL file contains additional lines after first line for non-survey/microdata project. Line " . $line_number . " will be ignored.");
                     }
                 }
             }
@@ -1157,6 +1157,9 @@ class ImportJsonMetadata
             $fid=$file_id_mappings[$variable['fid']];
             $variable['fid']=$fid;
 
+            // Drop missing-flagged Sysmiss categories (use invd for system missing); then drop Sysmiss when invd present
+            $this->sanitize_variable_categories_for_import($variable);
+
             //check if variable exists
             $var_key = $fid . '|' . (isset($variable['name']) ? $variable['name'] : '');
             $variable_info = null;
@@ -1176,8 +1179,7 @@ class ImportJsonMetadata
             if (isset($variable['var_catgry']) && is_array($variable['var_catgry'])) {
                 $missing_values = array();
                 foreach($variable['var_catgry'] as $cat) {
-                    if (isset($cat['is_missing']) && 
-                        ($cat['is_missing'] == '1' || $cat['is_missing'] == 1)) {
+                    if ($this->category_marked_missing($cat)) {
                         if (isset($cat['value']) && $cat['value'] !== null && $cat['value'] !== '') {
                             $missing_values[] = (string)$cat['value'];
                         }
@@ -1279,6 +1281,145 @@ class ImportJsonMetadata
         );
     }
 
+    /**
+     * JSON variable import: omit missing-flagged Sysmiss from categories/labels/invalrng, then apply invd-based strip.
+     */
+    public function sanitize_variable_categories_for_import(&$variable)
+    {
+        $this->strip_sysmiss_category_when_marked_missing($variable);
+        $this->strip_sysmiss_category_when_invd_present($variable);
+    }
+
+    /**
+     * When a category has missing set and value Sysmiss, do not import it — system missing is carried by sumStat invd.
+     */
+    private function strip_sysmiss_category_when_marked_missing(&$variable)
+    {
+        $stripped_missing_sysmiss = false;
+        if (isset($variable['var_catgry']) && is_array($variable['var_catgry'])) {
+            $filtered = array();
+            foreach ($variable['var_catgry'] as $cat) {
+                if (isset($cat['value']) && $this->is_sysmiss_category_value($cat['value']) && $this->category_marked_missing($cat)) {
+                    $stripped_missing_sysmiss = true;
+                    continue;
+                }
+                $filtered[] = $cat;
+            }
+            if (count($filtered) > 0) {
+                $variable['var_catgry'] = $filtered;
+            } else {
+                unset($variable['var_catgry']);
+            }
+        }
+        if ($stripped_missing_sysmiss && isset($variable['var_catgry_labels']) && is_array($variable['var_catgry_labels'])) {
+            $labs = array();
+            foreach ($variable['var_catgry_labels'] as $row) {
+                if (isset($row['value']) && $this->is_sysmiss_category_value($row['value'])) {
+                    continue;
+                }
+                $labs[] = $row;
+            }
+            if (count($labs) > 0) {
+                $variable['var_catgry_labels'] = $labs;
+            } else {
+                unset($variable['var_catgry_labels']);
+            }
+        }
+        if (isset($variable['var_invalrng']['values']) && is_array($variable['var_invalrng']['values'])) {
+            $vals = array();
+            foreach ($variable['var_invalrng']['values'] as $v) {
+                if ($this->is_sysmiss_category_value($v)) {
+                    continue;
+                }
+                $vals[] = $v;
+            }
+            $variable['var_invalrng']['values'] = array_values($vals);
+        }
+    }
+
+    private function category_marked_missing($cat)
+    {
+        if (!isset($cat['is_missing'])) {
+            return false;
+        }
+        $im = $cat['is_missing'];
+        return $im === '1' || $im === 1 || $im === 'Y' || $im === true;
+    }
+
+    /**
+     * When var_sumstat has a positive invd, system missing is shown from that stat — remove Sysmiss rows
+     * from var_catgry / var_catgry_labels / var_invalrng so import does not duplicate the UI row.
+     */
+    private function strip_sysmiss_category_when_invd_present(&$variable)
+    {
+        if (!$this->variable_has_positive_invd($variable)) {
+            return;
+        }
+        if (isset($variable['var_catgry']) && is_array($variable['var_catgry'])) {
+            $filtered = array();
+            foreach ($variable['var_catgry'] as $cat) {
+                if (isset($cat['value']) && $this->is_sysmiss_category_value($cat['value'])) {
+                    continue;
+                }
+                $filtered[] = $cat;
+            }
+            if (count($filtered) > 0) {
+                $variable['var_catgry'] = $filtered;
+            } else {
+                unset($variable['var_catgry']);
+            }
+        }
+        if (isset($variable['var_catgry_labels']) && is_array($variable['var_catgry_labels'])) {
+            $labs = array();
+            foreach ($variable['var_catgry_labels'] as $row) {
+                if (isset($row['value']) && $this->is_sysmiss_category_value($row['value'])) {
+                    continue;
+                }
+                $labs[] = $row;
+            }
+            if (count($labs) > 0) {
+                $variable['var_catgry_labels'] = $labs;
+            } else {
+                unset($variable['var_catgry_labels']);
+            }
+        }
+        if (isset($variable['var_invalrng']['values']) && is_array($variable['var_invalrng']['values'])) {
+            $vals = array();
+            foreach ($variable['var_invalrng']['values'] as $v) {
+                if ($this->is_sysmiss_category_value($v)) {
+                    continue;
+                }
+                $vals[] = $v;
+            }
+            $variable['var_invalrng']['values'] = array_values($vals);
+        }
+    }
+
+    private function variable_has_positive_invd($variable)
+    {
+        if (!isset($variable['var_sumstat']) || !is_array($variable['var_sumstat'])) {
+            return false;
+        }
+        foreach ($variable['var_sumstat'] as $ss) {
+            if (!isset($ss['type']) || $ss['type'] !== 'invd' || !isset($ss['value'])) {
+                continue;
+            }
+            $v = $ss['value'];
+            if ($v === '' || $v === null) {
+                continue;
+            }
+            if (is_numeric($v) && (float)$v > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function is_sysmiss_category_value($value)
+    {
+        return strcasecmp(trim((string)$value), 'Sysmiss') === 0;
+    }
+
     function get_variable_category_value_labels($variable)
     {
         $labels=[];
@@ -1352,7 +1493,7 @@ class ImportJsonMetadata
                 throw $e;
             }
         } else {
-            log_message('warning', "No feature types found in feature_catalogue for project {$sid}");
+            log_message('info', "No feature types found in feature_catalogue for project {$sid}");
         }
     }
 
@@ -1383,7 +1524,7 @@ class ImportJsonMetadata
                     : array();
                 
                 if (empty($type_name)) {
-                    log_message('warning', 'Skipping feature type with empty typeName');
+                    log_message('info', 'Skipping feature type with empty typeName');
                     continue;
                 }
                 
@@ -1456,7 +1597,7 @@ class ImportJsonMetadata
                         try {
                             $char_member_name = isset($characteristic['memberName']) ? $characteristic['memberName'] : '';
                             if (empty($char_member_name)) {
-                                log_message('warning', "Skipping characteristic with empty memberName for feature: {$type_name}");
+                                log_message('info', "Skipping characteristic with empty memberName for feature: {$type_name}");
                                 continue;
                             }
                             

@@ -994,7 +994,7 @@ class Geospatial_features_model extends CI_Model {
         
         // If we've exhausted all attempts, append timestamp as last resort
         $unique_name = $base_name . '_' . time();
-        log_message('warning', "Feature name conflict: using timestamp suffix for '{$base_name}' -> '{$unique_name}'");
+        log_message('info', "Feature name conflict: using timestamp suffix for '{$base_name}' -> '{$unique_name}'");
         return $unique_name;
     }
 
