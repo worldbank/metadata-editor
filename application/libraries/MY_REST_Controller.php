@@ -175,6 +175,72 @@ abstract class MY_REST_Controller extends REST_Controller {
 
     }
 
+    /**
+     * Non-fatal ACL check for branching (e.g. registry admin vs super-admin).
+     */
+    function user_has_access($resource, $privilege)
+    {
+        $user = $this->api_user();
+        try {
+            return $this->acl_manager->has_access($resource, $privilege, $user);
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Catalogue read: registry view, or editor view (in-project DSD / codelist pickers).
+     */
+    function has_registry_catalogue_view_or_die($resource)
+    {
+        if ($this->user_has_access($resource, 'view') || $this->user_has_access('editor', 'view')) {
+            return true;
+        }
+        $this->_registry_access_denied_response();
+    }
+
+    function has_registry_edit_or_die($resource)
+    {
+        return $this->has_access($resource, 'edit');
+    }
+
+    function has_registry_delete_or_die($resource)
+    {
+        return $this->has_access($resource, 'delete');
+    }
+
+    function has_registry_import_or_die($resource)
+    {
+        if ($this->user_has_access($resource, 'import') || $this->user_has_access($resource, 'edit')) {
+            return true;
+        }
+        $this->_registry_access_denied_response();
+    }
+
+    function has_registry_admin_or_die($resource)
+    {
+        return $this->has_access($resource, 'admin');
+    }
+
+    /**
+     * Registry lifecycle admin (locked/archived) or Ion Auth super-admin.
+     */
+    function is_registry_admin($resource)
+    {
+        return $this->is_admin() || $this->user_has_access($resource, 'admin');
+    }
+
+    private function _registry_access_denied_response()
+    {
+        $this->output
+            ->set_status_header(403)
+            ->set_content_type('application/json');
+        die(json_encode(array(
+            'status' => 'failed',
+            'error' => 'Access denied',
+        )));
+    }
+
     function has_access($resource,$privilege)
     {
         $user=$this->api_user();

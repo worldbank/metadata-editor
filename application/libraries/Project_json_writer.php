@@ -208,6 +208,11 @@ class Project_json_writer
 			unset($metadata[$field]);
 		}
 
+		// Binding-only fields (stored in metadata for convenience; not part of timeseries schema export)
+		if (in_array($project['type'], array('indicator', 'timeseries'))) {
+			unset($metadata['indicator_id_value']);
+		}
+
 		if ($exclude_private_fields==1){
 			$this->json_remove_private_fields($sid,$metadata);
 		}
@@ -303,12 +308,12 @@ class Project_json_writer
 			}
 		}
 
-		// Indicator/timeseries: export data structure only when rows exist
+		// Indicator/timeseries: export global DSD reference when bound
 		if (in_array($project['type'], array('indicator', 'timeseries'))) {
 			$this->ci->load->library('Indicator_util');
-			$data_structure = $this->ci->indicator_util->get_data_structure_for_project($sid);
-			if (!empty($data_structure)) {
-				$output['data_structure'] = $data_structure;
+			$ds_fields = $this->ci->indicator_util->get_data_structure_export_fields($sid);
+			foreach ($ds_fields as $k => $v) {
+				$output[$k] = $v;
 			}
 		}
 		

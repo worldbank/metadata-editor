@@ -4,6 +4,9 @@ require(APPPATH.'/libraries/MY_REST_Controller.php');
 
 class Codelists extends MY_REST_Controller
 {
+	/** @var string ACL resource key (see acl_permissions.php). */
+	private $registry_resource = 'codelist';
+
 	public function __construct()
 	{
 		parent::__construct();
@@ -24,53 +27,99 @@ class Codelists extends MY_REST_Controller
 	}
 
 	/**
-	 * 
-	 * List all codelists
-	 * 
+	 * List codelists (catalogue).
+	 *
 	 * GET /api/codelists
-	 * Query params: agency, search, offset, limit, order_by, order_dir
-	 * 
+	 * Default: one row per family (collapsed, id = pid) with versions_count.
+	 * flat=1: all version rows. collapsed=0 forces flat; collapsed=1 forces collapsed.
+	 * with_counts=1 (default): item_count, dsd_component_count.
+	 * page + per_page: paginated (max 200 per page). Without page: legacy offset/limit or full list.
 	 */
 	function index_get()
 	{
 		try{
-			// Build filters from query parameters
+			$this->has_registry_catalogue_view_or_die($this->registry_resource);
 			$filters = array();
-			
+
 			$agency = $this->input->get('agency');
 			if ($agency) {
 				$filters['agency'] = $agency;
 			}
-			
+
 			$search = $this->input->get('search');
+			if ($search === null || $search === '') {
+				$search = $this->input->get('q');
+			}
 			if ($search) {
 				$filters['search'] = $search;
 			}
 
-			$offset = (int)$this->input->get('offset');
-			$limit = $this->input->get('limit');
-			if ($limit !== null) {
-				$limit = (int)$limit;
+			if (filter_var($this->input->get('exclude_archived'), FILTER_VALIDATE_BOOLEAN)) {
+				$filters['exclude_archived'] = true;
 			}
 
-			$order_by = $this->input->get('order_by') ?: 'created_at';
-			$order_dir = strtoupper($this->input->get('order_dir') ?: 'DESC');
-			if (!in_array($order_dir, array('ASC', 'DESC'))) {
-				$order_dir = 'DESC';
+			$status = $this->input->get('status');
+			if ($status !== null && $status !== '') {
+				$filters['status'] = $status;
 			}
 
-			$codelists = $this->Codelists_model->get_all($filters, $offset, $limit, $order_by, $order_dir);
-			$total = $this->Codelists_model->count($filters);
-			
+			$with_counts = $this->input->get('with_counts');
+			$with_counts = ($with_counts === null || $with_counts === '' || $with_counts === '1' || $with_counts === 'true');
+			$flat = $this->_codelists_catalog_flat_mode();
+
+			$page_raw = $this->input->get('page');
+			if ($page_raw !== null && $page_raw !== '') {
+				$page = max(1, (int) $page_raw);
+				$per_page = $this->input->get('per_page');
+				$per_page = ($per_page !== null && $per_page !== '') ? (int) $per_page : 50;
+				$p = $this->Codelists_model->get_codelists_paged(array(
+					'page' => $page,
+					'per_page' => $per_page,
+					'search' => isset($filters['search']) ? $filters['search'] : '',
+					'with_counts' => $with_counts,
+					'flat' => $flat,
+					'agency' => isset($filters['agency']) ? $filters['agency'] : null,
+					'status' => isset($filters['status']) ? $filters['status'] : null,
+					'exclude_archived' => !empty($filters['exclude_archived']),
+				));
+				$this->set_response(array(
+					'status' => 'success',
+					'codelists' => $p['rows'],
+					'total' => $p['total'],
+					'page' => $p['page'],
+					'per_page' => $p['per_page'],
+					'collapsed' => !$flat,
+				), REST_Controller::HTTP_OK);
+				return;
+			}
+
+			if ($flat) {
+				$offset = (int) $this->input->get('offset');
+				$limit = $this->input->get('limit');
+				if ($limit !== null) {
+					$limit = (int) $limit;
+				}
+				$codelists = $this->Codelists_model->get_all($filters, $offset, $limit, 'created_at', 'ASC');
+				if ($with_counts && !empty($codelists)) {
+					$this->Codelists_model->attach_catalog_counts($codelists, false);
+				}
+				$total = $this->Codelists_model->count($filters);
+			} else {
+				$codelists = $this->Codelists_model->get_all_collapsed($filters, $with_counts);
+				$total = $this->Codelists_model->count_collapsed($filters);
+			}
+
 			$response = array(
 				'status' => 'success',
 				'codelists' => $codelists,
-				'total' => $total
+				'total' => $total,
+				'collapsed' => !$flat,
 			);
 
-			if ($limit !== null && $limit > 0) {
-				$response['offset'] = $offset;
-				$response['limit'] = $limit;
+			$limit = $this->input->get('limit');
+			if ($flat && $limit !== null && (int) $limit > 0) {
+				$response['offset'] = (int) $this->input->get('offset');
+				$response['limit'] = (int) $limit;
 			}
 
 			$this->set_response($response, REST_Controller::HTTP_OK);
@@ -85,6 +134,51 @@ class Codelists extends MY_REST_Controller
 	}
 
 	/**
+	 * flat=1 => all version rows; collapsed=1 => family heads; default collapsed.
+	 */
+	private function _codelists_catalog_flat_mode()
+	{
+		$flat = ($this->input->get('flat') === '1' || $this->input->get('flat') === 'true');
+		if ($this->input->get('collapsed') === '1' || $this->input->get('collapsed') === 'true') {
+			$flat = false;
+		}
+		if ($this->input->get('collapsed') === '0' || $this->input->get('collapsed') === 'false') {
+			$flat = true;
+		}
+		if ($this->input->get('flat') === '1' || $this->input->get('flat') === 'true') {
+			$flat = true;
+		}
+		return $flat;
+	}
+
+	/**
+	 * GET /api/codelists/versions/{name}?agency=
+	 */
+	function versions_get($name = null)
+	{
+		try {
+			$this->has_registry_catalogue_view_or_die($this->registry_resource);
+			if (!$name) {
+				throw new Exception('Codelist name (SDMX id) is required');
+			}
+			$agency = $this->input->get('agency');
+			$rows = $this->Codelists_model->get_codelist_versions($name, $agency ?: null);
+			if ($this->input->get('with_counts') !== '0' && $this->input->get('with_counts') !== 'false') {
+				$this->Codelists_model->attach_catalog_counts($rows, false);
+			}
+			$this->set_response(array(
+				'status' => 'success',
+				'codelists' => $rows,
+			), REST_Controller::HTTP_OK);
+		} catch (Exception $e) {
+			$this->set_response(array(
+				'status' => 'failed',
+				'message' => $e->getMessage(),
+			), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
 	 * 
 	 * Get single codelist by ID
 	 * 
@@ -94,6 +188,7 @@ class Codelists extends MY_REST_Controller
 	function single_get($id = null)
 	{
 		try{
+			$this->has_registry_catalogue_view_or_die($this->registry_resource);
 			if (!$id) {
 				throw new Exception("Codelist ID is required");
 			}
@@ -122,22 +217,23 @@ class Codelists extends MY_REST_Controller
 
 	/**
 	 * 
-	 * Get codelist by agency, codelist_id, and version (version may be empty for blank DB version)
+	 * Get codelist by agency, name (SDMX id), and version (version may be empty for blank DB version)
 	 * 
-	 * GET /api/codelists/by-identity/{agency}/{codelist_id}/{version}
+	 * GET /api/codelists/by-identity/{agency}/{name}/{version}
 	 * 
 	 */
-	function by_identity_get($agency = null, $codelist_id = null, $version = null)
+	function by_identity_get($agency = null, $name = null, $version = null)
 	{
 		try{
-			if (!$agency || !$codelist_id) {
-				throw new Exception("Agency and codelist_id are required");
+			$this->has_registry_catalogue_view_or_die($this->registry_resource);
+			if (!$agency || !$name) {
+				throw new Exception("Agency and name (SDMX maintainable id) are required");
 			}
 			if ($version === null || $version === '') {
 				$version = '';
 			}
 
-			$codelist = $this->Codelists_model->get_by_identity($agency, $codelist_id, $version);
+			$codelist = $this->Codelists_model->get_by_identity($agency, $name, $version);
 
 			if (!$codelist) {
 				throw new Exception("Codelist not found");
@@ -162,7 +258,7 @@ class Codelists extends MY_REST_Controller
 	/**
 	 * Resolve a registry codelist by SDMX identity (query params; safe for special characters).
 	 *
-	 * GET /api/codelists/lookup_by_identity?agency=&codelist_id=&version=
+	 * GET /api/codelists/lookup_by_identity?agency=&name=&version=
 	 * version is optional (empty string matches codelists with blank version).
 	 *
 	 * @return void JSON { status, codelist } or error
@@ -170,26 +266,27 @@ class Codelists extends MY_REST_Controller
 	function lookup_by_identity_get()
 	{
 		try {
+			$this->has_registry_catalogue_view_or_die($this->registry_resource);
 			$agency = $this->input->get('agency');
-			$codelist_id = $this->input->get('codelist_id');
+			$name = $this->input->get('name');
 			$version = $this->input->get('version');
 
 			$agency = $agency !== null && $agency !== false ? trim((string) $agency) : '';
-			$codelist_id = $codelist_id !== null && $codelist_id !== false ? trim((string) $codelist_id) : '';
+			$name = $name !== null && $name !== false ? trim((string) $name) : '';
 			if ($version === null || $version === false) {
 				$version = '';
 			} else {
 				$version = trim((string) $version);
 			}
 
-			if ($agency === '' || $codelist_id === '') {
-				throw new Exception('agency and codelist_id query parameters are required');
+			if ($agency === '' || $name === '') {
+				throw new Exception('agency and name query parameters are required');
 			}
 
-			$codelist = $this->Codelists_model->get_by_identity($agency, $codelist_id, $version);
+			$codelist = $this->Codelists_model->get_by_identity($agency, $name, $version);
 
 			if (!$codelist) {
-				throw new Exception('Codelist not found for the given agency, codelist_id, and version');
+				throw new Exception('Codelist not found for the given agency, name, and version');
 			}
 
 			$this->set_response(array(
@@ -214,6 +311,7 @@ class Codelists extends MY_REST_Controller
 	function index_post()
 	{
 		try{
+			$this->has_registry_edit_or_die($this->registry_resource);
 			$data = (array)$this->raw_json_input();
 
 			if (empty($data)) {
@@ -224,25 +322,33 @@ class Codelists extends MY_REST_Controller
 			if (empty($data['agency'])) {
 				throw new Exception("Agency is required");
 			}
-			if (empty($data['codelist_id'])) {
-				throw new Exception("Codelist ID is required");
+			if (empty($data['name'])) {
+				throw new Exception("Name (SDMX maintainable id) is required");
 			}
 			if (empty($data['version'])) {
 				throw new Exception("Version is required");
 			}
-			if (empty($data['name'])) {
-				throw new Exception("Name is required");
+			if (empty($data['title'])) {
+				throw new Exception("Title is required");
+			}
+
+			if (isset($data['status'])) {
+				$data['status'] = $this->Codelists_model->normalize_status($data['status']);
+				if (!$this->_codelist_registry_admin()
+					&& !in_array($data['status'], array('draft', 'active'), true)) {
+					throw new Exception('Only administrators can create codelists with locked or archived status');
+				}
 			}
 
 			// Check if codelist already exists
 			$existing = $this->Codelists_model->get_by_identity(
 				$data['agency'],
-				$data['codelist_id'],
+				$data['name'],
 				$data['version']
 			);
 
 			if ($existing) {
-				throw new Exception("Codelist with this agency, id, and version already exists");
+				throw new Exception("Codelist with this agency, name, and version already exists");
 			}
 
 			// Create codelist
@@ -280,6 +386,7 @@ class Codelists extends MY_REST_Controller
 	function import_sdmx_post()
 	{
 		try {
+			$this->has_registry_import_or_die($this->registry_resource);
 			$this->load->library('SDMX/SdmxCodelistImporter');
 			$dry = filter_var($this->input->get('dry_run'), FILTER_VALIDATE_BOOLEAN);
 			$replace = filter_var($this->input->get('replace'), FILTER_VALIDATE_BOOLEAN);
@@ -509,6 +616,7 @@ class Codelists extends MY_REST_Controller
 	function update_post($id = null)
 	{
 		try{
+			$this->has_registry_edit_or_die($this->registry_resource);
 			if (!$id) {
 				throw new Exception("Codelist ID is required");
 			}
@@ -527,8 +635,11 @@ class Codelists extends MY_REST_Controller
 
 			// Don't allow changing identity fields
 			unset($data['agency']);
-			unset($data['codelist_id']);
+			unset($data['name']);
 			unset($data['version']);
+			unset($data['idno']);
+
+			$this->_apply_codelist_update_rules($existing, $data);
 
 			// Update codelist
 			$result = $this->Codelists_model->update($id, $data);
@@ -562,15 +673,12 @@ class Codelists extends MY_REST_Controller
 	function delete_post($id = null)
 	{
 		try{
+			$this->has_registry_delete_or_die($this->registry_resource);
 			if (!$id) {
 				throw new Exception("Codelist ID is required");
 			}
 
-			// Verify the codelist exists
-			$existing = $this->Codelists_model->get_by_id($id);
-			if (!$existing) {
-				throw new Exception("Codelist not found");
-			}
+			$this->Codelists_model->require_deletable($id);
 
 			$result = $this->Codelists_model->delete($id);
 
@@ -620,6 +728,7 @@ class Codelists extends MY_REST_Controller
 	function codes_get($id = null)
 	{
 		try{
+			$this->has_registry_catalogue_view_or_die($this->registry_resource);
 			if (!$id) {
 				throw new Exception("Codelist ID is required");
 			}
@@ -722,6 +831,7 @@ class Codelists extends MY_REST_Controller
 	function code_get($code_id = null)
 	{
 		try{
+			$this->has_registry_catalogue_view_or_die($this->registry_resource);
 			if (!$code_id) {
 				throw new Exception("Code ID is required");
 			}
@@ -759,15 +869,12 @@ class Codelists extends MY_REST_Controller
 	function codes_post($id = null)
 	{
 		try{
+			$this->has_registry_edit_or_die($this->registry_resource);
 			if (!$id) {
 				throw new Exception("Codelist ID is required");
 			}
 
-			// Verify the codelist exists
-			$codelist = $this->Codelists_model->get_by_id($id);
-			if (!$codelist) {
-				throw new Exception("Codelist not found");
-			}
+			$this->Codelists_model->require_content_mutable($id);
 
 			$data = (array)$this->raw_json_input();
 
@@ -813,15 +920,17 @@ class Codelists extends MY_REST_Controller
 	function code_update_post($code_id = null)
 	{
 		try{
+			$this->has_registry_edit_or_die($this->registry_resource);
 			if (!$code_id) {
 				throw new Exception("Code ID is required");
 			}
 
-			// Verify the code exists
 			$existing = $this->Codelists_model->get_code_by_id($code_id);
 			if (!$existing) {
 				throw new Exception("Code not found");
 			}
+
+			$this->Codelists_model->require_content_mutable((int) $existing['codelist_id']);
 
 			$data = (array)$this->raw_json_input();
 
@@ -864,17 +973,17 @@ class Codelists extends MY_REST_Controller
 	function code_delete_post($code_id = null)
 	{
 		try{
+			$this->has_registry_edit_or_die($this->registry_resource);
 			if (!$code_id) {
 				throw new Exception("Code ID is required");
 			}
 
-			// Get code to get codelist_id before deletion
 			$code = $this->Codelists_model->get_code_by_id($code_id);
 			if (!$code) {
 				throw new Exception("Code not found");
 			}
 
-			$codelist_id = $code['codelist_id'];
+			$this->Codelists_model->require_content_mutable((int) $code['codelist_id']);
 
 			$result = $this->Codelists_model->delete_code($code_id);
 
@@ -926,15 +1035,18 @@ class Codelists extends MY_REST_Controller
 	function code_label_post($code_id = null)
 	{
 		try{
+			$this->has_registry_edit_or_die($this->registry_resource);
 			if (!$code_id) {
 				throw new Exception("Code ID is required");
 			}
 
-			// Verify the code exists
 			$code = $this->Codelists_model->get_code_by_id($code_id);
 			if (!$code) {
 				throw new Exception("Code not found");
 			}
+
+			$codelist_pk = (int) $code['codelist_id'];
+			$this->Codelists_model->require_content_mutable($codelist_pk);
 
 			$data = (array)$this->raw_json_input();
 
@@ -945,7 +1057,6 @@ class Codelists extends MY_REST_Controller
 				throw new Exception("Label is required");
 			}
 
-			$codelist_pk = (int) $code['codelist_id'];
 			if (!$this->Codelists_model->codelist_has_language($codelist_pk, $data['language'])) {
 				throw new Exception("Language is not enabled for this codelist. Add it under codelist translations first.");
 			}
@@ -986,6 +1097,7 @@ class Codelists extends MY_REST_Controller
 	function label_delete_post($label_id = null)
 	{
 		try{
+			$this->has_registry_edit_or_die($this->registry_resource);
 			if (!$label_id) {
 				throw new Exception("Label ID is required");
 			}
@@ -998,11 +1110,12 @@ class Codelists extends MY_REST_Controller
 				throw new Exception("Label not found");
 			}
 
-			// Get code to find codelist
 			$code = $this->Codelists_model->get_code_by_id($label['codelist_item_id']);
 			if (!$code) {
 				throw new Exception("Code not found");
 			}
+
+			$this->Codelists_model->require_content_mutable((int) $code['codelist_id']);
 
 			$result = $this->Codelists_model->delete_code_label($label_id);
 
@@ -1054,6 +1167,7 @@ class Codelists extends MY_REST_Controller
 	function hierarchy_get($id = null)
 	{
 		try{
+			$this->has_registry_catalogue_view_or_die($this->registry_resource);
 			if (!$id) {
 				throw new Exception("Codelist ID is required");
 			}
@@ -1091,6 +1205,7 @@ class Codelists extends MY_REST_Controller
 	function codelist_translations_get($id = null)
 	{
 		try{
+			$this->has_registry_catalogue_view_or_die($this->registry_resource);
 			if (!$id) {
 				throw new Exception("Codelist ID is required");
 			}
@@ -1124,14 +1239,12 @@ class Codelists extends MY_REST_Controller
 	function codelist_translations_post($id = null)
 	{
 		try{
+			$this->has_registry_edit_or_die($this->registry_resource);
 			if (!$id) {
 				throw new Exception("Codelist ID is required");
 			}
 
-			$codelist = $this->Codelists_model->get_by_id($id);
-			if (!$codelist) {
-				throw new Exception("Codelist not found");
-			}
+			$this->Codelists_model->require_content_mutable($id);
 
 			$data = (array)$this->raw_json_input();
 
@@ -1179,6 +1292,7 @@ class Codelists extends MY_REST_Controller
 	function codelist_translation_delete_post($translation_id = null)
 	{
 		try{
+			$this->has_registry_edit_or_die($this->registry_resource);
 			if (!$translation_id) {
 				throw new Exception("Translation ID is required");
 			}
@@ -1189,6 +1303,7 @@ class Codelists extends MY_REST_Controller
 			}
 
 			$codelist_pk = (int) $row['codelist_id'];
+			$this->Codelists_model->require_content_mutable($codelist_pk);
 			$existing = $this->Codelists_model->get_codelist_translations($codelist_pk);
 			if (count($existing) <= 1) {
 				throw new Exception("Cannot remove the last codelist language. Add another language first.");
@@ -1229,6 +1344,133 @@ class Codelists extends MY_REST_Controller
 	}
 
 	/**
+	 * Export a single codelist as NADA-compatible JSON (seed / import_json shape).
+	 *
+	 * GET /api/codelists/export_json/{id}
+	 * Query: download=1 — Content-Disposition attachment (default for browsers)
+	 */
+	function export_json_get($id = null)
+	{
+		try {
+			$this->has_registry_catalogue_view_or_die($this->registry_resource);
+			if (!$id) {
+				throw new Exception('Codelist ID is required');
+			}
+
+			$codelist = $this->Codelists_model->get_by_id($id);
+			if (!$codelist) {
+				throw new Exception('Codelist not found');
+			}
+
+			$doc = $this->Codelists_model->export_nada_json_document((int) $id);
+
+			$download = $this->input->get('download');
+			if ($download === null || $download === '') {
+				$download = true;
+			} else {
+				$download = filter_var($download, FILTER_VALIDATE_BOOLEAN);
+			}
+
+			if ($download) {
+				$safe_id = preg_replace('/[^A-Za-z0-9_\-]/', '_', $codelist['name']);
+				$filename = $safe_id . '_' . str_replace('.', '', (string) $codelist['version']) . '.json';
+				$json = json_encode($doc, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+				if ($json === false) {
+					throw new Exception('Failed to encode JSON');
+				}
+				header('Content-Type: application/json; charset=UTF-8');
+				header('Content-Disposition: attachment; filename="' . $filename . '"');
+				header('Cache-Control: no-store, no-cache');
+				echo $json;
+				exit();
+			}
+
+			$this->set_response(array(
+				'status' => 'success',
+				'export' => $doc,
+			), REST_Controller::HTTP_OK);
+		}
+		catch (Exception $e) {
+			$this->set_response(array(
+				'status' => 'failed',
+				'message' => $e->getMessage(),
+			), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * Import one codelist from NADA-compatible JSON.
+	 *
+	 * POST /api/codelists/import_json
+	 *
+	 * Body: JSON object (flat NADA seed shape or { "codelist": {…}, "overwrite": bool, "dry_run": bool }).
+	 * Multipart field {@code file} with .json contents is also supported.
+	 * Query: dry_run=1, replace=1 (overrides body flags when set).
+	 */
+	function import_json_post()
+	{
+		try {
+			$this->has_registry_import_or_die($this->registry_resource);
+			$input = $this->_import_json_read_body();
+			if ($input === null || !is_array($input) || empty($input)) {
+				throw new Exception('Send JSON body or multipart "file" with a codelist document');
+			}
+
+			$dry = $this->_import_bool_param('dry_run', $input, false);
+			$replace = $this->_import_bool_param('replace', $input, false);
+			if (!$replace) {
+				$replace = $this->_import_bool_param('overwrite', $input, false);
+			}
+
+			$payload = $input;
+			if (isset($input['codelist']) && is_array($input['codelist'])) {
+				$payload = $input;
+			}
+
+			$userId = $this->get_api_user_id();
+			$r = $this->Codelists_model->import_json_codelist($payload, array(
+				'dry_run' => $dry,
+				'replace_existing' => $replace,
+				'created_by' => $userId ? (int) $userId : null,
+			));
+
+			$warnings = isset($r['warnings']) ? $r['warnings'] : array();
+			if (empty($r['ok'])) {
+				$this->set_response(array(
+					'status' => 'failed',
+					'message' => isset($r['message']) ? $r['message'] : 'Import failed',
+					'result' => $r,
+					'warnings' => $warnings,
+				), REST_Controller::HTTP_BAD_REQUEST);
+				return;
+			}
+
+			$overall = 'success';
+			if (isset($r['action']) && $r['action'] === 'skipped') {
+				$overall = 'success';
+			}
+
+			$http = REST_Controller::HTTP_OK;
+			if (!$dry && isset($r['action']) && $r['action'] === 'created') {
+				$http = REST_Controller::HTTP_OK;
+			}
+
+			$this->set_response(array(
+				'status' => $overall,
+				'dry_run' => $dry,
+				'imported' => array($r),
+				'warnings' => array_values($warnings),
+			), $http);
+		}
+		catch (Exception $e) {
+			$this->set_response(array(
+				'status' => 'failed',
+				'message' => $e->getMessage(),
+			), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
 	 * Export a single codelist as a SDMX-ML Structure message.
 	 *
 	 * GET /api/codelists/export_sdmx/{id}
@@ -1240,6 +1482,7 @@ class Codelists extends MY_REST_Controller
 	function export_sdmx_get($id = null)
 	{
 		try {
+			$this->has_registry_catalogue_view_or_die($this->registry_resource);
 			if (!$id) {
 				throw new Exception("Codelist ID is required");
 			}
@@ -1270,7 +1513,7 @@ class Codelists extends MY_REST_Controller
 				$version
 			);
 
-			$safe_id = preg_replace('/[^A-Za-z0-9_\-]/', '_', $codelist['codelist_id']);
+			$safe_id = preg_replace('/[^A-Za-z0-9_\-]/', '_', $codelist['name']);
 			$filename = $safe_id . '_' . str_replace('.', '', $version) . '.xml';
 
 			header('Content-Type: application/xml; charset=UTF-8');
@@ -1284,6 +1527,128 @@ class Codelists extends MY_REST_Controller
 				'status'  => 'failed',
 				'message' => $e->getMessage()
 			), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * Site administrators may set locked/archived or unlock codelists.
+	 *
+	 * @return bool
+	 */
+	/**
+	 * @return array|null
+	 */
+	private function _import_json_read_body()
+	{
+		if (!empty($_FILES['file']['tmp_name']) && is_uploaded_file($_FILES['file']['tmp_name'])) {
+			$data = file_get_contents($_FILES['file']['tmp_name']);
+			if ($data === false || trim($data) === '') {
+				return null;
+			}
+			$j = json_decode($data, true);
+			return is_array($j) ? $j : null;
+		}
+		$raw = $this->input->raw_input_stream;
+		if ($raw === null || trim($raw) === '') {
+			return null;
+		}
+		$j = json_decode($raw, true);
+		return is_array($j) ? $j : null;
+	}
+
+	/**
+	 * @param string $name Query param name
+	 * @param array  $body JSON body
+	 * @param bool   $default
+	 * @return bool
+	 */
+	private function _import_bool_param($name, array $body, $default)
+	{
+		$q = $this->input->get($name);
+		if ($q !== null && $q !== '') {
+			return filter_var($q, FILTER_VALIDATE_BOOLEAN);
+		}
+		if (array_key_exists($name, $body)) {
+			return $this->_import_boolish($body[$name], $default);
+		}
+
+		return (bool) $default;
+	}
+
+	/**
+	 * @param mixed $value
+	 * @param bool  $default
+	 * @return bool
+	 */
+	private function _import_boolish($value, $default)
+	{
+		if (is_bool($value)) {
+			return $value;
+		}
+		if (is_int($value) || is_float($value)) {
+			return ((int) $value) === 1;
+		}
+		if (is_string($value)) {
+			$v = strtolower(trim($value));
+			if (in_array($v, array('1', 'true', 'yes', 'on'), true)) {
+				return true;
+			}
+			if (in_array($v, array('0', 'false', 'no', 'off'), true)) {
+				return false;
+			}
+		}
+
+		return (bool) $default;
+	}
+
+	private function _codelist_registry_admin()
+	{
+		return $this->is_registry_admin($this->registry_resource);
+	}
+
+	/**
+	 * Enforce content mutability and status transition rules on update payloads.
+	 *
+	 * @param array $existing
+	 * @param array $data Passed by reference; may unset fields
+	 * @throws Exception
+	 */
+	private function _apply_codelist_update_rules(array $existing, array &$data)
+	{
+		$current_status = $this->Codelists_model->normalize_status(isset($existing['status']) ? $existing['status'] : null);
+		$new_status = isset($data['status'])
+			? $this->Codelists_model->normalize_status($data['status'])
+			: $current_status;
+
+		$content_fields = array('name', 'description', 'uri', 'changed_at', 'changed_by', 'created_at', 'created_by');
+		$has_content_change = false;
+		foreach ($content_fields as $field) {
+			if (array_key_exists($field, $data)) {
+				$has_content_change = true;
+				break;
+			}
+		}
+
+		if (isset($data['status']) && !$this->Codelists_model->is_status_transition_allowed($current_status, $new_status, $this->_codelist_registry_admin())) {
+			throw new Exception('You are not allowed to change codelist status from ' . $current_status . ' to ' . $new_status);
+		}
+
+		if (!$this->Codelists_model->is_content_mutable($existing)) {
+			if ($has_content_change) {
+				throw new Exception('Codelist is ' . $current_status . ' and cannot be edited');
+			}
+			if (!isset($data['status']) || $new_status === $current_status) {
+				throw new Exception('Codelist is ' . $current_status . ' and cannot be modified');
+			}
+			// Status-only unlock/archive for admins.
+			$data = array('status' => $new_status);
+			return;
+		}
+
+		if (isset($data['status'])
+			&& !$this->_codelist_registry_admin()
+			&& !in_array($new_status, array('draft', 'active'), true)) {
+			throw new Exception('Only administrators can set locked or archived status');
 		}
 	}
 
@@ -1306,6 +1671,7 @@ class Codelists extends MY_REST_Controller
 	function update_hash_post($id = null)
 	{
 		try{
+			$this->has_registry_catalogue_view_or_die($this->registry_resource);
 			if (!$id) {
 				throw new Exception("Codelist ID is required");
 			}

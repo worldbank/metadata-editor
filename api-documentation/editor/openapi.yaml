@@ -65,6 +65,10 @@ tags:
     description: Manage catalog connections
   - name: Jobs
     description: Background jobs
+  - name: Data Structures
+    description: Global DSD catalogue (registry)
+  - name: Indicator DSD
+    description: Project-level DSD binding, validation, and data import
 x-tagGroups:
   - name: Projects
     tags:
@@ -121,6 +125,12 @@ x-tagGroups:
   - name: Jobs
     tags:
       - Jobs
+  - name: Registry
+    tags:
+      - Data Structures
+  - name: Indicator DSD
+    tags:
+      - Indicator DSD
 paths:
   /editor:
     get:
@@ -3292,6 +3302,725 @@ paths:
           description: successful operation
 
   # ─────────────────────────────────────────────────────────────────────────
+  # Data structures (global DSD catalogue)
+  # ─────────────────────────────────────────────────────────────────────────
+
+  /data_structures:
+    get:
+      tags:
+        - Data Structures
+      summary: List data structures
+      description: List global DSDs. Supports collapsed or flat list and optional pagination.
+      operationId: dataStructuresList
+      parameters:
+        - name: flat
+          in: query
+          schema:
+            type: boolean
+          description: When true, return one row per version.
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+          description: 1-based page number. When provided, returns paginated payload.
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Search across title/name/agency/idno/version/description/notes.
+        - name: q
+          in: query
+          schema:
+            type: string
+          description: Alias for `search`.
+        - name: status
+          in: query
+          description: Exact status filter (`DataStructureStatusCode`).
+          schema:
+            $ref: '#/components/schemas/DataStructureStatusCode'
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Bad request
+
+  /data_structures/single/{id}:
+    get:
+      tags:
+        - Data Structures
+      summary: Get data structure by id
+      operationId: dataStructuresSingle
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: with_components
+          in: query
+          schema:
+            type: boolean
+          description: When true, include components array.
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Bad request
+
+  /data_structures/lookup/{segment}:
+    get:
+      tags:
+        - Data Structures
+      summary: Get data structure by id or idno
+      operationId: dataStructuresLookup
+      parameters:
+        - name: segment
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: with_components
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Bad request
+
+  /data_structures/by_identity:
+    get:
+      tags:
+        - Data Structures
+      summary: Get data structure by SDMX identity
+      operationId: dataStructuresByIdentity
+      parameters:
+        - name: agency
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Bad request
+
+  /data_structures/validate/{id}:
+    get:
+      tags:
+        - Data Structures
+      summary: Validate persisted data structure
+      operationId: dataStructuresValidate
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Validation report
+        '400':
+          description: Bad request
+
+  /data_structures/export/{segment}:
+    get:
+      tags:
+        - Data Structures
+      summary: Export data structure JSON
+      description: >-
+        Returns canonical interchange JSON. Export shape places `components` as a
+        sibling of `data_structure` (header only). Import via `import_json` expects
+        `components` nested inside `data_structure` — see `data-structure-schema.json`.
+      operationId: dataStructuresExport
+      parameters:
+        - name: segment
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Numeric id or catalogue idno.
+        - name: download
+          in: query
+          schema:
+            type: boolean
+            default: true
+          description: When true (default), respond as attachment download.
+      responses:
+        '200':
+          description: Export payload or file download
+        '400':
+          description: Bad request
+
+  /data_structures/versions/{segment}:
+    get:
+      tags:
+        - Data Structures
+      summary: List versions for a data structure family
+      operationId: dataStructuresVersions
+      parameters:
+        - name: segment
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Bad request
+
+  /data_structures/projects/{segment}:
+    get:
+      tags:
+        - Data Structures
+      summary: List projects linked to a data structure
+      operationId: dataStructuresProjects
+      parameters:
+        - name: segment
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Bad request
+
+  /data_structures/create:
+    post:
+      tags:
+        - Data Structures
+      summary: Create data structure
+      description: Create a global DSD header row (components added separately or via import_json).
+      operationId: dataStructuresCreate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: Data structure created
+        '400':
+          description: Bad request
+
+  /data_structures/update/{id}:
+    post:
+      tags:
+        - Data Structures
+      summary: Update data structure
+      operationId: dataStructuresUpdate
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: Data structure updated
+        '400':
+          description: Bad request
+
+  /data_structures/import_json:
+    post:
+      tags:
+        - Data Structures
+      summary: Import data structure JSON
+      description: >-
+        Import global DSD, components and codelists from JSON. Body matches
+        `data-structure-schema.json`: root `data_structure` (identity + `components`),
+        optional boolean `overwrite` and `dry_run` on the same JSON object (no query
+        flags).
+      operationId: dataStructuresImportJson
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: 'data-structure-schema.json'
+      responses:
+        '200':
+          description: Validation/dry-run succeeded or import completed
+        '400':
+          description: Validation failed or bad request
+
+  /data_structures/import_sdmx:
+    post:
+      tags:
+        - Data Structures
+      summary: Import data structure from SDMX XML
+      description: Import SDMX-ML structure XML from multipart `file` or XML body.
+      operationId: dataStructuresImportSdmx
+      parameters:
+        - name: overwrite_codelists
+          in: query
+          schema:
+            type: boolean
+        - name: dsd_id
+          in: query
+          schema:
+            type: string
+          description: Optional DataStructure @id selector when multiple are present in XML.
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                overwrite_codelists:
+                  type: string
+                dsd_id:
+                  type: string
+          application/xml:
+            schema:
+              type: string
+          text/xml:
+            schema:
+              type: string
+      responses:
+        '201':
+          description: Import completed
+        '400':
+          description: Bad request
+
+  /data_structures/components/{structure_id}:
+    post:
+      tags:
+        - Data Structures
+      summary: Create data structure component
+      operationId: dataStructuresComponentCreate
+      parameters:
+        - name: structure_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: Component created
+        '400':
+          description: Bad request
+
+  /data_structures/component_update/{id}:
+    post:
+      tags:
+        - Data Structures
+      summary: Update data structure component
+      operationId: dataStructuresComponentUpdate
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: Component updated
+        '400':
+          description: Bad request
+
+  /data_structures/component_delete/{id}:
+    post:
+      tags:
+        - Data Structures
+      summary: Delete data structure component
+      operationId: dataStructuresComponentDelete
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Component deleted
+        '400':
+          description: Bad request
+
+  /data_structures/duplicate/{id}:
+    post:
+      tags:
+        - Data Structures
+      summary: Duplicate data structure
+      operationId: dataStructuresDuplicate
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                agency:
+                  type: string
+                version:
+                  type: string
+      responses:
+        '200':
+          description: Duplicate created
+        '400':
+          description: Bad request
+
+  /data_structures/delete/{id}:
+    post:
+      tags:
+        - Data Structures
+      summary: Delete data structure
+      operationId: dataStructuresDelete
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Deleted
+        '400':
+          description: Bad request
+
+  /data_structures/batch_delete:
+    post:
+      tags:
+        - Data Structures
+      summary: Batch delete data structures
+      operationId: dataStructuresBatchDelete
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ids]
+              properties:
+                ids:
+                  type: array
+                  items:
+                    type: integer
+      responses:
+        '200':
+          description: Batch delete result
+        '400':
+          description: Bad request
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Indicator DSD (project binding and data)
+  # ─────────────────────────────────────────────────────────────────────────
+
+  "/indicator_dsd/{sid}":
+    get:
+      tags:
+        - Indicator DSD
+      summary: List DSD columns for a project
+      description: >-
+        Returns resolved DSD columns for the project. When bound to a global catalogue
+        DSD, columns are read from the registry (read-only). Use `resolve_codelists=1`
+        to expand linked global codelists into each column.
+      operationId: indicatorDsdList
+      parameters:
+        - name: sid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Project id or idno
+        - name: detailed
+          in: query
+          schema:
+            type: integer
+            enum: [0, 1]
+        - name: resolve_codelists
+          in: query
+          schema:
+            type: integer
+            enum: [0, 1]
+        - name: offset
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Column list
+        '400':
+          description: Bad request
+
+  "/indicator_dsd/single/{sid}/{id}":
+    get:
+      tags:
+        - Indicator DSD
+      summary: Get single DSD column
+      operationId: indicatorDsdSingle
+      parameters:
+        - name: sid
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Column detail
+        '400':
+          description: Bad request
+
+  "/indicator_dsd/validate/{sid}":
+    get:
+      tags:
+        - Indicator DSD
+      summary: Validate project DSD structure and data
+      operationId: indicatorDsdValidate
+      parameters:
+        - name: sid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Validation report (always HTTP 200)
+        '400':
+          description: Bad request
+
+  "/indicator_dsd/binding/{sid}":
+    get:
+      tags:
+        - Indicator DSD
+      summary: Get project DSD binding context
+      description: >-
+        Binding state, metadata `data_structure_reference`, global structure header,
+        import readiness, and validation summary.
+      operationId: indicatorDsdBinding
+      parameters:
+        - name: sid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Binding context
+        '400':
+          description: Bad request
+
+  "/indicator_dsd/bind_global/{sid}":
+    post:
+      tags:
+        - Indicator DSD
+      summary: Bind global catalogue DSD to project
+      description: >-
+        Attach a registry DSD. Supply `data_structure_id` or
+        `data_structure_reference` (see `DataStructureReference`). Optionally set
+        `indicator_id_value` for data import.
+      operationId: indicatorDsdBindGlobal
+      parameters:
+        - name: sid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IndicatorDsdBindRequest'
+      responses:
+        '200':
+          description: Bound
+        '400':
+          description: Bad request
+
+  "/indicator_dsd/update_binding/{sid}":
+    post:
+      tags:
+        - Indicator DSD
+      summary: Update project DSD binding fields
+      operationId: indicatorDsdUpdateBinding
+      parameters:
+        - name: sid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                indicator_id_value:
+                  type: string
+                implied_freq_code:
+                  type: string
+                  description: SDMX FREQ code when structure has no periodicity column
+      responses:
+        '200':
+          description: Updated
+        '400':
+          description: Bad request
+
+  "/indicator_dsd/unbind/{sid}":
+    post:
+      tags:
+        - Indicator DSD
+      summary: Detach global DSD from project
+      description: Removes binding, clears metadata reference, and drops published timeseries data.
+      operationId: indicatorDsdUnbind
+      parameters:
+        - name: sid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unbound
+        '400':
+          description: Bad request
+
+  "/indicator_dsd/reset/{sid}":
+    post:
+      tags:
+        - Indicator DSD
+      summary: Reset published indicator data
+      description: Drops the DuckDB timeseries table for the project.
+      operationId: indicatorDsdReset
+      parameters:
+        - name: sid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Reset result
+        '400':
+          description: Bad request
+
+  "/indicator_dsd/data_upload_prepare/{sid}":
+    post:
+      tags:
+        - Indicator DSD
+      summary: Prepare indicator data upload
+      operationId: indicatorDsdDataUploadPrepare
+      parameters:
+        - name: sid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: Prepare result
+        '400':
+          description: Bad request
+
+  "/indicator_dsd/data_upload_import/{sid}":
+    post:
+      tags:
+        - Indicator DSD
+      summary: Import prepared indicator data
+      operationId: indicatorDsdDataUploadImport
+      parameters:
+        - name: sid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: Import result
+        '400':
+          description: Bad request
+
+  # ─────────────────────────────────────────────────────────────────────────
   # Jobs
   # ─────────────────────────────────────────────────────────────────────────
 
@@ -3302,17 +4031,18 @@ paths:
       summary: Import indicator data (full workflow)
       description: >
         Submit a single background job that handles the complete indicator data
-        import workflow: loads the CSV into the draft buffer, validates columns
-        against the DSD, and publishes rows for the requested `indicator_value`.
+        import workflow: copies the uploaded CSV, validates headers against the
+        bound DSD, and publishes rows for the requested `indicator_value` via
+        replace-from-csv.
 
 
         The CSV must be uploaded first via `POST /uploads/*` to obtain an
         `upload_id`. Poll job status via `GET /jobs/{uuid}`.
 
 
-        This is the recommended endpoint for API-based data ingestion. For
-        step-by-step control (e.g. inspect the draft before publishing) use the
-        individual `data_draft` / `data_import` endpoints instead.
+        For interactive import in the editor, use
+        `POST /api/indicator_dsd/data_upload_prepare/{sid}` and
+        `POST /api/indicator_dsd/data_upload_import/{sid}` instead.
 
 
         Requires edit access to the target project (same as the indicator DSD import APIs).
@@ -4105,6 +4835,50 @@ components:
           items:
             type: object
             additionalProperties: true
+    DataStructureStatusCode:
+      type: string
+      description: >-
+        Catalogue DSD lifecycle slug (persisted as an integer in `data_structures.status`):
+        `draft`, `review`, `published` (locked from destructive edits), `deprecated`,
+        `archived` (locked). Request bodies and import JSON must use these strings.
+      enum: [draft, review, published, deprecated, archived]
+    DataStructureReference:
+      type: object
+      description: >-
+        Canonical link to a global catalogue DSD stored on project/study metadata.
+        Matches `data_structure_reference` in `timeseries-schema.json`.
+      required: [idno, agency, name, version]
+      properties:
+        idno:
+          type: string
+          description: Stable catalogue DSD idno
+        agency:
+          type: string
+        name:
+          type: string
+          description: SDMX maintainable id
+        version:
+          type: string
+        uri:
+          type: string
+          format: uri
+          description: Optional URL for documentation or discovery; not used for import
+        notes:
+          type: string
+          description: Optional free-text notes about this DSD link
+      additionalProperties: false
+    IndicatorDsdBindRequest:
+      type: object
+      description: Bind a global registry DSD to a project
+      properties:
+        data_structure_id:
+          type: integer
+          description: Numeric catalogue data structure id
+        data_structure_reference:
+          $ref: '#/components/schemas/DataStructureReference'
+        indicator_id_value:
+          type: string
+          description: Value for the DSD indicator_id column used during data import
     ApiResponse:
       type: object
       properties:

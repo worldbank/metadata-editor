@@ -10,13 +10,16 @@ Vue.component('codelist-edit', {
             loading: false,
             saving: false,
             form: {
+                idno: '',
                 agency: '',
-                codelist_id: '',
-                version: '',
                 name: '',
+                version: '',
+                title: '',
                 description: '',
-                uri: ''
+                uri: '',
+                status: 'active'
             },
+            codelistStatus: 'active',
             codesLoading: false,
             savingItems: false,
             itemRows: [],
@@ -80,6 +83,24 @@ Vue.component('codelist-edit', {
         },
         isPageDirty: function () {
             return this.pendingItemDeletes.length > 0 || this.itemRows.some(function (r) { return !r.id; });
+        },
+        isAdmin: function () {
+            return CI && CI.user_info && CI.user_info.is_admin === true;
+        },
+        isReadOnly: function () {
+            if (this.isCreate) {
+                return false;
+            }
+            var s = (this.codelistStatus || 'active').toLowerCase();
+            return s === 'locked' || s === 'archived';
+        },
+        statusSelectItems: function () {
+            return [
+                { value: 'draft', text: this.$t('codelist_status_draft') || 'Draft' },
+                { value: 'active', text: this.$t('codelist_status_active') || 'Active' },
+                { value: 'locked', text: this.$t('codelist_status_locked') || 'Locked' },
+                { value: 'archived', text: this.$t('codelist_status_archived') || 'Archived' }
+            ];
         }
     },
     watch: {
@@ -123,7 +144,8 @@ Vue.component('codelist-edit', {
             this.itemsSearchInput = '';
             this.itemsTotal = 0;
             if (this.isCreate) {
-                this.form = { agency: '', codelist_id: '', version: '', name: '', description: '', uri: '' };
+                this.form = { idno: '', agency: '', name: '', version: '', title: '', description: '', uri: '', status: 'active' };
+                this.codelistStatus = 'active';
                 this.itemRows = [];
                 this.translationRows = [];
                 return;
@@ -182,13 +204,16 @@ Vue.component('codelist-edit', {
                     vm.loading = false;
                     if (res.data && res.data.status === 'success' && res.data.codelist) {
                         var c = res.data.codelist;
+                        vm.codelistStatus = (c.status || 'active').toLowerCase();
                         vm.form = {
+                            idno: c.idno || '',
                             agency: c.agency || '',
-                            codelist_id: c.codelist_id || '',
-                            version: c.version || '',
                             name: c.name || '',
+                            version: c.version || '',
+                            title: c.title || '',
                             description: c.description || '',
-                            uri: c.uri || ''
+                            uri: c.uri || '',
+                            status: vm.codelistStatus
                         };
                     }
                 })
@@ -308,16 +333,31 @@ Vue.component('codelist-edit', {
         },
         saveMeta: function () {
             var vm = this;
-            var payload = {
-                name: vm.form.name,
-                description: vm.form.description,
-                uri: vm.form.uri || null
-            };
+            var payload;
+            if (vm.isReadOnly) {
+                if (!vm.isAdmin) {
+                    return;
+                }
+                payload = { status: vm.form.status || 'active' };
+            } else {
+                payload = {
+                    title: vm.form.title,
+                    description: vm.form.description,
+                    uri: vm.form.uri || null
+                };
+                if (vm.isAdmin && vm.form.status) {
+                    payload.status = vm.form.status;
+                }
+            }
             vm.saving = true;
             if (vm.isCreate) {
                 payload.agency = vm.form.agency;
-                payload.codelist_id = vm.form.codelist_id;
+                payload.name = vm.form.name;
                 payload.version = vm.form.version;
+                payload.title = vm.form.title;
+                if ((vm.form.idno || '').trim()) {
+                    payload.idno = vm.form.idno.trim();
+                }
                 axios.post(vm.apiBase(), payload)
                     .then(function (res) {
                         vm.saving = false;
@@ -334,6 +374,7 @@ Vue.component('codelist-edit', {
                 axios.post(vm.apiBase() + '/update/' + vm.numericId, payload)
                     .then(function () {
                         vm.saving = false;
+                        vm.codelistStatus = (vm.form.status || 'active').toLowerCase();
                         vm.notifySuccess('Saved');
                     })
                     .catch(function (err) {
@@ -663,38 +704,51 @@ Vue.component('codelist-edit', {
         <div>
             <v-btn text class="mb-2" @click="cancel"><v-icon left>mdi-arrow-left</v-icon> Back to list</v-btn>
 
+            <v-alert v-if="isReadOnly" type="info" dense outlined class="mb-4">
+                {{ $t('codelist_read_only_banner') || 'This codelist is read-only. Unlock it (admin) to edit codes and metadata.' }}
+            </v-alert>
+
             <v-card class="mb-4">
-                <v-card-title>{{ isCreate ? 'New codelist' : 'Edit codelist' }}</v-card-title>
+                <v-card-title>{{ isCreate ? 'New codelist' : (isReadOnly ? 'View codelist' : 'Edit codelist') }}</v-card-title>
                 <v-card-text>
                     <v-row>
                         <v-col cols="12" md="4">
                             <v-text-field v-model="form.agency" label="Agency" outlined dense
-                                :disabled="!isCreate" required></v-text-field>
+                                :disabled="!isCreate || isReadOnly" required></v-text-field>
                         </v-col>
                         <v-col cols="12" md="4">
-                            <v-text-field v-model="form.codelist_id" label="Codelist ID" outlined dense
-                                :disabled="!isCreate" required></v-text-field>
+                            <v-text-field v-model="form.name" label="Name" outlined dense
+                                :disabled="!isCreate || isReadOnly" required></v-text-field>
                         </v-col>
                         <v-col cols="12" md="4">
                             <v-text-field v-model="form.version" label="Version" outlined dense
-                                :disabled="!isCreate" required></v-text-field>
+                                :disabled="!isCreate || isReadOnly" required></v-text-field>
+                        </v-col>
+                        <v-col v-if="!isCreate && isAdmin" cols="12" md="4">
+                            <v-select v-model="form.status" :items="statusSelectItems" item-text="text" item-value="value"
+                                :label="$t('codelist_status') || 'Status'" outlined dense></v-select>
+                        </v-col>
+                        <v-col cols="12" md="6">
+                            <v-text-field v-model="form.title" label="Title" outlined dense required :disabled="isReadOnly"></v-text-field>
+                        </v-col>
+                        <v-col cols="12" md="6">
+                            <v-text-field v-model="form.idno" label="Idno (catalogue handle)" outlined dense
+                                :disabled="!isCreate || isReadOnly"
+                                hint="Leave blank to auto-generate from agency, name, and version"></v-text-field>
                         </v-col>
                         <v-col cols="12">
-                            <v-text-field v-model="form.name" label="Name" outlined dense required></v-text-field>
+                            <v-textarea v-model="form.description" label="Description" outlined dense rows="3" :disabled="isReadOnly"></v-textarea>
                         </v-col>
                         <v-col cols="12">
-                            <v-textarea v-model="form.description" label="Description" outlined dense rows="3"></v-textarea>
-                        </v-col>
-                        <v-col cols="12">
-                            <v-text-field v-model="form.uri" label="URI" outlined dense></v-text-field>
+                            <v-text-field v-model="form.uri" label="URI" outlined dense :disabled="isReadOnly"></v-text-field>
                         </v-col>
                     </v-row>
                 </v-card-text>
                 <v-card-actions>
-                    <v-btn color="primary" :loading="saving" @click="saveMeta">Save</v-btn>
+                    <v-btn v-if="!isReadOnly || isAdmin" color="primary" :loading="saving" @click="saveMeta">{{ isReadOnly ? 'Save status' : 'Save' }}</v-btn>
                     <v-btn text @click="cancel">Cancel</v-btn>
                     <v-spacer></v-spacer>
-                    <v-btn v-if="!isCreate" color="error" text @click="deleteCodelist">Delete codelist</v-btn>
+                    <v-btn v-if="!isCreate && !isReadOnly" color="error" text @click="deleteCodelist">Delete codelist</v-btn>
                 </v-card-actions>
             </v-card>
 
@@ -702,9 +756,9 @@ Vue.component('codelist-edit', {
                 <v-card-title class="d-flex flex-wrap align-center">
                     <span>Codelist translations</span>
                     <v-spacer></v-spacer>
-                    <v-btn small class="mr-2" :loading="translationsLoading" @click="revertTranslations" :disabled="savingTranslations">Revert</v-btn>
-                    <v-btn small color="primary" class="mr-2" :loading="savingTranslations" :disabled="translationsLoading" @click="saveTranslations">Save translations</v-btn>
-                    <v-btn small color="primary" outlined :disabled="translationsLoading || savingTranslations" @click="addTranslationRow">Add language</v-btn>
+                    <v-btn small class="mr-2" :loading="translationsLoading" @click="revertTranslations" :disabled="savingTranslations || isReadOnly">Revert</v-btn>
+                    <v-btn small color="primary" class="mr-2" :loading="savingTranslations" :disabled="translationsLoading || isReadOnly" @click="saveTranslations">Save translations</v-btn>
+                    <v-btn small color="primary" outlined :disabled="translationsLoading || savingTranslations || isReadOnly" @click="addTranslationRow">Add language</v-btn>
                 </v-card-title>
                 <v-progress-linear v-if="translationsLoading" indeterminate></v-progress-linear>
                 <div v-else class="px-4 pb-4 codelist-edit-tables" style="overflow-x: auto;">
@@ -761,9 +815,9 @@ Vue.component('codelist-edit', {
                         @keyup.enter="onItemsSearchSubmit"
                         @click:clear="onItemsSearchClear"
                     ></v-text-field>
-                    <v-btn small class="mr-2" :loading="codesLoading" @click="revertItems" :disabled="savingItems">Revert</v-btn>
-                    <v-btn small color="primary" class="mr-2" :loading="savingItems" :disabled="codesLoading" @click="saveAllItems">Save items</v-btn>
-                    <v-btn small color="primary" outlined :disabled="codesLoading || savingItems" @click="addItemRow">Add row</v-btn>
+                    <v-btn small class="mr-2" :loading="codesLoading" @click="revertItems" :disabled="savingItems || isReadOnly">Revert</v-btn>
+                    <v-btn small color="primary" class="mr-2" :loading="savingItems" :disabled="codesLoading || isReadOnly" @click="saveAllItems">Save items</v-btn>
+                    <v-btn small color="primary" outlined :disabled="codesLoading || savingItems || isReadOnly" @click="addItemRow">Add row</v-btn>
                 </v-card-title>
                 <v-progress-linear v-if="codesLoading" indeterminate></v-progress-linear>
                 <div v-else class="items-grid-wrap px-4 pb-4 codelist-edit-tables" style="overflow-x: auto;">

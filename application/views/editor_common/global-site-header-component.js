@@ -71,6 +71,15 @@ Vue.component('vue-global-site-header', {
                 base_url = base_url.slice(0, -10);
             }
             return base_url;
+        },
+        canAccessSiteAdmin(){
+            if (!CI || !CI.user_info) {
+                return false;
+            }
+            if (CI.user_info.can_access_site_admin === true) {
+                return true;
+            }
+            return CI.user_info.is_admin === true;
         }
 
     },
@@ -127,7 +136,7 @@ Vue.component('vue-global-site-header', {
                     <v-list-item>
                         <v-list-item-title><v-btn text @click="pageLink('auth/change_password')" >{{$t('password')}}</v-btn></v-list-item-title>
                     </v-list-item>
-                    <v-list-item v-if="CI.user_info.is_admin">
+                    <v-list-item v-if="canAccessSiteAdmin">
                         <v-list-item-title><v-btn text @click="pageLink('admin')" >{{$t('site_administration')}}</v-btn></v-list-item-title>
                     </v-list-item>
                     <v-list-item>

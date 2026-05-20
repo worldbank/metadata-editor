@@ -12,28 +12,6 @@ use League\Csv\Reader;
  */
 class Indicator_dsd_model extends CI_Model {
 
-    private $fields = array(
-        'name',
-        'label',
-        'description',
-        'sid',
-        'data_type',
-        'column_type',
-        'time_period_format',
-        'code_list',
-        'code_list_reference',
-        'metadata',
-        'sum_stats',
-        'codelist_type',
-        'global_codelist_id',
-        'local_codelist_id',
-        'sort_order',
-        'created',
-        'changed',
-        'created_by',
-        'changed_by'
-    );
- 
     /**
      * Standard filename for indicator CSV data files
      */
@@ -59,47 +37,12 @@ class Indicator_dsd_model extends CI_Model {
      **/
     function select_all($sid, $metadata_detailed = false, $offset = 0, $limit = null)
     {
-        if ($metadata_detailed == true) {
-            $fields = "id,sid,name,label,description,data_type,column_type,time_period_format,code_list,code_list_reference,metadata,sum_stats,codelist_type,global_codelist_id,local_codelist_id,sort_order";
-        } else {
-            $fields = "id,sid,name,label,description,data_type,column_type,time_period_format,code_list,code_list_reference,sum_stats,codelist_type,global_codelist_id,local_codelist_id,sort_order";
-        }
-        
-        $this->db->select($fields);
-        $this->db->where("sid", $sid);
-        $this->db->order_by("sort_order,id", "asc");
-
-        // Apply pagination if limit is specified
-        if ($limit !== null && $limit > 0) {
-            $this->db->limit($limit, $offset);
+        $this->load->library('Project_dsd_resolver');
+        if (!$this->project_dsd_resolver->is_bound($sid)) {
+            return array();
         }
 
-        $columns = $this->db->get("indicator_dsd")->result_array();
-
-        // Decode JSON columns
-        foreach ($columns as $key => $column) {
-            // Decode JSON fields
-            if (isset($column['code_list']) && is_string($column['code_list'])) {
-                $columns[$key]['code_list'] = json_decode($column['code_list'], true);
-            }
-            if (isset($column['code_list_reference']) && is_string($column['code_list_reference'])) {
-                $columns[$key]['code_list_reference'] = json_decode($column['code_list_reference'], true);
-            }
-            if (isset($column['metadata']) && is_string($column['metadata'])) {
-                $columns[$key]['metadata'] = json_decode($column['metadata'], true);
-            }
-            if (isset($columns[$key]['metadata']) && !is_array($columns[$key]['metadata'])) {
-                $columns[$key]['metadata'] = array();
-            }
-            if (isset($columns[$key]['sum_stats']) && is_string($columns[$key]['sum_stats'])) {
-                $decoded = json_decode($columns[$key]['sum_stats'], true);
-                $columns[$key]['sum_stats'] = is_array($decoded) ? $decoded : null;
-            } elseif (isset($columns[$key]['sum_stats']) && !is_array($columns[$key]['sum_stats'])) {
-                $columns[$key]['sum_stats'] = null;
-            }
-        }
-
-        return $columns;
+        return $this->project_dsd_resolver->get_columns($sid, $metadata_detailed, $offset, $limit);
     }
 
     /**
@@ -113,492 +56,14 @@ class Indicator_dsd_model extends CI_Model {
      **/
     function get_row($sid, $id)
     {
-        $this->db->where("sid", $sid);
-        $this->db->where("id", $id);
-        $column = $this->db->get("indicator_dsd")->row_array();
-
-        if (!$column) {
+        $this->load->library('Project_dsd_resolver');
+        if (!$this->project_dsd_resolver->is_bound($sid)) {
             return false;
         }
 
-        // Decode JSON columns
-        if (isset($column['code_list']) && is_string($column['code_list'])) {
-            $column['code_list'] = json_decode($column['code_list'], true);
-        }
-        if (isset($column['code_list_reference']) && is_string($column['code_list_reference'])) {
-            $column['code_list_reference'] = json_decode($column['code_list_reference'], true);
-        }
-        if (isset($column['metadata']) && is_string($column['metadata'])) {
-            $column['metadata'] = json_decode($column['metadata'], true);
-        }
-
-        // Merge metadata if present
-        if (isset($column['metadata']) && is_array($column['metadata'])) {
-            $column_metadata = $column['metadata'];
-            unset($column['metadata']);
-            $column = array_merge($column, $column_metadata);
-        }
-
-        if (isset($column['sum_stats']) && is_string($column['sum_stats'])) {
-            $decoded = json_decode($column['sum_stats'], true);
-            $column['sum_stats'] = is_array($decoded) ? $decoded : null;
-        } elseif (isset($column['sum_stats']) && !is_array($column['sum_stats'])) {
-            $column['sum_stats'] = null;
-        }
-
-        return $column;
+        return $this->project_dsd_resolver->get_column_by_component_id($sid, $id, true);
     }
 
-    /**
-     * 
-     * Insert new DSD column
-     * 
-     * @param int $sid - Project ID
-     * @param array $options - Column data
-     * @param bool $validate_time_freq_rules When false, skip project-wide time_period / FREQ consistency check (internal writes).
-     * @return int Inserted column ID
-     * 
-     **/
-    public function insert($sid, $options, $validate_time_freq_rules = true)
-    {
-        $this->Editor_model->check_project_editable($sid);
-
-        // Filter to allowed fields
-        foreach ($options as $key => $value) {
-            if (!in_array($key, $this->fields)) {
-                unset($options[$key]);
-            }
-        }
-
-        $options['sid'] = $sid;
-
-        // Extract core fields from metadata if present and has actual data
-        // Only extract if metadata contains the core fields (not just empty object)
-        // Direct fields in $options take precedence over metadata fields
-        if (isset($options['metadata']) && is_array($options['metadata']) && !empty($options['metadata'])) {
-            // Check if metadata actually contains any core fields
-            $has_core_fields = false;
-            $core_field_names = array('name', 'label', 'description', 'data_type', 'column_type', 'time_period_format');
-            foreach ($core_field_names as $field) {
-                if (isset($options['metadata'][$field]) && $options['metadata'][$field] !== '' && $options['metadata'][$field] !== null) {
-                    $has_core_fields = true;
-                    break;
-                }
-            }
-            
-            if ($has_core_fields) {
-                $core = $this->get_dsd_core_fields($options['metadata']);
-                // Merge so direct fields ($options) overwrite metadata fields ($core)
-                $options = array_merge($core, $options);
-            }
-        }
-
-        if (isset($options['name']) && self::is_reserved_system_column_name($options['name'])) {
-            throw new Exception('Column name cannot start with underscore (_); reserved for system fields.');
-        }
-
-        if ($validate_time_freq_rules) {
-            $projected_new = array(
-                'name' => isset($options['name']) ? $options['name'] : '',
-                'column_type' => isset($options['column_type']) ? $options['column_type'] : 'dimension',
-                'time_period_format' => array_key_exists('time_period_format', $options) ? $options['time_period_format'] : null,
-                'metadata' => isset($options['metadata']) && is_array($options['metadata']) ? $options['metadata'] : array(),
-            );
-            $this->assert_project_time_period_freq_rules(array_merge($this->select_all($sid, true), array($projected_new)));
-        }
-
-        // Handle JSON columns - explicitly JSON encode arrays
-        if (isset($options['code_list'])) {
-            if (is_array($options['code_list']) && !empty($options['code_list'])) {
-                $options['code_list'] = json_encode($options['code_list']);
-            } elseif (is_array($options['code_list']) && empty($options['code_list'])) {
-                // Empty array should be stored as JSON array, not null
-                $options['code_list'] = json_encode(array());
-            } else {
-                $options['code_list'] = null;
-            }
-        }
-        if (isset($options['code_list_reference'])) {
-            if (is_array($options['code_list_reference']) || is_object($options['code_list_reference'])) {
-                // Check if it's an empty object/array with only empty values
-                $has_data = false;
-                if (is_array($options['code_list_reference'])) {
-                    foreach ($options['code_list_reference'] as $val) {
-                        if (!empty($val)) {
-                            $has_data = true;
-                            break;
-                        }
-                    }
-                } else {
-                    foreach ((array)$options['code_list_reference'] as $val) {
-                        if (!empty($val)) {
-                            $has_data = true;
-                            break;
-                        }
-                    }
-                }
-                if ($has_data) {
-                    $options['code_list_reference'] = json_encode($options['code_list_reference']);
-                } else {
-                    $options['code_list_reference'] = null;
-                }
-            } else {
-                $options['code_list_reference'] = null;
-            }
-        }
-        if (isset($options['metadata'])) {
-            if (is_array($options['metadata']) || is_object($options['metadata'])) {
-                if (is_object($options['metadata'])) {
-                    $options['metadata'] = (array) $options['metadata'];
-                }
-                if (!empty($options['metadata'])) {
-                    $this->normalize_metadata_freq_key_for_storage($options['metadata']);
-                }
-                // Empty array/object should be stored as JSON
-                if (empty($options['metadata'])) {
-                    $options['metadata'] = json_encode(array());
-                } else {
-                    $options['metadata'] = json_encode($options['metadata']);
-                }
-            } else {
-                $options['metadata'] = null;
-            }
-        }
-        if (array_key_exists('sum_stats', $options)) {
-            $options['sum_stats'] = $this->encode_sum_stats_for_db($options['sum_stats']);
-        }
-
-        // Ensure sort_order is an integer
-        if (isset($options['sort_order'])) {
-            $options['sort_order'] = (int)$options['sort_order'];
-        } else {
-            // Default to 0 if not provided
-            $options['sort_order'] = 0;
-        }
-
-        // Set timestamps
-        if (!isset($options['created'])) {
-            $options['created'] = time();
-        }
-
-        $this->db->insert("indicator_dsd", $options);
-        $insert_id = $this->db->insert_id();
-        return $insert_id;
-    }
-
-    /**
-     * 
-     * Update existing DSD column
-     * 
-     * @param int $sid - Project ID
-     * @param int $id - Column ID
-     * @param array $options - Column data
-     * @param bool $validate_time_freq_rules When false, skip project-wide time_period / FREQ consistency check (internal writes).
-     * @return int Updated column ID
-     * 
-     **/
-    public function update($sid, $id, $options, $validate_time_freq_rules = true)
-    {
-        $this->Editor_model->check_project_editable($sid);
-
-        // Filter to allowed fields
-        foreach ($options as $key => $value) {
-            if (!in_array($key, $this->fields)) {
-                unset($options[$key]);
-            }
-        }
-
-        // Exclude sort_order from updates - it should be managed separately
-        if (isset($options['sort_order'])) {
-            unset($options['sort_order']);
-        }
-
-        $options['sid'] = $sid;
-
-        // Extract core fields from metadata if present and has actual data
-        // Only extract if metadata contains the core fields (not just empty object)
-        // Direct fields in $options take precedence over metadata fields
-        if (isset($options['metadata']) && is_array($options['metadata']) && !empty($options['metadata'])) {
-            // Check if metadata actually contains any core fields
-            $has_core_fields = false;
-            $core_field_names = array('name', 'label', 'description', 'data_type', 'column_type', 'time_period_format');
-            foreach ($core_field_names as $field) {
-                if (isset($options['metadata'][$field]) && $options['metadata'][$field] !== '' && $options['metadata'][$field] !== null) {
-                    $has_core_fields = true;
-                    break;
-                }
-            }
-            
-            if ($has_core_fields) {
-                $core = $this->get_dsd_core_fields($options['metadata']);
-                // Merge so direct fields ($options) overwrite metadata fields ($core)
-                $options = array_merge($core, $options);
-            }
-        }
-
-        if (isset($options['name']) && self::is_reserved_system_column_name($options['name'])) {
-            throw new Exception('Column name cannot start with underscore (_); reserved for system fields.');
-        }
-
-        // Ensure id is an integer
-        $id = (int)$id;
-        $sid = (int)$sid;
-
-        // Check if record exists before updating
-        $exists = $this->db->select('id')->where('sid', $sid)->where('id', $id)->get('indicator_dsd')->row_array();
-        if (!$exists) {
-            throw new Exception("Column with ID {$id} not found for project {$sid}");
-        }
-
-        $cols = $this->select_all($sid, true);
-        $idx = -1;
-        foreach ($cols as $i => $c) {
-            if (isset($c['id']) && (int) $c['id'] === $id) {
-                $idx = $i;
-                break;
-            }
-        }
-        if ($idx < 0) {
-            throw new Exception("Column with ID {$id} not found for project {$sid}");
-        }
-        $merged = $cols[$idx];
-        foreach ($options as $k => $v) {
-            if (!in_array($k, $this->fields, true)) {
-                continue;
-            }
-            if ($k === 'metadata' && is_array($v)) {
-                $prev = isset($merged['metadata']) && is_array($merged['metadata']) ? $merged['metadata'] : array();
-                $merged['metadata'] = array_merge($prev, $v);
-            } else {
-                $merged[$k] = $v;
-            }
-        }
-        $cols[$idx] = $merged;
-        if ($validate_time_freq_rules) {
-            $this->assert_project_time_period_freq_rules($cols);
-        }
-
-        // Handle JSON columns - explicitly JSON encode arrays
-        if (isset($options['code_list'])) {
-            if (is_array($options['code_list'])) {
-                $options['code_list'] = json_encode($options['code_list']);
-            } else {
-                $options['code_list'] = null;
-            }
-        }
-        if (isset($options['code_list_reference'])) {
-            if (is_array($options['code_list_reference']) || is_object($options['code_list_reference'])) {
-                $options['code_list_reference'] = json_encode($options['code_list_reference']);
-            } else {
-                $options['code_list_reference'] = null;
-            }
-        }
-        if (isset($options['metadata'])) {
-            if (is_array($options['metadata']) || is_object($options['metadata'])) {
-                if (is_object($options['metadata'])) {
-                    $options['metadata'] = (array) $options['metadata'];
-                }
-                if (!empty($options['metadata'])) {
-                    $this->normalize_metadata_freq_key_for_storage($options['metadata']);
-                }
-                // Empty array/object should be stored as JSON
-                if (empty($options['metadata'])) {
-                    $options['metadata'] = json_encode(array());
-                } else {
-                    $options['metadata'] = json_encode($options['metadata']);
-                }
-            } else {
-                $options['metadata'] = null;
-            }
-        }
-        if (array_key_exists('sum_stats', $options)) {
-            $options['sum_stats'] = $this->encode_sum_stats_for_db($options['sum_stats']);
-        }
-
-        // Set changed timestamp
-        $options['changed'] = time();
-
-        // Remove 'id' from options if present (should not be updated)
-        if (isset($options['id'])) {
-            unset($options['id']);
-        }
-
-        // Ensure all text fields preserve empty strings (don't convert to null)
-        // This ensures fields like 'label' with value "Name" are saved correctly
-        $text_fields = array('name', 'label', 'description');
-        foreach ($text_fields as $field) {
-            // If field is set but is null, convert to empty string
-            // This ensures the field is included in the update
-            if (array_key_exists($field, $options) && $options[$field] === null) {
-                $options[$field] = '';
-            }
-        }
-
-        $this->db->where('sid', $sid);
-        $this->db->where('id', $id);
-        $this->db->update("indicator_dsd", $options);
-        
-        if ($this->db->affected_rows() === 0) {
-            // No rows updated - this might indicate no changes, but log it
-            log_message('debug', "Indicator DSD update: No rows affected for sid={$sid}, id={$id}. Options: " . json_encode($options));
-        }
-        
-        return $id;
-    }
-
-    /**
-     * 
-     * Upsert DSD column (insert or update)
-     * 
-     * @param int $sid - Project ID
-     * @param array $options - Column data (must include 'name' for lookup)
-     * @return int Column ID
-     * 
-     **/
-    /**
-     * Normalize sum_stats for MySQL JSON column (insert/update).
-     *
-     * @param mixed $value array, JSON string, or null to clear
-     * @return string|null JSON string or NULL for SQL
-     */
-    private function encode_sum_stats_for_db($value)
-    {
-        if ($value === null || $value === '') {
-            return null;
-        }
-        if (is_array($value)) {
-            return empty($value) ? null : json_encode($value);
-        }
-        if (is_object($value)) {
-            $arr = (array) $value;
-
-            return empty($arr) ? null : json_encode($value);
-        }
-        if (is_string($value)) {
-            $decoded = json_decode($value, true);
-            if (json_last_error() !== JSON_ERROR_NONE || !is_array($decoded)) {
-                return null;
-            }
-
-            return json_encode($decoded);
-        }
-
-        return null;
-    }
-
-    /**
-     * Raw row for import matching by primary key (no JSON decode).
-     *
-     * @param int $sid
-     * @param int $id
-     * @return array|null
-     */
-    private function get_indicator_dsd_row_by_id($sid, $id)
-    {
-        $id = (int) $id;
-        if ($id <= 0) {
-            return null;
-        }
-        $this->db->where('sid', (int) $sid);
-        $this->db->where('id', $id);
-        return $this->db->get('indicator_dsd')->row_array();
-    }
-
-    public function upsert($sid, $options)
-    {
-        if (!isset($options['name'])) {
-            throw new Exception("Column name is required for upsert");
-        }
-
-        // Check if column exists by name
-        $this->db->select("id");
-        $this->db->where("sid", $sid);
-        $this->db->where("name", $options['name']);
-        $existing = $this->db->get("indicator_dsd")->row_array();
-
-        if ($existing) {
-            // Update existing
-            return $this->update($sid, $existing['id'], $options);
-        } else {
-            // Insert new
-            return $this->insert($sid, $options);
-        }
-    }
-
-    /**
-     * 
-     * Delete DSD columns
-     * 
-     * @param int $sid - Project ID
-     * @param array $id_list - Array of column IDs to delete
-     * @return array Result with affected rows
-     * 
-     **/
-    function delete($sid, $id_list)
-    {
-        if (empty($id_list) || !is_array($id_list)) {
-            return array('rows' => 0);
-        }
-
-        $this->load->model('Local_codelists_model');
-        foreach ($id_list as $dsd_id) {
-            $this->Local_codelists_model->delete_list_by_field($sid, (int) $dsd_id);
-        }
-
-        $this->db->where('sid', $sid);
-        $this->db->where_in('id', $id_list);
-        $this->db->delete('indicator_dsd');
-        
-        return array(
-            'rows' => $this->db->affected_rows(),
-            'query' => $this->db->last_query()
-        );
-    }
-
-    /**
-     * Delete ALL DSD columns for a project (full reset before reimport).
-     * Cleans up associated local codelist entries first.
-     *
-     * @param int $sid
-     * @return array { rows: int }
-     */
-    public function delete_all_for_project($sid)
-    {
-        $sid = (int) $sid;
-        if ($sid <= 0) {
-            return array('rows' => 0);
-        }
-
-        $this->db->select('id');
-        $this->db->where('sid', $sid);
-        $existing = $this->db->get('indicator_dsd')->result_array();
-
-        if (empty($existing)) {
-            return array('rows' => 0);
-        }
-
-        $id_list = array_column($existing, 'id');
-        $this->load->model('Local_codelists_model');
-        foreach ($id_list as $dsd_id) {
-            $this->Local_codelists_model->delete_list_by_field($sid, (int) $dsd_id);
-        }
-
-        $this->db->where('sid', $sid);
-        $this->db->delete('indicator_dsd');
-
-        return array('rows' => $this->db->affected_rows());
-    }
-
-    /**
-     * 
-     * Validate DSD column data
-     * 
-     * @param array $options - Column data
-     * @param bool $is_new - Whether this is a new record
-     * @return bool True if valid
-     * @throws ValidationException If validation fails
-     * 
-     **/
     /**
      * Column names starting with "_" are reserved for system/DuckDB fields (e.g. _ts_freq).
      *
@@ -611,144 +76,7 @@ class Indicator_dsd_model extends CI_Model {
         return $name !== '' && $name[0] === '_';
     }
 
-    function validate($options, $is_new = true)
-    {
-        $this->load->library("form_validation");
-        $this->form_validation->reset_validation();
-        $this->form_validation->set_data($options);
 
-        // Validation rules - all optional (no 'required' rule)
-        // Only validate if field is present
-        if (isset($options['name'])) {
-            $this->form_validation->set_rules('name', 'Column name', 'xss_clean|trim|max_length[100]|regex_match[/^[a-zA-Z0-9_]*$/]');
-            if (self::is_reserved_system_column_name($options['name'])) {
-                throw new ValidationException('VALIDATION_ERROR: Column name cannot start with underscore (_); reserved for system fields.', array('name' => 'Reserved name'));
-            }
-        }
-        if (isset($options['data_type'])) {
-            $this->form_validation->set_rules('data_type', 'Data type', 'in_list[string,integer,float,double,date,boolean]');
-        }
-        if (isset($options['column_type'])) {
-            $this->form_validation->set_rules('column_type', 'Column type', 'in_list[dimension,time_period,measure,attribute,indicator_id,indicator_name,annotation,geography,observation_value,periodicity]');
-        }
-        if (isset($options['time_period_format']) && $options['time_period_format'] !== '' && $options['time_period_format'] !== null) {
-            $this->load->config('indicator_dsd', true);
-            $tf_rows = $this->config->item('dsd_time_period_formats', 'indicator_dsd');
-            $allowed_tf = array();
-            foreach ((array) $tf_rows as $row) {
-                if (!empty($row['code'])) {
-                    $allowed_tf[] = $row['code'];
-                }
-            }
-            if (count($allowed_tf) > 0) {
-                $this->form_validation->set_rules('time_period_format', 'Time period format', 'in_list[' . implode(',', $allowed_tf) . ']');
-            }
-        }
-        if (isset($options['codelist_type'])) {
-            $this->form_validation->set_rules('codelist_type', 'Codelist type', 'in_list[none,global,local]');
-        }
-
-        if ($this->form_validation->run() == TRUE) {
-            return TRUE;
-        }
-
-        // Failed
-        $errors = $this->form_validation->error_array();
-        $error_str = $this->form_validation->error_array_to_string($errors);
-        throw new ValidationException("VALIDATION_ERROR: " . $error_str, $errors);
-    }
-
-    /**
-     * 
-     * Get core fields from metadata array
-     * Extracts fields that should be stored in dedicated columns
-     * 
-     * @param array $column - Column metadata array
-     * @return array Core fields
-     * 
-     **/
-    private function get_dsd_core_fields($column)
-    {
-        // Extract only core fields that go into dedicated columns
-        // code_list, code_list_reference, and other metadata stay in their respective JSON columns
-        $core_fields = array(
-            'name' => isset($column['name']) ? $column['name'] : '',
-            'label' => isset($column['label']) ? $column['label'] : '',
-            'description' => isset($column['description']) ? $column['description'] : '',
-            'data_type' => isset($column['data_type']) ? $column['data_type'] : '',
-            'column_type' => isset($column['column_type']) ? $column['column_type'] : '',
-            'time_period_format' => isset($column['time_period_format']) ? $column['time_period_format'] : null
-        );
-
-        return $core_fields;
-    }
-
-    /**
-     * Constant series SDMX FREQ on a time_period column: stored as metadata.freq; legacy metadata.import_freq_code still accepted when reading.
-     *
-     * @param array $meta
-     * @return string|null trimmed code or null
-     */
-    private function resolve_metadata_constant_freq(array $meta)
-    {
-        if (isset($meta['freq']) && is_string($meta['freq'])) {
-            $t = trim($meta['freq']);
-            if ($t !== '') {
-                return $t;
-            }
-        }
-        if (isset($meta['import_freq_code']) && is_string($meta['import_freq_code'])) {
-            $t = trim($meta['import_freq_code']);
-            if ($t !== '') {
-                return $t;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Before persisting indicator_dsd.metadata: use freq only, migrate import_freq_code -> freq, drop legacy key.
-     *
-     * @param array $meta
-     */
-    private function normalize_metadata_freq_key_for_storage(array &$meta)
-    {
-        $v = $this->resolve_metadata_constant_freq($meta);
-        unset($meta['import_freq_code']);
-        unset($meta['global_codelist_id'], $meta['global_freq_codelist_id']);
-        if ($v !== null) {
-            $meta['freq'] = $v;
-        } else {
-            unset($meta['freq']);
-        }
-    }
-
-    /**
-     * 
-     * Import CSV file to create/update DSD columns
-     * 
-     * @param int $sid - Project ID
-     * @param string $csv_file_path - Path to uploaded CSV file
-     * @param array $column_mappings - Array of column mappings with action, columnType, dataType, label, etc.
-     * @param int $overwrite_existing - Whether to overwrite existing columns (1) or not (0)
-     * @param int $skip_existing - Whether to skip existing columns (1) or not (0)
-     * @param int $user_id - User ID for created_by/changed_by
-     * @return array Result with created, updated, skipped counts and errors
-     * 
-     **/
-    /**
-     * 
-     * Validate indicator_id values in CSV match project IDNO
-     * Stops early on first mismatch
-     * 
-     * @param string $csv_file_path - Path to CSV file
-     * @param string $indicator_id_column - CSV column name for indicator_id
-     * @param string $project_idno - Project IDNO to match against
-     * @return void
-     * @throws Exception if validation fails
-     * 
-     **/
     /**
      * Single CSV header cell → DuckDB/FastAPI-safe label: only letters, digits, underscore, hyphen.
      * Other characters (spaces, dots, slashes, parentheses, etc.) become underscores; runs collapse.
@@ -833,6 +161,225 @@ class Indicator_dsd_model extends CI_Model {
         }
 
         return $this->rewrite_csv_with_normalized_headers($csv_file_path);
+    }
+
+    /**
+     * Read normalized header names from the first row of a CSV (after DuckDB rewrite).
+     *
+     * @param string $csv_file_path Absolute path
+     * @return string[]
+     * @throws Exception
+     */
+    public function read_csv_header_names($csv_file_path)
+    {
+        if (!is_readable($csv_file_path)) {
+            throw new Exception('CSV file is not readable');
+        }
+
+        $in = @fopen($csv_file_path, 'rb');
+        if ($in === false) {
+            throw new Exception('Failed to read CSV file');
+        }
+
+        $raw_first_line = fgets($in);
+        fclose($in);
+
+        if ($raw_first_line === false) {
+            throw new Exception('CSV file has no header row');
+        }
+
+        $first_line_stripped = rtrim($raw_first_line, "\r\n");
+        $headers = str_getcsv($first_line_stripped);
+        if (empty($headers)) {
+            throw new Exception('CSV file has no header row');
+        }
+
+        $out = array();
+        foreach ($headers as $header) {
+            $name = trim((string) $header);
+            if ($name !== '') {
+                $out[] = $name;
+            }
+        }
+
+        return $out;
+    }
+
+    /**
+     * Validate CSV contains all DSD columns. Extra CSV columns are allowed and reported as ignored.
+     *
+     * @param string   $csv_path Absolute path (headers should already be rewritten for DuckDB)
+     * @param string[] $expected_column_names Normalized DSD column names
+     * @return array valid, missing_in_csv, ignored_columns, extra_in_csv, csv_columns, expected_columns, message?
+     */
+    public function validate_csv_headers_for_dsd($csv_path, array $expected_column_names)
+    {
+        $csv_headers = $this->read_csv_header_names($csv_path);
+        $expected = $this->normalize_duckdb_staging_column_names($expected_column_names);
+
+        $missing = array();
+        $matched_csv = array();
+
+        foreach ($expected as $exp) {
+            $found = false;
+            foreach ($csv_headers as $idx => $hdr) {
+                if ($this->mapping_csv_column_matches_header($exp, $hdr)) {
+                    $found = true;
+                    $matched_csv[$idx] = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                $missing[] = $exp;
+            }
+        }
+
+        $ignored = array();
+        foreach ($csv_headers as $idx => $hdr) {
+            if (empty($matched_csv[$idx])) {
+                $ignored[] = $hdr;
+            }
+        }
+
+        $valid = empty($missing);
+        $result = array(
+            'valid' => $valid,
+            'missing_in_csv' => $missing,
+            'ignored_columns' => $ignored,
+            'extra_in_csv' => $ignored,
+            'csv_columns' => $csv_headers,
+            'expected_columns' => $expected,
+        );
+
+        if (!$valid) {
+            $result['message'] = 'CSV is missing required data structure columns.';
+        }
+
+        return $result;
+    }
+
+    /**
+     * Rewrite CSV in place keeping only columns defined in the DSD (streaming; safe for large files).
+     *
+     * @param string   $csv_file_path Absolute path (headers should already be rewritten for DuckDB)
+     * @param string[] $expected_column_names Normalized DSD column names
+     * @return array ignored_columns, columns_kept
+     * @throws Exception
+     */
+    public function trim_csv_to_dsd_columns($csv_file_path, array $expected_column_names)
+    {
+        if (!is_readable($csv_file_path)) {
+            throw new Exception('CSV file is not readable');
+        }
+
+        $expected = $this->normalize_duckdb_staging_column_names($expected_column_names);
+        $csv_headers = $this->read_csv_header_names($csv_file_path);
+
+        $column_indices = array();
+        $output_headers = array();
+        foreach ($expected as $exp) {
+            $found_idx = null;
+            foreach ($csv_headers as $idx => $hdr) {
+                if ($this->mapping_csv_column_matches_header($exp, $hdr)) {
+                    $found_idx = $idx;
+                    break;
+                }
+            }
+            if ($found_idx === null) {
+                throw new Exception('CSV is missing required data structure column: ' . $exp);
+            }
+            $column_indices[] = $found_idx;
+            $output_headers[] = $exp;
+        }
+
+        $matched = array();
+        foreach ($column_indices as $idx) {
+            $matched[$idx] = true;
+        }
+        $ignored = array();
+        foreach ($csv_headers as $idx => $hdr) {
+            if (empty($matched[$idx])) {
+                $ignored[] = $hdr;
+            }
+        }
+
+        $in = @fopen($csv_file_path, 'rb');
+        if ($in === false) {
+            throw new Exception('Failed to read CSV file');
+        }
+
+        $raw_first_line = fgets($in);
+        if ($raw_first_line === false) {
+            fclose($in);
+            throw new Exception('CSV file has no header row');
+        }
+
+        $tmp_path = $csv_file_path . '.trim_' . uniqid('', true);
+        $out = @fopen($tmp_path, 'wb');
+        if ($out === false) {
+            fclose($in);
+            throw new Exception('Failed to write trimmed CSV file');
+        }
+
+        fwrite($out, $this->csv_line_from_values($output_headers) . "\n");
+
+        while (($row = fgetcsv($in)) !== false) {
+            if ($row === array(null) || ($row === false)) {
+                continue;
+            }
+            $out_row = array();
+            foreach ($column_indices as $idx) {
+                $out_row[] = isset($row[$idx]) ? $row[$idx] : '';
+            }
+            if (count(array_filter($out_row, function ($v) {
+                return trim((string) $v) !== '';
+            })) === 0) {
+                continue;
+            }
+            fwrite($out, $this->csv_line_from_values($out_row) . "\n");
+        }
+
+        fclose($in);
+        fclose($out);
+
+        if (!@rename($tmp_path, $csv_file_path)) {
+            @unlink($tmp_path);
+            throw new Exception('Failed to replace CSV with trimmed version');
+        }
+
+        return array(
+            'ignored_columns' => $ignored,
+            'columns_kept' => $output_headers,
+        );
+    }
+
+    /**
+     * Path for FastAPI replace-from-csv: full staging file, or a DSD-only copy when extras are omitted.
+     * FastAPI rejects CSV files that contain columns outside expected_columns ("extra in CSV").
+     * indicator_staging_upload.csv is never modified; a sibling indicator_staging_import.csv is trimmed instead
+     * (kept on disk until the next import so async FastAPI jobs can read it).
+     *
+     * @param string   $staging_csv_path Absolute path to indicator_staging_upload.csv
+     * @param string[] $expected_column_names Normalized DSD column names
+     * @param bool     $keep_extra_columns
+     * @return array path (string)
+     * @throws Exception
+     */
+    public function resolve_csv_path_for_fastapi_import($staging_csv_path, array $expected_column_names, $keep_extra_columns = false)
+    {
+        if ($keep_extra_columns) {
+            return array('path' => $staging_csv_path);
+        }
+
+        $dir = dirname($staging_csv_path);
+        $import_csv = $dir . '/indicator_staging_import.csv';
+        if (!@copy($staging_csv_path, $import_csv)) {
+            throw new Exception('Could not copy staging CSV for import');
+        }
+
+        $this->trim_csv_to_dsd_columns($import_csv, $expected_column_names);
+
+        return array('path' => $import_csv);
     }
 
     /**
@@ -985,323 +532,6 @@ class Indicator_dsd_model extends CI_Model {
      * @return int Number of rows kept
      * @throws Exception if no rows match or file cannot be written
      */
-    private function filter_csv_to_matching_indicator_id($csv_file_path, $indicator_id_column, $project_idno)
-    {
-        if (empty($project_idno)) {
-            throw new Exception("Indicator IDNO is not available");
-        }
-
-        $csv = Reader::createFromPath($csv_file_path, 'r');
-        $csv->setHeaderOffset(0);
-        $headers = $csv->getHeader();
-        $physical_indicator_col = null;
-        foreach ($headers as $h) {
-            if ($this->mapping_csv_column_matches_header($indicator_id_column, $h)) {
-                $physical_indicator_col = $h;
-                break;
-            }
-        }
-        if ($physical_indicator_col === null) {
-            throw new Exception("Indicator ID column '{$indicator_id_column}' not found in CSV headers");
-        }
-        $indicator_id_column = $physical_indicator_col;
-
-        $project_idno_upper = strtoupper(trim($project_idno));
-
-        $matching = array();
-        foreach ($csv->getRecords() as $record) {
-            $indicator_id = isset($record[$indicator_id_column]) ? trim($record[$indicator_id_column]) : '';
-            if ($indicator_id !== '' && strtoupper($indicator_id) === $project_idno_upper) {
-                $row = array();
-                foreach ($headers as $h) {
-                    $row[] = isset($record[$h]) ? $record[$h] : '';
-                }
-                $matching[] = $row;
-            }
-        }
-        unset($csv);
-
-        if (empty($matching)) {
-            throw new Exception("No rows match indicator IDNO '{$project_idno}'. Please add at least one row with matching indicator ID, or check the indicator IDNO.");
-        }
-
-        $lines = array($this->csv_line_from_values($headers));
-        foreach ($matching as $row) {
-            $lines[] = $this->csv_line_from_values($row);
-        }
-        $content = implode("\n", $lines);
-        if (file_put_contents($csv_file_path, $content) === false) {
-            throw new Exception("Failed to write filtered CSV file");
-        }
-        return count($matching);
-    }
-
-    public function import_csv($sid, $csv_file_path, $column_mappings, $overwrite_existing = 0, $skip_existing = 0, $user_id = null, $indicator_idno = null, $required_field_label_columns = array())
-    {
-        $this->Editor_model->check_project_editable($sid);
-
-        $result = array(
-            'created' => 0,
-            'updated' => 0,
-            'skipped' => 0,
-            'errors' => array(),
-            'rows_imported' => 0,
-            'local_codelists_pending' => 0,
-        );
-
-        if (!file_exists($csv_file_path)) {
-            throw new Exception("CSV file not found");
-        }
-
-        // Normalize column names in the CSV (first line: FastAPI-safe identifiers) and overwrite file
-        $headers = $this->rewrite_csv_with_normalized_headers($csv_file_path);
-
-        // Validate column mappings match CSV headers (exact or same sanitized token as original header)
-        foreach ($column_mappings as $mapping) {
-            $found = false;
-            foreach ($headers as $h) {
-                if ($this->mapping_csv_column_matches_header($mapping['csvColumn'], $h)) {
-                    $found = true;
-                    break;
-                }
-            }
-            if (!$found) {
-                $result['errors'][] = "Column '{$mapping['csvColumn']}' not found in CSV";
-            }
-        }
-
-        if (!empty($result['errors'])) {
-            return $result;
-        }
-
-        // Get project IDNO: use provided indicator_idno (from import form) when non-empty, else from project
-        $project_idno = (!empty($indicator_idno) && is_string($indicator_idno)) ? trim($indicator_idno) : $this->Editor_model->get_project_idno_by_id($sid);
-        
-        // Find indicator_id mapping (REQUIRED)
-        $indicator_id_mapping = null;
-        foreach ($column_mappings as $mapping) {
-            if (isset($mapping['columnType']) && $mapping['columnType'] === 'indicator_id') {
-                $indicator_id_mapping = $mapping;
-                break;
-            }
-        }
-        
-        // Validate indicator_id mapping exists
-        if (!$indicator_id_mapping) {
-            $result['errors'][] = "Indicator ID column mapping is required";
-            return $result;
-        }
-        
-        // Keep only rows where indicator_id matches project IDNO; rewrite CSV so stored file is clean
-        try {
-            $result['rows_imported'] = $this->filter_csv_to_matching_indicator_id(
-                $csv_file_path,
-                $indicator_id_mapping['csvColumn'],
-                $project_idno
-            );
-        } catch (Throwable $e) {
-            $result['errors'][] = $e->getMessage();
-            return $result; // Stop here, don't create columns
-        }
-
-        // Upload and store CSV file with standard name (singleton pattern)
-        // This happens after validation but before processing columns
-        try {
-            $upload_result = $this->upload_indicator_csv($sid, $csv_file_path, $user_id);
-            $result['file_id'] = $upload_result['file_id'];
-            $result['file_name'] = $upload_result['file_name'];
-        } catch (Throwable $e) {
-            $result['errors'][] = "Failed to store CSV file: " . $e->getMessage();
-            return $result; // Stop here if file storage fails
-        }
-
-        // Get existing columns by name (compare uppercase for SDMX compatibility)
-        $existing_columns = $this->select_all($sid, false);
-        $existing_by_name = array();
-        foreach ($existing_columns as $col) {
-            $existing_by_name[strtoupper($col['name'])] = $col;
-        }
-
-        // Process each column mapping (only selected ones are sent)
-        foreach ($column_mappings as $mapping) {
-            try {
-                $csv_column = $mapping['csvColumn'];
-                // Use uppercase column name for SDMX compatibility
-                $column_name = isset($mapping['columnName']) ? strtoupper(trim($mapping['columnName'])) : strtoupper($csv_column);
-                
-                // Validate column name
-                if (empty($column_name)) {
-                    $result['errors'][] = "Column name is required for '{$csv_column}'";
-                    continue;
-                }
-                
-                if (!preg_match('/^[A-Z0-9_]+$/', $column_name)) {
-                    $result['errors'][] = "Invalid column name '{$column_name}'. Only uppercase letters, numbers, and underscores are allowed.";
-                    continue;
-                }
-                
-                if (strlen($column_name) > 255) {
-                    $result['errors'][] = "Column name '{$column_name}' exceeds maximum length of 255 characters.";
-                    continue;
-                }
-
-                if (self::is_reserved_system_column_name($column_name)) {
-                    $result['errors'][] = "Column name '{$column_name}' cannot start with underscore (_); reserved for system fields.";
-                    continue;
-                }
-
-                // Prefer stable DSD row id when client sends it (re-import after renames)
-                $existing_column = null;
-                $dsd_id = isset($mapping['dsdColumnId']) ? (int) $mapping['dsdColumnId'] : 0;
-                if ($dsd_id > 0) {
-                    $by_id = $this->get_indicator_dsd_row_by_id($sid, $dsd_id);
-                    if ($by_id) {
-                        $existing_column = $by_id;
-                    }
-                }
-                if (!$existing_column) {
-                    $exists = isset($existing_by_name[strtoupper($column_name)]);
-                    $existing_column = $exists ? $existing_by_name[strtoupper($column_name)] : null;
-                }
-                $exists = (bool) $existing_column;
-
-                // Handle existing columns
-                if ($exists) {
-                    if ($skip_existing) {
-                        $result['skipped']++;
-                        continue;
-                    }
-                    
-                    if (!$overwrite_existing) {
-                        $result['errors'][] = "Column '{$column_name}' already exists. Enable 'overwrite existing' to update.";
-                        continue;
-                    }
-
-                    // Build metadata: load existing then set value_label_column from required_field_label_columns
-                    $meta_row = $this->db->select('metadata')->where('id', $existing_column['id'])->where('sid', $sid)->get('indicator_dsd')->row_array();
-                    $metadata = isset($meta_row['metadata']) ? json_decode($meta_row['metadata'], true) : array();
-                    if (!is_array($metadata)) {
-                        $metadata = array();
-                    }
-                    $col_type = isset($mapping['columnType']) ? $mapping['columnType'] : 'dimension';
-                    if (!empty($required_field_label_columns[$col_type]) && is_string($required_field_label_columns[$col_type])) {
-                        $metadata['value_label_column'] = trim($required_field_label_columns[$col_type]);
-                    }
-                    // For dimension/attribute columns: use labelColumn from mapping as value_label_column
-                    if (empty($metadata['value_label_column'])) {
-                        $label_col = isset($mapping['labelColumn']) && is_string($mapping['labelColumn']) ? trim($mapping['labelColumn']) : '';
-                        if ($label_col !== '') {
-                            $metadata['value_label_column'] = $label_col;
-                        }
-                    }
-                    if (isset($mapping['metadata']) && is_array($mapping['metadata'])) {
-                        $metadata = array_merge($metadata, $mapping['metadata']);
-                    }
-                    if ($col_type === 'time_period') {
-                        if (!empty($mapping['timePeriodFreqCode']) && is_string($mapping['timePeriodFreqCode']) && trim($mapping['timePeriodFreqCode']) !== '') {
-                            $metadata['freq'] = trim($mapping['timePeriodFreqCode']);
-                        } else {
-                            unset($metadata['freq']);
-                        }
-                        unset($metadata['import_freq_code']);
-                    }
-                    $this->normalize_metadata_freq_key_for_storage($metadata);
-
-                    // Update existing column (include name so import mapping can rename; matched by dsdColumnId when sent)
-                    $update_data = array(
-                        'name' => $column_name,
-                        'label' => isset($mapping['label']) ? $mapping['label'] : $column_name,
-                        'description' => isset($mapping['description']) ? $mapping['description'] : '',
-                        'data_type' => isset($mapping['dataType']) ? $mapping['dataType'] : 'string',
-                        'column_type' => $col_type,
-                        'time_period_format' => isset($mapping['timePeriodFormat']) ? $mapping['timePeriodFormat'] : null,
-                        'code_list' => isset($mapping['codeList']) ? $mapping['codeList'] : null,
-                        'code_list_reference' => isset($mapping['codeListReference']) ? $mapping['codeListReference'] : null,
-                        'metadata' => $metadata,
-                        'changed_by' => $user_id
-                    );
-
-                    // Auto-promote to local codelist when a label column was mapped and the column
-                    // type supports coded vocabularies; only if not already explicitly configured.
-                    $non_codelist_types = array('time_period', 'observation_value', 'periodicity', 'measure', 'indicator_name', 'annotation');
-                    $has_label_col = !empty($metadata['value_label_column']);
-                    $existing_codelist_type = isset($existing_column['codelist_type']) ? $existing_column['codelist_type'] : 'none';
-                    if ($has_label_col && !in_array($col_type, $non_codelist_types) && $existing_codelist_type === 'none') {
-                        $update_data['codelist_type'] = 'local';
-                        $result['local_codelists_pending']++;
-                    }
-
-                    $this->update($sid, $existing_column['id'], $update_data);
-                    $result['updated']++;
-                } else {
-                    // Build metadata with value_label_column from required_field_label_columns
-                    $metadata = isset($mapping['metadata']) && is_array($mapping['metadata']) ? $mapping['metadata'] : array();
-                    $col_type = isset($mapping['columnType']) ? $mapping['columnType'] : 'dimension';
-                    if (!empty($required_field_label_columns[$col_type]) && is_string($required_field_label_columns[$col_type])) {
-                        $metadata['value_label_column'] = trim($required_field_label_columns[$col_type]);
-                    }
-                    // For dimension/attribute columns: use labelColumn from mapping as value_label_column
-                    if (empty($metadata['value_label_column'])) {
-                        $label_col = isset($mapping['labelColumn']) && is_string($mapping['labelColumn']) ? trim($mapping['labelColumn']) : '';
-                        if ($label_col !== '') {
-                            $metadata['value_label_column'] = $label_col;
-                        }
-                    }
-                    if ($col_type === 'time_period') {
-                        if (!empty($mapping['timePeriodFreqCode']) && is_string($mapping['timePeriodFreqCode']) && trim($mapping['timePeriodFreqCode']) !== '') {
-                            $metadata['freq'] = trim($mapping['timePeriodFreqCode']);
-                        } else {
-                            unset($metadata['freq']);
-                        }
-                        unset($metadata['import_freq_code']);
-                    }
-                    $this->normalize_metadata_freq_key_for_storage($metadata);
-
-                    // Auto-promote to local codelist when a label column was mapped
-                    $non_codelist_types = array('time_period', 'observation_value', 'periodicity', 'measure', 'indicator_name', 'annotation');
-                    $has_label_col = !empty($metadata['value_label_column']);
-                    $auto_codelist_type = ($has_label_col && !in_array($col_type, $non_codelist_types)) ? 'local' : 'none';
-                    if ($auto_codelist_type === 'local') {
-                        $result['local_codelists_pending']++;
-                    }
-
-                    // Create new column
-                    $insert_data = array(
-                        'name' => $column_name, // Already uppercase
-                        'label' => isset($mapping['label']) ? $mapping['label'] : $column_name,
-                        'description' => isset($mapping['description']) ? $mapping['description'] : '',
-                        'data_type' => isset($mapping['dataType']) ? $mapping['dataType'] : 'string',
-                        'column_type' => $col_type,
-                        'time_period_format' => isset($mapping['timePeriodFormat']) ? $mapping['timePeriodFormat'] : null,
-                        'code_list' => isset($mapping['codeList']) ? $mapping['codeList'] : null,
-                        'code_list_reference' => isset($mapping['codeListReference']) ? $mapping['codeListReference'] : null,
-                        'codelist_type' => $auto_codelist_type,
-                        'metadata' => $metadata,
-                        'sort_order' => $this->get_max_sort_order($sid) + 1,
-                        'created_by' => $user_id
-                    );
-
-                    $this->insert($sid, $insert_data);
-                    $result['created']++;
-                }
-            } catch (Throwable $e) {
-                $result['errors'][] = "Error processing column '{$mapping['csvColumn']}': " . $e->getMessage();
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Get maximum sort_order for a project
-     */
-    private function get_max_sort_order($sid)
-    {
-        $this->db->select_max('sort_order');
-        $this->db->where('sid', $sid);
-        $result = $this->db->get('indicator_dsd')->row_array();
-        return $result && $result['sort_order'] !== null ? (int)$result['sort_order'] : 0;
-    }
 
     /**
      * Default FREQ code per time_period_format when no user FREQ column (from config indicator_dsd.php).
@@ -1318,14 +548,14 @@ class Indicator_dsd_model extends CI_Model {
 
     /**
      * Build optional time_spec for FastAPI promote (DuckDB _ts_year / _ts_freq).
-     * Sent as JSON on POST timeseries/indicators/timeseries/import-queue when a time_period column exists.
      *
-     * @param int $sid
-     * @return array keys: time_column, time_period_format, default_freq_by_format; optional freq_column,
-     *     implied_freq_code (from metadata.freq when no freq_column; legacy import_freq_code still read)
+     * @param int   $sid
+     * @param array $overrides optional: implied_freq_code (import-time constant FREQ when no periodicity column)
+     * @return array
      */
-    public function build_duckdb_promote_time_spec($sid)
+    public function build_duckdb_promote_time_spec($sid, array $overrides = array())
     {
+        $this->load->library('SDMX/Sdmx_time_period');
         $columns = $this->select_all($sid, true);
         $spec = array();
 
@@ -1334,14 +564,6 @@ class Indicator_dsd_model extends CI_Model {
                 continue;
             }
             $spec['time_column'] = $col['name'];
-            $tf = isset($col['time_period_format']) ? $col['time_period_format'] : null;
-            $spec['time_period_format'] = ($tf !== '' && $tf !== null) ? $tf : null;
-
-            $meta = isset($col['metadata']) && is_array($col['metadata']) ? $col['metadata'] : array();
-            $ifc_const = $this->resolve_metadata_constant_freq($meta);
-            if ($ifc_const !== null) {
-                $spec['implied_freq_code'] = $ifc_const;
-            }
             break;
         }
 
@@ -1353,80 +575,43 @@ class Indicator_dsd_model extends CI_Model {
             break;
         }
 
-        if (!empty($spec['time_column'])) {
-            $spec['default_freq_by_format'] = $this->get_dsd_default_freq_by_time_period_format_from_config();
+        if (empty($spec['time_column'])) {
+            return $spec;
         }
+
+        $implied = null;
+        if (!empty($overrides['implied_freq_code'])) {
+            $implied = trim((string) $overrides['implied_freq_code']);
+        }
+        if (($implied === null || $implied === '') && empty($spec['freq_column'])) {
+            $this->load->model('Editor_project_dsd_model');
+            $binding = $this->Editor_project_dsd_model->get_by_sid($sid);
+            if ($binding && !empty($binding['implied_freq_code'])) {
+                $implied = trim((string) $binding['implied_freq_code']);
+            }
+        }
+        if ($implied !== null && $implied !== '') {
+            $spec['implied_freq_code'] = $implied;
+            $tf = $this->sdmx_time_period->format_for_freq($implied);
+            if ($tf !== null) {
+                $spec['time_period_format'] = $tf;
+            }
+        }
+
+        $spec['default_freq_by_format'] = $this->get_dsd_default_freq_by_time_period_format_from_config();
 
         return $spec;
     }
 
     /**
-     * Without a periodicity (FREQ-from-data) column, each time_period row must have
-     * time_period_format and metadata.freq (constant series FREQ; legacy import_freq_code still read).
+     * Whether the bound structure has a periodicity (FREQ) column.
      *
-     * @param array $columns rows like select_all($sid, true) with metadata decoded
-     * @return array list of error messages (may be empty)
+     * @param int $sid
+     * @return bool
      */
-    private function collect_time_period_freq_errors(array $columns)
+    public function project_has_periodicity_column($sid)
     {
-        $has_periodicity = false;
-        foreach ($columns as $c) {
-            $nm = isset($c['name']) ? trim((string) $c['name']) : '';
-            if ($nm !== '' && isset($c['column_type']) && $c['column_type'] === 'periodicity') {
-                $has_periodicity = true;
-                break;
-            }
-        }
-
-        $this->load->config('indicator_dsd', true);
-        $allowed_freq = array();
-        foreach ((array) $this->config->item('dsd_freq_codes', 'indicator_dsd') as $row) {
-            if (!empty($row['code'])) {
-                $allowed_freq[] = (string) $row['code'];
-            }
-        }
-
-        $errors = array();
-        foreach ($columns as $c) {
-            if (!isset($c['column_type']) || $c['column_type'] !== 'time_period') {
-                continue;
-            }
-            if ($has_periodicity) {
-                continue;
-            }
-
-            $name = isset($c['name']) ? $c['name'] : '?';
-            $tf = isset($c['time_period_format']) ? $c['time_period_format'] : null;
-            $meta = isset($c['metadata']) && is_array($c['metadata']) ? $c['metadata'] : array();
-            $ifc = $this->resolve_metadata_constant_freq($meta);
-
-            if ($tf === null || $tf === '' || (is_string($tf) && trim($tf) === '')) {
-                $errors[] = "Time period column '{$name}': time_period_format is required when no FREQ (periodicity) column exists.";
-            }
-            if ($ifc === null) {
-                $errors[] = "Time period column '{$name}': constant series FREQ (metadata.freq) is required when no FREQ (periodicity) column exists.";
-            }
-            if ($ifc !== null && count($allowed_freq) > 0) {
-                $code = $ifc;
-                if (!in_array($code, $allowed_freq, true)) {
-                    $errors[] = "Time period column '{$name}': metadata.freq '{$code}' is not a configured SDMX FREQ code.";
-                }
-            }
-        }
-
-        return $errors;
-    }
-
-    /**
-     * @param array $projected_columns full column set after a would-be insert/update (metadata arrays)
-     * @throws ValidationException
-     */
-    private function assert_project_time_period_freq_rules(array $projected_columns)
-    {
-        $errs = $this->collect_time_period_freq_errors($projected_columns);
-        if (!empty($errs)) {
-            throw new ValidationException('VALIDATION_ERROR: ' . implode(' ', $errs), $errs);
-        }
+        return $this->get_column_name_by_type($sid, 'periodicity') !== null;
     }
 
     /**
@@ -1449,19 +634,39 @@ class Indicator_dsd_model extends CI_Model {
     }
 
     /**
-     * Resolve data columns for validation from DuckDB: published timeseries, else staging.
+     * Resolve data columns for validation from published DuckDB timeseries.
      *
      * @param int $sid
      * @return array|null { source, column_keys: map upper=>name, row_count?, warning? }
      */
     private function resolve_indicator_data_validation_context($sid)
     {
+        $this->load->model('Editor_project_dsd_model');
+        $binding = $this->Editor_project_dsd_model->get_by_sid($sid);
+        if (!$binding || empty($binding['has_published_data'])) {
+            return null;
+        }
+
         $this->load->library('indicator_duckdb_service');
 
         // Only validate against published timeseries data.
         // Staging (upload buffer) is provisional and must not be used here —
         // it would produce false validation errors before the import is complete.
         $page = $this->indicator_duckdb_service->timeseries_page($sid, 0, 1);
+        if (is_array($page) && !empty($page['error'])) {
+            $hc = isset($page['http_code']) ? (int) $page['http_code'] : 0;
+            if ($hc === 404) {
+                $this->Editor_project_dsd_model->clear_published_data($sid);
+                return null;
+            }
+
+            return array(
+                'skipped_api' => true,
+                'warning' => 'Published data is recorded but the data API was unavailable; data checks were skipped.',
+                'row_count' => isset($binding['published_row_count']) ? (int) $binding['published_row_count'] : null,
+            );
+        }
+
         if (is_array($page) && empty($page['error']) && !empty($page['columns']) && is_array($page['columns'])) {
             $map = array();
             foreach ($page['columns'] as $col) {
@@ -1480,12 +685,76 @@ class Indicator_dsd_model extends CI_Model {
                 }
             }
             if (count($map) > 0) {
+                $row_count = isset($page['total_row_count']) ? (int) $page['total_row_count'] : null;
+                if ($row_count !== null) {
+                    $this->Editor_project_dsd_model->mark_published_data($sid, $row_count);
+                }
+
                 return array(
                     'source' => 'timeseries',
                     'column_keys' => $map,
-                    'row_count' => isset($page['total_row_count']) ? (int) $page['total_row_count'] : null,
+                    'row_count' => $row_count,
                     'warning' => null,
                 );
+            }
+        }
+
+        $this->Editor_project_dsd_model->clear_published_data($sid);
+        return null;
+    }
+
+    /**
+     * Record successful publish of indicator timeseries data (MySQL tracking; avoids FastAPI probe when unset).
+     *
+     * @param int      $sid
+     * @param int|null $row_count
+     * @return bool
+     */
+    public function record_published_data_import($sid, $row_count = null)
+    {
+        $this->load->model('Editor_project_dsd_model');
+        if (!$this->Editor_project_dsd_model->get_by_sid($sid)) {
+            return false;
+        }
+
+        return $this->Editor_project_dsd_model->mark_published_data($sid, $row_count);
+    }
+
+    /**
+     * Clear published-data tracking when timeseries is dropped or structure is replaced.
+     *
+     * @param int $sid
+     * @return bool
+     */
+    public function clear_published_data_tracking($sid)
+    {
+        $this->load->model('Editor_project_dsd_model');
+        if (!$this->Editor_project_dsd_model->get_by_sid($sid)) {
+            return false;
+        }
+
+        return $this->Editor_project_dsd_model->clear_published_data($sid);
+    }
+
+    /**
+     * @param array|null $job_body poll_job() result when status is done
+     * @return int|null
+     */
+    public function extract_row_count_from_import_job($job_body)
+    {
+        if (!is_array($job_body)) {
+            return null;
+        }
+        foreach (array('row_count', 'rows_imported', 'total_row_count') as $key) {
+            if (isset($job_body[$key]) && $job_body[$key] !== '') {
+                return (int) $job_body[$key];
+            }
+        }
+        if (!empty($job_body['info']) && is_array($job_body['info'])) {
+            foreach (array('row_count', 'rows_imported', 'total_row_count') as $key) {
+                if (isset($job_body['info'][$key]) && $job_body['info'][$key] !== '') {
+                    return (int) $job_body['info'][$key];
+                }
             }
         }
 
@@ -1495,18 +764,14 @@ class Indicator_dsd_model extends CI_Model {
     /**
      * @param array $dsd_columns rows like select_all($sid, true)
      * @param array $column_key_to_name map uppercase key => physical name in data
-     * @param string $source timeseries|staging
+     * @param string $source timeseries
      * @return array [ list $errors, list $warnings ]
      */
     private function validate_dsd_columns_against_data_keys(array $dsd_columns, array $column_key_to_name, $source)
     {
         $errors = array();
         $warnings = array();
-        $labels = array(
-            'timeseries' => 'published data (timeseries)',
-            'staging' => 'staging data',
-        );
-        $label = isset($labels[$source]) ? $labels[$source] : (string) $source;
+        $label = 'published data (timeseries)';
 
         foreach ($dsd_columns as $col) {
             $name = isset($col['name']) ? trim((string) $col['name']) : '';
@@ -1529,7 +794,7 @@ class Indicator_dsd_model extends CI_Model {
     }
 
     /**
-     * Structural errors: vocabulary is set (global/local/metadata-linked) but the list is missing or has no codes.
+     * Structural errors: vocabulary is set (global or inline) but the list is missing or has no codes.
      *
      * @param int $sid
      * @param array $columns select_all(..., true)
@@ -1539,7 +804,6 @@ class Indicator_dsd_model extends CI_Model {
     {
         $errors = array();
         $this->load->model('Codelists_model');
-        $this->load->model('Local_codelists_model');
 
         foreach ($columns as $column) {
             $label = isset($column['name']) && $column['name'] !== '' ? $column['name'] : ('#' . (isset($column['id']) ? $column['id'] : '?'));
@@ -1561,18 +825,6 @@ class Indicator_dsd_model extends CI_Model {
                         }
                     }
                 }
-            } elseif ($ctype === 'local') {
-                $lid = isset($column['local_codelist_id']) ? (int) $column['local_codelist_id'] : 0;
-                if ($lid <= 0) {
-                    $errors[] = "Column '{$label}': local vocabulary is selected but no local codelist is linked (save the column and add codes, or use “Local codelists from data”).";
-                } elseif (!$this->Local_codelists_model->get_list($sid, $lid)) {
-                    $errors[] = "Column '{$label}': local codelist id {$lid} was not found for this project.";
-                } else {
-                    $n = $this->Local_codelists_model->count_items($lid);
-                    if ($n === 0) {
-                        $errors[] = "Column '{$label}': local codelist has no codes.";
-                    }
-                }
             }
 
             $meta = isset($column['metadata']) && is_array($column['metadata']) ? $column['metadata'] : array();
@@ -1589,9 +841,9 @@ class Indicator_dsd_model extends CI_Model {
     }
 
     /**
-     * Resolve registry codelist row from indicator_dsd.global_codelist_id (codelists.id).
+     * Resolve registry codelist row from global_codelist_id (codelists.id).
      *
-     * @param array $column indicator_dsd row (decoded)
+     * @param array $column resolved DSD column row (decoded)
      * @return array|null codelists row or null
      */
     private function resolve_global_registry_codelist_row(array $column)
@@ -1608,7 +860,7 @@ class Indicator_dsd_model extends CI_Model {
     /**
      * Build lookup map code => true from codelist_items rows or inline code_list entries.
      *
-     * @param array $rows get_codes() rows or local items
+     * @param array $rows get_codes() rows or inline code_list entries
      * @return array
      */
     private function dsd_allow_map_from_code_rows(array $rows)
@@ -1632,14 +884,13 @@ class Indicator_dsd_model extends CI_Model {
      * Allowed codes for one DSD column (multiple constraints = value must match every map).
      *
      * @param int $sid
-     * @param array $column indicator_dsd row decoded
+     * @param array $column resolved DSD column row (decoded)
      * @return array [ list of [ 'label' => string, 'map' => array code=>true ] ], empty = no codelist enforcement
      */
     private function dsd_column_codelist_constraints($sid, array $column)
     {
         $constraints = array();
         $this->load->model('Codelists_model');
-        $this->load->model('Local_codelists_model');
 
         $ctype = isset($column['codelist_type']) ? $column['codelist_type'] : 'none';
         $col_type = isset($column['column_type']) ? $column['column_type'] : '';
@@ -1653,17 +904,6 @@ class Indicator_dsd_model extends CI_Model {
                     $constraints[] = array(
                         'label' => 'global vocabulary',
                         'map' => $this->dsd_allow_map_from_code_rows($codes),
-                    );
-                }
-            }
-        } elseif ($ctype === 'local') {
-            $lid = isset($column['local_codelist_id']) ? (int) $column['local_codelist_id'] : 0;
-            if ($lid > 0 && $this->Local_codelists_model->get_list($sid, $lid)) {
-                $items = $this->Local_codelists_model->get_items($lid, 0, null, null, 'ASC', null);
-                if (is_array($items) && count($items) > 0) {
-                    $constraints[] = array(
-                        'label' => 'local vocabulary',
-                        'map' => $this->dsd_allow_map_from_code_rows($items),
                     );
                 }
             }
@@ -1681,14 +921,13 @@ class Indicator_dsd_model extends CI_Model {
     }
 
     /**
-     * Distinct non-empty values for one physical column from timeseries or staging (DuckDB).
+     * Distinct non-empty values for one physical column from published timeseries (DuckDB).
      *
      * @param int $sid
-     * @param string $source timeseries|staging
      * @param string $physical_name
      * @return array [ string[] distinct values, bool truncated ]
      */
-    private function fetch_distinct_values_for_dsd_data_column($sid, $source, $physical_name)
+    private function fetch_distinct_values_for_dsd_data_column($sid, $physical_name)
     {
         $this->load->library('indicator_duckdb_service');
         $physical_name = trim((string) $physical_name);
@@ -1699,48 +938,23 @@ class Indicator_dsd_model extends CI_Model {
             return array(array(), false);
         }
 
-        if ($source === 'timeseries') {
-            $raw = $this->indicator_duckdb_service->timeseries_distinct_pairs($sid, $physical_name, null, 20000);
-            if (is_array($raw) && empty($raw['error']) && !empty($raw['items']) && is_array($raw['items'])) {
-                foreach ($raw['items'] as $it) {
-                    if (!is_array($it)) {
-                        continue;
-                    }
-                    $c = isset($it['code']) ? trim((string) $it['code']) : '';
-                    if ($c !== '') {
-                        $values[$c] = true;
-                    }
+        $raw = $this->indicator_duckdb_service->timeseries_distinct_pairs($sid, $physical_name, null, 20000);
+        if (is_array($raw) && empty($raw['error']) && !empty($raw['items']) && is_array($raw['items'])) {
+            foreach ($raw['items'] as $it) {
+                if (!is_array($it)) {
+                    continue;
                 }
-                if (!empty($raw['truncated'])) {
-                    $truncated = true;
+                $c = isset($it['code']) ? trim((string) $it['code']) : '';
+                if ($c !== '') {
+                    $values[$c] = true;
                 }
             }
-
-            return array(array_keys($values), $truncated);
-        }
-
-        if ($source === 'staging') {
-            $raw = $this->indicator_duckdb_service->draft_distinct($sid, $physical_name, 3000);
-            if (is_array($raw) && empty($raw['error'])) {
-                $items = isset($raw['items']) && is_array($raw['items']) ? $raw['items'] : array();
-                foreach ($items as $it) {
-                    if (!is_array($it)) {
-                        continue;
-                    }
-                    $v = isset($it['value']) ? trim((string) $it['value']) : '';
-                    if ($v !== '') {
-                        $values[$v] = true;
-                    }
-                }
-                if (!empty($raw['truncated'])) {
-                    $truncated = true;
-                }
+            if (!empty($raw['truncated'])) {
+                $truncated = true;
             }
-
-            return array(array_keys($values), $truncated);
         }
 
-        return array(array(), false);
+        return array(array_keys($values), $truncated);
     }
 
     /**
@@ -1778,7 +992,6 @@ class Indicator_dsd_model extends CI_Model {
             $physical = $ctx['column_keys'][$key];
             list($distinct_vals, $truncated) = $this->fetch_distinct_values_for_dsd_data_column(
                 $sid,
-                $ctx['source'],
                 $physical
             );
             if ($truncated) {
@@ -1843,8 +1056,8 @@ class Indicator_dsd_model extends CI_Model {
             'valid' => null,
         );
 
-        if ($ctx['source'] === 'staging') {
-            $meta['reason'] = 'Observation key uniqueness is checked on published timeseries only, not on staging.';
+        if (!$ctx || empty($ctx['source']) || $ctx['source'] !== 'timeseries') {
+            $meta['reason'] = 'Observation key uniqueness requires published timeseries data.';
 
             return array($errors, $warnings, $meta);
         }
@@ -1967,6 +1180,9 @@ class Indicator_dsd_model extends CI_Model {
             'warnings' => $structure['warnings'],
             'summary' => $structure['summary'],
         );
+        if (!empty($structure['roles'])) {
+            $structure_block['roles'] = $structure['roles'];
+        }
 
         return array(
             'valid' => $overall,
@@ -1987,63 +1203,16 @@ class Indicator_dsd_model extends CI_Model {
      */
     public function validate_dsd_structure($sid)
     {
-        $errors = array();
-        $warnings = array();
-
         $columns = $this->select_all($sid, true);
 
-        $by_type = array();
-        foreach ($columns as $column) {
-            $type = $column['column_type'];
-            if (!isset($by_type[$type])) {
-                $by_type[$type] = array();
-            }
-            $by_type[$type][] = $column;
-        }
-
-        $required_types = array('geography', 'time_period', 'indicator_id', 'observation_value');
-        foreach ($required_types as $type) {
-            $count = isset($by_type[$type]) ? count($by_type[$type]) : 0;
-            if ($count === 0) {
-                $errors[] = "Required column type '{$type}' is missing. Exactly one column of this type is required.";
-            } elseif ($count > 1) {
-                $column_names = array_map(function ($col) {
-                    return $col['name'];
-                }, $by_type[$type]);
-                $errors[] = "Column type '{$type}' has {$count} columns (max allowed: 1). Found: " . implode(', ', $column_names);
-            }
-        }
-
-        $optional_single_types = array('periodicity', 'indicator_name');
-        foreach ($optional_single_types as $type) {
-            $count = isset($by_type[$type]) ? count($by_type[$type]) : 0;
-            if ($count > 1) {
-                $column_names = array_map(function ($col) {
-                    return $col['name'];
-                }, $by_type[$type]);
-                $errors[] = "Column type '{$type}' has {$count} columns (max allowed: 1). Found: " . implode(', ', $column_names);
-            }
-        }
-
-        $valid_types = array(
-            'dimension', 'time_period', 'measure', 'attribute',
-            'indicator_id', 'indicator_name', 'annotation',
-            'geography', 'observation_value', 'periodicity'
+        $this->load->library('Indicator_dsd_structure_validate');
+        $result = $this->indicator_dsd_structure_validate->validate_columns(
+            $columns,
+            array('include_role_checklist' => true)
         );
 
-        foreach ($columns as $column) {
-            $type = $column['column_type'];
-            if (!in_array($type, $valid_types)) {
-                $errors[] = "Column '{$column['name']}' has invalid column_type '{$type}'";
-            }
-            if (!empty($column['name']) && self::is_reserved_system_column_name($column['name'])) {
-                $errors[] = "Column '{$column['name']}' uses a reserved name (cannot start with '_').";
-            }
-        }
-
-        foreach ($this->collect_time_period_freq_errors($columns) as $msg) {
-            $errors[] = $msg;
-        }
+        $errors = $result['errors'];
+        $warnings = $result['warnings'];
 
         foreach ($this->collect_dsd_codelist_definition_errors($sid, $columns) as $msg) {
             $errors[] = $msg;
@@ -2068,18 +1237,11 @@ class Indicator_dsd_model extends CI_Model {
             }
         }
 
-        return array(
-            'valid' => count($errors) === 0,
-            'errors' => $errors,
-            'warnings' => $warnings,
-            'summary' => array(
-                'total_columns' => count($columns),
-                'by_type' => array_map(function ($cols) {
-                    return count($cols);
-                }, $by_type),
-            ),
-            'columns' => $columns,
-        );
+        $result['errors'] = $errors;
+        $result['warnings'] = $warnings;
+        $result['valid'] = count($errors) === 0;
+
+        return $result;
     }
 
     /**
@@ -2087,7 +1249,8 @@ class Indicator_dsd_model extends CI_Model {
      * Data checks are skipped if structure validation fails.
      *
      * Validation rules (structure):
-     * - Required (must have exactly 1): geography, time_period, indicator_id, observation_value
+     * - Required (must have exactly 1): indicator_id, time_period, observation_value
+     * - Recommended (0 or 1): geography (warning if missing)
      * - Optional single (0 or 1): periodicity, indicator_name
      * - Optional multiple (0 or more): dimension, measure (SDMX measure as a slice dimension), attribute, annotation
      *
@@ -2122,7 +1285,24 @@ class Indicator_dsd_model extends CI_Model {
 
         $ctx = $this->resolve_indicator_data_validation_context($sid);
         if ($ctx === null) {
-            $data_validation['reason'] = 'No published timeseries data found; data checks were not run.';
+            $this->load->model('Editor_project_dsd_model');
+            $binding = $this->Editor_project_dsd_model->get_by_sid($sid);
+            if (!$binding || empty($binding['has_published_data'])) {
+                $data_validation['reason'] = 'No published data attached; data checks were not run.';
+            } else {
+                $data_validation['reason'] = 'No published timeseries data found; data checks were not run.';
+            }
+
+            return $this->merge_dsd_validation_response($structure, $data_validation);
+        }
+
+        if (!empty($ctx['skipped_api'])) {
+            $data_validation['reason'] = isset($ctx['warning']) ? $ctx['warning'] : 'Data API unavailable; data checks were skipped.';
+            $data_validation['warnings'][] = $data_validation['reason'];
+            if (!empty($ctx['row_count'])) {
+                $data_validation['has_data'] = true;
+                $data_validation['row_count'] = (int) $ctx['row_count'];
+            }
 
             return $this->merge_dsd_validation_response($structure, $data_validation);
         }
@@ -2320,7 +1500,7 @@ class Indicator_dsd_model extends CI_Model {
     }
 
     /**
-     * Valid code for local/inline population: non-empty, DB-safe length, no control characters.
+     * Valid code for inline CSV population: non-empty, DB-safe length, no control characters.
      * (Series / SDMX-style ids often use ".", "-", ":" etc.; strict alphanumeric was dropping them.)
      *
      * @param string $code
@@ -2337,264 +1517,11 @@ class Indicator_dsd_model extends CI_Model {
     }
 
     /**
-     * Populate local_codelist_items from DuckDB timeseries for columns with codelist_type = local
-     * (any column_type: attribute, indicator_id, dimension, etc., if the name exists in timeseries).
-     * Uses metadata.value_label_column (physical header) for labels when set and present in timeseries.
+     * Resolve code_list items for UI: inline code_list on the column, else global registry codes.
      *
-     * @param int $sid
-     * @param int|null $user_id
-     * @return array keys: updated (int), skipped (string[]), errors (string[]), warnings (string[]), truncated (string[])
-     */
-    public function populate_local_codelists_from_timeseries($sid, $user_id = null)
-    {
-        $this->Editor_model->check_project_editable($sid);
-        $this->load->library('indicator_duckdb_service');
-        $this->load->model('Local_codelists_model');
-
-        $result = array(
-            'updated' => 0,
-            'skipped' => array(),
-            'errors' => array(),
-            'warnings' => array(),
-            'truncated' => array(),
-        );
-
-        $columns = $this->select_all($sid, true);
-        $local_count = 0;
-        foreach ($columns as $c) {
-            if (isset($c['codelist_type']) && $c['codelist_type'] === 'local') {
-                $local_count++;
-            }
-        }
-        if ($local_count === 0) {
-            $result['skipped'][] = 'No columns with codelist type "local". Set vocabulary to Local, then try again.';
-
-            return $result;
-        }
-
-        $page = $this->indicator_duckdb_service->timeseries_page($sid, 0, 1);
-        if (!is_array($page) || !empty($page['error'])) {
-            $result['errors'][] = isset($page['message']) ? $page['message'] : 'Could not read timeseries from DuckDB.';
-
-            return $result;
-        }
-        $duck_cols = isset($page['columns']) && is_array($page['columns']) ? $page['columns'] : array();
-        $physical_names = array();
-        foreach ($duck_cols as $coldef) {
-            if (isset($coldef['name']) && $coldef['name'] !== '') {
-                $physical_names[strtoupper(trim($coldef['name']))] = $coldef['name'];
-            }
-        }
-
-        foreach ($columns as $column) {
-            $ct = isset($column['codelist_type']) ? $column['codelist_type'] : 'none';
-            if ($ct !== 'local') {
-                continue;
-            }
-            $name_u = strtoupper(trim($column['name']));
-            if (!isset($physical_names[$name_u])) {
-                $result['skipped'][] = $column['name'] . ' (no column with this name in DuckDB timeseries)';
-
-                continue;
-            }
-            $phys_code = $physical_names[$name_u];
-            $metadata = isset($column['metadata']) && is_array($column['metadata']) ? $column['metadata'] : array();
-            $label_header = isset($metadata['value_label_column']) ? trim((string) $metadata['value_label_column']) : '';
-            $phys_label = null;
-            if ($label_header !== '') {
-                $lu = strtoupper($label_header);
-                if (isset($physical_names[$lu])) {
-                    $phys_label = $physical_names[$lu];
-                } else {
-                    $result['skipped'][] = $column['name'] . ' (value label column "' . $label_header . '" not in timeseries)';
-
-                    continue;
-                }
-            }
-
-            $raw = $this->indicator_duckdb_service->timeseries_distinct_pairs($sid, $phys_code, $phys_label, 5000);
-            if (!is_array($raw) || !empty($raw['error'])) {
-                $result['errors'][] = $column['name'] . ': ' . (isset($raw['message']) ? $raw['message'] : 'could not load distinct values');
-
-                continue;
-            }
-            $items = isset($raw['items']) && is_array($raw['items']) ? $raw['items'] : array();
-            if (!empty($raw['truncated'])) {
-                $result['truncated'][] = $column['name'];
-                $result['warnings'][] = $column['name'] . ': list truncated at distinct limit.';
-            }
-
-            $pairs_map = array();
-            foreach ($items as $it) {
-                if (!is_array($it)) {
-                    continue;
-                }
-                $code = isset($it['code']) ? trim((string) $it['code']) : '';
-                if ($code === '' || !$this->is_valid_code_list_code($code)) {
-                    continue;
-                }
-                $label = isset($it['label']) ? trim((string) $it['label']) : '';
-                if ($label === '') {
-                    $label = $code;
-                }
-                $pairs_map[$code] = array('code' => $code, 'label' => $label);
-            }
-            ksort($pairs_map);
-            $pairs = array_values($pairs_map);
-
-            $list_id = isset($column['local_codelist_id']) ? (int) $column['local_codelist_id'] : 0;
-            if ($list_id <= 0) {
-                $existing = $this->Local_codelists_model->get_list_by_field($sid, (int) $column['id']);
-                if ($existing) {
-                    $list_id = (int) $existing['id'];
-                } else {
-                    try {
-                        $list_id = $this->Local_codelists_model->insert_list(
-                            $sid,
-                            (int) $column['id'],
-                            array('name' => !empty($column['label']) ? $column['label'] : $column['name']),
-                            $user_id
-                        );
-                    } catch (Throwable $e) {
-                        $result['errors'][] = $column['name'] . ': ' . $e->getMessage();
-
-                        continue;
-                    }
-                }
-                try {
-                    $this->update($sid, (int) $column['id'], array(
-                        'local_codelist_id' => $list_id,
-                        'changed_by' => $user_id,
-                    ), false);
-                } catch (Throwable $e) {
-                    $result['errors'][] = $column['name'] . ': ' . $e->getMessage();
-
-                    continue;
-                }
-            }
-
-            try {
-                $this->Local_codelists_model->replace_all_items($sid, $list_id, $pairs, $user_id);
-                $result['updated']++;
-            } catch (Throwable $e) {
-                $result['errors'][] = $column['name'] . ': ' . $e->getMessage();
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Populate code_list from the indicator CSV file only for dimensions and core fields (geography, time_period).
-     * For each column: code = trimmed cell value (non-empty, max 150 chars, no control characters);
-     * label = value from metadata.value_label_column CSV column if set, else same as code.
-     *
-     * @param int $sid - Project ID
-     * @param int|null $user_id - User ID for changed_by
-     * @return array - ['updated' => int, 'errors' => array(), 'skipped' => array()]
-     */
-    public function populate_code_lists_from_csv($sid, $user_id = null)
-    {
-        $this->Editor_model->check_project_editable($sid);
-
-        $result = array('updated' => 0, 'errors' => array(), 'skipped' => array());
-
-        $csv_path = $this->get_indicator_csv_path($sid);
-        if (!$csv_path || !file_exists($csv_path)) {
-            $result['errors'][] = 'CSV data file not found. Import a CSV first.';
-            return $result;
-        }
-
-        $columns = $this->select_all($sid, true);
-        if (empty($columns)) {
-            $result['errors'][] = 'No DSD columns found.';
-            return $result;
-        }
-
-        $allowed_column_types = array('dimension', 'measure', 'geography', 'time_period');
-
-        $csv = Reader::createFromPath($csv_path, 'r');
-        $csv->setHeaderOffset(0);
-        $headers = $csv->getHeader();
-        $header_map = array();
-        foreach ($headers as $header) {
-            $header_map[strtoupper(trim($header))] = $header;
-        }
-
-        foreach ($columns as $column) {
-            $col_type = isset($column['column_type']) ? $column['column_type'] : 'attribute';
-            if (!in_array($col_type, $allowed_column_types, true)) {
-                $result['skipped'][] = $column['name'] . ' (only dimensions and geography/time_period get code lists from data)';
-                continue;
-            }
-
-            $col_name_upper = strtoupper(trim($column['name']));
-            $code_column = isset($header_map[$col_name_upper]) ? $header_map[$col_name_upper] : null;
-            if (!$code_column) {
-                $result['skipped'][] = $column['name'] . ' (no matching CSV column)';
-                continue;
-            }
-
-            $metadata = isset($column['metadata']) && is_array($column['metadata']) ? $column['metadata'] : array();
-            $label_column_name = isset($metadata['value_label_column']) && is_string($metadata['value_label_column']) ? trim($metadata['value_label_column']) : '';
-            $label_column = null;
-            if ($label_column_name !== '') {
-                $label_column = isset($header_map[strtoupper($label_column_name)]) ? $header_map[strtoupper($label_column_name)] : null;
-                if (!$label_column) {
-                    $label_column = null;
-                }
-            }
-
-            $code_to_label = array();
-            foreach ($csv->getRecords() as $record) {
-                $code = isset($record[$code_column]) ? trim((string)$record[$code_column]) : '';
-                if ($code === '' || !$this->is_valid_code_list_code($code)) {
-                    continue;
-                }
-                $label = $label_column !== null && isset($record[$label_column]) ? trim((string)$record[$label_column]) : $code;
-                $code_to_label[$code] = $label;
-            }
-
-            $code_list = array();
-            foreach ($code_to_label as $code => $label) {
-                $code_list[] = array(
-                    'code' => $code,
-                    'label' => $label,
-                    'description' => ''
-                );
-            }
-
-            $update_metadata = $metadata;
-            $update_data = array(
-                'label' => isset($column['label']) ? $column['label'] : $column['name'],
-                'description' => isset($column['description']) ? $column['description'] : '',
-                'data_type' => isset($column['data_type']) ? $column['data_type'] : 'string',
-                'column_type' => isset($column['column_type']) ? $column['column_type'] : 'dimension',
-                'time_period_format' => $column['time_period_format'] ?? null,
-                'code_list' => $code_list,
-                'code_list_reference' => isset($column['code_list_reference']) ? $column['code_list_reference'] : null,
-                'metadata' => $update_metadata,
-                'changed_by' => $user_id
-            );
-
-            try {
-                $this->update($sid, $column['id'], $update_data, false);
-                $result['updated']++;
-            } catch (Throwable $e) {
-                $result['errors'][] = $column['name'] . ': ' . $e->getMessage();
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Build [{ code, label }, ...] for chart/filter UIs from inline JSON, global registry, or local list.
-     * Global/local codelists often leave indicator_dsd.code_list empty — this resolves actual codes.
-     *
-     * @param int $sid
-     * @param array $column indicator_dsd row with decoded code_list / metadata
-     * @return array
+     * @param int $sid Project ID
+     * @param array $column resolved DSD column row (decoded)
+     * @return array[] { code, label }
      */
     public function resolve_column_code_list_items_for_ui($sid, array $column)
     {
@@ -2652,37 +1579,11 @@ class Indicator_dsd_model extends CI_Model {
             return $out;
         }
 
-        if ($ctype === 'local') {
-            $this->load->model('Local_codelists_model');
-            $lid = isset($column['local_codelist_id']) ? (int) $column['local_codelist_id'] : 0;
-            if ($lid > 0 && $this->Local_codelists_model->get_list($sid, $lid)) {
-                $items = $this->Local_codelists_model->get_items($lid, 0, null, null, 'ASC', null);
-                if (is_array($items)) {
-                    foreach ($items as $it) {
-                        if (!is_array($it)) {
-                            continue;
-                        }
-                        $code = isset($it['code']) ? trim((string) $it['code']) : '';
-                        if ($code === '') {
-                            continue;
-                        }
-                        $lab = isset($it['label']) ? trim((string) $it['label']) : '';
-                        $out[] = array(
-                            'code' => $code,
-                            'label' => $lab !== '' ? $lab : $code,
-                        );
-                    }
-                }
-            }
-
-            return $out;
-        }
-
         return $out;
     }
 
     /**
-     * Fill each column's code_list in-memory for API consumers (e.g. chart filters) when empty but linked to global/local.
+     * Fill each column's code_list in-memory for API consumers (e.g. chart filters) when empty but linked to global registry.
      *
      * @param int $sid
      * @param array $columns from select_all
@@ -2704,10 +1605,10 @@ class Indicator_dsd_model extends CI_Model {
     }
 
     /**
-     * Whether a column has at least one code after resolving inline / global / local codelists.
+     * Whether a column has at least one code after resolving inline / global codelists.
      *
      * @param int $sid
-     * @param array $column indicator_dsd row (decoded)
+     * @param array $column resolved DSD column row (decoded)
      * @return bool
      */
     public function indicator_dsd_column_has_resolved_codelist($sid, array $column)
@@ -3035,6 +1936,162 @@ class Indicator_dsd_model extends CI_Model {
                 'columns_truncated' => $trunc,
             ),
         );
+    }
+
+    /**
+     * Chart filter dropdowns: observed values only (DuckDB counts + codelist labels when available).
+     *
+     * @param int $sid
+     * @return array geography_column, geography_options, periodicity_facet, dimension_facets, attribute_facets, annotation_facets, metadata
+     */
+    public function get_chart_filter_options($sid)
+    {
+        $counts_payload = $this->get_chart_facet_value_counts($sid);
+        $column_counts = isset($counts_payload['column_counts']) && is_array($counts_payload['column_counts'])
+            ? $counts_payload['column_counts']
+            : array();
+        $metadata = isset($counts_payload['metadata']) && is_array($counts_payload['metadata'])
+            ? $counts_payload['metadata']
+            : array('source' => 'none');
+
+        $columns = $this->select_all($sid, false);
+
+        $geography_column = null;
+        $geography_options = array();
+        $periodicity_facet = null;
+        $dimension_facets = array();
+        $attribute_facets = array();
+        $annotation_facets = array();
+
+        foreach ($columns as $col) {
+            if (!is_array($col) || empty($col['name'])) {
+                continue;
+            }
+            $ctype = isset($col['column_type']) ? (string) $col['column_type'] : '';
+            $name = (string) $col['name'];
+            $count_rows = isset($column_counts[$name]) && is_array($column_counts[$name])
+                ? $column_counts[$name]
+                : array();
+
+            if ($ctype === 'geography') {
+                $geography_column = $name;
+                $geography_options = $this->build_observed_filter_options_from_counts($sid, $col, $count_rows);
+                continue;
+            }
+
+            if ($ctype === 'periodicity') {
+                $periodicity_facet = $this->build_chart_filter_facet($sid, $col, $count_rows);
+                continue;
+            }
+
+            if ($ctype === 'dimension' || $ctype === 'measure') {
+                $dimension_facets[] = $this->build_chart_filter_facet($sid, $col, $count_rows);
+                continue;
+            }
+
+            if ($ctype === 'attribute') {
+                if (!$this->indicator_dsd_column_has_resolved_codelist($sid, $col)) {
+                    continue;
+                }
+                $attribute_facets[] = $this->build_chart_filter_facet($sid, $col, $count_rows);
+                continue;
+            }
+
+            if ($ctype === 'annotation') {
+                if (!$this->indicator_dsd_column_has_resolved_codelist($sid, $col)) {
+                    continue;
+                }
+                $annotation_facets[] = $this->build_chart_filter_facet($sid, $col, $count_rows);
+            }
+        }
+
+        return array(
+            'geography_column' => $geography_column,
+            'geography_options' => $geography_options,
+            'periodicity_facet' => $periodicity_facet,
+            'dimension_facets' => $dimension_facets,
+            'attribute_facets' => $attribute_facets,
+            'annotation_facets' => $annotation_facets,
+            'metadata' => $metadata,
+        );
+    }
+
+    /**
+     * @param int   $sid
+     * @param array $column DSD column row
+     * @param array $count_rows [{ value, count }, ...]
+     * @return array name, label, column_type, items
+     */
+    private function build_chart_filter_facet($sid, array $column, array $count_rows)
+    {
+        $label = isset($column['label']) && trim((string) $column['label']) !== ''
+            ? trim((string) $column['label'])
+            : (isset($column['name']) ? (string) $column['name'] : '');
+
+        return array(
+            'name' => isset($column['name']) ? (string) $column['name'] : '',
+            'label' => $label,
+            'column_type' => isset($column['column_type']) ? (string) $column['column_type'] : '',
+            'items' => $this->build_observed_filter_options_from_counts($sid, $column, $count_rows),
+        );
+    }
+
+    /**
+     * Observed codes with labels (from codelist when available) and row counts from DuckDB.
+     *
+     * @param int   $sid
+     * @param array $column
+     * @param array $count_rows
+     * @return array<int,array{code:string,label:string,count:int}>
+     */
+    private function build_observed_filter_options_from_counts($sid, array $column, array $count_rows)
+    {
+        if (!is_array($count_rows) || count($count_rows) === 0) {
+            return array();
+        }
+
+        $label_map = array();
+        foreach ($this->resolve_column_code_list_items_for_ui($sid, $column) as $it) {
+            if (!is_array($it)) {
+                continue;
+            }
+            $code = isset($it['code']) ? trim((string) $it['code']) : '';
+            if ($code === '') {
+                continue;
+            }
+            $lab = isset($it['label']) ? trim((string) $it['label']) : '';
+            $label_map[strtolower($code)] = $lab !== '' ? $lab : $code;
+        }
+
+        $options = array();
+        foreach ($count_rows as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $code = isset($row['value']) ? trim((string) $row['value']) : '';
+            if ($code === '') {
+                continue;
+            }
+            $count = isset($row['count']) ? (int) $row['count'] : 0;
+            $base_label = isset($label_map[strtolower($code)]) ? $label_map[strtolower($code)] : $code;
+            $options[] = array(
+                'code' => $code,
+                'label' => $base_label . ' (' . number_format($count) . ')',
+                'count' => $count,
+            );
+        }
+
+        usort($options, function ($a, $b) {
+            $ca = isset($a['count']) ? (int) $a['count'] : 0;
+            $cb = isset($b['count']) ? (int) $b['count'] : 0;
+            if ($ca !== $cb) {
+                return $cb <=> $ca;
+            }
+
+            return strcmp((string) $a['code'], (string) $b['code']);
+        });
+
+        return $options;
     }
 
     /**
@@ -3410,229 +2467,167 @@ class Indicator_dsd_model extends CI_Model {
         );
     }
 
-    // -------------------------------------------------------------------------
-    // SDMX DSD import
-    // -------------------------------------------------------------------------
-
-    /**
-     * Column-type heuristic map: concept id (uppercase) → column_type.
-     * Checked after element_type rules.
-     */
-    private static $SDMX_CONCEPT_COLUMN_TYPE_MAP = array(
-        'TIME_PERIOD'      => 'time_period',
-        'TIME'             => 'time_period',
-        'REF_AREA'         => 'geography',
-        'GEO'              => 'geography',
-        'GEOGRAPHY'        => 'geography',
-        'REF_GEOGRAPHY'    => 'geography',
-        'COUNTRY'          => 'geography',
-        'REGION'           => 'geography',
-        'AREA'             => 'geography',
-        'FREQ'             => 'periodicity',
-        'FREQUENCY'        => 'periodicity',
-        'PERIODICITY'      => 'periodicity',
-        'OBS_VALUE'        => 'observation_value',
-        'OBSVALUE'         => 'observation_value',
-        'VALUE'            => 'observation_value',
-        'OBS'              => 'observation_value',
-        'INDICATOR'        => 'indicator_id',
-        'INDICATOR_ID'     => 'indicator_id',
-        'SERIES'           => 'indicator_id',
-        'SERIES_CODE'      => 'indicator_id',
-        'SERIES_ID'        => 'indicator_id',
-        'INDICATOR_CODE'   => 'indicator_id',
-        'INDICATOR_NAME'   => 'indicator_name',
-        'SERIES_NAME'      => 'indicator_name',
-    );
-
-    /**
-     * Determine column_type for a parsed DSD component.
-     *
-     * @param array $component  Component from SdmxDsdImporter
-     * @return string  One of the valid column_type values
-     */
-    private function _sdmx_component_column_type(array $component)
+    public function is_project_dsd_read_only($sid)
     {
-        $elementType = isset($component['element_type']) ? $component['element_type'] : '';
-        $conceptId   = strtoupper(isset($component['concept_id']) ? (string) $component['concept_id'] : '');
-        $compId      = strtoupper(isset($component['id']) ? (string) $component['id'] : '');
+        $this->load->model('Editor_project_dsd_model');
 
-        // Element-type-based rules (strongest signal)
-        if ($elementType === 'TimeDimension') {
-            return 'time_period';
-        }
-        if ($elementType === 'Measure') {
-            return 'observation_value';
-        }
-        if ($elementType === 'Attribute') {
-            return 'attribute';
-        }
-
-        // Concept-id look-up (try concept_id first, then component id)
-        foreach (array($conceptId, $compId) as $key) {
-            if ($key !== '' && isset(self::$SDMX_CONCEPT_COLUMN_TYPE_MAP[$key])) {
-                return self::$SDMX_CONCEPT_COLUMN_TYPE_MAP[$key];
-            }
-        }
-
-        // Default for remaining Dimensions
-        return 'dimension';
+        return $this->Editor_project_dsd_model->get_by_sid($sid) !== null;
     }
 
     /**
-     * Import a parsed SDMX DSD into indicator_dsd, replacing everything.
+     * Require global DSD binding before CSV data upload.
      *
-     * Steps:
-     *  1. Drop DuckDB timeseries (data no longer matches the new structure)
-     *  2. Delete all existing indicator_dsd rows for the project (cascades local codelists)
-     *  3. Insert new rows from DSD components
-     *  4. For components with inline codes, create a local codelist
-     *
-     * @param int   $sid
-     * @param array $dsd       Parsed DSD from SdmxDsdImporter::parseString/File/Url
-     * @param int   $user_id
-     * @return array {
-     *   'created'           => int,
-     *   'codelists_created' => int,
-     *   'timeseries_dropped'=> bool,
-     *   'warnings'          => string[],
-     * }
+     * @param int  $sid
+     * @param bool $require_indicator_id_value When false (prepare step), indicator_id_value may be empty.
+     * @param bool $require_implied_freq_code When false (prepare step), implied_freq_code may be empty if structure has no periodicity column.
+     * @return array binding row, indicator_column, column_count, indicator_id_value
      * @throws Exception
      */
-    public function import_sdmx_dsd($sid, array $dsd, $user_id)
+    public function assert_ready_for_data_upload($sid, $require_indicator_id_value = true, $require_implied_freq_code = true)
     {
-        $this->Editor_model->check_project_editable($sid);
-
-        $warnings          = array();
-        $timeseries_dropped = false;
-
-        // 1. Drop DuckDB timeseries — data must be re-imported after a DSD change
-        $this->load->library('indicator_duckdb_service');
-        $drop = $this->indicator_duckdb_service->timeseries_drop($sid);
-        if (is_array($drop) && !empty($drop['error'])) {
-            $warnings[] = 'Could not drop timeseries: '
-                . (isset($drop['message']) ? $drop['message'] : 'unknown error');
-        } else {
-            $timeseries_dropped = true;
+        $this->load->model('Editor_project_dsd_model');
+        $binding = $this->Editor_project_dsd_model->get_by_sid($sid);
+        if (!$binding) {
+            throw new Exception('Attach a global data structure to this project before importing data.');
         }
 
-        // Also drop any staging draft
-        $this->indicator_duckdb_service->draft_drop($sid);
-
-        // 2. Delete all existing DSD rows
-        $existing = $this->select_all($sid, false);
-        if (!empty($existing)) {
-            $ids = array_column($existing, 'id');
-            $this->delete($sid, $ids);
+        $structure = $this->validate_dsd_structure($sid);
+        if (empty($structure['valid'])) {
+            $msg = !empty($structure['errors'][0])
+                ? $structure['errors'][0]
+                : 'Data structure has validation errors. Fix them before importing data.';
+            throw new Exception($msg);
         }
 
-        // 3. Insert new DSD rows from components
-        $components        = isset($dsd['components']) ? $dsd['components'] : array();
-        $created           = 0;
-        $codelists_created = 0;
+        $columns = $this->select_all($sid, false);
+        if (empty($columns)) {
+            throw new Exception('Data structure has no components. Check the global data structure definition.');
+        }
 
-        $this->load->model('Local_codelists_model');
+        $indicator_col = $this->get_column_name_by_type($sid, 'indicator_id');
+        if ($indicator_col === null || $indicator_col === '') {
+            throw new Exception('Data structure must include an indicator_id column.');
+        }
 
-        foreach ($components as $i => $comp) {
-            $name        = isset($comp['id']) ? (string) $comp['id'] : ('COL_' . ($i + 1));
-            $column_type = $this->_sdmx_component_column_type($comp);
+        $indicator_id_value = isset($binding['indicator_id_value'])
+            ? trim((string) $binding['indicator_id_value'])
+            : '';
+        if ($require_indicator_id_value && $indicator_id_value === '') {
+            throw new Exception('Set the indicator ID value for this project before importing data.');
+        }
 
-            // Derive label from component names (prefer English)
-            $names = isset($comp['names']) && is_array($comp['names']) ? $comp['names'] : array();
-            $label = isset($names['en']) ? $names['en'] : (reset($names) ?: $name);
-
-            // Build codelist reference metadata when the DSD references an external codelist
-            $code_list_reference = null;
-            if (!empty($comp['codelist_id'])) {
-                $code_list_reference = array(
-                    'agency'  => $comp['codelist_agency'],
-                    'id'      => $comp['codelist_id'],
-                    'version' => $comp['codelist_version'],
+        if ($require_implied_freq_code && !$this->project_has_periodicity_column($sid)) {
+            $implied = isset($binding['implied_freq_code']) ? trim((string) $binding['implied_freq_code']) : '';
+            if ($implied === '') {
+                throw new Exception(
+                    'This data structure has no FREQ (periodicity) column. Set a series FREQ (SDMX code) on the project before importing data.'
                 );
             }
-
-            // Has inline codes → codelist_type = local; otherwise none
-            $hasCodes      = !empty($comp['codes']);
-            $codelist_type = $hasCodes ? 'local' : 'none';
-
-            // data_type from parsed TextFormat; validate against allowed values
-            $allowed_data_types = array('string', 'integer', 'float', 'double', 'date', 'boolean');
-            $raw_data_type = isset($comp['data_type']) ? $comp['data_type'] : null;
-            $data_type = ($raw_data_type !== null && in_array($raw_data_type, $allowed_data_types, true))
-                ? $raw_data_type
-                : 'string';
-
-            $row = array(
-                'name'                => $name,
-                'label'               => $label,
-                'column_type'         => $column_type,
-                'data_type'           => $data_type,
-                'codelist_type'       => $codelist_type,
-                'sort_order'          => $i + 1,
-                'created_by'          => $user_id,
-                'changed_by'          => $user_id,
-            );
-
-            if ($code_list_reference !== null) {
-                $row['code_list_reference'] = $code_list_reference;
-            }
-
-            try {
-                $dsd_id = $this->insert($sid, $row, false);
-                $created++;
-
-                // 4. Create local codelist with inline codes
-                if ($hasCodes && $dsd_id) {
-                    try {
-                        $list_id = $this->Local_codelists_model->insert_list(
-                            $sid,
-                            $dsd_id,
-                            array(
-                                'name'        => $label ?: $name,
-                                'description' => isset($comp['codelist_id']) ? $comp['codelist_id'] : null,
-                                'created_by'  => $user_id,
-                                'changed_by'  => $user_id,
-                            ),
-                            $user_id
-                        );
-
-                        foreach ($comp['codes'] as $code) {
-                            $this->Local_codelists_model->insert_item(
-                                $sid,
-                                $list_id,
-                                array(
-                                    'code'       => $code['code'],
-                                    'label'      => isset($code['label']) ? $code['label'] : $code['code'],
-                                    'sort_order' => isset($code['sort_order']) ? (int) $code['sort_order'] : 0,
-                                    'created_by' => $user_id,
-                                    'changed_by' => $user_id,
-                                ),
-                                $user_id
-                            );
-                        }
-
-                        // Update the DSD row to link the local codelist
-                        $this->update($sid, $dsd_id, array(
-                            'local_codelist_id' => $list_id,
-                            'changed_by'        => $user_id,
-                        ), false);
-
-                        $codelists_created++;
-                    } catch (Throwable $e) {
-                        $warnings[] = 'Could not create local codelist for column "' . $name . '": ' . $e->getMessage();
-                    }
-                }
-            } catch (Throwable $e) {
-                $warnings[] = 'Skipped component "' . $name . '": ' . $e->getMessage();
+            $this->load->library('SDMX/Sdmx_time_period');
+            if (!$this->sdmx_time_period->is_allowed_freq_code($implied)) {
+                throw new Exception("Series FREQ '{$implied}' is not a configured SDMX FREQ code.");
             }
         }
 
         return array(
-            'created'            => $created,
-            'codelists_created'  => $codelists_created,
-            'timeseries_dropped' => $timeseries_dropped,
-            'warnings'           => $warnings,
+            'binding' => $binding,
+            'indicator_column' => $indicator_col,
+            'indicator_id_value' => $indicator_id_value,
+            'column_count' => count($columns),
         );
+    }
+
+    /**
+     * DSD column names normalized for DuckDB / CSV header matching.
+     *
+     * @param int $sid
+     * @return string[]
+     */
+    public function get_dsd_column_names_for_csv($sid)
+    {
+        $columns = $this->select_all($sid, false);
+        $names = array();
+        foreach ($columns as $col) {
+            if (!empty($col['name'])) {
+                $names[] = (string) $col['name'];
+            }
+        }
+
+        return $this->normalize_duckdb_staging_column_names($names);
+    }
+
+    /**
+     * Column names to pass to DuckDB replace-from-csv (staging CSV may still contain extra columns).
+     * When $keep_extra_columns is false (default), returns DSD columns only — FastAPI should not load extras.
+     * When true, appends extra CSV columns (normalized) after DSD columns in CSV header order.
+     *
+     * @param string[] $expected_column_names Normalized DSD column names
+     * @param array    $validation Result from validate_csv_headers_for_dsd()
+     * @param bool     $keep_extra_columns
+     * @return string[]
+     */
+    public function build_csv_import_column_names(array $expected_column_names, array $validation, $keep_extra_columns = false)
+    {
+        if (!$keep_extra_columns) {
+            return $expected_column_names;
+        }
+
+        $csv_headers = isset($validation['csv_columns']) && is_array($validation['csv_columns'])
+            ? $validation['csv_columns']
+            : array();
+        $seen = array();
+        $out = array();
+
+        foreach ($expected_column_names as $exp) {
+            $out[] = $exp;
+            $seen[$exp] = true;
+        }
+
+        foreach ($csv_headers as $hdr) {
+            $matched_dsd = false;
+            foreach ($expected_column_names as $exp) {
+                if ($this->mapping_csv_column_matches_header($exp, $hdr)) {
+                    $matched_dsd = true;
+                    break;
+                }
+            }
+            if ($matched_dsd) {
+                continue;
+            }
+            $norm = $this->normalize_csv_header_token($hdr);
+            if ($norm === '' || isset($seen[$norm])) {
+                continue;
+            }
+            $out[] = $norm;
+            $seen[$norm] = true;
+        }
+
+        return $out;
+    }
+
+    /**
+     * First column name for a given SDMX column_type (DuckDB-safe token).
+     *
+     * @param int    $sid
+     * @param string $column_type e.g. indicator_id
+     * @return string|null
+     */
+    public function get_column_name_by_type($sid, $column_type)
+    {
+        $columns = $this->select_all($sid, false);
+        foreach ($columns as $col) {
+            if (
+                isset($col['column_type'])
+                && $col['column_type'] === $column_type
+                && !empty($col['name'])
+            ) {
+                $normalized = $this->normalize_duckdb_staging_column_names(array((string) $col['name']));
+
+                return $normalized[0];
+            }
+        }
+
+        return null;
     }
 }
 

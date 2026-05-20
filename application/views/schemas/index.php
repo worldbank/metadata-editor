@@ -105,6 +105,7 @@
     'username'=> $user,
     'is_logged_in'=> !empty($user),
     'is_admin'=> $this->ion_auth->is_admin(),
+    'can_access_site_admin'=> $this->ion_auth->can_access_site_admin(),
     'has_schema_permission'=> $has_schema_permission,
   ];
 ?>

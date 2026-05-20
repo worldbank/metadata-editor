@@ -3,13 +3,31 @@ Vue.component('indicator-dsd-overview', {
         return {
             dataset_id: project_sid,
             loading: false,
+            componentsLoading: false,
             error: null,
             report: null,
+            binding: null,
+            components: [],
+            bindGlobalDialog: false,
+            globalStructuresList: [],
+            globalStructuresLoading: false,
+            bindStructureId: null,
+            bindingGlobal: false,
+            removeDialog: false,
+            removing: false,
+            compHeaders: [
+                { text: 'Order', value: 'sort_order', width: '72px' },
+                { text: 'Name', value: 'name' },
+                { text: 'Label', value: 'label' },
+                { text: 'Column type', value: 'column_type' },
+                { text: 'Data type', value: 'data_type' },
+                { text: 'Codelist', value: 'codelist_ref' }
+            ]
         };
     },
 
     mounted() {
-        this.loadReport();
+        this.loadAll();
     },
 
     computed: {
@@ -19,10 +37,10 @@ Vue.component('indicator-dsd-overview', {
         summary() {
             return this.structure && this.structure.summary ? this.structure.summary : null;
         },
-        byType() {
-            return (this.summary && this.summary.by_type) ? this.summary.by_type : {};
-        },
         totalColumns() {
+            if (this.binding && this.binding.column_count) {
+                return this.binding.column_count;
+            }
             return this.summary ? (this.summary.total_columns || 0) : 0;
         },
         structureValid() {
@@ -31,44 +49,48 @@ Vue.component('indicator-dsd-overview', {
         structureErrors() {
             return this.structure ? (this.structure.errors || []) : [];
         },
-        dataValidation() {
-            return this.report ? (this.report.data_validation || null) : null;
+        structureWarnings() {
+            return this.structure ? (this.structure.warnings || []) : [];
         },
-        hasData() {
-            return this.dataValidation && this.dataValidation.has_data;
+        hasValidationIssues() {
+            return this.structureErrors.length > 0 || this.structureWarnings.length > 0;
         },
-        rowCount() {
-            return this.dataValidation ? this.dataValidation.row_count : null;
+        isBound() {
+            return !!(this.binding && this.binding.bound);
         },
-        // Required column types — each must appear exactly once.
-        requiredTypes() {
-            return [
-                { type: 'indicator_id',       label: 'Indicator ID',        icon: 'mdi-identifier' },
-                { type: 'geography',          label: 'Geography',            icon: 'mdi-map-marker' },
-                { type: 'time_period',        label: 'Time Period',          icon: 'mdi-calendar-range' },
-                { type: 'observation_value',  label: 'Observation Value',    icon: 'mdi-chart-line' },
-            ];
+        globalStructure() {
+            return (this.binding && this.binding.global_structure) ? this.binding.global_structure : null;
         },
-        // Optional / repeating column types.
-        additionalTypes() {
-            const skip = new Set(['indicator_id', 'geography', 'time_period', 'observation_value']);
-            const result = [];
-            Object.keys(this.byType).forEach(t => {
-                if (!skip.has(t)) {
-                    result.push({ type: t, count: this.byType[t] });
-                }
-            });
-            return result;
+        globalStructureTitle() {
+            var ds = this.globalStructure;
+            if (!ds) {
+                return 'Data structure';
+            }
+            return ds.title || ds.name || ds.idno || 'Data structure';
         },
+        globalStructureDetailUrl() {
+            var ds = this.globalStructure;
+            if (!ds || !ds.id) {
+                return null;
+            }
+            var root = (typeof CI !== 'undefined' && CI.base_url) ? String(CI.base_url).replace(/\/?$/, '') : '';
+            return root + '/data_structures#/view/' + parseInt(ds.id, 10);
+        },
+        canRemoveStructure() {
+            return this.isBound || this.totalColumns > 0;
+        },
+        removeConfirmMessage() {
+            return 'Remove the data structure from this project?';
+        }
     },
 
     methods: {
-        async loadReport() {
+        async loadAll() {
             this.loading = true;
-            this.error   = null;
+            this.error = null;
             try {
-                const res = await axios.get(CI.base_url + '/api/indicator_dsd/validate/' + this.dataset_id);
-                this.report = res.data || null;
+                await Promise.all([this.loadReport(), this.loadBinding()]);
+                await this.loadComponents();
             } catch (e) {
                 this.error = (e.response && e.response.data && e.response.data.message) || e.message || 'Could not load DSD summary';
             } finally {
@@ -76,115 +98,247 @@ Vue.component('indicator-dsd-overview', {
             }
         },
 
-        goTo(path) {
-            this.$router.push(path);
+        async loadReport() {
+            const res = await axios.get(CI.base_url + '/api/indicator_dsd/validate/' + this.dataset_id);
+            this.report = res.data || null;
         },
 
-        typeCount(type) {
-            return this.byType[type] != null ? this.byType[type] : 0;
+        async loadBinding() {
+            try {
+                const res = await axios.get(CI.base_url + '/api/indicator_dsd/binding/' + this.dataset_id);
+                this.binding = res.data || {};
+            } catch (e) {
+                this.binding = { bound: false, column_count: 0 };
+            }
         },
 
-        typePresent(type) {
-            return this.typeCount(type) === 1;
+        async loadComponents() {
+            this.components = [];
+            this.componentsLoading = true;
+            try {
+                var ds = this.globalStructure;
+                if (ds && ds.id) {
+                    const res = await axios.get(
+                        CI.base_url + '/api/data_structures/single/' + parseInt(ds.id, 10) + '?with_components=1'
+                    );
+                    if (res.data && res.data.status === 'success' && res.data.data_structure) {
+                        var structure = res.data.data_structure;
+                        this.components = (structure.components || []).map(function(c) {
+                            var ref = '';
+                            if (c.codelist_reference && c.codelist_reference.idno) {
+                                ref = c.codelist_reference.idno;
+                            } else if (c.codelist_reference && c.codelist_reference.name) {
+                                ref = (c.codelist_reference.agency || '') + ':' + c.codelist_reference.name;
+                            } else if (c.codelist_type && c.codelist_type !== 'none') {
+                                ref = c.codelist_type;
+                            }
+                            return Object.assign({}, c, { codelist_ref: ref });
+                        });
+                        return;
+                    }
+                }
+
+                if (this.totalColumns > 0) {
+                    const res = await axios.get(CI.base_url + '/api/indicator_dsd/' + this.dataset_id, {
+                        params: { detailed: 1 }
+                    });
+                    var cols = Array.isArray(res.data && res.data.columns) ? res.data.columns : [];
+                    this.components = cols.map(function(c, idx) {
+                        var ref = '';
+                        if (c.codelist_type === 'global' && c.global_codelist_id) {
+                            ref = 'registry #' + c.global_codelist_id;
+                        }
+                        return {
+                            sort_order: c.sort_order != null ? c.sort_order : (idx + 1),
+                            name: c.name || '',
+                            label: c.label || '',
+                            column_type: c.column_type || '',
+                            data_type: c.data_type || '',
+                            codelist_ref: ref
+                        };
+                    });
+                }
+            } catch (e) {
+                // Non-fatal: validation summary still useful without component rows
+            } finally {
+                this.componentsLoading = false;
+            }
+        },
+
+        openBindGlobalDialog() {
+            var vm = this;
+            vm.bindStructureId = null;
+            vm.bindGlobalDialog = true;
+            vm.globalStructuresLoading = true;
+            axios.get(CI.base_url + '/api/data_structures', { params: { page: 1, per_page: 200 } })
+                .then(function(res) {
+                    var data = res.data || {};
+                    vm.globalStructuresList = Array.isArray(data.data_structures) ? data.data_structures : [];
+                })
+                .catch(function() {
+                    vm.globalStructuresList = [];
+                })
+                .then(function() {
+                    vm.globalStructuresLoading = false;
+                });
+        },
+
+        submitBindGlobal() {
+            var vm = this;
+            if (!vm.bindStructureId) {
+                return;
+            }
+            vm.bindingGlobal = true;
+            axios.post(CI.base_url + '/api/indicator_dsd/bind_global/' + vm.dataset_id, {
+                data_structure_id: parseInt(vm.bindStructureId, 10)
+            })
+                .then(function() {
+                    vm.bindingGlobal = false;
+                    vm.bindGlobalDialog = false;
+                    if (typeof EventBus !== 'undefined') {
+                        EventBus.$emit('onSuccess', vm.isBound ? 'Data structure updated' : 'Data structure attached');
+                    }
+                    return vm.loadAll();
+                })
+                .catch(function(err) {
+                    vm.bindingGlobal = false;
+                    var m = (err.response && err.response.data && err.response.data.message) || 'Attach failed';
+                    if (typeof EventBus !== 'undefined') {
+                        EventBus.$emit('onFail', m);
+                    }
+                });
+        },
+
+        submitRemoveStructure() {
+            var vm = this;
+            vm.removing = true;
+            axios.post(CI.base_url + '/api/indicator_dsd/unbind/' + vm.dataset_id)
+                .then(function(res) {
+                    vm.removing = false;
+                    vm.removeDialog = false;
+                    var d = res.data || {};
+                    if (typeof EventBus !== 'undefined') {
+                        EventBus.$emit('onSuccess', 'Data structure removed');
+                        if (Array.isArray(d.warnings) && d.warnings.length) {
+                            EventBus.$emit('onFail', d.warnings.join(' '));
+                        }
+                    }
+                    return vm.loadAll();
+                })
+                .catch(function(err) {
+                    vm.removing = false;
+                    var m = (err.response && err.response.data && err.response.data.message) || 'Remove failed';
+                    if (typeof EventBus !== 'undefined') {
+                        EventBus.$emit('onFail', m);
+                    }
+                });
+        },
+
+        globalStructureLabel(ds) {
+            if (!ds) {
+                return '';
+            }
+            var t = ds.title || ds.name || '';
+            var id = ds.idno || ((ds.agency || '') + ':' + (ds.name || ''));
+            return t + ' (' + id + ')';
         },
 
         formatNumber(n) {
             if (n == null) return '—';
             return Number(n).toLocaleString();
-        },
+        }
     },
 
     template: `
-<div class="pa-4 mt-5" style="max-width: 100%; background:#fff; margin:10px; border-radius:4px;">
+<div class="pa-4 indicator-dsd-overview" style="max-width: 100%; background:#fff; margin:10px; border-radius:4px;">
 
-    <!-- Loading -->
+    <h4 class="text-h6 font-weight-medium mb-1">{{ $t('data_structure_definition') || 'Data structure definition' }}</h4>
+    <p class="caption grey--text mb-4">
+        Attach a data structure for this project. Import and browse indicator data from the <strong>Data</strong> item in the sidebar.
+    </p>
+
     <div v-if="loading" class="d-flex align-center" style="gap:10px; min-height:120px;">
         <v-progress-circular indeterminate color="primary" size="24" width="2"></v-progress-circular>
-        <span class="body-2 grey--text">Loading structure summary…</span>
+        <span class="body-2 grey--text">Loading data structure…</span>
     </div>
 
-    <!-- Error -->
     <v-alert v-else-if="error" type="error" dense outlined class="mb-4">{{ error }}</v-alert>
 
-    <!-- No DSD yet -->
-    <template v-else-if="report && totalColumns === 0">
+    <template v-else-if="!loading && totalColumns === 0">
         <div class="text-center py-8">
             <v-icon size="48" color="grey lighten-1">mdi-table-off</v-icon>
-            <div class="subtitle-1 grey--text mt-3">No data structure defined yet</div>
-            <div class="caption grey--text mt-1 mb-4">Import a CSV file to create the structure automatically, or define it manually.</div>
-            <v-btn small color="primary" @click="goTo('/indicator-dsd-import')">
-                <v-icon left small>mdi-upload</v-icon> Import Data
-            </v-btn>
-            <v-btn small outlined class="ml-2" @click="goTo('/indicator-dsd')">
-                <v-icon left small>mdi-pencil</v-icon> Define manually
+            <div class="subtitle-1 grey--text mt-3">No data structure attached</div>
+            <div class="caption grey--text mt-1 mb-4">
+                Attach a data structure from the registry. You can import indicator data later from <strong>Data</strong> in the sidebar.
+            </div>
+            <v-btn small color="primary" @click="openBindGlobalDialog">
+                <v-icon left small>mdi-sitemap</v-icon> Attach data structure
             </v-btn>
         </div>
     </template>
 
-    <!-- Summary -->
-    <template v-else-if="report">
+    <template v-else>
 
-        <!-- Header row: column count + validation badge -->
-        <div class="d-flex align-center justify-space-between mb-4 flex-wrap" style="gap:8px;">
-            <div>
-                <span class="text-h6 font-weight-bold">{{ totalColumns }}</span>
-                <span class="body-2 grey--text ml-1">{{ totalColumns === 1 ? 'column' : 'columns' }}</span>
-            </div>
-            <v-chip v-if="structureValid === true"  small color="success" text-color="white" label>
-                <v-icon left x-small>mdi-check-circle</v-icon> Structure valid
-            </v-chip>
-            <v-chip v-else-if="structureValid === false" small color="error" text-color="white" label>
-                <v-icon left x-small>mdi-alert-circle</v-icon>
-                {{ structureErrors.length }} {{ structureErrors.length === 1 ? 'error' : 'errors' }}
-            </v-chip>
-        </div>
+        <v-card outlined class="mb-4">
+            <v-card-text class="pa-4">
+                <div class="d-flex align-start justify-space-between flex-wrap" style="gap:12px;">
+                    <div>
+                        <div class="text-subtitle-1 font-weight-medium">{{ globalStructureTitle }}</div>
+                        <div v-if="globalStructure" class="caption grey--text mt-1">
+                            <span v-if="globalStructure.agency">{{ globalStructure.agency }}</span>
+                            <span v-if="globalStructure.name"> · {{ globalStructure.name }}</span>
+                            <span v-if="globalStructure.version"> · v{{ globalStructure.version }}</span>
+                        </div>
+                        <div class="d-flex align-center flex-wrap mt-2" style="gap:8px;">
+                            <span class="body-2">
+                                <strong>{{ totalColumns }}</strong>
+                                <span class="grey--text">{{ totalColumns === 1 ? ' component' : ' components' }}</span>
+                            </span>
+                            <v-chip v-if="structureValid === true && !hasValidationIssues" small color="success" text-color="white" label>
+                                <v-icon left x-small>mdi-check-circle</v-icon> Valid
+                            </v-chip>
+                            <v-chip v-else-if="structureValid === false" small color="error" text-color="white" label>
+                                <v-icon left x-small>mdi-alert-circle</v-icon>
+                                {{ structureErrors.length }} {{ structureErrors.length === 1 ? 'error' : 'errors' }}
+                            </v-chip>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-wrap" style="gap:8px;">
+                        <v-btn
+                            v-if="globalStructureDetailUrl"
+                            small
+                            outlined
+                            color="primary"
+                            :href="globalStructureDetailUrl"
+                            target="_blank"
+                            rel="noopener"
+                        >
+                            <v-icon left small>mdi-open-in-new</v-icon> View in registry
+                        </v-btn>
+                        <v-btn small outlined @click="openBindGlobalDialog">
+                            <v-icon left small>mdi-swap-horizontal</v-icon> Change structure
+                        </v-btn>
+                        <v-btn
+                            v-if="canRemoveStructure"
+                            small
+                            outlined
+                            color="error"
+                            @click="removeDialog = true"
+                        >
+                            <v-icon left small>mdi-link-off</v-icon> Remove structure
+                        </v-btn>
+                    </div>
+                </div>
+            </v-card-text>
+        </v-card>
 
-        <!-- Required columns -->
-        <div class="subtitle-2 mb-2">Required columns</div>
-        <v-row dense class="mb-3">
-            <v-col v-for="rt in requiredTypes" :key="rt.type" cols="6" sm="3">
-                <v-card outlined :class="typePresent(rt.type) ? '' : 'grey lighten-4'" style="height:100%;">
-                    <v-card-text class="pa-3 text-center">
-                        <v-icon :color="typePresent(rt.type) ? 'primary' : 'grey lighten-1'" size="22">{{ rt.icon }}</v-icon>
-                        <div class="caption mt-1" style="font-size:11px; line-height:1.3;">{{ rt.label }}</div>
-                        <v-icon v-if="typePresent(rt.type)" small color="success" class="mt-1">mdi-check-circle</v-icon>
-                        <v-icon v-else small color="grey lighten-1" class="mt-1">mdi-minus-circle-outline</v-icon>
-                    </v-card-text>
-                </v-card>
-            </v-col>
-        </v-row>
-
-        <!-- Additional column types -->
-        <template v-if="additionalTypes.length > 0">
-            <div class="subtitle-2 mb-2">Additional columns</div>
-            <div class="d-flex flex-wrap mb-4" style="gap:8px;">
-                <v-chip v-for="at in additionalTypes" :key="at.type" small outlined label>
-                    {{ at.count }} {{ at.type }}
-                </v-chip>
-            </div>
-        </template>
-
-        <!-- Data row -->
-        <v-divider class="mb-3"></v-divider>
-        <div class="d-flex align-center mb-4" style="gap:12px; flex-wrap:wrap;">
-            <template v-if="hasData">
-                <v-icon color="success" small>mdi-database-check</v-icon>
-                <span class="body-2">
-                    <strong>{{ formatNumber(rowCount) }}</strong>
-                    <span class="grey--text ml-1">published rows</span>
-                </span>
-            </template>
-            <template v-else-if="dataValidation && dataValidation.skipped">
-                <v-icon color="grey" small>mdi-database-off-outline</v-icon>
-                <span class="body-2 grey--text">No published data</span>
-            </template>
-        </div>
-
-        <!-- Structure errors list (collapsed) -->
         <v-expansion-panels v-if="structureErrors.length > 0" flat class="mb-4">
             <v-expansion-panel style="border:1px solid #ffccbc; border-radius:4px;">
                 <v-expansion-panel-header class="body-2 error--text py-2 px-3" style="min-height:40px;">
-                    <span><v-icon small color="error" class="mr-1">mdi-alert-circle</v-icon>{{ structureErrors.length }} structure {{ structureErrors.length === 1 ? 'issue' : 'issues' }}</span>
+                    <span>
+                        <v-icon small color="error" class="mr-1">mdi-alert-circle</v-icon>
+                        {{ structureErrors.length }} structure {{ structureErrors.length === 1 ? 'issue' : 'issues' }}
+                    </span>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
                     <ul class="caption pl-4 my-1">
@@ -194,21 +348,84 @@ Vue.component('indicator-dsd-overview', {
             </v-expansion-panel>
         </v-expansion-panels>
 
-        <!-- Action buttons -->
-        <div class="d-flex flex-wrap" style="gap:8px;">
-            <v-btn small outlined @click="goTo('/indicator-dsd')">
-                <v-icon left small>mdi-pencil</v-icon> Edit Structure
-            </v-btn>
-            <v-btn small outlined @click="goTo('/indicator-dsd-import')">
-                <v-icon left small>mdi-upload</v-icon> Import Data
-            </v-btn>
-            <v-btn small outlined @click="goTo('/indicator-dsd-chart')" v-if="hasData">
-                <v-icon left small>mdi-chart-line</v-icon> View Chart
-            </v-btn>
-        </div>
+        <v-expansion-panels v-if="structureWarnings.length > 0" flat class="mb-4">
+            <v-expansion-panel style="border:1px solid #ffe0b2; border-radius:4px;">
+                <v-expansion-panel-header class="body-2 orange--text text--darken-2 py-2 px-3" style="min-height:40px;">
+                    <span>
+                        <v-icon small color="warning" class="mr-1">mdi-alert-outline</v-icon>
+                        {{ structureWarnings.length }} {{ structureWarnings.length === 1 ? 'warning' : 'warnings' }}
+                    </span>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                    <ul class="caption pl-4 my-1">
+                        <li v-for="(w, i) in structureWarnings" :key="'w' + i" class="mb-1">{{ w }}</li>
+                    </ul>
+                </v-expansion-panel-content>
+            </v-expansion-panel>
+        </v-expansion-panels>
+
+        <v-card outlined class="mb-4">
+            <v-card-title class="text-subtitle-1 py-3">
+                Components
+                <v-progress-circular v-if="componentsLoading" indeterminate size="16" width="2" class="ml-2"></v-progress-circular>
+            </v-card-title>
+            <v-data-table
+                :headers="compHeaders"
+                :items="components"
+                :items-per-page="50"
+                dense
+                class="elevation-0"
+                :loading="componentsLoading"
+                loading-text="Loading components…"
+                no-data-text="No components found"
+            ></v-data-table>
+        </v-card>
 
     </template>
 
+    <v-dialog v-model="bindGlobalDialog" max-width="560" persistent>
+        <v-card>
+            <v-card-title>{{ isBound ? 'Change data structure' : 'Attach data structure' }}</v-card-title>
+            <v-card-text>
+                <p class="text-body-2 grey--text text--darken-1">
+                    Link this project to a data structure from the registry.
+                </p>
+                <v-select
+                    v-model="bindStructureId"
+                    :items="globalStructuresList"
+                    :item-text="globalStructureLabel"
+                    item-value="id"
+                    label="Data structure"
+                    outlined
+                    dense
+                    :loading="globalStructuresLoading"
+                    clearable
+                ></v-select>
+            </v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn text :disabled="bindingGlobal" @click="bindGlobalDialog = false">Cancel</v-btn>
+                <v-btn color="primary" :loading="bindingGlobal" :disabled="!bindStructureId" @click="submitBindGlobal">
+                    {{ isBound ? 'Replace' : 'Attach' }}
+                </v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="removeDialog" max-width="480" persistent>
+        <v-card>
+            <v-card-title class="error--text">Remove data structure</v-card-title>
+            <v-card-text>
+                <p class="text-body-2">{{ removeConfirmMessage }}</p>
+            </v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn text :disabled="removing" @click="removeDialog = false">Cancel</v-btn>
+                <v-btn color="error" dark depressed :loading="removing" @click="submitRemoveStructure">Remove</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
+
 </div>
-    `,
+    `
 });

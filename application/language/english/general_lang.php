@@ -76,6 +76,16 @@ $lang['invalid_file_failed_to_read']="Invalid file, failed to read the file!";
 
 $lang['template']="Template";
 $lang['templates']="Templates";
+$lang['codelists']="Codelists";
+$lang['codelist_status']="Status";
+$lang['codelist_status_draft']="Draft";
+$lang['codelist_status_active']="Active";
+$lang['codelist_status_locked']="Locked";
+$lang['codelist_status_archived']="Archived";
+$lang['codelist_lock']="Lock";
+$lang['codelist_unlock']="Unlock";
+$lang['codelist_archive']="Archive";
+$lang['codelist_read_only_banner']="This codelist is read-only. Unlock it (admin) to edit codes and metadata.";
 $lang['switch_template']="Switch template";
 
 $lang['validation_errors']="Validation errors";

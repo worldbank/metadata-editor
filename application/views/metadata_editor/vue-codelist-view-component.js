@@ -206,6 +206,10 @@ Vue.component('codelist-view', {
             var base = (typeof CI !== 'undefined' && CI.site_url) ? CI.site_url.replace(/\/$/, '') : '';
             return base + '/api/codelists/export_sdmx/' + this.numericId + '?version=' + version;
         },
+        exportJsonUrl: function () {
+            var base = (typeof CI !== 'undefined' && CI.site_url) ? CI.site_url.replace(/\/$/, '') : '';
+            return base + '/api/codelists/export_json/' + this.numericId + '?download=1';
+        },
         backToList: function () {
             this.$router.push('/');
         },
@@ -222,6 +226,10 @@ Vue.component('codelist-view', {
                     <v-icon left>mdi-arrow-left</v-icon> Back to list
                 </v-btn>
                 <v-spacer></v-spacer>
+                <v-btn small outlined class="mr-2" :disabled="!numericId" tag="a"
+                    :href="exportJsonUrl()" title="Download JSON">
+                    <v-icon left small>mdi-code-json</v-icon> Export JSON
+                </v-btn>
                 <v-btn small outlined class="mr-2" :disabled="!numericId" tag="a"
                     :href="sdmxExportUrl('2.1')" title="Download SDMX 2.1 Structure XML">
                     <v-icon left small>mdi-download</v-icon> SDMX 2.1
@@ -245,10 +253,11 @@ Vue.component('codelist-view', {
                     <v-card-text>
                         <v-simple-table dense>
                             <tbody>
-                                <tr><td class="grey--text" style="width: 160px;">Agency</td><td>{{ codelist.agency }}</td></tr>
-                                <tr><td class="grey--text">Codelist ID</td><td>{{ codelist.codelist_id }}</td></tr>
-                                <tr><td class="grey--text">Version</td><td>{{ codelist.version }}</td></tr>
+                                <tr><td class="grey--text" style="width: 160px;">Idno</td><td>{{ codelist.idno }}</td></tr>
+                                <tr><td class="grey--text">Agency</td><td>{{ codelist.agency }}</td></tr>
                                 <tr><td class="grey--text">Name</td><td>{{ codelist.name }}</td></tr>
+                                <tr><td class="grey--text">Version</td><td>{{ codelist.version }}</td></tr>
+                                <tr><td class="grey--text">Title</td><td>{{ codelist.title }}</td></tr>
                                 <tr v-if="codelist.description"><td class="grey--text">Description</td><td class="codelist-view-pre">{{ codelist.description }}</td></tr>
                                 <tr v-if="codelist.uri"><td class="grey--text">URI</td><td><a :href="codelist.uri" target="_blank" rel="noopener">{{ codelist.uri }}</a></td></tr>
                                 <tr><td class="grey--text">Database ID</td><td>{{ codelist.id }}</td></tr>

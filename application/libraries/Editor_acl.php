@@ -507,28 +507,7 @@ class Editor_acl
 
 	function has_site_admin_access($user=null)
 	{
-		if(empty($user)){
-			$user=$this->current_user();
-		}
-
-		if(!$user){
-			die("acl_manager::User not set");
-		}
-
-		//get user roles
-		$user_roles=$this->get_user_roles($user->id);
-
-		if(!$user_roles){
-			return false;
-		}
-
-		foreach($user_roles as $role){
-			if ($role['role_id']==2){ //user
-				return false;
-			}
-		}
-
-		return true;
+		return $this->ci->acl_manager->has_site_admin_access($user);
 	}
 
 	function has_access_or_die($resource,$privilege, $user=null)

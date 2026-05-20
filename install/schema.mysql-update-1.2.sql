@@ -296,31 +296,6 @@ CREATE TABLE `project_tags` (
 ) DEFAULT CHARSET=utf8mb4;
 
 
--- indicator DSD (Data Structure Definition)
-CREATE TABLE `indicator_dsd` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `sid` int NOT NULL,
-  `name` varchar(100) NOT NULL,
-  `label` varchar(255) DEFAULT NULL,
-  `description` text,
-  `data_type` enum('string','integer','float','double','date','boolean') NULL,
-  `column_type` enum('dimension','time_period','measure','attribute','indicator_id','indicator_name','annotation','geography','observation_value','periodicity')  NULL,
-  `time_period_format` varchar(30) DEFAULT NULL,
-  `code_list` json DEFAULT NULL,
-  `code_list_reference` json DEFAULT NULL,
-  `metadata` json DEFAULT NULL,
-  `sum_stats` json DEFAULT NULL COMMENT 'Column profile from DuckDB: row_count, non_null_count, null_count, distinct_count, freq (max 100); missing = NULL/trim empty',
-  `sort_order` int DEFAULT '0',
-  `created` int DEFAULT NULL,
-  `changed` int DEFAULT NULL,
-  `created_by` int DEFAULT NULL,
-  `changed_by` int DEFAULT NULL,
-  PRIMARY KEY (`id`),  
-  KEY `idx_sid_column_type` (`sid`, `column_type`),
-  KEY `idx_sid_sort_order` (`sid`, `sort_order`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
-
-
 -- seed supported languages configuration
 INSERT INTO `configurations` VALUES ('supported_languages','[{"folder":"english","code":"en","display":"English","direction":"ltr"}]','Supported languages in JSON format',NULL,NULL);
 

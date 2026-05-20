@@ -305,7 +305,7 @@ class Editor_model extends CI_Model {
 			$survey=$this->decode_encoded_fields($survey);
 		}
 
-		if (!is_array($survey['metadata']) && !empty($survey['metadata'])){
+		if (!is_array($survey['metadata']) || empty($survey['metadata'])){
 			$survey['metadata']=array(
 				'type'=>$survey['type']			
 			);
@@ -332,6 +332,33 @@ class Editor_model extends CI_Model {
 			return $project['metadata'];
 		}
 	}
+
+	/**
+	 * Persist metadata blob directly without table-field extraction/filtering.
+	 * Use for small metadata patches (e.g. data_structure_reference) where
+	 * update_project would strip sparse metadata to an empty array.
+	 *
+	 * @param int $sid
+	 * @param array $metadata
+	 * @param int|null $user_id
+	 */
+	function update_metadata_array($sid, array $metadata, $user_id = null)
+	{
+		$this->check_project_editable($sid);
+
+		$update = array(
+			'metadata' => $this->encode_metadata($metadata),
+			'changed' => time(),
+		);
+
+		if ($user_id) {
+			$update['changed_by'] = (int) $user_id;
+		}
+
+		$this->db->where('id', (int) $sid);
+		$this->db->update('editor_projects', $update);
+	}
+
 
 	//get project basic info
     function get_basic_info($sid)

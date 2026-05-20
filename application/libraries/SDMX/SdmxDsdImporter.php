@@ -507,10 +507,12 @@ class SdmxDsdImporter
 			$this->warnings[] = $elementType . ' missing id; assigned placeholder ' . $id;
 		}
 
-		$names     = $this->_collectLangMap($el, array('Name'));
-		$conceptId = $this->_extractConceptId($el);
-		$clRef     = $this->_extractCodelistRef($el);
-		$dataType  = $this->_extractDataType($el, $elementType, $clRef !== null);
+		$names       = $this->_collectLangMap($el, array('Name'));
+		$conceptId   = $this->_extractConceptId($el);
+		$conceptRoles = $this->_extractConceptRoles($el);
+		$textType    = $this->_extractTextType($el);
+		$clRef       = $this->_extractCodelistRef($el);
+		$dataType    = $this->_extractDataType($el, $elementType, $clRef !== null);
 
 		// Resolve inline codes if we have a codelist reference
 		$codes = array();
@@ -534,6 +536,8 @@ class SdmxDsdImporter
 			'element_type'     => $elementType,
 			'position'         => $position,
 			'concept_id'       => $conceptId ?: $id,
+			'concept_roles'    => $conceptRoles,
+			'text_type'        => $textType,
 			'data_type'        => $dataType,
 			'codelist_agency'  => $clRef !== null ? $clRef['agency']  : null,
 			'codelist_id'      => $clRef !== null ? $clRef['id']      : null,
@@ -541,6 +545,34 @@ class SdmxDsdImporter
 			'codes'            => $codes,
 			'names'            => $names,
 		);
+	}
+
+	/**
+	 * SDMX 3 ConceptRole refs (e.g. FREQ, GEO).
+	 *
+	 * @param DOMElement $componentEl
+	 * @return string[]
+	 */
+	private function _extractConceptRoles(DOMElement $componentEl)
+	{
+		$CI = get_instance();
+		$CI->load->library('SDMX/Sdmx_component_semantics');
+
+		return $CI->sdmx_component_semantics->extract_concept_roles_from_dom($componentEl);
+	}
+
+	/**
+	 * TextFormat/@textType from LocalRepresentation or CoreRepresentation.
+	 *
+	 * @param DOMElement $componentEl
+	 * @return string|null
+	 */
+	private function _extractTextType(DOMElement $componentEl)
+	{
+		$CI = get_instance();
+		$CI->load->library('SDMX/Sdmx_component_semantics');
+
+		return $CI->sdmx_component_semantics->extract_text_type_from_dom($componentEl);
 	}
 
 	// -------------------------------------------------------------------------

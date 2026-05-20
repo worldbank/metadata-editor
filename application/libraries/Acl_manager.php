@@ -270,6 +270,101 @@ class Acl_manager
 		return false;
 	}
 
+	/**
+	 * Require the current user to have an admin role (is_admin=1).
+	 */
+	function require_admin_or_die($user=null)
+	{
+		if (!$this->user_is_admin($user)) {
+			show_error('Access denied', 403);
+		}
+	}
+
+	/**
+	 * Role IDs flagged with is_admin=1 (e.g. site Admin).
+	 *
+	 * @return int[]
+	 */
+	function get_admin_role_ids()
+	{
+		$this->ci->db->select('id');
+		$this->ci->db->where('is_admin', 1);
+		$rows = $this->ci->db->get('roles')->result_array();
+
+		return array_map('intval', array_column($rows, 'id'));
+	}
+
+	/**
+	 * Roles that may be shown/assigned by the given user.
+	 * Non-admins cannot assign admin roles.
+	 */
+	function roles_for_assigner($user=null)
+	{
+		$roles = $this->get_roles();
+
+		if ($this->user_is_admin($user)) {
+			return $roles;
+		}
+
+		$admin_role_ids = $this->get_admin_role_ids();
+		if (empty($admin_role_ids)) {
+			return $roles;
+		}
+
+		return array_values(array_filter($roles, function ($role) use ($admin_role_ids) {
+			return !in_array((int)$role['id'], $admin_role_ids, true);
+		}));
+	}
+
+	/**
+	 * Sanitize submitted role IDs for create/replace assignment.
+	 * Non-admins cannot grant admin roles; existing admin roles on the target are preserved.
+	 *
+	 * @param int[]|mixed $role_ids
+	 * @param int|null $target_user_id
+	 * @return int[]
+	 */
+	function sanitize_role_assignment($role_ids, $target_user_id=null, $user=null)
+	{
+		$role_ids = array_values(array_filter(array_map('intval', (array)$role_ids)));
+
+		if ($this->user_is_admin($user)) {
+			return $role_ids;
+		}
+
+		$admin_role_ids = $this->get_admin_role_ids();
+		$sanitized = array_values(array_diff($role_ids, $admin_role_ids));
+
+		if ($target_user_id !== null && !empty($admin_role_ids)) {
+			$existing = $this->get_user_roles($target_user_id);
+			foreach ($existing as $role) {
+				$role_id = (int)$role['role_id'];
+				if (in_array($role_id, $admin_role_ids, true) && !in_array($role_id, $sanitized, true)) {
+					$sanitized[] = $role_id;
+				}
+			}
+		}
+
+		return $sanitized;
+	}
+
+	/**
+	 * Strip admin roles from bulk-add requests by non-admins.
+	 *
+	 * @param int[]|mixed $role_ids
+	 * @return int[]
+	 */
+	function filter_assignable_role_ids($role_ids, $user=null)
+	{
+		$role_ids = array_values(array_filter(array_map('intval', (array)$role_ids)));
+
+		if ($this->user_is_admin($user)) {
+			return $role_ids;
+		}
+
+		return array_values(array_diff($role_ids, $this->get_admin_role_ids()));
+	}
+
 	private function is_admin_role($roles)
 	{
 		foreach($roles as $role){
@@ -281,6 +376,10 @@ class Acl_manager
 	}
 
 
+	/**
+	 * True when the user is a super admin or has any site-administration permission.
+	 * Excludes the general "editor" resource (project access, not /admin UI).
+	 */
 	function has_site_admin_access($user=null)
 	{
 		if(empty($user)){
@@ -288,23 +387,69 @@ class Acl_manager
 		}
 
 		if(!$user){
-			die("acl_manager::User not set");
-		}
-
-		//get user roles
-		$user_roles=$this->get_user_roles($user->id);
-
-		if(!$user_roles){
 			return false;
 		}
 
-		foreach($user_roles as $role){
-			if ($role['role_id']==1){ //admin
+		try{
+			if($this->user_is_admin($user)){
+				return true;
+			}
+		}
+		catch(Exception $e){
+			return false;
+		}
+
+		foreach($this->get_site_admin_resources() as $resource){
+			if($this->user_has_resource_access($resource, $user)){
 				return true;
 			}
 		}
 
-		return true;
+		return false;
+	}
+
+	/**
+	 * ACL resources that grant access to the site administration area.
+	 *
+	 * @return string[]
+	 */
+	private function get_site_admin_resources()
+	{
+		$resources = array_keys($this->acl_permissions);
+
+		return array_values(array_diff($resources, array('editor')));
+	}
+
+	/**
+	 * Check access without throwing (for composite checks).
+	 */
+	function check_access($resource, $privilege, $user=null)
+	{
+		try{
+			$this->has_access($resource, $privilege, $user);
+			return true;
+		}
+		catch(Exception $e){
+			return false;
+		}
+	}
+
+	/**
+	 * True if the user has any configured privilege on the resource.
+	 */
+	function user_has_resource_access($resource, $user=null)
+	{
+		if(!isset($this->acl_permissions[$resource]['permissions'])){
+			return false;
+		}
+
+		foreach($this->acl_permissions[$resource]['permissions'] as $perm){
+			if($this->check_access($resource, $perm['permission'], $user)){
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	function has_access_or_die($resource,$privilege, $user=null)

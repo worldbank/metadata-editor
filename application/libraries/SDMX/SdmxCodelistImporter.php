@@ -19,12 +19,12 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  *     'codelists' => [
  *       [
  *         'agency' => string,
- *         'codelist_id' => string,
+ *         'name' => string,              // SDMX maintainable id
  *         'version' => string,
  *         'urn' => string|null,
  *         'uri' => string|null,
  *         'is_final' => bool|null,
- *         'name' => string,              // preferred language label for header
+ *         'title' => string,             // preferred language label for header
  *         'description' => string|null,
  *         'names' => [ 'en' => '...', ... ],
  *         'descriptions' => [ 'en' => '...', ... ],
@@ -467,12 +467,12 @@ class SdmxCodelistImporter
 
 		return array(
 			'agency' => $agency,
-			'codelist_id' => $id,
+			'name' => $id,
 			'version' => $version,
 			'urn' => $this->_pickAttr($el, array('urn')),
 			'uri' => $this->_pickAttr($el, array('uri', 'structureURL')),
 			'is_final' => $isFinal,
-			'name' => $prefName,
+			'title' => $prefName,
 			'description' => $prefDesc,
 			'names' => $headerNames,
 			'descriptions' => $headerDesc,

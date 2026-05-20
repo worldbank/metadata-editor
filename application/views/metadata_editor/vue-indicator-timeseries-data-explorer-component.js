@@ -4,7 +4,11 @@
  * Columns are displayed in DSD order: indicator → geography → time + FREQ + _ts_* → value → other.
  */
 Vue.component('indicator-timeseries-data-explorer', {
-    props: ['file_id'],
+    props: {
+        file_id: { type: String, default: '' },
+        embedded: { type: Boolean, default: false },
+        hideToolbar: { type: Boolean, default: false }
+    },
     data: function() {
         return {
             fid: this.file_id,
@@ -24,7 +28,9 @@ Vue.component('indicator-timeseries-data-explorer', {
             filterDistinctLoading: false,
             filterDistinctError: null,
             deleteDataLoading: false,
-            deleteDataDialog: false
+            deleteDataDialog: false,
+            /** True when DuckDB timeseries table does not exist yet (not a hard error). */
+            noPublishedData: false
         };
     },
     mounted: function() {
@@ -165,6 +171,22 @@ Vue.component('indicator-timeseries-data-explorer', {
         exportUrl: function() {
             return CI.base_url + '/api/indicator_dsd/data_export/' + this.ProjectID;
         },
+        showEmptyState: function() {
+            if (this.data_loading || this.errors.length > 0) {
+                return false;
+            }
+            if (this.noPublishedData) {
+                return true;
+            }
+            if (!this.pagePayload) {
+                return false;
+            }
+            if (this.totalRows > 0) {
+                return false;
+            }
+            var hasFilters = Object.keys(this.columnValueFilters || {}).length > 0;
+            return !hasFilters;
+        },
         physicalColumnNames: function() {
             return (this.tableColumns || []).map(function(c) {
                 return c && c.name ? String(c.name) : '';
@@ -293,10 +315,46 @@ Vue.component('indicator-timeseries-data-explorer', {
             this.filterDistinctItems = [];
             this.loadPage(0);
         },
+        isMissingTimeseriesError: function(msg, httpStatus) {
+            if (httpStatus === 404) {
+                return true;
+            }
+            var s = String(msg || '').toLowerCase();
+            return s.indexOf('timeseries table not found') >= 0
+                || s.indexOf('table not found') >= 0
+                || s.indexOf('not found for this project') >= 0;
+        },
+        applyEmptyNoData: function() {
+            this.noPublishedData = true;
+            this.pagePayload = { columns: [], rows: [], total_row_count: 0, offset: 0 };
+            this.errors = [];
+            this.emitDataState();
+        },
+        emitDataState: function() {
+            var hasData = this.totalRows > 0 || this.records.length > 0;
+            this.$emit('data-state', { hasData: hasData, totalRows: this.totalRows });
+        },
+        handleDataLoadFailure: function(msg, httpStatus) {
+            if (this.isMissingTimeseriesError(msg, httpStatus)) {
+                this.applyEmptyNoData();
+                return true;
+            }
+            return false;
+        },
+        onEmptyImportClick: function() {
+            if (this.embedded) {
+                this.$emit('go-import');
+                return;
+            }
+            if (this.$router) {
+                this.$router.push({ path: '/data-explorer/INDICATOR_DATA', query: { tab: 'import' } });
+            }
+        },
         loadPage: function(offset) {
             var vm = this;
             this.data_loading = true;
             this.errors = [];
+            this.noPublishedData = false;
             var params = { offset: offset, limit: this.rowsLimit };
             var fp = this.buildFiltersPayload();
             if (Object.keys(fp).length) {
@@ -309,20 +367,31 @@ Vue.component('indicator-timeseries-data-explorer', {
                 .then(function(res) {
                     if (res.data && res.data.status === 'success' && res.data.data) {
                         vm.pagePayload = res.data.data;
+                        vm.noPublishedData = false;
                     } else {
-                        vm.pagePayload = null;
-                        vm.errors.push((res.data && res.data.message) || 'Could not load timeseries');
+                        var failMsg = (res.data && res.data.message) || 'Could not load timeseries';
+                        var failStatus = res.status || 0;
+                        if (!vm.handleDataLoadFailure(failMsg, failStatus)) {
+                            vm.pagePayload = null;
+                            vm.errors.push(failMsg);
+                        }
                     }
                 })
                 .catch(function(err) {
-                    vm.pagePayload = null;
                     var msg = (err.response && err.response.data && err.response.data.message)
                         || err.message
                         || 'Could not load timeseries';
-                    vm.errors.push(msg);
+                    var status = err.response && err.response.status;
+                    if (!vm.handleDataLoadFailure(msg, status)) {
+                        vm.pagePayload = null;
+                        vm.errors.push(msg);
+                    }
                 })
                 .then(function() {
                     vm.data_loading = false;
+                    vm.$nextTick(function() {
+                        vm.emitDataState();
+                    });
                 });
         },
         navigatePage: function(page) {
@@ -345,7 +414,7 @@ Vue.component('indicator-timeseries-data-explorer', {
                 return this.$t('dsd_role_ts_year') || 'Computed · period year';
             }
             if (up === '_TS_FREQ') {
-                return this.$t('dsd_role_ts_freq') || 'Computed · SDMX FREQ';
+                return this.$t('dsd_role_ts_freq') || 'Computed · frequency';
             }
             var dsd = this.dsdByUpperName[up];
             if (!dsd || !dsd.column_type) {
@@ -360,21 +429,6 @@ Vue.component('indicator-timeseries-data-explorer', {
                 attribute: this.$t('dsd_role_attribute') || 'Attribute'
             };
             return map[ct] || ct;
-        },
-        dsdLabelLine: function(physicalName) {
-            var dsd = this.dsdByUpperName[String(physicalName || '').trim().toUpperCase()];
-            if (!dsd) {
-                return '';
-            }
-            var parts = [];
-            if (dsd.label && String(dsd.label).trim() !== '') {
-                parts.push(String(dsd.label).trim());
-            }
-            if (dsd.data_type && String(dsd.data_type).trim() !== '') {
-                var lab = this.$t('dsd_editor_type_label') || 'DSD type';
-                parts.push(lab + ': ' + String(dsd.data_type).trim());
-            }
-            return parts.join(' · ');
         },
         exportCsv: function() {
             window.location.assign(this.exportUrl);
@@ -396,7 +450,7 @@ Vue.component('indicator-timeseries-data-explorer', {
                     if (typeof EventBus !== 'undefined') {
                         EventBus.$emit('onSuccess', msg);
                     }
-                    vm.pagePayload = null;
+                    vm.applyEmptyNoData();
                     vm.columnValueFilters = {};
                     vm.filterMenuColumn = null;
                     vm.filterMenuValues = [];
@@ -414,7 +468,7 @@ Vue.component('indicator-timeseries-data-explorer', {
         }
     },
     template: `
-        <div class="indicator-ts-explorer mt-5 pt-3 m-3">
+        <div class="indicator-ts-explorer" :class="embedded ? '' : 'mt-5 pt-3 m-3'">
             <!-- Confirm delete dialog -->
             <v-dialog v-model="deleteDataDialog" max-width="420" persistent>
                 <v-card>
@@ -437,8 +491,8 @@ Vue.component('indicator-timeseries-data-explorer', {
             </v-dialog>
 
             <template v-if="activeDataFile">
-                <v-card>
-                    <v-card-title class="d-flex flex-wrap align-center justify-space-between">
+                <v-card :flat="embedded" :outlined="!embedded" class="mb-0">
+                    <v-card-title v-if="!embedded && !hideToolbar" class="d-flex flex-wrap align-center justify-space-between">
                         <span>{{ $t('data_view') || 'Data' }}</span>
                         <div class="d-flex align-center flex-wrap" style="gap: 8px;">
                             <v-btn
@@ -464,7 +518,7 @@ Vue.component('indicator-timeseries-data-explorer', {
                             </v-btn>
                         </div>
                     </v-card-title>
-                    <v-card-text style="min-height: 200px;">
+                    <v-card-text :class="embedded ? 'pa-0' : ''" style="min-height: 200px;">
                         <v-alert v-for="(err, i) in errors" :key="i" type="error" dense outlined class="mb-2">
                             {{ err }}
                         </v-alert>
@@ -517,16 +571,9 @@ Vue.component('indicator-timeseries-data-explorer', {
                                                 <div class="d-flex align-start justify-space-between" style="gap: 2px;">
                                                     <div class="flex-grow-1">
                                                         <div class="font-weight-medium">{{ col.name }}</div>
-                                                        <div class="caption grey--text text--darken-1">
-                                                            {{ col.data_type }}
-                                                            <span v-if="String(col.is_nullable).toUpperCase() === 'YES'"> · {{ $t('nullable') || 'nullable' }}</span>
-                                                        </div>
                                                         <v-chip x-small outlined class="mt-1" :color="columnChipColor(col.name)">
                                                             {{ columnRoleLabel(col.name) }}
                                                         </v-chip>
-                                                        <div v-if="dsdLabelLine(col.name)" class="caption mt-1 grey--text">
-                                                            {{ dsdLabelLine(col.name) }}
-                                                        </div>
                                                     </div>
                                                     <v-menu
                                                         :value="filterMenuColumn === col.name"
@@ -597,9 +644,10 @@ Vue.component('indicator-timeseries-data-explorer', {
                             </div>
                         </template>
 
-                        <div v-else-if="!data_loading && !errors.length" class="text-center py-6">
+                        <div v-else-if="showEmptyState" class="text-center py-6">
                             <v-icon size="48" color="grey lighten-1">mdi-table-off</v-icon>
-                            <p class="mt-3 mb-0 grey--text">{{ $t('duckdb_timeseries_empty') || 'No published timeseries table in DuckDB yet. Import and promote data first.' }}</p>
+                            <p class="mt-3 mb-2 grey--text">{{ $t('indicator_data_empty') || 'No published indicator data yet.' }}</p>
+                            <p class="caption grey--text mb-0">Import a CSV that matches the project data structure using Import data above.</p>
                         </div>
                     </v-card-text>
                 </v-card>

@@ -2,15 +2,14 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 /**
- * Indicator DSD: time period formats and SDMX FREQ codes (code + label).
+ * Indicator DSD: SDMX FREQ codes and TIME_PERIOD format tokens (import/promote only — not on DSD rows).
  *
- * - Each `code` under dsd_time_period_formats must match indicator_dsd.time_period_format and timeseries JSON schema enums.
- * - dsd_default_freq_by_time_period_format: default FREQ code for _ts_freq when no user FREQ column (promote / FastAPI).
+ * - dsd_freq_to_time_period_format: FREQ → format token for FastAPI time_spec when no FREQ column in data.
+ * - dsd_default_freq_by_time_period_format: format → FREQ (FastAPI backward compatibility).
  *
  * Load: $this->config->load('indicator_dsd', true);
- *       $this->config->item('dsd_time_period_formats', 'indicator_dsd');
  *       $this->config->item('dsd_freq_codes', 'indicator_dsd');
- *       $this->config->item('dsd_default_freq_by_time_period_format', 'indicator_dsd');
+ *       $this->config->item('dsd_freq_to_time_period_format', 'indicator_dsd');
  */
 
 $config['dsd_time_period_formats'] = array(
@@ -73,4 +72,18 @@ $config['dsd_default_freq_by_time_period_format'] = array(
 	'YYYY-MM-DD'             => 'D',
 	'YYYY-MM-DDTHH:mm:ss'    => 'D',
 	'YYYY-MM-DDTHH:mm:ssZ'   => 'D',
+);
+
+/**
+ * Primary map: SDMX FREQ code → TIME_PERIOD format token (used by Sdmx_time_period / promote time_spec).
+ */
+$config['dsd_freq_to_time_period_format'] = array(
+	'A'  => 'YYYY',
+	'S'  => 'YYYY-Sn',
+	'Q'  => 'YYYY-Qn',
+	'M'  => 'YYYY-MM',
+	'W'  => 'YYYY-Www',
+	'D'  => 'YYYY-MM-DD',
+	'H'  => 'YYYY-MM-DDTHH:mm:ss',
+	'I'  => 'YYYY-MM-DDTHH:mm:ss',
 );

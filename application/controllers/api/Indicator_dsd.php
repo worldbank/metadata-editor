@@ -31,7 +31,7 @@ class Indicator_dsd extends MY_REST_Controller
 	 * 
 	 * GET /api/indicator_dsd/{sid}
 	 * Query params: detailed (0|1), offset (default: 0), limit (default: null - all),
-	 *   resolve_codelists (0|1) — when 1, expand global/local linked codelists into each column's code_list (chart filters)
+	 *   resolve_codelists (0|1) — when 1, expand global linked codelists into each column's code_list (chart filters)
 	 * 
 	 */
 	function index_get($sid = null)
@@ -60,7 +60,6 @@ class Indicator_dsd extends MY_REST_Controller
 
 			$this->config->load('indicator_dsd', true);
 			$response['dictionaries'] = array(
-				'time_period_formats' => $this->config->item('dsd_time_period_formats', 'indicator_dsd') ?: array(),
 				'freq_codes' => $this->config->item('dsd_freq_codes', 'indicator_dsd') ?: array(),
 			);
 
@@ -120,384 +119,6 @@ class Indicator_dsd extends MY_REST_Controller
 		}
 	}
 
-	/**
-	 * 
-	 * Create new DSD column
-	 * 
-	 * POST /api/indicator_dsd/{sid}
-	 * 
-	 */
-	function index_post($sid = null)
-	{
-		try{
-			$sid = $this->get_sid($sid);
-			$this->editor_acl->user_has_project_access($sid, $permission = 'edit', $this->api_user);
-			
-			$options = (array)$this->raw_json_input();
-			$user_id = $this->get_api_user_id();
-
-			if (empty($options)) {
-				throw new Exception("Column data is required");
-			}
-
-			// Set created_by if not provided
-			if (!isset($options['created_by'])) {
-				$options['created_by'] = $user_id;
-			}
-
-			// Validate (optional validation - no required fields)
-			// Validation will be done via separate endpoint
-			// $this->Indicator_dsd_model->validate($options, $is_new = true);
-
-			// Insert
-			$id = $this->Indicator_dsd_model->insert($sid, $options);
-
-			$response = array(
-				'status' => 'success',
-				'id' => $id,
-				'message' => 'Column created successfully'
-			);
-
-			$this->set_response($response, REST_Controller::HTTP_OK);
-		}
-		catch(ValidationException $e){
-			$error_output = array(
-				'status' => 'failed',
-				'message' => $e->getMessage(),
-				'errors' => $e->GetValidationErrors()
-			);
-			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
-		}
-		catch(Exception $e){
-			$error_output = array(
-				'status' => 'failed',
-				'message' => $e->getMessage()
-			);
-			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
-		}
-	}
-
-	/**
-	 * 
-	 * Update existing DSD column
-	 * 
-	 * POST /api/indicator_dsd/{sid}/{id}
-	 * 
-	 */
-	function update_post($sid = null, $id = null)
-	{
-		try{
-			$sid = $this->get_sid($sid);
-			$this->editor_acl->user_has_project_access($sid, $permission = 'edit', $this->api_user);
-			
-			if (!$id) {
-				throw new Exception("Column ID is required");
-			}
-
-			// Verify the column exists before attempting update
-			$existing = $this->Indicator_dsd_model->get_row($sid, $id, false);
-			if (!$existing) {
-				throw new Exception("Column with ID {$id} not found for project {$sid}");
-			}
-
-			$options = (array)$this->raw_json_input();
-			$user_id = $this->get_api_user_id();
-
-			if (empty($options)) {
-				throw new Exception("Column data is required");
-			}
-
-			// Set changed_by if not provided
-			if (!isset($options['changed_by'])) {
-				$options['changed_by'] = $user_id;
-			}
-
-			// Time period / FREQ consistency is enforced by validate_dsd (Validation tab), not on each save,
-			// so users can set column_type to time_period and fill format & metadata.freq in any order.
-			$this->Indicator_dsd_model->update($sid, $id, $options, false);
-
-			$response = array(
-				'status' => 'success',
-				'id' => $id,
-				'message' => 'Column updated successfully'
-			);
-
-			$this->set_response($response, REST_Controller::HTTP_OK);
-		}
-		catch(ValidationException $e){
-			$error_output = array(
-				'status' => 'failed',
-				'message' => $e->getMessage(),
-				'errors' => $e->GetValidationErrors()
-			);
-			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
-		}
-		catch(Exception $e){
-			$error_output = array(
-				'status' => 'failed',
-				'message' => $e->getMessage()
-			);
-			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
-		}
-	}
-
-	/**
-	 * 
-	 * Delete DSD columns
-	 * 
-	 * DELETE /api/indicator_dsd/{sid}
-	 * Body: { "sid": 1, "ids": [1, 2, 3] }
-	 * 
-	 */
-	function index_delete($sid = null)
-	{
-		$this->delete_columns($sid);
-	}
-
-	/**
-	 * 
-	 * Delete DSD columns (POST)
-	 * 
-	 * POST /api/indicator_dsd/delete/{sid}
-	 * Body: { "sid": 1, "ids": [1, 2, 3] }
-	 * 
-	 */
-	function delete_post($sid = null)
-	{
-		$this->delete_columns($sid);
-	}
-
-	/**
-	 * 
-	 * Internal method to handle column deletion
-	 * 
-	 */
-	private function delete_columns($sid = null)
-	{
-		try{
-			$data = (array)$this->raw_json_input();
-			
-			// Get sid from payload (required)
-			if (!isset($data['sid'])) {
-				throw new Exception("Project ID (sid) is required in request body");
-			}
-			
-			$body_sid = (int)$data['sid'];
-			
-			// Validate URL parameter matches body if URL parameter is provided
-			if ($sid !== null && (int)$sid !== $body_sid) {
-				throw new Exception("Project ID in URL must match Project ID in request body");
-			}
-			
-			$sid = $body_sid;
-			$this->editor_acl->user_has_project_access($sid, $permission = 'edit', $this->api_user);
-			
-			if (!isset($data['ids']) || !is_array($data['ids']) || empty($data['ids'])) {
-				throw new Exception("Column IDs array is required");
-			}
-
-			$result = $this->Indicator_dsd_model->delete($sid, $data['ids']);
-
-			$response = array(
-				'status' => 'success',
-				'message' => 'Columns deleted successfully',
-				'rows_deleted' => $result['rows']
-			);
-
-			$this->set_response($response, REST_Controller::HTTP_OK);
-		}
-		catch(Exception $e){
-			$error_output = array(
-				'status' => 'failed',
-				'message' => $e->getMessage()
-			);
-			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
-		}
-	}
-
-	/**
-	 * 
-	 * Import CSV file to create/update DSD columns
-	 * 
-	 * POST /api/indicator_dsd/dsd_import/{sid}
-	 * Body: multipart/form-data
-	 *   - file: CSV file (direct upload), or
-	 *   - upload_id: completed resumable upload from /api/uploads/* (do not send both)
-	 *   - column_mappings: JSON string with column mappings
-	 *   - overwrite_existing: 0|1
-	 *   - skip_existing: 0|1
-	 *
-	 * When neither file nor upload_id is provided, uses data/indicator_staging_upload.csv from the project folder (copy to temp; staging file is not mutated).
-	 *
-	 * On success (no import errors), drops project_{sid}.staging in DuckDB via FastAPI and deletes data/indicator_staging_upload.csv when present.
-	 *
-	 */
-	function dsd_import_post($sid = null)
-	{
-		$tmp_staging_copy = null;
-		$resumable_upload_id = null;
-
-		try{
-			$sid = $this->get_sid($sid);
-			$this->editor_acl->user_has_project_access($sid, $permission = 'edit', $this->api_user);
-
-			$upload_id_raw = $this->input->post('upload_id');
-			$upload_id = is_string($upload_id_raw) ? trim($upload_id_raw) : '';
-			$has_file = isset($_FILES['file']) && is_uploaded_file($_FILES['file']['tmp_name']);
-
-			if ($upload_id !== '' && $has_file) {
-				throw new Exception('Provide either a file upload or upload_id, not both');
-			}
-
-			if ($has_file) {
-				$file_ext = strtolower(pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION));
-				if ($file_ext !== 'csv') {
-					throw new Exception("Only CSV files are supported");
-				}
-				$file_tmp = $_FILES['file']['tmp_name'];
-			} elseif ($upload_id !== '') {
-				// Resumable upload path
-				$this->load->library('Resumable_upload', null, 'uploader');
-				$completed = $this->uploader->get_completed_upload($upload_id);
-				if (!$completed) {
-					throw new Exception('Resumable upload not found or not yet complete');
-				}
-				$file_ext = strtolower(pathinfo($completed['filename'], PATHINFO_EXTENSION));
-				if ($file_ext !== 'csv') {
-					throw new Exception('Only CSV files are supported');
-				}
-				$file_tmp = $completed['file_path'];
-				$resumable_upload_id = $upload_id;
-			} else {
-				$src = $this->indicator_staging_upload_realpath($sid);
-				if (!$src) {
-					throw new Exception("CSV file is required (upload a file, or ensure the staging CSV exists on the server)");
-				}
-				$tmp_staging_copy = tempnam(sys_get_temp_dir(), 'me_ind_dsd_');
-				if ($tmp_staging_copy === false || ! @copy($src, $tmp_staging_copy)) {
-					throw new Exception("Could not read saved staging CSV");
-				}
-				$file_tmp = $tmp_staging_copy;
-			}
-
-			// Get column mappings
-			$column_mappings_json = $this->input->post('column_mappings');
-			if (empty($column_mappings_json)) {
-				throw new Exception("Column mappings are required");
-			}
-
-			$column_mappings = json_decode($column_mappings_json, true);
-			if (!is_array($column_mappings)) {
-				throw new Exception("Invalid column mappings format");
-			}
-
-			$overwrite_existing = (int)$this->input->post('overwrite_existing');
-			$skip_existing = (int)$this->input->post('skip_existing');
-			$indicator_idno = $this->input->post('indicator_idno');
-			$required_field_label_columns_json = $this->input->post('required_field_label_columns');
-			$required_field_label_columns = array();
-			if (!empty($required_field_label_columns_json)) {
-				$decoded = json_decode($required_field_label_columns_json, true);
-				if (is_array($decoded)) {
-					$required_field_label_columns = $decoded;
-				}
-			}
-			$user_id = $this->get_api_user_id();
-
-			// Process CSV and create/update columns
-			// This will also upload and store the CSV file with standard name
-			$result = $this->Indicator_dsd_model->import_csv(
-				$sid,
-				$file_tmp,
-				$column_mappings,
-				$overwrite_existing,
-				$skip_existing,
-				$user_id,
-				$indicator_idno,
-				$required_field_label_columns
-			);
-
-		$response = array(
-			'status' => 'success',
-			'sid' => $sid,
-			'message' => 'CSV imported successfully',
-			'created' => $result['created'],
-			'updated' => $result['updated'],
-			'skipped' => $result['skipped'],
-			'errors' => $result['errors']
-		);
-		if (isset($result['rows_imported'])) {
-			$response['rows_imported'] = (int) $result['rows_imported'];
-		}
-
-		// Include file information if file was stored
-		if (isset($result['file_id'])) {
-			$response['file_id'] = $result['file_id'];
-			$response['file_name'] = $result['file_name'];
-		}
-
-		// keep_staging=1: caller will run promote AFTER dsd_import (Workflow 1 ordering fix).
-		// When set, staging and the on-disk CSV are preserved so the subsequent promote can use them.
-		$keep_staging = $this->input->post('keep_staging') === '1';
-
-		// After successful DSD import: drop DuckDB staging (data already in timeseries via promote) and remove wizard CSV.
-		if (empty($result['errors']) && !$keep_staging) {
-			// Auto-populate local codelists for columns where a label column was mapped.
-			// Timeseries is already promoted at this point; errors are non-fatal warnings.
-			if (!empty($result['local_codelists_pending'])) {
-				$cl_result = $this->Indicator_dsd_model->populate_local_codelists_from_timeseries($sid, $user_id);
-				$response['local_codelists_populated'] = isset($cl_result['updated']) ? (int) $cl_result['updated'] : 0;
-				$cl_warnings = array();
-				if (!empty($cl_result['errors'])) {
-					foreach ($cl_result['errors'] as $e) {
-						$cl_warnings[] = 'Codelist: ' . $e;
-					}
-				}
-				if (!empty($cl_result['warnings'])) {
-					foreach ($cl_result['warnings'] as $w) {
-						$cl_warnings[] = 'Codelist: ' . $w;
-					}
-				}
-				if (!empty($cl_warnings)) {
-					$response['warnings'] = isset($response['warnings']) ? array_merge($response['warnings'], $cl_warnings) : $cl_warnings;
-				}
-			}
-
-			$cleanup_warnings = array();
-			$this->load->library('indicator_duckdb_service');
-			$drop = $this->indicator_duckdb_service->draft_drop($sid);
-			if (! is_array($drop) || ! empty($drop['error'])) {
-				$cleanup_warnings[] = isset($drop['message'])
-					? 'DuckDB staging was not removed: ' . $drop['message']
-					: 'DuckDB staging cleanup request failed';
-			}
-			$csv_path = $this->indicator_staging_upload_realpath($sid);
-			if ($csv_path !== null && is_file($csv_path) && ! @unlink($csv_path)) {
-				$cleanup_warnings[] = 'Could not delete saved staging CSV file on disk';
-			}
-			if (! empty($cleanup_warnings)) {
-				$response['warnings'] = isset($response['warnings']) ? array_merge($response['warnings'], $cleanup_warnings) : $cleanup_warnings;
-			}
-		}
-
-			$this->set_response($response, REST_Controller::HTTP_OK);
-		}
-		catch(Exception $e){
-			$error_output = array(
-				'status' => 'failed',
-				'message' => $e->getMessage()
-			);
-			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
-		}
-		finally {
-			if ($tmp_staging_copy !== null && is_file($tmp_staging_copy)) {
-				@unlink($tmp_staging_copy);
-			}
-			if ($resumable_upload_id !== null) {
-				$this->uploader->delete_upload($resumable_upload_id);
-			}
-		}
-	}
 
 	/**
 	 * Validate DSD structure, then data (column presence vs DuckDB: published timeseries or staging) only if structure is valid.
@@ -543,18 +164,15 @@ class Indicator_dsd extends MY_REST_Controller
 	}
 
 	/**
-	 * Full reset for Workflow 1 (full replace): deletes all MySQL DSD column rows and drops the
-	 * DuckDB timeseries table so the project can be reimported from scratch.
+	 * Full reset: drops the DuckDB timeseries table for the project.
 	 * POST /api/indicator_dsd/reset/{sid}
-	 * No body required. Returns { dsd_columns_deleted, timeseries_dropped }.
+	 * No body required. Returns { timeseries_dropped }.
 	 */
 	function reset_post($sid = null)
 	{
 		try {
 			$sid = $this->get_sid($sid);
 			$this->editor_acl->user_has_project_access($sid, $permission = 'edit', $this->api_user);
-
-			$deleted = $this->Indicator_dsd_model->delete_all_for_project($sid);
 
 			$this->load->library('indicator_duckdb_service');
 			$drop = $this->indicator_duckdb_service->timeseries_drop($sid);
@@ -563,205 +181,30 @@ class Indicator_dsd extends MY_REST_Controller
 			$warnings   = array();
 			if (is_array($drop) && !empty($drop['error'])) {
 				$hc = isset($drop['http_code']) ? (int) $drop['http_code'] : 0;
-				if ($hc !== 404) {
+				if ($hc !== 404 && $hc !== 0) {
 					$ts_dropped = false;
 					$warnings[] = isset($drop['message']) ? $drop['message'] : 'Timeseries drop failed';
+				} elseif ($hc === 0) {
+					$ts_dropped = false;
+					$warnings[] = 'Published data could not be dropped (data API unavailable).';
 				}
 			}
 
 			$response = array(
-				'status'              => 'success',
-				'dsd_columns_deleted' => isset($deleted['rows']) ? (int) $deleted['rows'] : 0,
-				'timeseries_dropped'  => $ts_dropped,
+				'status'             => 'success',
+				'timeseries_dropped' => $ts_dropped,
 			);
 			if (!empty($warnings)) {
 				$response['warnings'] = $warnings;
 			}
+
+			$this->Indicator_dsd_model->clear_published_data_tracking($sid);
 
 			$this->set_response($response, REST_Controller::HTTP_OK);
 		}
 		catch (Throwable $e) {
 			$this->set_response(array(
 				'status'  => 'failed',
-				'message' => $e->getMessage(),
-			), REST_Controller::HTTP_BAD_REQUEST);
-		}
-	}
-
-	/**
-	 * Add extra CSV columns (by name) to the DSD as attribute-type rows (Workflow 2).
-	 * POST /api/indicator_dsd/add_attributes/{sid}
-	 * JSON body: { "columns": ["COL_A", "COL_B", ...] }
-	 *
-	 * Adds new DSD columns without a column_type so the user can classify them via the UI.
-	 * - Columns already in the DSD are skipped (no overwrite).
-	 * - Columns with invalid names (special chars, starts with _, too long) are skipped with a warning.
-	 * Returns { added: [], skipped_existing: [], skipped_invalid: [] }
-	 */
-	function add_attributes_post($sid = null)
-	{
-		try {
-			$sid  = $this->get_sid($sid);
-			$this->editor_acl->user_has_project_access($sid, $permission = 'edit', $this->api_user);
-
-			$body    = (array) $this->raw_json_input();
-			$columns = isset($body['columns']) && is_array($body['columns']) ? $body['columns'] : array();
-
-			if (empty($columns)) {
-				$this->set_response(array(
-					'status'           => 'success',
-					'added'            => array(),
-					'skipped_existing' => array(),
-					'skipped_invalid'  => array(),
-				), REST_Controller::HTTP_OK);
-				return;
-			}
-
-			$existing     = $this->Indicator_dsd_model->select_all($sid, false);
-			$exist_upper  = array_map(function ($c) {
-				return strtoupper(trim((string) $c['name']));
-			}, $existing);
-
-			$user_id      = $this->get_api_user_id();
-			$name_pattern = '/^[a-zA-Z0-9_]+$/';
-
-			$added            = array();
-			$skipped_existing = array();
-			$skipped_invalid  = array();
-
-			foreach ($columns as $raw) {
-				$name  = trim((string) $raw);
-				$upper = strtoupper($name);
-
-				if (in_array($upper, $exist_upper)) {
-					$skipped_existing[] = $upper;
-					continue;
-				}
-
-				if (
-					$name === ''
-					|| !preg_match($name_pattern, $name)
-					|| $name[0] === '_'
-					|| strlen($name) > 255
-				) {
-					$skipped_invalid[] = $name;
-					continue;
-				}
-
-				try {
-				$this->Indicator_dsd_model->insert($sid, array(
-					'name'        => $upper,
-					'label'       => '',
-					'description' => '',
-				), false);
-					$added[]      = $upper;
-					$exist_upper[] = $upper;
-				}
-				catch (Throwable $e) {
-					$skipped_invalid[] = $name . ' (' . $e->getMessage() . ')';
-				}
-			}
-
-			$this->set_response(array(
-				'status'           => 'success',
-				'added'            => $added,
-				'skipped_existing' => $skipped_existing,
-				'skipped_invalid'  => $skipped_invalid,
-			), REST_Controller::HTTP_OK);
-		}
-		catch (Throwable $e) {
-			$this->set_response(array(
-				'status'  => 'failed',
-				'message' => $e->getMessage(),
-			), REST_Controller::HTTP_BAD_REQUEST);
-		}
-	}
-
-	/**
-	 * Pre-flight: compare staging CSV columns against the saved DSD structure.
-	 * GET /api/indicator_dsd/validate_draft/{sid}
-	 *
-	 * Useful before a data-only import to confirm that the CSV covers the required DSD columns.
-	 *
-	 * Response fields:
-	 *   staging_exists  bool    — whether project_{sid}.staging exists in DuckDB
-	 *   dsd_exists      bool    — whether MySQL indicator_dsd has rows for this project
-	 *   matched         string[]  — DSD column names present in draft (normalised uppercase)
-	 *   missing_dsd     string[]  — DSD column names NOT in draft (data will be null for these)
-	 *   extra_csv       string[]  — draft columns not in DSD (will be ignored in data-only mode)
-	 *   required_missing array   — required-role DSD columns (geography/time_period/etc.) missing from draft
-	 *   has_errors      bool    — true if any required-role DSD column is absent from draft
-	 */
-	function validate_draft_get($sid = null)
-	{
-		try {
-			$sid = $this->get_sid($sid);
-			$this->editor_acl->user_has_project_access($sid, $permission = 'view', $this->api_user);
-
-			$this->load->library('indicator_duckdb_service');
-			$staging_meta = $this->indicator_duckdb_service->draft_describe($sid);
-
-			$staging_exists = is_array($staging_meta) && !empty($staging_meta['exists']);
-			$staging_col_upper = array();
-			if ($staging_exists && !empty($staging_meta['columns']) && is_array($staging_meta['columns'])) {
-				foreach ($staging_meta['columns'] as $col) {
-					$raw = is_array($col) && isset($col['name']) ? (string) $col['name'] : (string) $col;
-					$u = strtoupper(trim($raw));
-					if ($u !== '') {
-						$staging_col_upper[] = $u;
-					}
-				}
-			}
-
-			$dsd_columns = $this->Indicator_dsd_model->select_all($sid, false);
-			$dsd_exists = !empty($dsd_columns);
-
-			$matched = array();
-			$missing_dsd = array();
-			foreach ($dsd_columns as $col) {
-				$name_u = strtoupper(trim((string) $col['name']));
-				if (in_array($name_u, $staging_col_upper)) {
-					$matched[] = $name_u;
-				} else {
-					$missing_dsd[] = $name_u;
-				}
-			}
-
-			$dsd_names_upper = array_map(function ($c) {
-				return strtoupper(trim((string) $c['name']));
-			}, $dsd_columns);
-
-			$extra_csv = array();
-			foreach ($staging_col_upper as $name_u) {
-				if (!in_array($name_u, $dsd_names_upper)) {
-					$extra_csv[] = $name_u;
-				}
-			}
-
-			// Required-role columns: must be present in staging for a valid promote
-			$required_types = array('geography', 'time_period', 'indicator_id', 'observation_value');
-			$required_missing = array();
-			foreach ($dsd_columns as $col) {
-				$name_u = strtoupper(trim((string) $col['name']));
-				if (in_array($col['column_type'], $required_types) && !in_array($name_u, $staging_col_upper)) {
-					$required_missing[] = array('name' => $name_u, 'type' => $col['column_type']);
-				}
-			}
-
-			$this->set_response(array(
-				'status' => 'success',
-				'staging_exists' => $staging_exists,
-				'dsd_exists' => $dsd_exists,
-				'matched' => $matched,
-				'missing_dsd' => $missing_dsd,
-				'extra_csv' => $extra_csv,
-				'required_missing' => $required_missing,
-				'has_errors' => !empty($required_missing),
-			), REST_Controller::HTTP_OK);
-		}
-		catch (Throwable $e) {
-			$this->set_response(array(
-				'status' => 'failed',
 				'message' => $e->getMessage(),
 			), REST_Controller::HTTP_BAD_REQUEST);
 		}
@@ -902,65 +345,21 @@ class Indicator_dsd extends MY_REST_Controller
 	}
 
 	/**
-	 * Populate code_list for all DSD columns from the indicator CSV file.
-	 * For each column: code = value from CSV; label = value_label_column if set, else code.
-	 *
-	 * POST /api/indicator_dsd/populate_code_lists/{sid}
+	 * GET /api/indicator_dsd/chart_filter_options/{sid}
+	 * Observed-only filter options for chart (DuckDB facet counts + codelist labels).
 	 */
-	function populate_code_lists_post($sid = null)
+	function chart_filter_options_get($sid = null)
 	{
 		try {
 			$sid = $this->get_sid($sid);
-			$this->editor_acl->user_has_project_access($sid, $permission = 'edit', $this->api_user);
+			$this->editor_acl->user_has_project_access($sid, $permission = 'view', $this->api_user);
 
-			$user_id = $this->get_api_user_id();
-			$result = $this->Indicator_dsd_model->populate_code_lists_from_csv($sid, $user_id);
+			$payload = $this->Indicator_dsd_model->get_chart_filter_options($sid);
 
-			$response = array(
-				'status' => count($result['errors']) === 0 ? 'success' : 'partial',
-				'message' => count($result['errors']) === 0
-					? 'Code lists populated from CSV.'
-					: 'Code lists updated with some errors.',
-				'updated' => $result['updated'],
-				'skipped' => $result['skipped'],
-				'errors' => $result['errors']
-			);
-
-			$this->set_response($response, REST_Controller::HTTP_OK);
-		}
-		catch (Throwable $e) {
-			$error_output = array(
-				'status' => 'failed',
-				'message' => $e->getMessage()
-			);
-			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
-		}
-	}
-
-	/**
-	 * Populate local_codelist_items from DuckDB for DSD columns with codelist_type = local.
-	 * POST /api/indicator_dsd/populate_local_codelists/{sid}
-	 */
-	function populate_local_codelists_post($sid = null)
-	{
-		try {
-			$sid = $this->get_sid($sid);
-			$this->editor_acl->user_has_project_access($sid, $permission = 'edit', $this->api_user);
-			$user_id = $this->get_api_user_id();
-			$result = $this->Indicator_dsd_model->populate_local_codelists_from_timeseries($sid, $user_id);
-			$ok = count($result['errors']) === 0;
-			$response = array(
-				'status' => $ok ? 'success' : 'partial',
-				'message' => $ok
-					? 'Local codelists updated from timeseries data.'
-					: 'Local codelists partially updated; see errors.',
-				'updated' => $result['updated'],
-				'skipped' => $result['skipped'],
-				'errors' => $result['errors'],
-				'warnings' => isset($result['warnings']) ? $result['warnings'] : array(),
-				'truncated' => isset($result['truncated']) ? $result['truncated'] : array(),
-			);
-			$this->set_response($response, REST_Controller::HTTP_OK);
+			$this->set_response(array(
+				'status' => 'success',
+				'data' => $payload,
+			), REST_Controller::HTTP_OK);
 		}
 		catch (Throwable $e) {
 			$this->set_response(array(
@@ -971,7 +370,7 @@ class Indicator_dsd extends MY_REST_Controller
 	}
 
 	/**
-	 * Distinct code/label pairs from published timeseries (for local codelist preview / future UI).
+	 * Distinct code/label pairs from published timeseries.
 	 * GET /api/indicator_dsd/data_values/{sid}?code_column=COL&label_column=COL2&limit=5000
 	 */
 	function data_values_get($sid = null)
@@ -999,222 +398,6 @@ class Indicator_dsd extends MY_REST_Controller
 			if (is_array($data) && !empty($data['error'])) {
 				throw new Exception(isset($data['message']) ? $data['message'] : 'distinct pairs failed');
 			}
-			$this->set_response(array(
-				'status' => 'success',
-				'data' => $data,
-			), REST_Controller::HTTP_OK);
-		}
-		catch (Throwable $e) {
-			$this->set_response(array(
-				'status' => 'failed',
-				'message' => $e->getMessage(),
-			), REST_Controller::HTTP_BAD_REQUEST);
-		}
-	}
-
-	/**
-	 * Upload CSV and queue import into the draft buffer (project_{sid}.staging).
-	 * POST /api/indicator_dsd/data_draft/{sid}
-	 * Accepts one of:
-	 *   - multipart file field "file" (direct upload), or
-	 *   - form field "upload_id" referencing a completed resumable upload from /api/uploads/*
-	 * Optional: delimiter, dsd_columns (JSON array of column name strings)
-	 */
-	function data_draft_post($sid = null)
-	{
-		try {
-			$sid = $this->get_sid($sid);
-			$this->editor_acl->user_has_project_access($sid, $permission = 'edit', $this->api_user);
-
-			$upload_id_raw = $this->input->post('upload_id');
-			$upload_id = is_string($upload_id_raw) ? trim($upload_id_raw) : '';
-			$has_file = isset($_FILES['file']) && is_uploaded_file($_FILES['file']['tmp_name']);
-
-			if ($upload_id !== '' && $has_file) {
-				throw new Exception('Provide either a file upload or upload_id, not both');
-			}
-
-			$this->Editor_model->create_project_folder($sid);
-			$folder = $this->Editor_model->get_project_folder($sid);
-			if (!$folder) {
-				throw new Exception('Project folder not available');
-			}
-
-			$data_dir = $folder . '/data';
-			if (!is_dir($data_dir)) {
-				@mkdir($data_dir, 0777, true);
-			}
-
-			$dest = $data_dir . '/indicator_staging_upload.csv';
-
-			if ($upload_id !== '') {
-				// Resumable upload path
-				$this->load->library('Resumable_upload', null, 'uploader');
-				$completed = $this->uploader->get_completed_upload($upload_id);
-				if (!$completed) {
-					throw new Exception('Resumable upload not found or not yet complete');
-				}
-				$ext = strtolower(pathinfo($completed['filename'], PATHINFO_EXTENSION));
-				if ($ext !== 'csv') {
-					throw new Exception('Only CSV files are supported');
-				}
-				if (!@copy($completed['file_path'], $dest)) {
-					throw new Exception('Failed to save uploaded CSV');
-				}
-				$this->uploader->delete_upload($upload_id);
-			} elseif ($has_file) {
-				// Direct multipart upload path
-				$ext = strtolower(pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION));
-				if ($ext !== 'csv') {
-					throw new Exception('Only CSV files are supported');
-				}
-				if (!@move_uploaded_file($_FILES['file']['tmp_name'], $dest)) {
-					throw new Exception('Failed to save uploaded CSV');
-				}
-			} else {
-				throw new Exception('CSV file is required');
-			}
-
-			$real_path = realpath($dest);
-			if ($real_path === false) {
-				throw new Exception('Could not resolve CSV path');
-			}
-
-			// Sanitize header row so FastAPI/DuckDB accept field names (e.g. Area.Code -> Area_Code).
-			$this->Indicator_dsd_model->rewrite_indicator_csv_headers_for_duckdb($real_path);
-
-			$delimiter = $this->input->post('delimiter');
-			if ($delimiter === null || $delimiter === '') {
-				$delimiter = ',';
-			}
-			if (strlen($delimiter) !== 1) {
-				$delimiter = ',';
-			}
-
-			$dsd_names = null;
-			$dsd_raw = $this->input->post('dsd_columns');
-			if ($dsd_raw !== null && $dsd_raw !== '') {
-				$decoded = json_decode($dsd_raw, true);
-				if (is_array($decoded)) {
-					$dsd_names = $decoded;
-				}
-			}
-			if (is_array($dsd_names) && count($dsd_names) > 0) {
-				$dsd_names = $this->Indicator_dsd_model->normalize_duckdb_staging_column_names($dsd_names);
-			}
-
-			$this->load->library('indicator_duckdb_service');
-			$queue = $this->indicator_duckdb_service->draft_queue($real_path, $sid, $delimiter, $dsd_names);
-
-			if (is_array($queue) && !empty($queue['error'])) {
-				throw new Exception(isset($queue['message']) ? $queue['message'] : 'FastAPI staging request failed');
-			}
-
-			if (empty($queue['job_id'])) {
-				throw new Exception('FastAPI did not return job_id');
-			}
-
-			$this->set_response(array(
-				'status' => 'success',
-				'job_id' => $queue['job_id'],
-				'message' => isset($queue['message']) ? $queue['message'] : 'Staging import queued',
-			), REST_Controller::HTTP_OK);
-		}
-		catch (Throwable $e) {
-			$this->set_response(array(
-				'status' => 'failed',
-				'message' => $e->getMessage(),
-			), REST_Controller::HTTP_BAD_REQUEST);
-		}
-	}
-
-	/**
-	 * Draft buffer metadata (resume import UI).
-	 * GET /api/indicator_dsd/data_draft_status/{sid}
-	 */
-	function data_draft_status_get($sid = null)
-	{
-		try {
-			$sid = $this->get_sid($sid);
-			$this->editor_acl->user_has_project_access($sid, $permission = 'view', $this->api_user);
-
-			$csv_on_disk = $this->indicator_staging_upload_realpath($sid) !== null;
-
-			$this->load->library('indicator_duckdb_service');
-			$raw = $this->indicator_duckdb_service->draft_describe($sid);
-
-			if (is_array($raw) && ! empty($raw['error'])) {
-				$this->set_response(array(
-					'status' => 'success',
-					'data' => array(
-						'exists' => false,
-						'row_count' => 0,
-						'columns' => array(),
-						'csv_on_disk' => $csv_on_disk,
-						'describe_error' => isset($raw['message']) ? $raw['message'] : 'FastAPI staging describe failed',
-					),
-				), REST_Controller::HTTP_OK);
-
-				return;
-			}
-
-			$exists = ! empty($raw['exists']);
-			$row_count = isset($raw['row_count']) ? (int) $raw['row_count'] : 0;
-			$columns = array();
-
-			if (isset($raw['columns']) && is_array($raw['columns'])) {
-				foreach ($raw['columns'] as $c) {
-					if (is_string($c)) {
-						$columns[] = array('name' => $c);
-					}
-					elseif (is_array($c) && isset($c['name'])) {
-						$columns[] = array('name' => (string) $c['name']);
-					}
-				}
-			}
-
-			$this->set_response(array(
-				'status' => 'success',
-				'data' => array(
-					'exists' => $exists,
-					'row_count' => $row_count,
-					'columns' => $columns,
-					'csv_on_disk' => $csv_on_disk,
-				),
-			), REST_Controller::HTTP_OK);
-		}
-		catch (Throwable $e) {
-			$this->set_response(array(
-				'status' => 'failed',
-				'message' => $e->getMessage(),
-			), REST_Controller::HTTP_BAD_REQUEST);
-		}
-	}
-
-	/**
-	 * Preview rows from the draft buffer. GET /api/indicator_dsd/data_draft_preview/{sid}?limit=20
-	 */
-	function data_draft_preview_get($sid = null)
-	{
-		try {
-			$sid = $this->get_sid($sid);
-			$this->editor_acl->user_has_project_access($sid, $permission = 'view', $this->api_user);
-
-			$limit = (int) $this->input->get('limit');
-			if ($limit < 1) {
-				$limit = 20;
-			}
-			if ($limit > 500) {
-				$limit = 500;
-			}
-
-			$this->load->library('indicator_duckdb_service');
-			$data = $this->indicator_duckdb_service->draft_sample($sid, $limit);
-
-			if (is_array($data) && ! empty($data['error'])) {
-				throw new Exception(isset($data['message']) ? $data['message'] : 'FastAPI staging sample failed');
-			}
-
 			$this->set_response(array(
 				'status' => 'success',
 				'data' => $data,
@@ -1316,129 +499,6 @@ class Indicator_dsd extends MY_REST_Controller
 		}
 	}
 
-	/**
-	 * Compute column summary stats in DuckDB and persist JSON to indicator_dsd.sum_stats.
-	 * POST /api/indicator_dsd/sum_stats_refresh/{sid}
-	 * Body (optional): { "columns": ["PhysicalCol", ...] } — limit refresh to these DSD names; omit to refresh all DSD rows.
-	 */
-	function sum_stats_refresh_post($sid = null)
-	{
-		try {
-			$sid = $this->get_sid($sid);
-			$this->editor_acl->user_has_project_access($sid, $permission = 'edit', $this->api_user);
-
-			$body = (array) $this->raw_json_input();
-			$only = null;
-			if (! empty($body['columns']) && is_array($body['columns'])) {
-				$only = array_values(array_filter(array_map('trim', array_map('strval', $body['columns']))));
-			}
-
-			$dsd = $this->Indicator_dsd_model->select_all($sid, false);
-			$to_process = $dsd;
-			$want = array();
-
-			if ($only !== null && count($only) > 0) {
-				$set = array_flip(array_map('strtoupper', $only));
-				$to_process = array();
-				foreach ($dsd as $row) {
-					if (isset($set[strtoupper($row['name'])])) {
-						$to_process[] = $row;
-					}
-				}
-				$want = $only;
-			} else {
-				foreach ($dsd as $row) {
-					if (! empty($row['name'])) {
-						$want[] = $row['name'];
-					}
-				}
-			}
-
-			$to_process = array_values(array_filter($to_process, function ($r) {
-				return ! empty($r['name']);
-			}));
-
-			if (count($to_process) === 0) {
-				throw new Exception('No DSD columns match this request');
-			}
-
-			$this->load->library('indicator_duckdb_service');
-			$res = $this->indicator_duckdb_service->timeseries_column_stats($sid, count($want) > 0 ? $want : null);
-
-			if (! is_array($res) || ! empty($res['error'])) {
-				$msg = isset($res['message']) ? $res['message'] : 'Column stats request failed';
-				$hc = isset($res['http_code']) ? (int) $res['http_code'] : 0;
-				if ($hc === 404) {
-					throw new Exception($msg, REST_Controller::HTTP_NOT_FOUND);
-				}
-				throw new Exception($msg);
-			}
-
-			$computed_at = isset($res['computed_at']) ? $res['computed_at'] : null;
-			$source = isset($res['source']) ? $res['source'] : 'timeseries';
-
-			$by_upper = array();
-			if (! empty($res['columns']) && is_array($res['columns'])) {
-				foreach ($res['columns'] as $c) {
-					if (! empty($c['field'])) {
-						$by_upper[strtoupper($c['field'])] = $c;
-					}
-				}
-			}
-
-			$updated = 0;
-			$missing = array();
-			foreach ($to_process as $row) {
-				$id = (int) $row['id'];
-				$uname = strtoupper($row['name']);
-				if (! isset($by_upper[$uname])) {
-					$missing[] = $row['name'];
-					$err_payload = array(
-						'schema_version' => 1,
-						'field' => $row['name'],
-						'computed_at' => $computed_at,
-						'source' => $source,
-						'compute' => array(
-							'ok' => false,
-							'error_code' => 'column_not_in_timeseries',
-							'message' => 'Column not found in DuckDB timeseries or no stats returned',
-						),
-					);
-					$this->Indicator_dsd_model->update($sid, $id, array('sum_stats' => $err_payload), false);
-					++$updated;
-					continue;
-				}
-				$payload = $by_upper[$uname];
-				$payload['computed_at'] = $computed_at;
-				$payload['source'] = $source;
-				$payload['schema_version'] = 1;
-				$this->Indicator_dsd_model->update($sid, $id, array('sum_stats' => $payload), false);
-				++$updated;
-			}
-
-			$this->set_response(array(
-				'status' => 'success',
-				'updated_columns' => $updated,
-				'computed_at' => $computed_at,
-				'not_found_in_timeseries' => $missing,
-			), REST_Controller::HTTP_OK);
-		}
-		catch (Throwable $e) {
-			$msg = $e->getMessage();
-			$code = $e->getCode();
-			if ($code === REST_Controller::HTTP_NOT_FOUND) {
-				$this->set_response(array(
-					'status' => 'failed',
-					'message' => $msg,
-				), REST_Controller::HTTP_NOT_FOUND);
-				return;
-			}
-			$this->set_response(array(
-				'status' => 'failed',
-				'message' => $msg,
-			), REST_Controller::HTTP_BAD_REQUEST);
-		}
-	}
 
 	/**
 	 * Download full published timeseries as CSV.
@@ -1486,6 +546,8 @@ class Indicator_dsd extends MY_REST_Controller
 				throw new Exception(isset($result['message']) ? $result['message'] : 'Failed to drop timeseries table');
 			}
 
+			$this->Indicator_dsd_model->clear_published_data_tracking($sid);
+
 			$this->set_response(array(
 				'status'    => 'success',
 				'dropped'   => isset($result['dropped']) ? (bool) $result['dropped'] : true,
@@ -1501,149 +563,9 @@ class Indicator_dsd extends MY_REST_Controller
 	}
 
 	/**
-	 * Delete timeseries rows for a specific indicator value (Workflow 2 — always replace).
-	 * DELETE /api/indicator_dsd/timeseries_delete_by_indicator/{sid}
-	 * Query params: indicator_column, indicator_value
-	 *
-	 * Called before promoting staging rows so that existing data for the chosen indicator is
-	 * fully replaced rather than appended/upserted.
-	 * A 404 from FastAPI (no rows existed yet) is treated as success.
-	 */
-	function timeseries_delete_by_indicator_delete($sid = null)
-	{
-		try {
-			$sid = $this->get_sid($sid);
-			$this->editor_acl->user_has_project_access($sid, $permission = 'edit', $this->api_user);
-
-			$indicator_column = trim((string) ($this->input->get('indicator_column') ?? ''));
-			$indicator_value  = $this->input->get('indicator_value');
-
-			if ($indicator_column === '') {
-				throw new Exception('indicator_column query param is required');
-			}
-			if ($indicator_value === null || $indicator_value === '') {
-				throw new Exception('indicator_value query param is required');
-			}
-
-			$this->load->library('indicator_duckdb_service');
-			$result = $this->indicator_duckdb_service->timeseries_delete_by_indicator($sid, $indicator_column, (string) $indicator_value);
-
-			// 404 = table / rows did not exist yet — not an error
-			if (is_array($result) && !empty($result['error'])) {
-				$hc = isset($result['http_code']) ? (int) $result['http_code'] : 0;
-				if ($hc !== 404) {
-					throw new Exception(isset($result['message']) ? $result['message'] : 'FastAPI filtered delete failed');
-				}
-			}
-
-			$this->set_response(array(
-				'status'  => 'success',
-				'message' => 'Deleted',
-			), REST_Controller::HTTP_OK);
-		}
-		catch (Throwable $e) {
-			$this->set_response(array(
-				'status'  => 'failed',
-				'message' => $e->getMessage(),
-			), REST_Controller::HTTP_BAD_REQUEST);
-		}
-	}
-
-	/**
-	 * Distinct values in a draft buffer column (indicator id picker).
-	 * GET /api/indicator_dsd/data_draft_values/{sid}?column=COL&limit= (max 3000)
-	 */
-	function data_draft_values_get($sid = null)
-	{
-		try {
-			$sid = $this->get_sid($sid);
-			$this->editor_acl->user_has_project_access($sid, $permission = 'view', $this->api_user);
-
-			$column = $this->input->get('column');
-			if ($column === null || trim($column) === '') {
-				throw new Exception('Query parameter column is required');
-			}
-
-			$limit = (int) $this->input->get('limit');
-			if ($limit < 1) {
-				$limit = 3000;
-			}
-			if ($limit > 3000) {
-				$limit = 3000;
-			}
-
-			$this->load->library('indicator_duckdb_service');
-			$data = $this->indicator_duckdb_service->draft_distinct($sid, $column, $limit);
-
-			if (is_array($data) && !empty($data['error'])) {
-				throw new Exception(isset($data['message']) ? $data['message'] : 'FastAPI distinct request failed');
-			}
-
-			$this->set_response(array(
-				'status' => 'success',
-				'data' => $data,
-			), REST_Controller::HTTP_OK);
-		}
-		catch (Throwable $e) {
-			$this->set_response(array(
-				'status' => 'failed',
-				'message' => $e->getMessage(),
-			), REST_Controller::HTTP_BAD_REQUEST);
-		}
-	}
-
-	/**
-	 * Publish draft data → timeseries for one indicator value.
-	 * POST /api/indicator_dsd/data_import/{sid}
-	 * JSON: { "indicator_column": "...", "indicator_value": "..." }
-	 */
-	function data_import_post($sid = null)
-	{
-		try {
-			$sid = $this->get_sid($sid);
-			$this->editor_acl->user_has_project_access($sid, $permission = 'edit', $this->api_user);
-
-			$body = (array) $this->raw_json_input();
-			$indicator_column = isset($body['indicator_column']) ? trim((string) $body['indicator_column']) : '';
-			$indicator_value = isset($body['indicator_value']) ? $body['indicator_value'] : null;
-
-			if ($indicator_column === '') {
-				throw new Exception('indicator_column is required');
-			}
-			if ($indicator_value === null || $indicator_value === '') {
-				throw new Exception('indicator_value is required');
-			}
-
-			$this->load->library('indicator_duckdb_service');
-			$time_spec = $this->Indicator_dsd_model->build_duckdb_promote_time_spec($sid);
-			$queue = $this->indicator_duckdb_service->timeseries_import_queue($sid, $indicator_column, (string) $indicator_value, $time_spec);
-
-			if (is_array($queue) && !empty($queue['error'])) {
-				throw new Exception(isset($queue['message']) ? $queue['message'] : 'FastAPI promote request failed');
-			}
-
-			if (empty($queue['job_id'])) {
-				throw new Exception('FastAPI did not return job_id');
-			}
-
-			$this->set_response(array(
-				'status' => 'success',
-				'job_id' => $queue['job_id'],
-				'message' => isset($queue['message']) ? $queue['message'] : 'Promote queued',
-			), REST_Controller::HTTP_OK);
-		}
-		catch (Throwable $e) {
-			$this->set_response(array(
-				'status' => 'failed',
-				'message' => $e->getMessage(),
-			), REST_Controller::HTTP_BAD_REQUEST);
-		}
-	}
-
-	/**
 	 * Queue FastAPI job to recompute _ts_year / _ts_freq on published timeseries from current DSD.
 	 * POST /api/indicator_dsd/data_recompute/{sid}
-	 * No body; time_spec is built from MySQL indicator_dsd (same as data_import).
+	 * No body; time_spec is built from the bound global data structure.
 	 */
 	function data_recompute_post($sid = null)
 	{
@@ -1731,76 +653,578 @@ class Indicator_dsd extends MY_REST_Controller
 	}
 
 	/**
-	 * Import an SDMX-ML DataStructureDefinition (DSD) to replace the project's data structure.
+	 * Global DSD binding for this project (read-only structure when bound).
 	 *
-	 * WARNING: Importing replaces ALL existing DSD columns and drops all published timeseries
-	 * data for the project. This action cannot be undone.
-	 *
-	 * POST /api/indicator_dsd/import_sdmx_dsd/{sid}
-	 * Body: multipart/form-data
-	 *   - file:      SDMX-ML structure XML file (.xml)   — mutually exclusive with sdmx_url
-	 *   - sdmx_url:  URL of an SDMX REST structure endpoint — mutually exclusive with file
-	 *
-	 * Response on success:
-	 *   { status, created, codelists_created, timeseries_dropped, sdmx_version, warnings }
+	 * GET /api/indicator_dsd/binding/{sid}
 	 */
-	function import_sdmx_dsd_post($sid = null)
+	function binding_get($sid = null)
 	{
-		$tmp_path = null;
+		try {
+			$sid = $this->get_sid($sid);
+			$this->editor_acl->user_has_project_access($sid, $permission = 'view', $this->api_user);
 
+			$this->load->model('Editor_project_dsd_model');
+			$this->load->library('Data_structure_util');
+			$this->load->model('Data_structure_model');
+
+			$binding = $this->Editor_project_dsd_model->get_by_sid($sid);
+			$reference = $this->data_structure_util->get_project_reference($sid);
+			$columns = $this->Indicator_dsd_model->select_all($sid, false);
+			$structure_validation = $this->Indicator_dsd_model->validate_dsd_structure($sid);
+
+			$structure = null;
+			if ($binding && !empty($binding['data_structure_id'])) {
+				$structure = $this->Data_structure_model->get_structure_by_id((int) $binding['data_structure_id'], false);
+			}
+
+			$indicator_id_value = ($binding && isset($binding['indicator_id_value']))
+				? trim((string) $binding['indicator_id_value'])
+				: '';
+			$default_indicator_id_value = $this->data_structure_util->resolve_default_indicator_id_value($sid);
+			$series_idno = $this->data_structure_util->resolve_series_idno($sid);
+			$indicator_id_column = $this->Indicator_dsd_model->get_column_name_by_type($sid, 'indicator_id');
+
+			$has_published_data = $binding && !empty($binding['has_published_data']);
+			$published_row_count = ($binding && isset($binding['published_row_count']))
+				? $binding['published_row_count']
+				: null;
+			$data_imported_at = ($binding && isset($binding['data_imported_at']))
+				? $binding['data_imported_at']
+				: null;
+
+			$import_blocked_reasons = array();
+			if (!$binding) {
+				$import_blocked_reasons[] = 'No data structure attached';
+			}
+			if (empty($structure_validation['valid'])) {
+				if (!empty($structure_validation['errors'])) {
+					$import_blocked_reasons[] = $structure_validation['errors'][0];
+				} else {
+					$import_blocked_reasons[] = 'Structure has validation errors';
+				}
+			}
+			if ($indicator_id_value === '') {
+				$import_blocked_reasons[] = 'Indicator ID value is not set';
+			}
+
+			$has_periodicity = $this->Indicator_dsd_model->project_has_periodicity_column($sid);
+			$implied_freq = ($binding && isset($binding['implied_freq_code']))
+				? trim((string) $binding['implied_freq_code'])
+				: '';
+			if (!$has_periodicity && $implied_freq === '') {
+				$import_blocked_reasons[] = 'Series FREQ (SDMX) is not set — required when the structure has no FREQ column';
+			}
+
+			$this->config->load('indicator_dsd', true);
+
+			$this->set_response(array(
+				'status' => 'success',
+				'bound' => $binding !== null,
+				'read_only' => $binding !== null,
+				'binding' => $binding,
+				'data_structure_reference' => $reference,
+				'global_structure' => $structure,
+				'column_count' => count($columns),
+				'indicator_id_value' => $indicator_id_value !== '' ? $indicator_id_value : null,
+				'series_idno' => $series_idno !== '' ? $series_idno : null,
+				'default_indicator_id_value' => $default_indicator_id_value !== '' ? $default_indicator_id_value : null,
+				'indicator_id_column' => $indicator_id_column,
+				'has_periodicity_column' => $has_periodicity,
+				'needs_implied_freq_code' => !$has_periodicity,
+				'implied_freq_code' => $implied_freq !== '' ? $implied_freq : null,
+				'has_published_data' => $has_published_data,
+				'published_row_count' => $published_row_count !== null ? (int) $published_row_count : null,
+				'data_imported_at' => $data_imported_at !== null ? (int) $data_imported_at : null,
+				'import_ready' => count($import_blocked_reasons) === 0,
+				'import_blocked_reasons' => $import_blocked_reasons,
+				'structure_validation' => array(
+					'valid' => !empty($structure_validation['valid']),
+					'errors' => isset($structure_validation['errors']) ? $structure_validation['errors'] : array(),
+					'warnings' => isset($structure_validation['warnings']) ? $structure_validation['warnings'] : array(),
+					'roles' => isset($structure_validation['roles']) ? $structure_validation['roles'] : array(),
+				),
+				'freq_codes' => $this->config->item('dsd_freq_codes', 'indicator_dsd') ?: array(),
+			), REST_Controller::HTTP_OK);
+		} catch (Throwable $e) {
+			$this->set_response(array(
+				'status' => 'failed',
+				'message' => $e->getMessage(),
+			), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * Upload CSV, validate required DSD headers (extra CSV columns allowed), return distinct indicator_id values.
+	 *
+	 * POST /api/indicator_dsd/data_upload_prepare/{sid}
+	 * multipart: file or upload_id; optional delimiter.
+	 * Does not require indicator_id_value or implied_freq_code (those are enforced on import).
+	 */
+	function data_upload_prepare_post($sid = null)
+	{
 		try {
 			$sid = $this->get_sid($sid);
 			$this->editor_acl->user_has_project_access($sid, $permission = 'edit', $this->api_user);
 
-			$this->load->library('SDMX/SdmxDsdImporter');
+			$ready = $this->Indicator_dsd_model->assert_ready_for_data_upload($sid, false, false);
+			$real_path = $this->save_indicator_csv_upload($sid);
 
-			if (isset($_FILES['file']) && is_uploaded_file($_FILES['file']['tmp_name'])) {
-				$ext = strtolower(pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION));
-				if ($ext !== 'xml') {
-					throw new Exception('Only XML files are supported for SDMX DSD import');
-				}
-				$result = $this->sdmxdsdimporter->parseFile($_FILES['file']['tmp_name']);
-			} else {
-				$url = $this->input->post('sdmx_url');
-				if (empty($url)) {
-					throw new Exception('Either a file upload or sdmx_url is required');
-				}
-				$result = $this->sdmxdsdimporter->parseUrl(trim($url));
+			$delimiter = $this->input->post('delimiter');
+			if ($delimiter === null || $delimiter === '' || strlen($delimiter) !== 1) {
+				$delimiter = ',';
 			}
 
-			if ($result['status'] !== 'success') {
-				throw new Exception('Could not parse SDMX file: ' . $result['message']);
+			$keep_extra = $this->parse_bool_request_flag($this->input->post('keep_extra_csv_columns'), false);
+
+			$expected = $this->Indicator_dsd_model->get_dsd_column_names_for_csv($sid);
+			$validation = $this->Indicator_dsd_model->validate_csv_headers_for_dsd($real_path, $expected);
+
+			if (empty($validation['valid'])) {
+				$this->set_response(array(
+					'status' => 'failed',
+					'headers_valid' => false,
+					'message' => isset($validation['message']) ? $validation['message'] : 'CSV is missing required data structure columns',
+					'missing_in_csv' => isset($validation['missing_in_csv']) ? $validation['missing_in_csv'] : array(),
+					'ignored_columns' => isset($validation['ignored_columns']) ? $validation['ignored_columns'] : array(),
+					'extra_in_csv' => isset($validation['ignored_columns']) ? $validation['ignored_columns'] : array(),
+					'expected_columns' => $expected,
+				), REST_Controller::HTTP_BAD_REQUEST);
+				return;
 			}
 
-			$user_id    = $this->get_api_user_id();
-			$import_res = $this->Indicator_dsd_model->import_sdmx_dsd($sid, $result['dsd'], $user_id);
-
-			$warnings = array_merge(
-				isset($result['warnings']) ? $result['warnings'] : array(),
-				$import_res['warnings']
+			$this->load->library('indicator_duckdb_service');
+			$distinct_limit = 2000;
+			$distinct = $this->indicator_duckdb_service->csv_distinct(
+				$sid,
+				$real_path,
+				$ready['indicator_column'],
+				$delimiter,
+				$distinct_limit
 			);
 
+			if (is_array($distinct) && !empty($distinct['error'])) {
+				throw new Exception(isset($distinct['message']) ? $distinct['message'] : 'Could not read indicator values from CSV');
+			}
+
+			$indicator_values = array();
+			if (!empty($distinct['items']) && is_array($distinct['items'])) {
+				foreach ($distinct['items'] as $item) {
+					if (!is_array($item) || !isset($item['value'])) {
+						continue;
+					}
+					$value = trim((string) $item['value']);
+					if ($value === '') {
+						continue;
+					}
+					$indicator_values[] = array(
+						'value' => $value,
+						'count' => isset($item['count']) ? (int) $item['count'] : null,
+					);
+				}
+			} elseif (!empty($distinct['values']) && is_array($distinct['values'])) {
+				foreach ($distinct['values'] as $value) {
+					$value = trim((string) $value);
+					if ($value === '') {
+						continue;
+					}
+					$indicator_values[] = array(
+						'value' => $value,
+						'count' => null,
+					);
+				}
+			}
+
+			$this->load->library('Data_structure_util');
+			$series_idno = $this->data_structure_util->resolve_series_idno($sid);
+			$series_idno_in_csv = false;
+			if ($series_idno !== '') {
+				foreach ($indicator_values as $item) {
+					if ($item['value'] === $series_idno) {
+						$series_idno_in_csv = true;
+						break;
+					}
+				}
+			}
+
+			$import_columns = $this->Indicator_dsd_model->build_csv_import_column_names($expected, $validation, $keep_extra);
+
 			$this->set_response(array(
-				'status'             => 'success',
-				'message'            => 'DSD imported successfully',
-				'sdmx_version'       => $result['sdmx_version'],
-				'created'            => $import_res['created'],
-				'codelists_created'  => $import_res['codelists_created'],
-				'timeseries_dropped' => $import_res['timeseries_dropped'],
-				'warnings'           => $warnings,
+				'status' => 'success',
+				'headers_valid' => true,
+				'expected_columns' => $expected,
+				'import_columns' => $import_columns,
+				'keep_extra_csv_columns' => $keep_extra,
+				'indicator_column' => $ready['indicator_column'],
+				'indicator_id_value' => $ready['indicator_id_value'] !== '' ? $ready['indicator_id_value'] : null,
+				'indicator_values' => $indicator_values,
+				'indicator_values_truncated' => !empty($distinct['truncated']),
+				'indicator_values_limit' => $distinct_limit,
+				'series_idno' => $series_idno !== '' ? $series_idno : null,
+				'series_idno_in_csv' => $series_idno_in_csv,
+				'ignored_columns' => isset($validation['ignored_columns']) ? $validation['ignored_columns'] : array(),
+				'extra_in_csv' => isset($validation['ignored_columns']) ? $validation['ignored_columns'] : array(),
+				'csv_row_count' => isset($distinct['row_count']) ? (int) $distinct['row_count'] : null,
 			), REST_Controller::HTTP_OK);
-		}
-		catch (Throwable $e) {
+		} catch (Throwable $e) {
 			$this->set_response(array(
-				'status'  => 'failed',
+				'status' => 'failed',
 				'message' => $e->getMessage(),
 			), REST_Controller::HTTP_BAD_REQUEST);
 		}
-		finally {
-			if ($tmp_path !== null && is_file($tmp_path)) {
-				@unlink($tmp_path);
+	}
+
+	/**
+	 * Replace project timeseries from prepared CSV for one indicator_id value.
+	 *
+	 * POST /api/indicator_dsd/data_upload_import/{sid}
+	 * JSON: optional { "wait": true|false (default true) } — uses bound indicator_id_value
+	 */
+	function data_upload_import_post($sid = null)
+	{
+		try {
+			$sid = $this->get_sid($sid);
+			$this->editor_acl->user_has_project_access($sid, $permission = 'edit', $this->api_user);
+
+			$body = (array) $this->raw_json_input();
+			if (array_key_exists('implied_freq_code', $body)) {
+				$this->load->library('Data_structure_util');
+				$this->data_structure_util->update_project_implied_freq_code(
+					$sid,
+					$body['implied_freq_code'],
+					$this->get_api_user_id()
+				);
+			}
+			$ready = $this->Indicator_dsd_model->assert_ready_for_data_upload($sid);
+			$indicator_value = $ready['indicator_id_value'];
+
+			$wait = !isset($body['wait']) || filter_var($body['wait'], FILTER_VALIDATE_BOOLEAN);
+
+			$real_path = $this->indicator_staging_upload_realpath($sid);
+			if (!$real_path) {
+				throw new Exception('No prepared CSV found. Upload and validate a CSV first.');
+			}
+
+			$keep_extra = $this->parse_bool_request_flag(
+				isset($body['keep_extra_csv_columns']) ? $body['keep_extra_csv_columns'] : null,
+				false
+			);
+
+			$expected = $this->Indicator_dsd_model->get_dsd_column_names_for_csv($sid);
+			$validation = $this->Indicator_dsd_model->validate_csv_headers_for_dsd($real_path, $expected);
+			if (empty($validation['valid'])) {
+				$msg = isset($validation['message']) ? $validation['message'] : 'CSV is missing required data structure columns';
+				if (!empty($validation['missing_in_csv'])) {
+					$msg .= ' Missing: ' . implode(', ', $validation['missing_in_csv']);
+				}
+				throw new Exception($msg);
+			}
+
+			$import_columns = $this->Indicator_dsd_model->build_csv_import_column_names($expected, $validation, $keep_extra);
+
+			$csv_for_import = $this->Indicator_dsd_model->resolve_csv_path_for_fastapi_import(
+				$real_path,
+				$expected,
+				$keep_extra
+			);
+			$import_csv_path = $csv_for_import['path'];
+
+			$overrides = array();
+			if (!empty($body['implied_freq_code'])) {
+				$overrides['implied_freq_code'] = trim((string) $body['implied_freq_code']);
+			}
+			$time_spec = $this->Indicator_dsd_model->build_duckdb_promote_time_spec($sid, $overrides);
+
+			$this->load->library('indicator_duckdb_service');
+			$queue = $this->indicator_duckdb_service->timeseries_replace_from_csv_queue(
+				$sid,
+				$import_csv_path,
+				$import_columns,
+				$ready['indicator_column'],
+				$indicator_value,
+				$time_spec,
+				','
+			);
+
+			if (is_array($queue) && !empty($queue['error'])) {
+				throw new Exception($this->format_fastapi_error_message(
+					$queue,
+					'FastAPI replace-from-csv request failed'
+				));
+			}
+			if (empty($queue['job_id'])) {
+				throw new Exception('FastAPI did not return job_id');
+			}
+
+			$job_id = $queue['job_id'];
+			$result = array(
+				'status' => 'success',
+				'job_id' => $job_id,
+				'indicator_value' => $indicator_value,
+			);
+
+			if ($wait) {
+				$poll = $this->indicator_duckdb_service->poll_job($job_id, 1800, 3);
+				$result['job'] = $poll;
+				if (!is_array($poll) || ($poll['status'] ?? '') !== 'done') {
+					$err = isset($poll['error']) ? $poll['error'] : 'Import did not complete';
+					throw new Exception($err);
+				}
+
+				$user_id = $this->get_api_user_id();
+				$this->Indicator_dsd_model->upload_indicator_csv($sid, $real_path, $user_id);
+				$row_count = $this->Indicator_dsd_model->extract_row_count_from_import_job($poll);
+				$this->Indicator_dsd_model->record_published_data_import($sid, $row_count);
+				$result['message'] = 'Timeseries data imported successfully';
+			} else {
+				$result['message'] = 'Replace-from-csv queued; poll GET /api/indicator_dsd/job/{sid}?job_id=';
+			}
+
+			$this->set_response($result, REST_Controller::HTTP_OK);
+		} catch (Throwable $e) {
+			$this->set_response(array(
+				'status' => 'failed',
+				'message' => $e->getMessage(),
+			), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * Bind a global registry DSD to this project (structure read from registry; no per-project column table).
+	 *
+	 * POST /api/indicator_dsd/bind_global/{sid}
+	 * Body JSON: { "data_structure_id": int } OR { "data_structure_reference": { idno|agency,name,version } }
+	 */
+	function bind_global_post($sid = null)
+	{
+		try {
+			$sid = $this->get_sid($sid);
+			$this->editor_acl->user_has_project_access($sid, $permission = 'edit', $this->api_user);
+
+			$input = (array) $this->raw_json_input();
+			$this->load->library('Data_structure_util');
+			$user_id = $this->get_api_user_id();
+
+			$indicator_id_value = null;
+			if (isset($input['indicator_id_value'])) {
+				$indicator_id_value = trim((string) $input['indicator_id_value']);
+			}
+
+			if (!empty($input['data_structure_id'])) {
+				$summary = $this->data_structure_util->bind_project(
+					$sid,
+					(int) $input['data_structure_id'],
+					$user_id,
+					$indicator_id_value
+				);
+			} elseif (!empty($input['data_structure_reference']) && is_array($input['data_structure_reference'])) {
+				$summary = $this->data_structure_util->bind_project_by_reference(
+					$sid,
+					$input['data_structure_reference'],
+					$user_id,
+					$indicator_id_value
+				);
+			} else {
+				throw new Exception('data_structure_id or data_structure_reference is required');
+			}
+
+			$this->set_response(array(
+				'status' => 'success',
+				'result' => $summary,
+			), REST_Controller::HTTP_OK);
+		} catch (Throwable $e) {
+			$this->set_response(array(
+				'status' => 'failed',
+				'message' => $e->getMessage(),
+			), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * Update project binding fields (indicator ID value).
+	 *
+	 * POST /api/indicator_dsd/update_binding/{sid}
+	 * Body JSON: { "indicator_id_value": "..." } and/or { "implied_freq_code": "A" }
+	 */
+	function update_binding_post($sid = null)
+	{
+		try {
+			$sid = $this->get_sid($sid);
+			$this->editor_acl->user_has_project_access($sid, $permission = 'edit', $this->api_user);
+
+			$input = (array) $this->raw_json_input();
+			if (!isset($input['indicator_id_value']) && !array_key_exists('implied_freq_code', $input)) {
+				throw new Exception('indicator_id_value and/or implied_freq_code is required');
+			}
+
+			$this->load->library('Data_structure_util');
+			$user_id = $this->get_api_user_id();
+			$result = array('sid' => (int) $sid);
+			if (isset($input['indicator_id_value'])) {
+				$result = array_merge($result, $this->data_structure_util->update_project_indicator_id_value(
+					$sid,
+					$input['indicator_id_value'],
+					$user_id
+				));
+			}
+			if (array_key_exists('implied_freq_code', $input)) {
+				$freqResult = $this->data_structure_util->update_project_implied_freq_code(
+					$sid,
+					$input['implied_freq_code'],
+					$user_id
+				);
+				$result = array_merge($result, $freqResult);
+			}
+
+			$this->set_response(array(
+				'status' => 'success',
+				'result' => $result,
+			), REST_Controller::HTTP_OK);
+		} catch (Throwable $e) {
+			$this->set_response(array(
+				'status' => 'failed',
+				'message' => $e->getMessage(),
+			), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * Detach global data structure from project: remove binding, clear metadata reference,
+	 * and drop published timeseries data.
+	 *
+	 * POST /api/indicator_dsd/unbind/{sid}
+	 */
+	function unbind_post($sid = null)
+	{
+		try {
+			$sid = $this->get_sid($sid);
+			$this->editor_acl->user_has_project_access($sid, $permission = 'edit', $this->api_user);
+
+			$this->load->library('Data_structure_util');
+			$user_id = $this->get_api_user_id();
+			$result = $this->data_structure_util->unbind_project($sid, $user_id);
+
+			$response = array(
+				'status' => 'success',
+				'unbound' => !empty($result['unbound']),
+				'dsd_columns_deleted' => isset($result['dsd_columns_deleted']) ? (int) $result['dsd_columns_deleted'] : 0,
+				'timeseries_dropped' => !empty($result['timeseries_dropped']),
+			);
+			if (!empty($result['warnings'])) {
+				$response['warnings'] = $result['warnings'];
+			}
+
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		} catch (Throwable $e) {
+			$this->set_response(array(
+				'status' => 'failed',
+				'message' => $e->getMessage(),
+			), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	/**
+	 * @param array  $queue Result from indicator_duckdb_service (error branch)
+	 * @param string $fallback
+	 * @return string
+	 */
+	protected function format_fastapi_error_message(array $queue, $fallback = 'FastAPI request failed')
+	{
+		$raw = isset($queue['message']) ? trim((string) $queue['message']) : '';
+		if ($raw !== '' && $raw[0] === '{') {
+			$decoded = json_decode($raw, true);
+			if (is_array($decoded) && isset($decoded['detail'])) {
+				$detail = $decoded['detail'];
+				return is_string($detail) ? $detail : json_encode($detail);
 			}
 		}
+		if ($raw !== '') {
+			return $raw;
+		}
+
+		return $fallback;
+	}
+
+	/**
+	 * Parse boolean request flag (POST field or JSON body).
+	 *
+	 * @param mixed $value
+	 * @param bool  $default
+	 * @return bool
+	 */
+	protected function parse_bool_request_flag($value, $default = false)
+	{
+		if ($value === null || $value === '') {
+			return $default;
+		}
+
+		return filter_var($value, FILTER_VALIDATE_BOOLEAN);
+	}
+
+	/**
+	 * Save uploaded CSV to project data/indicator_staging_upload.csv (rewrite headers for DuckDB).
+	 *
+	 * @param int $sid
+	 * @return string Absolute path
+	 * @throws Exception
+	 */
+	protected function save_indicator_csv_upload($sid)
+	{
+		$upload_id_raw = $this->input->post('upload_id');
+		$upload_id = is_string($upload_id_raw) ? trim($upload_id_raw) : '';
+		$has_file = isset($_FILES['file']) && is_uploaded_file($_FILES['file']['tmp_name']);
+
+		if ($upload_id !== '' && $has_file) {
+			throw new Exception('Provide either a file upload or upload_id, not both');
+		}
+
+		$this->Editor_model->create_project_folder($sid);
+		$folder = $this->Editor_model->get_project_folder($sid);
+		if (!$folder) {
+			throw new Exception('Project folder not available');
+		}
+
+		$data_dir = $folder . '/data';
+		if (!is_dir($data_dir)) {
+			@mkdir($data_dir, 0777, true);
+		}
+
+		$dest = $data_dir . '/indicator_staging_upload.csv';
+
+		if ($upload_id !== '') {
+			$this->load->library('Resumable_upload', null, 'uploader');
+			$completed = $this->uploader->get_completed_upload($upload_id);
+			if (!$completed) {
+				throw new Exception('Resumable upload not found or not yet complete');
+			}
+			$ext = strtolower(pathinfo($completed['filename'], PATHINFO_EXTENSION));
+			if ($ext !== 'csv') {
+				throw new Exception('Only CSV files are supported');
+			}
+			if (!@copy($completed['file_path'], $dest)) {
+				throw new Exception('Failed to save uploaded CSV');
+			}
+			$this->uploader->delete_upload($upload_id);
+		} elseif ($has_file) {
+			$ext = strtolower(pathinfo($_FILES['file']['name'], PATHINFO_EXTENSION));
+			if ($ext !== 'csv') {
+				throw new Exception('Only CSV files are supported');
+			}
+			if (!@move_uploaded_file($_FILES['file']['tmp_name'], $dest)) {
+				throw new Exception('Failed to save uploaded CSV');
+			}
+		} else {
+			throw new Exception('CSV file is required');
+		}
+
+		$real_path = realpath($dest);
+		if ($real_path === false) {
+			throw new Exception('Could not resolve CSV path');
+		}
+
+		$this->Indicator_dsd_model->rewrite_indicator_csv_headers_for_duckdb($real_path);
+
+		return $real_path;
 	}
 
 	/**

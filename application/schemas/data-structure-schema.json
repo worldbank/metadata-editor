@@ -1,0 +1,315 @@
+{
+	"$id": "https://ihsn.org/schemas/data-structure/1.0.0",
+	"$schema": "https://json-schema.org/draft-07/schema#",
+	"title": "Metadata Editor global data structure (DSD) — create / import",
+	"description": "Payload for POST /api/data_structures/import_json: create a catalogue global DSD (data_structures + components) and associated global codelists. Root shape matches the study-side DSD envelope: data_structure holds identity fields plus components[]. Optional root-level overwrite and dry_run are read only from this JSON body (not from query strings). overwrite governs destructive updates where the API applies them (matched codelists when inline items are supplied; structure-level behaviour as implemented). dry_run validates without persisting. Each component uses codelist (inline binding) and/or codelist_reference (canonical catalogue identity); when both are present, codelist_reference takes precedence. Cross-field rules are enforced by the API, not only this schema.",
+	"version": "1.0.0",
+	"definitions": {
+		"codeListItem": {
+			"type": "object",
+			"description": "One code in a global codelist. Maps to codelist_item: code, title (from label), sort_order, parent_id. Description is carried in the payload for documentation or import logic if the persistence layer supports it.",
+			"properties": {
+				"code": {
+					"title": "Code",
+					"description": "Stable code value (unique within the codelist).",
+					"type": ["string", "number"],
+					"minLength": 1
+				},
+				"label": {
+					"title": "Label",
+					"description": "Display label; import maps to codelist_item.title when persisting.",
+					"type": ["string", "number"]
+				},
+				"description": {
+					"title": "Description",
+					"description": "Optional longer text; import may persist if supported or ignore.",
+					"type": "string"
+				},
+				"sort_order": {
+					"title": "Sort order",
+					"description": "Order within the codelist (default 0).",
+					"type": "integer",
+					"default": 0
+				},
+				"parent_id": {
+					"title": "Parent item id",
+					"description": "Optional codelist_item.id of the parent row for hierarchies; use when parent already exists (e.g. second import pass).",
+					"type": ["integer", "null"]
+				}
+			},
+			"required": ["code"],
+			"additionalProperties": false
+		},
+		"codelistBinding": {
+			"type": "object",
+			"description": "Nested codelist binding for a component. Reuse existing catalogue codelist by supplying only 'idno'. Create a new codelist by supplying 'idno' + 'name' (and optional agency/version/description) together with 'items'. When the list already exists and 'items' is present, they are applied only if overwrite=true on the request; otherwise items are ignored with a warning.",
+			"properties": {
+				"idno": {
+					"title": "Codelist idno",
+					"description": "Catalogue codelist idno. Required to reuse an existing codelist; required when creating a new codelist so studies can reference it stably.",
+					"type": "string",
+					"minLength": 1,
+					"maxLength": 191
+				},
+				"name": {
+					"title": "Codelist maintainable name",
+					"description": "Required when creating a new codelist.",
+					"type": "string",
+					"minLength": 1,
+					"maxLength": 191
+				},
+				"agency": {
+					"title": "Agency",
+					"description": "Defaults to NADA in API if omitted.",
+					"type": "string",
+					"maxLength": 64
+				},
+				"version": {
+					"title": "Version",
+					"description": "Defaults to 1.0 in API if omitted.",
+					"type": "string",
+					"maxLength": 32
+				},
+				"description": {
+					"title": "Description",
+					"type": "string"
+				},
+				"items": {
+					"title": "Codelist items",
+					"description": "Codes to load when creating a new codelist (or when overwrite is true on existing).",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/codeListItem"
+					}
+				}
+			},
+			"additionalProperties": false
+		},
+		"codelistReference": {
+			"type": "object",
+			"description": "Canonical catalogue codelist identity. When present with codelist on the same component, this reference wins and inline codelist is ignored for binding.",
+			"properties": {
+				"idno": {
+					"title": "Codelist idno",
+					"type": "string",
+					"minLength": 1,
+					"maxLength": 191
+				},
+				"agency": {
+					"title": "Agency",
+					"type": "string",
+					"minLength": 1,
+					"maxLength": 64
+				},
+				"name": {
+					"title": "Maintainable id",
+					"type": "string",
+					"minLength": 1,
+					"maxLength": 64
+				},
+				"version": {
+					"title": "Version",
+					"type": "string",
+					"minLength": 1,
+					"maxLength": 32
+				},
+				"uri": {
+					"title": "Source URI",
+					"description": "Optional URL for documentation or discovery; not used by import.",
+					"type": "string",
+					"format": "uri",
+					"maxLength": 2048
+				}
+			},
+			"required": ["idno", "agency", "name", "version"],
+			"additionalProperties": false
+		},
+		"dataStructureStatus": {
+			"title": "DSD status",
+			"type": "string",
+			"enum": ["draft", "review", "published", "deprecated", "archived"]
+		},
+		"dsdComponent": {
+			"type": "object",
+			"description": "One DSD column. For dimension/geography, supply codelist_reference (existing catalogue idno) and/or codelist for inline create/reuse with items.",
+			"properties": {
+				"name": {
+					"title": "Name",
+					"description": "Field name in observations; must not start with underscore.",
+					"type": "string",
+					"minLength": 1,
+					"maxLength": 100,
+					"pattern": "^(?!_)[a-zA-Z0-9_]+$"
+				},
+				"label": {
+					"title": "Label",
+					"type": "string"
+				},
+				"description": {
+					"title": "Description",
+					"type": "string"
+				},
+				"data_type": {
+					"title": "Data type",
+					"type": "string",
+					"enum": [
+						"string",
+						"integer",
+						"float",
+						"double",
+						"date",
+						"boolean"
+					]
+				},
+				"column_type": {
+					"title": "Column type",
+					"type": "string",
+					"enum": [
+						"dimension",
+						"time_period",
+						"measure",
+						"attribute",
+						"indicator_id",
+						"indicator_name",
+						"annotation",
+						"geography",
+						"observation_value",
+						"periodicity"
+					]
+				},
+				"time_period_format": {
+					"title": "Time period format",
+					"type": "string",
+					"enum": [
+						"YYYY",
+						"YYYY-Sn",
+						"YYYY-Qn",
+						"YYYY-MM",
+						"YYYY-Www",
+						"YYYY-MM-DD",
+						"YYYY-MM-DDTHH:mm:ss",
+						"YYYY-MM-DDTHH:mm:ssZ"
+					]
+				},
+				"sort_order": {
+					"title": "Sort order",
+					"type": "integer",
+					"default": 0
+				},
+				"codelist": {
+					"$ref": "#/definitions/codelistBinding"
+				},
+				"codelist_reference": {
+					"$ref": "#/definitions/codelistReference"
+				},
+				"paired_time_column": {
+					"title": "Paired time_period component name",
+					"description": "Name of the sibling component with column_type time_period (e.g. periodicity paired with TIME_PERIOD). Logical reference only.",
+					"type": "string",
+					"minLength": 1,
+					"maxLength": 100
+				},
+				"value_label_column": {
+					"title": "Value label source column",
+					"type": "string"
+				},
+				"attachment_level": {
+					"title": "Applies at",
+					"type": "string",
+					"enum": ["DataSet", "Series", "Observation"]
+				},
+				"assignment_status": {
+					"title": "Value presence",
+					"type": "string",
+					"enum": ["Mandatory", "Conditional"]
+				}
+			},
+			"required": ["name", "column_type"],
+			"additionalProperties": false
+		},
+		"componentList": {
+			"type": "array",
+			"description": "Ordered DSD components",
+			"items": {
+				"$ref": "#/definitions/dsdComponent"
+			}
+		},
+		"data_structure": {
+			"type": "object",
+			"description": "Global DSD catalogue identity plus components. idno is the handle for studies (metadata.data_structure_reference).",
+			"properties": {
+				"name": {
+					"title": "Maintainable name",
+					"description": "Unique with agency + version.",
+					"type": "string",
+					"minLength": 1,
+					"maxLength": 64
+				},
+				"agency": {
+					"title": "Agency",
+					"description": "Defaults to NADA in API if omitted.",
+					"type": "string",
+					"maxLength": 64
+				},
+				"version": {
+					"title": "Version",
+					"description": "Defaults per API if omitted.",
+					"type": "string",
+					"maxLength": 32
+				},
+				"idno": {
+					"title": "DSD idno",
+					"description": "Stable catalogue idno; required for JSON import.",
+					"type": "string",
+					"minLength": 1,
+					"maxLength": 191
+				},
+				"status": {
+					"$ref": "#/definitions/dataStructureStatus"
+				},
+				"title": {
+					"title": "Title",
+					"type": "string",
+					"maxLength": 255
+				},
+				"description": {
+					"title": "Description",
+					"type": "string",
+					"maxLength": 255
+				},
+				"notes": {
+					"title": "Notes",
+					"type": "string"
+				},
+				"components": {
+					"title": "Components",
+					"description": "Ordered DSD columns to create under this structure.",
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/dsdComponent"
+					}
+				}
+			},
+			"required": ["name", "idno", "components"],
+			"additionalProperties": false
+		}
+	},
+	"type": "object",
+	"properties": {
+		"data_structure": {
+			"$ref": "#/definitions/data_structure"
+		},
+		"overwrite": {
+			"type": "boolean",
+			"description": "When true, allows destructive updates for catalogue artefacts touched by this import (e.g. replacing codes on matched codelists when inline items are supplied; structure-related rules as defined by the server). When false, existing codelists are not mutated.",
+			"default": false
+		},
+		"dry_run": {
+			"type": "boolean",
+			"description": "When true, validate only; do not persist.",
+			"default": false
+		}
+	},
+	"required": ["data_structure"],
+	"additionalProperties": false
+}

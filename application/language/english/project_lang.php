@@ -695,7 +695,16 @@ $lang['name_already_used'] = "Name already in use: ";
 
 // DSD
 $lang['data_structure_definition']="Data Structure Definition";
-$lang['data_preview']="Data Preview";
+$lang['data_preview']="Data";
+$lang['indicator_data']="Data";
+$lang['import_indicator_data']="Import data";
+$lang['published_data']="Published data";
+$lang['upload_csv']="Upload CSV";
+$lang['select_csv_file']="Select CSV file";
+$lang['csv_extra_remove']="Do not import";
+$lang['csv_extra_keep']="Import into published data";
+$lang['indicator_data_empty']="No published indicator data yet.";
+$lang['browse']="Browse";
 $lang['chart_visualization']="Visualization";
 $lang['import_csv_data_structure']='Import CSV';
 $lang['import_csv_description']='Import CSV to create the data structure definition';

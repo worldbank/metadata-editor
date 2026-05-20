@@ -69,6 +69,7 @@
         'username'=> $user,
         'is_logged_in'=> !empty($user),
         'is_admin'=> $this->ion_auth->is_admin(),
+        'can_access_site_admin'=> $this->ion_auth->can_access_site_admin(),
       ];
       
     ?>
@@ -968,32 +969,21 @@
               type: 'indicator-dsd-container',
               file: 'database',
               key:'indicator-dsd-container',
-              items:(() => {
-                const items = [
-                  {
-                    title: this.$t('data_structure_definition'),
-                    type: 'indicator-dsd',
-                    file: 'database',
-                    key:'indicator-dsd'
-                  }
-                ];
-                if (typeof dsd_temporary_features_enabled !== 'undefined' && dsd_temporary_features_enabled) {
-                  items.push({
-                    title: this.$t('data_preview'),
-                    type: 'data-preview',
-                    file: 'txt',
-                    key:'data-preview',
-                    datafile: this.IndicatorDataFile // Attach datafile for routing
-                  });
-                  items.push({
-                    title: this.$t('chart_visualization'),
-                    type: 'indicator-dsd-chart',
-                    file: 'chart',
-                    key:'indicator-dsd-chart'
-                  });
+              items:[
+                {
+                  title: this.$t('indicator_data') || 'Data',
+                  type: 'data-preview',
+                  file: 'txt',
+                  key:'data-preview',
+                  datafile: this.IndicatorDataFile
+                },
+                {
+                  title: this.$t('chart_visualization'),
+                  type: 'indicator-dsd-chart',
+                  file: 'chart',
+                  key:'indicator-dsd-chart'
                 }
-                return items;
-              })()
+              ]
             });
           }
           
@@ -1058,10 +1048,11 @@
             this.setTreeActiveNode(this.$route.path);
           }
           else if (this.$route.path.startsWith("/indicator-dsd")){
+            this.initiallyOpen.push("indicator-dsd-container");
             if (this.$route.path.startsWith("/indicator-dsd-chart")){
               this.setTreeActiveNode("indicator-dsd-chart");
             } else {
-              this.setTreeActiveNode("indicator-dsd");
+              this.setTreeActiveNode("indicator-dsd-container");
             }
           }
           else{
@@ -1221,11 +1212,6 @@
 
           if (node.type=='indicator-dsd-container'){
             router.push('/indicator-dsd-overview');
-            return;
-          }
-
-          if (node.type=='indicator-dsd'){
-            router.push('/indicator-dsd');
             return;
           }
 

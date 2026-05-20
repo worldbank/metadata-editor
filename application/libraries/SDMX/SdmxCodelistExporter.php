@@ -12,7 +12,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * Input shape for $codelists (array of one or more):
  *   [
  *     [
- *       'codelist'     => [ id, agency, codelist_id, version, name, description, uri, ... ],
+ *       'codelist'     => [ id, idno, agency, name, version, title, description, uri, ... ],
  *       'translations' => [ [ language, label, description ], ... ],   // codelist_labels rows
  *       'codes'        => [ [ id, code, parent_id, sort_order, labels => [ [language, label, description] ] ], ... ],
  *     ],
@@ -126,7 +126,7 @@ class SdmxCodelistExporter
 		$translations = isset($entry['translations']) ? $entry['translations'] : array();
 		$codes        = isset($entry['codes'])        ? $entry['codes']        : array();
 
-		$cid     = isset($codelist['codelist_id']) ? (string) $codelist['codelist_id'] : '';
+		$cid     = isset($codelist['name']) ? (string) $codelist['name'] : '';
 		$agency  = isset($codelist['agency'])      ? (string) $codelist['agency']      : '';
 		$ver     = isset($codelist['version'])     ? (string) $codelist['version']     : '1.0';
 		$uri     = isset($codelist['uri'])         ? (string) $codelist['uri']         : '';

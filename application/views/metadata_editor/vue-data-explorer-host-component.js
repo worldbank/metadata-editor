@@ -12,7 +12,7 @@ Vue.component('data-explorer-host', {
     },
     template: `
         <div>
-            <indicator-timeseries-data-explorer v-if="useDuckdbExplorer" :file_id="file_id" />
+            <indicator-data-page v-if="useDuckdbExplorer" :file_id="file_id" />
             <datafile-data-explorer v-else :file_id="file_id" />
         </div>
     `

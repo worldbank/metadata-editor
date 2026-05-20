@@ -21,17 +21,32 @@
         $this->load->library('Editor_acl');
         
         $has_schema_permission = false;
+        $has_codelist_permission = false;
+        $has_data_structure_permission = false;
         try {
             $has_schema_permission = $this->editor_acl->has_access('schema', 'view');
         } catch (Exception $e) {
             $has_schema_permission = false;
+        }
+        try {
+            $has_codelist_permission = $this->editor_acl->has_access('codelist', 'view');
+        } catch (Exception $e) {
+            $has_codelist_permission = false;
+        }
+        try {
+            $has_data_structure_permission = $this->editor_acl->has_access('data_structure', 'view');
+        } catch (Exception $e) {
+            $has_data_structure_permission = false;
         }
 
         $user_info=[
             'username'=> $user,
             'is_logged_in'=> !empty($user),
             'is_admin'=> $this->ion_auth->is_admin(),
+            'can_access_site_admin'=> $this->ion_auth->can_access_site_admin(),
             'has_schema_permission'=> $has_schema_permission,
+            'has_codelist_permission'=> $has_codelist_permission,
+            'has_data_structure_permission'=> $has_data_structure_permission,
         ];
         
         ?>
@@ -138,6 +153,9 @@
             <v-login v-model="login_dialog"></v-login>
             
             <v-container fluid class="pa-4">
+                <div class="mb-4">
+                    <main-navigation-tabs active-tab="codelists" v-model="navTabsModel"></main-navigation-tabs>
+                </div>
                 <router-view></router-view>
                 <v-toast></v-toast>
             </v-container>
@@ -164,6 +182,7 @@
             echo $this->load->view("metadata_editor/vue-codelist-edit-component.js", null, true);
             echo $this->load->view("metadata_editor/vue-codelist-view-component.js", null, true);
             echo $this->load->view("editor_common/global-site-header-component.js", null, true);
+            echo $this->load->view("editor_common/main-navigation-tabs-component.js", null, true);
         ?>
 
         // Define route components
@@ -245,7 +264,8 @@
             router: router,
             vuetify: vuetify,
             data: {
-                login_dialog: false
+                login_dialog: false,
+                navTabsModel: 5
             },
             methods: {
                 // Event handlers for codelist actions
@@ -277,9 +297,11 @@
                     }
                 },
                 handleCodelistExport: function(codelist) {
-                    // Export codelist
-                    // This can be implemented later
-                    alert('Export functionality coming soon');
+                    if (!codelist || !codelist.id) {
+                        return;
+                    }
+                    var base = (typeof CI !== 'undefined' && CI.site_url) ? CI.site_url.replace(/\/$/, '') : '';
+                    window.open(base + '/api/codelists/export_json/' + codelist.id + '?download=1', '_blank');
                 }
             },
             created: function() {

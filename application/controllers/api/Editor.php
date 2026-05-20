@@ -251,11 +251,23 @@ class Editor extends MY_REST_Controller
 		$options['changed_by'] = $user_id;
 		$options['changed'] = date("U");
 		
-		// Indicator/timeseries: import data_structure into DSD table and remove from metadata
-		if (in_array($type, array('indicator', 'timeseries')) && isset($options['data_structure']) && is_array($options['data_structure'])) {
-			$this->load->library('Indicator_util');
-			$this->indicator_util->import_data_structure_for_project($id, $options['data_structure'], $user_id);
+		// Indicator/timeseries: bind global DSD reference only (no inline data_structure).
+		if (in_array($type, array('indicator', 'timeseries'))) {
+			if (isset($options['data_structure']) && is_array($options['data_structure']) && count($options['data_structure']) > 0) {
+				throw new Exception(
+					'Inline data_structure is no longer supported. Attach a global data structure via data_structure_reference or the project DSD UI.'
+				);
+			}
 			unset($options['data_structure']);
+
+			if (isset($options['data_structure_reference']) && is_array($options['data_structure_reference'])) {
+				$this->load->library('Data_structure_util');
+				$this->data_structure_util->bind_project_by_reference(
+					$id,
+					$options['data_structure_reference'],
+					$user_id
+				);
+			}
 		}
 		
 		$this->load->library('ImportJsonMetadata');

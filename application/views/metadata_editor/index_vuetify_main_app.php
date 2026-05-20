@@ -248,12 +248,12 @@
             echo $this->load->view("metadata_editor/vue-geospatial-feature-description-component.js",null,true);
 
             echo $this->load->view("metadata_editor/vue-indicator-dsd-component.js",null,true);
-            echo $this->load->view("metadata_editor/vue-indicator-dsd-local-codelist-grid-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-indicator-dsd-global-codelist-preview-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-indicator-dsd-edit-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-indicator-dsd-import-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-indicator-dsd-chart-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-indicator-dsd-overview-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-indicator-data-page-component.js",null,true);
         ?>
 
         <?php if (empty($metadata)):?>
@@ -311,7 +311,6 @@
         const GeoFeatureDescription ={template: '<div><geospatial-feature-description/></div>'}
         const PagePreview ={template: '<div><page-preview/></div>'}
         const GeoGallery ={template: '<div><geospatial-gallery/></div>'}
-        const IndicatorDsd ={template: '<div><indicator-dsd/></div>'}
         const IndicatorDsdImport ={template: '<div><indicator-dsd-import/></div>'}
         const IndicatorDsdChart ={template: '<div><indicator-dsd-chart/></div>'}
         const IndicatorDsdOverview ={template: '<div><indicator-dsd-overview/></div>'}
@@ -355,8 +354,8 @@
             // This route must come last to avoid matching /description or /import
             { path: '/geospatial-features/:id', component: GeoFeature, props: true },
             { path: '/geospatial-gallery', component: GeoGallery, props: true },
-            { path: '/indicator-dsd', component: IndicatorDsd, name: 'indicator-dsd', props: true },
-            { path: '/indicator-dsd-import', component: IndicatorDsdImport, name: 'indicator-dsd-import', props: true },
+            { path: '/indicator-dsd', redirect: '/indicator-dsd-overview' },
+            { path: '/indicator-dsd-import', redirect: { path: '/data-explorer/INDICATOR_DATA', query: { tab: 'import' } } },
             { path: '/indicator-dsd-chart', component: IndicatorDsdChart, name: 'indicator-dsd-chart', props: true },
             { path: '/indicator-dsd-overview', component: IndicatorDsdOverview, name: 'indicator-dsd-overview', props: true },
             { path: '/change-log', component: ProjectHistory },

@@ -11,26 +11,28 @@ Vue.component('indicator-dsd', {
             column_search: '',
             page_action: 'list',
             edit_item: null,
-            column_copy: {}, // copy of the column before any editing
-            has_clicked_edit: true, // to ignore watch from triggering on editColumn click
-            is_navigating: false, // to ignore watch from triggering during navigation
             validationResult: null,
             isValidating: false,
             /** 0 = Structure (editor), 1 = Validation report */
             dsdMainTab: 0,
-            selectedColumns: [], // Array of selected column IDs for deletion
-            sortOrder: 'asc', // asc, desc
-            isPopulatingCodeLists: false,
-            isRefreshingSumStats: false,
+            sortOrder: 'asc',
             globalCodelistsList: [],
             globalCodelistsLoading: false,
+            bindGlobalDialog: false,
+            globalStructuresList: [],
+            globalStructuresLoading: false,
+            bindStructureId: null,
+            bindingGlobal: false,
+            dsdBinding: {
+                bound: false,
+                read_only: false,
+                column_count: 0,
+                global_structure: null,
+                data_structure_reference: null
+            },
             dsdDictionaries: {
-                time_period_formats: [],
                 freq_codes: []
             },
-            /** Persistent save/create errors: { message, errors[] } or null */
-            dsdSaveError: null,
-            /** Left column list width (px); resizable via splitter */
             dsdSplitListWidth: 280
         }
     },
@@ -45,56 +47,15 @@ Vue.component('indicator-dsd', {
             }
         } catch (e) { /* ignore */ }
         this.fetchGlobalCodelists();
+        await this.loadBinding();
         await this.loadColumns();
         if (this.columns.length > 0) {
             this.validateDSDDebounce();
         }
     },
-    watch: {
-        activeColumn: {
-            deep: true,
-            handler(val, oldVal) {
-                if (this.page_action != "edit") {
-                    return;
-                }
-
-                if (this.has_clicked_edit) {
-                    this.has_clicked_edit = false;
-                    return;
-                }
-
-                // don't save if navigating to a column
-                if (this.is_navigating) {
-                    return;
-                }
-
-                // don't save if val is null/undefined
-                if (!val) {
-                    return;
-                }
-
-                // For single column, compare with the original copy
-                if (JSON.stringify(val) == JSON.stringify(this.column_copy)) {
-                    // no change detected
-                } else {
-                    this.saveColumnDebounce(val);
-                }
-            }
-        },
-        /*columns: {
-            deep: true,
-            handler() {
-                // Debounce validation when columns change
-                this.validateDSDDebounce();
-            }
-        }*/
-    },
     methods: {
         clearColumnSearch: function() {
             this.column_search = '';
-        },
-        clearDsdSaveError: function() {
-            this.dsdSaveError = null;
         },
         formatObservationKeyColumns: function(cols) {
             if (!cols || !cols.length) {
@@ -161,31 +122,10 @@ Vue.component('indicator-dsd', {
                 localStorage.setItem('indicator_dsd_list_width_px', String(this.dsdSplitListWidth));
             } catch (err) { /* ignore */ }
         },
-        /** Populate dsdSaveError from axios error (REST message + errors array). */
-        applyDsdSaveErrorFromResponse: function(error) {
-            var data = error.response && error.response.data;
-            var msg = data && data.message != null ? String(data.message) : '';
-            if (!msg && error.message) {
-                msg = String(error.message);
-            }
-            var errs = [];
-            if (data && Array.isArray(data.errors)) {
-                errs = data.errors.filter(function(x) {
-                    return x != null && String(x).trim() !== '';
-                }).map(function(x) {
-                    return String(x);
-                });
-            }
-            if (!msg && errs.length === 0) {
-                msg = this.$t('request_failed') || 'Request failed.';
-            }
-            this.dsdSaveError = { message: msg, errors: errs };
-            this.dsdMainTab = 0;
-        },
         fetchGlobalCodelists: function() {
             var vm = this;
             vm.globalCodelistsLoading = true;
-            axios.get(CI.base_url + '/api/codelists', { params: { limit: 500, order_by: 'name', order_dir: 'ASC' } })
+            axios.get(CI.base_url + '/api/codelists', { params: { limit: 500, order_by: 'name', order_dir: 'ASC', exclude_archived: 1 } })
                 .then(function(res) {
                     var data = res.data || {};
                     vm.globalCodelistsList = Array.isArray(data.codelists) ? data.codelists : [];
@@ -196,6 +136,80 @@ Vue.component('indicator-dsd', {
                 .then(function() {
                     vm.globalCodelistsLoading = false;
                 });
+        },
+        openBindGlobalDialog: function() {
+            var vm = this;
+            vm.bindStructureId = null;
+            vm.bindGlobalDialog = true;
+            vm.globalStructuresLoading = true;
+            axios.get(CI.base_url + '/api/data_structures', { params: { page: 1, per_page: 200 } })
+                .then(function(res) {
+                    var data = res.data || {};
+                    vm.globalStructuresList = Array.isArray(data.data_structures) ? data.data_structures : [];
+                })
+                .catch(function() {
+                    vm.globalStructuresList = [];
+                })
+                .then(function() {
+                    vm.globalStructuresLoading = false;
+                });
+        },
+        submitBindGlobal: function() {
+            var vm = this;
+            if (!vm.bindStructureId) {
+                return;
+            }
+            vm.bindingGlobal = true;
+            axios.post(CI.base_url + '/api/indicator_dsd/bind_global/' + vm.dataset_id, {
+                data_structure_id: parseInt(vm.bindStructureId, 10)
+            })
+                .then(function() {
+                    vm.bindingGlobal = false;
+                    vm.bindGlobalDialog = false;
+                    if (typeof EventBus !== 'undefined') {
+                        EventBus.$emit('onSuccess', 'Bound to data structure');
+                    }
+                    return vm.loadBinding().then(function() {
+                        return vm.loadColumns();
+                    });
+                })
+                .then(function() {
+                    if (vm.columns.length > 0) {
+                        vm.validateDSDDebounce();
+                    }
+                })
+                .catch(function(err) {
+                    vm.bindingGlobal = false;
+                    var m = (err.response && err.response.data && err.response.data.message) || 'Bind failed';
+                    if (typeof EventBus !== 'undefined') {
+                        EventBus.$emit('onFail', m);
+                    }
+                });
+        },
+        globalStructureLabel: function(ds) {
+            if (!ds) {
+                return '';
+            }
+            var t = ds.title || ds.name || '';
+            var id = ds.idno || ((ds.agency || '') + ':' + (ds.name || ''));
+            return t + ' (' + id + ')';
+        },
+        loadBinding: async function() {
+            const vm = this;
+            try {
+                const response = await axios.get(CI.base_url + '/api/indicator_dsd/binding/' + vm.dataset_id);
+                if (response.data) {
+                    vm.dsdBinding = {
+                        bound: !!response.data.bound,
+                        read_only: !!response.data.read_only,
+                        column_count: response.data.column_count || 0,
+                        global_structure: response.data.global_structure || null,
+                        data_structure_reference: response.data.data_structure_reference || null
+                    };
+                }
+            } catch (e) {
+                console.log('binding load failed', e);
+            }
         },
         loadColumns: async function() {
             this.loading = true;
@@ -210,7 +224,6 @@ Vue.component('indicator-dsd', {
                 if (response.data && response.data.dictionaries) {
                     var d = response.data.dictionaries;
                     vm.dsdDictionaries = {
-                        time_period_formats: Array.isArray(d.time_period_formats) ? d.time_period_formats : [],
                         freq_codes: Array.isArray(d.freq_codes) ? d.freq_codes : []
                     };
                 }
@@ -222,286 +235,14 @@ Vue.component('indicator-dsd', {
             }
         },
         editColumn: function(index) {
-            this.exitEditMode();
-            this.is_navigating = true;
-            var vm = this;
-            this.$nextTick().then(() => {
-                vm.page_action = "edit";
-                vm.has_clicked_edit = true;
-                vm.edit_item = index;
-                vm.$forceUpdate();
-
-                // Clone column_copy AFTER the edit component's created() has run
-                // and added any missing defaults — prevents false-positive change detection.
-                vm.$nextTick(function() {
-                    vm.column_copy = _.cloneDeep(vm.columns[index]);
-                    setTimeout(function() {
-                        vm.has_clicked_edit = false;
-                        vm.is_navigating = false;
-                    }, 50);
-                });
-            });
+            this.page_action = "edit";
+            this.edit_item = index;
         },
         editColumnByColumn: function(column) {
             // Find the index of the column in the original columns array
             const index = this.columns.findIndex(col => col.id === column.id);
             if (index !== -1) {
                 this.editColumn(index);
-            }
-        },
-        addColumn: function() {
-            this.column_search = "";
-            this.page_action = "edit";
-
-            let url = CI.base_url + '/api/indicator_dsd/' + this.dataset_id;
-            let new_column = {
-                "name": this.$t("untitled") || "Untitled",
-                "label": this.$t("untitled") || "Untitled",
-                "description": "",
-                "data_type": "string",
-                "column_type": "dimension",
-                "time_period_format": null,
-                "code_list": null,
-                "code_list_reference": null,
-                "metadata": {},
-                "codelist_type": "none",
-                "global_codelist_id": null,
-                "local_codelist_id": null,
-                "sort_order": this.columns.length
-            };
-
-            axios.post(url, new_column)
-                .then((response) => {
-                    if (response.data && response.data.id) {
-                        this.clearDsdSaveError();
-                        new_column.id = response.data.id;
-                        this.columns.push(new_column);
-                        let newIdx = this.columns.length - 1;
-                        this.editColumn(newIdx);
-                        EventBus.$emit('onSuccess', 'Column created!');
-                        this.validateDSDDebounce();
-                    }
-                })
-                .catch((error) => {
-                    console.log("error creating column", error);
-                    this.applyDsdSaveErrorFromResponse(error);
-                });
-        },
-        importColumns: function() {
-            this.$router.push('/indicator-dsd-import');
-        },
-        populateLocalCodelistsFromData: async function() {
-            if (!confirm(this.$t('populate_local_codelists_confirm') || 'Refresh local codelists from data for all fields set to "Local" vocabulary?')) {
-                return;
-            }
-            const vm = this;
-            vm.isPopulatingCodeLists = true;
-            const url = CI.base_url + '/api/indicator_dsd/populate_local_codelists/' + vm.dataset_id;
-            try {
-                const response = await axios.post(url);
-                const data = response.data || {};
-                if (data.status === 'success' || data.status === 'partial') {
-                    const msg = data.updated !== undefined
-                        ? ((vm.$t('local_codelists_populated') || 'Local codelists updated') + ': ' + data.updated + ' ' + (vm.$t('fields') || 'fields'))
-                        : (vm.$t('local_codelists_populated') || 'Local codelists updated');
-                    EventBus.$emit('onSuccess', msg);
-                    if (data.warnings && data.warnings.length > 0) {
-                        console.warn('Populate local codelists warnings:', data.warnings);
-                    }
-                    if (data.skipped && data.skipped.length > 0) {
-                        console.log('Populate local codelists skipped:', data.skipped);
-                    }
-                    if (data.errors && data.errors.length > 0) {
-                        console.warn('Populate local codelists errors:', data.errors);
-                    }
-                    await vm.loadColumns();
-                } else {
-                    EventBus.$emit('onFail', data.message || (vm.$t('populate_local_codelists_failed') || 'Failed to populate local codelists'));
-                }
-            } catch (error) {
-                const msg = (error.response && error.response.data && error.response.data.message) || error.message || (vm.$t('populate_local_codelists_failed') || 'Failed to populate local codelists');
-                EventBus.$emit('onFail', msg);
-            } finally {
-                vm.isPopulatingCodeLists = false;
-            }
-        },
-        refreshSumStatsFromData: async function() {
-            if (!confirm(this.$t('sum_stats_refresh_confirm') || 'Compute column statistics from data and save to each DSD field? This can take a moment on large datasets.')) {
-                return;
-            }
-            const vm = this;
-            vm.isRefreshingSumStats = true;
-            const url = CI.base_url + '/api/indicator_dsd/sum_stats_refresh/' + vm.dataset_id;
-            try {
-                const response = await axios.post(url, {}, {
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                const data = response.data || {};
-                if (data.status === 'success') {
-                    let msg = vm.$t('sum_stats_refreshed') || 'Column statistics updated';
-                    if (data.updated_columns != null) {
-                        msg += ' (' + data.updated_columns + ' ' + (vm.$t('columns') || 'columns') + ')';
-                    }
-                    if (data.not_found_in_timeseries && data.not_found_in_timeseries.length > 0) {
-                        console.warn('sum_stats: not in timeseries:', data.not_found_in_timeseries);
-                        msg += ' — ' + (vm.$t('sum_stats_some_missing_in_data') || 'some fields not found in data');
-                    }
-                    EventBus.$emit('onSuccess', msg);
-                    await vm.loadColumns();
-                } else {
-                    EventBus.$emit('onFail', data.message || (vm.$t('sum_stats_refresh_failed') || 'Failed to refresh column statistics'));
-                }
-            } catch (error) {
-                const msg = (error.response && error.response.data && error.response.data.message) || error.message || (vm.$t('sum_stats_refresh_failed') || 'Failed to refresh column statistics');
-                EventBus.$emit('onFail', msg);
-            } finally {
-                vm.isRefreshingSumStats = false;
-            }
-        },
-        /** After DSD time/FREQ changes, refresh DuckDB _ts_year / _ts_freq on timeseries (no-op if table missing). */
-        queueRecomputeTsDerivedSilent: function() {
-            var vm = this;
-            var url = CI.base_url + '/api/indicator_dsd/data_recompute/' + vm.dataset_id;
-            axios.post(url, {}, { headers: { 'Content-Type': 'application/json' } })
-                .then(function() {
-                    /* Success is silent; job runs in FastAPI. Use duckdb_job poll if UI needs completion. */
-                })
-                .catch(function(err) {
-                    var st = err.response && err.response.status;
-                    if (st === 404) {
-                        return;
-                    }
-                    if (err.response && err.response.data && err.response.data.message) {
-                        if (st === 400 && /nothing to recompute/i.test(String(err.response.data.message))) {
-                            return;
-                        }
-                    }
-                });
-        },
-        saveColumnDebounce: _.debounce(function() {
-            // Save current column from state so we always send latest (e.g. metadata.value_label_column)
-            if (this.edit_item !== null && this.columns[this.edit_item]) {
-                this.saveColumn(this.columns[this.edit_item]);
-            }
-        }, 300),
-        validateDSDDebounce: _.debounce(function() {
-            if (this.columns.length > 0) {
-                this.validateDSD();
-            }
-        }, 1000),
-        saveColumn: function(data) {
-            const vm = this;
-            // Use current column from state so value_label_column and all edits are included
-            var col = (vm.edit_item !== null && vm.columns[vm.edit_item]) ? vm.columns[vm.edit_item] : data;
-            let url = CI.base_url + '/api/indicator_dsd/update/' + vm.dataset_id + '/' + col.id;
-
-            const updateData = _.cloneDeep(col);
-            if (updateData.hasOwnProperty('sort_order')) {
-                delete updateData.sort_order;
-            }
-            // Build metadata from current column (full replace on server)
-            var meta = col.metadata;
-            var hideValueLabelColumn = col.column_type === 'time_period' || col.column_type === 'observation_value';
-            updateData.metadata = {};
-            if (meta && typeof meta === 'object' && !Array.isArray(meta)) {
-                for (var k in meta) {
-                    if (!Object.prototype.hasOwnProperty.call(meta, k)) {
-                        continue;
-                    }
-                    if (hideValueLabelColumn && k === 'value_label_column') {
-                        continue;
-                    }
-                    updateData.metadata[k] = meta[k];
-                }
-            }
-            if (!hideValueLabelColumn) {
-                var val = (meta && meta.hasOwnProperty('value_label_column')) ? meta.value_label_column : '';
-                updateData.metadata.value_label_column = val != null ? String(val) : '';
-            }
-
-            axios.post(url, updateData, {
-                headers: { 'Content-Type': 'application/json' }
-            })
-                .then(function (response) {
-                    vm.clearDsdSaveError();
-                    EventBus.$emit('onSuccess', 'Column saved!');
-                    // Update column_copy only after successful save
-                    if (vm.edit_item !== null) {
-                        vm.column_copy = _.cloneDeep(vm.columns[vm.edit_item]);
-                    }
-                    var ct = col.column_type;
-                    if (ct === 'time_period' || ct === 'periodicity') {
-                        vm.queueRecomputeTsDerivedSilent();
-                    }
-                    vm.validateDSDDebounce();
-                })
-                .catch(function (error) {
-                    console.log(error);
-                    vm.applyDsdSaveErrorFromResponse(error);
-                });
-        },
-        deleteColumn: function() {
-            const ids = this.selectedColumns.length > 0 ? this.selectedColumns : 
-                       (this.edit_item !== null ? [this.columns[this.edit_item].id] : []);
-            
-            if (ids.length === 0) {
-                return;
-            }
-
-            const confirmMessage = ids.length === 1 
-                ? (this.$t("confirm_delete_column") || "Are you sure you want to delete this column?")
-                : (this.$t("confirm_delete_columns") || `Are you sure you want to delete ${ids.length} columns?`);
-            
-            if (!confirm(confirmMessage)) {
-                return;
-            }
-
-            const vm = this;
-            let url = CI.base_url + '/api/indicator_dsd/delete/' + vm.dataset_id;
-            axios.post(url, { sid: vm.dataset_id, ids: ids })
-                .then(function (response) {
-                    // Remove deleted columns from array (in reverse order to maintain indices)
-                    const deletedIds = new Set(ids);
-                    for (let i = vm.columns.length - 1; i >= 0; i--) {
-                        if (deletedIds.has(vm.columns[i].id)) {
-                            vm.columns.splice(i, 1);
-                        }
-                    }
-                    
-                    // Clear selection and reset edit state
-                    vm.selectedColumns = [];
-                    if (deletedIds.has(vm.columns[vm.edit_item]?.id)) {
-                        vm.edit_item = null;
-                        vm.page_action = "list";
-                    }
-                    
-                    EventBus.$emit('onSuccess', ids.length === 1 ? 'Column deleted!' : `${ids.length} columns deleted!`);
-                })
-                .catch(function (error) {
-                    console.log("error deleting column", error);
-                    if (error.response && error.response.data && error.response.data.message) {
-                        alert((vm.$t("error_deleting_columns") || "Error deleting columns") + ": " + error.response.data.message);
-                    } else {
-                        alert(vm.$t("error_deleting_columns") || "Error deleting columns");
-                    }
-                });
-        },
-        toggleColumnSelection: function(columnId) {
-            const index = this.selectedColumns.indexOf(columnId);
-            if (index > -1) {
-                this.selectedColumns.splice(index, 1);
-            } else {
-                this.selectedColumns.push(columnId);
-            }
-        },
-        isColumnSelected: function(columnId) {
-            return this.selectedColumns.indexOf(columnId) > -1;
-        },
-        toggleSelectAll: function() {
-            if (this.allColumnsSelected) {
-                this.selectedColumns = [];
-            } else {
-                this.selectedColumns = this.filteredColumns.map(col => col.id);
             }
         },
         toggleSortOrder: function() {
@@ -515,13 +256,8 @@ Vue.component('indicator-dsd', {
             this.page_action = "list";
             this.edit_item = null;
         },
-        hasDataChanged: function() {
-            if (this.edit_item === null) return false;
-            return JSON.stringify(this.columns[this.edit_item]) !== JSON.stringify(this.column_copy);
-        },
         colNavigate: function(direction) {
             const total_cols = this.columns.length - 1;
-            this.is_navigating = true;
 
             switch (direction) {
                 case 'first':
@@ -542,12 +278,7 @@ Vue.component('indicator-dsd', {
                     break;
             }
 
-            this.editColumn(this.edit_item);
-
-            // Reset the navigation flag after a short delay
-            setTimeout(() => {
-                this.is_navigating = false;
-            }, 100);
+            this.page_action = "edit";
         },
         columnActiveClass: function(idx, column) {
             if (!column || !column.id) {
@@ -589,34 +320,15 @@ Vue.component('indicator-dsd', {
             
             return style;
         },
-        OnColumnUpdate: function(column) {
-            if (this.edit_item === null || this.is_navigating) {
-                return;
+        validateDSDDebounce: _.debounce(function() {
+            if (this.columns.length > 0) {
+                this.validateDSD();
             }
-            Vue.set(this.columns, this.edit_item, column);
-            if (column && column.id) {
-                this.saveColumnDebounce();
+        }, 1000),
+        validateDSD: async function(autoExpand) {
+            if (autoExpand === undefined) {
+                autoExpand = false;
             }
-        },
-        OnValueLabelColumnChange: function(newValue) {
-            if (this.edit_item === null) return;
-            var col = this.columns[this.edit_item];
-            if (!col) return;
-            if (!col.metadata) {
-                Vue.set(col, 'metadata', {});
-            }
-            Vue.set(col.metadata, 'value_label_column', newValue == null ? '' : String(newValue));
-            if (col.id && this.columnHasChanges(col)) {
-                this.saveColumnDebounce();
-            }
-        },
-        columnHasChanges: function(column) {
-            if (!column || !this.column_copy) return false;
-            var a = JSON.stringify(column);
-            var b = JSON.stringify(this.column_copy);
-            return a !== b;
-        },
-        validateDSD: async function(autoExpand = false) {
             this.isValidating = true;
             this.validationResult = null;
             const vm = this;
@@ -628,7 +340,7 @@ Vue.component('indicator-dsd', {
                 if (response.data) {
                     vm.validationResult = response.data;
                     if (autoExpand) {
-                        vm.$nextTick(() => {
+                        vm.$nextTick(function() {
                             vm.dsdMainTab = 1;
                         });
                     }
@@ -636,10 +348,14 @@ Vue.component('indicator-dsd', {
             } catch (error) {
                 // This is an actual error (network, server error, etc.)
                 console.error("Validation error:", error);
-                EventBus.$emit('onFail', 'Failed to validate data structure: ' + (error.response?.data?.message || error.message));
+                var errMsg = (error.response && error.response.data && error.response.data.message) || error.message;
+                EventBus.$emit('onFail', 'Failed to validate data structure: ' + errMsg);
             } finally {
                 this.isValidating = false;
             }
+        },
+        importDataOnly: function() {
+            this.$router.push({ path: '/data-explorer/INDICATOR_DATA', query: { tab: 'import' } });
         },
         getColumnTypeColor: function(type) {
             const colors = {
@@ -655,30 +371,22 @@ Vue.component('indicator-dsd', {
                 'measure': 'brown'
             };
             return colors[type] || 'blue-grey darken-1';
-        },
-        /** Time row needs format + constant FREQ when no DSD column is typed as periodicity (FREQ from data). */
-        timePeriodRowNeedsConstantFreqSetup: function(column) {
-            if (!column || column.column_type !== 'time_period') {
-                return false;
-            }
-            var hasFreqCol = (this.columns || []).some(function(c) {
-                return c && c.column_type === 'periodicity' && c.name && String(c.name).trim() !== '';
-            });
-            if (hasFreqCol) {
-                return false;
-            }
-            var fmt = column.time_period_format;
-            var meta = column.metadata || {};
-            var ifc = meta.freq;
-            if (ifc == null || String(ifc).trim() === '') {
-                ifc = meta.import_freq_code;
-            }
-            var missingFmt = fmt == null || String(fmt).trim() === '';
-            var missingFreq = ifc == null || String(ifc).trim() === '';
-            return missingFmt || missingFreq;
         }
     },
     computed: {
+        isDsdReadOnly: function() {
+            return true;
+        },
+        boundGlobalLabel: function() {
+            if (!this.dsdBinding || !this.dsdBinding.global_structure) {
+                return '';
+            }
+            var ds = this.dsdBinding.global_structure;
+            return ds.title || ds.name || ds.idno || 'Data structure';
+        },
+        dataStructuresRegistryUrl: function() {
+            return CI.base_url + '/data_structures';
+        },
         ProjectID() {
             return this.$store.state.project_id;
         },
@@ -755,24 +463,14 @@ Vue.component('indicator-dsd', {
         hasGroupedColumns: function() {
             return this.filteredColumns.length > 0;
         },
-        allColumnsSelected: function() {
-            return this.filteredColumns.length > 0 && 
-                   this.filteredColumns.every(col => this.selectedColumns.indexOf(col.id) > -1);
-        },
-        someColumnsSelected: function() {
-            return this.selectedColumns.length > 0 && !this.allColumnsSelected;
-        },
-        selectedColumnsCount: function() {
-            return this.selectedColumns.length;
-        },
         validationStatus: function() {
             if (!this.validationResult) {
-                return null; // No validation run yet
+                return null;
             }
-            
+
             const hasErrors = this.validationResult.errors && this.validationResult.errors.length > 0;
             const hasWarnings = this.validationResult.warnings && this.validationResult.warnings.length > 0;
-            
+
             if (hasErrors) {
                 return { color: 'error', icon: 'mdi-alert-circle', status: 'error' };
             } else if (hasWarnings) {
@@ -851,42 +549,23 @@ Vue.component('indicator-dsd', {
                         </v-icon>
                     </div>
                     <div>
-                        <v-btn
-                            color="primary"
-                            class="mr-2"
-                            @click="refreshSumStatsFromData"
-                            :loading="isRefreshingSumStats"
-                            :disabled="columns.length === 0"
-                            small
-                        >
-                            <v-icon left small>mdi-chart-box-outline</v-icon>
-                            {{ $t('sum_stats_refresh') || 'Refresh Stats' }}
-                        </v-btn>
-                        <v-btn 
-                            v-if="typeof dsd_temporary_features_enabled !== 'undefined' && dsd_temporary_features_enabled"
-                            color="primary" 
-                            class="ml-2"
-                            @click="populateLocalCodelistsFromData"
-                            :loading="isPopulatingCodeLists"
-                            :disabled="columns.length === 0"
-                            small
-                        >
-                            <v-icon left small>mdi-database-import</v-icon>
-                            {{ $t('populate_local_codelists') || 'Refresh Codelists' }}
-                        </v-btn>
-                        <v-btn 
-                            v-if="typeof dsd_temporary_features_enabled !== 'undefined' && dsd_temporary_features_enabled"
-                            color="primary"
-                            class="ml-2"
-                            @click="importColumns"
-                            small
-                        >
+                        <v-btn color="primary" class="ml-2" outlined small @click="importDataOnly">
                             <v-icon left small>mdi-upload</v-icon>
-                            {{$t("import") || "Import"}}
+                            {{ $t('import_data') || 'Import data' }}
+                        </v-btn>
+                        <v-btn color="primary" class="ml-2" outlined small @click="openBindGlobalDialog">
+                            <v-icon left small>mdi-sitemap</v-icon>
+                            Attach data structure
                         </v-btn>
                     </div>
                 </v-card-title>
             </v-card>
+
+            <v-alert v-if="isDsdReadOnly" type="info" dense outlined class="mx-2 mb-2">
+                Structure is read-only (bound to data structure: <strong>{{ boundGlobalLabel }}</strong>).
+                <a :href="dataStructuresRegistryUrl" target="_blank" rel="noopener">Edit in Data Structures</a>
+                or change binding below.
+            </v-alert>
 
             <v-tabs v-model="dsdMainTab" class="flex-shrink-0 mx-2 mt-1" background-color="transparent" show-arrows>
                 <v-tab>{{ $t('structure') || 'Structure' }}</v-tab>
@@ -917,43 +596,6 @@ Vue.component('indicator-dsd', {
             <v-tabs-items v-model="dsdMainTab" class="flex-grow-1 dsd-main-tabs-items fill-height" style="min-height: 0; overflow: hidden; display: flex; flex-direction: column;">
                 <v-tab-item class="dsd-tab-structure fill-height" eager>
                     <div class="d-flex flex-column flex-grow-1 fill-height" style="min-height: 0;">
-                        <v-alert
-                            v-if="dsdSaveError"
-                            type="error"
-                            outlined
-                            dense
-                            class="flex-shrink-0 ma-4"
-                            style="border-width: 2px;"
-                        >
-                            <div class="d-flex align-start" style="gap: 8px;">
-                                <div class="flex-grow-1" style="min-width: 0;">
-                                    <div class="text-subtitle-2 font-weight-medium">
-                                        {{ $t('could_not_save') || 'Could not save' }}
-                                    </div>
-                                    <ul
-                                        v-if="dsdSaveError.errors && dsdSaveError.errors.length"
-                                        class="mt-2 mb-0 pl-4"
-                                        style="list-style-type: disc;"
-                                    >
-                                        <li v-for="(err, idx) in dsdSaveError.errors" :key="'dsd-save-err-' + idx" class="text-body-2">
-                                            {{ err }}
-                                        </li>
-                                    </ul>
-                                    <div v-else-if="dsdSaveError.message" class="mt-2 mb-0 text-body-2">
-                                        {{ dsdSaveError.message }}
-                                    </div>
-                                </div>
-                                <v-btn
-                                    icon
-                                    small
-                                    class="flex-shrink-0 mt-n1"
-                                    :aria-label="$t('close') || 'Close'"
-                                    @click="clearDsdSaveError"
-                                >
-                                    <v-icon>mdi-close</v-icon>
-                                </v-btn>
-                            </div>
-                        </v-alert>
             <!-- Two Column Layout (resizable split) -->
             <div ref="dsdSplitRoot" style="display: flex; flex: 1; min-height: 0; gap: 0; overflow: hidden; background: rgb(240 240 240);" class="m-2 elevation-2 indicator-dsd-split-root">
                 <!-- Left Column: column list -->
@@ -983,33 +625,7 @@ Vue.component('indicator-dsd', {
                     
                     <!-- Actions Header Row -->
                     <div class="pa-1" style="border-bottom: 1px solid #e0e0e0; background: #fff;">
-                        <div class="d-flex align-center" style="gap: 8px;">
-                            <!-- Batch Selection Checkbox -->
-                            <v-checkbox
-                                :input-value="allColumnsSelected"
-                                :indeterminate="someColumnsSelected"
-                                @change="toggleSelectAll"
-                                hide-details
-                                class="mt-0 ml-3"
-                                dense
-                            ></v-checkbox>
-                            
-                            <!-- Delete Icon -->
-                            <v-btn
-                                icon
-                                small
-                                @click="deleteColumn"
-                                :disabled="selectedColumnsCount === 0"
-                                color="error"
-                                class="mt-0"
-                            >
-                                <v-icon small>mdi-delete</v-icon>
-                            </v-btn>
-                            
-                            <!-- Spacer to push refresh icon to the right -->
-                            <v-spacer></v-spacer>
-                            
-                            <!-- Refresh Icon -->
+                        <div class="d-flex align-center justify-end" style="gap: 8px;">
                             <v-btn
                                 icon
                                 small
@@ -1041,7 +657,7 @@ Vue.component('indicator-dsd', {
                                     :key="'hint-' + group.groupKey + '-empty'"
                                     class="px-4 pb-2 text-caption text--secondary"
                                 >
-                                    {{ $t('dsd_time_period_empty_hint') || 'Add a column and set its type to Time period, or map time on import.' }}
+                                    {{ $t('dsd_time_period_empty_hint') || 'Attach a data structure that includes a time period column.' }}
                                 </div>
                                 <v-list-item
                                     v-for="column in group.columns"
@@ -1050,15 +666,6 @@ Vue.component('indicator-dsd', {
                                     :class="columnActiveClass(0, column)"
                                     :style="getRowStyle(column)"
                                 >
-                                <v-list-item-action class="mr-2" @click.stop>
-                                    <v-checkbox
-                                        :input-value="isColumnSelected(column.id)"
-                                        @change="toggleColumnSelection(column.id)"
-                                        @click.stop
-                                        hide-details
-                                        color="primary"
-                                    ></v-checkbox>
-                                </v-list-item-action>
                                 <v-list-item-avatar size="32" class="mr-2">
                                     <v-icon 
                                         v-if="column.data_type=='string'"
@@ -1084,16 +691,6 @@ Vue.component('indicator-dsd', {
                                 <v-list-item-content>
                                     <v-list-item-title class="d-flex flex-wrap align-center" style="gap: 6px;">
                                         <span class="font-weight-medium">{{ column.name }}</span>
-                                        <v-chip
-                                            v-if="timePeriodRowNeedsConstantFreqSetup(column)"
-                                            x-small
-                                            label
-                                            class="ma-0"
-                                            color="amber darken-2"
-                                            text-color="black"
-                                        >
-                                            {{ $t('dsd_time_freq_incomplete') || 'Set time format & FREQ' }}
-                                        </v-chip>
                                     </v-list-item-title>
                                     <v-list-item-subtitle v-if="column.label">
                                         {{ column.label }}
@@ -1121,20 +718,6 @@ Vue.component('indicator-dsd', {
                                 </v-list-item>
                             </template>
                         </v-list>
-                    </div>
-                    
-                    <!-- Footer: Add column -->
-                    <div class="pa-1" style="border-top: 1px solid #e0e0e0; background: #fff;">
-                        <v-btn
-                            small
-                            color="primary"
-                            @click="addColumn"
-                            block
-                            class="mt-0"
-                        >
-                            <v-icon left small>mdi-plus</v-icon>
-                            {{$t("add_column") || "Add column"}}
-                        </v-btn>
                     </div>
                 </div>
 
@@ -1192,15 +775,6 @@ Vue.component('indicator-dsd', {
                                 >
                                     <v-icon small>mdi-chevron-double-right</v-icon>
                                 </v-btn>
-                                <v-btn 
-                                    icon 
-                                    small 
-                                    color="error"
-                                    @click="deleteColumn"
-                                    class="ml-2"
-                                >
-                                    <v-icon small>mdi-delete</v-icon>
-                                </v-btn>
                             </div>
                         </div>
                     </div>
@@ -1220,8 +794,7 @@ Vue.component('indicator-dsd', {
                                 :all-columns="columns"
                                 :global-codelists-list="globalCodelistsList"
                                 :global-codelists-loading="globalCodelistsLoading"
-                                @input="OnColumnUpdate"
-                                @value-label-column-change="OnValueLabelColumnChange"
+                                :read-only="isDsdReadOnly"
                                 :index_key="edit_item"
                             ></indicator-dsd-edit>
                         </div>
@@ -1437,6 +1010,32 @@ Vue.component('indicator-dsd', {
                     </div>
                 </v-tab-item>
             </v-tabs-items>
+
+            <v-dialog v-model="bindGlobalDialog" max-width="560" persistent>
+                <v-card>
+                    <v-card-title>{{ isDsdReadOnly ? 'Change data structure' : 'Attach data structure' }}</v-card-title>
+                    <v-card-text>
+                        <p class="text-body-2 grey--text text--darken-1">
+                            Link this project to a data structure from the registry.
+                        </p>
+                        <v-select
+                            v-model="bindStructureId"
+                            :items="globalStructuresList"
+                            :item-text="globalStructureLabel"
+                            item-value="id"
+                            label="Data structure"
+                            outlined dense
+                            :loading="globalStructuresLoading"
+                            clearable
+                        ></v-select>
+                    </v-card-text>
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn text :disabled="bindingGlobal" @click="bindGlobalDialog = false">Cancel</v-btn>
+                        <v-btn color="primary" :loading="bindingGlobal" :disabled="!bindStructureId" @click="submitBindGlobal">Attach</v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
         </div>
     `
 })

@@ -9,6 +9,11 @@
  */
 class Codelists_model extends CI_Model {
 
+    const STATUS_DRAFT = 'draft';
+    const STATUS_ACTIVE = 'active';
+    const STATUS_LOCKED = 'locked';
+    const STATUS_ARCHIVED = 'archived';
+
     private $table_codelists = 'codelists';
     private $table_items = 'codelist_items';
     private $table_item_labels = 'codelist_items_labels';
@@ -16,17 +21,143 @@ class Codelists_model extends CI_Model {
     private $table_codelist_translations = 'codelist_labels';
 
     private $codelist_fields = array(
+        'idno',
         'agency',
-        'codelist_id',
-        'version',
         'name',
+        'version',
+        'version_seq',
+        'title',
         'description',
         'uri',
+        'status',
         'created_at',
         'changed_at',
         'created_by',
         'changed_by'
     );
+
+    /**
+     * @return string[]
+     */
+    public function valid_statuses()
+    {
+        return array(
+            self::STATUS_DRAFT,
+            self::STATUS_ACTIVE,
+            self::STATUS_LOCKED,
+            self::STATUS_ARCHIVED,
+        );
+    }
+
+    /**
+     * @param string|null $status
+     * @return string
+     */
+    public function normalize_status($status)
+    {
+        $status = strtolower(trim((string) $status));
+        if ($status === '' || !in_array($status, $this->valid_statuses(), true)) {
+            return self::STATUS_ACTIVE;
+        }
+
+        return $status;
+    }
+
+    /**
+     * Whether header, codes, and translations may be edited.
+     *
+     * @param array|string $row_or_status Codelist row or status string
+     * @return bool
+     */
+    public function is_content_mutable($row_or_status)
+    {
+        $status = is_array($row_or_status)
+            ? $this->normalize_status(isset($row_or_status['status']) ? $row_or_status['status'] : null)
+            : $this->normalize_status($row_or_status);
+
+        return in_array($status, array(self::STATUS_DRAFT, self::STATUS_ACTIVE), true);
+    }
+
+    /**
+     * Whether the codelist row may be deleted.
+     *
+     * @param array|string $row_or_status
+     * @return bool
+     */
+    public function is_deletable($row_or_status)
+    {
+        return $this->is_content_mutable($row_or_status);
+    }
+
+    /**
+     * @param string $from
+     * @param string $to
+     * @param bool $is_admin
+     * @return bool
+     */
+    public function is_status_transition_allowed($from, $to, $is_admin = false)
+    {
+        $from = $this->normalize_status($from);
+        $to = $this->normalize_status($to);
+        if ($from === $to) {
+            return true;
+        }
+        if ($is_admin) {
+            return true;
+        }
+        // Non-admins may only move between draft and active.
+        return in_array($from, array(self::STATUS_DRAFT, self::STATUS_ACTIVE), true)
+            && in_array($to, array(self::STATUS_DRAFT, self::STATUS_ACTIVE), true);
+    }
+
+    /**
+     * @param int $codelist_pk
+     * @return array Codelist row
+     * @throws Exception
+     */
+    public function require_content_mutable($codelist_pk)
+    {
+        $row = $this->get_by_id($codelist_pk);
+        if (!$row) {
+            throw new Exception('Codelist not found');
+        }
+        if (!$this->is_content_mutable($row)) {
+            throw new Exception('Codelist is ' . $row['status'] . ' and cannot be modified');
+        }
+
+        return $row;
+    }
+
+    /**
+     * @param int $codelist_pk
+     * @return array
+     * @throws Exception
+     */
+    public function require_deletable($codelist_pk)
+    {
+        $row = $this->get_by_id($codelist_pk);
+        if (!$row) {
+            throw new Exception('Codelist not found');
+        }
+        if (!$this->is_deletable($row)) {
+            throw new Exception('Codelist is ' . $row['status'] . ' and cannot be deleted');
+        }
+
+        return $row;
+    }
+
+    /**
+     * @param int $code_id
+     * @return int
+     */
+    public function get_codelist_pk_for_code($code_id)
+    {
+        $this->db->select('codelist_id');
+        $this->db->where('id', (int) $code_id);
+        $row = $this->db->get($this->table_items)->row_array();
+
+        return $row ? (int) $row['codelist_id'] : 0;
+    }
 
     private $item_fields = array(
         'codelist_id',
@@ -64,16 +195,29 @@ class Codelists_model extends CI_Model {
         }
         if (isset($filters['search']) && !empty($filters['search'])) {
             $this->db->group_start();
-            $this->db->like('name', $filters['search']);
-            $this->db->or_like('codelist_id', $filters['search']);
+            $this->db->like('title', $filters['search']);
+            $this->db->or_like('name', $filters['search']);
+            $this->db->or_like('idno', $filters['search']);
+            $this->db->or_like('agency', $filters['search']);
             $this->db->or_like('description', $filters['search']);
             $this->db->group_end();
         }
+        if (!empty($filters['exclude_archived'])) {
+            $this->db->where('status !=', self::STATUS_ARCHIVED);
+        }
+        if (isset($filters['status']) && $filters['status'] !== '') {
+            $this->db->where('status', $this->normalize_status($filters['status']));
+        }
 
-        // Ordering
-        $this->db->order_by($order_by, $order_dir);
+        if ($order_by === 'created_at') {
+            $this->db->order_by('agency', 'ASC');
+            $this->db->order_by('name', 'ASC');
+            $this->db->order_by('version_seq', 'ASC');
+            $this->db->order_by('id', 'ASC');
+        } else {
+            $this->db->order_by($order_by, $order_dir);
+        }
 
-        // Pagination
         if ($limit !== null && $limit > 0) {
             $this->db->limit($limit, $offset);
         }
@@ -102,27 +246,460 @@ class Codelists_model extends CI_Model {
     }
 
     /**
-     * 
-     * Get a codelist by agency, codelist_id, and version
-     * 
-     * @param string $agency - Agency identifier
-     * @param string $codelist_id - Codelist identifier
-     * @param string $version - Version string
-     * @return array|false Codelist or false if not found
-     * 
+     * Get a codelist by SDMX identity (agency + maintainable name + version).
+     *
+     * @param string $agency
+     * @param string $name SDMX maintainable id (codelists.name)
+     * @param string $version
+     * @return array|false
      */
-    public function get_by_identity($agency, $codelist_id, $version)
+    public function get_by_identity($agency, $name, $version)
     {
-        $this->db->where('agency', $agency);
-        $this->db->where('codelist_id', $codelist_id);
-        $this->db->where('version', $version);
-        $codelist = $this->db->get($this->table_codelists)->row_array();
+        $agency = trim((string) $agency);
+        $name = trim((string) $name);
+        $version = $version === null ? '' : trim((string) $version);
+
+        if ($name === '') {
+            return false;
+        }
+
+        if ($version === '') {
+            $this->db->where('agency', $agency);
+            $this->db->where('name', $name);
+            $this->db->order_by('version_seq', 'DESC');
+            $this->db->order_by('id', 'DESC');
+            $this->db->limit(1);
+            $codelist = $this->db->get($this->table_codelists)->row_array();
+        } else {
+            $this->db->where('agency', $agency);
+            $this->db->where('name', $name);
+            $this->db->where('version', $version);
+            $codelist = $this->db->get($this->table_codelists)->row_array();
+        }
 
         if (!$codelist) {
             return false;
         }
 
         return $codelist;
+    }
+
+    /**
+     * DSD components bound to this codelist row.
+     *
+     * @param int $codelist_id
+     * @return int
+     */
+    public function count_data_structure_components_by_codelist($codelist_id)
+    {
+        if (!$this->db->table_exists('data_structure_components')) {
+            return 0;
+        }
+        $codelist_id = (int) $codelist_id;
+        if ($codelist_id <= 0) {
+            return 0;
+        }
+        $this->db->where('codelist_id', $codelist_id);
+        return (int) $this->db->count_all_results('data_structure_components');
+    }
+
+    /**
+     * DSD components referencing any version for (agency, name).
+     *
+     * @param string $agency
+     * @param string $name
+     * @return int
+     */
+    public function count_data_structure_components_by_codelist_family($agency, $name)
+    {
+        if (!$this->db->table_exists('data_structure_components')) {
+            return 0;
+        }
+        $agency = trim((string) $agency);
+        $name = trim((string) $name);
+        if ($agency === '' || $name === '') {
+            return 0;
+        }
+        $sql = 'SELECT COUNT(*) AS n FROM data_structure_components WHERE codelist_id IN '
+            . '(SELECT id FROM codelists WHERE agency = ? AND name = ?)';
+        $q = $this->db->query($sql, array($agency, $name));
+        if (!$q) {
+            return 0;
+        }
+        $r = $q->row_array();
+        return isset($r['n']) ? (int) $r['n'] : 0;
+    }
+
+    /**
+     * @param string $agency
+     * @param string $name
+     * @return int
+     */
+    public function get_next_version_seq($agency, $name)
+    {
+        $agency = trim((string) $agency);
+        $name = trim((string) $name);
+        $row = $this->db->select_max('version_seq')
+            ->from($this->table_codelists)
+            ->where('agency', $agency)
+            ->where('name', $name)
+            ->get()
+            ->row_array();
+        $max = isset($row['version_seq']) ? (int) $row['version_seq'] : 0;
+        return $max + 1;
+    }
+
+    /**
+     * All version rows for (agency, name), ordered by version_seq.
+     *
+     * @param string      $name
+     * @param string|null $agency
+     * @return array
+     */
+    public function get_codelist_versions($name, $agency = null)
+    {
+        $agency = ($agency === null || $agency === '') ? self::NADA_DEFAULT_AGENCY : trim((string) $agency);
+        $name = trim((string) $name);
+        if ($name === '') {
+            return array();
+        }
+        $this->db->where('name', $name);
+        $this->db->where('agency', $agency);
+        $this->db->order_by('version_seq', 'ASC');
+        $this->db->order_by('id', 'ASC');
+        return $this->db->get($this->table_codelists)->result_array();
+    }
+
+    /**
+     * One row per codelist family (family head: id = pid), with versions_count.
+     *
+     * @param array $filters agency, search, status, exclude_archived
+     * @param bool  $with_counts item_count, dsd_component_count (by family)
+     * @return array
+     */
+    public function get_all_collapsed($filters = array(), $with_counts = false)
+    {
+        $this->db->select(
+            'c.*, (SELECT COUNT(*) FROM codelists v WHERE v.pid = c.id) AS versions_count',
+            false
+        );
+        $this->db->from($this->table_codelists . ' c');
+        $this->db->where('c.id = c.pid', null, false);
+        $this->_apply_catalog_filters($filters, 'c.');
+        $this->db->order_by('c.agency', 'ASC');
+        $this->db->order_by('c.name', 'ASC');
+        $rows = $this->db->get()->result_array();
+        if ($with_counts && !empty($rows)) {
+            $this->_attach_item_counts($rows);
+            $this->_attach_dsd_component_counts($rows, true);
+        }
+        return $rows;
+    }
+
+    /**
+     * Paginated catalogue: flat (all versions) or collapsed (family heads).
+     *
+     * @param array $options page, per_page, search, flat, with_counts, agency, status, exclude_archived
+     * @return array{ rows: array, total: int, page: int, per_page: int }
+     */
+    public function get_codelists_paged(array $options = array())
+    {
+        $page = isset($options['page']) ? max(1, (int) $options['page']) : 1;
+        $perPage = isset($options['per_page']) ? (int) $options['per_page'] : 50;
+        if ($perPage < 1) {
+            $perPage = 50;
+        }
+        if ($perPage > 200) {
+            $perPage = 200;
+        }
+        $offset = ($page - 1) * $perPage;
+        $filters = array();
+        if (!empty($options['agency'])) {
+            $filters['agency'] = $options['agency'];
+        }
+        if (isset($options['search'])) {
+            $filters['search'] = $options['search'];
+        }
+        if (!empty($options['exclude_archived'])) {
+            $filters['exclude_archived'] = true;
+        }
+        if (isset($options['status']) && $options['status'] !== '') {
+            $filters['status'] = $options['status'];
+        }
+        $withCounts = !empty($options['with_counts']);
+        $flat = !empty($options['flat']);
+
+        if ($flat) {
+            return $this->_get_codelists_flat_paged($page, $perPage, $offset, $filters, $withCounts);
+        }
+        return $this->_get_codelists_collapsed_paged($page, $perPage, $offset, $filters, $withCounts);
+    }
+
+    /**
+     * @param array  $filters
+     * @param string $alias e.g. 'c.' or ''
+     */
+    private function _apply_catalog_filters(array $filters, $alias = '')
+    {
+        $p = $alias === '' ? '' : rtrim((string) $alias, '.') . '.';
+        if (isset($filters['agency']) && $filters['agency'] !== '') {
+            $this->db->where($p . 'agency', $filters['agency']);
+        }
+        if (isset($filters['search']) && trim((string) $filters['search']) !== '') {
+            $search = trim((string) $filters['search']);
+            $this->db->group_start();
+            $this->db->like($p . 'title', $search);
+            $this->db->or_like($p . 'name', $search);
+            $this->db->or_like($p . 'idno', $search);
+            $this->db->or_like($p . 'agency', $search);
+            $this->db->or_like($p . 'description', $search);
+            if (ctype_digit($search)) {
+                $this->db->or_where($p . 'id', (int) $search);
+            }
+            $this->db->group_end();
+        }
+        if (!empty($filters['exclude_archived'])) {
+            $this->db->where($p . 'status !=', self::STATUS_ARCHIVED);
+        }
+        if (isset($filters['status']) && $filters['status'] !== '') {
+            $this->db->where($p . 'status', $this->normalize_status($filters['status']));
+        }
+    }
+
+    /**
+     * @return array{ rows: array, total: int, page: int, per_page: int }
+     */
+    private function _get_codelists_flat_paged($page, $perPage, $offset, array $filters, $withCounts)
+    {
+        $this->db->from($this->table_codelists);
+        $this->_apply_catalog_filters($filters, '');
+        $total = (int) $this->db->count_all_results();
+
+        $this->db->from($this->table_codelists);
+        $this->_apply_catalog_filters($filters, '');
+        $this->db->order_by('agency', 'ASC');
+        $this->db->order_by('name', 'ASC');
+        $this->db->order_by('version_seq', 'ASC');
+        $this->db->order_by('id', 'ASC');
+        $this->db->limit($perPage, $offset);
+        $rows = $this->db->get()->result_array();
+
+        if ($withCounts && !empty($rows)) {
+            $this->_attach_item_counts($rows);
+            $this->_attach_dsd_component_counts($rows, false);
+        }
+
+        return array(
+            'rows' => $rows,
+            'total' => $total,
+            'page' => $page,
+            'per_page' => $perPage,
+        );
+    }
+
+    /**
+     * @return array{ rows: array, total: int, page: int, per_page: int }
+     */
+    private function _get_codelists_collapsed_paged($page, $perPage, $offset, array $filters, $withCounts)
+    {
+        $this->db->from($this->table_codelists . ' c');
+        $this->db->where('c.id = c.pid', null, false);
+        $this->_apply_catalog_filters($filters, 'c.');
+        $total = (int) $this->db->count_all_results();
+
+        $this->db->select(
+            'c.*, (SELECT COUNT(*) FROM codelists v WHERE v.pid = c.id) AS versions_count',
+            false
+        );
+        $this->db->from($this->table_codelists . ' c');
+        $this->db->where('c.id = c.pid', null, false);
+        $this->_apply_catalog_filters($filters, 'c.');
+        $this->db->order_by('c.agency', 'ASC');
+        $this->db->order_by('c.name', 'ASC');
+        $this->db->limit($perPage, $offset);
+        $rows = $this->db->get()->result_array();
+
+        if ($withCounts && !empty($rows)) {
+            $this->_attach_item_counts($rows);
+            $this->_attach_dsd_component_counts($rows, true);
+        }
+
+        return array(
+            'rows' => $rows,
+            'total' => $total,
+            'page' => $page,
+            'per_page' => $perPage,
+        );
+    }
+
+    /**
+     * @param array $rows
+     * @param bool  $by_family
+     */
+    public function attach_catalog_counts(array &$rows, $by_family = false)
+    {
+        $this->_attach_item_counts($rows);
+        $this->_attach_dsd_component_counts($rows, $by_family);
+    }
+
+    /**
+     * @param array $rows
+     */
+    private function _attach_item_counts(array &$rows)
+    {
+        if (empty($rows)) {
+            return;
+        }
+        $ids = array();
+        foreach ($rows as $row) {
+            $ids[] = (int) $row['id'];
+        }
+        $ids = array_values(array_unique(array_filter($ids)));
+        $item_map = array();
+        if (!empty($ids)) {
+            $this->db->select('codelist_id, COUNT(*) AS cnt', false);
+            $this->db->from($this->table_items);
+            $this->db->where_in('codelist_id', $ids);
+            $this->db->group_by('codelist_id');
+            $q = $this->db->get();
+            if ($q) {
+                foreach ($q->result_array() as $r) {
+                    $item_map[(int) $r['codelist_id']] = (int) $r['cnt'];
+                }
+            }
+        }
+        foreach ($rows as &$row) {
+            $id = (int) $row['id'];
+            $row['item_count'] = isset($item_map[$id]) ? $item_map[$id] : 0;
+        }
+        unset($row);
+    }
+
+    /**
+     * @param array $rows
+     * @param bool  $by_family collapsed heads: count DSD refs across all versions
+     */
+    private function _attach_dsd_component_counts(array &$rows, $by_family)
+    {
+        if (empty($rows)) {
+            return;
+        }
+        if (!$this->db->table_exists('data_structure_components')) {
+            foreach ($rows as &$row) {
+                $row['dsd_component_count'] = 0;
+            }
+            unset($row);
+            return;
+        }
+        if ($by_family) {
+            $pairs = array();
+            foreach ($rows as $row) {
+                $a = trim((string) (isset($row['agency']) ? $row['agency'] : ''));
+                $n = trim((string) (isset($row['name']) ? $row['name'] : ''));
+                if ($a !== '' && $n !== '') {
+                    $pairs[$a . "\0" . $n] = array('agency' => $a, 'name' => $n);
+                }
+            }
+            $family_map = array();
+            if (!empty($pairs)) {
+                $parts = array();
+                $bind = array();
+                foreach ($pairs as $p) {
+                    $parts[] = '(c.agency = ? AND c.name = ?)';
+                    $bind[] = $p['agency'];
+                    $bind[] = $p['name'];
+                }
+                $sql = 'SELECT c.agency, c.name, COUNT(*) AS cnt FROM data_structure_components dsc '
+                    . 'INNER JOIN codelists c ON c.id = dsc.codelist_id WHERE '
+                    . implode(' OR ', $parts)
+                    . ' GROUP BY c.agency, c.name';
+                $q = $this->db->query($sql, $bind);
+                if ($q) {
+                    foreach ($q->result_array() as $r) {
+                        $key = trim((string) (isset($r['agency']) ? $r['agency'] : '')) . "\0"
+                            . trim((string) (isset($r['name']) ? $r['name'] : ''));
+                        $family_map[$key] = (int) $r['cnt'];
+                    }
+                }
+            }
+            foreach ($rows as &$row) {
+                $a = trim((string) (isset($row['agency']) ? $row['agency'] : ''));
+                $n = trim((string) (isset($row['name']) ? $row['name'] : ''));
+                $key = $a . "\0" . $n;
+                $row['dsd_component_count'] = isset($family_map[$key]) ? $family_map[$key] : 0;
+            }
+            unset($row);
+            return;
+        }
+        $ids = array();
+        foreach ($rows as $row) {
+            $ids[] = (int) $row['id'];
+        }
+        $ids = array_values(array_unique(array_filter($ids)));
+        $map = array();
+        if (!empty($ids)) {
+            $this->db->select('codelist_id, COUNT(*) AS cnt', false);
+            $this->db->from('data_structure_components');
+            $this->db->where_in('codelist_id', $ids);
+            $this->db->group_by('codelist_id');
+            $q = $this->db->get();
+            if ($q) {
+                foreach ($q->result_array() as $r) {
+                    $map[(int) $r['codelist_id']] = (int) $r['cnt'];
+                }
+            }
+        }
+        foreach ($rows as &$row) {
+            $id = (int) $row['id'];
+            $row['dsd_component_count'] = isset($map[$id]) ? $map[$id] : 0;
+        }
+        unset($row);
+    }
+
+    /**
+     * Count family heads (collapsed catalogue total).
+     *
+     * @param array $filters
+     * @return int
+     */
+    public function count_collapsed($filters = array())
+    {
+        $this->db->from($this->table_codelists . ' c');
+        $this->db->where('c.id = c.pid', null, false);
+        $this->_apply_catalog_filters($filters, 'c.');
+        return (int) $this->db->count_all_results();
+    }
+
+    /**
+     * @param string $idno Catalogue handle (codelists.idno)
+     * @return array|false
+     */
+    public function get_by_idno($idno)
+    {
+        $idno = trim((string) $idno);
+        if ($idno === '') {
+            return false;
+        }
+        $this->db->where('idno', $idno);
+
+        return $this->db->get($this->table_codelists)->row_array();
+    }
+
+    /**
+     * Deterministic idno: '{agency}_{name}_{version}'.
+     *
+     * @param string $agency
+     * @param string $name SDMX maintainable id
+     * @param string $version
+     * @return string
+     */
+    public static function make_idno($agency, $name, $version)
+    {
+        $agency  = trim((string) $agency) !== '' ? trim((string) $agency) : self::NADA_DEFAULT_AGENCY;
+        $version = trim((string) $version) !== '' ? trim((string) $version) : self::NADA_DEFAULT_VERSION;
+        $name    = trim((string) $name);
+
+        return $agency . '_' . $name . '_' . $version;
     }
 
     /**
@@ -135,12 +712,10 @@ class Codelists_model extends CI_Model {
      */
     public function create($data)
     {
-        // Remove deprecated field name if present
         if (isset($data['access_mode'])) {
             unset($data['access_mode']);
         }
-        
-        // Filter to allowed fields
+
         $insert_data = array();
         foreach ($this->codelist_fields as $field) {
             if (isset($data[$field])) {
@@ -148,18 +723,55 @@ class Codelists_model extends CI_Model {
             }
         }
 
-        // Set timestamps
+        $agency = isset($insert_data['agency']) ? trim((string) $insert_data['agency']) : '';
+        $name = isset($insert_data['name']) ? trim((string) $insert_data['name']) : '';
+        if ($agency === '' || $name === '') {
+            return false;
+        }
+
+        if (empty($insert_data['idno'])) {
+            $ver = isset($insert_data['version']) ? $insert_data['version'] : '';
+            $insert_data['idno'] = self::make_idno($agency, $name, $ver);
+        }
+
+        if (!isset($insert_data['version_seq']) || (int) $insert_data['version_seq'] <= 0) {
+            $insert_data['version_seq'] = $this->get_next_version_seq($agency, $name);
+        } else {
+            $insert_data['version_seq'] = (int) $insert_data['version_seq'];
+        }
+
         if (!isset($insert_data['created_at'])) {
             $insert_data['created_at'] = date('Y-m-d H:i:s');
         }
-
-        if ($this->db->insert($this->table_codelists, $insert_data)) {
-            $id = $this->db->insert_id();
-            $this->seed_default_codelist_translation($id, $insert_data);
-            return $id;
+        if (isset($insert_data['status'])) {
+            $insert_data['status'] = $this->normalize_status($insert_data['status']);
+        } else {
+            $insert_data['status'] = self::STATUS_ACTIVE;
         }
 
-        return false;
+        $this->db->trans_begin();
+        if (!$this->db->insert($this->table_codelists, $insert_data)) {
+            $this->db->trans_rollback();
+            return false;
+        }
+        $id = (int) $this->db->insert_id();
+        if ($id <= 0) {
+            $this->db->trans_rollback();
+            return false;
+        }
+
+        $this->db->where('agency', $agency);
+        $this->db->where('name', $name);
+        $this->db->update($this->table_codelists, array('pid' => $id));
+
+        if ($this->db->trans_status() === false) {
+            $this->db->trans_rollback();
+            return false;
+        }
+        $this->db->trans_commit();
+
+        $this->seed_default_codelist_translation($id, $insert_data);
+        return $id;
     }
 
     /**
@@ -170,7 +782,10 @@ class Codelists_model extends CI_Model {
      */
     private function seed_default_codelist_translation($codelist_pk, $insert_data)
     {
-        $name = isset($insert_data['name']) ? trim((string) $insert_data['name']) : '';
+        $name = isset($insert_data['title']) ? trim((string) $insert_data['title']) : '';
+        if ($name === '' && isset($insert_data['name'])) {
+            $name = trim((string) $insert_data['name']);
+        }
         if ($name === '') {
             $name = '-';
         }
@@ -217,6 +832,9 @@ class Codelists_model extends CI_Model {
         if (empty($update_data)) {
             return false;
         }
+        if (isset($update_data['status'])) {
+            $update_data['status'] = $this->normalize_status($update_data['status']);
+        }
 
         $this->db->where('id', $id);
         return $this->db->update($this->table_codelists, $update_data);
@@ -232,8 +850,62 @@ class Codelists_model extends CI_Model {
      */
     public function delete($id)
     {
+        $id = (int) $id;
+        $existing = $this->get_by_id($id);
+        if (!$existing) {
+            throw new Exception('Codelist not found');
+        }
+
+        $dsd_refs = $this->count_data_structure_components_by_codelist($id);
+        if ($dsd_refs > 0) {
+            throw new Exception(
+                'This codelist cannot be deleted because it is referenced by '
+                . $dsd_refs
+                . ' data structure component'
+                . ($dsd_refs === 1 ? '' : 's')
+                . '. Remove the codelist from those components or delete the structures first.'
+            );
+        }
+
+        $agency = (string) $existing['agency'];
+        $name = (string) $existing['name'];
+        $family = $this->db->select('id, version_seq')
+            ->from($this->table_codelists)
+            ->where('agency', $agency)
+            ->where('name', $name)
+            ->order_by('version_seq', 'DESC')
+            ->order_by('id', 'DESC')
+            ->get()
+            ->result_array();
+
+        $this->db->trans_begin();
+        if (count($family) > 1) {
+            $new_pid = null;
+            foreach ($family as $row) {
+                if ((int) $row['id'] !== $id) {
+                    $new_pid = (int) $row['id'];
+                    break;
+                }
+            }
+            if ($new_pid) {
+                $this->db->where('agency', $agency);
+                $this->db->where('name', $name);
+                $this->db->where('id <>', $id);
+                $this->db->update($this->table_codelists, array('pid' => $new_pid));
+            }
+        }
         $this->db->where('id', $id);
-        return $this->db->delete($this->table_codelists);
+        $this->db->update($this->table_codelists, array('pid' => null));
+
+        $this->db->where('id', $id);
+        $this->db->delete($this->table_codelists);
+
+        if ($this->db->trans_status() === false) {
+            $this->db->trans_rollback();
+            return false;
+        }
+        $this->db->trans_commit();
+        return true;
     }
 
     /**
@@ -581,10 +1253,18 @@ class Codelists_model extends CI_Model {
         }
         if (isset($filters['search']) && !empty($filters['search'])) {
             $this->db->group_start();
-            $this->db->like('name', $filters['search']);
-            $this->db->or_like('codelist_id', $filters['search']);
+            $this->db->like('title', $filters['search']);
+            $this->db->or_like('name', $filters['search']);
+            $this->db->or_like('idno', $filters['search']);
+            $this->db->or_like('agency', $filters['search']);
             $this->db->or_like('description', $filters['search']);
             $this->db->group_end();
+        }
+        if (!empty($filters['exclude_archived'])) {
+            $this->db->where('status !=', self::STATUS_ARCHIVED);
+        }
+        if (isset($filters['status']) && $filters['status'] !== '') {
+            $this->db->where('status', $this->normalize_status($filters['status']));
         }
 
         return $this->db->count_all_results();
@@ -629,7 +1309,7 @@ class Codelists_model extends CI_Model {
     /**
      * Import one codelist from SdmxCodelistImporter parse row (non-SDMX callers should not use).
      *
-     * @param array $row Parsed codelist (agency, codelist_id, version, name, description, uri, names, descriptions, codes[])
+     * @param array $row Parsed codelist (agency, name, title, version, description, uri, names, descriptions, codes[])
      * @param array $options dry_run (bool), replace_existing (bool), created_by (int|null)
      * @return array ok, action (created|skipped|dry_run|error), message?, id?, codes_imported?, warnings[]
      */
@@ -641,18 +1321,18 @@ class Codelists_model extends CI_Model {
         $created_by = isset($options['created_by']) ? $options['created_by'] : null;
 
         $agency = isset($row['agency']) ? trim((string) $row['agency']) : '';
-        $cid = isset($row['codelist_id']) ? trim((string) $row['codelist_id']) : '';
+        $sdmx_name = isset($row['name']) ? trim((string) $row['name']) : '';
         $ver = isset($row['version']) ? trim((string) $row['version']) : '';
-        if ($cid === '') {
+        if ($sdmx_name === '') {
             return array(
                 'ok' => false,
                 'action' => 'error',
-                'message' => 'Missing codelist_id',
+                'message' => 'Missing name (SDMX maintainable id)',
                 'warnings' => $warnings,
             );
         }
 
-        $existing = $this->get_by_identity($agency, $cid, $ver);
+        $existing = $this->get_by_identity($agency, $sdmx_name, $ver);
         if ($existing) {
             if (!$replace) {
                 return array(
@@ -660,7 +1340,18 @@ class Codelists_model extends CI_Model {
                     'action' => 'skipped',
                     'message' => 'Already exists (pass replace=1 to overwrite)',
                     'agency' => $agency,
-                    'codelist_id' => $cid,
+                    'name' => $sdmx_name,
+                    'version' => $ver,
+                    'warnings' => $warnings,
+                );
+            }
+            if (!$this->is_content_mutable($existing)) {
+                return array(
+                    'ok' => false,
+                    'action' => 'error',
+                    'message' => 'Codelist is ' . $existing['status'] . ' and cannot be replaced',
+                    'agency' => $agency,
+                    'name' => $sdmx_name,
                     'version' => $ver,
                     'warnings' => $warnings,
                 );
@@ -676,20 +1367,26 @@ class Codelists_model extends CI_Model {
                 'ok' => true,
                 'action' => 'dry_run',
                 'agency' => $agency,
-                'codelist_id' => $cid,
+                'name' => $sdmx_name,
                 'version' => $ver,
                 'codes_count' => count($codes),
                 'warnings' => $warnings,
             );
         }
 
+        $title = isset($row['title']) ? trim((string) $row['title']) : '';
+        if ($title === '') {
+            $title = $sdmx_name;
+        }
+
         $this->db->trans_start();
 
         $insert = array(
             'agency' => $agency,
-            'codelist_id' => $cid,
+            'name' => $this->_sdmx_truncate($sdmx_name, 64),
             'version' => $ver,
-            'name' => isset($row['name']) ? $this->_sdmx_truncate((string) $row['name'], 255) : $this->_sdmx_truncate($cid, 255),
+            'title' => $this->_sdmx_truncate($title, 255),
+            'idno' => self::make_idno($agency, $sdmx_name, $ver),
             'description' => isset($row['description']) && $row['description'] !== '' ? $row['description'] : null,
             'uri' => isset($row['uri']) && $row['uri'] !== '' ? $this->_sdmx_truncate((string) $row['uri'], 500) : null,
             'created_by' => $created_by,
@@ -726,7 +1423,7 @@ class Codelists_model extends CI_Model {
             'action' => 'created',
             'id' => (int) $pk,
             'agency' => $agency,
-            'codelist_id' => $cid,
+            'name' => $sdmx_name,
             'version' => $ver,
             'codes_imported' => count($map),
             'warnings' => $warnings,
@@ -750,9 +1447,12 @@ class Codelists_model extends CI_Model {
             $langs = array_unique(array_merge($langs, $this->_sdmx_collect_iso_langs($cn, $cd)));
         }
 
-        $fallbackName = isset($row['name']) ? trim((string) $row['name']) : '';
+        $fallbackName = isset($row['title']) ? trim((string) $row['title']) : '';
+        if ($fallbackName === '' && isset($row['name'])) {
+            $fallbackName = trim((string) $row['name']);
+        }
         if ($fallbackName === '') {
-            $fallbackName = isset($row['codelist_id']) ? $row['codelist_id'] : '-';
+            $fallbackName = '-';
         }
 
         foreach ($langs as $lang) {
@@ -925,5 +1625,448 @@ class Codelists_model extends CI_Model {
             return mb_substr($s, 0, $len, 'UTF-8');
         }
         return substr($s, 0, $len);
+    }
+
+    /** NADA default agency when omitted from JSON seed / import_json payloads. */
+    const NADA_DEFAULT_AGENCY = 'NADA';
+
+    /** NADA default version when omitted from JSON. */
+    const NADA_DEFAULT_VERSION = '1.0';
+
+    /**
+     * Remove all codes (and item labels) for a codelist; header rows are kept.
+     *
+     * @param int $codelist_pk
+     * @return bool
+     */
+    public function delete_all_items_for_codelist($codelist_pk)
+    {
+        $this->db->where('codelist_id', (int) $codelist_pk);
+        return $this->db->delete($this->table_items);
+    }
+
+    /**
+     * Build a NADA-compatible codelist JSON document (seed / import_json shape).
+     *
+     * @param int $codelist_pk
+     * @return array
+     * @throws Exception
+     */
+    public function export_nada_json_document($codelist_pk)
+    {
+        $row = $this->get_by_id($codelist_pk);
+        if (!$row) {
+            throw new Exception('Codelist not found');
+        }
+
+        $codes = $this->get_codes((int) $codelist_pk, null, true, null, 0, null);
+        $id_by_pk = array();
+        foreach ($codes as $c) {
+            $id_by_pk[(int) $c['id']] = isset($c['code']) ? (string) $c['code'] : '';
+        }
+
+        $items = array();
+        foreach ($codes as $c) {
+            $title = $this->_json_pick_item_title($c);
+            $entry = array(
+                'code' => (string) $c['code'],
+                'title' => $title,
+            );
+            if (isset($c['sort_order']) && $c['sort_order'] !== null && $c['sort_order'] !== '') {
+                $entry['sort_order'] = (int) $c['sort_order'];
+            }
+            $pid = isset($c['parent_id']) ? (int) $c['parent_id'] : 0;
+            if ($pid > 0 && isset($id_by_pk[$pid]) && $id_by_pk[$pid] !== '') {
+                $entry['parent_code'] = $id_by_pk[$pid];
+            }
+            $labels = isset($c['labels']) && is_array($c['labels']) ? $c['labels'] : array();
+            if (count($labels) > 1 || (count($labels) === 1 && (!isset($labels[0]['language']) || $labels[0]['language'] !== 'en'))) {
+                $entry['labels'] = array();
+                foreach ($labels as $lbl) {
+                    if (!is_array($lbl) || empty($lbl['language'])) {
+                        continue;
+                    }
+                    $entry['labels'][] = array(
+                        'language' => (string) $lbl['language'],
+                        'label' => isset($lbl['label']) ? (string) $lbl['label'] : '',
+                        'description' => isset($lbl['description']) ? $lbl['description'] : null,
+                    );
+                }
+            }
+            $items[] = $entry;
+        }
+
+        $translations = $this->get_codelist_translations((int) $codelist_pk);
+        $header_trans = array();
+        foreach ($translations as $tr) {
+            $header_trans[] = array(
+                'language' => $tr['language'],
+                'label' => $tr['label'],
+                'description' => isset($tr['description']) ? $tr['description'] : null,
+            );
+        }
+
+        $doc = array(
+            'idno' => (string) $row['idno'],
+            'agency' => (string) $row['agency'],
+            'name' => (string) $row['name'],
+            'version' => (string) $row['version'],
+            'title' => (string) $row['title'],
+            'description' => isset($row['description']) ? $row['description'] : null,
+            'items' => $items,
+        );
+        if (!empty($row['uri'])) {
+            $doc['uri'] = (string) $row['uri'];
+        }
+        if (isset($row['status']) && $row['status'] !== '') {
+            $doc['status'] = (string) $row['status'];
+        }
+        if (!empty($header_trans)) {
+            $doc['translations'] = $header_trans;
+        }
+
+        return $doc;
+    }
+
+    /**
+     * Import one codelist from a NADA-compatible (or ME-extended) JSON object.
+     *
+     * @param array $payload Flat codelist object or envelope with codelist + items
+     * @param array $options dry_run, replace_existing (overwrite), created_by
+     * @return array
+     */
+    public function import_json_codelist(array $payload, array $options = array())
+    {
+        $warnings = array();
+        $dry = !empty($options['dry_run']);
+        $replace = !empty($options['replace_existing']);
+        $created_by = isset($options['created_by']) ? $options['created_by'] : null;
+
+        $payload = $this->_json_normalize_import_payload($payload);
+
+        $agency = isset($payload['agency']) && trim((string) $payload['agency']) !== ''
+            ? trim((string) $payload['agency'])
+            : self::NADA_DEFAULT_AGENCY;
+        $version = isset($payload['version']) && trim((string) $payload['version']) !== ''
+            ? trim((string) $payload['version'])
+            : self::NADA_DEFAULT_VERSION;
+
+        $sdmx_name = '';
+        if (isset($payload['name']) && trim((string) $payload['name']) !== '') {
+            $sdmx_name = trim((string) $payload['name']);
+        }
+        if ($sdmx_name === '') {
+            return array(
+                'ok' => false,
+                'action' => 'error',
+                'message' => 'name (SDMX maintainable id) is required',
+                'warnings' => $warnings,
+            );
+        }
+
+        $title = '';
+        if (isset($payload['title']) && trim((string) $payload['title']) !== '') {
+            $title = trim((string) $payload['title']);
+        } elseif (isset($payload['display_name']) && trim((string) $payload['display_name']) !== '') {
+            $title = trim((string) $payload['display_name']);
+        } elseif (isset($payload['label']) && trim((string) $payload['label']) !== '') {
+            $title = trim((string) $payload['label']);
+        } else {
+            $title = $sdmx_name;
+        }
+
+        $idno = '';
+        if (isset($payload['idno']) && trim((string) $payload['idno']) !== '') {
+            $idno = trim((string) $payload['idno']);
+        } else {
+            $idno = self::make_idno($agency, $sdmx_name, $version);
+        }
+
+        $items = isset($payload['items']) && is_array($payload['items']) ? $payload['items'] : array();
+        foreach ($items as $idx => $item) {
+            if (!is_array($item)) {
+                return array(
+                    'ok' => false,
+                    'action' => 'error',
+                    'message' => "items[{$idx}] must be an object",
+                    'warnings' => $warnings,
+                );
+            }
+            $code = isset($item['code']) ? trim((string) $item['code']) : '';
+            if ($code === '') {
+                return array(
+                    'ok' => false,
+                    'action' => 'error',
+                    'message' => "items[{$idx}].code is required",
+                    'warnings' => $warnings,
+                );
+            }
+            if (strlen($code) > 150) {
+                return array(
+                    'ok' => false,
+                    'action' => 'error',
+                    'message' => "items[{$idx}].code exceeds 150 characters",
+                    'warnings' => $warnings,
+                );
+            }
+        }
+
+        if (!empty($payload['groups']) && is_array($payload['groups']) && count($payload['groups']) > 0) {
+            $warnings[] = 'groups are not stored in Metadata Editor; group definitions were ignored';
+        }
+
+        $existing = $this->get_by_identity($agency, $sdmx_name, $version);
+
+        if ($dry) {
+            $action = 'create';
+            if ($existing) {
+                $action = ($replace && count($items) > 0) ? 'update' : 'reuse';
+            }
+            return array(
+                'ok' => true,
+                'action' => 'dry_run',
+                'agency' => $agency,
+                'name' => $sdmx_name,
+                'version' => $version,
+                'codes_count' => count($items),
+                'planned_action' => $action,
+                'warnings' => $warnings,
+            );
+        }
+
+        if ($existing && (!$replace || count($items) === 0)) {
+            if (count($items) > 0 && !$replace) {
+                $warnings[] = 'Codelist already exists; pass replace=1 (or overwrite=true) to replace items';
+            }
+            return array(
+                'ok' => true,
+                'action' => 'skipped',
+                'id' => (int) $existing['id'],
+                'agency' => $agency,
+                'name' => $sdmx_name,
+                'version' => $version,
+                'warnings' => $warnings,
+            );
+        }
+
+        $this->db->trans_start();
+
+        try {
+            if ($existing) {
+                $pk = (int) $existing['id'];
+                if (!$this->is_content_mutable($existing)) {
+                    $this->db->trans_rollback();
+                    return array(
+                        'ok' => false,
+                        'action' => 'error',
+                        'message' => 'Codelist is ' . $existing['status'] . ' and cannot be replaced',
+                        'warnings' => $warnings,
+                    );
+                }
+                $this->update($pk, array(
+                    'title' => $this->_sdmx_truncate($title, 255),
+                    'description' => isset($payload['description']) ? $payload['description'] : null,
+                    'uri' => isset($payload['uri']) ? $this->_sdmx_truncate((string) $payload['uri'], 500) : null,
+                    'changed_by' => $created_by,
+                ));
+                $this->delete_all_items_for_codelist($pk);
+                $imported = $this->_json_import_items($pk, $items, $warnings);
+                $this->_json_import_header_translations($pk, $payload, $title, $warnings);
+                $action = 'updated';
+            } else {
+                $insert = array(
+                    'idno' => $this->_sdmx_truncate($idno, 191),
+                    'agency' => $agency,
+                    'name' => $this->_sdmx_truncate($sdmx_name, 64),
+                    'version' => $version,
+                    'title' => $this->_sdmx_truncate($title, 255),
+                    'description' => isset($payload['description']) ? $payload['description'] : null,
+                    'uri' => isset($payload['uri']) ? $this->_sdmx_truncate((string) $payload['uri'], 500) : null,
+                    'created_by' => $created_by,
+                    'changed_by' => $created_by,
+                );
+                if (isset($payload['status'])) {
+                    $insert['status'] = $this->normalize_status($payload['status']);
+                }
+                $pk = $this->create($insert);
+                if (!$pk) {
+                    throw new Exception('Failed to create codelist');
+                }
+                $imported = $this->_json_import_items((int) $pk, $items, $warnings);
+                $this->_json_import_header_translations((int) $pk, $payload, $title, $warnings);
+                $action = 'created';
+            }
+
+            if ($this->db->trans_status() === false) {
+                throw new Exception('Transaction failed');
+            }
+            $this->db->trans_complete();
+
+            return array(
+                'ok' => true,
+                'action' => $action,
+                'id' => (int) $pk,
+                'agency' => $agency,
+                'name' => $sdmx_name,
+                'version' => $version,
+                'codes_imported' => $imported,
+                'warnings' => $warnings,
+            );
+        } catch (Exception $e) {
+            $this->db->trans_rollback();
+            return array(
+                'ok' => false,
+                'action' => 'error',
+                'message' => $e->getMessage(),
+                'warnings' => $warnings,
+            );
+        }
+    }
+
+    /**
+     * @param array $payload
+     * @return array
+     */
+    private function _json_normalize_import_payload(array $payload)
+    {
+        if (isset($payload['codelist']) && is_array($payload['codelist'])) {
+            $cl = $payload['codelist'];
+            if (isset($payload['items']) && is_array($payload['items'])) {
+                $cl['items'] = $payload['items'];
+            }
+            if (isset($payload['translations']) && is_array($payload['translations'])) {
+                $cl['translations'] = $payload['translations'];
+            }
+            if (isset($payload['groups']) && is_array($payload['groups'])) {
+                $cl['groups'] = $payload['groups'];
+            }
+            return $cl;
+        }
+
+        return $payload;
+    }
+
+    /**
+     * @param array $code_row From get_codes()
+     * @return string
+     */
+    private function _json_pick_item_title(array $code_row)
+    {
+        $labels = isset($code_row['labels']) && is_array($code_row['labels']) ? $code_row['labels'] : array();
+        foreach ($labels as $lbl) {
+            if (is_array($lbl) && isset($lbl['language']) && $lbl['language'] === 'en' && !empty($lbl['label'])) {
+                return (string) $lbl['label'];
+            }
+        }
+        if (!empty($labels) && is_array($labels[0]) && !empty($labels[0]['label'])) {
+            return (string) $labels[0]['label'];
+        }
+
+        return (string) $code_row['code'];
+    }
+
+    /**
+     * @param int   $codelist_pk
+     * @param array $items
+     * @param array $warnings
+     * @return int Number of items imported
+     */
+    private function _json_import_items($codelist_pk, array $items, array &$warnings)
+    {
+        $code_to_id = array();
+        $pending_parents = array();
+
+        foreach ($items as $idx => $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+            $code = trim((string) $item['code']);
+            if ($code === '') {
+                continue;
+            }
+            $sort_order = isset($item['sort_order']) ? (int) $item['sort_order'] : 0;
+            $item_id = $this->add_code($codelist_pk, array(
+                'code' => $code,
+                'sort_order' => $sort_order,
+                'parent_id' => null,
+            ));
+            if (!$item_id) {
+                $warnings[] = "Failed to insert item code {$code}";
+                continue;
+            }
+            $code_to_id[$code] = (int) $item_id;
+
+            $title = '';
+            if (isset($item['title']) && trim((string) $item['title']) !== '') {
+                $title = trim((string) $item['title']);
+            } elseif (isset($item['label']) && trim((string) $item['label']) !== '') {
+                $title = trim((string) $item['label']);
+            }
+
+            if (!empty($item['labels']) && is_array($item['labels'])) {
+                foreach ($item['labels'] as $lbl) {
+                    if (!is_array($lbl) || empty($lbl['language']) || !isset($lbl['label'])) {
+                        continue;
+                    }
+                    $lang = trim((string) $lbl['language']);
+                    $this->set_code_label(
+                        (int) $item_id,
+                        $lang,
+                        (string) $lbl['label'],
+                        isset($lbl['description']) ? $lbl['description'] : null
+                    );
+                }
+            } elseif ($title !== '' && $this->codelist_has_language($codelist_pk, 'en')) {
+                $this->set_code_label((int) $item_id, 'en', $title, null);
+            } elseif ($title !== '') {
+                $this->set_codelist_translation($codelist_pk, 'en', $this->_sdmx_truncate($title, 500), null);
+                $this->set_code_label((int) $item_id, 'en', $title, null);
+            }
+
+            if (isset($item['parent_code']) && trim((string) $item['parent_code']) !== '') {
+                $pending_parents[] = array(
+                    'item_id' => (int) $item_id,
+                    'parent_code' => trim((string) $item['parent_code']),
+                );
+            } elseif (isset($item['parent_id']) && (int) $item['parent_id'] > 0) {
+                $warnings[] = "items[{$idx}].parent_id ignored; use parent_code in JSON interchange";
+            }
+        }
+
+        foreach ($pending_parents as $link) {
+            $parent_code = $link['parent_code'];
+            if (!isset($code_to_id[$parent_code])) {
+                $warnings[] = "Unknown parent_code \"{$parent_code}\" for item id {$link['item_id']}";
+                continue;
+            }
+            $this->update_code($link['item_id'], array('parent_id' => $code_to_id[$parent_code]));
+        }
+
+        return count($code_to_id);
+    }
+
+    /**
+     * @param int    $codelist_pk
+     * @param array  $payload
+     * @param string $title
+     * @param array  $warnings
+     */
+    private function _json_import_header_translations($codelist_pk, array $payload, $title, array &$warnings)
+    {
+        $rows = isset($payload['translations']) && is_array($payload['translations']) ? $payload['translations'] : array();
+        if (empty($rows)) {
+            return;
+        }
+        foreach ($rows as $tr) {
+            if (!is_array($tr) || empty($tr['language']) || !isset($tr['label'])) {
+                continue;
+            }
+            $this->set_codelist_translation(
+                $codelist_pk,
+                trim((string) $tr['language']),
+                (string) $tr['label'],
+                isset($tr['description']) ? $tr['description'] : null
+            );
+        }
     }
 }

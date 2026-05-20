@@ -2,9 +2,10 @@
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\TransferException;
 
 /**
- * PHP → FastAPI bridge for indicator DuckDB (staging, distinct, promote, job poll).
+ * PHP → FastAPI bridge for indicator DuckDB (timeseries import, charts, job poll).
  *
  * Base URL: application/config/editor.php → editor.data_api_url (EDITOR_DATA_API_URL).
  */
@@ -22,63 +23,6 @@ class Indicator_duckdb_service {
 		$this->ci->load->config('editor');
 		$configured = $this->ci->config->item('data_api_url', 'editor');
 		$this->base_url = rtrim($configured ? $configured : 'http://localhost:8000/', '/') . '/';
-	}
-
-	/**
-	 * Queue CSV load into project_{sid}.staging (draft buffer).
-	 *
-	 * @param string $csv_path Absolute path readable by FastAPI
-	 * @param int $sid
-	 * @param string $delimiter
-	 * @param string[]|null $dsd_column_names DSD column names that must exist in CSV header
-	 * @return array Decoded JSON (job_id, message, …)
-	 */
-	public function draft_queue($csv_path, $sid, $delimiter = ',', $dsd_column_names = null)
-	{
-		$url = $this->base_url . 'timeseries/indicators/draft-queue';
-		$body = array(
-			'project_id' => (string) (int) $sid,
-			'csv_path' => $csv_path,
-			'delimiter' => $delimiter !== '' ? $delimiter[0] : ',',
-		);
-
-		if (is_array($dsd_column_names) && count($dsd_column_names) > 0) {
-			$body['dsd_columns'] = array_map(function ($name) {
-				return array('name' => (string) $name);
-			}, $dsd_column_names);
-		}
-
-		return $this->post_json($url, $body);
-	}
-
-	/**
-	 * Distinct non-null values for a column in staging (indicator id picker).
-	 *
-	 * @param int $sid
-	 * @param string $column Physical CSV column name
-	 * @param int $limit max distinct values (capped at 3000 server-side in FastAPI)
-	 * @return array
-	 */
-	public function draft_distinct($sid, $column, $limit = 3000)
-	{
-		$url = $this->base_url . 'timeseries/indicators/draft/distinct';
-		$client = new Client(array('timeout' => 120));
-
-		try {
-			$response = $client->request('GET', $url, array(
-				'query' => array(
-					'project_id' => (string) (int) $sid,
-					'column' => $column,
-					'limit' => (int) $limit,
-				),
-			));
-
-			return json_decode($response->getBody()->getContents(), true);
-		}
-		catch (RequestException $e) {
-			$raw = $e->hasResponse() ? (string) $e->getResponse()->getBody() : $e->getMessage();
-			return array('error' => true, 'message' => $raw, 'http_code' => $e->hasResponse() ? $e->getResponse()->getStatusCode() : 0);
-		}
 	}
 
 	/**
@@ -261,75 +205,6 @@ class Indicator_duckdb_service {
 			'truncated' => $truncated,
 			'source' => 'column_stats',
 		);
-	}
-
-	/**
-	 * Metadata for project_{sid}.staging (resume UI).
-	 *
-	 * FastAPI: GET timeseries/indicators/draft/describe?project_id=
-	 * JSON: { "exists": bool, "row_count": int, "columns": [ { "name": "..." }, ... ] }
-	 *
-	 * @param int $sid
-	 * @return array Decoded JSON, or [ 'error' => true, 'message' => ... ] on failure
-	 */
-	public function draft_describe($sid)
-	{
-		$url = $this->base_url . 'timeseries/indicators/draft/describe';
-		$client = new Client(array('timeout' => 60));
-
-		try {
-			$response = $client->request('GET', $url, array(
-				'query' => array(
-					'project_id' => (string) (int) $sid,
-				),
-			));
-
-			return json_decode($response->getBody()->getContents(), true);
-		}
-		catch (RequestException $e) {
-			$raw = $e->hasResponse() ? (string) $e->getResponse()->getBody() : $e->getMessage();
-
-			return array(
-				'error' => true,
-				'message' => $raw,
-				'http_code' => $e->hasResponse() ? $e->getResponse()->getStatusCode() : 0,
-			);
-		}
-	}
-
-	/**
-	 * First N rows from project_{sid}.staging (wizard data preview).
-	 *
-	 * FastAPI: GET timeseries/indicators/draft/sample?project_id=&limit=
-	 *
-	 * @param int $sid
-	 * @param int $limit
-	 * @return array Decoded JSON, or [ 'error' => true, 'message' => ... ]
-	 */
-	public function draft_sample($sid, $limit = 20)
-	{
-		$url = $this->base_url . 'timeseries/indicators/draft/sample';
-		$client = new Client(array('timeout' => 120));
-
-		try {
-			$response = $client->request('GET', $url, array(
-				'query' => array(
-					'project_id' => (string) (int) $sid,
-					'limit' => (int) $limit,
-				),
-			));
-
-			return json_decode($response->getBody()->getContents(), true);
-		}
-		catch (RequestException $e) {
-			$raw = $e->hasResponse() ? (string) $e->getResponse()->getBody() : $e->getMessage();
-
-			return array(
-				'error' => true,
-				'message' => $raw,
-				'http_code' => $e->hasResponse() ? $e->getResponse()->getStatusCode() : 0,
-			);
-		}
 	}
 
 	/**
@@ -564,13 +439,18 @@ class Indicator_duckdb_service {
 
 			return is_array($body) ? $body : array('error' => true, 'message' => 'Invalid JSON', 'http_code' => $code);
 		}
-		catch (RequestException $e) {
-			$raw = $e->hasResponse() ? (string) $e->getResponse()->getBody() : $e->getMessage();
+		catch (TransferException $e) {
+			$raw = $e->getMessage();
+			if ($e instanceof RequestException && $e->hasResponse()) {
+				$raw = (string) $e->getResponse()->getBody();
+			}
 
 			return array(
 				'error' => true,
 				'message' => $raw,
-				'http_code' => $e->hasResponse() ? $e->getResponse()->getStatusCode() : 0,
+				'http_code' => ($e instanceof RequestException && $e->hasResponse())
+					? $e->getResponse()->getStatusCode()
+					: 0,
 			);
 		}
 	}
@@ -653,34 +533,7 @@ class Indicator_duckdb_service {
 	}
 
 	/**
-	 * Queue promote: draft → timeseries filtered by indicator column/value.
-	 *
-	 * Optional $time_spec (from Indicator_dsd_model::build_duckdb_promote_time_spec) tells FastAPI
-	 * how to add _ts_year / _ts_freq. Unknown keys should be ignored by older FastAPI versions.
-	 *
-	 * @param int $sid
-	 * @param string $indicator_column
-	 * @param string $indicator_value
-	 * @param array|null $time_spec
-	 * @return array Decoded JSON (job_id, …)
-	 */
-	public function timeseries_import_queue($sid, $indicator_column, $indicator_value, $time_spec = null)
-	{
-		$url = $this->base_url . 'timeseries/indicators/timeseries/import-queue';
-		$body = array(
-			'project_id' => (string) (int) $sid,
-			'indicator_column' => $indicator_column,
-			'indicator_value' => (string) $indicator_value,
-		);
-		if (is_array($time_spec) && !empty($time_spec['time_column'])) {
-			$body['time_spec'] = $time_spec;
-		}
-
-		return $this->post_json($url, $body);
-	}
-
-	/**
-	 * Queue recomputation of _ts_year / _ts_freq on existing project_{sid}.timeseries (staging unchanged).
+	 * Queue recomputation of _ts_year / _ts_freq on existing project_{sid}.timeseries.
 	 *
 	 * @param int $sid
 	 * @param array $time_spec from Indicator_dsd_model::build_duckdb_promote_time_spec (must include time_column)
@@ -698,38 +551,32 @@ class Indicator_duckdb_service {
 	}
 
 	/**
-	 * Drop project_{sid}.staging in DuckDB after a successful import (promote already published to timeseries).
-	 *
-	 * FastAPI: DELETE timeseries/indicators/staging?project_id=
+	 * Distinct values in a CSV column without loading staging (indicator_id picker).
 	 *
 	 * @param int $sid
-	 * @return array Decoded JSON on 2xx, or [ 'error' => true, 'message' => ..., 'http_code' => int ]
+	 * @param string $csv_path
+	 * @param string $column
+	 * @param string $delimiter
+	 * @param int $limit
+	 * @return array
 	 */
-	public function draft_drop($sid)
+	public function csv_distinct($sid, $csv_path, $column, $delimiter = ',', $limit = 3000)
 	{
-		$url = $this->base_url . 'timeseries/indicators/draft';
-		$client = new Client(array('timeout' => 60, 'http_errors' => false));
+		$url = $this->base_url . 'timeseries/indicators/csv/distinct';
+		$client = new Client(array('timeout' => 120));
 
 		try {
-			$response = $client->request('DELETE', $url, array(
+			$response = $client->request('GET', $url, array(
 				'query' => array(
 					'project_id' => (string) (int) $sid,
+					'csv_path' => $csv_path,
+					'column' => $column,
+					'delimiter' => $delimiter !== '' ? $delimiter[0] : ',',
+					'limit' => (int) $limit,
 				),
 			));
 
-			$code = (int) $response->getStatusCode();
-			$raw = (string) $response->getBody();
-			$body = json_decode($raw, true);
-
-			if ($code >= 200 && $code < 300) {
-				return is_array($body) ? $body : array('ok' => true);
-			}
-
-			return array(
-				'error' => true,
-				'message' => is_array($body) && isset($body['detail']) ? $body['detail'] : ($raw !== '' ? $raw : 'HTTP ' . $code),
-				'http_code' => $code,
-			);
+			return json_decode($response->getBody()->getContents(), true);
 		}
 		catch (RequestException $e) {
 			$raw = $e->hasResponse() ? (string) $e->getResponse()->getBody() : $e->getMessage();
@@ -743,53 +590,80 @@ class Indicator_duckdb_service {
 	}
 
 	/**
-	 * Delete timeseries rows for a specific indicator value before reimporting (Workflow 2).
-	 *
-	 * FastAPI: DELETE timeseries/indicators/timeseries/by-indicator
-	 * Query params: project_id, indicator_column, indicator_value
+	 * Validate CSV header set matches expected DSD column names exactly (case-insensitive).
+	 * Prefer Indicator_dsd_model::validate_csv_headers_for_dsd() for import (allows extra CSV columns).
 	 *
 	 * @param int $sid
-	 * @param string $indicator_column Physical column name in timeseries that holds indicator codes
-	 * @param string $indicator_value  The indicator code whose rows should be deleted
-	 * @return array Decoded JSON on 2xx, or [ 'error' => true, 'message' => ..., 'http_code' => int ]
+	 * @param string $csv_path
+	 * @param string[] $expected_column_names
+	 * @param string $delimiter
+	 * @return array
 	 */
-	public function timeseries_delete_by_indicator($sid, $indicator_column, $indicator_value)
+	public function csv_validate_headers($sid, $csv_path, array $expected_column_names, $delimiter = ',')
 	{
-		$url = $this->base_url . 'timeseries/indicators/timeseries/by-indicator';
-		$client = new Client(array('timeout' => 120, 'http_errors' => false));
+		$url = $this->base_url . 'timeseries/indicators/csv/validate-headers';
+		$client = new Client(array('timeout' => 60));
 
 		try {
-			$response = $client->request('DELETE', $url, array(
+			$response = $client->request('GET', $url, array(
 				'query' => array(
-					'project_id'       => (string) (int) $sid,
-					'indicator_column' => (string) $indicator_column,
-					'indicator_value'  => (string) $indicator_value,
+					'project_id' => (string) (int) $sid,
+					'csv_path' => $csv_path,
+					'expected_columns' => implode(',', array_map('strval', $expected_column_names)),
+					'delimiter' => $delimiter !== '' ? $delimiter[0] : ',',
 				),
 			));
 
-			$code = (int) $response->getStatusCode();
-			$raw  = (string) $response->getBody();
-			$body = json_decode($raw, true);
-
-			if ($code >= 200 && $code < 300) {
-				return is_array($body) ? $body : array('ok' => true);
-			}
-
-			return array(
-				'error'     => true,
-				'message'   => is_array($body) && isset($body['detail']) ? $body['detail'] : ($raw !== '' ? $raw : 'HTTP ' . $code),
-				'http_code' => $code,
-			);
+			return json_decode($response->getBody()->getContents(), true);
 		}
 		catch (RequestException $e) {
 			$raw = $e->hasResponse() ? (string) $e->getResponse()->getBody() : $e->getMessage();
 
 			return array(
-				'error'     => true,
-				'message'   => $raw,
+				'error' => true,
+				'message' => $raw,
 				'http_code' => $e->hasResponse() ? $e->getResponse()->getStatusCode() : 0,
 			);
 		}
+	}
+
+	/**
+	 * Replace project timeseries from CSV (validate headers, filter by indicator_value). Returns job_id.
+	 *
+	 * @param int $sid
+	 * @param string $csv_path
+	 * @param string[] $expected_column_names
+	 * @param string $indicator_column
+	 * @param string $indicator_value
+	 * @param array|null $time_spec
+	 * @param string $delimiter
+	 * @return array
+	 */
+	public function timeseries_replace_from_csv_queue(
+		$sid,
+		$csv_path,
+		array $expected_column_names,
+		$indicator_column,
+		$indicator_value,
+		$time_spec = null,
+		$delimiter = ','
+	) {
+		$url = $this->base_url . 'timeseries/indicators/timeseries/replace-from-csv-queue';
+		$body = array(
+			'project_id' => (string) (int) $sid,
+			'csv_path' => $csv_path,
+			'delimiter' => $delimiter !== '' ? $delimiter[0] : ',',
+			'expected_columns' => array_map(function ($name) {
+				return array('name' => (string) $name);
+			}, $expected_column_names),
+			'indicator_column' => $indicator_column,
+			'indicator_value' => (string) $indicator_value,
+		);
+		if (is_array($time_spec) && !empty($time_spec['time_column'])) {
+			$body['time_spec'] = $time_spec;
+		}
+
+		return $this->post_json($url, $body);
 	}
 
 	/**
@@ -826,13 +700,18 @@ class Indicator_duckdb_service {
 				'http_code' => $code,
 			);
 		}
-		catch (RequestException $e) {
-			$raw = $e->hasResponse() ? (string) $e->getResponse()->getBody() : $e->getMessage();
+		catch (TransferException $e) {
+			$raw = $e->getMessage();
+			if ($e instanceof RequestException && $e->hasResponse()) {
+				$raw = (string) $e->getResponse()->getBody();
+			}
 
 			return array(
 				'error' => true,
 				'message' => $raw,
-				'http_code' => $e->hasResponse() ? $e->getResponse()->getStatusCode() : 0,
+				'http_code' => ($e instanceof RequestException && $e->hasResponse())
+					? $e->getResponse()->getStatusCode()
+					: 0,
 			);
 		}
 	}

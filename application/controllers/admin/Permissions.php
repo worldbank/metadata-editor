@@ -18,7 +18,9 @@ class Permissions extends MY_Controller {
 		//$this->output->enable_profiler(TRUE);
 
 		//set default template
-		$this->template->set_template('admin5');		
+		$this->template->set_template('admin5');
+
+		$this->acl_manager->require_admin_or_die();
 	}
 
 	
@@ -178,9 +180,7 @@ class Permissions extends MY_Controller {
 	* 
 	*/
 	function delete_role($id)
-	{			
-		$this->acl_manager->has_access_or_die('user', 'edit');
-
+	{
 		if (!is_numeric($id)){
 			show_error('INVALID_ROLE_ID');
 		}

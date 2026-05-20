@@ -2,13 +2,12 @@
 Vue.component('indicator-dsd-edit', {
     props: {
         column: { type: Object, required: true },
-        /** Project sid for /api/local_codelists/... */
         projectSid: { type: [Number, String], required: true },
         index_key: { default: null },
         dictionaries: {
             type: Object,
             default: function() {
-                return { time_period_formats: [], freq_codes: [] };
+                return { freq_codes: [] };
             }
         },
         /** All DSD columns for this project (detect FREQ / periodicity row). */
@@ -26,6 +25,10 @@ Vue.component('indicator-dsd-edit', {
             }
         },
         globalCodelistsLoading: {
+            type: Boolean,
+            default: false
+        },
+        readOnly: {
             type: Boolean,
             default: false
         }
@@ -90,18 +93,17 @@ Vue.component('indicator-dsd-edit', {
         } else if (!this.column.metadata.hasOwnProperty('value_label_column')) {
             Vue.set(this.column.metadata, 'value_label_column', this.column.metadata.value_label_column || '');
         }
-        if (!this.column.metadata.hasOwnProperty('freq')) {
-            Vue.set(this.column.metadata, 'freq', '');
-        }
-        var legacyFreq = this.column.metadata.import_freq_code;
-        if (legacyFreq != null && legacyFreq !== '' && (!this.column.metadata.freq || String(this.column.metadata.freq).trim() === '')) {
-            Vue.set(this.column.metadata, 'freq', String(legacyFreq));
+        if (this.column.metadata.hasOwnProperty('freq')) {
+            Vue.delete(this.column.metadata, 'freq');
         }
         if (this.column.metadata.hasOwnProperty('import_freq_code')) {
             Vue.delete(this.column.metadata, 'import_freq_code');
         }
+        if (this.column.hasOwnProperty('time_period_format')) {
+            Vue.delete(this.column, 'time_period_format');
+        }
         this.initSdmxAttributeFields();
-        if (!this.column.codelist_type) {
+        if (!this.column.codelist_type || this.column.codelist_type === 'local') {
             Vue.set(this.column, 'codelist_type', 'none');
         }
         if (this.column.global_codelist_id === undefined) {
@@ -157,6 +159,28 @@ Vue.component('indicator-dsd-edit', {
             });
             this.OnValueUpdate();
         },
+        /** Human-readable label for a registry codelist row. */
+        globalCodelistLabel: function(cl) {
+            if (!cl) {
+                return '';
+            }
+            var title = cl.title && String(cl.title).trim();
+            if (title) {
+                return title;
+            }
+            var agency = String(cl.agency || '');
+            var name = String(cl.name || '');
+            return agency && name ? agency + ':' + name : (name || agency || String(cl.id || ''));
+        },
+        /** SDMX identity suffix for picker options, e.g. (WB:CL_FREQ). */
+        globalCodelistIdentitySuffix: function(cl) {
+            if (!cl) {
+                return '';
+            }
+            var agency = String(cl.agency || '');
+            var name = String(cl.name || '');
+            return agency && name ? '(' + agency + ':' + name + ')' : '';
+        },
         /** Resolve display name for column.global_codelist_id (registry PK). */
         resolveLinkedGlobalCodelist: function() {
             var vm = this;
@@ -178,9 +202,7 @@ Vue.component('indicator-dsd-edit', {
                 return String(x.id) === String(pk);
             });
             if (row) {
-                vm.linkedGlobalDisplayName = (row.name && String(row.name).trim() !== '')
-                    ? String(row.name).trim()
-                    : (String(row.agency || '') + ':' + String(row.codelist_id || ''));
+                vm.linkedGlobalDisplayName = vm.globalCodelistLabel(row);
                 if (seq === vm.globalResolveSeq) {
                     vm.globalResolveLoading = false;
                 }
@@ -194,9 +216,7 @@ Vue.component('indicator-dsd-edit', {
                     var data = res.data || {};
                     var cl = data.codelist;
                     if (cl && cl.id != null) {
-                        vm.linkedGlobalDisplayName = (cl.name && String(cl.name).trim() !== '')
-                            ? String(cl.name).trim()
-                            : (String(cl.agency || '') + ':' + String(cl.codelist_id || ''));
+                        vm.linkedGlobalDisplayName = vm.globalCodelistLabel(cl);
                     } else {
                         vm.linkedGlobalDisplayName = '';
                     }
@@ -299,14 +319,8 @@ Vue.component('indicator-dsd-edit', {
             if (cl) {
                 var idNum = parseInt(cl.id, 10);
                 Vue.set(this.column, 'global_codelist_id', (!isNaN(idNum) && idNum > 0) ? idNum : null);
-                this.linkedGlobalDisplayName = (cl.name && String(cl.name).trim() !== '')
-                    ? String(cl.name).trim()
-                    : String(cl.agency || '') + ':' + String(cl.codelist_id || '');
+                this.linkedGlobalDisplayName = this.globalCodelistLabel(cl);
             }
-            this.OnValueUpdate();
-        },
-        onLocalCodelistListId: function(id) {
-            Vue.set(this.column, 'local_codelist_id', id);
             this.OnValueUpdate();
         }
     },
@@ -327,10 +341,6 @@ Vue.component('indicator-dsd-edit', {
         },
         freqColumnDisplayName: function() {
             return this.freqColumnRow ? String(this.freqColumnRow.name) : '';
-        },
-        timePeriodFormatOptions: function() {
-            var d = this.dictionaries && this.dictionaries.time_period_formats;
-            return Array.isArray(d) ? d : [];
         },
         freqCodeOptions: function() {
             var d = this.dictionaries && this.dictionaries.freq_codes;
@@ -361,36 +371,6 @@ Vue.component('indicator-dsd-edit', {
             return list.some(function(cl) {
                 return String(cl.id) === String(id);
             });
-        },
-        /** Published-data profile from indicator_dsd.sum_stats (DuckDB). */
-        hasSumStatsPayload: function() {
-            var s = this.column && this.column.sum_stats;
-            return s != null && typeof s === 'object' && Object.keys(s).length > 0;
-        },
-        sumStatsComputeFailed: function() {
-            var s = this.column && this.column.sum_stats;
-            return !!(s && s.compute && s.compute.ok === false);
-        },
-        sumStatsComputeMessage: function() {
-            var s = this.column && this.column.sum_stats;
-            if (!s || !s.compute || s.compute.ok !== false) {
-                return '';
-            }
-            return (s.compute.message || s.compute.error_code || '') || (this.$t('sum_stats_unavailable') || 'Statistics unavailable');
-        },
-        sumStatsDataField: function() {
-            var s = this.column && this.column.sum_stats;
-            if (s && s.field) {
-                return String(s.field);
-            }
-            return this.column && this.column.name != null ? String(this.column.name) : '';
-        },
-        sumStatsFreqRows: function() {
-            var s = this.column && this.column.sum_stats;
-            if (!s || !Array.isArray(s.freq)) {
-                return [];
-            }
-            return s.freq;
         },
         showValueLabelColumnField: function() {
             var t = this.column.column_type;
@@ -449,6 +429,8 @@ Vue.component('indicator-dsd-edit', {
     },
     template: `
         <div class="indicator-dsd-edit-component" style="height:100vh" v-if="column">
+            <v-alert v-if="readOnly" type="info" dense text class="mb-2">Read-only (bound data structure)</v-alert>
+            <fieldset :disabled="readOnly" style="border:0;margin:0;padding:0;min-width:0;">
             <div style="font-size:small;" class="mb-2">
 
                 <div class="p-2">
@@ -524,55 +506,28 @@ Vue.component('indicator-dsd-edit', {
                     <!-- Periodicity (FREQ column): inline help after column type -->
                     <template v-if="column.column_type === 'periodicity'">
                         <p class="text-muted small mb-2">
-                            {{$t('dsd_freq_column_intro') || 'This field type marks the CSV column that contains SDMX FREQ codes (e.g. A, M, Q) per row. Pair it with a Time period column: you do not set a global time period format on the time row when this column exists.'}}
+                            {{$t('dsd_freq_column_intro') || 'This field type marks the CSV column that contains FREQ codes (e.g. A, M, Q) per row. Pair it with a Time period column: you do not set a time period format on the time row when this column exists.'}}
                         </p>
                         <details class="mb-3" v-if="freqCodeOptions.length">
                             <summary class="small" style="cursor:pointer;">{{$t('dsd_freq_code_reference') || 'FREQ codes (reference from config)'}}</summary>
                             <ul class="small text-muted pl-3 mb-0 mt-1" style="max-height: 12rem; overflow-y: auto;">
                                 <li v-for="f in freqCodeOptions" :key="'ref-' + f.code"><code>{{ f.code }}</code> — {{ f.label }}</li>
                             </ul>
-                            <small class="form-text text-muted d-block mt-1">{{$t('dsd_freq_codes_hint') || 'Map CSV values to these SDMX FREQ codes.'}}</small>
+                            <small class="form-text text-muted d-block mt-1">{{$t('dsd_freq_codes_hint') || 'Map CSV values to these FREQ codes.'}}</small>
                         </details>
                     </template>
 
-                    <!-- Time period: format + constant FREQ right after column type -->
+                    <!-- Time period (SDMX TIME_PERIOD): paired with FREQ column or set at import -->
                     <template v-else-if="column.column_type === 'time_period'">
                         <div v-if="projectHasFreqColumn" class="alert alert-info py-2 small mb-3" role="alert">
                             <strong>{{$t('dsd_time_mode_freq_from_data') || 'FREQ from data'}}</strong>
                             — {{$t('dsd_time_mode_freq_from_data_body') || 'A FREQ column is defined in this DSD:'}}
                             <code class="mx-1">{{ freqColumnDisplayName }}</code>.
-                            {{$t('dsd_time_mode_freq_from_data_tail') || 'Frequency comes from that column; time period values are interpreted using platform rules per FREQ. You do not need a separate time period format here.'}}
+                            {{$t('dsd_time_mode_freq_from_data_tail') || 'Frequency comes from that column; TIME_PERIOD values are validated for each FREQ.'}}
                         </div>
-                        <template v-else>
-                            <div class="form-group form-field">
-                                <label>{{$t("time_period_format") || "Time period format"}} <span class="text-danger">*</span></label>
-                                <select
-                                    v-model="column.time_period_format"
-                                    @change="OnValueUpdate"
-                                    class="form-control form-control-sm form-field-dropdown"
-                                >
-                                    <option value="">-</option>
-                                    <option v-for="row in timePeriodFormatOptions" :key="row.code" :value="row.code">
-                                        {{ row.label }} ({{ row.code }})
-                                    </option>
-                                </select>
-                                <small class="form-text text-muted">{{$t('dsd_time_format_required_help') || 'Required when there is no FREQ column (e.g. YYYY, YYYY-MM).'}}</small>
-                            </div>
-                            <div class="form-group form-field">
-                                <label>{{$t('dsd_constant_series_freq') || 'Series frequency (FREQ)'}} <span class="text-danger">*</span></label>
-                                <select
-                                    class="form-control form-control-sm form-field-dropdown"
-                                    :value="metaSelectValue('freq')"
-                                    @change="setMetaString('freq', $event.target.value)"
-                                >
-                                    <option value="">{{ $t('choose') || '— Choose —' }}</option>
-                                    <option v-for="f in freqCodeOptions" :key="'ifc-' + f.code" :value="f.code">
-                                        {{ f.label }} ({{ f.code }})
-                                    </option>
-                                </select>
-                                <small class="form-text text-muted">{{$t('dsd_constant_series_freq_help') || 'Single SDMX FREQ code for the whole series (e.g. A, M, Q). Required when no FREQ column exists.'}}</small>
-                            </div>
-                        </template>
+                        <div v-else class="alert alert-info py-2 small mb-3" role="alert">
+                            {{$t('dsd_time_period_import_freq_help') || 'No FREQ column in this structure. Set the series FREQ on the Import data screen before publishing CSV data.'}}
+                        </div>                        </template>
                     </template>
 
                     <!-- Value label column: attribute DSD field whose values provide labels -->
@@ -599,7 +554,7 @@ Vue.component('indicator-dsd-edit', {
                             </option>
                         </select>
                         <small class="form-text text-muted" v-if="valueLabelAttributeOptions.length === 0 && !valueLabelOrphanName">
-                            {{ $t('value_label_column_no_attributes') || 'No Attribute columns in this DSD yet. Add one under Column type, or clear this to use none.' }}
+                            {{ $t('value_label_column_no_attributes') || 'No Attribute columns in this structure. Clear this field to use none.' }}
                         </small>
                     </div>
 
@@ -634,7 +589,7 @@ Vue.component('indicator-dsd-edit', {
                         </div>
                     </template>
 
-                    <!-- Codelist type: none / project codelist / global standard -->
+                    <!-- Codelist type: none / global registry -->
                     <div class="form-group form-field">
                         <label>{{$t('dsd_vocabulary') || 'Codelist type'}}</label>
                         <select
@@ -643,8 +598,7 @@ Vue.component('indicator-dsd-edit', {
                             @change="onCodelistTypeChange($event)"
                         >
                             <option value="none">{{$t('dsd_vocab_none') || 'None'}}</option>
-                            <option value="local">{{$t('dsd_vocab_local') || 'Codelist (local)'}}</option>
-                            <option value="global">{{$t('dsd_vocab_global') || 'Global standard codelist'}}</option>
+                            <option value="global">{{$t('dsd_vocab_global') || 'Standard codelist'}}</option>
                         </select>
                     </div>
                     <div class="form-group form-field" v-if="column.codelist_type === 'global'">
@@ -664,7 +618,7 @@ Vue.component('indicator-dsd-edit', {
                                 {{ linkedGlobalDisplayName || ('#' + effectiveGlobalRegistryPk) }}
                             </option>
                             <option v-for="cl in globalCodelistsList" :key="'gvocab-' + cl.id" :value="String(cl.id)">
-                                {{ cl.name }} <template v-if="cl.codelist_id">({{ cl.agency }}: {{ cl.codelist_id }})</template>
+                                {{ globalCodelistLabel(cl) }} <template v-if="globalCodelistIdentitySuffix(cl)"> {{ globalCodelistIdentitySuffix(cl) }}</template>
                             </option>
                         </select>
                         <div v-if="globalResolveLoading" class="small text-muted mt-1">{{ $t('loading') || 'Loading…' }}</div>
@@ -674,80 +628,10 @@ Vue.component('indicator-dsd-edit', {
                             :codelist-name="linkedGlobalDisplayName"
                         ></indicator-dsd-global-codelist-preview>
                     </div>
-                    <!-- Codelist grid (separate component) -->
-                    <div class="form-group form-field mb-3" v-if="column.codelist_type === 'local'">
-                        <label class="d-block font-weight-bold mb-2">{{$t('local_codelist') || 'Codelist'}}</label>
-                        <div v-if="!column.id" class="text-muted small">
-                            {{$t('dsd_save_column_for_local_codelist') || 'Save this column first to create and edit the local codelist.'}}
-                        </div>
-                        <indicator-dsd-local-codelist-grid
-                            v-else
-                            :project-sid="projectSid"
-                            :dsd-field-id="column.id"
-                            :local-list-id="column.local_codelist_id"
-                            :list-display-name="(column.label || column.name || '')"
-                            @update:local-list-id="onLocalCodelistListId"
-                        />
-                    </div>
 
-                    <!-- Summary statistics from DuckDB timeseries (sum_stats) — bottom of form -->
-                    <div class="card border-secondary mb-0 mt-4" v-if="hasSumStatsPayload">
-                        <div class="card-header py-2 px-3 bg-light d-flex flex-wrap justify-content-between align-items-center">
-                            <strong>{{$t('sum_stats_panel_title') || 'Summary statistics'}}</strong>
-                            <small class="text-muted" v-if="column.sum_stats.computed_at">{{ column.sum_stats.computed_at }}</small>
-                        </div>
-                        <div class="card-body py-2 px-3 small">
-                            <div v-if="sumStatsComputeFailed" class="alert alert-warning py-2 mb-0">
-                                <strong>{{$t('data_field') || 'Data field'}}:</strong> {{ sumStatsDataField }}<br/>
-                                {{ sumStatsComputeMessage }}
-                            </div>
-                            <template v-else>
-                                <div class="mb-2">
-                                    <strong>{{$t('field_in_data') || 'Field in data'}}:</strong>
-                                    <code class="ml-1">{{ sumStatsDataField }}</code>
-                                </div>
-                                <div class="row mb-2">
-                                    <div class="col-6 col-md-4 col-lg-3 mb-1">
-                                        <span class="text-muted">{{$t('rows') || 'Rows'}}</span>
-                                        <div class="font-weight-medium">{{ column.sum_stats.row_count != null ? column.sum_stats.row_count : '—' }}</div>
-                                    </div>
-                                    <div class="col-6 col-md-4 col-lg-3 mb-1">
-                                        <span class="text-muted">{{$t('present') || 'Present'}}</span>
-                                        <div class="font-weight-medium">{{ column.sum_stats.non_null_count != null ? column.sum_stats.non_null_count : '—' }}</div>
-                                    </div>
-                                    <div class="col-6 col-md-4 col-lg-3 mb-1">
-                                        <span class="text-muted">{{$t('missing') || 'Missing'}}</span>
-                                        <div class="font-weight-medium">{{ column.sum_stats.null_count != null ? column.sum_stats.null_count : '—' }}</div>
-                                    </div>
-                                    <div class="col-6 col-md-4 col-lg-3 mb-1">
-                                        <span class="text-muted">{{$t('distinct') || 'Distinct'}}</span>
-                                        <div class="font-weight-medium">{{ column.sum_stats.distinct_count != null ? column.sum_stats.distinct_count : '—' }}</div>
-                                    </div>
-                                </div>
-                                <div v-if="column.sum_stats.freq_max != null || column.sum_stats.freq_truncated" class="text-muted mb-2">
-                                    <span v-if="column.sum_stats.freq_max != null">{{$t('top_frequencies') || 'Top frequencies'}}: {{ column.sum_stats.freq_max }}</span>
-                                    <span v-if="column.sum_stats.freq_truncated" class="ml-2">({{ $t('truncated') || 'truncated' }})</span>
-                                </div>
-                                <div v-if="sumStatsFreqRows.length" class="table-responsive border rounded" style="max-height: 14rem; overflow-y: auto;">
-                                    <table class="table table-sm table-striped mb-0">
-                                        <thead class="thead-light"><tr><th>{{$t('value') || 'Value'}}</th><th class="text-right">{{$t('count') || 'Count'}}</th></tr></thead>
-                                        <tbody>
-                                            <tr v-for="(fr, idx) in sumStatsFreqRows" :key="'sumfreq-' + idx">
-                                                <td class="text-break"><code>{{ fr.value }}</code></td>
-                                                <td class="text-right">{{ fr.count }}</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <p v-else class="text-muted mb-0">{{$t('sum_stats_no_freq') || 'No frequency breakdown (no present values).'}}</p>
-                            </template>
-                        </div>
-                    </div>
-                    <p v-else class="text-muted small mb-0 mt-4">
-                        {{$t('sum_stats_none_hint') || 'No profile data yet. Use “Refresh Stats” on the data structure list to compute statistics for this field.'}}
-                    </p>
                 </div>
             </div>
+            </fieldset>
         </div>
     `
 })

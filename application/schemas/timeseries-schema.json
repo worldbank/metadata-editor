@@ -1408,163 +1408,50 @@
 				"name"
 			]
 		},
-		"data_structure": {
-			"type": "array",
-			"description": "Data structure definition",
-			"items": {
-				"type": "object",
-				"properties": {
-					"name": {
-						"title": "Name",
-						"description": "Name (required). Must not start with underscore; reserved for system columns.",
-						"type": "string",
-						"minLength": 1,
-						"maxLength": 100,
-						"pattern": "^(?!_)[a-zA-Z0-9_]+$"
-					},
-					"label": {
-						"title": "Label",
-						"type": "string"
-					},
-					"description": {
-						"title": "Description",
-						"type": "string"
-					},
-					"data_type": {
-						"title": "Data type",
-						"type": "string",
-						"enum": [
-							"string",
-							"integer",
-							"float",
-							"double",
-							"date",
-							"boolean"
-						]
-					},
-					"column_type": {
-						"title": "Column type",
-						"type": "string",
-						"enum": [
-							"dimension",
-							"time_period",
-							"measure",
-							"attribute",
-							"indicator_id",
-							"indicator_name",
-							"annotation",
-							"geography",
-							"observation_value",
-							"periodicity"
-						]
-					},
-					"time_period_format": {
-					"title": "Time period format",
+		"data_structure_reference": {
+			"type": "object",
+			"title": "Data structure reference",
+			"description": "Canonical link to a global catalogue DSD. This identity must include idno plus SDMX-style maintainable identity (agency, name, version). Optional uri documents where to find the artefact (e.g. external registry or documentation page); not used for import. Optional notes carry free-text context for editors or publication.",
+			"properties": {
+				"idno": {
+					"title": "DSD idno",
 					"type": "string",
-					"enum": [
-						"YYYY",
-						"YYYY-Sn",
-						"YYYY-Qn",
-						"YYYY-MM",
-						"YYYY-Www",
-						"YYYY-MM-DD",
-						"YYYY-MM-DDTHH:mm:ss",
-						"YYYY-MM-DDTHH:mm:ssZ"
-					]
+					"minLength": 1,
+					"maxLength": 191
 				},
-					"code_list": {
-						"title": "Code list",
-						"type": "array",
-						"items": {
-							"type": "object",
-							"properties": {
-								"code": {
-									"title": "Code",
-									"type": [
-										"string",
-										"number"
-									],
-									"minLength": 1
-								},
-								"label": {
-									"title": "Label",
-									"type": [
-										"string",
-										"number"
-									]
-								},
-								"description": {
-									"title": "Description",
-									"type": "string"
-								}
-							},
-							"required": [
-								"code"
-							],
-							"additionalProperties": false
-						}
-					},
-					"code_list_reference": {
-						"title": "Code list reference",
-						"type": "object",
-						"properties": {
-							"id": {
-								"title": "Identifier (ID)",
-								"type": "string"
-							},
-							"name": {
-								"title": "Name",
-								"type": "string"
-							},
-							"version": {
-								"title": "Version",
-								"type": "string"
-							},
-							"uri": {
-								"title": "URI",
-								"description": "URI",
-								"type": "string"
-							},
-							"note": {
-								"title": "Note",
-								"description": "Note",
-								"type": "string"
-							}
-						},
-						"required": [
-							"uri"
-						]
-					},
-					"paired_time_column_id": {
-						"title": "Paired TIME_PERIOD column id",
-						"description": "Optional link to another indicator_dsd.id (e.g. periodicity paired with time)",
-						"type": "integer"
-					},
-				"value_label_column": {
-					"title": "Value label source column",
-					"description": "CSV column name for labels",
+				"agency": {
+					"title": "Agency",
+					"type": "string",
+					"minLength": 1,
+					"maxLength": 64
+				},
+				"name": {
+					"title": "Maintainable id",
+					"type": "string",
+					"minLength": 1,
+					"maxLength": 64
+				},
+				"version": {
+					"title": "Version",
+					"type": "string",
+					"minLength": 1,
+					"maxLength": 32
+				},
+				"uri": {
+					"title": "Source URI",
+					"description": "Optional URL to registry page, documentation, or external definition for discoverability.",
+					"type": "string",
+					"format": "uri",
+					"maxLength": 2048
+				},
+				"notes": {
+					"title": "Notes",
+					"description": "Optional free-text notes about this DSD link (e.g. rationale, local usage context).",
 					"type": "string"
-				},
-				"attachment_level": {
-					"title": "Applies at",
-					"description": "Level at which the attribute or annotation attaches. Observation = once per data row; Series = once per series; DataSet = once for the whole file. Applies to attribute and annotation column types only.",
-					"type": "string",
-					"enum": ["DataSet", "Series", "Observation"]
-				},
-				"assignment_status": {
-					"title": "Value presence",
-					"description": "Whether providing a value for this attribute or annotation is mandatory or conditional. Mandatory = value must always be present; Conditional = value can be absent.",
-					"type": "string",
-					"enum": ["Mandatory", "Conditional"]
 				}
 			},
-			"required": [
-				"name",
-				"data_type",
-				"column_type"
-			],
+			"required": ["idno", "agency", "name", "version"],
 			"additionalProperties": false
-			}
 		},
 		"data_notes": {
 			"type": "array",

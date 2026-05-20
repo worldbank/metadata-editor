@@ -1,4 +1,6 @@
 // Indicator DSD Chart Visualization Component
+var INDICATOR_CHART_LINE_COLORS = ['#1976D2', '#4CAF50', '#FF9800', '#9C27B0', '#F44336', '#00BCD4', '#FFC107', '#795548'];
+
 Vue.component('indicator-dsd-chart', {
     props: [],
     data() {
@@ -8,6 +10,7 @@ Vue.component('indicator-dsd-chart', {
             dataset_type: project_type,
             loading: false,
             chart: null,
+            chartLegendItems: [],
             rawData: null, // Raw records from API
             filterOptions: {
                 geography: [],
@@ -36,13 +39,27 @@ Vue.component('indicator-dsd-chart', {
                 time_period_end: null
             },
             error: null,
-            activeTab: 0 // 0 = chart, 1 = table
+            activeTab: 0, // 0 = chart, 1 = table
+            suppressFilterAutoApply: false,
+            _filterApplyTimer: null
+        }
+    },
+    watch: {
+        filters: {
+            deep: true,
+            handler: function() {
+                this.scheduleAutoApplyFilters();
+            }
+        },
+        dimensionFilters: {
+            deep: true,
+            handler: function() {
+                this.scheduleAutoApplyFilters();
+            }
         }
     },
     created: async function() {
-        await this.loadFilterOptions();
-        await this.loadFacetCounts();
-        // Do not load chart data until user selects at least one geography
+        await this.loadChartFilterOptions();
     },
     mounted: function() {
         // Watch for tab changes and resize chart when the chart tab becomes visible
@@ -117,15 +134,61 @@ Vue.component('indicator-dsd-chart', {
             .indicator-dsd-chart-component .tab-pane--scroll {
                 overflow: auto;
             }
-            .indicator-dsd-chart-component .chart-area {
-                position: relative;
-                width: 100%;
+            .indicator-dsd-chart-component .tab-pane--chart {
+                display: flex;
+                flex-direction: column;
                 height: 100%;
+                min-height: 0;
+                padding: 8px 16px 16px;
+                box-sizing: border-box;
+                overflow-y: auto;
             }
-            .indicator-dsd-chart-component .chart-area canvas {
+            .indicator-dsd-chart-component .chart-series-summary {
+                flex: 0 0 auto;
+                font-size: 0.8125rem;
+                color: rgba(0, 0, 0, 0.6);
+                margin-bottom: 8px;
+            }
+            .indicator-dsd-chart-component .chart-plot-area {
+                position: relative;
+                flex: 0 0 auto;
+                width: 100%;
+                min-height: 480px;
+                height: 480px;
+            }
+            .indicator-dsd-chart-component .chart-plot-area canvas {
                 width: 100% !important;
                 height: 100% !important;
                 display: block;
+            }
+            .indicator-dsd-chart-component .chart-legend-panel {
+                flex: 0 0 auto;
+                display: flex;
+                flex-wrap: wrap;
+                align-content: flex-start;
+                gap: 10px 18px;
+                margin-top: 12px;
+                padding-top: 12px;
+                border-top: 1px solid rgba(0, 0, 0, 0.08);
+            }
+            .indicator-dsd-chart-component .chart-legend-item {
+                display: inline-flex;
+                align-items: flex-start;
+                gap: 8px;
+                max-width: 100%;
+            }
+            .indicator-dsd-chart-component .chart-legend-swatch {
+                width: 16px;
+                height: 4px;
+                border-radius: 2px;
+                margin-top: 7px;
+                flex-shrink: 0;
+            }
+            .indicator-dsd-chart-component .chart-legend-label {
+                font-size: 0.8125rem;
+                line-height: 1.35;
+                color: rgba(0, 0, 0, 0.87);
+                word-break: break-word;
             }
             .indicator-dsd-chart-component .facet-group-title {
                 font-size: 0.75rem;
@@ -154,175 +217,97 @@ Vue.component('indicator-dsd-chart', {
         if (this._customStyle && this._customStyle.parentNode) {
             this._customStyle.parentNode.removeChild(this._customStyle);
         }
+        if (this._filterApplyTimer) {
+            clearTimeout(this._filterApplyTimer);
+            this._filterApplyTimer = null;
+        }
     },
     methods: {
-        loadFilterOptions: async function() {
-            const mapItems = function(c) {
-                if (!c.code_list || !Array.isArray(c.code_list)) {
-                    return [];
-                }
-                return c.code_list.map(item => ({
-                    code: item.code != null ? String(item.code) : '',
-                    label: item.label != null ? String(item.label) : (item.code != null ? String(item.code) : '')
-                })).filter(item => item.code !== '');
-            };
-            const hasCodelist = function(c) {
-                return c.code_list && Array.isArray(c.code_list) && c.code_list.length > 0;
-            };
-            const facetLabel = function(c) {
-                return (c.label && String(c.label).trim()) ? c.label : c.name;
-            };
+        loadChartFilterOptions: async function() {
+            const vm = this;
+            vm.suppressFilterAutoApply = true;
             try {
                 const response = await axios.get(
-                    CI.base_url + '/api/indicator_dsd/' + this.dataset_id + '?detailed=1&resolve_codelists=1'
+                    CI.base_url + '/api/indicator_dsd/chart_filter_options/' + vm.dataset_id
                 );
-                if (response.data && response.data.columns && Array.isArray(response.data.columns)) {
-                    const cols = response.data.columns;
-                    const geoCol = cols.find(c => c.column_type === 'geography');
-                    if (geoCol && hasCodelist(geoCol)) {
-                        this.filterOptions.geography = mapItems(geoCol);
-                        this.geographyColumnName = geoCol.name;
-                    } else {
-                        this.filterOptions.geography = [];
-                        this.geographyColumnName = null;
-                    }
+                const data = (response.data && response.data.data) ? response.data.data : {};
+                const dimFilters = {};
 
-                    const dimFilters = {};
-                    this.coreFacetFreq = null;
-                    this.facetDimensions = [];
-                    this.facetAttributes = [];
-                    this.facetAnnotations = [];
+                vm.geographyColumnName = data.geography_column || null;
+                vm.filterOptions.geography = Array.isArray(data.geography_options) ? data.geography_options : [];
 
-                    const freqCol = cols.find(c => c.column_type === 'periodicity');
-                    if (freqCol && hasCodelist(freqCol)) {
-                        this.coreFacetFreq = {
-                            name: freqCol.name,
-                            label: facetLabel(freqCol),
-                            column_type: 'periodicity',
-                            items: mapItems(freqCol)
-                        };
-                        dimFilters[freqCol.name] = [];
-                    }
-
-                    cols.filter(c => c.column_type === 'dimension' || c.column_type === 'measure').forEach(c => {
-                        const items = hasCodelist(c) ? mapItems(c) : [];
-                        this.facetDimensions.push({
-                            name: c.name,
-                            label: facetLabel(c),
-                            column_type: c.column_type,
-                            items
-                        });
-                        dimFilters[c.name] = [];
-                    });
-
-                    cols.filter(c => c.column_type === 'attribute' && hasCodelist(c)).forEach(c => {
-                        this.facetAttributes.push({
-                            name: c.name,
-                            label: facetLabel(c),
-                            column_type: 'attribute',
-                            items: mapItems(c)
-                        });
-                        dimFilters[c.name] = [];
-                    });
-
-                    cols.filter(c => c.column_type === 'annotation' && hasCodelist(c)).forEach(c => {
-                        this.facetAnnotations.push({
-                            name: c.name,
-                            label: facetLabel(c),
-                            column_type: 'annotation',
-                            items: mapItems(c)
-                        });
-                        dimFilters[c.name] = [];
-                    });
-
-                    this.dimensionFilters = dimFilters;
+                vm.coreFacetFreq = data.periodicity_facet || null;
+                if (vm.coreFacetFreq && vm.coreFacetFreq.name) {
+                    dimFilters[vm.coreFacetFreq.name] = [];
                 }
+
+                vm.facetDimensions = Array.isArray(data.dimension_facets) ? data.dimension_facets : [];
+                vm.facetDimensions.forEach(function(col) {
+                    if (col && col.name) {
+                        dimFilters[col.name] = [];
+                    }
+                });
+
+                vm.facetAttributes = Array.isArray(data.attribute_facets) ? data.attribute_facets : [];
+                vm.facetAttributes.forEach(function(col) {
+                    if (col && col.name) {
+                        dimFilters[col.name] = [];
+                    }
+                });
+
+                vm.facetAnnotations = Array.isArray(data.annotation_facets) ? data.annotation_facets : [];
+                vm.facetAnnotations.forEach(function(col) {
+                    if (col && col.name) {
+                        dimFilters[col.name] = [];
+                    }
+                });
+
+                vm.dimensionFilters = dimFilters;
+                vm.filterOptionsError = null;
             } catch (error) {
-                console.error('Error loading filter options:', error);
-                this.filterOptionsError = (error.response && error.response.data && error.response.data.message)
+                console.error('Error loading chart filter options:', error);
+                vm.filterOptionsError = (error.response && error.response.data && error.response.data.message)
                     || error.message
                     || 'Could not load filter options';
-                this.filterOptions.geography = [];
-                this.geographyColumnName = null;
-                this.coreFacetFreq = null;
-                this.facetDimensions = [];
-                this.facetAttributes = [];
-                this.facetAnnotations = [];
-                this.dimensionFilters = {};
+                vm.filterOptions.geography = [];
+                vm.geographyColumnName = null;
+                vm.coreFacetFreq = null;
+                vm.facetDimensions = [];
+                vm.facetAttributes = [];
+                vm.facetAnnotations = [];
+                vm.dimensionFilters = {};
+            } finally {
+                vm.suppressFilterAutoApply = false;
             }
         },
-        /**
-         * Append " (n)" to item labels from dataset-wide DuckDB counts (DSD column keys).
-         */
-        mergeItemsWithCounts: function(items, countRows) {
-            const m = {};
-            (countRows || []).forEach(function(r) {
-                if (r && r.value != null && r.count != null) {
-                    m[String(r.value)] = Number(r.count);
-                }
-            });
-            return (items || []).map(function(it) {
-                const code = String(it.code != null ? it.code : '');
-                const baseLabel = it.label != null && String(it.label).trim() !== ''
-                    ? String(it.label)
-                    : code;
-                const n = m[code];
-                const label = n != null ? baseLabel + ' (' + n.toLocaleString() + ')' : baseLabel;
-                return Object.assign({}, it, { label: label });
-            });
-        },
-        applyFacetCountsToFilterItems: function(column_counts) {
-            if (!column_counts || typeof column_counts !== 'object') {
+        scheduleAutoApplyFilters: function() {
+            if (this.suppressFilterAutoApply) {
                 return;
             }
-            if (this.geographyColumnName && this.filterOptions.geography && this.filterOptions.geography.length) {
-                const gr = column_counts[this.geographyColumnName];
-                if (gr && gr.length) {
-                    this.filterOptions.geography = this.mergeItemsWithCounts(this.filterOptions.geography, gr);
-                }
+            if (this._filterApplyTimer) {
+                clearTimeout(this._filterApplyTimer);
             }
-            if (this.coreFacetFreq && this.coreFacetFreq.items && this.coreFacetFreq.items.length) {
-                const fr = column_counts[this.coreFacetFreq.name];
-                if (fr && fr.length) {
-                    this.coreFacetFreq = Object.assign({}, this.coreFacetFreq, {
-                        items: this.mergeItemsWithCounts(this.coreFacetFreq.items, fr)
-                    });
-                }
-            }
-            this.facetDimensions = this.facetDimensions.map(function(col) {
-                const rows = column_counts[col.name];
-                if (!col.items || !col.items.length || !rows || !rows.length) {
-                    return col;
-                }
-                return Object.assign({}, col, { items: this.mergeItemsWithCounts(col.items, rows) });
-            }.bind(this));
-            this.facetAttributes = this.facetAttributes.map(function(col) {
-                const rows = column_counts[col.name];
-                if (!col.items || !col.items.length || !rows || !rows.length) {
-                    return col;
-                }
-                return Object.assign({}, col, { items: this.mergeItemsWithCounts(col.items, rows) });
-            }.bind(this));
-            this.facetAnnotations = this.facetAnnotations.map(function(col) {
-                const rows = column_counts[col.name];
-                if (!col.items || !col.items.length || !rows || !rows.length) {
-                    return col;
-                }
-                return Object.assign({}, col, { items: this.mergeItemsWithCounts(col.items, rows) });
-            }.bind(this));
+            const vm = this;
+            this._filterApplyTimer = setTimeout(function() {
+                vm._filterApplyTimer = null;
+                vm.autoApplyFilters();
+            }, 350);
         },
-        loadFacetCounts: async function() {
-            try {
-                const response = await axios.get(
-                    CI.base_url + '/api/indicator_dsd/chart_facet_counts/' + this.dataset_id
-                );
-                if (response.data && response.data.status === 'success' && response.data.data
-                    && response.data.data.column_counts) {
-                    this.applyFacetCountsToFilterItems(response.data.data.column_counts);
-                }
-            } catch (e) {
-                console.warn('chart facet counts:', e);
+        clearChartData: function() {
+            this.rawData = null;
+            this.chartLegendItems = [];
+            this.error = null;
+            if (this.chart) {
+                this.chart.destroy();
+                this.chart = null;
             }
+        },
+        autoApplyFilters: function() {
+            if (!this.hasDimensionFilterSelection) {
+                this.clearChartData();
+                return;
+            }
+            this.loadChartData();
         },
         loadChartData: async function() {
             this.loading = true;
@@ -394,7 +379,7 @@ Vue.component('indicator-dsd-chart', {
         },
         transformToChartData: function(records) {
             if (!records || !Array.isArray(records) || records.length === 0) {
-                return { labels: [], datasets: [] };
+                return { labels: [], datasets: [], legendItems: [] };
             }
 
             const seriesData = {};
@@ -420,7 +405,6 @@ Vue.component('indicator-dsd-chart', {
             const labels = Array.from(timePeriods).sort();
 
             const datasets = [];
-            const colors = ['#1976D2', '#4CAF50', '#FF9800', '#9C27B0', '#F44336', '#00BCD4', '#FFC107', '#795548'];
             let colorIdx = 0;
 
             Object.keys(seriesData).sort((a, b) =>
@@ -430,19 +414,29 @@ Vue.component('indicator-dsd-chart', {
                     x: timePeriod,
                     y: seriesData[sid][timePeriod] !== undefined ? seriesData[sid][timePeriod] : null
                 }));
+                const color = INDICATOR_CHART_LINE_COLORS[colorIdx % INDICATOR_CHART_LINE_COLORS.length];
 
                 datasets.push({
                     label: seriesDisplay[sid] || sid,
                     data: data,
-                    borderColor: colors[colorIdx % colors.length],
-                    backgroundColor: colors[colorIdx % colors.length].replace(')', ', 0.1)'),
+                    borderColor: color,
+                    backgroundColor: color,
+                    borderWidth: 2,
                     tension: 0,
                     fill: false
                 });
                 colorIdx++;
             });
 
-            return { labels, datasets };
+            const legendItems = datasets.map(function(ds, idx) {
+                return {
+                    id: idx + '-' + String(ds.label || ''),
+                    label: ds.label || '',
+                    color: ds.borderColor || INDICATOR_CHART_LINE_COLORS[idx % INDICATOR_CHART_LINE_COLORS.length]
+                };
+            });
+
+            return { labels: labels, datasets: datasets, legendItems: legendItems };
         },
         transformToTableData: function(records) {
             if (!records || !Array.isArray(records) || records.length === 0) {
@@ -501,6 +495,7 @@ Vue.component('indicator-dsd-chart', {
                 return;
             }
 
+            const vm = this;
             const canvas = this.$refs.chartCanvas;
             if (!canvas) {
                 return;
@@ -519,6 +514,7 @@ Vue.component('indicator-dsd-chart', {
 
             // Transform raw data to Chart.js format
             const chartData = this.transformToChartData(this.rawData.records);
+            this.chartLegendItems = chartData.legendItems || [];
 
             const ctx = canvas.getContext('2d');
             
@@ -539,14 +535,18 @@ Vue.component('indicator-dsd-chart', {
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    layout: {
+                        padding: {
+                            bottom: 4
+                        }
+                    },
                     interaction: {
                         intersect: false,
                         mode: 'index'
                     },
                     plugins: {
                         legend: {
-                            display: true,
-                            position: 'top'
+                            display: false
                         },
                         tooltip: {
                             enabled: true,
@@ -588,19 +588,14 @@ Vue.component('indicator-dsd-chart', {
             });
         },
         applyFilters: function() {
-            let any = (this.filters.geography && this.filters.geography.length > 0);
-            if (!any && this.dimensionFilters) {
-                any = Object.keys(this.dimensionFilters).some(k =>
-                    Array.isArray(this.dimensionFilters[k]) && this.dimensionFilters[k].length > 0
-                );
+            if (this._filterApplyTimer) {
+                clearTimeout(this._filterApplyTimer);
+                this._filterApplyTimer = null;
             }
-            if (!any) {
-                EventBus.$emit('onFail', this.$t('select_at_least_one_dimension_filter') || 'Select at least one value in geography or another dimension filter.');
-                return;
-            }
-            this.loadChartData();
+            this.autoApplyFilters();
         },
         resetFilters: function() {
+            this.suppressFilterAutoApply = true;
             const dim = {};
             Object.keys(this.dimensionFilters || {}).forEach(k => { dim[k] = []; });
             this.dimensionFilters = dim;
@@ -609,12 +604,8 @@ Vue.component('indicator-dsd-chart', {
                 time_period_start: null,
                 time_period_end: null
             };
-            this.rawData = null;
-            this.error = null;
-            if (this.chart) {
-                this.chart.destroy();
-                this.chart = null;
-            }
+            this.clearChartData();
+            this.suppressFilterAutoApply = false;
         },
         exportChart: function() {
             if (!this.chart) {
@@ -633,6 +624,19 @@ Vue.component('indicator-dsd-chart', {
         },
         hasData: function() {
             return this.rawData && this.rawData.records && Array.isArray(this.rawData.records) && this.rawData.records.length > 0;
+        },
+        seriesCount: function() {
+            if (!this.rawData || !Array.isArray(this.rawData.records) || this.rawData.records.length === 0) {
+                return 0;
+            }
+            const seriesIds = new Set();
+            this.rawData.records.forEach(record => {
+                const sid = this.chartSeriesId(record);
+                if (sid) {
+                    seriesIds.add(sid);
+                }
+            });
+            return seriesIds.size;
         },
         hasFilters: function() {
             const dimAny = this.dimensionFilters && Object.keys(this.dimensionFilters).some(k =>
@@ -703,12 +707,15 @@ Vue.component('indicator-dsd-chart', {
         }
     },
     template: `
-        <div class="indicator-dsd-chart-component" style="display: flex; flex-direction: column; height: calc(100vh - 120px);">
+        <div class="indicator-dsd-chart-component" style="display: flex; flex-direction: column; height: calc(100vh - 72px); min-height: 640px;">
             <!-- Page Title -->
             <v-card class="mb-2 m-2 p-2" flat>
                 <v-card-title class="d-flex justify-space-between align-center">
                     <div>
                         <h4 class="mb-0">{{$t("timeseries_visualization") || "Timeseries Visualization"}}</h4>
+                        <div v-if="hasData" class="caption grey--text mt-1">
+                            {{ seriesCount }} {{ $t('series') || 'series' }}
+                        </div>
                     </div>
                     <div>
                         <v-btn 
@@ -757,7 +764,7 @@ Vue.component('indicator-dsd-chart', {
                                 outlined
                                 hide-details
                                 clearable
-                                :placeholder="$t('geography_codes_combobox') || 'Enter geography codes (no codelist on DSD)'"
+                                :placeholder="$t('geography_codes_combobox') || 'Enter geography codes (no values in published data yet)'"
                             ></v-combobox>
                             <v-autocomplete
                                 v-else
@@ -839,7 +846,7 @@ Vue.component('indicator-dsd-chart', {
                                 outlined
                                 hide-details
                                 clearable
-                                :placeholder="$t('dimension_codes_combobox') || 'Type or paste codes (no codelist on DSD)'"
+                                :placeholder="$t('dimension_codes_combobox') || 'Type codes (none observed in published data yet)'"
                             ></v-combobox>
                             <v-autocomplete
                                 v-else
@@ -898,7 +905,7 @@ Vue.component('indicator-dsd-chart', {
 
                         <!-- Action Buttons -->
                         <div class="d-flex align-center" style="gap: 8px;">
-                            <v-btn 
+                            <v-btn
                                 color="primary"
                                 depressed
                                 small
@@ -908,7 +915,7 @@ Vue.component('indicator-dsd-chart', {
                                 <v-icon left small>mdi-filter</v-icon>
                                 {{$t("apply_filters") || "Apply"}}
                             </v-btn>
-                            <v-btn 
+                            <v-btn
                                 v-if="hasFilters"
                                 text
                                 small
@@ -960,9 +967,25 @@ Vue.component('indicator-dsd-chart', {
                                     {{ hasDimensionFilterSelection ? ($t("no_data_available") || "No data available") : ($t("select_dimension_filters_to_view_chart") || "Select at least one geography or dimension filter to view the chart") }}
                                 </div>
                             </div>
-                            <div v-else class="tab-pane">
-                                <div class="chart-area">
+                            <div v-else class="tab-pane tab-pane--chart">
+                                <div class="chart-series-summary">
+                                    {{ seriesCount }} {{ $t('series') || 'series' }}
+                                </div>
+                                <div class="chart-plot-area">
                                     <canvas ref="chartCanvas"></canvas>
+                                </div>
+                                <div v-if="chartLegendItems.length" class="chart-legend-panel">
+                                    <div
+                                        v-for="item in chartLegendItems"
+                                        :key="item.id"
+                                        class="chart-legend-item"
+                                    >
+                                        <span
+                                            class="chart-legend-swatch"
+                                            :style="{ backgroundColor: item.color }"
+                                        ></span>
+                                        <span class="chart-legend-label">{{ item.label }}</span>
+                                    </div>
                                 </div>
                             </div>
                         </v-tab-item>
