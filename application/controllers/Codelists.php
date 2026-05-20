@@ -23,7 +23,7 @@ class Codelists extends MY_Controller {
 	 */
 	function index()
 	{
-		$this->editor_acl->has_access_or_die('codelist', 'view');
+		$this->editor_acl->registry_require('codelist', 'browse');
 		$this->template->set_template('default');
 		$options['translations']=$this->lang->language;
 		$this->load->config('iso_languages');

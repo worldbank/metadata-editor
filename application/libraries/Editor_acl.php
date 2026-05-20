@@ -19,6 +19,31 @@ class Editor_acl
 
 	}
 
+	/**
+	 * @return Acl_manager
+	 */
+	private function _acl_manager()
+	{
+		if (!isset($this->ci->acl_manager)) {
+			$this->ci->load->library('Acl_manager', null, 'acl_manager');
+		}
+		return $this->ci->acl_manager;
+	}
+
+	function registry_require($resource, $action, $user = null)
+	{
+		$this->_acl_manager()->registry_require($resource, $action, $user);
+	}
+
+	/**
+	 * @param object|null $user
+	 * @return array<string, bool>
+	 */
+	function registry_user_info_flags($user = null)
+	{
+		return $this->_acl_manager()->registry_user_info_flags($user);
+	}
+
 
 	function get_project_main_id($project_id)
 	{

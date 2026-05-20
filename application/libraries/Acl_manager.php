@@ -566,6 +566,80 @@ class Acl_manager
 		
 		return $resource_sub_perms;
 	}
+
+	/**
+	 * Registry ACL: codelist | data_structure.
+	 *
+	 * Actions: browse (catalogue + editor:view), edit, import (import or edit), delete, admin.
+	 *
+	 * @param string $resource codelist|data_structure
+	 * @param string $action browse|edit|import|delete|admin
+	 * @param object|null $user
+	 */
+	function registry_can($resource, $action, $user = null)
+	{
+		switch ($action) {
+			case 'browse':
+				return $this->check_access($resource, 'view', $user)
+					|| $this->check_access('editor', 'view', $user);
+			case 'edit':
+				return $this->check_access($resource, 'edit', $user);
+			case 'import':
+				return $this->check_access($resource, 'import', $user)
+					|| $this->check_access($resource, 'edit', $user);
+			case 'delete':
+				return $this->check_access($resource, 'delete', $user);
+			case 'admin':
+				return $this->user_is_admin($user)
+					|| $this->check_access($resource, 'admin', $user);
+			default:
+				throw new Exception('Unknown registry action: ' . $action);
+		}
+	}
+
+	/**
+	 * @param string $resource codelist|data_structure
+	 * @param string $action browse|edit|import|delete|admin
+	 * @param object|null $user
+	 */
+	function registry_require($resource, $action, $user = null)
+	{
+		if ($this->registry_can($resource, $action, $user)) {
+			return true;
+		}
+		$this->_registry_access_denied_die();
+	}
+
+	/**
+	 * Flags for CI.user_info (Vue nav, registry pages, action buttons).
+	 *
+	 * @param object|null $user
+	 * @return array<string, bool>
+	 */
+	function registry_user_info_flags($user = null)
+	{
+		return array(
+			'has_codelist_permission' => $this->registry_can('codelist', 'browse', $user),
+			'has_data_structure_permission' => $this->registry_can('data_structure', 'browse', $user),
+			'can_edit_codelist' => $this->registry_can('codelist', 'edit', $user),
+			'can_import_codelist' => $this->registry_can('codelist', 'import', $user),
+			'can_delete_codelist' => $this->registry_can('codelist', 'delete', $user),
+			'can_edit_data_structure' => $this->registry_can('data_structure', 'edit', $user),
+			'can_import_data_structure' => $this->registry_can('data_structure', 'import', $user),
+			'can_delete_data_structure' => $this->registry_can('data_structure', 'delete', $user),
+		);
+	}
+
+	private function _registry_access_denied_die()
+	{
+		if ($this->ci->input->is_ajax_request()) {
+			$this->ci->output
+				->set_status_header(403)
+				->set_content_type('application/json');
+			die(json_encode('Access denied'));
+		}
+		show_error('Access denied', 403);
+	}
 	
 }
 

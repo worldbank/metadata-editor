@@ -46,6 +46,12 @@ Vue.component('indicator-dsd-import', {
         canUpload: function() {
             return this.binding && this.binding.bound && (this.binding.column_count || 0) > 0;
         },
+        canEditProjectDsd: function () {
+            if (typeof this.$store === 'undefined' || !this.$store.getters.getUserHasEditAccess) {
+                return false;
+            }
+            return this.$store.getters.getUserHasEditAccess && !this.$store.state.project_is_locked;
+        },
         structureReady: function() {
             if (this.binding && this.binding.structure_validation) {
                 return !!this.binding.structure_validation.valid;
@@ -495,7 +501,11 @@ Vue.component('indicator-dsd-import', {
                 <v-btn small outlined class="mt-2" @click="goToDataStructures">Data structures registry</v-btn>
             </v-alert>
 
-            <template v-else>
+            <v-alert v-else-if="canUpload && !canEditProjectDsd" type="info" dense outlined class="mb-4">
+                You have view-only access to this project. Importing data requires edit permission.
+            </v-alert>
+
+            <template v-else-if="canUpload && canEditProjectDsd">
                 <v-alert v-if="!embedded" type="info" dense outlined class="mb-4">
                     Bound structure: <strong>{{ globalStructureLabel }}</strong>
                     ({{ binding.column_count }} columns)

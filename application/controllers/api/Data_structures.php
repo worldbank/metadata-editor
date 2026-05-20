@@ -38,7 +38,7 @@ class Data_structures extends MY_REST_Controller {
     public function index_get()
     {
         try {
-            $this->has_registry_catalogue_view_or_die($this->registry_resource);
+            $this->registry_require_or_die($this->registry_resource, 'browse');
             $page_raw = $this->input->get('page');
             $use_paged = ($page_raw !== null && $page_raw !== '');
             $flat = filter_var($this->input->get('flat'), FILTER_VALIDATE_BOOLEAN);
@@ -96,7 +96,7 @@ class Data_structures extends MY_REST_Controller {
     public function single_get($id = null)
     {
         try {
-            $this->has_registry_catalogue_view_or_die($this->registry_resource);
+            $this->registry_require_or_die($this->registry_resource, 'browse');
             if (!$id) {
                 throw new Exception('Data structure id is required');
             }
@@ -126,7 +126,7 @@ class Data_structures extends MY_REST_Controller {
     public function validate_get($id = null)
     {
         try {
-            $this->has_registry_catalogue_view_or_die($this->registry_resource);
+            $this->registry_require_or_die($this->registry_resource, 'browse');
             if (!$id) {
                 throw new Exception('Data structure id is required');
             }
@@ -147,7 +147,7 @@ class Data_structures extends MY_REST_Controller {
     public function by_identity_get()
     {
         try {
-            $this->has_registry_catalogue_view_or_die($this->registry_resource);
+            $this->registry_require_or_die($this->registry_resource, 'browse');
             $agency = trim((string) $this->input->get('agency'));
             $name = trim((string) $this->input->get('name'));
             $version = $this->input->get('version');
@@ -178,7 +178,7 @@ class Data_structures extends MY_REST_Controller {
     public function lookup_get($segment = null)
     {
         try {
-            $this->has_registry_catalogue_view_or_die($this->registry_resource);
+            $this->registry_require_or_die($this->registry_resource, 'browse');
             $row = $this->_resolve_structure_row($segment);
             if (!$row) {
                 throw new Exception('Data structure not found');
@@ -202,7 +202,7 @@ class Data_structures extends MY_REST_Controller {
     public function create_post()
     {
         try {
-            $this->has_registry_edit_or_die($this->registry_resource);
+            $this->registry_require_or_die($this->registry_resource, 'edit');
             $input = (array) $this->raw_json_input();
             if (empty($input)) {
                 throw new Exception('JSON body required');
@@ -230,7 +230,7 @@ class Data_structures extends MY_REST_Controller {
     public function update_post($id = null)
     {
         try {
-            $this->has_registry_edit_or_die($this->registry_resource);
+            $this->registry_require_or_die($this->registry_resource, 'edit');
             if (!$id) {
                 throw new Exception('Data structure id is required');
             }
@@ -263,7 +263,7 @@ class Data_structures extends MY_REST_Controller {
     public function components_post($structure_id = null)
     {
         try {
-            $this->has_registry_edit_or_die($this->registry_resource);
+            $this->registry_require_or_die($this->registry_resource, 'edit');
             if (!$structure_id) {
                 throw new Exception('Data structure id is required');
             }
@@ -294,7 +294,7 @@ class Data_structures extends MY_REST_Controller {
     public function component_update_post($id = null)
     {
         try {
-            $this->has_registry_edit_or_die($this->registry_resource);
+            $this->registry_require_or_die($this->registry_resource, 'edit');
             if (!$id) {
                 throw new Exception('Component id is required');
             }
@@ -323,7 +323,7 @@ class Data_structures extends MY_REST_Controller {
     public function component_delete_post($id = null)
     {
         try {
-            $this->has_registry_edit_or_die($this->registry_resource);
+            $this->registry_require_or_die($this->registry_resource, 'edit');
             if (!$id) {
                 throw new Exception('Component id is required');
             }
@@ -340,7 +340,7 @@ class Data_structures extends MY_REST_Controller {
     public function import_json_post()
     {
         try {
-            $this->has_registry_import_or_die($this->registry_resource);
+            $this->registry_require_or_die($this->registry_resource, 'import');
             $input = $this->_import_json_read_body();
             if ($input === null || !is_array($input) || empty($input)) {
                 throw new Exception('Send JSON body or multipart "file" with a data structure document');
@@ -350,6 +350,9 @@ class Data_structures extends MY_REST_Controller {
             $userId = $this->get_api_user_id();
 
             $this->load->library('Data_structure_json_import');
+            if (Data_structure_json_import::payload_mutates_codelists($input, $overwrite)) {
+                $this->registry_require_or_die('codelist', 'import');
+            }
             $summary = $this->data_structure_json_import->import_from_array($input, array(
                 'overwrite' => $overwrite,
                 'dry_run' => $dry_run,
@@ -375,7 +378,7 @@ class Data_structures extends MY_REST_Controller {
     public function export_get($segment = null)
     {
         try {
-            $this->has_registry_catalogue_view_or_die($this->registry_resource);
+            $this->registry_require_or_die($this->registry_resource, 'browse');
             $row = $this->_resolve_structure_row($segment);
             if (!$row) {
                 throw new Exception('Data structure not found');
@@ -414,7 +417,8 @@ class Data_structures extends MY_REST_Controller {
     public function import_sdmx_post()
     {
         try {
-            $this->has_registry_import_or_die($this->registry_resource);
+            $this->registry_require_or_die($this->registry_resource, 'import');
+            $this->registry_require_or_die('codelist', 'import');
             $overwrite = filter_var($this->input->get('overwrite_codelists'), FILTER_VALIDATE_BOOLEAN);
             if ($this->input->post('overwrite_codelists') === '1') {
                 $overwrite = true;
@@ -462,7 +466,7 @@ class Data_structures extends MY_REST_Controller {
     public function delete_post($id = null)
     {
         try {
-            $this->has_registry_delete_or_die($this->registry_resource);
+            $this->registry_require_or_die($this->registry_resource, 'delete');
             if (!$id) {
                 throw new Exception('Data structure id is required');
             }
@@ -480,7 +484,7 @@ class Data_structures extends MY_REST_Controller {
     public function duplicate_post($id = null)
     {
         try {
-            $this->has_registry_edit_or_die($this->registry_resource);
+            $this->registry_require_or_die($this->registry_resource, 'edit');
             if (!$id) {
                 throw new Exception('Data structure id is required');
             }
@@ -522,7 +526,7 @@ class Data_structures extends MY_REST_Controller {
     public function versions_get($segment = null)
     {
         try {
-            $this->has_registry_catalogue_view_or_die($this->registry_resource);
+            $this->registry_require_or_die($this->registry_resource, 'browse');
             $row = $this->_resolve_structure_row($segment);
             if (!$row) {
                 throw new Exception('Data structure not found');
@@ -547,7 +551,7 @@ class Data_structures extends MY_REST_Controller {
     public function batch_delete_post()
     {
         try {
-            $this->has_registry_delete_or_die($this->registry_resource);
+            $this->registry_require_or_die($this->registry_resource, 'delete');
             $input = (array) $this->raw_json_input();
             if (empty($input) || !isset($input['ids']) || !is_array($input['ids'])) {
                 throw new Exception('JSON body with ids array is required');
@@ -601,7 +605,7 @@ class Data_structures extends MY_REST_Controller {
     public function projects_get($segment = null)
     {
         try {
-            $this->has_registry_catalogue_view_or_die($this->registry_resource);
+            $this->registry_require_or_die($this->registry_resource, 'browse');
             $row = $this->_resolve_structure_row($segment);
             if (!$row) {
                 throw new Exception('Data structure not found');

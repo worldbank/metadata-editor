@@ -77,6 +77,15 @@ Vue.component('data-structures', {
         },
         hasSearch: function () {
             return String(this.searchDebounced || '').trim().length > 0;
+        },
+        canEditDataStructure: function () {
+            return CI && CI.user_info && CI.user_info.can_edit_data_structure === true;
+        },
+        canImportDataStructure: function () {
+            return CI && CI.user_info && CI.user_info.can_import_data_structure === true;
+        },
+        canDeleteDataStructure: function () {
+            return CI && CI.user_info && CI.user_info.can_delete_data_structure === true;
         }
     },
     methods: {
@@ -408,9 +417,9 @@ Vue.component('data-structures', {
                     <span class="text-h6">Data structures</span>
                     <v-spacer></v-spacer>
                     <v-chip v-if="!loading" small class="mr-3">{{ total }} {{ total === 1 ? 'structure' : 'structures' }}</v-chip>
-                    <v-btn color="primary" class="mr-2" @click="goCreate">New data structure</v-btn>
-                    <v-btn color="primary" outlined class="mr-2" @click="openImport('json')">Import JSON</v-btn>
-                    <v-btn color="primary" outlined class="mr-2" @click="openImport('sdmx')">Import SDMX</v-btn>
+                    <v-btn v-if="canEditDataStructure" color="primary" class="mr-2" @click="goCreate">New data structure</v-btn>
+                    <v-btn v-if="canImportDataStructure" color="primary" outlined class="mr-2" @click="openImport('json')">Import JSON</v-btn>
+                    <v-btn v-if="canImportDataStructure" color="primary" outlined class="mr-2" @click="openImport('sdmx')">Import SDMX</v-btn>
                 </v-card-title>
                 <v-card-text class="pt-0 pb-2">
                     <div class="d-flex flex-wrap align-center">
@@ -445,7 +454,7 @@ Vue.component('data-structures', {
                             class="mr-4"
                         ></v-select>
                     </div>
-                    <div v-if="selected.length > 0" class="d-flex align-center flex-wrap mt-2 py-2 px-3 grey lighten-4 rounded">
+                    <div v-if="canDeleteDataStructure && selected.length > 0" class="d-flex align-center flex-wrap mt-2 py-2 px-3 grey lighten-4 rounded">
                         <span class="text-body-2 font-weight-medium mr-3">{{ selected.length }} selected</span>
                         <v-btn color="error" small depressed class="mr-2" :loading="batchDeleting" @click="confirmBatchDelete">
                             <v-icon small left>mdi-delete</v-icon>
@@ -465,7 +474,7 @@ Vue.component('data-structures', {
                     :footer-props="{ 'items-per-page-options': [10, 25, 50, 100] }"
                     disable-sort
                     class="elevation-0"
-                    show-select
+                    :show-select="canDeleteDataStructure"
                     show-expand
                     :expanded.sync="expanded"
                     item-key="id"
@@ -484,7 +493,8 @@ Vue.component('data-structures', {
                         <a href="#" class="text-decoration-none" @click.prevent="goView(item)">{{ item.title || item.name }}</a>
                     </template>
                     <template v-slot:item.name="{ item }">
-                        <a href="#" class="text-decoration-none" @click.prevent="goEdit(item)">{{ item.name }}</a>
+                        <a v-if="canEditDataStructure" href="#" class="text-decoration-none" @click.prevent="goEdit(item)">{{ item.name }}</a>
+                        <a v-else href="#" class="text-decoration-none" @click.prevent="goView(item)">{{ item.name }}</a>
                     </template>
                     <template v-slot:item.version="{ item }">
                         <code class="text-caption">{{ item.version || '—' }}</code>
@@ -560,11 +570,11 @@ Vue.component('data-structures', {
                                     <v-list-item-icon class="mr-2"><v-icon small>mdi-eye-outline</v-icon></v-list-item-icon>
                                     <v-list-item-title>View</v-list-item-title>
                                 </v-list-item>
-                                <v-list-item @click="goEdit(item)">
+                                <v-list-item v-if="canEditDataStructure" @click="goEdit(item)">
                                     <v-list-item-icon class="mr-2"><v-icon small>mdi-pencil-outline</v-icon></v-list-item-icon>
                                     <v-list-item-title>Edit</v-list-item-title>
                                 </v-list-item>
-                                <v-list-item @click="duplicateStructure(item)">
+                                <v-list-item v-if="canEditDataStructure" @click="duplicateStructure(item)">
                                     <v-list-item-icon class="mr-2"><v-icon small>mdi-content-duplicate</v-icon></v-list-item-icon>
                                     <v-list-item-title>Duplicate</v-list-item-title>
                                 </v-list-item>
@@ -577,8 +587,8 @@ Vue.component('data-structures', {
                                     <v-list-item-icon class="mr-2"><v-icon small>mdi-code-json</v-icon></v-list-item-icon>
                                     <v-list-item-title>Export JSON</v-list-item-title>
                                 </v-list-item>
-                                <v-divider></v-divider>
-                                <v-list-item :disabled="isRowLocked(item) || (item.projects_count > 0)" @click="confirmDelete(item)">
+                                <v-divider v-if="canDeleteDataStructure"></v-divider>
+                                <v-list-item v-if="canDeleteDataStructure" :disabled="isRowLocked(item) || (item.projects_count > 0)" @click="confirmDelete(item)">
                                     <v-list-item-icon class="mr-2"><v-icon small color="error">mdi-delete-outline</v-icon></v-list-item-icon>
                                     <v-list-item-title class="error--text">Delete</v-list-item-title>
                                 </v-list-item>

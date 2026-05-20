@@ -65,6 +65,15 @@ Vue.component('codelists', {
         },
         isAdmin: function () {
             return CI && CI.user_info && CI.user_info.is_admin === true;
+        },
+        canEditCodelist: function () {
+            return CI && CI.user_info && CI.user_info.can_edit_codelist === true;
+        },
+        canImportCodelist: function () {
+            return CI && CI.user_info && CI.user_info.can_import_codelist === true;
+        },
+        canDeleteCodelist: function () {
+            return CI && CI.user_info && CI.user_info.can_delete_codelist === true;
         }
     },
     methods: {
@@ -487,9 +496,9 @@ Vue.component('codelists', {
                 <v-card-title class="d-flex flex-wrap align-center">
                     <span class="text-h6">{{ $t('codelists') || 'Codelists' }}</span>
                     <v-spacer></v-spacer>
-                    <v-btn color="primary" outlined class="mr-2" @click="openImportDialog('json')">Import JSON</v-btn>
-                    <v-btn color="primary" outlined class="mr-2" @click="openImportDialog('sdmx')">Import SDMX</v-btn>
-                    <v-btn color="primary" outlined @click="goCreate">New codelist</v-btn>
+                    <v-btn v-if="canImportCodelist" color="primary" outlined class="mr-2" @click="openImportDialog('json')">Import JSON</v-btn>
+                    <v-btn v-if="canImportCodelist" color="primary" outlined class="mr-2" @click="openImportDialog('sdmx')">Import SDMX</v-btn>
+                    <v-btn v-if="canEditCodelist" color="primary" outlined @click="goCreate">New codelist</v-btn>
                 </v-card-title>
                 <v-card-text class="pt-0 pb-2">
                     <v-text-field
@@ -511,7 +520,7 @@ Vue.component('codelists', {
                             </v-btn>
                         </template>
                     </v-text-field>
-                    <div v-if="selected.length > 0" class="d-flex align-center flex-wrap mt-2 py-2 px-3 grey lighten-4 rounded">
+                    <div v-if="canDeleteCodelist && selected.length > 0" class="d-flex align-center flex-wrap mt-2 py-2 px-3 grey lighten-4 rounded">
                         <span class="text-body-2 font-weight-medium mr-3">{{ selected.length }} selected</span>
                         <v-btn
                             color="error"
@@ -537,7 +546,7 @@ Vue.component('codelists', {
                     hide-default-footer
                     disable-sort
                     class="elevation-0"
-                    show-select
+                    :show-select="canDeleteCodelist"
                     show-expand
                     :expanded.sync="expanded"
                     item-key="id"
@@ -595,7 +604,7 @@ Vue.component('codelists', {
                         </td>
                     </template>
                     <template v-slot:item.title="{ item }">
-                        <a href="#" class="text-decoration-none d-inline-flex align-center" @click.prevent="goEdit(item)">
+                        <a href="#" class="text-decoration-none d-inline-flex align-center" @click.prevent="canEditCodelist && isContentMutable(item) ? goEdit(item) : goView(item)">
                             <v-icon small class="mr-2 grey--text text--darken-1">mdi-format-list-bulleted-type</v-icon>
                             <span>{{ item.title || item.name }}</span>
                         </a>
@@ -617,9 +626,9 @@ Vue.component('codelists', {
                                     <v-list-item-icon class="mr-2"><v-icon small>mdi-eye-outline</v-icon></v-list-item-icon>
                                     <v-list-item-title>View</v-list-item-title>
                                 </v-list-item>
-                                <v-list-item @click="goEdit(item)">
+                                <v-list-item v-if="canEditCodelist && isContentMutable(item)" @click="goEdit(item)">
                                     <v-list-item-icon class="mr-2"><v-icon small>mdi-pencil-outline</v-icon></v-list-item-icon>
-                                    <v-list-item-title>{{ isContentMutable(item) ? 'Edit' : 'View' }}</v-list-item-title>
+                                    <v-list-item-title>Edit</v-list-item-title>
                                 </v-list-item>
                                 <template v-if="isAdmin">
                                     <v-divider></v-divider>
@@ -653,8 +662,8 @@ Vue.component('codelists', {
                                     <v-list-item-icon class="mr-2"><v-icon small>mdi-download-outline</v-icon></v-list-item-icon>
                                     <v-list-item-title>SDMX 3.0</v-list-item-title>
                                 </v-list-item>
-                                <v-divider></v-divider>
-                                <v-list-item v-if="isContentMutable(item)" @click="deleteCodelist(item)" :disabled="deletingId != null && deletingId !== item.id">
+                                <v-divider v-if="canDeleteCodelist"></v-divider>
+                                <v-list-item v-if="canDeleteCodelist && isContentMutable(item)" @click="deleteCodelist(item)" :disabled="deletingId != null && deletingId !== item.id">
                                     <v-list-item-icon class="mr-2"><v-icon small color="error">mdi-delete-outline</v-icon></v-list-item-icon>
                                     <v-list-item-title class="error--text">Delete</v-list-item-title>
                                 </v-list-item>

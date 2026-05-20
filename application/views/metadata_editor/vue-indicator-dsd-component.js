@@ -523,6 +523,12 @@ Vue.component('indicator-dsd', {
                 return null;
             }
             return vr.data_validation;
+        },
+        canEditProjectDsd: function () {
+            if (typeof this.$store === 'undefined' || !this.$store.getters.getUserHasEditAccess) {
+                return false;
+            }
+            return this.$store.getters.getUserHasEditAccess && !this.$store.state.project_is_locked;
         }
     },
     beforeDestroy: function() {
@@ -548,7 +554,7 @@ Vue.component('indicator-dsd', {
                             {{validationStatus.icon}}
                         </v-icon>
                     </div>
-                    <div>
+                    <div v-if="canEditProjectDsd">
                         <v-btn color="primary" class="ml-2" outlined small @click="importDataOnly">
                             <v-icon left small>mdi-upload</v-icon>
                             {{ $t('import_data') || 'Import data' }}

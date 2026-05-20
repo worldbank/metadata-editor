@@ -76,8 +76,14 @@ Vue.component('indicator-dsd-overview', {
             var root = (typeof CI !== 'undefined' && CI.base_url) ? String(CI.base_url).replace(/\/?$/, '') : '';
             return root + '/data_structures#/view/' + parseInt(ds.id, 10);
         },
+        canEditProjectDsd() {
+            if (typeof this.$store === 'undefined' || !this.$store.getters.getUserHasEditAccess) {
+                return false;
+            }
+            return this.$store.getters.getUserHasEditAccess && !this.$store.state.project_is_locked;
+        },
         canRemoveStructure() {
-            return this.isBound || this.totalColumns > 0;
+            return this.canEditProjectDsd && (this.isBound || this.totalColumns > 0);
         },
         removeConfirmMessage() {
             return 'Remove the data structure from this project?';
@@ -271,7 +277,7 @@ Vue.component('indicator-dsd-overview', {
             <div class="caption grey--text mt-1 mb-4">
                 Attach a data structure from the registry. You can import indicator data later from <strong>Data</strong> in the sidebar.
             </div>
-            <v-btn small color="primary" @click="openBindGlobalDialog">
+            <v-btn v-if="canEditProjectDsd" small color="primary" @click="openBindGlobalDialog">
                 <v-icon left small>mdi-sitemap</v-icon> Attach data structure
             </v-btn>
         </div>
@@ -315,7 +321,7 @@ Vue.component('indicator-dsd-overview', {
                         >
                             <v-icon left small>mdi-open-in-new</v-icon> View in registry
                         </v-btn>
-                        <v-btn small outlined @click="openBindGlobalDialog">
+                        <v-btn v-if="canEditProjectDsd" small outlined @click="openBindGlobalDialog">
                             <v-icon left small>mdi-swap-horizontal</v-icon> Change structure
                         </v-btn>
                         <v-btn

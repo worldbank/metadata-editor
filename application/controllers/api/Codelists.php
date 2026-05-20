@@ -38,7 +38,7 @@ class Codelists extends MY_REST_Controller
 	function index_get()
 	{
 		try{
-			$this->has_registry_catalogue_view_or_die($this->registry_resource);
+			$this->registry_require_or_die($this->registry_resource, 'browse');
 			$filters = array();
 
 			$agency = $this->input->get('agency');
@@ -157,7 +157,7 @@ class Codelists extends MY_REST_Controller
 	function versions_get($name = null)
 	{
 		try {
-			$this->has_registry_catalogue_view_or_die($this->registry_resource);
+			$this->registry_require_or_die($this->registry_resource, 'browse');
 			if (!$name) {
 				throw new Exception('Codelist name (SDMX id) is required');
 			}
@@ -188,7 +188,7 @@ class Codelists extends MY_REST_Controller
 	function single_get($id = null)
 	{
 		try{
-			$this->has_registry_catalogue_view_or_die($this->registry_resource);
+			$this->registry_require_or_die($this->registry_resource, 'browse');
 			if (!$id) {
 				throw new Exception("Codelist ID is required");
 			}
@@ -225,7 +225,7 @@ class Codelists extends MY_REST_Controller
 	function by_identity_get($agency = null, $name = null, $version = null)
 	{
 		try{
-			$this->has_registry_catalogue_view_or_die($this->registry_resource);
+			$this->registry_require_or_die($this->registry_resource, 'browse');
 			if (!$agency || !$name) {
 				throw new Exception("Agency and name (SDMX maintainable id) are required");
 			}
@@ -266,7 +266,7 @@ class Codelists extends MY_REST_Controller
 	function lookup_by_identity_get()
 	{
 		try {
-			$this->has_registry_catalogue_view_or_die($this->registry_resource);
+			$this->registry_require_or_die($this->registry_resource, 'browse');
 			$agency = $this->input->get('agency');
 			$name = $this->input->get('name');
 			$version = $this->input->get('version');
@@ -311,7 +311,7 @@ class Codelists extends MY_REST_Controller
 	function index_post()
 	{
 		try{
-			$this->has_registry_edit_or_die($this->registry_resource);
+			$this->registry_require_or_die($this->registry_resource, 'edit');
 			$data = (array)$this->raw_json_input();
 
 			if (empty($data)) {
@@ -386,7 +386,7 @@ class Codelists extends MY_REST_Controller
 	function import_sdmx_post()
 	{
 		try {
-			$this->has_registry_import_or_die($this->registry_resource);
+			$this->registry_require_or_die($this->registry_resource, 'import');
 			$this->load->library('SDMX/SdmxCodelistImporter');
 			$dry = filter_var($this->input->get('dry_run'), FILTER_VALIDATE_BOOLEAN);
 			$replace = filter_var($this->input->get('replace'), FILTER_VALIDATE_BOOLEAN);
@@ -616,7 +616,7 @@ class Codelists extends MY_REST_Controller
 	function update_post($id = null)
 	{
 		try{
-			$this->has_registry_edit_or_die($this->registry_resource);
+			$this->registry_require_or_die($this->registry_resource, 'edit');
 			if (!$id) {
 				throw new Exception("Codelist ID is required");
 			}
@@ -673,7 +673,7 @@ class Codelists extends MY_REST_Controller
 	function delete_post($id = null)
 	{
 		try{
-			$this->has_registry_delete_or_die($this->registry_resource);
+			$this->registry_require_or_die($this->registry_resource, 'delete');
 			if (!$id) {
 				throw new Exception("Codelist ID is required");
 			}
@@ -728,7 +728,7 @@ class Codelists extends MY_REST_Controller
 	function codes_get($id = null)
 	{
 		try{
-			$this->has_registry_catalogue_view_or_die($this->registry_resource);
+			$this->registry_require_or_die($this->registry_resource, 'browse');
 			if (!$id) {
 				throw new Exception("Codelist ID is required");
 			}
@@ -831,7 +831,7 @@ class Codelists extends MY_REST_Controller
 	function code_get($code_id = null)
 	{
 		try{
-			$this->has_registry_catalogue_view_or_die($this->registry_resource);
+			$this->registry_require_or_die($this->registry_resource, 'browse');
 			if (!$code_id) {
 				throw new Exception("Code ID is required");
 			}
@@ -869,7 +869,7 @@ class Codelists extends MY_REST_Controller
 	function codes_post($id = null)
 	{
 		try{
-			$this->has_registry_edit_or_die($this->registry_resource);
+			$this->registry_require_or_die($this->registry_resource, 'edit');
 			if (!$id) {
 				throw new Exception("Codelist ID is required");
 			}
@@ -920,7 +920,7 @@ class Codelists extends MY_REST_Controller
 	function code_update_post($code_id = null)
 	{
 		try{
-			$this->has_registry_edit_or_die($this->registry_resource);
+			$this->registry_require_or_die($this->registry_resource, 'edit');
 			if (!$code_id) {
 				throw new Exception("Code ID is required");
 			}
@@ -973,7 +973,7 @@ class Codelists extends MY_REST_Controller
 	function code_delete_post($code_id = null)
 	{
 		try{
-			$this->has_registry_edit_or_die($this->registry_resource);
+			$this->registry_require_or_die($this->registry_resource, 'edit');
 			if (!$code_id) {
 				throw new Exception("Code ID is required");
 			}
@@ -1035,7 +1035,7 @@ class Codelists extends MY_REST_Controller
 	function code_label_post($code_id = null)
 	{
 		try{
-			$this->has_registry_edit_or_die($this->registry_resource);
+			$this->registry_require_or_die($this->registry_resource, 'edit');
 			if (!$code_id) {
 				throw new Exception("Code ID is required");
 			}
@@ -1097,7 +1097,7 @@ class Codelists extends MY_REST_Controller
 	function label_delete_post($label_id = null)
 	{
 		try{
-			$this->has_registry_edit_or_die($this->registry_resource);
+			$this->registry_require_or_die($this->registry_resource, 'edit');
 			if (!$label_id) {
 				throw new Exception("Label ID is required");
 			}
@@ -1167,7 +1167,7 @@ class Codelists extends MY_REST_Controller
 	function hierarchy_get($id = null)
 	{
 		try{
-			$this->has_registry_catalogue_view_or_die($this->registry_resource);
+			$this->registry_require_or_die($this->registry_resource, 'browse');
 			if (!$id) {
 				throw new Exception("Codelist ID is required");
 			}
@@ -1205,7 +1205,7 @@ class Codelists extends MY_REST_Controller
 	function codelist_translations_get($id = null)
 	{
 		try{
-			$this->has_registry_catalogue_view_or_die($this->registry_resource);
+			$this->registry_require_or_die($this->registry_resource, 'browse');
 			if (!$id) {
 				throw new Exception("Codelist ID is required");
 			}
@@ -1239,7 +1239,7 @@ class Codelists extends MY_REST_Controller
 	function codelist_translations_post($id = null)
 	{
 		try{
-			$this->has_registry_edit_or_die($this->registry_resource);
+			$this->registry_require_or_die($this->registry_resource, 'edit');
 			if (!$id) {
 				throw new Exception("Codelist ID is required");
 			}
@@ -1292,7 +1292,7 @@ class Codelists extends MY_REST_Controller
 	function codelist_translation_delete_post($translation_id = null)
 	{
 		try{
-			$this->has_registry_edit_or_die($this->registry_resource);
+			$this->registry_require_or_die($this->registry_resource, 'edit');
 			if (!$translation_id) {
 				throw new Exception("Translation ID is required");
 			}
@@ -1352,7 +1352,7 @@ class Codelists extends MY_REST_Controller
 	function export_json_get($id = null)
 	{
 		try {
-			$this->has_registry_catalogue_view_or_die($this->registry_resource);
+			$this->registry_require_or_die($this->registry_resource, 'browse');
 			if (!$id) {
 				throw new Exception('Codelist ID is required');
 			}
@@ -1410,7 +1410,7 @@ class Codelists extends MY_REST_Controller
 	function import_json_post()
 	{
 		try {
-			$this->has_registry_import_or_die($this->registry_resource);
+			$this->registry_require_or_die($this->registry_resource, 'import');
 			$input = $this->_import_json_read_body();
 			if ($input === null || !is_array($input) || empty($input)) {
 				throw new Exception('Send JSON body or multipart "file" with a codelist document');
@@ -1482,7 +1482,7 @@ class Codelists extends MY_REST_Controller
 	function export_sdmx_get($id = null)
 	{
 		try {
-			$this->has_registry_catalogue_view_or_die($this->registry_resource);
+			$this->registry_require_or_die($this->registry_resource, 'browse');
 			if (!$id) {
 				throw new Exception("Codelist ID is required");
 			}
@@ -1671,7 +1671,7 @@ class Codelists extends MY_REST_Controller
 	function update_hash_post($id = null)
 	{
 		try{
-			$this->has_registry_catalogue_view_or_die($this->registry_resource);
+			$this->registry_require_or_die($this->registry_resource, 'browse');
 			if (!$id) {
 				throw new Exception("Codelist ID is required");
 			}

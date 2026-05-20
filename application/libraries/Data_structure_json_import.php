@@ -389,4 +389,54 @@ class Data_structure_json_import {
 
 		return $row;
 	}
+
+	/**
+	 * True when import would create or update global codelists (inline binding), not reference-only.
+	 *
+	 * @param array $payload import_json body
+	 * @param bool  $overwrite
+	 * @return bool
+	 */
+	public static function payload_mutates_codelists(array $payload, $overwrite = false)
+	{
+		$overwrite = !empty($overwrite);
+		if (empty($payload['data_structure']['components']) || !is_array($payload['data_structure']['components'])) {
+			return false;
+		}
+
+		$ci =& get_instance();
+		$ci->load->model('Codelists_model');
+
+		foreach ($payload['data_structure']['components'] as $comp) {
+			if (!is_array($comp)) {
+				continue;
+			}
+			$hasRef = !empty($comp['codelist_reference']) && is_array($comp['codelist_reference']);
+			$refIdno = $hasRef && isset($comp['codelist_reference']['idno'])
+				? trim((string) $comp['codelist_reference']['idno'])
+				: '';
+			if ($hasRef && $refIdno !== '') {
+				continue;
+			}
+			if (empty($comp['codelist']) || !is_array($comp['codelist'])) {
+				continue;
+			}
+			$cl = $comp['codelist'];
+			$clIdno = isset($cl['idno']) ? trim((string) $cl['idno']) : '';
+			$clName = isset($cl['name']) ? trim((string) $cl['name']) : '';
+			$clItems = isset($cl['items']) && is_array($cl['items']) ? $cl['items'] : array();
+			if ($clIdno === '' && $clName === '' && count($clItems) === 0) {
+				continue;
+			}
+			$existing = $clIdno !== '' ? $ci->Codelists_model->get_by_idno($clIdno) : null;
+			if (!$existing) {
+				return true;
+			}
+			if ($overwrite && count($clItems) > 0) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 }

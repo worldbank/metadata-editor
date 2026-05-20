@@ -13,7 +13,7 @@ class Data_structures extends MY_Controller {
 
     function index()
     {
-        $this->editor_acl->has_access_or_die('data_structure', 'view');
+        $this->editor_acl->registry_require('data_structure', 'browse');
         $this->template->set_template('default');
         $options = array('translations' => $this->lang->language);
         echo $this->load->view('data_structures/index', $options, true);

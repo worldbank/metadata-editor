@@ -189,37 +189,17 @@ abstract class MY_REST_Controller extends REST_Controller {
     }
 
     /**
-     * Catalogue read: registry view, or editor view (in-project DSD / codelist pickers).
+     * Registry ACL for API (codelist | data_structure).
+     *
+     * @param string $resource codelist|data_structure
+     * @param string $action browse|edit|import|delete|admin
      */
-    function has_registry_catalogue_view_or_die($resource)
+    function registry_require_or_die($resource, $action)
     {
-        if ($this->user_has_access($resource, 'view') || $this->user_has_access('editor', 'view')) {
+        if ($this->acl_manager->registry_can($resource, $action, $this->api_user())) {
             return true;
         }
         $this->_registry_access_denied_response();
-    }
-
-    function has_registry_edit_or_die($resource)
-    {
-        return $this->has_access($resource, 'edit');
-    }
-
-    function has_registry_delete_or_die($resource)
-    {
-        return $this->has_access($resource, 'delete');
-    }
-
-    function has_registry_import_or_die($resource)
-    {
-        if ($this->user_has_access($resource, 'import') || $this->user_has_access($resource, 'edit')) {
-            return true;
-        }
-        $this->_registry_access_denied_response();
-    }
-
-    function has_registry_admin_or_die($resource)
-    {
-        return $this->has_access($resource, 'admin');
     }
 
     /**
@@ -227,7 +207,7 @@ abstract class MY_REST_Controller extends REST_Controller {
      */
     function is_registry_admin($resource)
     {
-        return $this->is_admin() || $this->user_has_access($resource, 'admin');
+        return $this->acl_manager->registry_can($resource, 'admin', $this->api_user());
     }
 
     private function _registry_access_denied_response()
