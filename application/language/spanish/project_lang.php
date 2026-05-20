@@ -427,6 +427,7 @@ $lang['select_export_format']="Seleccionar formato de exportación";
 
 // Collections management - missing translations
 $lang['No collections found']="No se encontraron colecciones";
+$lang['search_collections_placeholder']="Buscar colecciones...";
 $lang['Users']="Usuarios";
 $lang['Projects']="Proyectos";
 

@@ -34,6 +34,13 @@ class Auth extends MY_Controller {
 		$driver=$this->config->item('authentication_driver');
 		$drivers_list=$this->config->item('authentication_drivers');
 
+		if ($driver === 'ZeroAuth') {
+			$zero_auth = $this->config->item('zero_auth');
+			if (!is_array($zero_auth) || empty($zero_auth['enabled'])) {
+				show_error('ZeroAuth is disabled. Set zero_auth.enabled to true for local/desktop use only.', 403);
+			}
+		}
+
 		$driver_classpath=$drivers_list[$driver];
 		
 		if (!file_exists($driver_classpath)){

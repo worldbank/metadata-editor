@@ -414,6 +414,7 @@ $lang['select_export_format']="Select export format";
 
 // Collections management - missing translations
 $lang['No collections found']="No collections found";
+$lang['search_collections_placeholder']="Search collections...";
 $lang['Users']="Users";
 $lang['Projects']="Projects";
 
