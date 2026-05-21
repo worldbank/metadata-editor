@@ -97,6 +97,10 @@ class Sdmx_structure_xml_import {
 			}
 
 			$existing = $this->CI->Codelists_model->get_by_identity($agency, $name, $version);
+			if (!$existing) {
+				$idno = Codelists_model::make_idno($agency, $name, $version);
+				$existing = $this->CI->Codelists_model->get_by_idno($idno);
+			}
 			if ($existing) {
 				$id = (int) $existing['id'];
 				if ($overwrite) {
@@ -111,16 +115,16 @@ class Sdmx_structure_xml_import {
 			}
 
 			$title = $description !== '' ? $description : $name;
-			$newId = $this->CI->Codelists_model->create(array(
-				'name'        => $name,
-				'title'       => $title,
-				'agency'      => $agency,
-				'version'     => $version,
-				'description' => $description !== '' ? $description : null,
-			));
-			if (!$newId) {
-				throw new Exception("Failed to create codelist '{$agency}' / '{$name}' / '{$version}'.");
-			}
+			$newId = $this->CI->Codelists_model->create_or_throw(
+				array(
+					'name'        => $name,
+					'title'       => $title,
+					'agency'      => $agency,
+					'version'     => $version,
+					'description' => $description !== '' ? $description : null,
+				),
+				"Failed to create codelist '{$agency}' / '{$name}' / '{$version}'"
+			);
 			$this->_insert_items($newId, $codes);
 			$created[] = ['id' => $newId, 'name' => $name, 'agency' => $agency, 'version' => $version];
 			$map[$key] = $newId;

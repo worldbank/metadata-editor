@@ -56,10 +56,15 @@ class Data_structure_json_import {
 
 		$this->CI->db->trans_begin();
 		try {
+			$resolved_codelists = array();
+			foreach ($components as $idx => $comp) {
+				$resolved_codelists[$idx] = $this->_resolve_codelist_for_component($comp, $overwrite, $summary);
+			}
+
 			$dsId = $this->CI->Data_structure_model->create_structure($structure);
 
 			foreach ($components as $idx => $comp) {
-				$codelistId = $this->_resolve_codelist_for_component($comp, $overwrite, $summary);
+				$codelistId = $resolved_codelists[$idx];
 
 				$insert = $this->_component_to_create_row($comp, $codelistId);
 				if (!empty($options['user_id'])) {

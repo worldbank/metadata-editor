@@ -729,6 +729,26 @@ class Codelists_model extends CI_Model {
             return false;
         }
 
+        if (!isset($insert_data['created_at'])) {
+            $insert_data['created_at'] = date('Y-m-d H:i:s');
+        }
+        if (!isset($insert_data['status'])) {
+            $insert_data['status'] = self::STATUS_ACTIVE;
+        } else {
+            $insert_data['status'] = $this->normalize_status($insert_data['status']);
+        }
+
+        if (!isset($insert_data['title']) || trim((string) $insert_data['title']) === '') {
+            $insert_data['title'] = $name;
+        }
+
+        $insert_data = $this->_sanitize_codelist_insert_row($insert_data);
+        $agency = isset($insert_data['agency']) ? trim((string) $insert_data['agency']) : '';
+        $name = isset($insert_data['name']) ? trim((string) $insert_data['name']) : '';
+        if ($agency === '' || $name === '') {
+            return false;
+        }
+
         if (empty($insert_data['idno'])) {
             $ver = isset($insert_data['version']) ? $insert_data['version'] : '';
             $insert_data['idno'] = self::make_idno($agency, $name, $ver);
@@ -740,38 +760,253 @@ class Codelists_model extends CI_Model {
             $insert_data['version_seq'] = (int) $insert_data['version_seq'];
         }
 
-        if (!isset($insert_data['created_at'])) {
-            $insert_data['created_at'] = date('Y-m-d H:i:s');
+        $interim_pid = null;
+        $latest_family_row = $this->_get_latest_codelist_version_row($agency, $name);
+        if ($latest_family_row) {
+            $interim_pid = !empty($latest_family_row['pid'])
+                ? (int) $latest_family_row['pid']
+                : (int) $latest_family_row['id'];
         }
-        if (isset($insert_data['status'])) {
-            $insert_data['status'] = $this->normalize_status($insert_data['status']);
-        } else {
-            $insert_data['status'] = self::STATUS_ACTIVE;
-        }
+        $insert_data['pid'] = $interim_pid;
 
-        $this->db->trans_begin();
+        $own_trans = ! $this->db->trans_active();
+        if ($own_trans) {
+            $this->db->trans_begin();
+        }
+        $this->db->reset_query();
         if (!$this->db->insert($this->table_codelists, $insert_data)) {
-            $this->db->trans_rollback();
+            log_message('error', 'Codelists_model::create insert failed: ' . json_encode($this->db->error()));
+            if ($own_trans) {
+                $this->db->trans_rollback();
+            }
             return false;
         }
-        $id = (int) $this->db->insert_id();
+        $id = $this->_resolve_inserted_codelist_id($insert_data);
         if ($id <= 0) {
-            $this->db->trans_rollback();
+            if ($own_trans) {
+                $this->db->trans_rollback();
+            }
             return false;
         }
 
-        $this->db->where('agency', $agency);
-        $this->db->where('name', $name);
-        $this->db->update($this->table_codelists, array('pid' => $id));
+        if (!$this->_set_codelist_family_head($agency, $name, $id)) {
+            log_message('error', 'Codelists_model::create family head update failed: ' . json_encode($this->db->error()));
+            if ($own_trans) {
+                $this->db->trans_rollback();
+            }
+            return false;
+        }
 
         if ($this->db->trans_status() === false) {
-            $this->db->trans_rollback();
+            if ($own_trans) {
+                $this->db->trans_rollback();
+            }
             return false;
         }
-        $this->db->trans_commit();
+        if ($own_trans) {
+            $this->db->trans_commit();
+        }
 
         $this->seed_default_codelist_translation($id, $insert_data);
         return $id;
+    }
+
+    /**
+     * Create a codelist or throw with the underlying database error when present.
+     *
+     * @param array  $data
+     * @param string $messagePrefix
+     * @return int
+     * @throws Exception
+     */
+    public function create_or_throw(array $data, $messagePrefix = 'Failed to create codelist')
+    {
+        $id = $this->create($data);
+        if (!$id) {
+            throw $this->_codelist_create_exception($messagePrefix);
+        }
+
+        return (int) $id;
+    }
+
+    /**
+     * Resolve the primary key of a row just inserted into codelists.
+     *
+     * @param array $insert_data
+     * @return int
+     */
+    private function _resolve_inserted_codelist_id(array $insert_data)
+    {
+        $agency = isset($insert_data['agency']) ? trim((string) $insert_data['agency']) : '';
+        $name = isset($insert_data['name']) ? trim((string) $insert_data['name']) : '';
+        $version = isset($insert_data['version']) ? trim((string) $insert_data['version']) : '';
+
+        if ($agency !== '' && $name !== '' && $version !== '') {
+            $this->db->reset_query();
+            $row = $this->db->select('id')
+                ->from($this->table_codelists)
+                ->where('agency', $agency)
+                ->where('name', $name)
+                ->where('version', $version)
+                ->limit(1)
+                ->get()
+                ->row_array();
+            if ($row && (int) $row['id'] > 0) {
+                return (int) $row['id'];
+            }
+        }
+
+        if (!empty($insert_data['idno'])) {
+            $this->db->reset_query();
+            $row = $this->db->select('id')
+                ->from($this->table_codelists)
+                ->where('idno', $insert_data['idno'])
+                ->limit(1)
+                ->get()
+                ->row_array();
+            if ($row && (int) $row['id'] > 0) {
+                return (int) $row['id'];
+            }
+        }
+
+        $candidate = (int) $this->db->insert_id();
+        if ($candidate <= 0) {
+            return 0;
+        }
+
+        $this->db->reset_query();
+        $row = $this->db->select('id')
+            ->from($this->table_codelists)
+            ->where('id', $candidate)
+            ->limit(1)
+            ->get()
+            ->row_array();
+
+        return ($row && (int) $row['id'] > 0) ? (int) $row['id'] : 0;
+    }
+
+    /**
+     * Latest version row for a codelist family, if any.
+     *
+     * @param string $agency
+     * @param string $name
+     * @return array|false
+     */
+    private function _get_latest_codelist_version_row($agency, $name)
+    {
+        $agency = trim((string) $agency);
+        $name = trim((string) $name);
+        if ($agency === '' || $name === '') {
+            return false;
+        }
+
+        $this->db->reset_query();
+        $row = $this->db->select('id, pid, version_seq')
+            ->from($this->table_codelists)
+            ->where('agency', $agency)
+            ->where('name', $name)
+            ->order_by('version_seq', 'DESC')
+            ->order_by('id', 'DESC')
+            ->limit(1)
+            ->get()
+            ->row_array();
+
+        return $row ? $row : false;
+    }
+
+    /**
+     * Point all versions of a codelist family at the newest head row.
+     *
+     * Self-referential pid FK requires the head row to reference itself before
+     * sibling versions are repointed in a separate update.
+     *
+     * @param string $agency
+     * @param string $name
+     * @param int    $head_id
+     * @return bool
+     */
+    private function _set_codelist_family_head($agency, $name, $head_id)
+    {
+        $head_id = (int) $head_id;
+        $agency = trim((string) $agency);
+        $name = trim((string) $name);
+        if ($head_id <= 0 || $agency === '' || $name === '') {
+            return false;
+        }
+
+        $this->db->reset_query();
+        $this->db->where('id', $head_id);
+        if (!$this->db->update($this->table_codelists, array('pid' => $head_id))) {
+            return false;
+        }
+        if ((int) $this->db->affected_rows() !== 1) {
+            return false;
+        }
+
+        $this->db->reset_query();
+        $this->db->where('agency', $agency);
+        $this->db->where('name', $name);
+        $this->db->where('id <>', $head_id);
+        return (bool) $this->db->update($this->table_codelists, array('pid' => $head_id));
+    }
+
+    /**
+     * Truncate string columns to catalogue limits before insert/update.
+     *
+     * @param array $insert_data
+     * @return array
+     */
+    private function _sanitize_codelist_insert_row(array $insert_data)
+    {
+        if (isset($insert_data['idno'])) {
+            $insert_data['idno'] = $this->_sdmx_truncate(trim((string) $insert_data['idno']), 191);
+        }
+        if (isset($insert_data['agency'])) {
+            $insert_data['agency'] = $this->_sdmx_truncate(trim((string) $insert_data['agency']), 64);
+        }
+        if (isset($insert_data['name'])) {
+            $insert_data['name'] = $this->_sdmx_truncate(trim((string) $insert_data['name']), 64);
+        }
+        if (isset($insert_data['version'])) {
+            $insert_data['version'] = $this->_sdmx_truncate(trim((string) $insert_data['version']), 32);
+        }
+        if (isset($insert_data['title'])) {
+            $insert_data['title'] = $this->_sdmx_truncate(trim((string) $insert_data['title']), 255);
+        }
+        if (isset($insert_data['uri'])) {
+            $insert_data['uri'] = $this->_sdmx_truncate(trim((string) $insert_data['uri']), 500);
+        }
+
+        return $insert_data;
+    }
+
+    /**
+     * Last database error message for codelist create/import failures.
+     *
+     * @return string
+     */
+    private function _last_db_error_message()
+    {
+        $err = $this->db->error();
+        if (is_array($err) && !empty($err['message'])) {
+            return (string) $err['message'];
+        }
+
+        return '';
+    }
+
+    /**
+     * @param string $prefix
+     * @return Exception
+     */
+    private function _codelist_create_exception($prefix = 'Failed to create codelist')
+    {
+        $detail = $this->_last_db_error_message();
+        if ($detail !== '') {
+            return new Exception($prefix . ': ' . $detail);
+        }
+
+        return new Exception($prefix);
     }
 
     /**
@@ -894,8 +1129,6 @@ class Codelists_model extends CI_Model {
                 $this->db->update($this->table_codelists, array('pid' => $new_pid));
             }
         }
-        $this->db->where('id', $id);
-        $this->db->update($this->table_codelists, array('pid' => null));
 
         $this->db->where('id', $id);
         $this->db->delete($this->table_codelists);
@@ -1890,7 +2123,7 @@ class Codelists_model extends CI_Model {
                 }
                 $pk = $this->create($insert);
                 if (!$pk) {
-                    throw new Exception('Failed to create codelist');
+                    throw $this->_codelist_create_exception();
                 }
                 $imported = $this->_json_import_items((int) $pk, $items, $warnings);
                 $this->_json_import_header_translations((int) $pk, $payload, $title, $warnings);
