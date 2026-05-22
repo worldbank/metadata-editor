@@ -1354,19 +1354,37 @@ class Codelists_model extends CI_Model {
      */
     public function add_code($codelist_id, $data)
     {
-        // Filter to allowed fields
-        $insert_data = array('codelist_id' => $codelist_id);
-        foreach ($this->item_fields as $field) {
-            if (isset($data[$field]) && $field !== 'codelist_id') {
-                $insert_data[$field] = $data[$field];
-            }
+        try {
+            return $this->add_code_or_throw($codelist_id, $data);
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Add a code or throw with a descriptive error (duplicate code, DB constraint, etc.).
+     *
+     * @param int    $codelist_id
+     * @param array  $data
+     * @param string $prefix
+     * @return int
+     * @throws Exception
+     */
+    public function add_code_or_throw($codelist_id, $data, $prefix = 'Failed to add code')
+    {
+        $insert_data = $this->_prepare_code_write_data($codelist_id, $data);
+        $code = $insert_data['code'];
+
+        if ($this->find_item_by_code($codelist_id, $code)) {
+            throw new Exception('Code "' . $code . '" already exists in this codelist.');
         }
 
-        if ($this->db->insert($this->table_items, $insert_data)) {
-            return $this->db->insert_id();
+        if (!$this->db->insert($this->table_items, $insert_data)) {
+            log_message('error', 'Codelists_model::add_code insert failed: ' . json_encode($this->db->error()));
+            throw $this->_code_item_exception($prefix, $code);
         }
 
-        return false;
+        return (int) $this->db->insert_id();
     }
 
     /**
@@ -1380,20 +1398,134 @@ class Codelists_model extends CI_Model {
      */
     public function update_code($code_id, $data)
     {
-        // Filter to allowed fields
+        try {
+            return $this->update_code_or_throw($code_id, $data);
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * @param int    $code_id
+     * @param array  $data
+     * @param string $prefix
+     * @return bool
+     * @throws Exception
+     */
+    public function update_code_or_throw($code_id, $data, $prefix = 'Failed to update code')
+    {
+        $code_id = (int) $code_id;
+        $existing = $this->get_code_by_id($code_id);
+        if (!$existing) {
+            throw new Exception('Code not found');
+        }
+
         $update_data = array();
         foreach ($this->item_fields as $field) {
-            if (isset($data[$field]) && $field !== 'codelist_id') {
+            if (array_key_exists($field, $data) && $field !== 'codelist_id') {
                 $update_data[$field] = $data[$field];
             }
         }
 
         if (empty($update_data)) {
-            return false;
+            throw new Exception('No code fields to update');
+        }
+
+        if (array_key_exists('code', $update_data)) {
+            $update_data['code'] = trim((string) $update_data['code']);
+            if ($update_data['code'] === '') {
+                throw new Exception('Code identifier is required');
+            }
+            if ($this->find_item_by_code((int) $existing['codelist_id'], $update_data['code'], $code_id)) {
+                throw new Exception('Code "' . $update_data['code'] . '" already exists in this codelist.');
+            }
         }
 
         $this->db->where('id', $code_id);
-        return $this->db->update($this->table_items, $update_data);
+        if (!$this->db->update($this->table_items, $update_data)) {
+            log_message('error', 'Codelists_model::update_code failed: ' . json_encode($this->db->error()));
+            $codeLabel = array_key_exists('code', $update_data) ? $update_data['code'] : $existing['code'];
+            throw $this->_code_item_exception($prefix, $codeLabel);
+        }
+
+        return true;
+    }
+
+    /**
+     * Find a codelist item row by (codelist_id, code).
+     *
+     * @param int         $codelist_pk
+     * @param string      $code
+     * @param int|null    $exclude_id Optional item id to ignore (updates)
+     * @return array|false
+     */
+    public function find_item_by_code($codelist_pk, $code, $exclude_id = null)
+    {
+        $codelist_pk = (int) $codelist_pk;
+        $code = trim((string) $code);
+        if ($codelist_pk <= 0 || $code === '') {
+            return false;
+        }
+
+        $this->db->where('codelist_id', $codelist_pk);
+        $this->db->where('code', $code);
+        if ($exclude_id !== null && (int) $exclude_id > 0) {
+            $this->db->where('id <>', (int) $exclude_id);
+        }
+
+        $row = $this->db->get($this->table_items)->row_array();
+        return $row ? $row : false;
+    }
+
+    /**
+     * @param int   $codelist_id
+     * @param array $data
+     * @return array
+     * @throws Exception
+     */
+    private function _prepare_code_write_data($codelist_id, $data)
+    {
+        $insert_data = array('codelist_id' => (int) $codelist_id);
+        foreach ($this->item_fields as $field) {
+            if (isset($data[$field]) && $field !== 'codelist_id') {
+                $insert_data[$field] = $data[$field];
+            }
+        }
+
+        if (!isset($insert_data['code'])) {
+            throw new Exception('Code identifier is required');
+        }
+
+        $insert_data['code'] = trim((string) $insert_data['code']);
+        if ($insert_data['code'] === '') {
+            throw new Exception('Code identifier is required');
+        }
+
+        return $insert_data;
+    }
+
+    /**
+     * @param string      $prefix
+     * @param string|null $code
+     * @return Exception
+     */
+    private function _code_item_exception($prefix, $code = null)
+    {
+        $detail = $this->_last_db_error_message();
+        if ($detail !== '') {
+            if (stripos($detail, 'Duplicate') !== false || stripos($detail, 'uq_item_per_list') !== false) {
+                $label = ($code !== null && trim((string) $code) !== '') ? trim((string) $code) : 'value';
+                return new Exception('Code "' . $label . '" already exists in this codelist.');
+            }
+
+            return new Exception($prefix . ': ' . $detail);
+        }
+
+        if ($code !== null && trim((string) $code) !== '') {
+            return new Exception($prefix . ' (code: ' . trim((string) $code) . ')');
+        }
+
+        return new Exception($prefix);
     }
 
     /**
@@ -2307,5 +2439,381 @@ class Codelists_model extends CI_Model {
                 isset($tr['description']) ? $tr['description'] : null
             );
         }
+    }
+
+    /** CSV column order for item export/import (Excel-compatible). */
+    const CSV_ITEMS_COLUMNS = array('sort', 'parent_code', 'language', 'code', 'label', 'description');
+
+    /**
+     * Export all codelist items as UTF-8 CSV with BOM (Excel-friendly).
+     *
+     * @param int $codelist_pk
+     * @return string
+     * @throws Exception
+     */
+    public function export_items_csv($codelist_pk)
+    {
+        $row = $this->get_by_id($codelist_pk);
+        if (!$row) {
+            throw new Exception('Codelist not found');
+        }
+
+        $codes = $this->get_codes((int) $codelist_pk, null, true, null, 0, null);
+        $id_by_pk = array();
+        foreach ($codes as $c) {
+            $id_by_pk[(int) $c['id']] = isset($c['code']) ? (string) $c['code'] : '';
+        }
+
+        $lines = array();
+        $lines[] = $this->_csv_format_row(self::CSV_ITEMS_COLUMNS);
+
+        foreach ($codes as $c) {
+            $code = isset($c['code']) ? (string) $c['code'] : '';
+            $sort = isset($c['sort_order']) && $c['sort_order'] !== null && $c['sort_order'] !== ''
+                ? (string) (int) $c['sort_order']
+                : '';
+            $parent_code = '';
+            $pid = isset($c['parent_id']) ? (int) $c['parent_id'] : 0;
+            if ($pid > 0 && isset($id_by_pk[$pid])) {
+                $parent_code = $id_by_pk[$pid];
+            }
+
+            $labels = isset($c['labels']) && is_array($c['labels']) ? $c['labels'] : array();
+            if (empty($labels)) {
+                $lines[] = $this->_csv_format_row(array($sort, $parent_code, '', $code, '', ''));
+                continue;
+            }
+            foreach ($labels as $lbl) {
+                if (!is_array($lbl)) {
+                    continue;
+                }
+                $lines[] = $this->_csv_format_row(array(
+                    $sort,
+                    $parent_code,
+                    isset($lbl['language']) ? (string) $lbl['language'] : '',
+                    $code,
+                    isset($lbl['label']) ? (string) $lbl['label'] : '',
+                    isset($lbl['description']) ? (string) $lbl['description'] : '',
+                ));
+            }
+        }
+
+        return "\xEF\xBB\xBF" . implode("\r\n", $lines) . "\r\n";
+    }
+
+    /**
+     * Import items from CSV into an existing codelist (replace all items by default).
+     *
+     * @param int    $codelist_pk
+     * @param string $csv_content
+     * @param array  $options dry_run, replace_existing (default true)
+     * @return array
+     */
+    public function import_csv_codelist_items($codelist_pk, $csv_content, array $options = array())
+    {
+        $warnings = array();
+        $errors = array();
+        $dry = !empty($options['dry_run']);
+        $replace = !array_key_exists('replace_existing', $options) || !empty($options['replace_existing']);
+
+        $codelist = $this->get_by_id($codelist_pk);
+        if (!$codelist) {
+            return array(
+                'ok' => false,
+                'message' => 'Codelist not found',
+                'errors' => array('Codelist not found'),
+                'warnings' => $warnings,
+            );
+        }
+
+        if (!$replace) {
+            return array(
+                'ok' => false,
+                'message' => 'CSV item import requires replace=1 (all existing items are replaced)',
+                'errors' => array('replace=1 is required'),
+                'warnings' => $warnings,
+            );
+        }
+
+        if (!$this->is_content_mutable($codelist)) {
+            return array(
+                'ok' => false,
+                'message' => 'Codelist is ' . $codelist['status'] . ' and cannot be modified',
+                'errors' => array('Codelist is not editable'),
+                'warnings' => $warnings,
+            );
+        }
+
+        $parse = $this->_parse_csv_items_document($csv_content);
+        if (!empty($parse['errors'])) {
+            return array(
+                'ok' => false,
+                'message' => $parse['errors'][0],
+                'errors' => $parse['errors'],
+                'warnings' => $warnings,
+            );
+        }
+
+        $enabled_langs = array();
+        foreach ($this->get_codelist_translations((int) $codelist_pk) as $tr) {
+            $lang = trim((string) (isset($tr['language']) ? $tr['language'] : ''));
+            if ($lang !== '') {
+                $enabled_langs[$lang] = true;
+            }
+        }
+        if (empty($enabled_langs)) {
+            $enabled_langs['en'] = true;
+        }
+
+        $build = $this->_csv_rows_to_import_items($parse['rows'], $enabled_langs, $errors, $warnings);
+        if (!empty($errors)) {
+            return array(
+                'ok' => false,
+                'message' => $errors[0],
+                'errors' => $errors,
+                'warnings' => $warnings,
+                'rows_parsed' => count($parse['rows']),
+            );
+        }
+
+        $items = $build['items'];
+        $row_count = count($parse['rows']);
+        $code_count = count($items);
+
+        if ($dry) {
+            return array(
+                'ok' => true,
+                'action' => 'dry_run',
+                'dry_run' => true,
+                'rows_parsed' => $row_count,
+                'codes_count' => $code_count,
+                'warnings' => $warnings,
+            );
+        }
+
+        $this->db->trans_start();
+        try {
+            $this->delete_all_items_for_codelist((int) $codelist_pk);
+            $imported = $this->_json_import_items((int) $codelist_pk, $items, $warnings);
+            if ($this->db->trans_status() === false) {
+                throw new Exception('Transaction failed');
+            }
+            $this->db->trans_complete();
+
+            return array(
+                'ok' => true,
+                'action' => 'updated',
+                'codes_imported' => $imported,
+                'rows_parsed' => $row_count,
+                'codes_count' => $code_count,
+                'warnings' => $warnings,
+            );
+        } catch (Exception $e) {
+            $this->db->trans_rollback();
+            return array(
+                'ok' => false,
+                'message' => $e->getMessage(),
+                'errors' => array($e->getMessage()),
+                'warnings' => $warnings,
+            );
+        }
+    }
+
+    /**
+     * @param array $fields
+     * @return string
+     */
+    private function _csv_format_row(array $fields)
+    {
+        $out = array();
+        foreach ($fields as $field) {
+            $value = (string) $field;
+            if (strpos($value, '"') !== false || strpos($value, ',') !== false
+                || strpos($value, "\n") !== false || strpos($value, "\r") !== false) {
+                $out[] = '"' . str_replace('"', '""', $value) . '"';
+            } else {
+                $out[] = $value;
+            }
+        }
+
+        return implode(',', $out);
+    }
+
+    /**
+     * @param string $csv_content
+     * @return array{ rows: array, errors: array }
+     */
+    private function _parse_csv_items_document($csv_content)
+    {
+        $errors = array();
+        $csv_content = (string) $csv_content;
+        if ($csv_content === '') {
+            return array('rows' => array(), 'errors' => array('CSV file is empty'));
+        }
+
+        $csv_content = preg_replace('/^\xEF\xBB\xBF/', '', $csv_content);
+        $csv_content = str_replace(array("\r\n", "\r"), "\n", $csv_content);
+        $csv_content = trim($csv_content);
+        if ($csv_content === '') {
+            return array('rows' => array(), 'errors' => array('CSV file is empty'));
+        }
+
+        $stream = fopen('php://memory', 'r+');
+        if ($stream === false) {
+            return array('rows' => array(), 'errors' => array('Failed to read CSV'));
+        }
+        fwrite($stream, $csv_content);
+        rewind($stream);
+
+        $parsed = array();
+        $line_no = 0;
+        while (($cells = fgetcsv($stream)) !== false) {
+            $line_no++;
+            if ($cells === array(null) || (count($cells) === 1 && trim((string) $cells[0]) === '')) {
+                continue;
+            }
+            $parsed[] = array('line' => $line_no, 'cells' => $cells);
+        }
+        fclose($stream);
+
+        if (empty($parsed)) {
+            return array('rows' => array(), 'errors' => array('No data rows found in CSV'));
+        }
+
+        $header_map = array();
+        $first = $parsed[0]['cells'];
+        $normalized_first = array_map(function ($c) {
+            return strtolower(trim((string) $c));
+        }, $first);
+        $expected = self::CSV_ITEMS_COLUMNS;
+        $is_header = true;
+        foreach ($expected as $idx => $col) {
+            if (!isset($normalized_first[$idx]) || $normalized_first[$idx] !== $col) {
+                $is_header = false;
+                break;
+            }
+        }
+
+        $start = 0;
+        if ($is_header) {
+            foreach ($expected as $idx => $col) {
+                $header_map[$idx] = $col;
+            }
+            $start = 1;
+        } else {
+            foreach ($expected as $idx => $col) {
+                $header_map[$idx] = $col;
+            }
+        }
+
+        $rows = array();
+        for ($i = $start; $i < count($parsed); $i++) {
+            $cells = $parsed[$i]['cells'];
+            $line = $parsed[$i]['line'];
+            $row = array();
+            foreach ($header_map as $idx => $key) {
+                $row[$key] = isset($cells[$idx]) ? trim((string) $cells[$idx]) : '';
+            }
+            if ($row['code'] === '' && $row['label'] === '' && $row['language'] === ''
+                && $row['sort'] === '' && $row['parent_code'] === '' && $row['description'] === '') {
+                continue;
+            }
+            if ($row['code'] === '') {
+                $errors[] = 'Line ' . $line . ': code is required';
+                continue;
+            }
+            if (strlen($row['code']) > 150) {
+                $errors[] = 'Line ' . $line . ': code exceeds 150 characters';
+                continue;
+            }
+            $rows[] = $row;
+        }
+
+        if (!empty($errors)) {
+            return array('rows' => array(), 'errors' => $errors);
+        }
+        if (empty($rows)) {
+            return array('rows' => array(), 'errors' => array('No item rows found in CSV'));
+        }
+
+        return array('rows' => $rows, 'errors' => array());
+    }
+
+    /**
+     * @param array $csv_rows
+     * @param array $enabled_langs map lang => true
+     * @param array $errors
+     * @param array $warnings
+     * @return array{ items: array }
+     */
+    private function _csv_rows_to_import_items(array $csv_rows, array $enabled_langs, array &$errors, array &$warnings)
+    {
+        $sole_lang = null;
+        if (count($enabled_langs) === 1) {
+            $sole_lang = (string) key($enabled_langs);
+        }
+        $items_by_code = array();
+        $seen_lang = array();
+
+        foreach ($csv_rows as $idx => $row) {
+            $line = $idx + 1;
+            $code = $row['code'];
+            $lang = $row['language'];
+            if ($lang === '' && $sole_lang !== null) {
+                $lang = $sole_lang;
+            }
+            if ($lang === '') {
+                $errors[] = 'Row for code "' . $code . '": language is required (or configure a single codelist language)';
+                continue;
+            }
+            if (!isset($enabled_langs[$lang])) {
+                $errors[] = 'Row for code "' . $code . '": language "' . $lang . '" is not configured for this codelist';
+                continue;
+            }
+            $lang_key = $code . "\0" . $lang;
+            if (isset($seen_lang[$lang_key])) {
+                $errors[] = 'Duplicate language "' . $lang . '" for code "' . $code . '"';
+                continue;
+            }
+            $seen_lang[$lang_key] = true;
+
+            $lab = $row['label'];
+            if ($lab === '') {
+                $errors[] = 'Row for code "' . $code . '" (' . $lang . '): label is required';
+                continue;
+            }
+
+            if (!isset($items_by_code[$code])) {
+                $item = array('code' => $code, 'labels' => array());
+                if ($row['sort'] !== '' && is_numeric($row['sort'])) {
+                    $item['sort_order'] = (int) $row['sort'];
+                }
+                if ($row['parent_code'] !== '') {
+                    $item['parent_code'] = $row['parent_code'];
+                }
+                $items_by_code[$code] = $item;
+            } else {
+                if ($row['sort'] !== '' && is_numeric($row['sort'])
+                    && !isset($items_by_code[$code]['sort_order'])) {
+                    $items_by_code[$code]['sort_order'] = (int) $row['sort'];
+                }
+                if ($row['parent_code'] !== ''
+                    && empty($items_by_code[$code]['parent_code'])) {
+                    $items_by_code[$code]['parent_code'] = $row['parent_code'];
+                }
+            }
+
+            $items_by_code[$code]['labels'][] = array(
+                'language' => $lang,
+                'label' => $lab,
+                'description' => $row['description'] !== '' ? $row['description'] : null,
+            );
+        }
+
+        if (!empty($errors)) {
+            return array('items' => array());
+        }
+
+        return array('items' => array_values($items_by_code));
     }
 }

@@ -55,6 +55,25 @@
             vertical-align: top;
         }
 
+        .codelist-edit-tables .items-grid tbody.cl-grid-row-alt > tr {
+            background-color: rgba(0, 0, 0, 0.03);
+        }
+        .codelist-edit-tables .items-grid tbody.cl-grid-row-new > tr {
+            background-color: #e8f5e9;
+        }
+        .codelist-edit-tables .items-grid tbody.cl-grid-row-modified > tr {
+            background-color: #fff3e0;
+        }
+        .codelist-edit-tables .items-grid tbody.cl-grid-row-new .cl-grid-status-cell {
+            box-shadow: inset 3px 0 0 #43a047;
+        }
+        .codelist-edit-tables .items-grid tbody.cl-grid-row-modified .cl-grid-status-cell {
+            box-shadow: inset 3px 0 0 #fb8c00;
+        }
+        .codelist-edit-tables .translations-grid tr.cl-grid-row-alt {
+            background-color: rgba(0, 0, 0, 0.03);
+        }
+
         /* Compact inputs in codelist translation / item tables (headers only in <th>) */
         .codelist-edit-tables .cl-compact-control.v-input {
             margin-top: 0 !important;
@@ -107,6 +126,22 @@
         }
         .codelist-view-items .v-data-table__wrapper td {
             vertical-align: top;
+            word-break: break-word;
+        }
+
+        .items-search-field.v-input {
+            margin-top: 4px !important;
+            padding-top: 0 !important;
+        }
+        .items-search-field.v-text-field--outlined .v-input__control {
+            min-height: 32px;
+        }
+        .items-search-field.v-text-field--outlined .v-input__slot {
+            min-height: 32px !important;
+        }
+
+        .items-error-message {
+            white-space: pre-wrap;
             word-break: break-word;
         }
     </style>

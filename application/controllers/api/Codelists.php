@@ -887,11 +887,7 @@ class Codelists extends MY_REST_Controller
 			}
 
 			// Add code
-			$code_id = $this->Codelists_model->add_code($id, $data);
-
-			if (!$code_id) {
-				throw new Exception("Failed to add code");
-			}
+			$code_id = $this->Codelists_model->add_code_or_throw($id, $data);
 
 			$response = array(
 				'status' => 'success',
@@ -942,11 +938,7 @@ class Codelists extends MY_REST_Controller
 			unset($data['codelist_id']);
 
 			// Update code
-			$result = $this->Codelists_model->update_code($code_id, $data);
-
-			if (!$result) {
-				throw new Exception("Failed to update code");
-			}
+			$this->Codelists_model->update_code_or_throw($code_id, $data);
 
 			$response = array(
 				'status' => 'success',
@@ -1396,6 +1388,139 @@ class Codelists extends MY_REST_Controller
 				'message' => $e->getMessage(),
 			), REST_Controller::HTTP_BAD_REQUEST);
 		}
+	}
+
+	/**
+	 * Export all codelist items as CSV (UTF-8 with BOM for Excel).
+	 *
+	 * GET /api/codelists/export_csv/{id}
+	 * Query: download=1 — Content-Disposition attachment (default for browsers)
+	 */
+	function export_csv_get($id = null)
+	{
+		try {
+			$this->registry_require_or_die($this->registry_resource, 'browse');
+			if (!$id) {
+				throw new Exception('Codelist ID is required');
+			}
+
+			$codelist = $this->Codelists_model->get_by_id($id);
+			if (!$codelist) {
+				throw new Exception('Codelist not found');
+			}
+
+			$csv = $this->Codelists_model->export_items_csv((int) $id);
+
+			$download = $this->input->get('download');
+			if ($download === null || $download === '') {
+				$download = true;
+			} else {
+				$download = filter_var($download, FILTER_VALIDATE_BOOLEAN);
+			}
+
+			if ($download) {
+				$safe_id = preg_replace('/[^A-Za-z0-9_\-]/', '_', $codelist['name']);
+				$filename = $safe_id . '_' . str_replace('.', '', (string) $codelist['version']) . '_items.csv';
+				header('Content-Type: text/csv; charset=UTF-8');
+				header('Content-Disposition: attachment; filename="' . $filename . '"');
+				header('Cache-Control: no-store, no-cache');
+				echo $csv;
+				exit();
+			}
+
+			$this->set_response(array(
+				'status' => 'success',
+				'csv' => $csv,
+			), REST_Controller::HTTP_OK);
+		}
+		catch (Exception $e) {
+			$this->set_response(array(
+				'status' => 'failed',
+				'message' => $e->getMessage(),
+			), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * Import codelist items from CSV (replaces all existing items).
+	 *
+	 * POST /api/codelists/import_csv/{id}
+	 * Multipart field {@code file} with .csv contents, or raw CSV body.
+	 * Query: dry_run=1, replace=1 (replace defaults to true).
+	 */
+	function import_csv_post($id = null)
+	{
+		try {
+			$this->registry_require_or_die($this->registry_resource, 'edit');
+			if (!$id) {
+				throw new Exception('Codelist ID is required');
+			}
+
+			$codelist = $this->Codelists_model->get_by_id($id);
+			if (!$codelist) {
+				throw new Exception('Codelist not found');
+			}
+
+			$csv = $this->_import_csv_read_body();
+			if ($csv === null || trim($csv) === '') {
+				throw new Exception('Send CSV body or multipart "file" with item rows');
+			}
+
+			$dry = filter_var($this->input->get('dry_run'), FILTER_VALIDATE_BOOLEAN);
+			$replace_raw = $this->input->get('replace');
+			$replace = ($replace_raw === null || $replace_raw === '')
+				? true
+				: filter_var($replace_raw, FILTER_VALIDATE_BOOLEAN);
+
+			$r = $this->Codelists_model->import_csv_codelist_items((int) $id, $csv, array(
+				'dry_run' => $dry,
+				'replace_existing' => $replace,
+			));
+
+			$warnings = isset($r['warnings']) ? $r['warnings'] : array();
+			if (empty($r['ok'])) {
+				$this->set_response(array(
+					'status' => 'failed',
+					'message' => isset($r['message']) ? $r['message'] : 'Import failed',
+					'errors' => isset($r['errors']) ? $r['errors'] : array(),
+					'warnings' => $warnings,
+				), REST_Controller::HTTP_BAD_REQUEST);
+				return;
+			}
+
+			$this->set_response(array(
+				'status' => 'success',
+				'dry_run' => !empty($r['dry_run']),
+				'action' => isset($r['action']) ? $r['action'] : 'updated',
+				'codes_imported' => isset($r['codes_imported']) ? $r['codes_imported'] : null,
+				'codes_count' => isset($r['codes_count']) ? $r['codes_count'] : null,
+				'rows_parsed' => isset($r['rows_parsed']) ? $r['rows_parsed'] : null,
+				'warnings' => array_values($warnings),
+			), REST_Controller::HTTP_OK);
+		}
+		catch (Exception $e) {
+			$this->set_response(array(
+				'status' => 'failed',
+				'message' => $e->getMessage(),
+			), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * @return string|null
+	 */
+	private function _import_csv_read_body()
+	{
+		if (!empty($_FILES['file']['tmp_name']) && is_uploaded_file($_FILES['file']['tmp_name'])) {
+			$data = file_get_contents($_FILES['file']['tmp_name']);
+			return ($data === false) ? null : $data;
+		}
+		$raw = $this->input->raw_input_stream;
+		if ($raw === null || trim($raw) === '') {
+			return null;
+		}
+
+		return $raw;
 	}
 
 	/**
