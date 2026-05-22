@@ -74,6 +74,20 @@ Vue.component('codelists', {
         },
         canDeleteCodelist: function () {
             return CI && CI.user_info && CI.user_info.can_delete_codelist === true;
+        },
+        tableCodelists: function () {
+            var vm = this;
+            return (this.codelists || []).map(function (row) {
+                return Object.assign({}, row, {
+                    isSelectable: vm.isRowSelectable(row)
+                });
+            });
+        },
+        selectedBlockedCount: function () {
+            var vm = this;
+            return (this.selected || []).filter(function (item) {
+                return !vm.isRowSelectable(item);
+            }).length;
         }
     },
     methods: {
@@ -411,49 +425,94 @@ Vue.component('codelists', {
             var s = (item && item.status) ? String(item.status).toLowerCase() : 'active';
             return s === 'draft' || s === 'active';
         },
-        isRowSelectable: function (item) {
+        codelistLabel: function (row) {
+            return (row.title && String(row.title).trim()) || row.name || row.idno || row.id;
+        },
+        deleteBlockedReason: function (item) {
             if (!item || !item.id) {
-                return false;
+                return 'invalid row';
             }
             if (!this.isContentMutable(item)) {
-                return false;
+                return 'status is ' + (item.status || 'locked') + ' (only draft/active can be deleted)';
             }
             if (item.dsd_component_count != null && Number(item.dsd_component_count) > 0) {
-                return false;
+                var n = Number(item.dsd_component_count);
+                return 'in use by ' + n + ' data structure component' + (n === 1 ? '' : 's');
             }
-            return true;
+            return null;
         },
-        rowDisabled: function (item) {
-            return !this.isRowSelectable(item);
+        isRowSelectable: function (item) {
+            return !this.deleteBlockedReason(item);
+        },
+        formatBlockedDeleteMessage: function (rows) {
+            var vm = this;
+            var lines = (rows || []).slice(0, 5).map(function (r) {
+                return '• ' + vm.codelistLabel(r) + ': ' + vm.deleteBlockedReason(r);
+            });
+            if ((rows || []).length > 5) {
+                lines.push('• …and ' + (rows.length - 5) + ' more');
+            }
+            return lines.join('\n');
         },
         clearSelection: function () {
             this.selected = [];
         },
         deleteSelectedCodelists: function () {
             var vm = this;
-            var rows = (vm.selected || []).filter(function (item) {
-                return vm.isRowSelectable(item);
-            });
-            if (!rows.length) {
+            var selected = vm.selected || [];
+            if (!selected.length) {
                 return;
             }
-            var labels = rows.map(function (r) {
-                return (r.title && String(r.title).trim()) || r.name || r.idno || r.id;
+            var deletable = [];
+            var blocked = [];
+            selected.forEach(function (item) {
+                if (vm.isRowSelectable(item)) {
+                    deletable.push(item);
+                } else {
+                    blocked.push(item);
+                }
             });
-            var preview = labels.slice(0, 3).join(', ');
-            if (labels.length > 3) {
-                preview += '…';
+            if (!deletable.length) {
+                vm.notifyFail({
+                    response: {
+                        data: {
+                            message: 'None of the selected codelists can be deleted:\n\n'
+                                + vm.formatBlockedDeleteMessage(blocked)
+                        }
+                    }
+                });
+                return;
             }
-            if (!confirm('Delete ' + rows.length + ' codelist(s)?\n\n' + preview + '\n\nThis cannot be undone.')) {
+            var confirmMsg;
+            if (blocked.length) {
+                confirmMsg = 'Delete ' + deletable.length + ' codelist(s)? '
+                    + blocked.length + ' selected codelist(s) cannot be deleted and will be skipped:\n\n'
+                    + vm.formatBlockedDeleteMessage(blocked)
+                    + '\n\nContinue with deletable codelist(s) only?';
+            } else {
+                var labels = deletable.map(function (r) {
+                    return vm.codelistLabel(r);
+                });
+                var preview = labels.slice(0, 3).join(', ');
+                if (labels.length > 3) {
+                    preview += '…';
+                }
+                confirmMsg = 'Delete ' + deletable.length + ' codelist(s)?\n\n' + preview + '\n\nThis cannot be undone.';
+            }
+            if (!confirm(confirmMsg)) {
                 return;
             }
             vm.batchDeleting = true;
             var chain = Promise.resolve();
             var failed = 0;
-            rows.forEach(function (row) {
+            var lastErrorMessage = '';
+            deletable.forEach(function (row) {
                 chain = chain.then(function () {
-                    return axios.post(vm.apiBase() + '/delete/' + row.id).catch(function () {
+                    return axios.post(vm.apiBase() + '/delete/' + row.id).catch(function (err) {
                         failed++;
+                        if (err.response && err.response.data && err.response.data.message) {
+                            lastErrorMessage = err.response.data.message;
+                        }
                     });
                 });
             });
@@ -461,15 +520,25 @@ Vue.component('codelists', {
                 vm.batchDeleting = false;
                 vm.clearSelection();
                 if (failed) {
+                    var message = failed + ' of ' + deletable.length + ' could not be deleted.';
+                    if (lastErrorMessage) {
+                        message += ' ' + lastErrorMessage;
+                    } else {
+                        message += ' The codelist may be in use by a data structure or locked.';
+                    }
                     vm.notifyFail({
                         response: {
                             data: {
-                                message: failed + ' of ' + rows.length + ' could not be deleted (DSD references or locked status).'
+                                message: message
                             }
                         }
                     });
                 } else {
-                    vm.notifySuccess('Deleted ' + rows.length + ' codelist(s)');
+                    var successMsg = 'Deleted ' + deletable.length + ' codelist(s)';
+                    if (blocked.length) {
+                        successMsg += ' (' + blocked.length + ' skipped — in use or locked)';
+                    }
+                    vm.notifySuccess(successMsg);
                 }
                 vm.loadCodelists();
             });
@@ -522,6 +591,9 @@ Vue.component('codelists', {
                     </v-text-field>
                     <div v-if="canDeleteCodelist && selected.length > 0" class="d-flex align-center flex-wrap mt-2 py-2 px-3 grey lighten-4 rounded">
                         <span class="text-body-2 font-weight-medium mr-3">{{ selected.length }} selected</span>
+                        <span v-if="selectedBlockedCount > 0" class="text-caption orange--text text--darken-2 mr-3">
+                            {{ selectedBlockedCount }} cannot be deleted (in use or locked)
+                        </span>
                         <v-btn
                             color="error"
                             small
@@ -540,7 +612,7 @@ Vue.component('codelists', {
                 <v-data-table
                     v-model="selected"
                     :headers="headers"
-                    :items="codelists"
+                    :items="tableCodelists"
                     :loading="loading"
                     loading-text="Loading..."
                     hide-default-footer
@@ -550,7 +622,6 @@ Vue.component('codelists', {
                     show-expand
                     :expanded.sync="expanded"
                     item-key="id"
-                    :item-disabled="rowDisabled"
                     single-expand
                 >
                     <template v-slot:item.data-table-expand="{ item, expand, isExpanded }">
@@ -663,9 +734,13 @@ Vue.component('codelists', {
                                     <v-list-item-title>SDMX 3.0</v-list-item-title>
                                 </v-list-item>
                                 <v-divider v-if="canDeleteCodelist"></v-divider>
-                                <v-list-item v-if="canDeleteCodelist && isContentMutable(item)" @click="deleteCodelist(item)" :disabled="deletingId != null && deletingId !== item.id">
+                                <v-list-item v-if="canDeleteCodelist && isContentMutable(item) && isRowSelectable(item)" @click="deleteCodelist(item)" :disabled="deletingId != null && deletingId !== item.id">
                                     <v-list-item-icon class="mr-2"><v-icon small color="error">mdi-delete-outline</v-icon></v-list-item-icon>
                                     <v-list-item-title class="error--text">Delete</v-list-item-title>
+                                </v-list-item>
+                                <v-list-item v-else-if="canDeleteCodelist && isContentMutable(item) && !isRowSelectable(item)" disabled>
+                                    <v-list-item-icon class="mr-2"><v-icon small>mdi-delete-off-outline</v-icon></v-list-item-icon>
+                                    <v-list-item-title>{{ deleteBlockedReason(item) }}</v-list-item-title>
                                 </v-list-item>
                             </v-list>
                         </v-menu>

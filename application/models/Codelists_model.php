@@ -1130,12 +1130,18 @@ class Codelists_model extends CI_Model {
             }
         }
 
+        // Family head rows use pid = id (self-reference). Clear before DELETE so
+        // fk_codelists_pid ON DELETE RESTRICT does not block removal.
+        $this->db->where('id', $id);
+        $this->db->update($this->table_codelists, array('pid' => null));
+
         $this->db->where('id', $id);
         $this->db->delete($this->table_codelists);
 
         if ($this->db->trans_status() === false) {
             $this->db->trans_rollback();
-            return false;
+            log_message('error', 'Codelists_model::delete failed: ' . json_encode($this->db->error()));
+            throw $this->_codelist_create_exception('Failed to delete codelist');
         }
         $this->db->trans_commit();
         return true;
