@@ -109,8 +109,10 @@ class Configurations_model extends CI_Model {
 		foreach($options as $key=>$value)
 		{
 			if (!$this->check_key_exists($key)){
-				$this->add($key,$value);
-				return true;
+				if (!$this->add($key,$value)) {
+					return FALSE;
+				}
+				continue;
 			}
 
 			$data=array('value'=>$value);

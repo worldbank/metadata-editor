@@ -1,74 +1,79 @@
 <?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+
 /**
- * Loads the configurations from the database
- *
- **/
-class Site_configurations{
+ * Loads site configurations from the database into CI config.
+ */
+class Site_configurations {
+
+	/** @var CI_Controller */
+	protected $ci;
 
 	/**
-	 * __construct
-	 *
 	 * @return void
-	 **/
+	 */
 	public function __construct()
 	{
 		$this->ci =& get_instance();
 		$this->ci->load->model('configurations_model');
-		
-		//load settings from db
-		$settings=$this->ci->configurations_model->load();
-		
-		//list of settings stored in db in JSON format
-		$json_formatted=array('admin_allowed_ip','admin_allowed_hosts','supported_languages');
-		
-		//update the config array with values from DB
-		if ($settings)
-		{
-			foreach($settings as $setting)
-			{
-				//setting is stored in DB using JSON array format
-				if (in_array($setting['name'],$json_formatted))
-				{
-					//check if JSON is valid
-					if (json_decode($setting['value'])!==FALSE)
-					{
-						$this->ci->config->set_item($setting['name'], json_decode($setting['value']));
-					}	
-				}
-				else //normal non-json values
-				{
+
+		$settings = $this->ci->configurations_model->load();
+
+		$json_formatted = array(
+			'admin_allowed_ip',
+			'admin_allowed_hosts',
+			'supported_languages',
+		);
+
+		if ($settings) {
+			foreach ($settings as $setting) {
+				if (in_array($setting['name'], $json_formatted)) {
+					$decoded = json_decode($setting['value'], true);
+					if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+						$this->ci->config->set_item($setting['name'], $decoded);
+					}
+				} else {
 					$this->ci->config->set_item($setting['name'], $setting['value']);
-				}	
+				}
 			}
 		}
 
-		// Build language_codes from new supported_languages object format
-		$lang_data = $this->ci->config->item('supported_languages');
-		if (is_array($lang_data) && !empty($lang_data)) {
-			$first = $lang_data[0];
-			// New format: each entry has a 'folder' key (object or array)
-			if ((is_array($first) && isset($first['folder'])) ||
-			    (is_object($first) && isset($first->folder))) {
-				$language_codes = array();
-				$folder_names   = array();
-				foreach ($lang_data as $entry) {
-					$entry  = is_array($entry) ? $entry : (array)$entry;
-					$folder = isset($entry['folder']) ? $entry['folder'] : null;
-					if (!$folder) continue;
-					$folder_names[] = $folder;
-					$language_codes[$folder] = array(
-						'name'          => $folder,
-						'language_file' => $folder,
-						'display'       => isset($entry['display'])   ? $entry['display']   : ucfirst($folder),
-						'code'          => isset($entry['code'])      ? $entry['code']      : '',
-						'direction'     => isset($entry['direction']) ? $entry['direction'] : 'ltr',
-					);
-				}
-				$this->ci->config->set_item('language_codes',      $language_codes);
-				$this->ci->config->set_item('supported_languages', $folder_names);
-			}
-		}
-		
+		$this->build_language_codes();
 	}
-	
+
+	/**
+	 * Derive language_codes and folder list from supported_languages.
+	 */
+	protected function build_language_codes()
+	{
+		$lang_data = $this->ci->config->item('supported_languages');
+		if (!is_array($lang_data) || empty($lang_data)) {
+			return;
+		}
+
+		$first = $lang_data[0];
+		if (!((is_array($first) && isset($first['folder'])) ||
+			(is_object($first) && isset($first->folder)))) {
+			return;
+		}
+
+		$language_codes = array();
+		$folder_names   = array();
+		foreach ($lang_data as $entry) {
+			$entry  = is_array($entry) ? $entry : (array)$entry;
+			$folder = isset($entry['folder']) ? $entry['folder'] : null;
+			if (!$folder) {
+				continue;
+			}
+			$folder_names[] = $folder;
+			$language_codes[$folder] = array(
+				'name'          => $folder,
+				'language_file' => $folder,
+				'display'       => isset($entry['display'])   ? $entry['display']   : ucfirst($folder),
+				'code'          => isset($entry['code'])      ? $entry['code']      : '',
+				'direction'     => isset($entry['direction']) ? $entry['direction'] : 'ltr',
+			);
+		}
+		$this->ci->config->set_item('language_codes',      $language_codes);
+		$this->ci->config->set_item('supported_languages', $folder_names);
+	}
 }
