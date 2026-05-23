@@ -46,7 +46,16 @@ Vue.component('data-structure-edit', {
             activeCodelistCodesSearchInput: '',
             activeCodelistCodesSearch: '',
             _activeCodelistCodesForId: null,
-            _activeCodelistCodesLoadKey: null
+            _activeCodelistCodesLoadKey: null,
+            copyComponentDialog: false,
+            copyComponentSearch: '',
+            copyComponentList: [],
+            copyComponentLoading: false,
+            copyComponentTotal: 0,
+            copyComponentPage: 1,
+            copyComponentPerPage: 50,
+            copyComponentRequestSeq: 0,
+            copyComponentSelected: {}
         };
     },
     computed: {
@@ -278,6 +287,28 @@ Vue.component('data-structure-edit', {
         },
         selectedComponentCount: function () {
             return this.selectedComponentIndices.length;
+        },
+        copyComponentPickerHeaders: function () {
+            return [
+                { text: '', value: 'select', sortable: false, width: '40px' },
+                { text: 'Name', value: 'name' },
+                { text: 'Label', value: 'label' },
+                { text: 'Type', value: 'column_type' },
+                { text: 'Data structure', value: 'data_structure' },
+                { text: 'Codelist', value: 'codelist' }
+            ];
+        },
+        copyComponentSelectedCount: function () {
+            return Object.keys(this.copyComponentSelected).length;
+        },
+        copyComponentPageCount: function () {
+            if (!this.copyComponentTotal || !this.copyComponentPerPage) {
+                return 1;
+            }
+            return Math.max(1, Math.ceil(this.copyComponentTotal / this.copyComponentPerPage));
+        },
+        copyComponentCanSearch: function () {
+            return (this.copyComponentSearch || '').trim().length >= 2;
         }
     },
     watch: {
@@ -292,10 +323,16 @@ Vue.component('data-structure-edit', {
         vm.searchCodelistsDebounced = _.debounce(function (q) {
             vm.searchCodelists(q);
         }, 300);
+        vm.loadCopyComponentPickerDebounced = _.debounce(function () {
+            vm.loadCopyComponentPickerList();
+        }, 300);
     },
     beforeDestroy: function () {
         if (this.searchCodelistsDebounced && this.searchCodelistsDebounced.cancel) {
             this.searchCodelistsDebounced.cancel();
+        }
+        if (this.loadCopyComponentPickerDebounced && this.loadCopyComponentPickerDebounced.cancel) {
+            this.loadCopyComponentPickerDebounced.cancel();
         }
     },
     methods: {
@@ -892,6 +929,216 @@ Vue.component('data-structure-edit', {
                 return;
             }
             this.$router.push('/edit/' + this.numericId + '/bootstrap-csv');
+        },
+        openCopyComponentDialog: function () {
+            if (!this.canEditComponents) {
+                this.notifyFail('Save the data structure header first.');
+                return;
+            }
+            if (!this.numericId) {
+                return;
+            }
+            this.copyComponentDialog = true;
+            this.copyComponentSearch = '';
+            this.copyComponentList = [];
+            this.copyComponentTotal = 0;
+            this.copyComponentPage = 1;
+            this.copyComponentLoading = false;
+            this.copyComponentSelected = {};
+        },
+        closeCopyComponentDialog: function () {
+            this.copyComponentRequestSeq += 1;
+            this.copyComponentDialog = false;
+            this.copyComponentSearch = '';
+            this.copyComponentList = [];
+            this.copyComponentTotal = 0;
+            this.copyComponentPage = 1;
+            this.copyComponentLoading = false;
+            this.copyComponentSelected = {};
+        },
+        onCopyComponentSearchInput: function () {
+            if (!this.copyComponentDialog) {
+                return;
+            }
+            this.copyComponentPage = 1;
+            if (!this.copyComponentCanSearch) {
+                this.copyComponentList = [];
+                this.copyComponentTotal = 0;
+                this.copyComponentLoading = false;
+                return;
+            }
+            if (this.loadCopyComponentPickerDebounced) {
+                this.loadCopyComponentPickerDebounced();
+            } else {
+                this.loadCopyComponentPickerList();
+            }
+        },
+        loadCopyComponentPickerList: function () {
+            var vm = this;
+            if (!vm.copyComponentDialog || !vm.copyComponentCanSearch) {
+                return;
+            }
+            var requestId = ++vm.copyComponentRequestSeq;
+            vm.copyComponentLoading = true;
+            var params = {
+                page: vm.copyComponentPage,
+                per_page: vm.copyComponentPerPage,
+                search: (vm.copyComponentSearch || '').trim(),
+                exclude_structure_id: vm.numericId,
+                order_by: 'name',
+                order_dir: 'ASC'
+            };
+            axios.get(vm.apiBase() + '/components', { params: params, timeout: 30000 })
+                .then(function (res) {
+                    vm.copyComponentLoading = false;
+                    if (requestId !== vm.copyComponentRequestSeq || !vm.copyComponentDialog) {
+                        return;
+                    }
+                    if (res.data && res.data.status === 'success') {
+                        vm.copyComponentList = res.data.components || [];
+                        vm.copyComponentTotal = res.data.total != null ? res.data.total : vm.copyComponentList.length;
+                    } else {
+                        vm.copyComponentList = [];
+                        vm.copyComponentTotal = 0;
+                        vm.notifyFail((res.data && res.data.message) ? res.data.message : 'Could not search components.');
+                    }
+                })
+                .catch(function (err) {
+                    vm.copyComponentLoading = false;
+                    if (requestId !== vm.copyComponentRequestSeq) {
+                        return;
+                    }
+                    vm.copyComponentList = [];
+                    vm.copyComponentTotal = 0;
+                    var msg = 'Could not search components.';
+                    if (err.code === 'ECONNABORTED') {
+                        msg = 'Component search timed out. Try a shorter search term.';
+                    } else if (err.response && err.response.data && err.response.data.message) {
+                        msg = err.response.data.message;
+                    }
+                    vm.notifyFail(msg);
+                });
+        },
+        copyComponentStructureLabel: function (item) {
+            var ds = (item && item.data_structure) ? item.data_structure : {};
+            var title = (ds.title && String(ds.title).trim()) || '';
+            var agency = String(ds.agency || '');
+            var name = String(ds.name || '');
+            var version = String(ds.version || '');
+            var identity = agency && name ? agency + ':' + name : (name || agency);
+            if (version) {
+                identity += '@' + version;
+            }
+            if (title) {
+                return title + (identity ? ' (' + identity + ')' : '');
+            }
+            return identity || ('DSD #' + (ds.id || ''));
+        },
+        copyComponentCodelistLabel: function (item) {
+            if (!item || !item.codelist_id) {
+                return '—';
+            }
+            if (item.codelist_reference) {
+                var ref = item.codelist_reference;
+                var agency = ref.agency || '';
+                var name = ref.name || '';
+                if (agency && name) {
+                    return agency + ':' + name;
+                }
+                return name || ref.idno || String(item.codelist_id);
+            }
+            return '#' + item.codelist_id;
+        },
+        isCopyComponentSelected: function (item) {
+            return !!(item && item.id && this.copyComponentSelected[item.id]);
+        },
+        toggleCopyComponentSelection: function (item) {
+            if (!item || item.id == null) {
+                return;
+            }
+            if (this.copyComponentSelected[item.id]) {
+                Vue.delete(this.copyComponentSelected, item.id);
+            } else {
+                Vue.set(this.copyComponentSelected, item.id, item);
+            }
+        },
+        prevCopyComponentPage: function () {
+            if (this.copyComponentPage <= 1 || this.copyComponentLoading) {
+                return;
+            }
+            this.copyComponentPage -= 1;
+            this.loadCopyComponentPickerList();
+        },
+        nextCopyComponentPage: function () {
+            if (this.copyComponentPage >= this.copyComponentPageCount || this.copyComponentLoading) {
+                return;
+            }
+            this.copyComponentPage += 1;
+            this.loadCopyComponentPickerList();
+        },
+        mapCatalogComponentToNewRow: function (c) {
+            var row = this.mapApiComponentToRow(c, this.componentRows.length);
+            row.id = null;
+            row._localKey = this.nextLocalKey();
+            row.sort_order = String(this.componentRows.length);
+            return row;
+        },
+        applyCopyComponents: function () {
+            var vm = this;
+            var selected = Object.keys(vm.copyComponentSelected).map(function (id) {
+                return vm.copyComponentSelected[id];
+            });
+            if (!selected.length) {
+                vm.notifyFail('Select at least one component to copy.');
+                return;
+            }
+            var existing = {};
+            vm.componentRows.forEach(function (row) {
+                var key = (row.name || '').trim().toLowerCase();
+                if (key) {
+                    existing[key] = true;
+                }
+            });
+            var added = 0;
+            var skipped = 0;
+            var firstAddedIndex = null;
+            selected.sort(function (a, b) {
+                var an = (a.name || '').toLowerCase();
+                var bn = (b.name || '').toLowerCase();
+                if (an < bn) {
+                    return -1;
+                }
+                if (an > bn) {
+                    return 1;
+                }
+                return 0;
+            });
+            selected.forEach(function (c) {
+                var nameKey = (c.name || '').trim().toLowerCase();
+                if (!nameKey || existing[nameKey]) {
+                    skipped += 1;
+                    return;
+                }
+                var row = vm.mapCatalogComponentToNewRow(c);
+                row.sort_order = String(vm.componentRows.length);
+                vm.componentRows.push(row);
+                existing[nameKey] = true;
+                added += 1;
+                if (firstAddedIndex === null) {
+                    firstAddedIndex = vm.componentRows.length - 1;
+                }
+            });
+            if (firstAddedIndex !== null) {
+                vm.selectedComponentIndex = firstAddedIndex;
+            }
+            vm.closeCopyComponentDialog();
+            if (added && skipped) {
+                vm.notifySuccess('Copied ' + added + ' component(s); skipped ' + skipped + ' duplicate name(s).');
+            } else if (added) {
+                vm.notifySuccess('Copied ' + added + ' component(s). Save all to persist.');
+            } else {
+                vm.notifyFail('No components copied. Selected name(s) already exist in this DSD.');
+            }
         },
         confirmRemoveActiveComponent: function () {
             if (this.selectedComponentIndex === null) {
@@ -1491,6 +1738,11 @@ Vue.component('data-structure-edit', {
                             <v-btn small color="primary" block @click="addComponentRow">
                                 <v-icon left small>mdi-plus</v-icon> Add component
                             </v-btn>
+                            <v-btn small outlined color="primary" block class="mt-2"
+                                :disabled="loading || savingComponents || savingActiveComponent"
+                                @click="openCopyComponentDialog">
+                                <v-icon left small>mdi-content-copy</v-icon> Copy from DSD
+                            </v-btn>
                         </div>
                     </div>
                     <div class="ds-components-detail flex-grow-1" style="min-height:420px;">
@@ -1633,6 +1885,111 @@ Vue.component('data-structure-edit', {
                 </div>
             </v-card-text>
         </v-card>
+
+        <v-dialog v-model="copyComponentDialog" max-width="920" persistent content-class="ds-copy-component-dialog">
+            <v-card class="ds-copy-component-card">
+                <v-card-title class="text-subtitle-1 py-3 flex-shrink-0">
+                    Copy from DSD
+                    <v-spacer></v-spacer>
+                    <v-btn icon small @click="closeCopyComponentDialog"><v-icon>mdi-close</v-icon></v-btn>
+                </v-card-title>
+                <v-divider></v-divider>
+                <div class="ds-copy-component-body">
+                    <div class="ds-copy-component-search mb-4">
+                        <v-text-field
+                            v-model="copyComponentSearch"
+                            dense outlined hide-details clearable
+                            prepend-inner-icon="mdi-magnify"
+                            append-icon="mdi-arrow-right"
+                            placeholder="Search by component name, label, or DSD…"
+                            @keyup.enter="loadCopyComponentPickerList()"
+                            @click:append="loadCopyComponentPickerList()"
+                            @click:clear="onCopyComponentSearchInput()"
+                            @input="onCopyComponentSearchInput"
+                        ></v-text-field>
+                    </div>
+                    <div class="ds-copy-component-table-area">
+                        <div class="ds-copy-component-count text-caption grey--text">
+                            <span v-if="copyComponentLoading">Loading…</span>
+                            <span v-else-if="copyComponentCanSearch">
+                                Showing {{ copyComponentList.length }}<span v-if="copyComponentTotal > copyComponentList.length"> of {{ copyComponentTotal }}</span> component(s)
+                                <span v-if="copyComponentSelectedCount"> · {{ copyComponentSelectedCount }} selected</span>
+                            </span>
+                        </div>
+                        <div class="ds-copy-component-table-wrap elevation-1">
+                            <v-data-table
+                                :headers="copyComponentPickerHeaders"
+                                :items="copyComponentList"
+                                :items-per-page="-1"
+                                item-key="id"
+                                dense
+                                hide-default-footer
+                                disable-sort
+                                mobile-breakpoint="0"
+                                class="ds-copy-component-pick-table"
+                            >
+                                <template v-slot:item.select="{ item }">
+                                    <v-checkbox
+                                        :input-value="isCopyComponentSelected(item)"
+                                        hide-details dense class="ma-0 pa-0"
+                                        @change="toggleCopyComponentSelection(item)"
+                                        @click.stop
+                                    ></v-checkbox>
+                                </template>
+                                <template v-slot:item.name="{ item }">
+                                    <span class="font-weight-medium">{{ item.name }}</span>
+                                </template>
+                                <template v-slot:item.label="{ item }">
+                                    <span class="grey--text text--darken-1">{{ item.label || '—' }}</span>
+                                </template>
+                                <template v-slot:item.column_type="{ item }">
+                                    <v-chip x-small label class="ma-0 font-weight-medium white--text text-capitalize"
+                                        :color="columnTypeColor(item.column_type)">
+                                        {{ columnTypeLabel(item.column_type) }}
+                                    </v-chip>
+                                </template>
+                                <template v-slot:item.data_structure="{ item }">
+                                    <span class="text-caption">{{ copyComponentStructureLabel(item) }}</span>
+                                </template>
+                                <template v-slot:item.codelist="{ item }">
+                                    <span class="text-caption">{{ copyComponentCodelistLabel(item) }}</span>
+                                </template>
+                                <template v-slot:no-data>
+                                    <div class="pa-4 text-center grey--text text-caption">
+                                        {{ copyComponentCanSearch ? 'No components match your search.' : 'Search to browse components from other DSDs.' }}
+                                    </div>
+                                </template>
+                            </v-data-table>
+                        </div>
+                        <div v-if="copyComponentCanSearch && (copyComponentTotal > copyComponentPerPage || copyComponentPage > 1)"
+                            class="ds-copy-component-pager d-flex align-center justify-end pa-2">
+                            <span class="text-caption grey--text mr-2">
+                                Page {{ copyComponentPage }} of {{ copyComponentPageCount }}
+                            </span>
+                            <v-btn icon x-small :disabled="copyComponentPage <= 1 || copyComponentLoading"
+                                @click="prevCopyComponentPage">
+                                <v-icon small>mdi-chevron-left</v-icon>
+                            </v-btn>
+                            <v-btn icon x-small
+                                :disabled="copyComponentPage >= copyComponentPageCount || copyComponentLoading"
+                                @click="nextCopyComponentPage">
+                                <v-icon small>mdi-chevron-right</v-icon>
+                            </v-btn>
+                        </div>
+                    </div>
+                </div>
+                <v-divider></v-divider>
+                <v-card-actions class="px-4 py-3">
+                    <v-spacer></v-spacer>
+                    <v-btn text small @click="closeCopyComponentDialog">Cancel</v-btn>
+                    <v-btn color="primary" depressed small
+                        :disabled="!copyComponentSelectedCount"
+                        @click="applyCopyComponents">
+                        Copy selected
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
         </div>
     `
 });

@@ -435,6 +435,52 @@
             z-index: 2;
             background: #fafafa;
         }
+        .ds-copy-component-card {
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh;
+        }
+        .ds-copy-component-body {
+            flex: 1 1 auto;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: 16px 20px 8px;
+            min-height: 0;
+        }
+        .ds-copy-component-search .v-input {
+            margin-top: 0 !important;
+        }
+        .ds-copy-component-table-area {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        .ds-copy-component-count {
+            margin-bottom: 8px;
+        }
+        .ds-copy-component-table-wrap {
+            flex: 1 1 auto;
+            min-height: 200px;
+            max-height: 52vh;
+            overflow: auto;
+        }
+        .ds-copy-component-table-wrap .v-data-table__wrapper {
+            overflow: visible !important;
+        }
+        .ds-copy-component-pick-table thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: #fafafa;
+        }
+        .ds-copy-component-pick-table tbody tr:hover {
+            background: rgba(0, 0, 0, 0.04);
+        }
+        .ds-copy-component-pager {
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+        }
         .ds-csv-bootstrap .ds-csv-map-control.v-input,
         .ds-csv-bootstrap .ds-csv-step-control.v-input {
             margin-top: 0 !important;

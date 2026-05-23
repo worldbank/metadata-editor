@@ -4312,6 +4312,102 @@ paths:
         '400':
           description: Bad request
 
+  /data_structures/components:
+    get:
+      tags:
+        - Data Structures
+      summary: Search data structure components across all DSDs
+      description: |
+        Paginated catalogue of components with parent DSD context.
+        Requires at least one of `search` (min 2 characters), `name`, or `structure_id`.
+      operationId: dataStructuresComponentsSearch
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Match component name, label, description, or parent DSD metadata.
+        - name: q
+          in: query
+          schema:
+            type: string
+          description: Alias for `search`.
+        - name: name
+          in: query
+          schema:
+            type: string
+          description: Prefix match on component name (e.g. REF_AREA).
+        - name: column_type
+          in: query
+          schema:
+            type: string
+            enum:
+              - dimension
+              - time_period
+              - measure
+              - attribute
+              - indicator_id
+              - indicator_name
+              - annotation
+              - geography
+              - observation_value
+              - periodicity
+        - name: agency
+          in: query
+          schema:
+            type: string
+          description: Filter by parent DSD agency.
+        - name: structure_id
+          in: query
+          schema:
+            type: integer
+          description: Limit results to one DSD.
+        - name: exclude_structure_id
+          in: query
+          schema:
+            type: integer
+          description: Exclude components from a DSD (e.g. current draft when copying).
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/DataStructureStatusCode'
+          description: Filter by parent DSD status.
+        - name: has_codelist
+          in: query
+          schema:
+            type: boolean
+          description: When true, only components with a linked codelist.
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
+        - name: order_by
+          in: query
+          schema:
+            type: string
+            enum: [name, structure_title, updated]
+            default: name
+        - name: order_dir
+          in: query
+          schema:
+            type: string
+            enum: [ASC, DESC]
+            default: ASC
+      responses:
+        '200':
+          description: Paginated component search results
+        '400':
+          description: Bad request
+
   /data_structures/components/{structure_id}:
     post:
       tags:

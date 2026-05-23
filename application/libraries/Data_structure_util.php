@@ -524,6 +524,45 @@ class Data_structure_util {
     }
 
     /**
+     * Catalogue search row: export shape + ids + parent structure summary.
+     *
+     * @param array $row Joined row from Data_structure_component_model::search_catalog_paged()
+     * @return array
+     */
+    public function component_catalog_entry_shape(array $row)
+    {
+        $componentRow = array(
+            'id' => isset($row['id']) ? (int) $row['id'] : null,
+            'name' => isset($row['name']) ? $row['name'] : '',
+            'label' => isset($row['label']) ? $row['label'] : null,
+            'description' => isset($row['description']) ? $row['description'] : null,
+            'data_type' => isset($row['data_type']) ? $row['data_type'] : null,
+            'column_type' => isset($row['column_type']) ? $row['column_type'] : '',
+            'sort_order' => isset($row['sort_order']) ? (int) $row['sort_order'] : 0,
+            'codelist_id' => !empty($row['codelist_id']) ? (int) $row['codelist_id'] : null,
+            'metadata' => isset($row['metadata']) ? $row['metadata'] : null,
+        );
+
+        $out = $this->component_to_export_shape($componentRow);
+        $out['id'] = (int) $row['id'];
+        $out['codelist_id'] = $componentRow['codelist_id'];
+
+        $this->ci->load->model('Data_structure_model');
+        $statusCode = isset($row['structure_status']) ? (int) $row['structure_status'] : 0;
+        $out['data_structure'] = array(
+            'id' => (int) $row['data_structure_id'],
+            'agency' => isset($row['structure_agency']) ? (string) $row['structure_agency'] : '',
+            'name' => isset($row['structure_name']) ? (string) $row['structure_name'] : '',
+            'version' => isset($row['structure_version']) ? (string) $row['structure_version'] : '',
+            'title' => isset($row['structure_title']) ? $row['structure_title'] : null,
+            'idno' => isset($row['structure_idno']) ? $row['structure_idno'] : null,
+            'status' => Data_structure_model::status_code_to_slug($statusCode),
+        );
+
+        return $out;
+    }
+
+    /**
      * Duplicate a data structure and its components as a new draft family.
      * Codelist bindings are reused (global catalogue references unchanged).
      *

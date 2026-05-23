@@ -258,6 +258,32 @@ class Data_structures extends MY_REST_Controller {
     }
 
     /**
+     * GET /api/data_structures/components — search components across all DSDs.
+     */
+    public function components_get()
+    {
+        try {
+            $this->registry_require_or_die($this->registry_resource, 'browse');
+            $options = $this->_components_catalog_query_options();
+            $this->_assert_components_catalog_query($options);
+            $p = $this->Data_structure_component_model->search_catalog_paged($options);
+            $components = array();
+            foreach ($p['rows'] as $row) {
+                $components[] = $this->data_structure_util->component_catalog_entry_shape($row);
+            }
+            $this->set_response(array(
+                'status' => 'success',
+                'components' => $components,
+                'total' => $p['total'],
+                'page' => $p['page'],
+                'per_page' => $p['per_page'],
+            ), REST_Controller::HTTP_OK);
+        } catch (Exception $e) {
+            $this->set_response(array('status' => 'failed', 'message' => $e->getMessage()), REST_Controller::HTTP_BAD_REQUEST);
+        }
+    }
+
+    /**
      * POST /api/data_structures/components/{structure_id}
      */
     public function components_post($structure_id = null)
@@ -694,6 +720,82 @@ class Data_structures extends MY_REST_Controller {
             return $this->Data_structure_model->get_structure_by_id((int) $key, false);
         }
         return $this->Data_structure_model->get_structure_by_idno($key);
+    }
+
+    /**
+     * @return array
+     */
+    private function _components_catalog_query_options()
+    {
+        $search = $this->input->get('search');
+        if ($search === null || $search === false) {
+            $search = $this->input->get('q');
+        }
+        $search = is_string($search) ? trim($search) : '';
+
+        $status = null;
+        $status_raw = $this->input->get('status');
+        if ($status_raw !== null && $status_raw !== '') {
+            $status = Data_structure_model::decode_status_filter_value($status_raw);
+            if ($status === null) {
+                throw new Exception('Invalid status filter');
+            }
+        }
+
+        $column_type = $this->input->get('column_type');
+        $column_type = is_string($column_type) ? trim($column_type) : '';
+
+        $order_by = $this->input->get('order_by');
+        $order_by = is_string($order_by) ? trim($order_by) : 'name';
+
+        $order_dir = $this->input->get('order_dir');
+        $order_dir = is_string($order_dir) ? trim($order_dir) : 'ASC';
+
+        $structure_id = (int) $this->input->get('structure_id');
+        $exclude_structure_id = (int) $this->input->get('exclude_structure_id');
+
+        return array(
+            'page' => max(1, (int) $this->input->get('page')),
+            'per_page' => (int) $this->input->get('per_page'),
+            'search' => $search,
+            'name' => is_string($this->input->get('name')) ? trim($this->input->get('name')) : '',
+            'column_type' => $column_type,
+            'agency' => is_string($this->input->get('agency')) ? trim($this->input->get('agency')) : '',
+            'structure_id' => $structure_id > 0 ? $structure_id : null,
+            'exclude_structure_id' => $exclude_structure_id > 0 ? $exclude_structure_id : null,
+            'status' => $status,
+            'has_codelist' => filter_var($this->input->get('has_codelist'), FILTER_VALIDATE_BOOLEAN),
+            'order_by' => $order_by,
+            'order_dir' => $order_dir,
+        );
+    }
+
+    /**
+     * @param array $options
+     * @throws Exception
+     */
+    private function _assert_components_catalog_query(array $options)
+    {
+        $search = isset($options['search']) ? trim((string) $options['search']) : '';
+        $name = isset($options['name']) ? trim((string) $options['name']) : '';
+        $structure_id = !empty($options['structure_id']) ? (int) $options['structure_id'] : 0;
+
+        if ($search === '' && $name === '' && $structure_id <= 0) {
+            throw new Exception('Provide search (min 2 characters), name, or structure_id');
+        }
+        if ($search !== '' && strlen($search) < 2) {
+            throw new Exception('search must be at least 2 characters');
+        }
+
+        $column_type = isset($options['column_type']) ? trim((string) $options['column_type']) : '';
+        if ($column_type !== '' && !in_array($column_type, Data_structure_component_model::$allowed_column_types, true)) {
+            throw new Exception('Invalid column_type');
+        }
+
+        $order_by = isset($options['order_by']) ? strtolower(trim((string) $options['order_by'])) : 'name';
+        if (!in_array($order_by, array('name', 'structure_title', 'updated'), true)) {
+            throw new Exception('Invalid order_by');
+        }
     }
 
     /**
