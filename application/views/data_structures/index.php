@@ -254,10 +254,280 @@
             border-bottom: 1px solid rgba(0, 0, 0, 0.12);
             background: #f5f5f5;
         }
+        .ds-edit-form .ds-comp-codelist-preview-search {
+            flex: 0 1 220px;
+            min-width: 160px;
+            max-width: 260px;
+        }
+        .ds-edit-form .ds-comp-codelist-preview-search .v-input {
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+        }
+        .ds-edit-form .ds-comp-codelist-preview-table {
+            max-height: 280px;
+            overflow-y: auto;
+            background: #fff;
+            border-radius: 4px;
+        }
+        .ds-edit-form .ds-comp-codelist-preview-table-grid {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .ds-edit-form .ds-comp-codelist-preview-table-grid th,
+        .ds-edit-form .ds-comp-codelist-preview-table-grid td {
+            font-size: 0.8125rem !important;
+            padding: 6px 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        }
+        .ds-edit-form .ds-comp-codelist-preview-table-grid th {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            background: #fafafa;
+            font-weight: 600;
+        }
+        .ds-edit-form .ds-comp-codelist-preview-table-grid td code {
+            font-size: 0.8125rem;
+        }
+        .ds-edit-form .ds-comp-codelist-preview-pager {
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+        }
         .ds-edit-form .ds-header-card-actions {
             border-top: 1px solid rgba(0, 0, 0, 0.12);
             justify-content: flex-end;
             gap: 8px;
+        }
+        .ds-csv-bootstrap .ds-csv-stepper .v-stepper__header {
+            box-shadow: none;
+        }
+        .ds-csv-bootstrap-page {
+            width: 100%;
+        }
+        .ds-csv-bootstrap-actions {
+            position: sticky;
+            bottom: 0;
+            background: #fff;
+            border-top: 1px solid rgba(0, 0, 0, 0.12);
+            z-index: 2;
+        }
+        .ds-csv-mapping-wrap {
+            width: 100%;
+            border: 1px solid rgba(0, 0, 0, 0.12);
+            border-radius: 4px;
+        }
+        .ds-csv-map-check-col {
+            width: 44px;
+            padding-left: 8px !important;
+            padding-right: 4px !important;
+        }
+        .ds-csv-map-check-col .v-input--selection-controls {
+            margin-top: 0;
+            padding-top: 0;
+        }
+        .ds-csv-mapping-row--excluded {
+            opacity: 0.55;
+        }
+        .ds-csv-mapping-row--excluded td {
+            background: #fafafa;
+        }
+        .ds-csv-mapping-table th {
+            white-space: nowrap;
+            font-size: 0.75rem !important;
+        }
+        .ds-csv-mapping-table td {
+            font-size: 0.8125rem;
+            vertical-align: top;
+        }
+        .ds-csv-mapping-table td,
+        .ds-csv-mapping-table th {
+            padding: 3px 6px !important;
+        }
+        .ds-csv-map-col-role { min-width: 140px; max-width: 180px; }
+        .ds-csv-map-col-name { min-width: 110px; max-width: 160px; }
+        .ds-csv-map-col-codelist { min-width: 180px; }
+        .ds-csv-map-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .ds-csv-map-stack .text-caption {
+            line-height: 1.2;
+            margin-top: 0 !important;
+        }
+        .ds-csv-sample-cell {
+            min-width: 100px;
+            max-width: 220px;
+            word-break: break-word;
+        }
+        .ds-csv-global-codelist-pick {
+            gap: 2px;
+            min-width: 0;
+        }
+        .ds-csv-global-codelist-field {
+            flex: 1 1 auto;
+            min-width: 0;
+            cursor: pointer;
+        }
+        .ds-csv-global-codelist-field input {
+            cursor: pointer;
+        }
+        .ds-csv-codelist-pick-table tbody tr {
+            cursor: pointer;
+        }
+        .ds-csv-codelist-pick-table tbody tr:hover {
+            background: #f5f5f5;
+        }
+        .ds-csv-codelist-pick-table tbody tr.ds-csv-codelist-pick-row--selected {
+            background: #e3f2fd;
+        }
+        .ds-csv-codelist-pick-table th,
+        .ds-csv-codelist-pick-table td {
+            font-size: 0.8125rem !important;
+        }
+        .ds-csv-codelist-picker-search {
+            overflow: visible;
+            flex-shrink: 0;
+        }
+        .ds-csv-codelist-picker-search .v-input {
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+        }
+        .ds-csv-codelist-picker-count {
+            margin-bottom: 12px;
+        }
+        .ds-csv-codelist-picker-card {
+            display: flex;
+            flex-direction: column;
+            max-height: 85vh;
+        }
+        .ds-csv-codelist-picker-body {
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow: hidden;
+            padding: 20px;
+        }
+        .ds-csv-codelist-picker-table-area {
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 auto;
+            min-height: 0;
+        }
+        .ds-csv-codelist-picker-table-wrap {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
+            overflow-x: auto;
+            border-radius: 4px;
+            background: #fff;
+        }
+        .ds-csv-codelist-picker-table-wrap .ds-csv-codelist-pick-table.v-data-table {
+            box-shadow: none !important;
+        }
+        .ds-csv-codelist-picker-table-wrap .v-data-table__wrapper {
+            overflow: visible !important;
+        }
+        .ds-csv-codelist-picker-table-wrap .ds-csv-codelist-pick-table thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: #fafafa;
+        }
+        .ds-csv-bootstrap .ds-csv-map-control.v-input,
+        .ds-csv-bootstrap .ds-csv-step-control.v-input {
+            margin-top: 0 !important;
+            margin-bottom: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            font-size: 0.75rem;
+        }
+        .ds-csv-bootstrap .ds-csv-map-control.v-text-field--outlined:not(.v-textarea) .v-input__control,
+        .ds-csv-bootstrap .ds-csv-map-control.v-select--outlined .v-input__control,
+        .ds-csv-bootstrap .ds-csv-map-control.v-autocomplete--outlined .v-input__control,
+        .ds-csv-bootstrap .ds-csv-step-control.v-text-field--outlined:not(.v-textarea) .v-input__control,
+        .ds-csv-bootstrap .ds-csv-step-control.v-select--outlined .v-input__control {
+            min-height: 26px !important;
+            height: 26px !important;
+        }
+        .ds-csv-bootstrap .ds-csv-map-control:not(.v-textarea) .v-input__slot,
+        .ds-csv-bootstrap .ds-csv-step-control:not(.v-textarea) .v-input__slot {
+            min-height: 26px !important;
+            height: 26px !important;
+            font-size: 0.75rem;
+        }
+        .ds-csv-bootstrap .ds-csv-map-control.v-text-field--outlined:not(.v-textarea) .v-input__slot,
+        .ds-csv-bootstrap .ds-csv-map-control.v-select--outlined .v-input__slot,
+        .ds-csv-bootstrap .ds-csv-map-control.v-autocomplete--outlined .v-input__slot,
+        .ds-csv-bootstrap .ds-csv-step-control.v-text-field--outlined:not(.v-textarea) .v-input__slot,
+        .ds-csv-bootstrap .ds-csv-step-control.v-select--outlined .v-input__slot {
+            min-height: 26px !important;
+            height: 26px !important;
+            padding: 0 4px 0 6px !important;
+        }
+        .ds-csv-bootstrap .ds-csv-map-control.v-select--outlined .v-input__slot,
+        .ds-csv-bootstrap .ds-csv-map-control.v-autocomplete--outlined .v-input__slot,
+        .ds-csv-bootstrap .ds-csv-step-control.v-select--outlined .v-input__slot {
+            padding: 0 2px 0 6px !important;
+        }
+        .ds-csv-bootstrap .ds-csv-map-control input,
+        .ds-csv-bootstrap .ds-csv-map-control .v-select__selection,
+        .ds-csv-bootstrap .ds-csv-map-control .v-select__selection--comma,
+        .ds-csv-bootstrap .ds-csv-step-control input,
+        .ds-csv-bootstrap .ds-csv-step-control .v-select__selection {
+            font-size: 0.75rem;
+            line-height: 1.2;
+        }
+        .ds-csv-bootstrap .ds-csv-map-control.v-select .v-select__selections,
+        .ds-csv-bootstrap .ds-csv-map-control.v-autocomplete .v-select__selections,
+        .ds-csv-bootstrap .ds-csv-step-control.v-select .v-select__selections {
+            min-height: 26px !important;
+            max-height: 26px !important;
+            height: 26px !important;
+            padding: 0 !important;
+            align-items: center;
+        }
+        .ds-csv-bootstrap .ds-csv-map-control.v-select .v-select__selection,
+        .ds-csv-bootstrap .ds-csv-map-control.v-select .v-select__selection--comma,
+        .ds-csv-bootstrap .ds-csv-step-control.v-select .v-select__selection {
+            line-height: 26px !important;
+            max-height: 26px !important;
+            margin: 0 !important;
+        }
+        .ds-csv-bootstrap .ds-csv-map-control .v-input__append-inner,
+        .ds-csv-bootstrap .ds-csv-map-control .v-input__prepend-inner,
+        .ds-csv-bootstrap .ds-csv-step-control .v-input__append-inner {
+            margin-top: 0 !important;
+            padding-top: 0 !important;
+            align-self: center;
+        }
+        .ds-csv-bootstrap .ds-csv-map-control .v-input__append-inner .v-icon,
+        .ds-csv-bootstrap .ds-csv-step-control .v-input__append-inner .v-icon {
+            font-size: 16px !important;
+        }
+        .ds-csv-bootstrap .ds-csv-map-control fieldset,
+        .ds-csv-bootstrap .ds-csv-step-control fieldset {
+            top: 0 !important;
+        }
+        .ds-csv-bootstrap .ds-csv-map-control .v-label,
+        .ds-csv-bootstrap .ds-csv-step-control .v-label {
+            font-size: 0.75rem;
+        }
+        .ds-csv-bootstrap .ds-csv-step-control.v-file-input .v-input__control,
+        .ds-csv-bootstrap .ds-csv-step-control.v-file-input:not(.v-textarea) .v-input__slot {
+            min-height: 36px !important;
+            height: auto !important;
+        }
+        .ds-csv-payload-preview {
+            font-size: 0.7rem;
+            line-height: 1.35;
+            max-height: 240px;
+            overflow: auto;
+            background: #f5f5f5;
+            padding: 12px;
+            border-radius: 4px;
+            margin: 0;
         }
     </style>
 </head>
@@ -301,6 +571,7 @@
             echo $this->load->view('metadata_editor/vue-data-structure-validation-panel-component.js', null, true);
             echo $this->load->view('metadata_editor/vue-data-structure-view-component.js', null, true);
             echo $this->load->view('metadata_editor/vue-data-structure-edit-component.js', null, true);
+            echo $this->load->view('metadata_editor/vue-data-structure-csv-bootstrap-component.js', null, true);
             echo $this->load->view('editor_common/global-site-header-component.js', null, true);
             echo $this->load->view('editor_common/main-navigation-tabs-component.js', null, true);
         ?>
@@ -314,11 +585,16 @@
             template: '<div><data-structure-projects :id="$route.params.id"></data-structure-projects></div>',
             props: true
         };
+        const DataStructureCsvBootstrap = {
+            template: '<div><data-structure-csv-bootstrap :id="$route.params.id"></data-structure-csv-bootstrap></div>',
+            props: true
+        };
         const routes = [
             { path: '/', component: DataStructuresList, name: 'ds-list' },
             { path: '/view/:id', component: DataStructureView, name: 'ds-view', props: true },
             { path: '/projects/:id', component: DataStructureProjects, name: 'ds-projects', props: true },
             { path: '/edit', component: DataStructureEdit, name: 'ds-create', props: { id: null } },
+            { path: '/edit/:id/bootstrap-csv', component: DataStructureCsvBootstrap, name: 'ds-bootstrap-csv', props: true },
             { path: '/edit/:id', component: DataStructureEdit, name: 'ds-edit', props: true }
         ];
         const router = new VueRouter({ routes });

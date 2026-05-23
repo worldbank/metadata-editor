@@ -373,6 +373,55 @@ class Data_structures extends MY_REST_Controller {
     }
 
     /**
+     * POST /api/data_structures/import_components_csv/{id}
+     *
+     * Multipart: file + payload (JSON string), or JSON body with upload_id + payload fields.
+     * payload: { delimiter, dry_run?, overwrite?, components: [...] }
+     */
+    public function import_components_csv_post($id = null)
+    {
+        try {
+            $this->registry_require_or_die($this->registry_resource, 'edit');
+            if (!$id) {
+                throw new Exception('Data structure id is required');
+            }
+            $structure_id = (int) $id;
+            if ($structure_id <= 0) {
+                throw new Exception('Data structure id is required');
+            }
+
+            $read = $this->_import_components_csv_read_request();
+            $payload = $read['payload'];
+            $dry_run = !empty($payload['dry_run']);
+            $overwrite = !empty($payload['overwrite']);
+            $userId = $this->get_api_user_id();
+
+            $this->load->library('Data_structure_csv_import');
+            if (Data_structure_csv_import::payload_mutates_codelists($payload, $overwrite)) {
+                $this->registry_require_or_die('codelist', 'import');
+            }
+
+            $summary = $this->data_structure_csv_import->import_from_csv(
+                $structure_id,
+                $read['csv_path'],
+                $payload,
+                array(
+                    'dry_run' => $dry_run,
+                    'overwrite' => $overwrite,
+                    'user_id' => $userId ? (int) $userId : null,
+                )
+            );
+
+            $this->set_response(array(
+                'status' => 'success',
+                'summary' => $summary,
+            ), REST_Controller::HTTP_OK);
+        } catch (Exception $e) {
+            $this->set_response(array('status' => 'failed', 'message' => $e->getMessage()), REST_Controller::HTTP_BAD_REQUEST);
+        }
+    }
+
+    /**
      * GET /api/data_structures/export/{id_or_idno}
      */
     public function export_get($segment = null)
@@ -645,6 +694,67 @@ class Data_structures extends MY_REST_Controller {
             return $this->Data_structure_model->get_structure_by_id((int) $key, false);
         }
         return $this->Data_structure_model->get_structure_by_idno($key);
+    }
+
+    /**
+     * @return array{ csv_path: string, payload: array }
+     * @throws Exception
+     */
+    private function _import_components_csv_read_request()
+    {
+        $payload = null;
+        $payload_raw = $this->input->post('payload');
+        if (is_string($payload_raw) && trim($payload_raw) !== '') {
+            $decoded = json_decode($payload_raw, true);
+            if (!is_array($decoded)) {
+                throw new Exception('Invalid payload JSON.');
+            }
+            $payload = $decoded;
+        } else {
+            $raw = $this->input->raw_input_stream;
+            if ($raw !== null && trim($raw) !== '') {
+                $decoded = json_decode($raw, true);
+                if (is_array($decoded)) {
+                    $payload = $decoded;
+                }
+            }
+            if ($payload === null) {
+                $payload = (array) $this->raw_json_input();
+            }
+        }
+        if (empty($payload) || !is_array($payload)) {
+            throw new Exception('Request payload is required.');
+        }
+        if (empty($payload['components']) || !is_array($payload['components'])) {
+            throw new Exception('payload.components is required.');
+        }
+
+        $csv_path = null;
+        if (!empty($_FILES['file']['tmp_name']) && is_uploaded_file($_FILES['file']['tmp_name'])) {
+            $csv_path = $_FILES['file']['tmp_name'];
+        }
+
+        $upload_id = isset($payload['upload_id']) ? trim((string) $payload['upload_id']) : '';
+        if ($upload_id !== '') {
+            if ($csv_path !== null) {
+                throw new Exception('Provide either a file upload or upload_id, not both.');
+            }
+            $this->load->library('Resumable_upload', null, 'resumable_upload');
+            $upload = $this->resumable_upload->get_completed_upload($upload_id);
+            if (!$upload || empty($upload['file_path'])) {
+                throw new Exception('Completed upload not found for upload_id.');
+            }
+            $csv_path = $upload['file_path'];
+        }
+
+        if ($csv_path === null || $csv_path === '') {
+            throw new Exception('CSV file is required (multipart file or completed upload_id).');
+        }
+
+        return array(
+            'csv_path' => $csv_path,
+            'payload' => $payload,
+        );
     }
 
     /**

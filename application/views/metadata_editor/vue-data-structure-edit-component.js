@@ -37,7 +37,16 @@ Vue.component('data-structure-edit', {
             _codelistsPreloaded: false,
             _rowKeyCounter: 0,
             _codelistSearchSeq: 0,
-            _codelistExplicitClear: false
+            _codelistExplicitClear: false,
+            activeCodelistCodes: [],
+            activeCodelistCodesLoading: false,
+            activeCodelistCodesTotal: 0,
+            activeCodelistCodesPage: 1,
+            activeCodelistCodesPerPage: 25,
+            activeCodelistCodesSearchInput: '',
+            activeCodelistCodesSearch: '',
+            _activeCodelistCodesForId: null,
+            _activeCodelistCodesLoadKey: null
         };
     },
     computed: {
@@ -144,6 +153,52 @@ Vue.component('data-structure-edit', {
             }
             return this.componentRows[this.selectedComponentIndex] || null;
         },
+        activeCodelistId: function () {
+            var row = this.activeComponent;
+            if (!row || !row.codelist_id) {
+                return null;
+            }
+            var id = parseInt(row.codelist_id, 10);
+            return isNaN(id) ? null : id;
+        },
+        activeCodelistMeta: function () {
+            var id = this.activeCodelistId;
+            if (!id) {
+                return null;
+            }
+            return this.codelistCache[id] || null;
+        },
+        activeCodelistPreviewTitle: function () {
+            var row = this.activeComponent;
+            if (row && row.codelist_display) {
+                return row.codelist_display;
+            }
+            if (this.activeCodelistMeta) {
+                return this.codelistItemText(this.activeCodelistMeta);
+            }
+            if (this.activeCodelistId) {
+                return 'Codelist #' + this.activeCodelistId;
+            }
+            return '';
+        },
+        activeCodelistCodesOffset: function () {
+            return (this.activeCodelistCodesPage - 1) * this.activeCodelistCodesPerPage;
+        },
+        activeCodelistCodeHeaders: function () {
+            return [
+                { text: 'Code', value: 'code', sortable: false, width: '140px' },
+                { text: 'Label', value: 'label', sortable: false }
+            ];
+        },
+        activeCodelistCodeRows: function () {
+            return (this.activeCodelistCodes || []).map(function (c, idx) {
+                return {
+                    id: c.id != null ? String(c.id) : String((c.code || 'row') + '-' + idx),
+                    code: c.code || '',
+                    label: (c.label && String(c.label).trim()) ? c.label : '—'
+                };
+            });
+        },
         isActiveComponentDirty: function () {
             var row = this.activeComponent;
             return row ? this.isRowChanged(row) : false;
@@ -178,21 +233,26 @@ Vue.component('data-structure-edit', {
             var byId = {};
             (vm.codelistSearchResults || []).forEach(function (cl) {
                 if (cl && cl.id != null) {
-                    byId[cl.id] = cl;
+                    var nid = parseInt(cl.id, 10);
+                    if (!isNaN(nid)) {
+                        byId[nid] = Object.assign({}, cl, { id: nid });
+                    }
                 }
             });
             var active = vm.activeComponent;
             if (active && active.codelist_id) {
-                var cid = active.codelist_id;
-                if (vm.codelistCache[cid]) {
-                    byId[cid] = vm.codelistCache[cid];
-                } else if (!byId[cid]) {
-                    byId[cid] = {
-                        id: cid,
-                        title: active.codelist_display || ('Codelist #' + cid),
-                        agency: active.codelist_agency || '',
-                        name: active.codelist_name || ''
-                    };
+                var cid = parseInt(active.codelist_id, 10);
+                if (!isNaN(cid)) {
+                    if (vm.codelistCache[cid]) {
+                        byId[cid] = vm.codelistCache[cid];
+                    } else if (!byId[cid]) {
+                        byId[cid] = {
+                            id: cid,
+                            title: active.codelist_display || ('Codelist #' + cid),
+                            agency: active.codelist_agency || '',
+                            name: active.codelist_name || ''
+                        };
+                    }
                 }
             }
             return Object.keys(byId).map(function (k) { return byId[k]; });
@@ -222,7 +282,6 @@ Vue.component('data-structure-edit', {
     },
     watch: {
         id: function () { this.bootstrap(); },
-        '$route.params.id': function () { this.bootstrap(); },
         selectedComponentIndex: function () {
             this.ensureActiveCodelistCached();
         }
@@ -429,6 +488,7 @@ Vue.component('data-structure-edit', {
                         vm.selectedComponentIndex = vm.componentRows.length ? vm.componentRows.length - 1 : null;
                     }
                     vm.ensureActiveCodelistCached();
+                    vm.refreshActiveCodelistCodesIfNeeded();
                 })
                 .catch(function (err) {
                     vm.loading = false;
@@ -495,7 +555,11 @@ Vue.component('data-structure-edit', {
             if (!cl || cl.id == null) {
                 return;
             }
-            Vue.set(this.codelistCache, cl.id, cl);
+            var id = parseInt(cl.id, 10);
+            if (isNaN(id)) {
+                return;
+            }
+            Vue.set(this.codelistCache, id, Object.assign({}, cl, { id: id }));
         },
         codelistItemText: function (cl) {
             if (!cl) {
@@ -510,6 +574,9 @@ Vue.component('data-structure-edit', {
         normalizeCodelistId: function (val) {
             if (val == null || val === '') {
                 return null;
+            }
+            if (typeof val === 'object' && val.id != null) {
+                val = val.id;
             }
             var n = parseInt(val, 10);
             return isNaN(n) ? null : n;
@@ -533,19 +600,39 @@ Vue.component('data-structure-edit', {
             }
         },
         onCodelistIdInput: function (val) {
-            var row = this.activeComponent;
+            var vm = this;
+            var row = vm.activeComponent;
             if (!row) {
                 return;
             }
             if (val == null || val === '') {
-                if (this._codelistExplicitClear) {
-                    this.setRowCodelist(row, null);
-                    this._codelistExplicitClear = false;
+                if (vm._codelistExplicitClear) {
+                    vm.setRowCodelist(row, null);
+                    vm._codelistExplicitClear = false;
+                    vm.refreshActiveCodelistCodesIfNeeded();
                 }
                 return;
             }
-            this._codelistExplicitClear = false;
-            this.setRowCodelist(row, this.normalizeCodelistId(val));
+            vm._codelistExplicitClear = false;
+            if (typeof val === 'object' && val.id != null) {
+                vm.cacheCodelist(val);
+            }
+            var id = vm.normalizeCodelistId(val);
+            if (id == null) {
+                return;
+            }
+            if (Number(row.codelist_id) === id) {
+                return;
+            }
+            var list = vm.codelistSearchResults || [];
+            for (var i = 0; i < list.length; i++) {
+                if (parseInt(list[i].id, 10) === id) {
+                    vm.cacheCodelist(list[i]);
+                    break;
+                }
+            }
+            vm.setRowCodelist(row, id);
+            vm.refreshActiveCodelistCodesIfNeeded();
         },
         onCodelistAutocompleteClear: function () {
             this._codelistExplicitClear = true;
@@ -652,7 +739,7 @@ Vue.component('data-structure-edit', {
                     if (res.data && res.data.codelist) {
                         var cl = res.data.codelist;
                         vm.cacheCodelist(cl);
-                        if (vm.activeComponent && vm.activeComponent.codelist_id === id) {
+                        if (vm.activeComponent && Number(vm.activeComponent.codelist_id) === id) {
                             Vue.set(vm.activeComponent, 'codelist_display', cl.title || '');
                             Vue.set(vm.activeComponent, 'codelist_agency', cl.agency || '');
                             Vue.set(vm.activeComponent, 'codelist_name', cl.name || '');
@@ -661,13 +748,121 @@ Vue.component('data-structure-edit', {
                 })
                 .catch(function () { /* ignore */ });
         },
+        clearActiveCodelistCodesView: function () {
+            this.activeCodelistCodes = [];
+            this.activeCodelistCodesTotal = 0;
+            this.activeCodelistCodesPage = 1;
+            this.activeCodelistCodesSearch = '';
+            this.activeCodelistCodesSearchInput = '';
+            this._activeCodelistCodesForId = null;
+            this._activeCodelistCodesLoadKey = null;
+            this.activeCodelistCodesLoading = false;
+        },
+        activeCodelistCodesLoadKey: function () {
+            var cid = this.activeCodelistId;
+            if (!cid) {
+                return '';
+            }
+            return cid + '|' + this.activeCodelistCodesPage + '|' + this.activeCodelistCodesSearch + '|' + this.activeCodelistCodesOffset;
+        },
+        loadActiveCodelistCodes: function () {
+            var vm = this;
+            var cid = vm.activeCodelistId;
+            if (!cid) {
+                vm.clearActiveCodelistCodesView();
+                return;
+            }
+            var loadKey = vm.activeCodelistCodesLoadKey();
+            vm._activeCodelistCodesLoadKey = loadKey;
+            vm.activeCodelistCodesLoading = true;
+            vm._activeCodelistCodesForId = cid;
+            var params = {
+                offset: vm.activeCodelistCodesOffset,
+                limit: vm.activeCodelistCodesPerPage,
+                compact: 1
+            };
+            if (vm.activeCodelistCodesSearch) {
+                params.search = vm.activeCodelistCodesSearch;
+            }
+            axios.get(vm.codelistsApiBase() + '/codes/' + cid, { params: params, timeout: 30000 })
+                .then(function (res) {
+                    if (vm._activeCodelistCodesLoadKey !== loadKey) {
+                        return;
+                    }
+                    vm.activeCodelistCodesLoading = false;
+                    var payload = res && res.data ? res.data : {};
+                    if (payload.status === 'success') {
+                        vm.activeCodelistCodes = Array.isArray(payload.codes) ? payload.codes.slice() : [];
+                        vm.activeCodelistCodesTotal = payload.total != null ? payload.total : vm.activeCodelistCodes.length;
+                    } else {
+                        vm.activeCodelistCodes = [];
+                        vm.activeCodelistCodesTotal = 0;
+                        if (payload.message) {
+                            vm.notifyFail(payload.message);
+                        }
+                    }
+                })
+                .catch(function (err) {
+                    if (vm._activeCodelistCodesLoadKey !== loadKey) {
+                        return;
+                    }
+                    vm.activeCodelistCodesLoading = false;
+                    vm.notifyFail(err);
+                });
+        },
+        refreshActiveCodelistCodesIfNeeded: function () {
+            var vm = this;
+            var cid = vm.activeCodelistId;
+            if (!cid) {
+                vm.clearActiveCodelistCodesView();
+                return;
+            }
+            vm.ensureActiveCodelistCached();
+            if (Number(vm._activeCodelistCodesForId) !== Number(cid)) {
+                vm.activeCodelistCodesPage = 1;
+                vm.activeCodelistCodesSearch = '';
+                vm.activeCodelistCodesSearchInput = '';
+            }
+            var loadKey = vm.activeCodelistCodesLoadKey();
+            if (loadKey === vm._activeCodelistCodesLoadKey && vm.activeCodelistCodes.length > 0 && !vm.activeCodelistCodesLoading) {
+                return;
+            }
+            vm.loadActiveCodelistCodes();
+        },
+        onActiveCodelistCodesSearchSubmit: function () {
+            this.activeCodelistCodesSearch = (this.activeCodelistCodesSearchInput || '').trim();
+            this.activeCodelistCodesPage = 1;
+            this.loadActiveCodelistCodes();
+        },
+        onActiveCodelistCodesSearchClear: function () {
+            this.activeCodelistCodesSearchInput = '';
+            this.activeCodelistCodesSearch = '';
+            this.activeCodelistCodesPage = 1;
+            this.loadActiveCodelistCodes();
+        },
+        prevActiveCodelistCodesPage: function () {
+            if (this.activeCodelistCodesPage > 1) {
+                this.activeCodelistCodesPage--;
+                this.loadActiveCodelistCodes();
+            }
+        },
+        nextActiveCodelistCodesPage: function () {
+            if (this.activeCodelistCodesOffset + this.activeCodelistCodesPerPage < this.activeCodelistCodesTotal) {
+                this.activeCodelistCodesPage++;
+                this.loadActiveCodelistCodes();
+            }
+        },
         selectComponent: function (index) {
+            if (this.selectedComponentIndex === index) {
+                return;
+            }
             this.codelistSearchLoading = false;
             this.codelistSearchQuery = '';
             this._codelistSearchSeq += 1;
             this._codelistExplicitClear = false;
             this.selectedComponentIndex = index;
             this.ensureActiveCodelistCached();
+            this.refreshActiveCodelistCodesIfNeeded();
         },
         listRowClass: function (index) {
             var classes = ['ds-comp-list-item'];
@@ -687,6 +882,16 @@ Vue.component('data-structure-edit', {
             var row = this.emptyComponentRow();
             this.componentRows.push(row);
             this.selectedComponentIndex = this.componentRows.length - 1;
+        },
+        openCsvBootstrap: function () {
+            if (!this.canEditComponents) {
+                this.notifyFail('Save the data structure header first.');
+                return;
+            }
+            if (!this.numericId) {
+                return;
+            }
+            this.$router.push('/edit/' + this.numericId + '/bootstrap-csv');
         },
         confirmRemoveActiveComponent: function () {
             if (this.selectedComponentIndex === null) {
@@ -1213,6 +1418,11 @@ Vue.component('data-structure-edit', {
                     {{ dirtyComponentCount }} unsaved change(s)
                 </span>
                 <v-spacer></v-spacer>
+                <v-btn v-if="canEditComponents" small outlined color="primary" class="mr-1"
+                    :disabled="loading || savingComponents || savingActiveComponent"
+                    @click="openCsvBootstrap">
+                    <v-icon left small>mdi-file-delimited</v-icon> Import components from CSV
+                </v-btn>
                 <v-btn v-if="canEditComponents && isComponentsDirty" text small
                     :disabled="savingComponents || savingActiveComponent || loading"
                     @click="revertComponents">
@@ -1343,7 +1553,7 @@ Vue.component('data-structure-edit', {
                                     </v-col>
                                     <v-col cols="12">
                                         <div class="ds-field-label">Codelist</div>
-                                        <v-autocomplete :value="activeComponent.codelist_id" :items="codelistAutocompleteItems"
+                                        <v-autocomplete :value="activeCodelistId" :items="codelistAutocompleteItems"
                                             item-value="id" :item-text="codelistItemText" dense outlined
                                             hide-details clearable cache-items :disabled="!canEditComponents"
                                             :loading="codelistSearchLoading && codelistSearchQuery.trim().length >= 2"
@@ -1352,6 +1562,63 @@ Vue.component('data-structure-edit', {
                                             @click:clear="onCodelistAutocompleteClear"
                                             @focus="onCodelistAutocompleteFocus"
                                             @update:search-input="onCodelistSearchInput"></v-autocomplete>
+                                        <div v-if="activeCodelistId" class="ds-comp-codelist-preview mt-3">
+                                            <div class="ds-comp-codelist-preview-header d-flex align-center flex-wrap mb-2" style="gap:8px;">
+                                                <div class="text-caption font-weight-medium">
+                                                    {{ activeCodelistPreviewTitle || 'Codelist items' }}
+                                                    <span v-if="activeCodelistCodesTotal" class="grey--text font-weight-regular">({{ activeCodelistCodesTotal }} items)</span>
+                                                </div>
+                                                <v-spacer></v-spacer>
+                                                <v-text-field
+                                                    v-model="activeCodelistCodesSearchInput"
+                                                    dense outlined hide-details clearable
+                                                    prepend-inner-icon="mdi-magnify"
+                                                    append-icon="mdi-arrow-right"
+                                                    placeholder="Search codes"
+                                                    class="ds-comp-codelist-preview-search"
+                                                    @keyup.enter="onActiveCodelistCodesSearchSubmit"
+                                                    @click:append="onActiveCodelistCodesSearchSubmit"
+                                                    @click:clear="onActiveCodelistCodesSearchClear"
+                                                ></v-text-field>
+                                            </div>
+                                            <v-progress-linear v-if="activeCodelistCodesLoading" indeterminate height="2" class="mb-1"></v-progress-linear>
+                                            <div v-if="activeCodelistCodeRows.length || activeCodelistCodesLoading"
+                                                class="elevation-1 ds-comp-codelist-preview-table">
+                                                <table class="ds-comp-codelist-preview-table-grid">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Code</th>
+                                                            <th>Label</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr v-for="row in activeCodelistCodeRows" :key="row.id">
+                                                            <td><code>{{ row.code }}</code></td>
+                                                            <td>{{ row.label }}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div v-else-if="!activeCodelistCodesLoading" class="text-caption grey--text pa-3 text-center">
+                                                {{ activeCodelistCodesSearch ? 'No codes match your search.' : 'No items in this codelist.' }}
+                                            </div>
+                                            <div v-if="activeCodelistCodesTotal > activeCodelistCodesPerPage || activeCodelistCodesPage > 1"
+                                                class="ds-comp-codelist-preview-pager d-flex align-center justify-end pa-2">
+                                                <span class="text-caption grey--text mr-2">
+                                                    {{ activeCodelistCodesOffset + 1 }}–{{ Math.min(activeCodelistCodesOffset + activeCodelistCodesPerPage, activeCodelistCodesTotal) }}
+                                                    of {{ activeCodelistCodesTotal }}
+                                                </span>
+                                                <v-btn icon x-small :disabled="activeCodelistCodesPage <= 1 || activeCodelistCodesLoading"
+                                                    @click="prevActiveCodelistCodesPage">
+                                                    <v-icon small>mdi-chevron-left</v-icon>
+                                                </v-btn>
+                                                <v-btn icon x-small
+                                                    :disabled="activeCodelistCodesOffset + activeCodelistCodesPerPage >= activeCodelistCodesTotal || activeCodelistCodesLoading"
+                                                    @click="nextActiveCodelistCodesPage">
+                                                    <v-icon small>mdi-chevron-right</v-icon>
+                                                </v-btn>
+                                            </div>
+                                        </div>
                                     </v-col>
                                     <v-col cols="12">
                                         <div class="ds-field-label">Description</div>

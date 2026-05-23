@@ -4212,6 +4212,63 @@ paths:
         '400':
           description: Validation failed or bad request
 
+  /data_structures/import_components_csv/{id}:
+    post:
+      tags:
+        - Data Structures
+      summary: Import components from CSV mapping
+      description: >-
+        Add components to an existing draft data structure using a CSV file and column
+        mapping. Multipart form with `file` (CSV) and `payload` (JSON string), or JSON body
+        with `upload_id` (completed resumable upload) plus mapping fields. Payload shape:
+        `{ delimiter, dry_run?, overwrite?, components: [{ name, label, column_type,
+        csv_column, codelist?: { mode: global|from_csv, ... } }] }`. Codelists created from
+        CSV use maintainable id `CL_{component_name}` under the structure agency.
+      operationId: dataStructuresImportComponentsCsv
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file, payload]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                payload:
+                  type: string
+                  description: JSON string with delimiter and components array
+          application/json:
+            schema:
+              type: object
+              required: [components]
+              properties:
+                upload_id:
+                  type: string
+                delimiter:
+                  type: string
+                dry_run:
+                  type: boolean
+                overwrite:
+                  type: boolean
+                components:
+                  type: array
+                  items:
+                    type: object
+                    additionalProperties: true
+      responses:
+        '200':
+          description: Import or dry-run summary
+        '400':
+          description: Validation failed or bad request
+
   /data_structures/import_sdmx:
     post:
       tags:
