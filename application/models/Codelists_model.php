@@ -2558,11 +2558,11 @@ class Codelists_model extends CI_Model {
         foreach ($this->get_codelist_translations((int) $codelist_pk) as $tr) {
             $lang = trim((string) (isset($tr['language']) ? $tr['language'] : ''));
             if ($lang !== '') {
-                $enabled_langs[$lang] = true;
+                $enabled_langs[strtolower($lang)] = $lang;
             }
         }
         if (empty($enabled_langs)) {
-            $enabled_langs['en'] = true;
+            $enabled_langs['en'] = 'en';
         }
 
         $build = $this->_csv_rows_to_import_items($parse['rows'], $enabled_langs, $errors, $warnings);
@@ -2741,7 +2741,7 @@ class Codelists_model extends CI_Model {
 
     /**
      * @param array $csv_rows
-     * @param array $enabled_langs map lang => true
+     * @param array $enabled_langs map lowercase lang => canonical lang
      * @param array $errors
      * @param array $warnings
      * @return array{ items: array }
@@ -2750,7 +2750,7 @@ class Codelists_model extends CI_Model {
     {
         $sole_lang = null;
         if (count($enabled_langs) === 1) {
-            $sole_lang = (string) key($enabled_langs);
+            $sole_lang = (string) reset($enabled_langs);
         }
         $items_by_code = array();
         $seen_lang = array();
@@ -2758,24 +2758,26 @@ class Codelists_model extends CI_Model {
         foreach ($csv_rows as $idx => $row) {
             $line = $idx + 1;
             $code = $row['code'];
-            $lang = $row['language'];
-            if ($lang === '' && $sole_lang !== null) {
-                $lang = $sole_lang;
+            $lang_input = $row['language'];
+            if ($lang_input === '' && $sole_lang !== null) {
+                $lang_input = $sole_lang;
             }
-            if ($lang === '') {
+            if ($lang_input === '') {
                 $errors[] = 'Row for code "' . $code . '": language is required (or configure a single codelist language)';
                 continue;
             }
-            if (!isset($enabled_langs[$lang])) {
-                $errors[] = 'Row for code "' . $code . '": language "' . $lang . '" is not configured for this codelist';
+            $lang_key = strtolower($lang_input);
+            if (!isset($enabled_langs[$lang_key])) {
+                $errors[] = 'Row for code "' . $code . '": language "' . $lang_input . '" is not configured for this codelist';
                 continue;
             }
-            $lang_key = $code . "\0" . $lang;
-            if (isset($seen_lang[$lang_key])) {
-                $errors[] = 'Duplicate language "' . $lang . '" for code "' . $code . '"';
+            $lang = $enabled_langs[$lang_key];
+            $dup_key = $code . "\0" . $lang_key;
+            if (isset($seen_lang[$dup_key])) {
+                $errors[] = 'Duplicate language "' . $lang_input . '" for code "' . $code . '"';
                 continue;
             }
-            $seen_lang[$lang_key] = true;
+            $seen_lang[$dup_key] = true;
 
             $lab = $row['label'];
             if ($lab === '') {
