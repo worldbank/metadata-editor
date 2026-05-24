@@ -1116,6 +1116,41 @@ class Editor_publish_model extends ci_model {
 		);
 	}
 
+	/**
+	 * Cancel an in-progress NADA resumable upload and release ME server-side source file.
+	 *
+	 * @param int $user_id
+	 * @param int $catalog_connection_id
+	 * @param int|string $project_id
+	 * @param string $upload_id
+	 * @param string|null $server_file_key
+	 * @return array
+	 */
+	public function nada_upload_cancel($user_id, $catalog_connection_id, $project_id, $upload_id, $server_file_key = null)
+	{
+		$upload_id = trim((string) $upload_id);
+		if ($upload_id === '') {
+			throw new Exception('upload_id is required');
+		}
+
+		$client = $this->get_nada_catalog_client($user_id, $catalog_connection_id);
+
+		try {
+			$client->delete_resumable_upload($upload_id);
+		} catch (Exception $e) {
+			// Best-effort: upload may already be completed or removed.
+		}
+
+		if ($server_file_key !== null && trim((string) $server_file_key) !== '') {
+			$this->release_nada_upload_server_file($project_id, $server_file_key);
+		}
+
+		return array(
+			'status' => 'success',
+			'upload_id' => $upload_id,
+		);
+	}
+
 	private function get_study_info_from_nada($study_idno, $conn_info)
 	{
 		$base_url = rtrim($conn_info['url'], '/');

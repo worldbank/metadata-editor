@@ -417,6 +417,35 @@ class Nada_catalog_client {
 	}
 
 	/**
+	 * DELETE /api/uploads/{upload_id}
+	 *
+	 * @param string $uploadId
+	 * @return array
+	 */
+	public function delete_resumable_upload($uploadId)
+	{
+		$uploadId = trim((string) $uploadId);
+		if ($uploadId === '') {
+			throw new Exception('upload_id is required');
+		}
+
+		$url = $this->api_url('uploads/' . rawurlencode($uploadId));
+		$client = new Client(array(
+			'timeout' => $this->timeout,
+			'headers' => array('x-api-key' => $this->api_key),
+		));
+
+		try {
+			$response = $client->request('DELETE', $url);
+			return $this->decode_json_response((string) $response->getBody(), $url);
+		} catch (ClientException $e) {
+			throw $this->client_exception($e, $url);
+		} catch (RequestException $e) {
+			throw new Exception('NADA request failed: ' . $e->getMessage());
+		}
+	}
+
+	/**
 	 * Delete all external resource metadata rows for a study on NADA.
 	 *
 	 * @param string $studyIdno

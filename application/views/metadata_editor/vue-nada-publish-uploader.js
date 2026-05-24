@@ -5,6 +5,11 @@
 (function (global) {
     'use strict';
 
+    function UploadCancelledError(message) {
+        this.name = 'UploadCancelledError';
+        this.message = message || 'Upload cancelled';
+    }
+
     function delay(ms) {
         return new Promise(function (resolve) {
             setTimeout(resolve, ms);
@@ -38,6 +43,33 @@
         });
     }
 
+    function cancelNadaUpload(ctx) {
+        if (!ctx || !ctx.uploadId) {
+            return Promise.resolve();
+        }
+        return axios.post(
+            CI.site_url + '/api/publish/nada_upload_cancel/'
+                + encodeURIComponent(ctx.catalogConnectionId) + '/'
+                + encodeURIComponent(ctx.uploadId),
+            {
+                project_id: ctx.projectId,
+                server_file_key: ctx.serverFileKey || null
+            }
+        ).catch(function () {
+            // Best-effort cleanup.
+        });
+    }
+
+    function isCancelled(state) {
+        return !!(state && state.cancelled);
+    }
+
+    function throwIfCancelled(state) {
+        if (isCancelled(state)) {
+            throw new UploadCancelledError();
+        }
+    }
+
     /**
      * @param {object} options
      * @param {string|number} options.catalogConnectionId
@@ -45,7 +77,7 @@
      * @param {string} options.source indicator_data|external_resource
      * @param {string|number} [options.resourceId] Required for external_resource
      * @param {function({progress:number,uploaded_chunks:number,total_chunks:number,status:string})} [options.onProgress]
-     * @returns {Promise<{upload_id:string}>}
+     * @returns {{promise: Promise<{upload_id:string,server_file_key:?string}>, cancel: function(): Promise<void>}}
      */
     function uploadServerSourceToNada(options) {
         options = options || {};
@@ -57,16 +89,42 @@
         var retryDelay = options.retryDelay != null ? options.retryDelay : 1000;
 
         if (!catalogConnectionId) {
-            return Promise.reject(new Error('catalogConnectionId is required'));
+            return {
+                promise: Promise.reject(new Error('catalogConnectionId is required')),
+                cancel: function () { return Promise.resolve(); }
+            };
         }
         if (!projectId) {
-            return Promise.reject(new Error('projectId is required'));
+            return {
+                promise: Promise.reject(new Error('projectId is required')),
+                cancel: function () { return Promise.resolve(); }
+            };
         }
         if (!source) {
-            return Promise.reject(new Error('source is required'));
+            return {
+                promise: Promise.reject(new Error('source is required')),
+                cancel: function () { return Promise.resolve(); }
+            };
         }
         if (source === 'external_resource' && (resourceId === undefined || resourceId === null || resourceId === '')) {
-            return Promise.reject(new Error('resourceId is required for external_resource uploads'));
+            return {
+                promise: Promise.reject(new Error('resourceId is required for external_resource uploads')),
+                cancel: function () { return Promise.resolve(); }
+            };
+        }
+
+        var state = {
+            cancelled: false,
+            ctx: null,
+            abortController: typeof AbortController !== 'undefined' ? new AbortController() : null
+        };
+
+        function cancel() {
+            state.cancelled = true;
+            if (state.abortController) {
+                state.abortController.abort();
+            }
+            return cancelNadaUpload(state.ctx);
         }
 
         var initPayload = {
@@ -77,13 +135,17 @@
             initPayload.resource_id = resourceId;
         }
 
-        return axios
+        var promise = axios
             .post(
                 CI.site_url + '/api/publish/nada_upload_init/' + encodeURIComponent(catalogConnectionId),
                 initPayload,
-                { timeout: 600000 }
+                {
+                    timeout: 600000,
+                    signal: state.abortController ? state.abortController.signal : undefined
+                }
             )
             .then(function (response) {
+                throwIfCancelled(state);
                 var data = response.data || {};
                 if (data.status !== 'success' || !data.upload_id) {
                     throw new Error((data.message) ? data.message : 'Failed to initialize NADA upload');
@@ -100,6 +162,9 @@
                 };
             })
             .then(function (ctx) {
+                state.ctx = ctx;
+                throwIfCancelled(state);
+
                 var chunkBaseUrl = CI.site_url + '/api/publish/nada_upload_chunk/'
                     + encodeURIComponent(ctx.catalogConnectionId) + '/'
                     + encodeURIComponent(ctx.uploadId);
@@ -116,9 +181,11 @@
                 }
 
                 function uploadOneChunk(chunkNumber) {
+                    throwIfCancelled(state);
                     var queryParams = buildChunkQueryParams(ctx);
 
                     function attempt(retryIndex) {
+                        throwIfCancelled(state);
                         return axios.post(chunkBaseUrl, new Uint8Array(0), {
                             params: queryParams,
                             headers: {
@@ -126,8 +193,10 @@
                                 'X-Upload-Chunk-Number': chunkNumber,
                                 'X-Upload-Chunk-Size': ctx.chunkSize
                             },
-                            timeout: 120000
+                            timeout: 120000,
+                            signal: state.abortController ? state.abortController.signal : undefined
                         }).then(function (response) {
+                            throwIfCancelled(state);
                             var data = response.data || {};
                             if (data.status !== 'success') {
                                 throw new Error((data.message) ? data.message : 'NADA chunk upload failed');
@@ -142,6 +211,9 @@
                             });
                             return data;
                         }).catch(function (error) {
+                            if (isCancelled(state) || error.name === 'UploadCancelledError' || error.code === 'ERR_CANCELED') {
+                                throw new UploadCancelledError();
+                            }
                             if (retryIndex >= maxRetries) {
                                 var msg = (error.response && error.response.data && error.response.data.message)
                                     || error.message
@@ -167,12 +239,18 @@
                 }
 
                 return chain.then(function () {
+                    throwIfCancelled(state);
                     return axios.get(
                         CI.site_url + '/api/publish/nada_upload_status/'
                             + encodeURIComponent(ctx.catalogConnectionId) + '/'
                             + encodeURIComponent(ctx.uploadId),
-                        { params: { project_id: ctx.projectId }, timeout: 120000 }
+                        {
+                            params: { project_id: ctx.projectId },
+                            timeout: 120000,
+                            signal: state.abortController ? state.abortController.signal : undefined
+                        }
                     ).then(function (response) {
+                        throwIfCancelled(state);
                         var data = response.data || {};
                         if (data.status !== 'success') {
                             throw new Error((data.message) ? data.message : 'Failed to verify NADA upload status');
@@ -192,12 +270,28 @@
                         };
                     });
                 }).finally(function () {
-                    return releaseServerFile(ctx.projectId, ctx.serverFileKey);
+                    if (!isCancelled(state)) {
+                        return releaseServerFile(ctx.projectId, ctx.serverFileKey);
+                    }
                 });
+            })
+            .catch(function (error) {
+                if (isCancelled(state) || error.name === 'UploadCancelledError' || error.code === 'ERR_CANCELED') {
+                    return cancelNadaUpload(state.ctx).then(function () {
+                        throw new UploadCancelledError();
+                    });
+                }
+                throw error;
             });
+
+        return {
+            promise: promise,
+            cancel: cancel
+        };
     }
 
     global.NadaPublishUploader = {
-        uploadServerSourceToNada: uploadServerSourceToNada
+        uploadServerSourceToNada: uploadServerSourceToNada,
+        UploadCancelledError: UploadCancelledError
     };
 })(typeof window !== 'undefined' ? window : this);

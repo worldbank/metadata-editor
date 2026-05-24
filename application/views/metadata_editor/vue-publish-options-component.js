@@ -77,6 +77,11 @@ Vue.component('publish-options', {
             update_status:'',
             publish_processing_message:'',
             publish_progress_percent:null,
+            publish_upload_detail:null,
+            publish_file_upload_active:false,
+            publish_cancel_requested:false,
+            publish_was_cancelled:false,
+            activeUploadCancel:null,
             is_publishing:false,
             is_publishing_completed:false,
             project_export_status:'',
@@ -192,6 +197,37 @@ Vue.component('publish-options', {
                     ? this.resources_selected.length
                     : 0,
             };
+        },
+        isPublishCancelled: function() {
+            return this.publish_cancel_requested === true;
+        },
+        isUploadCancelledError: function(error) {
+            if (!error) {
+                return false;
+            }
+            if (error.name === 'UploadCancelledError') {
+                return true;
+            }
+            if (typeof NadaPublishUploader !== 'undefined'
+                && NadaPublishUploader.UploadCancelledError
+                && error instanceof NadaPublishUploader.UploadCancelledError) {
+                return true;
+            }
+            return false;
+        },
+        requestPublishCancel: async function() {
+            if (!this.is_publishing || this.publish_cancel_requested) {
+                return;
+            }
+            this.publish_cancel_requested = true;
+            this.publish_processing_message = this.$t('cancelling_publish');
+            if (typeof this.activeUploadCancel === 'function') {
+                try {
+                    await this.activeUploadCancel();
+                } catch (error) {
+                    console.log('upload cancel failed', error);
+                }
+            }
         },
         initPublishResponses: function(){
             this.publish_responses={
@@ -436,6 +472,11 @@ Vue.component('publish-options', {
             this.is_publishing=true;
             this.is_publishing_completed=false;
             this.publish_progress_percent=null;
+            this.publish_upload_detail=null;
+            this.publish_file_upload_active=false;
+            this.publish_cancel_requested=false;
+            this.publish_was_cancelled=false;
+            this.activeUploadCancel=null;
 
             if (!await this.saveUnsavedProjectIfNeeded()) {
                 this.is_publishing=false;
@@ -451,6 +492,10 @@ Vue.component('publish-options', {
                 this.is_publishing_completed=true;
                 return false;
             }
+            if (this.isPublishCancelled()) {
+                this.completePublishRun(true);
+                return false;
+            }
 
             if (this.publish_metadata==true){
                 this.publish_processing_message=this.$t("publishing_project_metadata");
@@ -459,6 +504,10 @@ Vue.component('publish-options', {
                     this.completePublishRun();
                     return false;
                 }
+            }
+            if (this.isPublishCancelled()) {
+                this.completePublishRun(true);
+                return false;
             }
 
             if (this.isIndicatorProject && this.publish_dsd) {
@@ -473,9 +522,24 @@ Vue.component('publish-options', {
                     });
                 }
             }
+            if (this.isPublishCancelled()) {
+                this.completePublishRun(true);
+                return false;
+            }
 
             if (this.isIndicatorProject && this.publish_indicator_data) {
-                await this.publishIndicatorDataStepByStep();
+                try {
+                    await this.publishIndicatorDataStepByStep();
+                } catch (error) {
+                    if (this.isUploadCancelledError(error)) {
+                        this.completePublishRun(true);
+                        return false;
+                    }
+                }
+            }
+            if (this.isPublishCancelled()) {
+                this.completePublishRun(true);
+                return false;
             }
 
             if (this.publish_thumbnail==true){
@@ -488,22 +552,48 @@ Vue.component('publish-options', {
                     this.publish_responses.thumbnail.errors.push(this.normalizePublishError(error));
                 }
             }
+            if (this.isPublishCancelled()) {
+                this.completePublishRun(true);
+                return false;
+            }
 
             if (this.delete_nada_resources_before_publish && this.studyExistsOnNada) {
                 await this.deleteNadaResourcesIfRequested();
             }
+            if (this.isPublishCancelled()) {
+                this.completePublishRun(true);
+                return false;
+            }
 
             if (this.publish_resources==true){
                 this.publish_processing_message=this.$t("publishing_external_resources");
-                await this.publishExternalResoures();
+                try {
+                    await this.publishExternalResoures();
+                } catch (error) {
+                    if (this.isUploadCancelledError(error)) {
+                        this.completePublishRun(true);
+                        return false;
+                    }
+                }
             }
 
             this.completePublishRun();
         },
-        completePublishRun: function() {
-            this.publish_processing_message=this.$t("publish_completed_refreshing");
-            this.loadCatalogInfo();
-            this.publish_processing_message=this.$t("publishing_completed");
+        completePublishRun: function(wasCancelled) {
+            var cancelled = wasCancelled === true || this.publish_cancel_requested === true;
+            this.publish_file_upload_active = false;
+            this.activeUploadCancel = null;
+            this.publish_progress_percent = null;
+            this.publish_upload_detail = null;
+            this.publish_cancel_requested = false;
+            if (cancelled) {
+                this.publish_was_cancelled = true;
+                this.publish_processing_message = this.$t('publish_cancelled');
+            } else {
+                this.publish_processing_message=this.$t("publish_completed_refreshing");
+                this.loadCatalogInfo();
+                this.publish_processing_message=this.$t("publishing_completed");
+            }
             this.is_publishing=false;
             this.is_publishing_completed=true;
         },
@@ -592,22 +682,25 @@ Vue.component('publish-options', {
             let vm=this;
 
             for (const idx of this.resources_selected) {
+                if (vm.isPublishCancelled()) {
+                    break;
+                }
                 vm.publish_processing_message=vm.$t("publishing_external_resource") + ": " + vm.ExternalResources[idx].title;
-                vm.publish_progress_percent=null;
                 try {
                     await vm.publishExternalResourceStepByStep(vm.ExternalResources[idx]);
                     vm.publish_responses.external_resources.messages.push( 
                         vm.ExternalResources[idx].title + ' ' + vm.$t("published_successfully")
                     );
                 } catch (error) {
+                    if (vm.isUploadCancelledError(error)) {
+                        throw error;
+                    }
                     console.error('Request ' + (idx + 1) + ' failed:', error.response || error);
                     var base = vm.normalizePublishError(error);
                     vm.publish_responses.external_resources.errors.push(Object.assign({}, base, {
                         resource_id: vm.ExternalResources[idx].id,
                         resource_title: vm.ExternalResources[idx].title
                     }));
-                } finally {
-                    vm.publish_progress_percent=null;
                 }
             }
         },
@@ -621,6 +714,25 @@ Vue.component('publish-options', {
                 return false;
             }
             return !/^https?:\/\//i.test(filename);
+        },
+        updatePublishUploadProgress: function(progress, uploadLabel) {
+            var percent = Number(progress && progress.progress);
+            if (isNaN(percent) && progress && progress.total_chunks > 0) {
+                percent = Math.round((Number(progress.uploaded_chunks) / Number(progress.total_chunks)) * 100);
+            }
+            if (isNaN(percent)) {
+                percent = 0;
+            }
+            this.publish_progress_percent = percent;
+            if (progress && progress.total_chunks != null) {
+                this.publish_upload_detail = {
+                    uploaded_chunks: progress.uploaded_chunks,
+                    total_chunks: progress.total_chunks
+                };
+            }
+            if (uploadLabel) {
+                this.publish_processing_message = uploadLabel;
+            }
         },
         uploadServerFileToNada: async function(options)
         {
@@ -636,22 +748,38 @@ Vue.component('publish-options', {
                 throw new Error(this.$t('catalog_was_not_found'));
             }
 
+            vm.publish_file_upload_active = true;
             vm.publish_progress_percent = 0;
-            const uploadResult = await NadaPublishUploader.uploadServerSourceToNada({
+            vm.publish_upload_detail = null;
+            if (options.uploadLabel) {
+                vm.publish_processing_message = options.uploadLabel;
+            }
+            const uploadHandle = NadaPublishUploader.uploadServerSourceToNada({
                 catalogConnectionId: nada_catalog.id,
                 projectId: vm.ProjectID,
                 source: options.source,
                 resourceId: options.resourceId,
                 onProgress: function (progress) {
-                    vm.publish_progress_percent = progress.progress;
-                    if (options.onProgressMessage) {
-                        vm.publish_processing_message = options.onProgressMessage(progress);
-                    }
+                    vm.updatePublishUploadProgress(progress, options.uploadLabel);
                 }
             });
+            vm.activeUploadCancel = uploadHandle.cancel;
 
-            vm.publish_progress_percent = 100;
-            return uploadResult;
+            try {
+                const uploadResult = await uploadHandle.promise;
+                vm.publish_progress_percent = 100;
+                if (vm.publish_upload_detail) {
+                    vm.publish_upload_detail.uploaded_chunks = vm.publish_upload_detail.total_chunks;
+                }
+                return uploadResult;
+            } finally {
+                vm.publish_file_upload_active = false;
+                vm.activeUploadCancel = null;
+                if (!vm.isPublishCancelled()) {
+                    vm.publish_progress_percent = null;
+                    vm.publish_upload_detail = null;
+                }
+            }
         },
         publishExternalResourceStepByStep: async function(resource)
         {
@@ -672,16 +800,12 @@ Vue.component('publish-options', {
             let url=CI.site_url + '/api/publish/external_resource/'+this.ProjectID +'/' + nada_catalog.id;
 
             if (this.catalogSupportsResumableUploads && this.resourceHasLocalFile(resource)) {
-                vm.publish_processing_message = vm.$t('uploading_external_resource_to_nada') + ': ' + resource.title;
+                const uploadLabel = vm.$t('uploading_external_resource_to_nada') + ': ' + resource.title;
 
                 const uploadResult = await vm.uploadServerFileToNada({
                     source: 'external_resource',
                     resourceId: resource.id,
-                    onProgressMessage: function(progress) {
-                        return vm.$t('uploading_external_resource_to_nada') + ': ' + resource.title
-                            + ' (' + progress.uploaded_chunks + '/' + progress.total_chunks
-                            + ', ' + progress.progress + '%)';
-                    }
+                    uploadLabel: uploadLabel
                 });
 
                 vm.publish_processing_message = vm.$t('publishing_external_resource') + ': ' + resource.title;
@@ -760,13 +884,10 @@ Vue.component('publish-options', {
             let vm=this;
 
             try {
-                vm.publish_processing_message = vm.$t('uploading_indicator_csv_to_nada');
+                const uploadLabel = vm.$t('uploading_indicator_csv_to_nada');
                 const uploadResult = await vm.uploadServerFileToNada({
                     source: 'indicator_data',
-                    onProgressMessage: function(progress) {
-                        return vm.$t('uploading_indicator_csv_to_nada')
-                            + ' (' + progress.uploaded_chunks + '/' + progress.total_chunks + ', ' + progress.progress + '%)';
-                    }
+                    uploadLabel: uploadLabel
                 });
 
                 vm.publish_processing_message = vm.$t('publishing_indicator_data_to_nada');
@@ -775,6 +896,9 @@ Vue.component('publish-options', {
                     nada_upload_id: uploadResult.upload_id
                 });
             } catch (error) {
+                if (vm.isUploadCancelledError(error)) {
+                    throw error;
+                }
                 console.log('indicator data step-by-step publish failed', error);
                 if (vm.publish_responses.indicator_data.errors.length === 0) {
                     var normalized = vm.normalizePublishError(error);
@@ -982,7 +1106,10 @@ Vue.component('publish-options', {
             deep: true
         }
     },
-    computed: {        
+    computed: {
+        showPublishUploadProgress(){
+            return this.publish_file_upload_active || this.publish_progress_percent != null;
+        },
         ProjectID(){
             return this.$store.state.project_id;
         },
@@ -1467,7 +1594,7 @@ Vue.component('publish-options', {
 
 
                 <!-- dialog -->
-                <v-dialog v-model="dialog_process" width="700" height="300" persistent>
+                <v-dialog v-model="dialog_process" width="700" persistent scrollable>
                     <v-card>
                         <v-card-title class="text-h5 grey lighten-2">
                             <div class="text-h5">{{$t('publish_project')}}</div>
@@ -1480,26 +1607,34 @@ Vue.component('publish-options', {
                             <div v-if="is_publishing">
                                 <div class="border p-3 mt-5 mb-5">
                                     <div><strong>{{ $t('publish_update_status') }}</strong></div>
-                                    <template>
-                                        <div>{{publish_processing_message}}<span v-if="publish_progress_percent == null">...</span></div>
+                                    <div class="mt-2">{{publish_processing_message}}<span v-if="!showPublishUploadProgress">...</span></div>
+                                    <template v-if="showPublishUploadProgress">
                                         <v-progress-linear
-                                        v-if="publish_progress_percent != null"
-                                        :value="publish_progress_percent"
-                                        color="blue"
-                                        height="8"
-                                        class="mt-2"
-                                        ></v-progress-linear>
-                                        <v-progress-linear
-                                        v-else
-                                        indeterminate
-                                        color="blue"
-                                        ></v-progress-linear>
+                                            class="mt-3 rounded"
+                                            color="primary"
+                                            height="12"
+                                            :indeterminate="publish_progress_percent == null"
+                                            :value="publish_progress_percent != null ? publish_progress_percent : 0"
+                                        >
+                                            <template v-if="publish_progress_percent != null" v-slot:default="{ value }">
+                                                <strong class="text-caption">{{ Math.ceil(value) }}%</strong>
+                                            </template>
+                                        </v-progress-linear>
+                                        <div
+                                            v-if="publish_upload_detail && publish_upload_detail.total_chunks"
+                                            class="text-caption text-center grey--text text--darken-1 mt-1"
+                                        >
+                                            {{ publish_upload_detail.uploaded_chunks }} / {{ publish_upload_detail.total_chunks }}
+                                        </div>
                                     </template>
                                 </div>                        
                             </div>
                             <!-- end show-status --> 
                             
                             <div v-if="is_publishing_completed" class="p-2">
+                                <div v-if="publish_was_cancelled" class="alert alert-warning mb-3">
+                                    {{ $t('publish_cancelled') }}
+                                </div>
                                 <div v-if="publish_responses.export.length>0" class="mb-3">
                                     <strong>{{ $t('publish_export_step') }}</strong>
                                     <div class="border rounded p-2 mb-2 mt-2 text-left text-danger" v-for="(msg, export_index) in publish_responses.export" :key="'pub-export-err-' + export_index">
@@ -1621,6 +1756,9 @@ Vue.component('publish-options', {
 
                         <v-card-actions>
                         <v-spacer></v-spacer>
+                        <v-btn color="error" text @click="requestPublishCancel()" v-if="is_publishing">
+                        {{$t('cancel')}}
+                        </v-btn>
                         <v-btn color="primary" text @click="dialog_process=false" v-if="is_publishing==false">
                         {{$t('close')}}
                         </v-btn>

@@ -588,6 +588,54 @@ class Publish extends MY_REST_Controller
 	}
 
 	/**
+	 * POST /api/publish/nada_upload_cancel/{catalog_connection_id}/{upload_id}
+	 */
+	function nada_upload_cancel_post($catalog_connection_id = null, $upload_id = null)
+	{
+		try {
+			$user_id = $this->get_api_user_id();
+			if (!$user_id) {
+				throw new Exception('User-login-required');
+			}
+
+			$input = $this->raw_json_input();
+			if (!is_array($input)) {
+				$input = array();
+			}
+			if (empty($input['project_id'])) {
+				throw new Exception('project_id is required');
+			}
+			if ($upload_id === null || trim((string) $upload_id) === '') {
+				throw new Exception('upload_id is required');
+			}
+
+			$this->editor_acl->user_has_project_access($input['project_id'], $permission = 'view');
+
+			$server_file_key = isset($input['server_file_key']) ? $input['server_file_key'] : null;
+			$response = $this->Editor_publish_model->nada_upload_cancel(
+				$user_id,
+				$catalog_connection_id,
+				$input['project_id'],
+				$upload_id,
+				$server_file_key
+			);
+
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		} catch (ApiRequestException $e) {
+			$this->set_response(array(
+				'status' => 'failed',
+				'message' => $e->getMessage(),
+				'response' => $e->getDetails(),
+			), REST_Controller::HTTP_BAD_REQUEST);
+		} catch (Exception $e) {
+			$this->set_response(array(
+				'status' => 'failed',
+				'message' => $e->getMessage(),
+			), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
 	 * Release a temporary server-side upload file registration.
 	 * POST /api/publish/nada_upload_release
 	 */
