@@ -2930,6 +2930,167 @@ paths:
           description: Bad request — user not logged in, missing parameters, or project not found
       security:
         - ApiKeyAuth: []
+  "/publish/indicator/{sid}/{catalog_connection_id}":
+    post:
+      tags:
+        - Publish projects
+      summary: Publish indicator DSD and/or data to NADA
+      description: >
+        For indicator/timeseries projects only. Optionally publishes the bound data structure
+        definition (DSD) via NADA `POST .../api/admin/data_structures/import_json`, and/or
+        exports published DuckDB timeseries rows to CSV, resumable-uploads to NADA, and imports
+        observations via `POST .../api/admin/timeseries/data/{study_idno}/import` (or `.../data/import`) with `upload_id`.
+        DSD publish skips when the structure already exists on NADA unless `dsd_overwrite` is true.
+        Indicator data always replaces existing observations for the study on NADA.
+      operationId: publishIndicatorExtrasToNada
+      parameters:
+        - in: path
+          name: sid
+          description: Project ID (internal Metadata Editor project id)
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: catalog_connection_id
+          description: Catalog connection ID
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IndicatorPublishOptions"
+      responses:
+        "200":
+          description: DSD and/or data publish result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IndicatorPublishResponse"
+        "400":
+          description: Bad request — not an indicator project, missing binding, or NADA error
+      security:
+        - ApiKeyAuth: []
+  "/publish/nada_upload_limits/{catalog_connection_id}":
+    get:
+      tags:
+        - Publish projects
+      summary: NADA resumable upload limits (proxy)
+      operationId: getNadaUploadLimitsForPublish
+      parameters:
+        - in: path
+          name: catalog_connection_id
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: project_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Chunk size limits from target NADA catalog
+      security:
+        - ApiKeyAuth: []
+  "/publish/nada_upload_init/{catalog_connection_id}":
+    post:
+      tags:
+        - Publish projects
+      summary: Initialize NADA resumable upload (proxy)
+      operationId: initNadaUploadForPublish
+      parameters:
+        - in: path
+          name: catalog_connection_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [project_id, filename, total_size, total_chunks, chunk_size]
+              properties:
+                project_id:
+                  type: string
+                filename:
+                  type: string
+                total_size:
+                  type: integer
+                total_chunks:
+                  type: integer
+                chunk_size:
+                  type: integer
+      responses:
+        "200":
+          description: NADA upload_id for subsequent chunk posts
+      security:
+        - ApiKeyAuth: []
+  "/publish/nada_upload_chunk/{catalog_connection_id}/{upload_id}":
+    post:
+      tags:
+        - Publish projects
+      summary: Upload one chunk to NADA (proxy)
+      operationId: uploadNadaChunkForPublish
+      parameters:
+        - in: path
+          name: catalog_connection_id
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: upload_id
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: project_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      responses:
+        "200":
+          description: Chunk accepted
+      security:
+        - ApiKeyAuth: []
+  "/publish/nada_upload_status/{catalog_connection_id}/{upload_id}":
+    get:
+      tags:
+        - Publish projects
+      summary: NADA resumable upload status (proxy)
+      operationId: getNadaUploadStatusForPublish
+      parameters:
+        - in: path
+          name: catalog_connection_id
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: upload_id
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: project_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Upload status from NADA
+      security:
+        - ApiKeyAuth: []
   "/publish/{sid}/{catalog_connection_id}":
     post:
       tags:
@@ -5677,6 +5838,58 @@ components:
           items:
             type: object
             additionalProperties: true
+        indicator_publish:
+          $ref: "#/components/schemas/IndicatorPublishPrefetch"
+    IndicatorPublishPrefetch:
+      type: object
+      description: >
+        Prefetched indicator DSD/data status for the publish UI (indicator/timeseries projects only).
+      properties:
+        local:
+          type: object
+          additionalProperties: true
+        nada_dsd:
+          type: object
+          nullable: true
+          additionalProperties: true
+        nada_data:
+          type: object
+          nullable: true
+          additionalProperties: true
+        prefetch_error:
+          type: string
+          nullable: true
+    IndicatorPublishOptions:
+      type: object
+      properties:
+        publish_dsd:
+          type: boolean
+          description: Publish bound DSD to NADA
+          default: false
+        dsd_overwrite:
+          type: boolean
+          description: Replace DSD on NADA when it already exists
+          default: false
+        publish_indicator_data:
+          type: boolean
+          description: Export DuckDB timeseries CSV and import observations to NADA
+          default: false
+        nada_upload_id:
+          type: string
+          description: >
+            Completed NADA resumable upload_id from step-by-step publish (skips export and upload;
+            import-only). Requires publish_indicator_data true.
+    IndicatorPublishResponse:
+      type: object
+      properties:
+        dsd:
+          type: object
+          nullable: true
+          additionalProperties: true
+        data:
+          type: object
+          nullable: true
+          additionalProperties: true
     DataStructureStatusCode:
       type: string
       description: >-

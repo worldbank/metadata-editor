@@ -188,9 +188,8 @@ class ImportIndicatorDataJob implements JobHandlerInterface
         }
 
         $user_id = isset($job['user_id']) ? (int) $job['user_id'] : null;
-        $this->ci->Indicator_dsd_model->upload_indicator_csv($sid, $real_path, $user_id);
         $row_count = $this->ci->Indicator_dsd_model->extract_row_count_from_import_job($poll);
-        $this->ci->Indicator_dsd_model->record_published_data_import($sid, $row_count);
+        $this->ci->Indicator_dsd_model->finalize_indicator_data_import($sid, $user_id, $row_count);
 
         return array(
             'status' => 'success',

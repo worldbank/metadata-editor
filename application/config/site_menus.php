@@ -50,6 +50,10 @@ $menu[]=array(
 			'url'	=>'admin/audit_logs'
 		),
 		array(
+			'title'	=>'Background Jobs',
+			'url'	=>'jobs'
+		),
+		array(
 			'type'	=>'divider'
 		),
 		array(

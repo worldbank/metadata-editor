@@ -95,6 +95,23 @@ class Indicator_dsd_structure_validate {
             }
         }
 
+        $seen_names = array();
+        foreach ($columns as $column) {
+            if (!is_array($column)) {
+                continue;
+            }
+            $name = isset($column['name']) ? trim((string) $column['name']) : '';
+            if ($name === '') {
+                continue;
+            }
+            $key = strtolower($name);
+            if (isset($seen_names[$key])) {
+                $errors[] = "Duplicate column name '{$name}' (case-insensitive match with '{$seen_names[$key]}').";
+            } else {
+                $seen_names[$key] = $name;
+            }
+        }
+
         foreach ($this->collect_global_codelist_definition_errors($columns) as $msg) {
             $errors[] = $msg;
         }

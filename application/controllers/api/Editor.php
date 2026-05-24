@@ -1014,7 +1014,8 @@ class Editor extends MY_REST_Controller
 			}
 
 			$this->editor_acl->user_has_project_access($sid,$permission='view');
-			$this->project_json_writer->generate_project_json($sid);
+			$this->load->library('ProjectPackage');
+			$this->projectpackage->run_stage($sid, 'json');
 
 			$output=array(
 				'status'=>'success'
@@ -1069,7 +1070,8 @@ class Editor extends MY_REST_Controller
 			}
 
 			$this->editor_acl->user_has_project_access($sid,$permission='view');
-			$this->Editor_model->generate_project_ddi($sid);
+			$this->load->library('ProjectPackage');
+			$this->projectpackage->run_stage($sid, 'ddi');
 
 			$output=array(
 				'status'=>'success'

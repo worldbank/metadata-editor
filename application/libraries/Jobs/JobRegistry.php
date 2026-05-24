@@ -9,6 +9,9 @@ class JobRegistry
 {
     private static $handlers = array();
     private static $initialized = false;
+    private static $aliases = array(
+        'pdf_generation' => 'generate_pdf',
+    );
     
     /**
      * Initialize the registry by loading all job handlers
@@ -57,6 +60,10 @@ class JobRegistry
     public static function getHandler($job_type)
     {
         self::initialize();
+
+        if (isset(self::$aliases[$job_type])) {
+            $job_type = self::$aliases[$job_type];
+        }
         
         return isset(self::$handlers[$job_type]) ? self::$handlers[$job_type] : null;
     }
@@ -82,6 +89,10 @@ class JobRegistry
     public static function hasHandler($job_type)
     {
         self::initialize();
+
+        if (isset(self::$aliases[$job_type])) {
+            $job_type = self::$aliases[$job_type];
+        }
         
         return isset(self::$handlers[$job_type]);
     }

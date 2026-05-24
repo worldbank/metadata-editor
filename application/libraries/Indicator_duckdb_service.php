@@ -667,6 +667,26 @@ class Indicator_duckdb_service {
 	}
 
 	/**
+	 * Queue export of project_{sid}.timeseries to indicator_data.csv on shared filesystem.
+	 *
+	 * FastAPI: POST timeseries/indicators/timeseries/export-to-file-queue
+	 *
+	 * @param int $sid
+	 * @param string $output_csv_path Absolute path to data/indicator_data.csv
+	 * @return array Decoded JSON (job_id, …) or error envelope
+	 */
+	public function timeseries_export_to_file_queue($sid, $output_csv_path)
+	{
+		$url = $this->base_url . 'timeseries/indicators/timeseries/export-to-file-queue';
+		$body = array(
+			'project_id' => (string) (int) $sid,
+			'output_csv_path' => (string) $output_csv_path,
+		);
+
+		return $this->post_json($url, $body);
+	}
+
+	/**
 	 * Drop project_{sid}.timeseries in DuckDB (delete all published indicator data).
 	 *
 	 * FastAPI: DELETE timeseries/indicators/timeseries?project_id=

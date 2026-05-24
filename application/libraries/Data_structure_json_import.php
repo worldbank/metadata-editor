@@ -38,8 +38,11 @@ class Data_structure_json_import {
 		$structure = $dsFull;
 		unset($structure['components'], $structure['metadata']);
 
+		$existing = $overwrite ? $this->_resolve_existing_structure_for_overwrite($structure) : null;
+
 		$summary = [
 			'dry_run'            => $dryRun,
+			'overwritten'        => $existing ? true : false,
 			'data_structure'     => null,
 			'components_created' => [],
 			'codelists_created'  => [],
@@ -61,7 +64,22 @@ class Data_structure_json_import {
 				$resolved_codelists[$idx] = $this->_resolve_codelist_for_component($comp, $overwrite, $summary);
 			}
 
-			$dsId = $this->CI->Data_structure_model->create_structure($structure);
+			if ($existing) {
+				$dsId = (int) $existing['id'];
+				$updateData = $structure;
+				if (!empty($options['user_id'])) {
+					$updateData['updated_by'] = (int) $options['user_id'];
+				}
+				$this->CI->Data_structure_model->update_structure($dsId, $updateData);
+
+				$existingComps = $this->CI->Data_structure_component_model->get_components_by_structure_id($dsId);
+				foreach ($existingComps as $ec) {
+					$this->CI->Data_structure_component_model->delete_component((int) $ec['id']);
+				}
+			} else {
+				$dsId = $this->CI->Data_structure_model->create_structure($structure);
+				$summary['overwritten'] = false;
+			}
 
 			foreach ($components as $idx => $comp) {
 				$codelistId = $resolved_codelists[$idx];
@@ -125,11 +143,23 @@ class Data_structure_json_import {
 		$agency  = isset($st['agency']) && trim((string) $st['agency']) !== '' ? trim((string) $st['agency']) : Data_structure_model::DEFAULT_AGENCY;
 		$version = isset($st['version']) && trim((string) $st['version']) !== '' ? trim((string) $st['version']) : Data_structure_model::DEFAULT_VERSION;
 
-		if ($name !== '' && $this->CI->Data_structure_model->get_structure_by_identity($name, $agency, $version)) {
-			$errors[] = ['path' => 'data_structure', 'message' => "Data structure already exists for agency '{$agency}', name '{$name}', version '{$version}'."];
-		}
-		if ($idno !== '' && $this->CI->Data_structure_model->get_structure_by_idno($idno)) {
-			$errors[] = ['path' => 'data_structure.idno', 'message' => "idno '{$idno}' already exists."];
+		if ($overwrite) {
+			try {
+				$existingForOverwrite = $this->_resolve_existing_structure_for_overwrite($st);
+			} catch (Exception $e) {
+				$errors[] = ['path' => 'data_structure', 'message' => $e->getMessage()];
+				$existingForOverwrite = null;
+			}
+			if (!empty($existingForOverwrite) && Data_structure_model::is_locked_status((int) $existingForOverwrite['status'])) {
+				$errors[] = ['path' => 'data_structure', 'message' => 'Locked data structures (published/archived) cannot be overwritten.'];
+			}
+		} else {
+			if ($name !== '' && $this->CI->Data_structure_model->get_structure_by_identity($name, $agency, $version)) {
+				$errors[] = ['path' => 'data_structure', 'message' => "Data structure already exists for agency '{$agency}', name '{$name}', version '{$version}'."];
+			}
+			if ($idno !== '' && $this->CI->Data_structure_model->get_structure_by_idno($idno)) {
+				$errors[] = ['path' => 'data_structure.idno', 'message' => "idno '{$idno}' already exists."];
+			}
 		}
 
 		$names = [];
@@ -141,10 +171,16 @@ class Data_structure_json_import {
 			$cname = isset($row['name']) ? trim((string) $row['name']) : '';
 			if ($cname === '') {
 				$errors[] = ['path' => "data_structure.components[{$idx}].name", 'message' => 'Required.'];
-			} elseif (isset($names[$cname])) {
-				$errors[] = ['path' => "data_structure.components[{$idx}].name", 'message' => 'Duplicate component name in payload.'];
 			} else {
-				$names[$cname] = true;
+				$cname_key = strtolower($cname);
+				if (isset($names[$cname_key])) {
+					$errors[] = [
+						'path' => "data_structure.components[{$idx}].name",
+						'message' => "Duplicate component name '{$cname}' (case-insensitive match with '{$names[$cname_key]}').",
+					];
+				} else {
+					$names[$cname_key] = $cname;
+				}
 			}
 			$ct = isset($row['column_type']) ? trim((string) $row['column_type']) : '';
 			if ($ct === '' || !in_array($ct, Data_structure_component_model::$allowed_column_types, true)) {
@@ -209,6 +245,41 @@ class Data_structure_json_import {
 		}
 
 		return $errors;
+	}
+
+	/**
+	 * Resolve overwrite target from structure payload using idno and/or agency+name+version.
+	 *
+	 * @param array $structure import payload data_structure (without components)
+	 * @return array|null data_structures row
+	 * @throws Exception when idno and identity refer to different rows
+	 */
+	protected function _resolve_existing_structure_for_overwrite(array $structure)
+	{
+		$row_by_idno = null;
+		$row_by_identity = null;
+
+		$idno = isset($structure['idno']) ? trim((string) $structure['idno']) : '';
+		if ($idno !== '') {
+			$row_by_idno = $this->CI->Data_structure_model->get_structure_by_idno($idno);
+		}
+
+		$name = isset($structure['name']) ? trim((string) $structure['name']) : '';
+		if ($name !== '') {
+			$agency = isset($structure['agency']) && trim((string) $structure['agency']) !== ''
+				? trim((string) $structure['agency'])
+				: Data_structure_model::DEFAULT_AGENCY;
+			$version = isset($structure['version']) && trim((string) $structure['version']) !== ''
+				? trim((string) $structure['version'])
+				: Data_structure_model::DEFAULT_VERSION;
+			$row_by_identity = $this->CI->Data_structure_model->get_structure_by_identity($name, $agency, $version);
+		}
+
+		if ($row_by_idno && $row_by_identity && (int) $row_by_idno['id'] !== (int) $row_by_identity['id']) {
+			throw new Exception('idno and identity refer to different data structures; overwrite is ambiguous.');
+		}
+
+		return $row_by_idno ?: $row_by_identity;
 	}
 
 	protected function _preview_structure_row(array $structure)

@@ -64,6 +64,12 @@ $route['api/geospatial-features/(.*)'] = "api/geospatial_features/$1";
 
 // Jobs API aliases - route job-specific endpoints to their implementations
 $route['api/jobs/import_microdata/(:num)'] = "api/data/import_microdata/$1";
+$route['api/jobs/batch/cancel'] = "api/jobs/batch_cancel";
+$route['api/jobs/batch/delete'] = "api/jobs/batch_delete";
+$route['api/jobs/batch/retry'] = "api/jobs/batch_retry";
+$route['api/jobs/(:any)/retry'] = "api/jobs/retry/$1";
+$route['api/jobs/(:any)/cancel'] = "api/jobs/cancel/$1";
+$route['api/jobs/(:any)/delete'] = "api/jobs/delete_job/$1";
 
 
 

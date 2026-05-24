@@ -482,6 +482,142 @@ class Data_structure_util {
     }
 
     /**
+     * NADA import_json expects components under data_structure; ME export uses a root-level components array.
+     *
+     * @param int  $data_structure_id
+     * @param bool $overwrite
+     * @return array Payload for POST .../api/admin/data_structures/import_json
+     */
+    public function build_nada_import_payload($data_structure_id, $overwrite = false)
+    {
+        $doc = $this->build_export_document((int) $data_structure_id);
+        $export = $this->sanitize_export_payload($doc);
+
+        return $this->normalize_export_for_nada_import_json($export, $overwrite);
+    }
+
+    /**
+     * @param array $export Document from build_export_document + sanitize_export_payload
+     * @param bool  $overwrite
+     * @return array
+     */
+    public function normalize_export_for_nada_import_json(array $export, $overwrite = false)
+    {
+        if (empty($export['data_structure']) || !is_array($export['data_structure'])) {
+            throw new Exception('Export document missing data_structure');
+        }
+
+        $payload = $export;
+        $components = array();
+
+        if (isset($payload['components']) && is_array($payload['components'])) {
+            $components = $payload['components'];
+            unset($payload['components']);
+        } elseif (isset($payload['data_structure']['components']) && is_array($payload['data_structure']['components'])) {
+            $components = $payload['data_structure']['components'];
+        }
+
+        $payload['data_structure']['components'] = $components;
+        $payload['overwrite'] = $overwrite ? true : false;
+
+        return $payload;
+    }
+
+    /**
+     * Pre-sync ME codelists referenced by a DSD to NADA before import_json (reference-only DSD payload).
+     *
+     * @param Nada_catalog_client $client
+     * @param int                 $data_structure_id
+     * @param bool                $overwrite When true, re-import items for codelists already on NADA
+     * @return array{synced:array,skipped:array}
+     */
+    public function sync_dsd_codelists_to_nada(Nada_catalog_client $client, $data_structure_id, $overwrite = false)
+    {
+        $row = $this->ci->Data_structure_model->get_structure_by_id((int) $data_structure_id, true);
+        if (!$row) {
+            throw new Exception('Data structure not found');
+        }
+
+        $components = isset($row['components']) && is_array($row['components']) ? $row['components'] : array();
+        $codelistIds = array();
+
+        foreach ($components as $comp) {
+            if (!is_array($comp)) {
+                continue;
+            }
+            $columnType = isset($comp['column_type']) ? trim((string) $comp['column_type']) : '';
+            if (!in_array($columnType, array('dimension', 'geography'), true)) {
+                continue;
+            }
+            $cid = isset($comp['codelist_id']) ? (int) $comp['codelist_id'] : 0;
+            if ($cid > 0) {
+                $codelistIds[$cid] = true;
+            }
+        }
+
+        $summary = array(
+            'synced' => array(),
+            'skipped' => array(),
+        );
+
+        foreach (array_keys($codelistIds) as $codelistId) {
+            $doc = $this->ci->Codelists_model->export_nada_json_document((int) $codelistId);
+            $idno = isset($doc['idno']) ? trim((string) $doc['idno']) : '';
+            if ($idno === '') {
+                continue;
+            }
+
+            $existsOnNada = $this->nada_codelist_exists($client, $idno);
+            if ($existsOnNada && !$overwrite) {
+                $summary['skipped'][] = array(
+                    'idno' => $idno,
+                    'reason' => 'already_on_nada',
+                );
+                continue;
+            }
+
+            $response = $client->post_json('admin/codelists/import_json', array(
+                'codelist' => $doc,
+                'overwrite' => ($existsOnNada && $overwrite) ? true : false,
+            ));
+
+            $summary['synced'][] = array(
+                'idno' => $idno,
+                'existed' => $existsOnNada,
+                'overwrite' => ($existsOnNada && $overwrite),
+                'response' => $response,
+            );
+        }
+
+        return $summary;
+    }
+
+    /**
+     * @param Nada_catalog_client $client
+     * @param string              $idno
+     * @return bool
+     */
+    public function nada_codelist_exists(Nada_catalog_client $client, $idno)
+    {
+        $idno = trim((string) $idno);
+        if ($idno === '') {
+            return false;
+        }
+
+        try {
+            $client->get('admin/codelists/by_idno/' . rawurlencode($idno));
+            return true;
+        } catch (ApiRequestException $e) {
+            $details = $e->getDetails();
+            $http = isset($details['status']) ? (int) $details['status'] : 0;
+            if ($http === 404) {
+                return false;
+            }
+            throw $e;
+        }
+    }
+
+    /**
      * @param array $component DB row
      * @return array
      */

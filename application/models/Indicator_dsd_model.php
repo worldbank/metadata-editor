@@ -757,6 +757,13 @@ class Indicator_dsd_model extends CI_Model {
                 }
             }
         }
+        if (!empty($job_body['data']) && is_array($job_body['data'])) {
+            foreach (array('row_count', 'rows_imported', 'total_row_count') as $key) {
+                if (isset($job_body['data'][$key]) && $job_body['data'][$key] !== '') {
+                    return (int) $job_body['data'][$key];
+                }
+            }
+        }
 
         return null;
     }
@@ -1412,6 +1419,178 @@ class Indicator_dsd_model extends CI_Model {
     }
 
     /**
+     * Absolute path for the canonical indicator archive CSV (may not exist yet).
+     *
+     * @param int $sid
+     * @return string|null
+     */
+    public function resolve_indicator_data_csv_absolute_path($sid)
+    {
+        $this->Editor_model->create_project_folder($sid);
+        $project_folder = $this->Editor_model->get_project_folder($sid);
+        if (!$project_folder) {
+            return null;
+        }
+
+        return $project_folder . '/data/' . $this->INDICATOR_DATA_FILENAME;
+    }
+
+    /**
+     * Update editor_datafiles for indicator_data.csv when the file already exists on disk.
+     *
+     * @param int $sid
+     * @param int|null $user_id
+     * @return array
+     * @throws Exception
+     */
+    public function register_indicator_datafile($sid, $user_id = null)
+    {
+        $target_file_path = $this->resolve_indicator_data_csv_absolute_path($sid);
+        if (!$target_file_path || !is_file($target_file_path)) {
+            throw new Exception('Indicator data CSV not found: ' . ($target_file_path ?: 'unknown path'));
+        }
+
+        $this->load->model('Editor_datafile_model');
+        $existing_file = $this->get_indicator_datafile($sid);
+
+        if ($existing_file) {
+            $update_data = array(
+                'file_physical_name' => $this->INDICATOR_DATA_FILENAME,
+                'file_name' => 'indicator_data',
+                'changed_by' => $user_id,
+                'changed' => time(),
+                'store_data' => 1,
+            );
+            $this->Editor_datafile_model->update($existing_file['id'], $update_data);
+            $file_id = $existing_file['file_id'];
+        } else {
+            $insert_data = array(
+                'sid' => $sid,
+                'file_id' => $this->INDICATOR_FILE_ID,
+                'file_physical_name' => $this->INDICATOR_DATA_FILENAME,
+                'file_name' => 'indicator_data',
+                'store_data' => 1,
+                'created_by' => $user_id,
+                'changed_by' => $user_id,
+                'created' => time(),
+                'changed' => time(),
+            );
+            $this->Editor_datafile_model->insert($sid, $insert_data);
+            $file_id = $this->INDICATOR_FILE_ID;
+        }
+
+        return array(
+            'file_id' => $file_id,
+            'file_name' => $this->INDICATOR_DATA_FILENAME,
+            'file_path' => $target_file_path,
+        );
+    }
+
+    /**
+     * Delete indicator_data.csv and regenerate from DuckDB via FastAPI export-to-file job.
+     *
+     * @param int $sid
+     * @param int|null $user_id
+     * @param int $max_wait_seconds
+     * @return array path, row_count, job_id, job
+     * @throws Exception
+     */
+    public function regenerate_indicator_csv_from_duckdb($sid, $user_id = null, $max_wait_seconds = 1800)
+    {
+        $this->delete_indicator_csv($sid);
+
+        $output_path = $this->resolve_indicator_data_csv_absolute_path($sid);
+        if (!$output_path) {
+            throw new Exception('Project folder not available');
+        }
+
+        $data_dir = dirname($output_path);
+        if (!is_dir($data_dir)) {
+            @mkdir($data_dir, 0777, true);
+        }
+
+        $this->load->library('indicator_duckdb_service');
+        $queue = $this->indicator_duckdb_service->timeseries_export_to_file_queue($sid, $output_path);
+
+        if (is_array($queue) && !empty($queue['error'])) {
+            throw new Exception(isset($queue['message']) ? $queue['message'] : 'FastAPI export-to-file request failed');
+        }
+        if (empty($queue['job_id'])) {
+            throw new Exception('FastAPI did not return job_id for export-to-file');
+        }
+
+        $poll = $this->indicator_duckdb_service->poll_job($queue['job_id'], $max_wait_seconds, 3);
+        if (!is_array($poll) || ($poll['status'] ?? '') !== 'done') {
+            $err = isset($poll['error']) ? $poll['error'] : 'Export-to-file did not complete';
+            throw new Exception($err);
+        }
+
+        $registered = $this->register_indicator_datafile($sid, $user_id);
+        $row_count = $this->extract_row_count_from_import_job($poll);
+
+        return array(
+            'path' => $registered['file_path'],
+            'row_count' => $row_count,
+            'job_id' => $queue['job_id'],
+            'job' => $poll,
+        );
+    }
+
+    /**
+     * Ensure indicator_data.csv exists when DuckDB has published data (legacy backfill).
+     * Skips when the archive file is already present.
+     *
+     * @param int $sid
+     * @param int|null $user_id
+     * @return array skipped?, path?, row_count?
+     * @throws Exception when export is required and fails
+     */
+    public function ensure_indicator_data_csv($sid, $user_id = null)
+    {
+        $path = $this->resolve_indicator_data_csv_absolute_path($sid);
+        if ($path && is_file($path) && is_readable($path)) {
+            return array(
+                'skipped' => true,
+                'reason' => 'file_exists',
+                'path' => $path,
+            );
+        }
+
+        $this->load->model('Editor_project_dsd_model');
+        if (!$this->Editor_project_dsd_model->has_published_data($sid)) {
+            return array(
+                'skipped' => true,
+                'reason' => 'no_published_data',
+            );
+        }
+
+        $result = $this->regenerate_indicator_csv_from_duckdb($sid, $user_id);
+        $result['skipped'] = false;
+
+        return $result;
+    }
+
+    /**
+     * After DuckDB import: remove stale archive, export from DuckDB, register datafile.
+     *
+     * @param int $sid
+     * @param int|null $user_id
+     * @param int|null $row_count Optional row count from import job (fallback when export job omits it)
+     * @return array
+     * @throws Exception
+     */
+    public function finalize_indicator_data_import($sid, $user_id = null, $row_count = null)
+    {
+        $export = $this->regenerate_indicator_csv_from_duckdb($sid, $user_id);
+        if ($row_count === null && isset($export['row_count'])) {
+            $row_count = $export['row_count'];
+        }
+        $this->record_published_data_import($sid, $row_count);
+
+        return $export;
+    }
+
+    /**
      * Get the single datafile for an indicator project
      * 
      * @param int $sid - Project ID
@@ -1480,20 +1659,17 @@ class Indicator_dsd_model extends CI_Model {
      */
     public function delete_indicator_csv($sid)
     {
-        $datafile = $this->get_indicator_datafile($sid);
-        if (!$datafile) {
-            return true; // Already deleted
-        }
-        
-        $this->load->model('Editor_datafile_model');
-        
-        // Delete physical file
-        $file_path = $this->get_indicator_csv_path($sid);
+        $file_path = $this->resolve_indicator_data_csv_absolute_path($sid);
         if ($file_path && file_exists($file_path)) {
             @unlink($file_path);
         }
+
+        $datafile = $this->get_indicator_datafile($sid);
+        if (!$datafile) {
+            return true;
+        }
         
-        // Delete database record
+        $this->load->model('Editor_datafile_model');
         $this->Editor_datafile_model->delete($sid, $datafile['file_id']);
         
         return true;

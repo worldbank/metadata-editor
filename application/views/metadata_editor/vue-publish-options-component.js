@@ -7,13 +7,22 @@ Vue.component('publish-options', {
             project_info: {},//study_metadata_idno
             resources_selected:[],
             toggle_resources_selected:false,
-            resources_overwrite:"no",
+            resources_overwrite:"yes",
+            delete_nada_resources_before_publish:false,
+            publish_selection_snapshot:null,
             publish_metadata:true,
             dialog_process:false,
-            publish_thumbnail:false,
-            publish_resources:false,
+            publish_thumbnail:true,
+            publish_resources:true,
+            publish_dsd:true,
+            dsd_overwrite:false,
+            indicator_publish_defaults_key:null,
+            publish_indicator_data:true,
+            indicator_publish:null,
+            nada_version:null,
+            nada_resumable_uploads:false,
             catalog_connections:[],
-            panels: [0, 1,2],
+            panels: [1, 2],
             catalog:false,
             publish_options:{
                 "overwrite": {
@@ -67,6 +76,7 @@ Vue.component('publish-options', {
             file:'',
             update_status:'',
             publish_processing_message:'',
+            publish_progress_percent:null,
             is_publishing:false,
             is_publishing_completed:false,
             project_export_status:'',
@@ -80,8 +90,74 @@ Vue.component('publish-options', {
     mounted: async function(){
         this.loadCatalogConnections();
         this.getProjectBasicInfo();
+        var vm = this;
+        this.$nextTick(function () {
+            vm.panels = vm.getDefaultExpandedPanels();
+            vm.applyPublishOptionDefaults();
+        });
     },
     methods:{
+        getExternalResourcesPanelIndex: function() {
+            return this.isIndicatorProject ? 3 : 2;
+        },
+        getDefaultExpandedPanels: function() {
+            var externalPanel = this.getExternalResourcesPanelIndex();
+            if (this.isIndicatorProject) {
+                return [1, 2, externalPanel];
+            }
+            return [1, externalPanel];
+        },
+        applyPublishOptionDefaults: function() {
+            this.publish_metadata = true;
+            this.publish_thumbnail = this.hasProjectThumbnail;
+            this.resources_overwrite = 'yes';
+
+            var resources = this.ExternalResources;
+            if (!resources || resources.length === 0) {
+                this.publish_resources = false;
+                this.resources_selected = [];
+                this.toggle_resources_selected = false;
+            } else {
+                this.publish_resources = true;
+                var selected = [];
+                for (var i = 0; i < resources.length; i++) {
+                    selected.push(i);
+                }
+                this.resources_selected = selected;
+                this.toggle_resources_selected = true;
+            }
+
+            if (!this.isIndicatorProject) {
+                this.publish_dsd = false;
+                this.publish_indicator_data = false;
+                this.dsd_overwrite = false;
+                return;
+            }
+
+            if (!this.indicator_publish || !this.indicator_publish.local) {
+                this.publish_dsd = false;
+                this.publish_indicator_data = false;
+                this.dsd_overwrite = false;
+                return;
+            }
+
+            var local = this.indicator_publish.local;
+            var nadaDsd = this.indicator_publish.nada_dsd;
+            var refIdno = local.data_structure_reference && local.data_structure_reference.idno
+                ? String(local.data_structure_reference.idno)
+                : '';
+            var defaultsKey = String(this.catalog) + ':' + refIdno;
+            var isNewContext = defaultsKey !== this.indicator_publish_defaults_key;
+
+            this.publish_dsd = !!local.bound;
+            this.publish_indicator_data = !!local.has_published_data
+                && (this.studyExistsOnNada || this.publish_metadata);
+
+            if (isNewContext) {
+                this.dsd_overwrite = !!(nadaDsd && nadaDsd.exists && nadaDsd.matches_local === false);
+                this.indicator_publish_defaults_key = defaultsKey;
+            }
+        },
         getProjectBasicInfo: function(){
             let url=CI.site_url + '/api/editor/basic_info/'+this.ProjectID;
             let vm=this;
@@ -90,10 +166,7 @@ Vue.component('publish-options', {
             .then(function (response) {
                 if (response.data.project){                    
                     vm.project_info=response.data.project;
-                    vm.publish_thumbnail = !!(response.data.project.has_thumbnail);
-                    if (!vm.resources_selected || vm.resources_selected.length === 0) {
-                        vm.publish_resources = false;
-                    }
+                    vm.applyPublishOptionDefaults();
                 }
                 else{
                     alert(vm.$t("project_metadata_not_found"));
@@ -106,6 +179,20 @@ Vue.component('publish-options', {
             })
         },
 
+        capturePublishSelectionSnapshot: function() {
+            this.publish_selection_snapshot = {
+                publish_metadata: this.publish_metadata === true,
+                publish_thumbnail: this.publish_thumbnail === true,
+                publish_resources: this.publish_resources === true,
+                publish_dsd: !!this.publish_dsd,
+                publish_indicator_data: !!this.publish_indicator_data,
+                delete_nada_resources: !!this.delete_nada_resources_before_publish,
+                is_indicator_project: !!this.isIndicatorProject,
+                resources_selected_count: Array.isArray(this.resources_selected)
+                    ? this.resources_selected.length
+                    : 0,
+            };
+        },
         initPublishResponses: function(){
             this.publish_responses={
                 "export":[],
@@ -122,6 +209,14 @@ Vue.component('publish-options', {
                     "errors":[],
                     //"resource.id, resource_title",
                     //"error_response"
+                },
+                "dsd":{
+                    "messages":[],
+                    "errors":[],
+                },
+                "indicator_data":{
+                    "messages":[],
+                    "errors":[],
                 }
             };
         },
@@ -154,6 +249,77 @@ Vue.component('publish-options', {
                 return JSON.stringify(obj, null, 2);
             } catch (e) {
                 return String(obj);
+            }
+        },
+        catalogApiFailed: function (data) {
+            if (!data || typeof data !== 'object') {
+                return true;
+            }
+            if (data.status === 'failed' || data.status === 'error') {
+                return true;
+            }
+            return false;
+        },
+        metadataPublishSucceeded: function (data) {
+            if (!data || typeof data !== 'object') {
+                return true;
+            }
+            if (data.status === 'failed' || data.status === 'error') {
+                return false;
+            }
+            return true;
+        },
+        saveUnsavedProjectIfNeeded: async function () {
+            var root = this.$root;
+            if (!root || !root.is_dirty) {
+                return true;
+            }
+            if (!confirm(this.$t('publish_save_before_confirm'))) {
+                return false;
+            }
+            var form_data = JSON.parse(JSON.stringify(this.$store.state.formData));
+            if (typeof root.removeEmpty === 'function') {
+                root.removeEmpty(form_data);
+            }
+            var url = CI.base_url + '/api/editor/update/' + this.ProjectType + '/' + this.ProjectID;
+            try {
+                await axios.post(url, form_data);
+                root.is_dirty = false;
+                await this.getProjectBasicInfoAsync();
+                return true;
+            } catch (error) {
+                alert(this.$t('publish_save_before_failed'));
+                return false;
+            }
+        },
+        getProjectBasicInfoAsync: function () {
+            var vm = this;
+            var url = CI.site_url + '/api/editor/basic_info/' + this.ProjectID;
+            return axios.get(url).then(function (response) {
+                if (response.data.project) {
+                    vm.project_info = response.data.project;
+                    vm.applyPublishOptionDefaults();
+                }
+            });
+        },
+        exportGet: async function (url, errorLabel) {
+            try {
+                await axios.get(url);
+                return true;
+            } catch (error) {
+                var msg = errorLabel;
+                if (error.response && error.response.data) {
+                    var d = error.response.data;
+                    if (typeof d.message === 'string' && d.message !== '') {
+                        msg += ': ' + d.message;
+                    } else if (typeof d === 'string') {
+                        msg += ': ' + d;
+                    }
+                } else if (error.message) {
+                    msg += ': ' + error.message;
+                }
+                this.publish_responses.export.push(msg);
+                return false;
             }
         },
         /**
@@ -246,25 +412,70 @@ Vue.component('publish-options', {
                 return false;
             }
 
-            this.dialog_process=true;
-            let formData=this.PublishOptions;
-            vm=this;
-
-            if(!this.publish_metadata && !this.publish_thumbnail && !this.publish_resources){
+            if(!this.hasAnyPublishSelection){
                 alert(this.$t("please_select_at_least_one_option_to_publish"));
                 return;
             }
 
+            if (this.isIndicatorProject && !this.hasStudyIdno) {
+                alert(this.$t('publish_study_idno_missing'));
+                return false;
+            }
+
+            if (this.isIndicatorProject && this.publish_indicator_data && !this.indicatorDataPublishAllowed) {
+                alert(this.$t('indicator_data_requires_metadata'));
+                return false;
+            }
+
+            this.dialog_process=true;
+            let formData=this.PublishOptions;
+            vm=this;
+
             this.initPublishResponses();
+            this.capturePublishSelectionSnapshot();
             this.is_publishing=true;
             this.is_publishing_completed=false;
+            this.publish_progress_percent=null;
+
+            if (!await this.saveUnsavedProjectIfNeeded()) {
+                this.is_publishing=false;
+                this.dialog_process=false;
+                return false;
+            }
 
             this.publish_processing_message=this.$t("preparing_project_export");
-            await this.prepareProjectExport();
+            var exportOk = await this.prepareProjectExport();
+            if (!exportOk) {
+                this.publish_processing_message=this.$t("publishing_completed");
+                this.is_publishing=false;
+                this.is_publishing_completed=true;
+                return false;
+            }
 
             if (this.publish_metadata==true){
                 this.publish_processing_message=this.$t("publishing_project_metadata");
-                await this.publishProjectMetadata();
+                var metadataOk = await this.publishProjectMetadata();
+                if (metadataOk !== true) {
+                    this.completePublishRun();
+                    return false;
+                }
+            }
+
+            if (this.isIndicatorProject && this.publish_dsd) {
+                this.publish_processing_message=this.$t("publishing_dsd_to_nada");
+                if (this.nadaDsdExists && this.dsd_overwrite !== true) {
+                    this.publish_responses.dsd.messages.push(this.$t('dsd_skipped_already_exists'));
+                } else {
+                    await this.publishIndicatorExtras({
+                        publish_dsd: true,
+                        dsd_overwrite: this.dsd_overwrite === true,
+                        publish_indicator_data: false
+                    });
+                }
+            }
+
+            if (this.isIndicatorProject && this.publish_indicator_data) {
+                await this.publishIndicatorDataStepByStep();
             }
 
             if (this.publish_thumbnail==true){
@@ -278,15 +489,23 @@ Vue.component('publish-options', {
                 }
             }
 
+            if (this.delete_nada_resources_before_publish && this.studyExistsOnNada) {
+                await this.deleteNadaResourcesIfRequested();
+            }
+
             if (this.publish_resources==true){
                 this.publish_processing_message=this.$t("publishing_external_resources");
                 await this.publishExternalResoures();
             }
 
+            this.completePublishRun();
+        },
+        completePublishRun: function() {
+            this.publish_processing_message=this.$t("publish_completed_refreshing");
+            this.loadCatalogInfo();
             this.publish_processing_message=this.$t("publishing_completed");
             this.is_publishing=false;
             this.is_publishing_completed=true;
-            //await this.publishExternalResourcesFiles();
         },
         publishProjectMetadata: async function()
         {
@@ -301,18 +520,68 @@ Vue.component('publish-options', {
             }
 
             let url=CI.site_url + '/api/publish/' +this.ProjectID +'/' + nada_catalog.id;
-            this.publish_responses.metadata.messages.push(this.$t("starting_metadata_publishing_to") + ": " + url);
         
-            return axios.post(url,
-                formData,
-                {}
-            ).then(function(response){
-                vm.publish_responses.metadata.messages.push(vm.$t("metadata_publishing_updated_successfully"));
-            })
-            .catch(function(error){
+            try {
+                const response = await axios.post(url, formData, {});
+                var data = response.data;
+                if (!vm.metadataPublishSucceeded(data)) {
+                    var failErr = {
+                        response: {
+                            status: response.status,
+                            data: data && typeof data === 'object' ? data : { status: 'failed', message: String(data) }
+                        }
+                    };
+                    vm.publish_responses.metadata.errors.push(vm.normalizePublishError(failErr));
+                    return false;
+                }
+                var successMsg = vm.$t("metadata_publishing_updated_successfully");
+                if (data && data.dataset && data.dataset.idno) {
+                    successMsg = vm.$t("metadata_published_with_idno") + data.dataset.idno;
+                }
+                vm.publish_responses.metadata.messages.push(successMsg);
+                return true;
+            } catch (error) {
                 console.log("publishing project failed", error);
                 vm.publish_responses.metadata.errors.push(vm.normalizePublishError(error));
-            }); 
+                return false;
+            }
+        },
+        deleteNadaResourcesIfRequested: async function()
+        {
+            if (!this.delete_nada_resources_before_publish || !this.studyExistsOnNada) {
+                return;
+            }
+
+            if (!window.confirm(this.$t('confirm_delete_all_nada_resources'))) {
+                return;
+            }
+
+            try {
+                this.publish_processing_message = this.$t('deleting_all_nada_resources');
+                await this.deleteAllNadaResourcesBeforePublish();
+                this.publish_responses.external_resources.messages.push(
+                    this.$t('nada_resources_deleted_successfully')
+                );
+            } catch (error) {
+                console.log('delete all NADA resources failed', error);
+                this.publish_responses.external_resources.errors.push(this.normalizePublishError(error));
+            }
+        },
+        deleteAllNadaResourcesBeforePublish: async function()
+        {
+            let nada_catalog = this.getConnectionInfo(this.catalog);
+            if (!nada_catalog) {
+                throw new Error(this.$t('catalog_was_not_found'));
+            }
+
+            let url = CI.site_url + '/api/publish/nada_resources_delete_all/'
+                + this.ProjectID + '/' + nada_catalog.id;
+
+            const response = await axios.post(url, {});
+            if (response.data && response.data.status === 'failed') {
+                throw new Error(response.data.message || 'Delete failed');
+            }
+            return response.data;
         },
         publishExternalResoures:  async function() 
         {
@@ -320,49 +589,110 @@ Vue.component('publish-options', {
                 return;
             }
 
-            let formData=this.PublishOptions;
-            vm=this;
+            let vm=this;
 
             for (const idx of this.resources_selected) {
-                vm.publish_processing_message=vm.$t("publishing_external_resource") + ": " + vm.ExternalResources[idx].title;    
+                vm.publish_processing_message=vm.$t("publishing_external_resource") + ": " + vm.ExternalResources[idx].title;
+                vm.publish_progress_percent=null;
                 try {
-                    const { data } = await vm.publishSingleResource(this.ExternalResources[idx]);
+                    await vm.publishExternalResourceStepByStep(vm.ExternalResources[idx]);
                     vm.publish_responses.external_resources.messages.push( 
                         vm.ExternalResources[idx].title + ' ' + vm.$t("published_successfully")
                     );
                 } catch (error) {
-                    console.error('Request ' + (idx + 1) + ' failed:', error.response);
+                    console.error('Request ' + (idx + 1) + ' failed:', error.response || error);
                     var base = vm.normalizePublishError(error);
                     vm.publish_responses.external_resources.errors.push(Object.assign({}, base, {
                         resource_id: vm.ExternalResources[idx].id,
                         resource_title: vm.ExternalResources[idx].title
                     }));
+                } finally {
+                    vm.publish_progress_percent=null;
                 }
             }
         },
-        publishSingleResource: async function(resource)
+        resourceHasLocalFile: function(resource)
         {
-            let nada_catalog=this.getConnectionInfo(this.catalog);      
+            if (!resource || resource.filename === undefined || resource.filename === null) {
+                return false;
+            }
+            var filename = String(resource.filename).trim();
+            if (filename === '') {
+                return false;
+            }
+            return !/^https?:\/\//i.test(filename);
+        },
+        uploadServerFileToNada: async function(options)
+        {
+            if (typeof NadaPublishUploader === 'undefined') {
+                throw new Error('NADA publish uploader is not loaded');
+            }
+
+            let vm = this;
+            let nada_catalog = options.catalogConnectionId
+                ? { id: options.catalogConnectionId }
+                : this.getConnectionInfo(this.catalog);
+            if (!nada_catalog) {
+                throw new Error(this.$t('catalog_was_not_found'));
+            }
+
+            vm.publish_progress_percent = 0;
+            const uploadResult = await NadaPublishUploader.uploadServerSourceToNada({
+                catalogConnectionId: nada_catalog.id,
+                projectId: vm.ProjectID,
+                source: options.source,
+                resourceId: options.resourceId,
+                onProgress: function (progress) {
+                    vm.publish_progress_percent = progress.progress;
+                    if (options.onProgressMessage) {
+                        vm.publish_processing_message = options.onProgressMessage(progress);
+                    }
+                }
+            });
+
+            vm.publish_progress_percent = 100;
+            return uploadResult;
+        },
+        publishExternalResourceStepByStep: async function(resource)
+        {
+            let nada_catalog=this.getConnectionInfo(this.catalog);
 
             if(!nada_catalog){
                 alert(this.$t("catalog_was_not_found"));
                 return false;
             }
 
+            let vm=this;
             let formData={
                 "overwrite": this.resources_overwrite,
                 "resource_id": resource.id,
                 "sid": this.ProjectID,
                 "catalog_id": nada_catalog.id
-            }
-
-            vm=this;            
+            };
             let url=CI.site_url + '/api/publish/external_resource/'+this.ProjectID +'/' + nada_catalog.id;
 
-            return axios.post(url,
-                formData,
-                {}            
-            );        
+            if (this.catalogSupportsResumableUploads && this.resourceHasLocalFile(resource)) {
+                vm.publish_processing_message = vm.$t('uploading_external_resource_to_nada') + ': ' + resource.title;
+
+                const uploadResult = await vm.uploadServerFileToNada({
+                    source: 'external_resource',
+                    resourceId: resource.id,
+                    onProgressMessage: function(progress) {
+                        return vm.$t('uploading_external_resource_to_nada') + ': ' + resource.title
+                            + ' (' + progress.uploaded_chunks + '/' + progress.total_chunks
+                            + ', ' + progress.progress + '%)';
+                    }
+                });
+
+                vm.publish_processing_message = vm.$t('publishing_external_resource') + ': ' + resource.title;
+                formData.nada_upload_id = uploadResult.upload_id;
+            }
+
+            return axios.post(url, formData, {});
+        },
+        publishSingleResource: async function(resource)
+        {
+            return this.publishExternalResourceStepByStep(resource);
         },
         publishProjectThumbnail: async function()
         {
@@ -384,80 +714,110 @@ Vue.component('publish-options', {
                 formData,
                 {}            
             );
-        },        
+        },
+        publishIndicatorExtras: async function(options)
+        {
+            let nada_catalog=this.getConnectionInfo(this.catalog);
+            if(!nada_catalog){
+                alert(this.$t("catalog_was_not_found"));
+                return false;
+            }
+
+            let vm=this;
+            let url=CI.site_url + '/api/publish/indicator/'+this.ProjectID +'/' + nada_catalog.id;
+
+            try {
+                const { data } = await axios.post(url, options || {});
+                if (options && options.publish_dsd && data && data.dsd) {
+                    if (data.dsd.status === 'skipped') {
+                        vm.publish_responses.dsd.messages.push(vm.$t('dsd_skipped_already_exists'));
+                    } else {
+                        vm.publish_responses.dsd.messages.push(vm.$t('dsd_published_successfully'));
+                    }
+                }
+                if (options && options.publish_indicator_data && data && data.data) {
+                    vm.publish_responses.indicator_data.messages.push(vm.$t('indicator_data_published_successfully'));
+                }
+            } catch (error) {
+                console.log('indicator publish failed', error);
+                var normalized = vm.normalizePublishError(error);
+                if (options && options.publish_dsd) {
+                    vm.publish_responses.dsd.errors.push(normalized);
+                }
+                if (options && (options.publish_indicator_data || options.nada_upload_id)) {
+                    vm.publish_responses.indicator_data.errors.push(normalized);
+                }
+            }
+        },
+        publishIndicatorDataStepByStep: async function()
+        {
+            let nada_catalog=this.getConnectionInfo(this.catalog);
+            if(!nada_catalog){
+                alert(this.$t("catalog_was_not_found"));
+                return false;
+            }
+
+            let vm=this;
+
+            try {
+                vm.publish_processing_message = vm.$t('uploading_indicator_csv_to_nada');
+                const uploadResult = await vm.uploadServerFileToNada({
+                    source: 'indicator_data',
+                    onProgressMessage: function(progress) {
+                        return vm.$t('uploading_indicator_csv_to_nada')
+                            + ' (' + progress.uploaded_chunks + '/' + progress.total_chunks + ', ' + progress.progress + '%)';
+                    }
+                });
+
+                vm.publish_processing_message = vm.$t('publishing_indicator_data_to_nada');
+                await vm.publishIndicatorExtras({
+                    publish_indicator_data: true,
+                    nada_upload_id: uploadResult.upload_id
+                });
+            } catch (error) {
+                console.log('indicator data step-by-step publish failed', error);
+                if (vm.publish_responses.indicator_data.errors.length === 0) {
+                    var normalized = vm.normalizePublishError(error);
+                    if (!normalized.summary && error && error.message) {
+                        normalized.summary = error.message;
+                    }
+                    vm.publish_responses.indicator_data.errors.push(normalized);
+                }
+            }
+        },
+        applyIndicatorPublishDefaults: function()
+        {
+            this.applyPublishOptionDefaults();
+        },
         async prepareProjectExport()
         {
+            var ok = true;
             this.project_export_status=this.$t("exporting_metadata_to_json");
-            await this.exportProjectJSON();
+            ok = await this.exportGet(
+                CI.site_url + '/api/editor/generate_json/' + this.ProjectID,
+                this.$t('exporting_metadata_to_json')
+            ) && ok;
 
             if (this.ProjectType=='survey' || this.ProjectType=='microdata'){
                 this.project_export_status=this.$t("exporting_metadata_to_ddi");
-                await this.exportProjectDDI();
-                //this.project_export_status="Exporting data files";
-                //await this.exportProjectDatafiles();
+                ok = await this.exportGet(
+                    CI.site_url + '/api/editor/generate_ddi/' + this.ProjectID,
+                    this.$t('exporting_metadata_to_ddi')
+                ) && ok;
             }
             
             this.project_export_status=this.$t("exporting_external_resources_metadata_as_json");
-            await this.exportExternalResourcesJSON();
+            ok = await this.exportGet(
+                CI.site_url + '/api/resources/write_json/' + this.ProjectID,
+                this.$t('exporting_external_resources_metadata_as_json')
+            ) && ok;
             this.project_export_status=this.$t("exporting_external_resources_as_rdf_xml");
-            await this.exportExternalResourcesRDF();
-            this.project_export_status="done";
-        },
-        async exportProjectJSON() {
-            let url=CI.site_url + '/api/editor/generate_json/'+this.ProjectID;
-            return axios
-            .get(url)
-            .then(function (response) {
-                console.log(response);
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
-            .then(function () {
-                console.log("writing JSON done");
-            });            
-        },
-        async exportProjectDDI() {
-            let url=CI.site_url + '/api/editor/generate_ddi/'+this.ProjectID;
-            return axios
-            .get(url)
-            .then(function (response) {
-                console.log(response);
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
-            .then(function () {
-                console.log("writing DDI done");
-            });            
-        },
-        async exportExternalResourcesJSON() {
-            let url=CI.site_url + '/api/resources/write_json/'+this.ProjectID;
-            return axios
-            .get(url)
-            .then(function (response) {
-                console.log(response);
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
-            .then(function () {
-                console.log("writing JSON done");
-            });            
-        },
-        async exportExternalResourcesRDF() {
-            let url=CI.site_url + '/api/resources/write_rdf/'+this.ProjectID;
-            return axios
-            .get(url)
-            .then(function (response) {
-                console.log(response);
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
-            .then(function () {
-                console.log("writing JSON done");
-            });            
+            ok = await this.exportGet(
+                CI.site_url + '/api/resources/write_rdf/' + this.ProjectID,
+                this.$t('exporting_external_resources_as_rdf_xml')
+            ) && ok;
+            this.project_export_status = ok ? 'done' : 'failed';
+            return ok;
         },
         loadCatalogConnections: function() {
             vm=this;
@@ -495,6 +855,50 @@ Vue.component('publish-options', {
                 return { text: enumObj[k], value: k };
             });
         },
+        normalizeDataAccessList: function(codes) {
+            if (Array.isArray(codes)) {
+                var normalized = codes.filter(function (code) {
+                    return code && code.type !== undefined && code.type !== null && String(code.type) !== '';
+                }).map(function (code) {
+                    return {
+                        id: code.id,
+                        type: code.type,
+                        title: code.title || code.type
+                    };
+                });
+                if (normalized.length > 0) {
+                    return normalized;
+                }
+            }
+            return this.enumToItems(this.publish_options.access_policy.enum).map(function (item) {
+                return { title: item.text, type: item.value };
+            });
+        },
+        applyStudyInfoToPublishOptions: function(studyInfo) {
+            if (!studyInfo || studyInfo.status === 'failed' || studyInfo.status === 'error') {
+                this.publish_options.overwrite.value = 'no';
+                return;
+            }
+
+            if (studyInfo.published !== undefined && studyInfo.published !== null) {
+                this.publish_options.published.value = String(studyInfo.published);
+            }
+
+            var accessPolicy = studyInfo.access_policy || studyInfo.data_access_type;
+            if (accessPolicy !== undefined && accessPolicy !== null && accessPolicy !== '') {
+                this.publish_options.access_policy.value = accessPolicy;
+            }
+
+            if (studyInfo.repositoryid !== undefined && studyInfo.repositoryid !== null) {
+                this.publish_options.repositoryid.value = studyInfo.repositoryid;
+            }
+
+            if (studyInfo.remote_data_url !== undefined && studyInfo.remote_data_url !== null) {
+                this.publish_options.data_remote_url.value = studyInfo.remote_data_url;
+            }
+
+            this.publish_options.overwrite.value = 'yes';
+        },
         /**
          * Load collections and data_access_codes from NADA via backend (single endpoint).
          */
@@ -503,6 +907,9 @@ Vue.component('publish-options', {
             vm.collections_codes = [];
             vm.collections_linked = [];
             vm.data_access_list = [];
+            vm.indicator_publish = null;
+            vm.nada_version = null;
+            vm.nada_resumable_uploads = false;
 
             if (vm.catalog === false || vm.catalog < 0){
                 return;
@@ -519,9 +926,7 @@ Vue.component('publish-options', {
                     if (response.data.collections_codes){
                         vm.collections_codes = response.data.collections_codes;
                     }
-                    if (response.data.data_access_codes){
-                        vm.data_access_list = response.data.data_access_codes;
-                    }
+                    vm.data_access_list = vm.normalizeDataAccessList(response.data.data_access_codes);
                     if (response.data.collections_linked) {
                         var raw = (response.data.collections_linked.collections && Array.isArray(response.data.collections_linked.collections))
                             ? response.data.collections_linked.collections
@@ -532,29 +937,25 @@ Vue.component('publish-options', {
                         vm.collections_linked = [];
                     }
                     vm.study_info = response.data.study_info || null;
-                    if (vm.catalog !== false && vm.catalog !== null) {
-                        vm.$nextTick(function () { vm.panels = [1, 2]; });
-                    }
-                    // Pre-populate project options from NADA study_info when study already exists in catalog
-                    var studyInfo = response.data.study_info;
-                    if (studyInfo && studyInfo.status !== 'failed' && studyInfo.status !== 'error') {
-                        if (studyInfo.published !== undefined && studyInfo.published !== null) {
-                            vm.publish_options.published.value = studyInfo.published;
-                        }
-                        if (studyInfo.data_access_type !== undefined && studyInfo.data_access_type !== null) {
-                            vm.publish_options.access_policy.value = studyInfo.data_access_type;
-                        }
-                        if (studyInfo.repositoryid !== undefined && studyInfo.repositoryid !== null) {
-                            vm.publish_options.repositoryid.value = studyInfo.repositoryid;
-                        }
-                        if (studyInfo.remote_data_url !== undefined && studyInfo.remote_data_url !== null) {
-                            vm.publish_options.data_remote_url.value = studyInfo.remote_data_url;
-                        }
-                        // Study exists in catalog: default overwrite to yes for re-publish
-                        vm.publish_options.overwrite.value = 'yes';
+                    vm.nada_version = response.data.nada_version || null;
+                    vm.nada_resumable_uploads = !!response.data.resumable_uploads;
+                    if (response.data.indicator_publish) {
+                        vm.indicator_publish = response.data.indicator_publish;
+                        vm.applyIndicatorPublishDefaults();
                     } else {
-                        vm.publish_options.overwrite.value = 'no';
+                        vm.indicator_publish = null;
                     }
+                    if (vm.catalog !== false && vm.catalog !== null) {
+                        vm.$nextTick(function () {
+                            vm.panels = vm.getDefaultExpandedPanels();
+                            vm.applyPublishOptionDefaults();
+                        });
+                    } else {
+                        vm.applyPublishOptionDefaults();
+                    }
+                    vm.$nextTick(function () {
+                        vm.applyStudyInfoToPublishOptions(response.data.study_info || null);
+                    });
                 })
                 .catch(function (error) {
                     console.log("failed loading catalog info (collections, data access codes)", error);
@@ -567,6 +968,11 @@ Vue.component('publish-options', {
         }
     },
     watch: {
+        publish_metadata: function (val) {
+            if (!val && !this.studyExistsOnNada && this.publish_indicator_data) {
+                this.publish_indicator_data = false;
+            }
+        },
         resources_selected: {
             handler: function (val) {
                 if (!val || val.length === 0) {
@@ -582,6 +988,15 @@ Vue.component('publish-options', {
         },
         StudyIDNO(){
             return this.project_info.study_idno;
+        },
+        hasStudyIdno(){
+            var id = this.StudyIDNO;
+            return id != null && String(id).trim() !== '';
+        },
+        studyExistsOnNada(){
+            return !!(this.study_info
+                && !this.catalogApiFailed(this.study_info)
+                && (this.study_info.idno || this.study_info.title));
         },
         ProjectMetadata(){
             return this.$store.state.formData;
@@ -656,6 +1071,54 @@ Vue.component('publish-options', {
         /** At least one external resource row is selected for publishing. */
         hasExternalResourcesPublishSelection(){
             return Array.isArray(this.resources_selected) && this.resources_selected.length > 0;
+        },
+        isIndicatorProject(){
+            var t = this.ProjectType;
+            return t === 'indicator' || t === 'timeseries';
+        },
+        canPublishDsd(){
+            return this.isIndicatorProject
+                && this.indicator_publish
+                && this.indicator_publish.local
+                && this.indicator_publish.local.bound;
+        },
+        canPublishIndicatorData(){
+            return this.isIndicatorProject
+                && this.indicator_publish
+                && this.indicator_publish.local
+                && this.indicator_publish.local.has_published_data;
+        },
+        indicatorDataPublishAllowed(){
+            if (!this.canPublishIndicatorData || !this.catalogSelected || !this.hasStudyIdno) {
+                return false;
+            }
+            if (this.publish_metadata) {
+                return true;
+            }
+            return this.studyExistsOnNada;
+        },
+        catalogSupportsResumableUploads(){
+            return !!this.nada_resumable_uploads;
+        },
+        nadaDsdExists(){
+            return !!(this.indicator_publish
+                && this.indicator_publish.nada_dsd
+                && this.indicator_publish.nada_dsd.exists);
+        },
+        hasAnyPublishSelection(){
+            return this.publish_metadata
+                || this.publish_thumbnail
+                || this.publish_resources
+                || (this.delete_nada_resources_before_publish && this.studyExistsOnNada)
+                || (this.isIndicatorProject && (this.publish_dsd || this.publish_indicator_data));
+        },
+        indicatorPublishInfoJson(){
+            if (!this.indicator_publish) return '';
+            try {
+                return JSON.stringify(this.indicator_publish, null, 2);
+            } catch (e) {
+                return String(this.indicator_publish);
+            }
         }
     },  
     template: `
@@ -686,16 +1149,28 @@ Vue.component('publish-options', {
                             </div>
                     </v-card>
 
+                    <v-alert v-if="!catalogSelected" type="info" dense outlined class="mb-0 mt-3">
+                        {{ $t('select_catalog_for_publishing') }}
+                    </v-alert>
+
+                    <template v-if="catalogSelected">
+                    <v-alert v-if="hasStudyIdno" type="info" dense outlined class="mb-3 mt-3">
+                        <strong>{{ $t('study_idno') }}:</strong> {{ StudyIDNO }}
+                    </v-alert>
+                    <v-alert v-else-if="isIndicatorProject" type="warning" dense outlined class="mb-3 mt-3">
+                        {{ $t('publish_study_idno_missing') }}
+                    </v-alert>
+
                     <v-expansion-panels multiple v-model="panels" class="mt-3">
-                        <v-expansion-panel v-show="catalog !== false && catalog !== null">
+                        <v-expansion-panel>
                             <v-expansion-panel-header>
                             <div>
-                                <v-icon v-if="study_info && study_info.status !== 'failed' && study_info.status !== 'error'" color="success" class="mr-2">mdi-check-circle</v-icon>
+                                <v-icon v-if="studyExistsOnNada" color="success" class="mr-2">mdi-check-circle</v-icon>
                                 {{$t("study_in_catalog")}} (NADA)
                                 </div>
                             </v-expansion-panel-header>
                             <v-expansion-panel-content>
-                                <div v-if="study_info && study_info.status !== 'failed' && study_info.status !== 'error'" class="mb-3">
+                                <div v-if="studyExistsOnNada" class="mb-3">
                                     <pre class="pa-3 bg-light border rounded text-left" style="max-height:400px;overflow:auto;font-size:0.85em;"><code>{{ studyInfoJson }}</code></pre>
                                 </div>
                                 <div v-else class="text-muted pa-3">
@@ -814,6 +1289,59 @@ Vue.component('publish-options', {
                             </v-expansion-panel-content>
                         </v-expansion-panel>
 
+                        <v-expansion-panel v-if="isIndicatorProject">
+                            <v-expansion-panel-header>
+                                <div>
+                                    {{$t("indicator_publish_status")}}
+                                </div>
+                            </v-expansion-panel-header>
+                            <v-expansion-panel-content>
+                                <div v-if="indicator_publish === null" class="text-muted pa-3">{{ $t("loading") }}...</div>
+                                <div v-else>
+                                    <div v-if="!indicator_publish.local || !indicator_publish.local.bound" class="alert alert-warning">
+                                        {{ $t("no_dsd_bound_to_project") }}
+                                    </div>
+                                    <div v-else class="mb-3">
+                                        <div><strong>{{ $t('study_idno') }}:</strong> {{ indicator_publish.local.study_idno || StudyIDNO || '—' }}</div>
+                                        <div><strong>{{ $t("data_structure") }}:</strong> {{ indicator_publish.local.data_structure_reference && indicator_publish.local.data_structure_reference.idno ? indicator_publish.local.data_structure_reference.idno : '—' }}</div>
+                                    </div>
+                                    <div class="switch-control mt-3 pt-3 border-top">
+                                        <v-switch
+                                            v-model="publish_dsd"
+                                            :value="true"
+                                            :disabled="!canPublishDsd"
+                                            :label="$t('publish_dsd_to_nada')"
+                                            dense
+                                            hide-details
+                                            class="ma-0 pa-0"
+                                        ></v-switch>
+                                        <v-switch
+                                            v-if="publish_dsd && nadaDsdExists"
+                                            v-model="dsd_overwrite"
+                                            :true-value="true"
+                                            :false-value="false"
+                                            :label="$t('dsd_overwrite_on_nada')"
+                                            dense
+                                            hide-details
+                                            class="ma-0 pa-0"
+                                        ></v-switch>
+                                        <v-switch
+                                            v-model="publish_indicator_data"
+                                            :value="true"
+                                            :disabled="!indicatorDataPublishAllowed"
+                                            :label="$t('publish_indicator_data_to_nada')"
+                                            dense
+                                            hide-details
+                                            class="ma-0 pa-0"
+                                        ></v-switch>
+                                        <div v-if="canPublishIndicatorData && !indicatorDataPublishAllowed" class="switch-control-hint text-warning">
+                                            {{ $t('indicator_data_requires_metadata') }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </v-expansion-panel-content>
+                        </v-expansion-panel>
+
                         <v-expansion-panel>
                             <v-expansion-panel-header>
                                 <div>{{$t("external_resources")}}
@@ -822,7 +1350,7 @@ Vue.component('publish-options', {
                                 
                             </v-expansion-panel-header>
                             <v-expansion-panel-content>
-                                <div class="mt-3">
+                                <div class="mt-3 switch-control">
                                         <v-switch
                                         v-model="resources_overwrite"
                                         value="yes"
@@ -871,6 +1399,9 @@ Vue.component('publish-options', {
                                 v-model="publish_metadata"
                                 :value="true"
                                 :label="$t('publish_project')"
+                                dense
+                                hide-details
+                                class="ma-0 pa-0"
                             ></v-switch>
                             
                             <v-switch
@@ -878,25 +1409,54 @@ Vue.component('publish-options', {
                                 :value="true"
                                 :disabled="!hasProjectThumbnail"
                                 :label="$t('publish_thumbnail')"
+                                dense
+                                hide-details
+                                class="ma-0 pa-0"
                             ></v-switch>
                             
                             <v-switch
                                 v-model="publish_resources"
                                 :value="true"
-                                :disabled="!hasExternalResourcesPublishSelection"
+                                :disabled="ExternalResources.length === 0"
                                 :label="$t('external_resources') + (resources_selected.length>0?' ('+resources_selected.length+')':'')"
-                            ></v-switch>                            
+                                dense
+                                hide-details
+                                class="ma-0 pa-0"
+                            ></v-switch>
+
+                            <template v-if="studyExistsOnNada">
+                                <v-switch
+                                    v-model="delete_nada_resources_before_publish"
+                                    :true-value="true"
+                                    :false-value="false"
+                                    :label="$t('delete_all_nada_resources_before_publish')"
+                                    dense
+                                    hide-details
+                                    class="ma-0 pa-0"
+                                ></v-switch>
+                                <v-alert
+                                    v-if="delete_nada_resources_before_publish"
+                                    type="warning"
+                                    dense
+                                    outlined
+                                    class="mt-2 mb-0"
+                                >
+                                    {{ $t('delete_all_nada_resources_warning') }}
+                                </v-alert>
+                            </template>
+
                     </div>
 
                     
-                    <div v-if="catalog!=false" class="mt-5 p-4 elevation-2 mb-5 bg-light" >
-                        <div><strong>{{$t('published_project_link')}}:</strong></div>
+                    <div v-if="hasStudyIdno" class="mt-5 p-4 elevation-2 mb-5 bg-light" >
+                        <div><strong>{{ studyExistsOnNada ? $t('published_project_link') : $t('catalog_preview_link_note') }}:</strong></div>
                         <div><a :href="TargetCatalogPublishedUrl" target="_blank">{{TargetCatalogPublishedUrl}} <v-icon color="primary">mdi-open-in-new</v-icon></a></div>
                     </div>
 
 
-                    <v-btn :disabled="is_publishing==true || !catalog" color="primary" @click="publishToCatalog()">{{$t("publish")}}</v-btn>
+                    <v-btn :disabled="is_publishing==true" color="primary" @click="publishToCatalog()">{{$t("publish")}}</v-btn>
 
+                    </template>
                     
                 
 
@@ -919,10 +1479,18 @@ Vue.component('publish-options', {
                             <!-- show-status -->
                             <div v-if="is_publishing">
                                 <div class="border p-3 mt-5 mb-5">
-                                    <div><strong>Update status</strong></div>
+                                    <div><strong>{{ $t('publish_update_status') }}</strong></div>
                                     <template>
-                                        <div>{{publish_processing_message}}...</div>
+                                        <div>{{publish_processing_message}}<span v-if="publish_progress_percent == null">...</span></div>
                                         <v-progress-linear
+                                        v-if="publish_progress_percent != null"
+                                        :value="publish_progress_percent"
+                                        color="blue"
+                                        height="8"
+                                        class="mt-2"
+                                        ></v-progress-linear>
+                                        <v-progress-linear
+                                        v-else
                                         indeterminate
                                         color="blue"
                                         ></v-progress-linear>
@@ -932,11 +1500,18 @@ Vue.component('publish-options', {
                             <!-- end show-status --> 
                             
                             <div v-if="is_publishing_completed" class="p-2">
-                                <div v-if="publish_metadata==true">
+                                <div v-if="publish_responses.export.length>0" class="mb-3">
+                                    <strong>{{ $t('publish_export_step') }}</strong>
+                                    <div class="border rounded p-2 mb-2 mt-2 text-left text-danger" v-for="(msg, export_index) in publish_responses.export" :key="'pub-export-err-' + export_index">
+                                        {{ msg }}
+                                    </div>
+                                </div>
+
+                                <div v-if="publish_selection_snapshot && publish_selection_snapshot.publish_metadata">
                                     <strong>{{$t('metadata')}}</strong>
                                     <div v-if="publish_responses.metadata.errors.length>0">
                                         <span class="mdi mdi-alert text-danger"></span>
-                                        <span>Failed to publish project metadata</span>
+                                        <span>{{ $t('metadata_publishing_failed') }}</span>
                                         <div class="border rounded p-2 mb-2 mt-2 text-left text-body" v-for="(err, response_index) in publish_responses.metadata.errors" :key="'pub-meta-err-' + response_index">
                                             <div class="text-danger font-weight-bold">{{ err.summary }}</div>
                                             <div v-if="err.httpStatus != null" class="text-muted small">Editor API: HTTP {{ err.httpStatus }}</div>
@@ -948,21 +1523,56 @@ Vue.component('publish-options', {
                                             <pre v-if="err.rawBody && err.jsonDetail == null" class="bg-light border rounded p-2 mt-1 small text-dark" style="max-height:240px;overflow:auto;white-space:pre-wrap;">{{ err.rawBody }}</pre>
                                         </div>    
                                     </div>
-                                    <div v-else>
-                                        <div class="border m-1 text-success" >
-                                            <div>
-                                                <span class="mdi mdi-check-circle text-success"></span>
-                                                <span>Project metadata updated successfully</span>
-                                            </div>
+                                    <div v-else-if="publish_responses.metadata.messages.length>0">
+                                        <div class="border m-1 text-success" v-for="(message, msg_index) in publish_responses.metadata.messages" :key="'pub-meta-msg-' + msg_index">
+                                            <span class="mdi mdi-check-circle text-success"></span> {{ message }}
                                         </div>
                                     </div>
                                 </div>
 
-                                <div v-if="publish_thumbnail==true" class="mt-5">
+                                <div v-if="publish_selection_snapshot && publish_selection_snapshot.is_indicator_project && publish_selection_snapshot.publish_dsd" class="mt-3">
+                                    <strong>{{$t('data_structure')}} (DSD)</strong>
+                                    <div v-if="publish_responses.dsd.errors.length>0">
+                                        <div class="border rounded p-2 mb-2 mt-2 text-left text-body" v-for="(err, response_index) in publish_responses.dsd.errors" :key="'pub-dsd-err-' + response_index">
+                                            <div class="text-danger font-weight-bold">{{ err.summary }}</div>
+                                            <div v-if="err.httpStatus != null" class="text-muted small">Editor API: HTTP {{ err.httpStatus }}</div>
+                                            <div v-if="err.nada && err.nada.api_url" class="text-muted small text-break">URL: {{ err.nada.api_url }}</div>
+                                            <pre v-if="err.jsonDetail != null" class="bg-light border rounded p-2 mt-1 small text-dark" style="max-height:200px;overflow:auto;white-space:pre-wrap;">{{ formatJsonForDisplay(err.jsonDetail) }}</pre>
+                                            <pre v-if="err.rawBody && err.jsonDetail == null" class="bg-light border rounded p-2 mt-1 small text-dark" style="max-height:200px;overflow:auto;white-space:pre-wrap;">{{ err.rawBody }}</pre>
+                                        </div>
+                                    </div>
+                                    <div v-if="publish_responses.dsd.messages.length>0">
+                                        <div class="border-bottom m-1 text-success" v-for="(message, msg_index) in publish_responses.dsd.messages" :key="'pub-dsd-msg-' + msg_index">
+                                            <span class="mdi mdi-check-circle text-success"></span> {{ message }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div v-if="publish_selection_snapshot && publish_selection_snapshot.is_indicator_project && publish_selection_snapshot.publish_indicator_data" class="mt-3">
+                                    <strong>{{$t('indicator_data')}}</strong>
+                                    <div v-if="publish_responses.indicator_data.errors.length>0">
+                                        <div class="border rounded p-2 mb-2 mt-2 text-left text-body" v-for="(err, response_index) in publish_responses.indicator_data.errors" :key="'pub-data-err-' + response_index">
+                                            <div class="text-danger font-weight-bold">{{ err.summary }}</div>
+                                            <div v-if="err.httpStatus != null" class="text-muted small">Editor API: HTTP {{ err.httpStatus }}</div>
+                                            <div v-if="err.nada && err.nada.api_url" class="text-muted small text-break">URL: {{ err.nada.api_url }}</div>
+                                            <div v-if="err.nada && err.nada.payload_idno" class="text-muted small">Study IDNO: {{ err.nada.payload_idno }}</div>
+                                            <div v-if="err.bodyFormat" class="text-muted small">Catalog response: {{ err.bodyFormat }}</div>
+                                            <pre v-if="err.jsonDetail != null" class="bg-light border rounded p-2 mt-1 small text-dark" style="max-height:240px;overflow:auto;white-space:pre-wrap;">{{ formatJsonForDisplay(err.jsonDetail) }}</pre>
+                                            <pre v-if="err.rawBody && err.jsonDetail == null" class="bg-light border rounded p-2 mt-1 small text-dark" style="max-height:240px;overflow:auto;white-space:pre-wrap;">{{ err.rawBody }}</pre>
+                                        </div>
+                                    </div>
+                                    <div v-if="publish_responses.indicator_data.messages.length>0">
+                                        <div class="border-bottom m-1 text-success" v-for="(message, msg_index) in publish_responses.indicator_data.messages" :key="'pub-data-msg-' + msg_index">
+                                            <span class="mdi mdi-check-circle text-success"></span> {{ message }}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div v-if="publish_selection_snapshot && publish_selection_snapshot.publish_thumbnail" class="mt-5">
                                     <strong>{{$t('thumbnail')}}</strong>
                                     <div v-if="publish_responses.thumbnail.errors.length>0">
                                         <span class="mdi mdi-alert text-danger"></span>
-                                        <span>Failed to publish thumbnail</span>
+                                        <span>{{ $t('thumbnail_publishing_failed') }}</span>
                                         <div class="border rounded p-2 mb-2 mt-2 text-left text-body" v-for="(err, response_index) in publish_responses.thumbnail.errors" :key="'pub-thumb-err-' + response_index">
                                             <div class="text-danger font-weight-bold">{{ err.summary }}</div>
                                             <div v-if="err.httpStatus != null" class="text-muted small">Editor API: HTTP {{ err.httpStatus }}</div>
@@ -981,8 +1591,8 @@ Vue.component('publish-options', {
                                     </div>                       
                                 </div>
 
-                                <div v-if="resources_selected.length>0" class="mt-5">
-                                    <strong>External resources</strong>
+                                <div v-if="publish_selection_snapshot && (publish_selection_snapshot.delete_nada_resources || (publish_selection_snapshot.publish_resources && publish_selection_snapshot.resources_selected_count > 0))" class="mt-5">
+                                    <strong>{{ $t('publish_external_resources_heading') }}</strong>
                                     <div v-if="publish_responses.external_resources.messages.length>0" >                            
                                         <div class="border-bottom m-1" v-for="message in publish_responses.external_resources.messages">
                                             <div>

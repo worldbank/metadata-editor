@@ -105,10 +105,13 @@ class Worker extends CI_Controller
         // Create PID file
         $this->create_pid_file();
         
-        // Reset any stuck jobs on startup
-        $stuck_count = $this->Job_queue_model->reset_stuck_jobs(2);
-        if ($stuck_count > 0) {
-            echo "[Worker] Reset {$stuck_count} stuck job(s)\n";
+        // Maintenance: reset stuck processing jobs and expire ancient pending jobs
+        $maintenance = $this->Job_queue_model->run_job_maintenance();
+        if ($maintenance['reset_stuck'] > 0) {
+            echo "[Worker] Reset {$maintenance['reset_stuck']} stuck job(s)\n";
+        }
+        if ($maintenance['expired_pending'] > 0) {
+            echo "[Worker] Expired {$maintenance['expired_pending']} stale pending job(s)\n";
         }
         
         // Update heartbeat immediately
@@ -123,14 +126,11 @@ class Worker extends CI_Controller
         $this->loop->addPeriodicTimer($this->poll_interval, function() {
             $this->process_queue();
         });
-        
-        // Clean up old jobs (older than 3 hours) every hour
-        $this->loop->addPeriodicTimer(3600, function() { // 3600 seconds = 1 hour
-            $this->cleanup_old_jobs();
+
+        // Periodic maintenance (stuck reset + pending expiry)
+        $this->loop->addPeriodicTimer(3600, function() {
+            $this->run_job_maintenance();
         });
-        
-        // Run cleanup immediately on startup
-        $this->cleanup_old_jobs();
         
         // Handle graceful shutdown
         if (function_exists('pcntl_signal')) {
@@ -277,18 +277,21 @@ class Worker extends CI_Controller
     }
     
     /**
-     * Clean up old jobs (older than 3 hours)
+     * Reset stuck processing jobs and expire stale pending jobs (records kept as failed)
      */
-    private function cleanup_old_jobs()
+    private function run_job_maintenance()
     {
         try {
-            $deleted_count = $this->Job_queue_model->cleanup_old_jobs_by_hours(12);
-            if ($deleted_count > 0) {
-                echo "[Worker] Cleaned up {$deleted_count} old job(s) (older than 12 hours)\n";
+            $maintenance = $this->Job_queue_model->run_job_maintenance();
+            if ($maintenance['reset_stuck'] > 0) {
+                echo "[Worker] Reset {$maintenance['reset_stuck']} stuck job(s)\n";
+            }
+            if ($maintenance['expired_pending'] > 0) {
+                echo "[Worker] Expired {$maintenance['expired_pending']} stale pending job(s)\n";
             }
         } catch (Exception $e) {
-            log_message('error', 'Worker::cleanup_old_jobs error: ' . $e->getMessage());
-            echo "[Worker] Error cleaning up old jobs: " . $e->getMessage() . "\n";
+            log_message('error', 'Worker::run_job_maintenance error: ' . $e->getMessage());
+            echo "[Worker] Error during job maintenance: " . $e->getMessage() . "\n";
         }
     }
     

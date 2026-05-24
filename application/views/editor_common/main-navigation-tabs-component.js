@@ -152,3 +152,4 @@ Vue.component('main-navigation-tabs', {
     `
 });
 
+

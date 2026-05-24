@@ -547,6 +547,7 @@ class Indicator_dsd extends MY_REST_Controller
 			}
 
 			$this->Indicator_dsd_model->clear_published_data_tracking($sid);
+			$this->Indicator_dsd_model->delete_indicator_csv($sid);
 
 			$this->set_response(array(
 				'status'    => 'success',
@@ -971,9 +972,8 @@ class Indicator_dsd extends MY_REST_Controller
 				}
 
 				$user_id = $this->get_api_user_id();
-				$this->Indicator_dsd_model->upload_indicator_csv($sid, $real_path, $user_id);
 				$row_count = $this->Indicator_dsd_model->extract_row_count_from_import_job($poll);
-				$this->Indicator_dsd_model->record_published_data_import($sid, $row_count);
+				$this->Indicator_dsd_model->finalize_indicator_data_import($sid, $user_id, $row_count);
 				$result['message'] = 'Timeseries data imported successfully';
 			} else {
 				$result['message'] = 'Replace-from-csv queued; poll GET /api/indicator_dsd/job/{sid}?job_id=';

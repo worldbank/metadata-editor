@@ -296,6 +296,22 @@ paths:
                     Whether to publish external resources: metadata to the NADA resources API, and
                     any attached project files to the study files API (skipped when filename is an external URL).
                   default: true
+                publish_dsd:
+                  type: boolean
+                  description: >
+                    For indicator/timeseries projects, publish the bound DSD to NADA before metadata.
+                  default: false
+                dsd_overwrite:
+                  type: boolean
+                  description: >
+                    When publishing DSD, replace an existing structure on NADA (otherwise skip if present).
+                  default: false
+                publish_indicator_data:
+                  type: boolean
+                  description: >
+                    For indicator/timeseries projects, export DuckDB timeseries CSV and import
+                    observations to NADA after metadata (resumable upload; may take several minutes).
+                  default: false
                 options:
                   type: object
                   description: Additional options (e.g. overwrite)

@@ -60,7 +60,7 @@
 				},
 				"agency": {
 					"title": "Agency",
-					"description": "Defaults to NADA in API if omitted.",
+					"description": "Defaults per API if omitted.",
 					"type": "string",
 					"maxLength": 64
 				},
@@ -247,7 +247,7 @@
 				},
 				"agency": {
 					"title": "Agency",
-					"description": "Defaults to NADA in API if omitted.",
+					"description": "Defaults per API if omitted.",
 					"type": "string",
 					"maxLength": 64
 				},
