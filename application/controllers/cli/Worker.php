@@ -89,7 +89,10 @@ class Worker extends CI_Controller
      */
     public function run()
     {
-        
+        // Long-running daemon: do not inherit web PHP max_execution_time limits
+        set_time_limit(0);
+        ini_set('max_execution_time', '0');
+
         $this->loop = Factory::create();
         
         echo "[Worker] Starting job queue worker\n";
@@ -208,7 +211,12 @@ class Worker extends CI_Controller
      */
     private function process_queue()
     {
+        $job = null;
+
         try {
+            // Reconnect after idle periods or long-running jobs (MySQL may drop the connection)
+            $this->db->reconnect();
+
             // Get next pending job
             $job = $this->Job_queue_model->get_next_job($this->worker_id);
             
@@ -231,12 +239,12 @@ class Worker extends CI_Controller
                 return;
             }
 
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             log_message('error', 'Worker::process_queue error: ' . $e->getMessage());
             echo "[Worker] Error: " . $e->getMessage() . "\n";
             
             // If we have a job, mark it as failed
-            if (isset($job) && isset($job['id'])) {
+            if (isset($job['id'])) {
                 $this->Job_queue_model->mark_failed($job['id'], $e->getMessage());
             }
         }
@@ -267,7 +275,7 @@ class Worker extends CI_Controller
             $job_uuid = isset($job['uuid']) ? $job['uuid'] : 'N/A';
             echo "[Worker] Job #{$job['id']} (UUID: {$job_uuid}) completed successfully\n";
             
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             // Mark job as failed
             $this->Job_queue_model->mark_failed($job['id'], $e->getMessage());
             $job_uuid = isset($job['uuid']) ? $job['uuid'] : 'N/A';
@@ -282,6 +290,7 @@ class Worker extends CI_Controller
     private function run_job_maintenance()
     {
         try {
+            $this->db->reconnect();
             $maintenance = $this->Job_queue_model->run_job_maintenance();
             if ($maintenance['reset_stuck'] > 0) {
                 echo "[Worker] Reset {$maintenance['reset_stuck']} stuck job(s)\n";
@@ -289,7 +298,7 @@ class Worker extends CI_Controller
             if ($maintenance['expired_pending'] > 0) {
                 echo "[Worker] Expired {$maintenance['expired_pending']} stale pending job(s)\n";
             }
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             log_message('error', 'Worker::run_job_maintenance error: ' . $e->getMessage());
             echo "[Worker] Error during job maintenance: " . $e->getMessage() . "\n";
         }

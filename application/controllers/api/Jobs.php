@@ -37,7 +37,7 @@ class Jobs extends MY_REST_Controller
 	 * Get list of all jobs (basic information only)
 	 * 
 	 * Query parameters:
-	 *   status - Filter by status (pending, processing, completed, failed)
+	 *   status - Filter by status (pending, held, processing, completed, failed)
 	 *   job_type - Filter by job type
 	 *   user_id - Filter by user ID (admin only, or own jobs)
 	 *   limit - Number of jobs to return (default: 50)
@@ -752,6 +752,7 @@ class Jobs extends MY_REST_Controller
 			if ($user_id_filter) {
 				$user_stats = array(
 					'pending' => count($this->Job_queue_model->get_by_user($user_id_filter, 'pending', 1000, 0)),
+					'held' => count($this->Job_queue_model->get_by_user($user_id_filter, 'held', 1000, 0)),
 					'processing' => count($this->Job_queue_model->get_by_user($user_id_filter, 'processing', 1000, 0)),
 					'completed' => count($this->Job_queue_model->get_by_user($user_id_filter, 'completed', 1000, 0)),
 					'failed' => count($this->Job_queue_model->get_by_user($user_id_filter, 'failed', 1000, 0))
@@ -1008,6 +1009,136 @@ class Jobs extends MY_REST_Controller
 	}
 
 	/**
+	 * Hold all pending jobs (admin only)
+	 *
+	 * POST /api/jobs/hold_all
+	 */
+	function hold_all_post()
+	{
+		try {
+			$this->is_admin_or_die();
+
+			$count = $this->Job_queue_model->hold_all_pending();
+
+			$this->set_response(array(
+				'status' => 'success',
+				'message' => "Held {$count} pending job(s)",
+				'held_count' => $count,
+			), REST_Controller::HTTP_OK);
+		} catch (Exception $e) {
+			if ($e->getMessage() === 'Access denied') {
+				$this->set_response(array('status' => 'failed', 'message' => 'Access denied'), REST_Controller::HTTP_FORBIDDEN);
+				return;
+			}
+			$this->set_response(array('status' => 'failed', 'message' => $e->getMessage()), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * Release all held jobs back to pending (admin only)
+	 *
+	 * POST /api/jobs/release_all
+	 */
+	function release_all_post()
+	{
+		try {
+			$this->is_admin_or_die();
+
+			$count = $this->Job_queue_model->release_all_held();
+
+			$this->set_response(array(
+				'status' => 'success',
+				'message' => "Released {$count} held job(s)",
+				'released_count' => $count,
+			), REST_Controller::HTTP_OK);
+		} catch (Exception $e) {
+			if ($e->getMessage() === 'Access denied') {
+				$this->set_response(array('status' => 'failed', 'message' => 'Access denied'), REST_Controller::HTTP_FORBIDDEN);
+				return;
+			}
+			$this->set_response(array('status' => 'failed', 'message' => $e->getMessage()), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * Hold a pending job (admin only)
+	 *
+	 * POST /api/jobs/{uuid}/hold
+	 */
+	function hold_post($job_identifier = null)
+	{
+		try {
+			$this->is_admin_or_die();
+
+			$job = $this->get_job_with_access($job_identifier, false);
+			if (!$job) {
+				$this->set_response(array('status' => 'failed', 'message' => 'Job not found'), REST_Controller::HTTP_NOT_FOUND);
+				return;
+			}
+
+			if ($job['status'] !== 'pending') {
+				throw new Exception('Only pending jobs can be held');
+			}
+
+			if (!$this->Job_queue_model->hold_job($job['id'])) {
+				throw new Exception('Job could not be held');
+			}
+
+			$updated = $this->Job_queue_model->get($job['id']);
+			$this->set_response(array(
+				'status' => 'success',
+				'message' => 'Job held',
+				'job' => $this->format_job_for_api($updated),
+			), REST_Controller::HTTP_OK);
+		} catch (Exception $e) {
+			if ($e->getMessage() === 'Access denied') {
+				$this->set_response(array('status' => 'failed', 'message' => 'Access denied'), REST_Controller::HTTP_FORBIDDEN);
+				return;
+			}
+			$this->set_response(array('status' => 'failed', 'message' => $e->getMessage()), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * Release a held job back to pending (admin only)
+	 *
+	 * POST /api/jobs/{uuid}/release
+	 */
+	function release_post($job_identifier = null)
+	{
+		try {
+			$this->is_admin_or_die();
+
+			$job = $this->get_job_with_access($job_identifier, false);
+			if (!$job) {
+				$this->set_response(array('status' => 'failed', 'message' => 'Job not found'), REST_Controller::HTTP_NOT_FOUND);
+				return;
+			}
+
+			if ($job['status'] !== 'held') {
+				throw new Exception('Only held jobs can be released');
+			}
+
+			if (!$this->Job_queue_model->release_job($job['id'])) {
+				throw new Exception('Job could not be released');
+			}
+
+			$updated = $this->Job_queue_model->get($job['id']);
+			$this->set_response(array(
+				'status' => 'success',
+				'message' => 'Job released',
+				'job' => $this->format_job_for_api($updated),
+			), REST_Controller::HTTP_OK);
+		} catch (Exception $e) {
+			if ($e->getMessage() === 'Access denied') {
+				$this->set_response(array('status' => 'failed', 'message' => 'Access denied'), REST_Controller::HTTP_FORBIDDEN);
+				return;
+			}
+			$this->set_response(array('status' => 'failed', 'message' => $e->getMessage()), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
 	 * Batch cancel pending jobs
 	 *
 	 * POST /api/jobs/batch/cancel
@@ -1016,6 +1147,38 @@ class Jobs extends MY_REST_Controller
 	function batch_cancel_post()
 	{
 		$this->process_batch_action('cancel');
+	}
+
+	/**
+	 * Batch hold pending jobs (admin only)
+	 *
+	 * POST /api/jobs/batch/hold
+	 * Body: { "uuids": ["...", "..."] }
+	 */
+	function batch_hold_post()
+	{
+		try {
+			$this->is_admin_or_die();
+		} catch (Exception $e) {
+			return;
+		}
+		$this->process_batch_action('hold');
+	}
+
+	/**
+	 * Batch release held jobs (admin only)
+	 *
+	 * POST /api/jobs/batch/release
+	 * Body: { "uuids": ["...", "..."] }
+	 */
+	function batch_release_post()
+	{
+		try {
+			$this->is_admin_or_die();
+		} catch (Exception $e) {
+			return;
+		}
+		$this->process_batch_action('release');
 	}
 
 	/**
@@ -1110,7 +1273,7 @@ class Jobs extends MY_REST_Controller
 	/**
 	 * Process batch cancel, retry, or delete
 	 *
-	 * @param string $action cancel|retry|delete
+	 * @param string $action cancel|retry|delete|hold|release
 	 */
 	private function process_batch_action($action)
 	{
@@ -1167,6 +1330,26 @@ class Jobs extends MY_REST_Controller
 						}
 						if (!$this->Job_queue_model->delete_job($job['id'])) {
 							$errors[] = array('uuid' => $uuid, 'message' => 'Delete failed');
+							continue;
+						}
+						$succeeded[] = $uuid;
+					} elseif ($action === 'hold') {
+						if ($job['status'] !== 'pending') {
+							$skipped[] = array('uuid' => $uuid, 'reason' => 'Only pending jobs can be held');
+							continue;
+						}
+						if (!$this->Job_queue_model->hold_job($job['id'])) {
+							$errors[] = array('uuid' => $uuid, 'message' => 'Hold failed');
+							continue;
+						}
+						$succeeded[] = $uuid;
+					} elseif ($action === 'release') {
+						if ($job['status'] !== 'held') {
+							$skipped[] = array('uuid' => $uuid, 'reason' => 'Only held jobs can be released');
+							continue;
+						}
+						if (!$this->Job_queue_model->release_job($job['id'])) {
+							$errors[] = array('uuid' => $uuid, 'message' => 'Release failed');
 							continue;
 						}
 						$succeeded[] = $uuid;

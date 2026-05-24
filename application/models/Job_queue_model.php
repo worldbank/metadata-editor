@@ -200,6 +200,14 @@ class Job_queue_model extends CI_Model {
 				FOR UPDATE";
 		
 		$query = $this->db->query($sql);
+		if ($query === false) {
+			$error = $this->db->error();
+			$message = isset($error['message']) && $error['message'] !== ''
+				? $error['message']
+				: 'unknown database error';
+			$this->db->trans_complete();
+			throw new RuntimeException('Database query failed in get_next_job: ' . $message);
+		}
 		$job = $query->row_array();
 		
 		if ($job) {
@@ -574,7 +582,7 @@ class Job_queue_model extends CI_Model {
 		if ($stale_only) {
 			$this->apply_stale_filter_sql($this->get_stale_config());
 		} elseif ($active_only) {
-			$this->db->where_in('status', array('pending', 'processing'));
+			$this->db->where_in('status', array('pending', 'held', 'processing'));
 		} elseif ($history_only) {
 			$this->db->where_in('status', array('completed', 'failed'));
 		} elseif ($status !== null) {
@@ -632,7 +640,7 @@ class Job_queue_model extends CI_Model {
 		if ($stale_only) {
 			$this->apply_stale_filter_sql($this->get_stale_config());
 		} elseif ($active_only) {
-			$this->db->where_in('status', array('pending', 'processing'));
+			$this->db->where_in('status', array('pending', 'held', 'processing'));
 		} elseif ($history_only) {
 			$this->db->where_in('status', array('completed', 'failed'));
 		} elseif ($status !== null && $status !== '') {
@@ -683,6 +691,9 @@ class Job_queue_model extends CI_Model {
 		
 		// Completed jobs count
 		$stats['completed'] = isset($stats['completed']) ? $stats['completed'] : 0;
+
+		// Held jobs count
+		$stats['held'] = isset($stats['held']) ? $stats['held'] : 0;
 		
 		return $stats;
 	}
@@ -933,6 +944,62 @@ class Job_queue_model extends CI_Model {
 		$this->db->update('job_queue');
 		
 		return $this->db->affected_rows();
+	}
+
+	/**
+	 * Hold a pending job (skip until released back to pending)
+	 *
+	 * @param int $job_id Job ID
+	 * @return bool Success
+	 */
+	function hold_job($job_id)
+	{
+		$this->db->where('id', $job_id);
+		$this->db->where('status', 'pending');
+		$this->db->update('job_queue', array('status' => 'held'));
+
+		return $this->db->affected_rows() > 0;
+	}
+
+	/**
+	 * Release a held job back to the pending queue
+	 *
+	 * @param int $job_id Job ID
+	 * @return bool Success
+	 */
+	function release_job($job_id)
+	{
+		$this->db->where('id', $job_id);
+		$this->db->where('status', 'held');
+		$this->db->update('job_queue', array('status' => 'pending'));
+
+		return $this->db->affected_rows() > 0;
+	}
+
+	/**
+	 * Hold all pending jobs
+	 *
+	 * @return int Number of jobs held
+	 */
+	function hold_all_pending()
+	{
+		$this->db->where('status', 'pending');
+		$this->db->update('job_queue', array('status' => 'held'));
+
+		return (int) $this->db->affected_rows();
+	}
+
+	/**
+	 * Release all held jobs back to pending
+	 *
+	 * @return int Number of jobs released
+	 */
+	function release_all_held()
+	{
+		$this->db->where('status', 'held');
+		$this->db->update('job_queue', array('status' => 'pending'));
+
+		return (int) $this->db->affected_rows();
 	}
 
 	/**
