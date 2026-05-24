@@ -148,7 +148,7 @@ class Configurations extends MY_Controller {
 		}
 
 		// Remove nested-array keys so the generic loop below doesn't try to process them
-		unset($post['lang_enabled'], $post['lang_code']);
+		unset($post['lang_enabled'], $post['lang_code'], $post['submit']);
 
 		foreach($post as $key=>$value)
 		{

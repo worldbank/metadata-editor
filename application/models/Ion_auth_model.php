@@ -391,6 +391,10 @@ class Ion_auth_model extends CI_Model
 
 		$user=(object)$user;
 
+		if ((int) $user->active !== 1) {
+			return FALSE;
+		}
+
 		$expiry_time=new DateTime();
 		$expiry_time->modify("4 hour");
 
@@ -427,6 +431,10 @@ class Ion_auth_model extends CI_Model
 
 		$user=(object)$user[0];
 
+		if ((int) $user->active !== 1) {
+			return false;
+		}
+
 		$code_arr=explode(":",base64_decode($code));
 		$token=array(
 			'code' => $code_arr[0],
@@ -458,6 +466,11 @@ class Ion_auth_model extends CI_Model
 
 	public function reset_password($email, $password)
 	{
+		$user = $this->get_userinfo_by_email($email);
+		if (!$user || (int) $user['active'] !== 1) {
+			return false;
+		}
+
 		$password=$this->hash_password($password);
 		$result=$this->set_password($email,$password);
 		
@@ -489,6 +502,10 @@ class Ion_auth_model extends CI_Model
 		}
 
 		$user=(object)$user[0];
+
+		if ((int) $user->active !== 1) {
+			return false;
+		}
 
 		$code_arr=explode(":",base64_decode($code));
 		$token=array(

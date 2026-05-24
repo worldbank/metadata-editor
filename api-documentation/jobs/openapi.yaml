@@ -43,6 +43,7 @@ paths:
             type: string
             enum:
               - pending
+              - held
               - processing
               - completed
               - failed
@@ -240,6 +241,10 @@ paths:
                 notes:
                   type: string
                   description: File notes
+                priority:
+                  type: integer
+                  description: Job queue priority; higher values are processed before lower ones
+                  default: 0
       responses:
         "201":
           description: File uploaded and job created successfully
@@ -296,6 +301,22 @@ paths:
                     Whether to publish external resources: metadata to the NADA resources API, and
                     any attached project files to the study files API (skipped when filename is an external URL).
                   default: true
+                publish_dsd:
+                  type: boolean
+                  description: >
+                    For indicator/timeseries projects, publish the bound DSD to NADA before metadata.
+                  default: false
+                dsd_overwrite:
+                  type: boolean
+                  description: >
+                    When publishing DSD, replace an existing structure on NADA (otherwise skip if present).
+                  default: false
+                publish_indicator_data:
+                  type: boolean
+                  description: >
+                    For indicator/timeseries projects, export DuckDB timeseries CSV and import
+                    observations to NADA after metadata (resumable upload; may take several minutes).
+                  default: false
                 options:
                   type: object
                   description: Additional options (e.g. overwrite)
@@ -400,6 +421,140 @@ paths:
       security:
         - ApiKeyAuth: []
 
+  /jobs/hold_all:
+    post:
+      tags:
+        - Jobs
+      summary: Hold all pending jobs
+      description: >
+        Admin only. Sets all pending jobs to held status so the worker skips them.
+        Use this to pause the queue for testing without deleting jobs.
+      operationId: holdAllJobs
+      responses:
+        "200":
+          description: Jobs held successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                  held_count:
+                    type: integer
+        "403":
+          description: Access denied (admin only)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+      security:
+        - ApiKeyAuth: []
+
+  /jobs/release_all:
+    post:
+      tags:
+        - Jobs
+      summary: Release all held jobs
+      description: Admin only. Restores all held jobs to pending so the worker can process them again.
+      operationId: releaseAllJobs
+      responses:
+        "200":
+          description: Jobs released successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                  released_count:
+                    type: integer
+        "403":
+          description: Access denied (admin only)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+      security:
+        - ApiKeyAuth: []
+
+  /jobs/{uuid}/hold:
+    post:
+      tags:
+        - Jobs
+      summary: Hold a pending job
+      description: Admin only. Sets a pending job to held status.
+      operationId: holdJob
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Job held
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobDetailResponse"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+        "403":
+          description: Access denied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+      security:
+        - ApiKeyAuth: []
+
+  /jobs/{uuid}/release:
+    post:
+      tags:
+        - Jobs
+      summary: Release a held job
+      description: Admin only. Restores a held job to pending status.
+      operationId: releaseJob
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Job released
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobDetailResponse"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+        "403":
+          description: Access denied
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+      security:
+        - ApiKeyAuth: []
+
 components:
   schemas:
     Job:
@@ -416,6 +571,7 @@ components:
           type: string
           enum:
             - pending
+            - held
             - processing
             - completed
             - failed
@@ -472,6 +628,7 @@ components:
           type: string
           enum:
             - pending
+            - held
             - processing
             - completed
             - failed
@@ -584,6 +741,9 @@ components:
             pending:
               type: integer
               description: Number of pending jobs
+            held:
+              type: integer
+              description: Number of held jobs (paused, not processed by worker)
             processing:
               type: integer
               description: Number of jobs currently processing
@@ -601,6 +761,8 @@ components:
           description: User-specific statistics (if user_id filter provided)
           properties:
             pending:
+              type: integer
+            held:
               type: integer
             processing:
               type: integer

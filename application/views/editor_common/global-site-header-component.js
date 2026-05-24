@@ -71,6 +71,15 @@ Vue.component('vue-global-site-header', {
                 base_url = base_url.slice(0, -10);
             }
             return base_url;
+        },
+        canAccessSiteAdmin(){
+            if (!CI || !CI.user_info) {
+                return false;
+            }
+            if (CI.user_info.can_access_site_admin === true) {
+                return true;
+            }
+            return CI.user_info.is_admin === true;
         }
 
     },
@@ -108,6 +117,27 @@ Vue.component('vue-global-site-header', {
                         </v-list-item>
                     </v-list>
                 </v-menu>
+
+                <v-menu offset-y style="z-index: 2000;" >
+                    <template v-slot:activator="{ on, attrs }">
+                        <v-btn
+                        text
+                        dark
+                        v-bind="attrs"
+                        v-on="on"
+                        >
+                        <v-icon>mdi-cog</v-icon>
+                        </v-btn>
+                    </template>
+                    <v-list>
+                        <v-list-item>
+                            <v-list-item-title><v-btn text @click="pageLink('settings')">{{$t('catalog_connections')}}</v-btn></v-list-item-title>
+                        </v-list-item>
+                        <v-list-item>
+                            <v-list-item-title><v-btn text @click="pageLink('jobs')">{{$t('my_jobs')}}</v-btn></v-list-item-title>
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
                 
                 <v-menu offset-y style="z-index: 2000;" >
                 <template v-slot:activator="{ on, attrs }">
@@ -127,8 +157,8 @@ Vue.component('vue-global-site-header', {
                     <v-list-item>
                         <v-list-item-title><v-btn text @click="pageLink('auth/change_password')" >{{$t('password')}}</v-btn></v-list-item-title>
                     </v-list-item>
-                    <v-list-item v-if="CI.user_info.is_admin">
-                        <v-list-item-title><v-btn text @click="pageLink('admin')" >{{$t('site_administration')}}</v-btn></v-list-item-title>
+                    <v-list-item v-if="canAccessSiteAdmin">
+                        <v-list-item-title><v-btn text @click="pageLink('admin')">{{$t('site_administration')}}</v-btn></v-list-item-title>
                     </v-list-item>
                     <v-list-item>
                         <v-list-item-title><v-btn text @click="pageLink('auth/logout')" >{{$t('logout')}}</v-btn></v-list-item-title>

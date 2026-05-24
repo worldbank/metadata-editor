@@ -63,6 +63,8 @@ class Projects extends MY_Controller {
 				$this->lang->load("geospatial");
 			}
 
+			$this->lang->load('indicator_dsd');
+
 			$options['translations']=$this->lang->language;
 
 			$template=$this->get_project_template($project);

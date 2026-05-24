@@ -5,7 +5,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 require_once 'application/libraries/Auth/AuthInterface.php';
 
 /**
- * 
+ *
  * ZeroAuth - Local/desktop mode (no password, one-click login)
  *
  */
@@ -16,6 +16,7 @@ class ZeroAuth implements AuthInterface
     public function __construct()
     {
         $this->ci =& get_instance();
+        $this->assert_zero_auth_allowed();
         $this->ci->load->library('ion_auth');
         $this->ci->load->library('session');
         $this->ci->load->library('form_validation');
@@ -28,7 +29,7 @@ class ZeroAuth implements AuthInterface
     }
 
     /**
-     * ZeroAuth config (admin_email, admin_name). Defaults if not set.
+     * ZeroAuth config with safe defaults.
      */
     private function get_zero_auth_config()
     {
@@ -36,10 +37,143 @@ class ZeroAuth implements AuthInterface
         if (!is_array($config)) {
             $config = array();
         }
+
+        $allowed_hosts = array('localhost', '127.0.0.1');
+        if (isset($config['allowed_hosts']) && is_array($config['allowed_hosts'])) {
+            $allowed_hosts = $config['allowed_hosts'];
+        }
+
         return array(
-            'admin_email' => isset($config['admin_email']) ? $config['admin_email'] : 'admin@localhost',
-            'admin_name'  => isset($config['admin_name']) ? $config['admin_name'] : 'Editor Admin',
+            'enabled'       => !empty($config['enabled']),
+            'admin_email'   => isset($config['admin_email']) ? $config['admin_email'] : 'local-admin@localhost',
+            'admin_name'    => isset($config['admin_name']) ? $config['admin_name'] : 'Local Administrator',
+            'allowed_hosts' => $allowed_hosts,
         );
+    }
+
+    /**
+     * Block ZeroAuth unless explicitly enabled for an allowed local host.
+     */
+    private function assert_zero_auth_allowed()
+    {
+        $conf = $this->get_zero_auth_config();
+
+        if (!$conf['enabled']) {
+            show_error('ZeroAuth is disabled. Set zero_auth.enabled to true for local/desktop use only.', 403);
+        }
+
+        if (defined('ENVIRONMENT') && ENVIRONMENT === 'production') {
+            show_error('ZeroAuth is not available in production.', 403);
+        }
+
+        $host = isset($_SERVER['HTTP_HOST']) ? strtolower($_SERVER['HTTP_HOST']) : '';
+        $host = preg_replace('/:\d+$/', '', $host);
+
+        if (!empty($conf['allowed_hosts'])) {
+            $allowed = false;
+            foreach ($conf['allowed_hosts'] as $allowed_host) {
+                if (strtolower((string)$allowed_host) === $host) {
+                    $allowed = true;
+                    break;
+                }
+            }
+
+            if (!$allowed) {
+                show_error('ZeroAuth is not available on this host.', 403);
+            }
+        }
+    }
+
+    /**
+     * Resolve the local admin account without creating one.
+     */
+    private function resolve_zero_auth_user()
+    {
+        $conf = $this->get_zero_auth_config();
+
+        $user = $this->get_user_by_authtype('zero_auth');
+        if ($user) {
+            return $user;
+        }
+
+        $user = $this->ci->ion_auth->get_user_by_email($conf['admin_email']);
+        if ($user) {
+            $this->mark_user_as_zero_auth($user->id);
+            return $user;
+        }
+
+        $user = $this->find_sole_site_admin_user();
+        if ($user) {
+            $this->mark_user_as_zero_auth($user->id);
+            return $user;
+        }
+
+        return null;
+    }
+
+    private function get_user_by_authtype($authtype)
+    {
+        $row = $this->ci->db
+            ->where('authtype', $authtype)
+            ->where('active', 1)
+            ->order_by('id', 'ASC')
+            ->limit(1)
+            ->get('users')
+            ->row();
+
+        if (!$row) {
+            return null;
+        }
+
+        return $this->ci->ion_auth->get_user($row->id);
+    }
+
+    private function find_sole_site_admin_user()
+    {
+        $admin_role_ids = $this->ci->acl_manager->get_admin_role_ids();
+        if (empty($admin_role_ids)) {
+            return null;
+        }
+
+        $this->ci->db->select('users.id');
+        $this->ci->db->from('users');
+        $this->ci->db->join('user_roles', 'user_roles.user_id = users.id');
+        $this->ci->db->where_in('user_roles.role_id', $admin_role_ids);
+        $this->ci->db->where('users.active', 1);
+        $this->ci->db->group_by('users.id');
+        $rows = $this->ci->db->get()->result_array();
+
+        if (count($rows) !== 1) {
+            return null;
+        }
+
+        return $this->ci->ion_auth->get_user((int)$rows[0]['id']);
+    }
+
+    private function mark_user_as_zero_auth($user_id)
+    {
+        $this->ci->db
+            ->where('id', (int)$user_id)
+            ->update('users', array('authtype' => 'zero_auth'));
+    }
+
+    private function sync_admin_display_name($user, $name)
+    {
+        if (!$user || trim($name) === '') {
+            return;
+        }
+
+        $updates = array();
+        if (!isset($user->first_name) || $user->first_name !== $name) {
+            $updates['first_name'] = $name;
+        }
+        if (!isset($user->identity) || $user->identity !== $name) {
+            $updates['identity'] = $name;
+        }
+
+        if (!empty($updates)) {
+            $this->ci->ion_auth->update_user($user->id, $updates);
+        }
     }
 
     /**
@@ -48,12 +182,11 @@ class ZeroAuth implements AuthInterface
     private function ensure_admin_user()
     {
         $conf = $this->get_zero_auth_config();
-        $email = $conf['admin_email'];
-        $name  = $conf['admin_name'];
-
-        $user = $this->ci->ion_auth->get_user_by_email($email);
+        $user = $this->resolve_zero_auth_user();
 
         if (!$user) {
+            $email = $conf['admin_email'];
+            $name = $conf['admin_name'];
             $username = $name;
             $password = bin2hex(random_bytes(32));
             $additional_data = array(
@@ -63,10 +196,12 @@ class ZeroAuth implements AuthInterface
                 'email'      => $email,
             );
             $this->ci->ion_auth->register($username, $password, $email, $additional_data, false, 'zero_auth');
-            $user = $this->ci->ion_auth->get_user_by_email($email);
+            $user = $this->resolve_zero_auth_user();
         }
 
         if ($user) {
+            $this->sync_admin_display_name($user, $conf['admin_name']);
+
             try {
                 if (!$this->ci->acl_manager->user_is_admin($user)) {
                     $admin_role = $this->ci->acl_manager->get_role_by_name('admin');
@@ -81,6 +216,8 @@ class ZeroAuth implements AuthInterface
                 }
             }
         }
+
+        return $user;
     }
 
     /**
@@ -122,9 +259,7 @@ class ZeroAuth implements AuthInterface
         $do_login = $this->ci->input->post('zero_auth_login') === '1' || $this->ci->input->get('do') === 'login';
 
         if ($do_login) {
-            $this->ensure_admin_user();
-            $conf = $this->get_zero_auth_config();
-            $user = $this->ci->ion_auth->get_user_by_email($conf['admin_email']);
+            $user = $this->ensure_admin_user();
 
             if ($user) {
                 $this->set_local_admin_session($user);
@@ -138,10 +273,14 @@ class ZeroAuth implements AuthInterface
                 }
                 redirect($this->ci->config->item('base_url'), 'refresh');
             }
+
+            $this->ci->session->set_flashdata('error', t('local_mode_login_failed'));
         }
 
+        $conf = $this->get_zero_auth_config();
         $this->data['error'] = $this->ci->session->flashdata('error');
         $this->data['popup_mode'] = $popup_mode;
+        $this->data['local_admin_name'] = $conf['admin_name'];
         if ($popup_mode) {
             $this->data['show_default_login'] = false;
             $this->data['show_oidc_button'] = false;
@@ -155,9 +294,7 @@ class ZeroAuth implements AuthInterface
 
     function login_ajax()
     {
-        $this->ensure_admin_user();
-        $conf = $this->get_zero_auth_config();
-        $user = $this->ci->ion_auth->get_user_by_email($conf['admin_email']);
+        $user = $this->ensure_admin_user();
 
         if ($user) {
             $this->set_local_admin_session($user);

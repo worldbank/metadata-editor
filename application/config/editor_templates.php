@@ -207,6 +207,17 @@ $config['document'][]=array(
 );
 
 $config['document'][]=array(
+    'template' => 'metadata_editor/metadata_editor_templates/document_form_template_es.json',
+    'lang'=>'es',
+    'uid'=>'document-system-es',
+    'name'=>'Documento IHSN Esquema 1.0 ES',
+    'version'=>'1.0',
+    'organization'=>'IHSN',
+    'author'=>'MA OD',
+    'description'=>'Plantilla con todos los elementos del esquema de metadatos para documentar documentos (libros, publicaciones, artículos, informes, manuales, etc.). Puede usarse como base para plantillas personalizadas con vocabularios controlados, reglas de validación y valores por defecto propios de cada organismo. Incorpora elementos de Dublin Core (Dublin Core Metadata Initiative), BibTeX, MARC21 (Biblioteca del Congreso de EE. UU.) y otros estándares.',
+);
+
+$config['document'][]=array(
     'template' => 'metadata_editor/metadata_editor_templates/document_template_ihsn_fr.json',
     "uid"=> "4915f93564fbde26945dd9022b9d7fc1fr",
     "data_type"=> "document",

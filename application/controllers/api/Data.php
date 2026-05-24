@@ -154,6 +154,7 @@ class Data extends MY_REST_Controller
 	 *   - upload_id: completed resumable upload (do not send both)
 	 *   - overwrite: (optional) 0 or 1, default 0
 	 *   - store_data: (optional) "store" or "remove", default "store"
+	 *   - priority: (optional) Job queue priority; higher values run before lower (default: 0)
 	 *   - description, producer, data_checks, missing_data, version, notes: (optional) datafile metadata
 	 * 
 	 * Returns:
@@ -182,6 +183,10 @@ class Data extends MY_REST_Controller
 			}
 
 			$overwrite=$this->input->post("overwrite") ? (int)$this->input->post("overwrite") : 0;
+			$priority_post = $this->input->post('priority');
+			$priority = ($priority_post !== false && $priority_post !== null && $priority_post !== '')
+				? (int) $priority_post
+				: 0;
 			$store_data=$this->input->post("store_data");
 
 			if (empty($store_data)) {
@@ -239,7 +244,7 @@ class Data extends MY_REST_Controller
 				$job_type,
 				$payload,
 				$this->get_api_user_id(),
-				0, // priority
+				$priority,
 				3  // max_attempts
 			);
 			

@@ -41,7 +41,8 @@ class Resources extends MY_REST_Controller
 			}
 
 			$this->editor_acl->user_has_project_access($sid,$permission='view');
-			$this->Editor_resource_model->write_json($sid);
+			$this->load->library('ProjectPackage');
+			$this->projectpackage->run_stage($sid, 'resources_json');
 			
 			$output=array(
 				'status'=>'success'
@@ -70,7 +71,8 @@ class Resources extends MY_REST_Controller
 			}
 
 			$this->editor_acl->user_has_project_access($sid,$permission='view');
-			$this->Editor_resource_model->write_rdf($sid);
+			$this->load->library('ProjectPackage');
+			$this->projectpackage->run_stage($sid, 'resources_rdf');
 			
 			$output=array(
 				'status'=>'success'

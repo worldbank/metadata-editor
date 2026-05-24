@@ -427,6 +427,7 @@ $lang['select_export_format']="Sélectionner le format d'exportation";
 
 // Collections management - missing translations
 $lang['No collections found']="Aucune collection trouvée";
+$lang['search_collections_placeholder']="Rechercher des collections...";
 $lang['Users']="Utilisateurs";
 $lang['Projects']="Projets";
 
@@ -697,7 +698,15 @@ $lang['duplicate_new_name'] = "Nouveau nom en doublon : ";
 $lang['name_already_used'] = "Nom déjà utilisé : ";
 
 $lang['data_structure_definition']="Définition de structure de données";
-$lang['data_preview']="Aperçu des données";
+$lang['data_preview']="Données";
+$lang['indicator_data']="Données";
+$lang['import_indicator_data']="Importer les données";
+$lang['upload_csv']="Téléverser le CSV";
+$lang['select_csv_file']="Sélectionner un fichier CSV";
+$lang['csv_extra_remove']="Ne pas importer";
+$lang['csv_extra_keep']="Importer dans les données publiées";
+$lang['indicator_data_empty']="Aucune donnée d'indicateur publiée pour l'instant.";
+$lang['browse']="Parcourir";
 $lang['chart_visualization']="Visualisation";
 $lang['import_csv_data_structure']='Importer CSV';
 $lang['import_csv_description']='Importer un CSV pour créer la définition de structure de données';

@@ -49,12 +49,15 @@ $config['authentication_driver'] = 'DefaultAuth';
 || ZeroAuth – local/desktop mode (no password, one-click login)
 ||--------------------------------------------------------------------------
 ||
-|| One-click login for local/desktop mode (no password, one-click login).
+|| Set authentication_driver to ZeroAuth and enabled to true for local/desktop
+|| builds only. Login is one-click; admin_email is an internal bootstrap key.
 ||
 */
 $config['zero_auth'] = array(
-    'admin_email' => 'editor@localhost',
-    'admin_name'  => 'Editor Admin',
+    'enabled'       => false,
+    'admin_name'    => 'Local Administrator',
+    'admin_email'   => 'local-admin@localhost',
+    'allowed_hosts' => array('localhost', '127.0.0.1'),
 );
 
 // Load OIDC configuration file - config/auth_oidc.php

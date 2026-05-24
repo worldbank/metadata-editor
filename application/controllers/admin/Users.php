@@ -198,7 +198,7 @@ class Users extends MY_Controller {
 									 'active'     => $this->input->post('active'),
 									 'country'    => $this->input->post('country'),
         							 'active'     => $this->input->post('active'),
-									 'role_id'    => $this->input->post('role')
+									 'role_id'    => $this->acl_manager->sanitize_role_assignment($this->input->post('role'))
         							);
         	
         	//register the user
@@ -285,7 +285,7 @@ class Users extends MY_Controller {
 				$this->data['user_role']=$this->input->post('role');
 			}
 			
-			$this->data['roles']= $this->acl_manager->get_roles();//full list of roles
+			$this->data['roles']= $this->acl_manager->roles_for_assigner();
 			$this->data['options_country']= $this->ion_auth_model->get_all_countries();
 			
             $content=$this->load->view('users/create', $this->data,TRUE);
@@ -327,7 +327,7 @@ class Users extends MY_Controller {
 				'company'    => $this->input->post('company'),
 				'phone'      => $this->input->post('phone1'),
 				'active'     => $this->input->post('active'),
-				'role_id'     => $this->input->post('role'),
+				'role_id'     => $this->acl_manager->sanitize_role_assignment($this->input->post('role'), $id),
 				'country'     => $this->input->post('country'),
 			);
 						
@@ -431,7 +431,7 @@ class Users extends MY_Controller {
 				$this->data['user_role']= $db_data->user_role;//roles assigned to user
 			}
 
-			$this->data['roles']= $this->acl_manager->get_roles();//full list of roles
+			$this->data['roles']= $this->acl_manager->roles_for_assigner();
 			$this->data['options_country']= $this->ion_auth_model->get_all_countries();
 
 			$content=$this->load->view('users/edit', $this->data,TRUE);						
@@ -844,7 +844,7 @@ class Users extends MY_Controller {
 		
 		// Get available roles
 		$this->load->library('Acl_manager');
-		$roles = $this->acl_manager->get_roles();
+		$roles = $this->acl_manager->roles_for_assigner();
 		
 		$data = [
 			'users' => $users,
@@ -875,7 +875,7 @@ class Users extends MY_Controller {
 		$this->acl_manager->has_access_or_die('user', 'edit');
 		
 		$user_ids = $this->input->post('user_ids');
-		$role_ids = $this->input->post('role_ids');
+		$role_ids = $this->acl_manager->filter_assignable_role_ids($this->input->post('role_ids'));
 		
 		if (empty($user_ids) || empty($role_ids)) {
 			$this->session->set_flashdata('error', 'No users or roles selected');
@@ -954,6 +954,15 @@ class Users extends MY_Controller {
 				}
 			}
 		}
+
+		if (!$this->acl_manager->user_is_admin()) {
+			$admin_role_ids = $this->acl_manager->get_admin_role_ids();
+			foreach ($user_roles as $uid => $roles) {
+				$user_roles[$uid] = array_values(array_filter($roles, function ($role) use ($admin_role_ids) {
+					return !in_array((int)$role['role_id'], $admin_role_ids, true);
+				}));
+			}
+		}
 		
 		$data = [
 			'users' => $users,
@@ -984,7 +993,7 @@ class Users extends MY_Controller {
 		$this->acl_manager->has_access_or_die('user', 'edit');
 		
 		$user_ids = $this->input->post('user_ids');
-		$role_ids = $this->input->post('role_ids');
+		$role_ids = $this->acl_manager->filter_assignable_role_ids($this->input->post('role_ids'));
 		
 		if (empty($user_ids) || empty($role_ids)) {
 			$this->session->set_flashdata('error', 'No users or roles selected');

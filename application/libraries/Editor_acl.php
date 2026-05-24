@@ -19,6 +19,31 @@ class Editor_acl
 
 	}
 
+	/**
+	 * @return Acl_manager
+	 */
+	private function _acl_manager()
+	{
+		if (!isset($this->ci->acl_manager)) {
+			$this->ci->load->library('Acl_manager', null, 'acl_manager');
+		}
+		return $this->ci->acl_manager;
+	}
+
+	function registry_require($resource, $action, $user = null)
+	{
+		$this->_acl_manager()->registry_require($resource, $action, $user);
+	}
+
+	/**
+	 * @param object|null $user
+	 * @return array<string, bool>
+	 */
+	function registry_user_info_flags($user = null)
+	{
+		return $this->_acl_manager()->registry_user_info_flags($user);
+	}
+
 
 	function get_project_main_id($project_id)
 	{
@@ -507,28 +532,7 @@ class Editor_acl
 
 	function has_site_admin_access($user=null)
 	{
-		if(empty($user)){
-			$user=$this->current_user();
-		}
-
-		if(!$user){
-			die("acl_manager::User not set");
-		}
-
-		//get user roles
-		$user_roles=$this->get_user_roles($user->id);
-
-		if(!$user_roles){
-			return false;
-		}
-
-		foreach($user_roles as $role){
-			if ($role['role_id']==2){ //user
-				return false;
-			}
-		}
-
-		return true;
+		return $this->ci->acl_manager->has_site_admin_access($user);
 	}
 
 	function has_access_or_die($resource,$privilege, $user=null)

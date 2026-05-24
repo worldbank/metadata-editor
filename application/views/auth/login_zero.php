@@ -32,7 +32,9 @@
 
 <h1><?php echo t('log_in'); ?></h1>
 
-<p class="text-secondary mb-4"><?php echo t('local_mode_login_message'); ?></p>
+<p class="text-secondary mb-2"><?php echo t('local_mode_login_message'); ?></p>
+<p class="mb-1"><strong><?php echo htmlspecialchars(isset($local_admin_name) ? $local_admin_name : t('local_administrator')); ?></strong></p>
+<p class="text-secondary mb-4"><?php echo t('local_mode_no_password_required'); ?></p>
 
 <form method="post" class="form" autocomplete="off">
 	<input type="hidden" name="zero_auth_login" value="1">

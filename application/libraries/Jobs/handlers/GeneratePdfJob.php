@@ -25,7 +25,7 @@ class GeneratePdfJob implements JobHandlerInterface
      */
     public function getJobType()
     {
-        return 'pdf_generation';
+        return 'generate_pdf';
     }
     
     /**

@@ -22,19 +22,12 @@
         $user=$this->session->userdata('username');
         $this->load->library('Editor_acl');
         
-        $has_schema_permission = false;
-        try {
-            $has_schema_permission = $this->editor_acl->has_access('schema', 'view');
-        } catch (Exception $e) {
-            $has_schema_permission = false;
-        }
-
-        $user_info=[
+        $user_info=array_merge(array(
             'username'=> $user,
             'is_logged_in'=> !empty($user),
             'is_admin'=> $this->ion_auth->is_admin(),
-            'has_schema_permission'=> $has_schema_permission,
-        ];
+            'can_access_site_admin'=> $this->ion_auth->can_access_site_admin(),
+        ), registry_acl_user_info_flags());
         
         ?>
     
@@ -129,6 +122,53 @@
 
         .collection-title {
             flex: 1;
+        }
+
+        .collections-grid-search-header {
+            padding: 2px 0 4px;
+            min-height: 32px;
+        }
+
+        .collections-grid-header {
+            padding: 4px 0 6px;
+            min-height: 36px;
+        }
+
+        .collections-grid-search {
+            max-width: 280px;
+            margin: 0;
+        }
+
+        .collections-grid-search.v-text-field {
+            padding-top: 0;
+            margin-top: 0;
+        }
+
+        .collections-grid-search .v-input__control {
+            min-height: 28px !important;
+        }
+
+        .collections-grid-search .v-input__slot {
+            min-height: 28px !important;
+            padding: 0 6px !important;
+        }
+
+        .collections-grid-search input {
+            font-size: 0.8rem;
+            padding: 2px 0 !important;
+        }
+
+        .collections-grid-search .v-input__prepend-inner {
+            margin-top: 4px !important;
+            padding-right: 4px !important;
+        }
+
+        .collections-grid-search .v-input__append-inner {
+            margin-top: 4px !important;
+        }
+
+        .collections-grid-search .v-icon {
+            font-size: 16px;
         }
     </style>
 </head>

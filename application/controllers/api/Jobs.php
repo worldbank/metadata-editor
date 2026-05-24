@@ -11,6 +11,7 @@ class Jobs extends MY_REST_Controller
 	{
 		parent::__construct();
 		$this->load->model('Job_queue_model');
+		$this->load->library('Editor_acl');
 		
 		// Load job registry for validation
 		require_once APPPATH . 'libraries/Jobs/JobHandlerInterface.php';
@@ -36,7 +37,7 @@ class Jobs extends MY_REST_Controller
 	 * Get list of all jobs (basic information only)
 	 * 
 	 * Query parameters:
-	 *   status - Filter by status (pending, processing, completed, failed)
+	 *   status - Filter by status (pending, held, processing, completed, failed)
 	 *   job_type - Filter by job type
 	 *   user_id - Filter by user ID (admin only, or own jobs)
 	 *   limit - Number of jobs to return (default: 50)
@@ -63,6 +64,9 @@ class Jobs extends MY_REST_Controller
 			$status = $this->input->get('status');
 			$job_type = $this->input->get('job_type');
 			$user_id_filter = $this->input->get('user_id');
+			$active_only = $this->input->get('active') === '1' || $this->input->get('active') === 'true';
+			$history_only = $this->input->get('history') === '1' || $this->input->get('history') === 'true';
+			$stale_only = $this->input->get('stale') === '1' || $this->input->get('stale') === 'true';
 			$limit = (int)($this->input->get('limit') ?: 50);
 			$offset = (int)($this->input->get('offset') ?: 0);
 			
@@ -75,59 +79,34 @@ class Jobs extends MY_REST_Controller
 			$is_admin = $this->is_admin();
 			
 			if (!$is_admin) {
-				// Regular users can only see their own jobs
 				$user_id_filter = $this->user_id;
 			}
-			
-			// Build query based on filters
-			$jobs = array();
-			
-			if ($user_id_filter) {
-				// Get jobs by user
-				$jobs = $this->Job_queue_model->get_by_user(
-					$user_id_filter,
-					$status,
-					$limit,
-					$offset
-				);
+
+			$filters = array();
+			if ($stale_only) {
+				$filters['stale'] = true;
+			} elseif ($active_only) {
+				$filters['active'] = true;
+			} elseif ($history_only) {
+				$filters['history'] = true;
 			} elseif ($status) {
-				// Get jobs by status
-				$jobs = $this->Job_queue_model->get_by_status(
-					$status,
-					$limit,
-					$offset
-				);
-			} elseif ($job_type) {
-				// Get jobs by type
-				$jobs = $this->Job_queue_model->get_by_job_type(
-					$job_type,
-					$status,
-					$limit
-				);
-			} else {
-				// Get all jobs (admin only, or fallback to user's jobs)
-				if ($is_admin) {
-					// Admin can see all jobs
-					$filters = array();
-					if ($job_type) {
-						$filters['job_type'] = $job_type;
-					}
-					$jobs = $this->Job_queue_model->get_all($filters, $limit, $offset);
-				} else {
-					// Regular users see only their jobs
-					$jobs = $this->Job_queue_model->get_by_user(
-						$this->user_id,
-						$status,
-						$limit,
-						$offset
-					);
-				}
+				$filters['status'] = $status;
 			}
+			if ($job_type) {
+				$filters['job_type'] = $job_type;
+			}
+			if ($user_id_filter) {
+				$filters['user_id'] = $user_id_filter;
+			}
+
+			$total_count = $this->Job_queue_model->count_jobs($filters);
+			$jobs = $this->Job_queue_model->get_all($filters, $limit, $offset);
 			
 			// Return only basic information (exclude payload and result)
 			$basic_jobs = array();
 			foreach ($jobs as $job) {
 				$job_uuid = isset($job['uuid']) ? $job['uuid'] : null;
+				$stale_info = $this->Job_queue_model->get_job_stale_info($job);
 				$basic_jobs[] = array(
 					'uuid' => $job_uuid, // Public-facing UUID
 					'job_type' => $job['job_type'],
@@ -140,17 +119,21 @@ class Jobs extends MY_REST_Controller
 					'started_at' => $job['started_at'],
 					'completed_at' => $job['completed_at'],
 					'worker_id' => isset($job['worker_id']) ? $job['worker_id'] : null,
-                    'job_status_link' => $job_uuid ? site_url('api/jobs/' . $job_uuid) : null
+                    'job_status_link' => $job_uuid ? site_url('api/jobs/' . $job_uuid) : null,
+					'is_stale' => $stale_info['is_stale'],
+					'stale_reason' => $stale_info['stale_reason'],
+					'stale_level' => $stale_info['stale_level'],
 				);
 			}
 			
 			$response = array(
 				'status' => 'success',
-				'total' => count($basic_jobs),
+				'total' => $total_count,
 				'found' => count($basic_jobs),
 				'limit' => $limit,
 				'offset' => $offset,
-				'jobs' => $basic_jobs
+				'jobs' => $basic_jobs,
+				'stale_config' => $this->Job_queue_model->get_stale_config(),
 			);
 			
 			$this->set_response($response, REST_Controller::HTTP_OK);
@@ -213,13 +196,18 @@ class Jobs extends MY_REST_Controller
 			
 			// Remove numeric ID from job object for API response
 			$job_response = $this->sanitize_job_for_api($job);
+			$stale_info = $this->Job_queue_model->get_job_stale_info($job);
+			$job_response['is_stale'] = $stale_info['is_stale'];
+			$job_response['stale_reason'] = $stale_info['stale_reason'];
+			$job_response['stale_level'] = $stale_info['stale_level'];
 			$worker_status_response = $this->_get_worker_status_response();
 			
 			// Return full job details
 			$response = array(
 				'status' => 'success',
 				'job' => $job_response,
-				'worker_status' => $worker_status_response
+				'worker_status' => $worker_status_response,
+				'stale_config' => $this->Job_queue_model->get_stale_config(),
 			);
 			
 			$this->set_response($response, REST_Controller::HTTP_OK);
@@ -495,6 +483,9 @@ class Jobs extends MY_REST_Controller
 				'publish_metadata' => isset($input['publish_metadata']) ? $input['publish_metadata'] : true,
 				'publish_thumbnail' => isset($input['publish_thumbnail']) ? $input['publish_thumbnail'] : true,
 				'publish_resources' => isset($input['publish_resources']) ? $input['publish_resources'] : true,
+				'publish_dsd' => !empty($input['publish_dsd']),
+				'dsd_overwrite' => !empty($input['dsd_overwrite']),
+				'publish_indicator_data' => !empty($input['publish_indicator_data']),
 			);
 			
 			// Add options if provided
@@ -550,6 +541,111 @@ class Jobs extends MY_REST_Controller
 				'message' => $e->getMessage()
 			);
 			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * Create an indicator data import job (convenience endpoint)
+	 *
+	 * POST /api/jobs/import_indicator_data
+	 *
+	 * Imports a CSV file into the timeseries data store for an indicator/timeseries project.
+	 * Handles the full workflow as a single background job:
+	 *   1. Loads the CSV into the draft buffer
+	 *   2. Validates that all required DSD columns are present
+	 *   3. Imports data for the requested indicator_value (indicator_id column)
+	 *
+	 * The CSV must be uploaded first via POST /api/uploads/* to obtain an upload_id.
+	 *
+	 * Request body:
+	 *   {
+	 *     "project_id": 885,
+	 *     "upload_id": "abc123",
+	 *     "delimiter": ",",
+	 *     "indicator_value": "NY.GDP.PCAP.CD"
+	 *   }
+	 *
+	 * project_id may be the numeric database id or the project idno (same as get_sid() elsewhere).
+	 * Caller must have edit access to the project (same as indicator_dsd data import endpoints).
+	 *
+	 * Required fields:
+	 *   - project_id: Numeric id or idno of an indicator or timeseries project
+	 *   - upload_id:  Completed resumable upload ID (from POST /api/uploads/*)
+	 *   - indicator_value: Only import rows whose indicator_id column matches this value
+	 *
+	 * Optional fields:
+	 *   - delimiter:    CSV field delimiter character (default: ',')
+	 *   - priority:     Job queue priority (default: 0)
+	 *   - max_attempts: Maximum retry attempts (default: 1)
+	 *
+	 * Returns: { status, uuid, job }
+	 * Poll status via GET /api/jobs/{uuid}
+	 */
+	function import_indicator_data_post()
+	{
+		try {
+			$input = json_decode($this->input->raw_input_stream, true);
+			if (!$input) {
+				$input = $this->input->post();
+			}
+			if (empty($input)) {
+				throw new Exception('Request body is required');
+			}
+			if (empty($input['project_id'])) {
+				throw new Exception('project_id is required');
+			}
+			if (empty($input['upload_id'])) {
+				throw new Exception('upload_id is required — upload the CSV first via POST /api/uploads/*');
+			}
+			if (!isset($input['indicator_value']) || trim((string) $input['indicator_value']) === '') {
+				throw new Exception('indicator_value is required');
+			}
+
+			$resolved_sid = $this->get_sid((string) $input['project_id']);
+			$this->editor_acl->user_has_project_access($resolved_sid, 'edit', $this->api_user);
+
+			$payload = array(
+				'project_id' => (int) $resolved_sid,
+				'upload_id'  => (string) $input['upload_id'],
+			);
+			if (!empty($input['delimiter'])) {
+				$payload['delimiter'] = (string) $input['delimiter'];
+			}
+			$payload['indicator_value'] = trim((string) $input['indicator_value']);
+
+			$job_type     = 'import_indicator_data';
+			$priority     = isset($input['priority']) ? (int) $input['priority'] : 0;
+			// Default to 1 attempt — retrying a partial import could duplicate rows
+			$max_attempts = isset($input['max_attempts']) ? (int) $input['max_attempts'] : 1;
+
+			if (!$this->Job_queue_model->is_valid_job_type($job_type)) {
+				$available_types = $this->Job_queue_model->get_job_types();
+				throw new Exception("Invalid job_type: {$job_type}. Available types: " . implode(', ', $available_types));
+			}
+
+			$handler = JobRegistry::getHandler($job_type);
+			if ($handler) {
+				$handler->validatePayload($payload);
+			}
+
+			$job_id = $this->Job_queue_model->enqueue($job_type, $payload, $this->user_id, $priority, $max_attempts);
+			$job    = $this->Job_queue_model->get($job_id);
+
+			$job_response = $this->sanitize_job_for_api($job);
+			$job_uuid     = isset($job['uuid']) ? $job['uuid'] : null;
+
+			$this->set_response(array(
+				'status'  => 'success',
+				'message' => 'Import job created. Poll GET /api/jobs/' . $job_uuid . ' for status.',
+				'uuid'    => $job_uuid,
+				'job'     => $job_response,
+			), REST_Controller::HTTP_CREATED);
+
+		} catch (Exception $e) {
+			$this->set_response(array(
+				'status'  => 'failed',
+				'message' => $e->getMessage(),
+			), REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
 
@@ -649,12 +745,14 @@ class Jobs extends MY_REST_Controller
 			
 			// Get overall statistics
 			$stats = $this->Job_queue_model->get_stats();
+			$stale_count = $this->Job_queue_model->count_stale_jobs($user_id_filter);
 			
 			// If user_id filter is provided, get user-specific stats
 			$user_stats = null;
 			if ($user_id_filter) {
 				$user_stats = array(
 					'pending' => count($this->Job_queue_model->get_by_user($user_id_filter, 'pending', 1000, 0)),
+					'held' => count($this->Job_queue_model->get_by_user($user_id_filter, 'held', 1000, 0)),
 					'processing' => count($this->Job_queue_model->get_by_user($user_id_filter, 'processing', 1000, 0)),
 					'completed' => count($this->Job_queue_model->get_by_user($user_id_filter, 'completed', 1000, 0)),
 					'failed' => count($this->Job_queue_model->get_by_user($user_id_filter, 'failed', 1000, 0))
@@ -665,6 +763,10 @@ class Jobs extends MY_REST_Controller
 			$response = array(
 				'status' => 'success',
 				'queue' => $stats,
+				'stale' => array(
+					'count' => $stale_count,
+				),
+				'stale_config' => $this->Job_queue_model->get_stale_config(),
 				//'user_id' => $user_id_filter
 			);
 			
@@ -799,6 +901,483 @@ class Jobs extends MY_REST_Controller
 		);
 	}
 	
+	/**
+	 * Retry a failed job (creates a new job with the same parameters)
+	 *
+	 * POST /api/jobs/{uuid}/retry
+	 */
+	function retry_post($job_identifier = null)
+	{
+		try {
+			$job = $this->get_job_with_access($job_identifier);
+			if (!$job) {
+				$this->set_response(array('status' => 'failed', 'message' => 'Job not found'), REST_Controller::HTTP_NOT_FOUND);
+				return;
+			}
+
+			$new_job_id = $this->Job_queue_model->create_retry_from_job($job, $this->user_id);
+			$new_job = $this->Job_queue_model->get($new_job_id);
+			$job_response = $this->format_job_for_api($new_job);
+
+			$this->set_response(array(
+				'status' => 'success',
+				'message' => 'Retry job created',
+				'uuid' => isset($new_job['uuid']) ? $new_job['uuid'] : null,
+				'job' => $job_response,
+			), REST_Controller::HTTP_CREATED);
+		} catch (Exception $e) {
+			if ($e->getMessage() === 'Access denied') {
+				$this->set_response(array('status' => 'failed', 'message' => 'Access denied'), REST_Controller::HTTP_FORBIDDEN);
+				return;
+			}
+			$this->set_response(array('status' => 'failed', 'message' => $e->getMessage()), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * Cancel a pending job
+	 *
+	 * POST /api/jobs/{uuid}/cancel
+	 */
+	function cancel_post($job_identifier = null)
+	{
+		try {
+			$job = $this->get_job_with_access($job_identifier);
+			if (!$job) {
+				$this->set_response(array('status' => 'failed', 'message' => 'Job not found'), REST_Controller::HTTP_NOT_FOUND);
+				return;
+			}
+
+			if ($job['status'] !== 'pending') {
+				throw new Exception('Only pending jobs can be cancelled');
+			}
+
+			if (!$this->Job_queue_model->cancel_job($job['id'])) {
+				throw new Exception('Job could not be cancelled');
+			}
+
+			$updated = $this->Job_queue_model->get($job['id']);
+			$this->set_response(array(
+				'status' => 'success',
+				'message' => 'Job cancelled',
+				'job' => $this->format_job_for_api($updated),
+			), REST_Controller::HTTP_OK);
+		} catch (Exception $e) {
+			if ($e->getMessage() === 'Access denied') {
+				$this->set_response(array('status' => 'failed', 'message' => 'Access denied'), REST_Controller::HTTP_FORBIDDEN);
+				return;
+			}
+			$this->set_response(array('status' => 'failed', 'message' => $e->getMessage()), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * Delete a terminal job (admin only)
+	 *
+	 * POST /api/jobs/{uuid}/delete
+	 */
+	function delete_job_post($job_identifier = null)
+	{
+		try {
+			$this->is_admin_or_die();
+
+			$job = $this->get_job_with_access($job_identifier, false);
+			if (!$job) {
+				$this->set_response(array('status' => 'failed', 'message' => 'Job not found'), REST_Controller::HTTP_NOT_FOUND);
+				return;
+			}
+
+			if (!in_array($job['status'], array('completed', 'failed'), true)) {
+				throw new Exception('Only completed or failed jobs can be deleted');
+			}
+
+			if (!$this->Job_queue_model->delete_job($job['id'])) {
+				throw new Exception('Job could not be deleted');
+			}
+
+			$this->set_response(array(
+				'status' => 'success',
+				'message' => 'Job deleted',
+				'uuid' => $job['uuid'],
+			), REST_Controller::HTTP_OK);
+		} catch (Exception $e) {
+			if ($e->getMessage() === 'ACCESS-DENIED') {
+				return;
+			}
+			$this->set_response(array('status' => 'failed', 'message' => $e->getMessage()), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * Hold all pending jobs (admin only)
+	 *
+	 * POST /api/jobs/hold_all
+	 */
+	function hold_all_post()
+	{
+		try {
+			$this->is_admin_or_die();
+
+			$count = $this->Job_queue_model->hold_all_pending();
+
+			$this->set_response(array(
+				'status' => 'success',
+				'message' => "Held {$count} pending job(s)",
+				'held_count' => $count,
+			), REST_Controller::HTTP_OK);
+		} catch (Exception $e) {
+			if ($e->getMessage() === 'Access denied') {
+				$this->set_response(array('status' => 'failed', 'message' => 'Access denied'), REST_Controller::HTTP_FORBIDDEN);
+				return;
+			}
+			$this->set_response(array('status' => 'failed', 'message' => $e->getMessage()), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * Release all held jobs back to pending (admin only)
+	 *
+	 * POST /api/jobs/release_all
+	 */
+	function release_all_post()
+	{
+		try {
+			$this->is_admin_or_die();
+
+			$count = $this->Job_queue_model->release_all_held();
+
+			$this->set_response(array(
+				'status' => 'success',
+				'message' => "Released {$count} held job(s)",
+				'released_count' => $count,
+			), REST_Controller::HTTP_OK);
+		} catch (Exception $e) {
+			if ($e->getMessage() === 'Access denied') {
+				$this->set_response(array('status' => 'failed', 'message' => 'Access denied'), REST_Controller::HTTP_FORBIDDEN);
+				return;
+			}
+			$this->set_response(array('status' => 'failed', 'message' => $e->getMessage()), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * Hold a pending job (admin only)
+	 *
+	 * POST /api/jobs/{uuid}/hold
+	 */
+	function hold_post($job_identifier = null)
+	{
+		try {
+			$this->is_admin_or_die();
+
+			$job = $this->get_job_with_access($job_identifier, false);
+			if (!$job) {
+				$this->set_response(array('status' => 'failed', 'message' => 'Job not found'), REST_Controller::HTTP_NOT_FOUND);
+				return;
+			}
+
+			if ($job['status'] !== 'pending') {
+				throw new Exception('Only pending jobs can be held');
+			}
+
+			if (!$this->Job_queue_model->hold_job($job['id'])) {
+				throw new Exception('Job could not be held');
+			}
+
+			$updated = $this->Job_queue_model->get($job['id']);
+			$this->set_response(array(
+				'status' => 'success',
+				'message' => 'Job held',
+				'job' => $this->format_job_for_api($updated),
+			), REST_Controller::HTTP_OK);
+		} catch (Exception $e) {
+			if ($e->getMessage() === 'Access denied') {
+				$this->set_response(array('status' => 'failed', 'message' => 'Access denied'), REST_Controller::HTTP_FORBIDDEN);
+				return;
+			}
+			$this->set_response(array('status' => 'failed', 'message' => $e->getMessage()), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * Release a held job back to pending (admin only)
+	 *
+	 * POST /api/jobs/{uuid}/release
+	 */
+	function release_post($job_identifier = null)
+	{
+		try {
+			$this->is_admin_or_die();
+
+			$job = $this->get_job_with_access($job_identifier, false);
+			if (!$job) {
+				$this->set_response(array('status' => 'failed', 'message' => 'Job not found'), REST_Controller::HTTP_NOT_FOUND);
+				return;
+			}
+
+			if ($job['status'] !== 'held') {
+				throw new Exception('Only held jobs can be released');
+			}
+
+			if (!$this->Job_queue_model->release_job($job['id'])) {
+				throw new Exception('Job could not be released');
+			}
+
+			$updated = $this->Job_queue_model->get($job['id']);
+			$this->set_response(array(
+				'status' => 'success',
+				'message' => 'Job released',
+				'job' => $this->format_job_for_api($updated),
+			), REST_Controller::HTTP_OK);
+		} catch (Exception $e) {
+			if ($e->getMessage() === 'Access denied') {
+				$this->set_response(array('status' => 'failed', 'message' => 'Access denied'), REST_Controller::HTTP_FORBIDDEN);
+				return;
+			}
+			$this->set_response(array('status' => 'failed', 'message' => $e->getMessage()), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * Batch cancel pending jobs
+	 *
+	 * POST /api/jobs/batch/cancel
+	 * Body: { "uuids": ["...", "..."] }
+	 */
+	function batch_cancel_post()
+	{
+		$this->process_batch_action('cancel');
+	}
+
+	/**
+	 * Batch hold pending jobs (admin only)
+	 *
+	 * POST /api/jobs/batch/hold
+	 * Body: { "uuids": ["...", "..."] }
+	 */
+	function batch_hold_post()
+	{
+		try {
+			$this->is_admin_or_die();
+		} catch (Exception $e) {
+			return;
+		}
+		$this->process_batch_action('hold');
+	}
+
+	/**
+	 * Batch release held jobs (admin only)
+	 *
+	 * POST /api/jobs/batch/release
+	 * Body: { "uuids": ["...", "..."] }
+	 */
+	function batch_release_post()
+	{
+		try {
+			$this->is_admin_or_die();
+		} catch (Exception $e) {
+			return;
+		}
+		$this->process_batch_action('release');
+	}
+
+	/**
+	 * Batch retry failed jobs
+	 *
+	 * POST /api/jobs/batch/retry
+	 * Body: { "uuids": ["...", "..."] }
+	 */
+	function batch_retry_post()
+	{
+		$this->process_batch_action('retry');
+	}
+
+	/**
+	 * Batch delete terminal jobs (admin only)
+	 *
+	 * POST /api/jobs/batch/delete
+	 * Body: { "uuids": ["...", "..."] }
+	 */
+	function batch_delete_post()
+	{
+		try {
+			$this->is_admin_or_die();
+		} catch (Exception $e) {
+			return;
+		}
+		$this->process_batch_action('delete');
+	}
+
+	/**
+	 * Load a job and enforce access control
+	 *
+	 * @param string|null $job_identifier UUID or numeric ID
+	 * @param bool $enforce_owner Non-admins may only access own jobs
+	 * @return array|null Job row or null if not found
+	 * @throws Exception Access denied
+	 */
+	private function get_job_with_access($job_identifier = null, $enforce_owner = true)
+	{
+		if (!$job_identifier) {
+			$job_identifier = $this->uri->segment(3);
+		}
+		if (!$job_identifier) {
+			throw new Exception('Invalid or missing job identifier');
+		}
+
+		$job = $this->Job_queue_model->get_by_uuid_or_id($job_identifier);
+		if (!$job) {
+			return null;
+		}
+
+		if ($enforce_owner && !$this->is_admin() && $job['user_id'] != $this->user_id) {
+			throw new Exception('Access denied');
+		}
+
+		return $job;
+	}
+
+	/**
+	 * Format job for API with stale metadata (no numeric id)
+	 *
+	 * @param array|null $job
+	 * @return array|null
+	 */
+	private function format_job_for_api($job)
+	{
+		if (!$job) {
+			return $job;
+		}
+		$response = $this->sanitize_job_for_api($job);
+		$stale_info = $this->Job_queue_model->get_job_stale_info($job);
+		$response['is_stale'] = $stale_info['is_stale'];
+		$response['stale_reason'] = $stale_info['stale_reason'];
+		$response['stale_level'] = $stale_info['stale_level'];
+		return $response;
+	}
+
+	/**
+	 * Parse JSON request body
+	 *
+	 * @return array
+	 */
+	private function parse_json_body()
+	{
+		$input = json_decode($this->input->raw_input_stream, true);
+		if (!$input) {
+			$input = $this->input->post();
+		}
+		return is_array($input) ? $input : array();
+	}
+
+	/**
+	 * Process batch cancel, retry, or delete
+	 *
+	 * @param string $action cancel|retry|delete|hold|release
+	 */
+	private function process_batch_action($action)
+	{
+		try {
+			$input = $this->parse_json_body();
+			$uuids = isset($input['uuids']) ? $input['uuids'] : array();
+			if (!is_array($uuids) || empty($uuids)) {
+				throw new Exception('uuids array is required');
+			}
+
+			$succeeded = array();
+			$skipped = array();
+			$errors = array();
+
+			foreach ($uuids as $uuid) {
+				$uuid = trim((string) $uuid);
+				if ($uuid === '') {
+					continue;
+				}
+
+				try {
+					$enforce_owner = ($action !== 'delete');
+					$job = $this->get_job_with_access($uuid, $enforce_owner);
+					if (!$job) {
+						$skipped[] = array('uuid' => $uuid, 'reason' => 'Job not found');
+						continue;
+					}
+
+					if ($action === 'cancel') {
+						if ($job['status'] !== 'pending') {
+							$skipped[] = array('uuid' => $uuid, 'reason' => 'Only pending jobs can be cancelled');
+							continue;
+						}
+						if (!$this->Job_queue_model->cancel_job($job['id'])) {
+							$errors[] = array('uuid' => $uuid, 'message' => 'Cancel failed');
+							continue;
+						}
+						$succeeded[] = $uuid;
+					} elseif ($action === 'retry') {
+						if ($job['status'] !== 'failed') {
+							$skipped[] = array('uuid' => $uuid, 'reason' => 'Only failed jobs can be retried');
+							continue;
+						}
+						$new_job_id = $this->Job_queue_model->create_retry_from_job($job, $this->user_id);
+						$new_job = $this->Job_queue_model->get($new_job_id);
+						$succeeded[] = array(
+							'source_uuid' => $uuid,
+							'uuid' => isset($new_job['uuid']) ? $new_job['uuid'] : null,
+						);
+					} elseif ($action === 'delete') {
+						if (!in_array($job['status'], array('completed', 'failed'), true)) {
+							$skipped[] = array('uuid' => $uuid, 'reason' => 'Only completed or failed jobs can be deleted');
+							continue;
+						}
+						if (!$this->Job_queue_model->delete_job($job['id'])) {
+							$errors[] = array('uuid' => $uuid, 'message' => 'Delete failed');
+							continue;
+						}
+						$succeeded[] = $uuid;
+					} elseif ($action === 'hold') {
+						if ($job['status'] !== 'pending') {
+							$skipped[] = array('uuid' => $uuid, 'reason' => 'Only pending jobs can be held');
+							continue;
+						}
+						if (!$this->Job_queue_model->hold_job($job['id'])) {
+							$errors[] = array('uuid' => $uuid, 'message' => 'Hold failed');
+							continue;
+						}
+						$succeeded[] = $uuid;
+					} elseif ($action === 'release') {
+						if ($job['status'] !== 'held') {
+							$skipped[] = array('uuid' => $uuid, 'reason' => 'Only held jobs can be released');
+							continue;
+						}
+						if (!$this->Job_queue_model->release_job($job['id'])) {
+							$errors[] = array('uuid' => $uuid, 'message' => 'Release failed');
+							continue;
+						}
+						$succeeded[] = $uuid;
+					}
+				} catch (Exception $e) {
+					if ($e->getMessage() === 'Access denied') {
+						$errors[] = array('uuid' => $uuid, 'message' => 'Access denied');
+					} else {
+						$errors[] = array('uuid' => $uuid, 'message' => $e->getMessage());
+					}
+				}
+			}
+
+			$this->set_response(array(
+				'status' => 'success',
+				'action' => $action,
+				'succeeded' => $succeeded,
+				'succeeded_count' => count($succeeded),
+				'skipped' => $skipped,
+				'skipped_count' => count($skipped),
+				'errors' => $errors,
+				'error_count' => count($errors),
+			), REST_Controller::HTTP_OK);
+		} catch (Exception $e) {
+			$this->set_response(array('status' => 'failed', 'message' => $e->getMessage()), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
 	/**
 	 * Remove numeric ID from job object for API responses
 	 * 

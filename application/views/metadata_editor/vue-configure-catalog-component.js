@@ -1,6 +1,12 @@
 // configure-catalog component
 Vue.component('configure-catalog', {
-    props:['value'],
+    props: {
+        value: {},
+        showPublishLink: {
+            type: Boolean,
+            default: true
+        }
+    },
     data: function () {    
         return {          
             catalog_connections:[],
@@ -9,20 +15,7 @@ Vue.component('configure-catalog', {
             },
             editing: false,
             editingId: null,
-            loading: false,
-            tableHeaders: [
-                {
-                    text: this.$t('catalog_title'),
-                    value: 'info',
-                    sortable: true
-                },
-                {
-                    text: this.$t('actions'),
-                    value: 'actions',
-                    sortable: false,
-                    width: '120px'
-                }
-            ]
+            loading: false
         }
     },
     mounted: function(){
@@ -216,6 +209,7 @@ Vue.component('configure-catalog', {
     computed: {
         tableHeaders() {
             return [
+                { text: this.$t('id'), value: 'id', sortable: true, width: '72px' },
                 { text: this.$t('catalog_info'), value: 'info', sortable: true },
                 { text: this.$t('actions'), value: 'actions', sortable: false, width: '120px' }
             ];
@@ -229,7 +223,10 @@ Vue.component('configure-catalog', {
                     <v-row>                        
                         <v-col cols="6">
                             <v-card>
-                                <v-card-title>{{$t('catalog_connections')}}</v-card-title>
+                                <v-card-title class="d-flex align-center justify-space-between flex-wrap">
+                                    <span>{{$t('catalog_connections')}}</span>
+                                    <router-link v-if="showPublishLink" class="btn btn-sm btn-link" to="/publish">{{$t('publish_to_nada')}}</router-link>
+                                </v-card-title>
                                 <v-card-text>
                                     <v-data-table
                                         :headers="tableHeaders"

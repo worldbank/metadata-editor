@@ -251,11 +251,23 @@ class Editor extends MY_REST_Controller
 		$options['changed_by'] = $user_id;
 		$options['changed'] = date("U");
 		
-		// Indicator/timeseries: import data_structure into DSD table and remove from metadata
-		if (in_array($type, array('indicator', 'timeseries')) && isset($options['data_structure']) && is_array($options['data_structure'])) {
-			$this->load->library('Indicator_util');
-			$this->indicator_util->import_data_structure_for_project($id, $options['data_structure'], $user_id);
+		// Indicator/timeseries: bind global DSD reference only (no inline data_structure).
+		if (in_array($type, array('indicator', 'timeseries'))) {
+			if (isset($options['data_structure']) && is_array($options['data_structure']) && count($options['data_structure']) > 0) {
+				throw new Exception(
+					'Inline data_structure is no longer supported. Attach a global data structure via data_structure_reference or the project DSD UI.'
+				);
+			}
 			unset($options['data_structure']);
+
+			if (isset($options['data_structure_reference']) && is_array($options['data_structure_reference'])) {
+				$this->load->library('Data_structure_util');
+				$this->data_structure_util->bind_project_by_reference(
+					$id,
+					$options['data_structure_reference'],
+					$user_id
+				);
+			}
 		}
 		
 		$this->load->library('ImportJsonMetadata');
@@ -291,12 +303,11 @@ class Editor extends MY_REST_Controller
 				$idno=$this->Editor_model->generate_uuid();
 			}
 
-			// check if project already exists
-			$sid=$this->Editor_model->get_project_id_by_idno($idno);
-			
-			if ($sid){
-				throw new Exception("Project with this IDNO already exists: ".$idno);
-			}
+			$overwrite_raw = $project_options['overwrite'] ?? false;
+			$overwrite = is_string($overwrite_raw)
+				? in_array(strtolower(trim($overwrite_raw)), ['true', 'yes'], true)
+				: (bool) $overwrite_raw;
+			unset($project_options['overwrite']);
 
 			//collection IDs
 			$collection_ids = null;
@@ -306,6 +317,31 @@ class Editor extends MY_REST_Controller
 			}
 
 			$this->_batch_validate_collection_access($collection_ids);
+
+			// check if project already exists
+			$sid=$this->Editor_model->get_project_id_by_idno($idno);
+
+			if ($sid && $overwrite) {
+				// Verify the existing project is the same type before overwriting
+				if (!$this->Editor_model->check_id_exists($sid, $type)) {
+					throw new Exception("Cannot overwrite: existing project with IDNO [".$idno."] is a different type");
+				}
+
+				if (!empty($project_options)) {
+					$this->_update_project_metadata($type, $sid, $project_options, false, $this->api_user(), $user_id);
+				}
+
+				$this->_add_project_to_collections($sid, $collection_ids, $user_id);
+				$this->audit_log->log_event('project', $sid, 'update', null, $user_id, null);
+
+				$this->set_response(array('status' => 'success', 'id' => $sid), REST_Controller::HTTP_OK);
+				return;
+			}
+
+			if ($sid){
+				throw new Exception("Project with this IDNO already exists: ".$idno);
+			}
+
 			$this->validate_project_idno($idno);
 						
 			$options=array(
@@ -978,7 +1014,8 @@ class Editor extends MY_REST_Controller
 			}
 
 			$this->editor_acl->user_has_project_access($sid,$permission='view');
-			$this->project_json_writer->generate_project_json($sid);
+			$this->load->library('ProjectPackage');
+			$this->projectpackage->run_stage($sid, 'json');
 
 			$output=array(
 				'status'=>'success'
@@ -1033,7 +1070,8 @@ class Editor extends MY_REST_Controller
 			}
 
 			$this->editor_acl->user_has_project_access($sid,$permission='view');
-			$this->Editor_model->generate_project_ddi($sid);
+			$this->load->library('ProjectPackage');
+			$this->projectpackage->run_stage($sid, 'ddi');
 
 			$output=array(
 				'status'=>'success'

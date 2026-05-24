@@ -390,7 +390,16 @@ class Ion_auth
 			$user_id=$this->ci->session->userdata("user_id");
 		}
 
-		return $this->ci->acl_manager->has_site_admin_access();
+		if(!$user_id){
+			return false;
+		}
+
+		$user=$this->get_user($user_id);
+		if(!$user){
+			return false;
+		}
+
+		return $this->ci->acl_manager->has_site_admin_access($user);
 	}
 	
 	/**
