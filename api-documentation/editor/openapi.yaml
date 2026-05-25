@@ -4234,9 +4234,11 @@ paths:
         - Data Structures
       summary: Export data structure JSON
       description: >-
-        Returns canonical interchange JSON. Export shape places `components` as a
-        sibling of `data_structure` (header only). Import via `import_json` expects
-        `components` nested inside `data_structure` — see `data-structure-schema.json`.
+        Returns import-ready interchange JSON per `data-structure-schema.json`:
+        `data_structure` includes nested `components[]`; dimension/geography
+        components embed inline `codelist` objects with `items` (not
+        `codelist_reference` only). Suitable for `POST .../import_json` on this
+        editor or NADA without a separate codelist export step.
       operationId: dataStructuresExport
       parameters:
         - name: segment

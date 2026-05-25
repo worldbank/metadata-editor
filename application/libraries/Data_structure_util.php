@@ -454,13 +454,21 @@ class Data_structure_util {
     }
 
     /**
-     * Export payload for interchange (structure header + components with codelist_reference).
+     * Export payload for interchange.
      *
-     * @param int $data_structure_id
+     * Options:
+     * - inline_codelists (bool): embed codelist + items on dimension/geography components (default false = codelist_reference only)
+     * - nest_components (bool): place components under data_structure for import_json (default false = legacy root-level components)
+     *
+     * @param int   $data_structure_id
+     * @param array $options
      * @return array
      */
-    public function build_export_document($data_structure_id)
+    public function build_export_document($data_structure_id, array $options = array())
     {
+        $inlineCodelists = !empty($options['inline_codelists']);
+        $nestComponents = !empty($options['nest_components']);
+
         $row = $this->ci->Data_structure_model->get_structure_by_id((int) $data_structure_id, true);
         if (!$row) {
             throw new Exception('Data structure not found');
@@ -472,7 +480,14 @@ class Data_structure_util {
 
         $out_components = array();
         foreach ($components as $comp) {
-            $out_components[] = $this->component_to_export_shape($comp);
+            $out_components[] = $this->component_to_export_shape($comp, $inlineCodelists);
+        }
+
+        if ($nestComponents) {
+            $row['components'] = $out_components;
+            return array(
+                'data_structure' => $row,
+            );
         }
 
         return array(
@@ -618,10 +633,64 @@ class Data_structure_util {
     }
 
     /**
-     * @param array $component DB row
+     * Build inline codelist binding (idno, name, agency, version, items[]) for DSD JSON export/import.
+     *
+     * @param int $codelist_pk
      * @return array
      */
-    public function component_to_export_shape(array $component)
+    public function codelist_to_inline_binding($codelist_pk)
+    {
+        $doc = $this->ci->Codelists_model->export_nada_json_document((int) $codelist_pk);
+
+        $binding = array(
+            'idno' => isset($doc['idno']) ? (string) $doc['idno'] : '',
+            'name' => isset($doc['name']) ? (string) $doc['name'] : '',
+            'agency' => isset($doc['agency']) ? (string) $doc['agency'] : '',
+            'version' => isset($doc['version']) ? (string) $doc['version'] : '',
+        );
+        if (isset($doc['description']) && trim((string) $doc['description']) !== '') {
+            $binding['description'] = trim((string) $doc['description']);
+        }
+
+        $items = array();
+        $rawItems = isset($doc['items']) && is_array($doc['items']) ? $doc['items'] : array();
+        foreach ($rawItems as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+            $code = isset($item['code']) ? trim((string) $item['code']) : '';
+            if ($code === '') {
+                continue;
+            }
+            $entry = array('code' => $code);
+            $label = null;
+            if (isset($item['label']) && $item['label'] !== '' && $item['label'] !== null) {
+                $label = is_string($item['label']) ? trim($item['label']) : (string) $item['label'];
+            } elseif (isset($item['title']) && $item['title'] !== '' && $item['title'] !== null) {
+                $label = is_string($item['title']) ? trim($item['title']) : (string) $item['title'];
+            }
+            if ($label !== null && $label !== '') {
+                $entry['label'] = $label;
+            }
+            if (isset($item['description']) && trim((string) $item['description']) !== '') {
+                $entry['description'] = trim((string) $item['description']);
+            }
+            if (isset($item['sort_order']) && $item['sort_order'] !== null && $item['sort_order'] !== '') {
+                $entry['sort_order'] = (int) $item['sort_order'];
+            }
+            $items[] = $entry;
+        }
+        $binding['items'] = $items;
+
+        return $binding;
+    }
+
+    /**
+     * @param array $component DB row
+     * @param bool  $inline_codelists When true, embed codelist + items (no codelist_reference) on dimension/geography
+     * @return array
+     */
+    public function component_to_export_shape(array $component, $inline_codelists = false)
     {
         $out = array(
             'name' => $component['name'],
@@ -644,15 +713,21 @@ class Data_structure_util {
         }
 
         $cid = isset($component['codelist_id']) ? (int) $component['codelist_id'] : 0;
-        if ($cid > 0) {
-            $cl = $this->ci->Codelists_model->get_by_id($cid);
-            if ($cl) {
-                $out['codelist_reference'] = array(
-                    'idno' => isset($cl['idno']) ? (string) $cl['idno'] : '',
-                    'agency' => isset($cl['agency']) ? (string) $cl['agency'] : '',
-                    'name' => isset($cl['name']) ? (string) $cl['name'] : '',
-                    'version' => isset($cl['version']) ? (string) $cl['version'] : '',
-                );
+        $columnType = isset($component['column_type']) ? trim((string) $component['column_type']) : '';
+        $needsCodelist = in_array($columnType, array('dimension', 'geography'), true);
+        if ($cid > 0 && $needsCodelist) {
+            if ($inline_codelists) {
+                $out['codelist'] = $this->codelist_to_inline_binding($cid);
+            } else {
+                $cl = $this->ci->Codelists_model->get_by_id($cid);
+                if ($cl) {
+                    $out['codelist_reference'] = array(
+                        'idno' => isset($cl['idno']) ? (string) $cl['idno'] : '',
+                        'agency' => isset($cl['agency']) ? (string) $cl['agency'] : '',
+                        'name' => isset($cl['name']) ? (string) $cl['name'] : '',
+                        'version' => isset($cl['version']) ? (string) $cl['version'] : '',
+                    );
+                }
             }
         }
 

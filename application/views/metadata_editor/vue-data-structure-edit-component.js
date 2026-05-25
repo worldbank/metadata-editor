@@ -487,14 +487,15 @@ Vue.component('data-structure-edit', {
             }
             vm.loadStructure();
         },
-        loadStructure: function () {
+        loadStructure: function (options) {
             var vm = this;
+            options = options || {};
             if (!vm.numericId) {
-                return;
+                return Promise.resolve();
             }
             vm.loading = true;
             vm.saveComponentErrors = [];
-            axios.get(vm.apiBase() + '/single/' + vm.numericId + '?with_components=1')
+            return axios.get(vm.apiBase() + '/single/' + vm.numericId + '?with_components=1')
                 .then(function (res) {
                     vm.loading = false;
                     if (!res.data || res.data.status !== 'success' || !res.data.data_structure) {
@@ -526,6 +527,9 @@ Vue.component('data-structure-edit', {
                     }
                     vm.ensureActiveCodelistCached();
                     vm.refreshActiveCodelistCodesIfNeeded();
+                    if (options.refreshValidation) {
+                        vm.refreshStructureValidation();
+                    }
                 })
                 .catch(function (err) {
                     vm.loading = false;
@@ -1247,19 +1251,42 @@ Vue.component('data-structure-edit', {
             }
         },
         componentPayload: function (row) {
+            var sortOrder = row.sort_order !== '' && row.sort_order != null ? parseInt(row.sort_order, 10) : 0;
+            if (isNaN(sortOrder)) {
+                sortOrder = 0;
+            }
             var p = {
-                sort_order: row.sort_order !== '' && row.sort_order != null ? parseInt(row.sort_order, 10) : 0,
+                sort_order: sortOrder,
                 name: (row.name || '').trim(),
                 label: (row.label || '').trim() || null,
                 description: (row.description || '').trim() || null,
                 column_type: row.column_type,
                 data_type: row.data_type || null,
-                codelist_id: row.codelist_id || null
+                codelist_id: this.normalizeCodelistId(row.codelist_id)
             };
             if (p.data_type === '') {
                 p.data_type = null;
             }
             return p;
+        },
+        applyComponentPayloadToRow: function (row) {
+            if (!row) {
+                return;
+            }
+            var p = this.componentPayload(row);
+            row.sort_order = p.sort_order != null ? String(p.sort_order) : '0';
+            row.name = p.name || '';
+            row.label = p.label || '';
+            row.description = p.description || '';
+            row.column_type = p.column_type || 'dimension';
+            row.data_type = p.data_type || '';
+            Vue.set(row, 'codelist_id', p.codelist_id || null);
+        },
+        refreshStructureValidation: function () {
+            var panel = this.$refs.validationPanel;
+            if (panel && typeof panel.refresh === 'function') {
+                panel.refresh();
+            }
         },
         validateActiveComponent: function (row) {
             if (!row) {
@@ -1305,6 +1332,14 @@ Vue.component('data-structure-edit', {
                 Vue.set(this.componentBaseline, row.id, this.rowSnapshot(row));
             }
         },
+        finalizeComponentSave: function (row) {
+            if (!row) {
+                return;
+            }
+            this.applyComponentPayloadToRow(row);
+            this.markRowBaseline(row);
+            this.refreshStructureValidation();
+        },
         saveActiveComponent: function () {
             var vm = this;
             if (!vm.canEditComponents || !vm.activeComponent) {
@@ -1326,17 +1361,14 @@ Vue.component('data-structure-edit', {
                     .then(function (res) {
                         if (res.data && res.data.id) {
                             row.id = res.data.id;
-                            vm.markRowBaseline(row);
                         }
                     });
             } else {
-                req = axios.post(vm.apiBase() + '/component_update/' + row.id, vm.componentPayload(row))
-                    .then(function () {
-                        vm.markRowBaseline(row);
-                    });
+                req = axios.post(vm.apiBase() + '/component_update/' + row.id, vm.componentPayload(row));
             }
             req.then(function () {
                 vm.savingActiveComponent = false;
+                vm.finalizeComponentSave(row);
                 vm.notifySuccess('Component saved');
             }).catch(function (err) {
                 vm.savingActiveComponent = false;
@@ -1552,7 +1584,7 @@ Vue.component('data-structure-edit', {
                 }
                 vm.pendingComponentDeletes = [];
                 vm.notifySuccess('Components saved');
-                vm.loadStructure();
+                vm.loadStructure({ refreshValidation: true });
             }).catch(function (err) {
                 vm.savingComponents = false;
                 vm.savingProgress = { current: 0, total: 0, label: '' };
@@ -1657,7 +1689,7 @@ Vue.component('data-structure-edit', {
                 </v-btn>
             </v-card-actions>
         </v-card>
-        <data-structure-validation-panel v-if="!isCreate && numericId" :structure-id="numericId" class="mb-3"></data-structure-validation-panel>
+        <data-structure-validation-panel ref="validationPanel" v-if="!isCreate && numericId" :structure-id="numericId" class="mb-3"></data-structure-validation-panel>
         <v-card>
             <v-card-title class="d-flex align-center text-subtitle-2 py-2 flex-wrap" style="gap:8px;">
                 <span>Components</span>

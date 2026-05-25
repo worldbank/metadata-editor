@@ -57,11 +57,11 @@ Vue.component('data-structure-validation-panel', {
         load: function () {
             var vm = this;
             if (!vm.numericId) {
-                return;
+                return Promise.resolve();
             }
             vm.loading = true;
             vm.error = null;
-            axios.get(vm.apiBase() + '/validate/' + vm.numericId)
+            return axios.get(vm.apiBase() + '/validate/' + vm.numericId)
                 .then(function (res) {
                     vm.loading = false;
                     if (res.data && res.data.status === 'success') {
@@ -72,6 +72,13 @@ Vue.component('data-structure-validation-panel', {
                     vm.loading = false;
                     vm.error = (err.response && err.response.data && err.response.data.message) || 'Validation failed';
                 });
+        },
+        refresh: function () {
+            if (this.validation) {
+                return Promise.resolve();
+            }
+            this.localValidation = null;
+            return this.load();
         },
         roleColor: function (role) {
             if (role.present) {

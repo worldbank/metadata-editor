@@ -458,7 +458,10 @@ class Data_structures extends MY_REST_Controller {
             if (!$row) {
                 throw new Exception('Data structure not found');
             }
-            $doc = $this->data_structure_util->build_export_document((int) $row['id']);
+            $doc = $this->data_structure_util->build_export_document((int) $row['id'], array(
+                'inline_codelists' => true,
+                'nest_components' => true,
+            ));
             $export = $this->data_structure_util->sanitize_export_payload($doc);
 
             $download = $this->input->get('download');
