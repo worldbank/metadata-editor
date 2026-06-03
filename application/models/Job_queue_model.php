@@ -278,6 +278,8 @@ class Job_queue_model extends CI_Model {
 	 */
 	function mark_completed($job_id, $result = null)
 	{
+		$this->db_keepalive_ping();
+
 		$data = array(
 			'status' => 'completed',
 			'completed_at' => date('Y-m-d H:i:s'),
@@ -303,6 +305,8 @@ class Job_queue_model extends CI_Model {
 	 */
 	function mark_failed($job_id, $error_message)
 	{
+		$this->db_keepalive_ping();
+
 		$job = $this->get_by_id($job_id);
 		
 		if (!$job) {
@@ -338,21 +342,8 @@ class Job_queue_model extends CI_Model {
 	 */
 	function get_by_id($job_id)
 	{
-		$this->db->where('id', $job_id);
-		$query = $this->db->get('job_queue');
-		$job = $query->row_array();
-		
-		if ($job) {
-			// Decode JSON fields
-			if (!empty($job['payload'])) {
-				$job['payload'] = json_decode($job['payload'], true);
-			}
-			if (!empty($job['result'])) {
-				$job['result'] = json_decode($job['result'], true);
-			}
-		}
-		
-		return $job ? $job : null;
+		$job = $this->fetch_job_queue_row(array('id' => $job_id));
+		return $job ? $this->decode_job_row($job) : null;
 	}
 
 	/**
@@ -378,21 +369,8 @@ class Job_queue_model extends CI_Model {
 			return null;
 		}
 		
-		$this->db->where('uuid', $uuid);
-		$query = $this->db->get('job_queue');
-		$job = $query->row_array();
-		
-		if ($job) {
-			// Decode JSON fields
-			if (!empty($job['payload'])) {
-				$job['payload'] = json_decode($job['payload'], true);
-			}
-			if (!empty($job['result'])) {
-				$job['result'] = json_decode($job['result'], true);
-			}
-		}
-		
-		return $job ? $job : null;
+		$job = $this->fetch_job_queue_row(array('uuid' => $uuid));
+		return $job ? $this->decode_job_row($job) : null;
 	}
 
 	/**
@@ -1079,6 +1057,80 @@ class Job_queue_model extends CI_Model {
 			isset($job['priority']) ? (int) $job['priority'] : 0,
 			isset($job['max_attempts']) ? (int) $job['max_attempts'] : 3
 		);
+	}
+
+	/**
+	 * Keep MySQL connection alive (long-running worker jobs).
+	 */
+	private function db_keepalive_ping()
+	{
+		$this->load->library('db_keepalive');
+		$this->db_keepalive->ping($this->db);
+	}
+
+	/**
+	 * Fetch one job_queue row; retries once after reconnect on query failure.
+	 *
+	 * @param array $where Column => value
+	 * @return array|false Row array, or false if the query failed
+	 */
+	private function fetch_job_queue_row($where)
+	{
+		$this->db_keepalive_ping();
+
+		$row = $this->run_job_queue_get($where);
+
+		if ($row !== false)
+		{
+			return $row;
+		}
+
+		$this->db_keepalive_ping();
+		return $this->run_job_queue_get($where);
+	}
+
+	/**
+	 * @param array $where
+	 * @return array|false
+	 */
+	private function run_job_queue_get($where)
+	{
+		foreach ($where as $column => $value)
+		{
+			$this->db->where($column, $value);
+		}
+
+		$query = $this->db->get('job_queue');
+
+		if ($query === false)
+		{
+			$error = $this->db->error();
+			$message = isset($error['message']) && $error['message'] !== ''
+				? $error['message']
+				: 'unknown database error';
+			log_message('error', 'Job_queue_model: query failed: ' . $message);
+			return false;
+		}
+
+		return $query->row_array();
+	}
+
+	/**
+	 * @param array $job
+	 * @return array
+	 */
+	private function decode_job_row($job)
+	{
+		if (!empty($job['payload']))
+		{
+			$job['payload'] = json_decode($job['payload'], true);
+		}
+		if (!empty($job['result']))
+		{
+			$job['result'] = json_decode($job['result'], true);
+		}
+
+		return $job;
 	}
 }
 

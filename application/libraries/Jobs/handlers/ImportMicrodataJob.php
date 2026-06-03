@@ -177,11 +177,16 @@ class ImportMicrodataJob implements JobHandlerInterface
         $poll_interval = 3; // seconds between checks
         $max_wait_time = 1800; // 30 minutes maximum wait time
         $start_time = time();
+        $last_db_ping = null;
+
+        $this->ci->load->library('db_keepalive');
         
         $fastapi_completed = false;
         $fastapi_result = null;
         
         while ((time() - $start_time) < $max_wait_time) {
+            $this->ci->db_keepalive->ping_if_due($last_db_ping);
+
             // Check FastAPI job status
             $status_response = $this->ci->datautils->get_job_status($fastapi_job_id);
             
@@ -215,6 +220,9 @@ class ImportMicrodataJob implements JobHandlerInterface
         if (!$fastapi_completed) {
             throw new Exception("FastAPI job did not complete within {$max_wait_time} seconds (timeout)");
         }
+
+        // Refresh DB connection after long idle poll (avoids "MySQL server has gone away")
+        $this->ci->db_keepalive->ping();
         
         // Step 3: Process FastAPI results - import variables and update case_count
         $variable_import_result = array();
