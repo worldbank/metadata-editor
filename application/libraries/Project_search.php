@@ -358,13 +358,21 @@ class Project_search
 			$keywords_query=$this->build_keywords_fulltext_query($search_options['keywords']);
 
 			$escaped_keywords=$this->ci->db->escape('%'.trim($search_options['keywords']).'%');
-			$where = sprintf('(title like %s OR idno like %s OR study_idno like %s OR %s)',
-                        $escaped_keywords,
-                        $escaped_keywords,
-						$escaped_keywords,
-						$keywords_query
-                    );
-            $this->ci->db->where($where,NULL,FALSE);			
+			if ($keywords_query !== null) {
+				$where = sprintf('(title like %s OR idno like %s OR study_idno like %s OR %s)',
+					$escaped_keywords,
+					$escaped_keywords,
+					$escaped_keywords,
+					$keywords_query
+				);
+			} else {
+				$where = sprintf('(title like %s OR idno like %s OR study_idno like %s)',
+					$escaped_keywords,
+					$escaped_keywords,
+					$escaped_keywords
+				);
+			}
+			$this->ci->db->where($where,NULL,FALSE);
 			$applied_filters['keywords']=$search_options['keywords'];
 		}
 		
@@ -386,19 +394,41 @@ class Project_search
 		return '('.$keyword_query.')';
 	}
 
+	/**
+	 * Build MATCH(title) AGAINST(...) for boolean fulltext search.
+	 *
+	 * @param string $keywords Raw search string
+	 * @return string|null SQL expression, or null if no valid terms (caller should use LIKE only)
+	 */
 	function build_keywords_fulltext_query($keywords)
 	{
 		//remove characters that are not allowed in fulltext search
 		$keywords=preg_replace('/[@+\-&|!(){}[\]^"~*?:\/\\\]/','',$keywords);
-		$keywords=trim($keywords);		
+		$keywords=trim(preg_replace('/\s+/',' ',$keywords));
 
-		$keywords_list=explode(" ",$keywords);
+		if ($keywords === '')
+		{
+			return null;
+		}
+
+		$keywords_list=explode(' ',$keywords);
 		$keyword_query=array();
-		foreach($keywords_list as $idx=>$keyword){
+		foreach($keywords_list as $keyword)
+		{
+			$keyword=trim($keyword);
+			if ($keyword === '')
+			{
+				continue;
+			}
 			$keyword_query[]='+'.$keyword.'*';
 		}
 
-		return 'MATCH(title) AGAINST('.$this->ci->db->escape( implode(" ", $keyword_query) ).' IN BOOLEAN MODE)';
+		if (empty($keyword_query))
+		{
+			return null;
+		}
+
+		return 'MATCH(title) AGAINST('.$this->ci->db->escape(implode(' ',$keyword_query)).' IN BOOLEAN MODE)';
 	}
 
 	function parse_filter_values_as_int($values)
