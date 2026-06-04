@@ -330,7 +330,26 @@ class Project_json_writer
 		return $output_file;
 	}
 
-	function transform_variable($variable)
+	/**
+	 * Count value categories stored on a variable (max of var_catgry and var_catgry_labels).
+	 */
+	public static function count_variable_categories($metadata)
+	{
+		if (!is_array($metadata)) {
+			return 0;
+		}
+		$n = 0;
+		if (isset($metadata['var_catgry']) && is_array($metadata['var_catgry'])) {
+			$n = max($n, count($metadata['var_catgry']));
+		}
+		if (isset($metadata['var_catgry_labels']) && is_array($metadata['var_catgry_labels'])) {
+			$n = max($n, count($metadata['var_catgry_labels']));
+		}
+		return $n;
+	}
+
+
+	function transform_variable($variable, $options=array())
 	{		
 		$sid=(int)$variable['sid'];
 		unset($variable['metadata']['uid']);
