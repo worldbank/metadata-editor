@@ -563,11 +563,12 @@ class Editor_DDI_Writer
         //sumstats
         $sumstats=new \Adbar\Dot($var->get('var_sumstat'));
         foreach($sumstats->all() as $idx=>$sumstat){
-            if ($sumstats[$idx]['value']=='None' || $sumstats[$idx]['value']==''){
+            $value = $sumstats["{$idx}.value"] ?? null;
+            if ($value === null || $value === '' || $value === 'None') {
                 continue;
             }
             $output->set([
-                'sumStat.'.$idx.'._value'=>(string)$sumstats["{$idx}.value"],
+                'sumStat.'.$idx.'._value'=>(string)$value,
                 'sumStat.'.$idx.'._attributes'=>[
                     'type'=>$sumstats["{$idx}.type"],
                     'wgtd'=>$sumstats["{$idx}.wgtd"]
@@ -608,7 +609,8 @@ class Editor_DDI_Writer
                 'catgry.'.$idx.'.labl'=> $categories["{$idx}.labl"],
             ]);
             foreach ($cat_stats->all() as $stat_idx => $_) {
-                if ($cat_stats["{$stat_idx}.value"] == 'None' || $cat_stats["{$stat_idx}.value"] === '') {
+                $stat_value = $cat_stats["{$stat_idx}.value"] ?? null;
+                if ($stat_value === null || $stat_value === '' || $stat_value === 'None') {
                     continue;
                 }
                 $output->set([
@@ -616,7 +618,7 @@ class Editor_DDI_Writer
                         'type'=>$cat_stats["{$stat_idx}.type"],
                         'wgtd'=>$cat_stats["{$stat_idx}.wgtd"],
                     ],
-                    'catgry.'.$idx.'.catStat.'.$stat_idx.'._value'=>(string)$cat_stats["{$stat_idx}.value"],
+                    'catgry.'.$idx.'.catStat.'.$stat_idx.'._value'=>(string)$stat_value,
                 ]);
             }
         }

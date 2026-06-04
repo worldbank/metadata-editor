@@ -463,6 +463,11 @@ class Project_json_writer
 					}
 				}
 			}
+			foreach ($variable['metadata']['var_sumstat'] as $idx => $sumstat) {
+				if (!isset($sumstat['value']) || $sumstat['value'] === '' || $sumstat['value'] === 'None') {
+					unset($variable['metadata']['var_sumstat'][$idx]);
+				}
+			}
 			// when no options are set (missing or all false): keep all summary statistics in export
 			$variable['metadata']['var_sumstat'] = array_values((array)$variable['metadata']['var_sumstat']);
 		}
