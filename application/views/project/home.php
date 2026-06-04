@@ -1272,7 +1272,7 @@
             '&' + urlParams.toString();
 
           if (keywords && keywords.length>0){
-            url += '&keywords=' + keywords;
+            url += '&keywords=' + encodeURIComponent(keywords);
           }
 
           // Ensure exclude_collections parameter is passed

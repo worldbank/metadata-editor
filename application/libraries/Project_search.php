@@ -5,6 +5,9 @@ class Project_search
 	// limit for listing versions to avoid huge query load
 	private $versions_max_page_size = 100;
 
+	/** @var int Maximum length for project list keyword search */
+	private $keywords_max_length = 256;
+
 	private $listing_fields=array(
 		'id',
 		'pid',
@@ -354,26 +357,23 @@ class Project_search
 		}
 
 		//keywords
-		if (isset($search_options['keywords']) && !empty($search_options['keywords'])) {
-			$keywords_query=$this->build_keywords_fulltext_query($search_options['keywords']);
+		$keywords=$this->normalize_search_keywords(
+			isset($search_options['keywords']) ? $search_options['keywords'] : ''
+		);
+		if ($keywords !== '') {
+			$keywords_query=$this->build_keywords_fulltext_query($keywords);
+			$like_pattern=$this->escape_keywords_like_pattern($keywords);
 
-			$escaped_keywords=$this->ci->db->escape('%'.trim($search_options['keywords']).'%');
+			$where='(title like '.$like_pattern
+				.' OR idno like '.$like_pattern
+				.' OR study_idno like '.$like_pattern;
 			if ($keywords_query !== null) {
-				$where = sprintf('(title like %s OR idno like %s OR study_idno like %s OR %s)',
-					$escaped_keywords,
-					$escaped_keywords,
-					$escaped_keywords,
-					$keywords_query
-				);
-			} else {
-				$where = sprintf('(title like %s OR idno like %s OR study_idno like %s)',
-					$escaped_keywords,
-					$escaped_keywords,
-					$escaped_keywords
-				);
+				$where .= ' OR '.$keywords_query;
 			}
+			$where .= ')';
+
 			$this->ci->db->where($where,NULL,FALSE);
-			$applied_filters['keywords']=$search_options['keywords'];
+			$applied_filters['keywords']=$keywords;
 		}
 		
 		return $applied_filters;		
@@ -382,16 +382,76 @@ class Project_search
 
 	function build_keywords_like_query($keywords)
 	{
+		$keywords=$this->normalize_search_keywords($keywords);
+		if ($keywords === '') {
+			return '';
+		}
+
 		//split keywords
 		$keywords_list=explode(" ",$keywords);
 		
 		$keyword_query=array();
 		foreach($keywords_list as $idx=>$keyword){
-			$keyword_query[]='title like ' .$this->ci->db->escape('%'.$keyword.'%');
+			$keyword_query[]='title like '.$this->escape_keywords_like_pattern($keyword);
 		}
 
 		$keyword_query=implode(" OR ",$keyword_query);		
 		return '('.$keyword_query.')';
+	}
+
+	/**
+	 * Sanitize keyword input for project list search.
+	 *
+	 * @param mixed $keywords Raw value from request
+	 * @return string Normalized keywords, or empty string if unusable
+	 */
+	function normalize_search_keywords($keywords)
+	{
+		if (is_array($keywords)) {
+			$keywords=reset($keywords);
+		}
+
+		if (!is_string($keywords)) {
+			if (!is_scalar($keywords)) {
+				return '';
+			}
+			$keywords=(string)$keywords;
+		}
+
+		$keywords=trim($keywords);
+		if ($keywords === '') {
+			return '';
+		}
+
+		// Remove control characters (e.g. pasted script blobs, null bytes).
+		$keywords=preg_replace('/[\x00-\x1F\x7F]/u', '', $keywords);
+		$keywords=trim($keywords);
+		if ($keywords === '') {
+			return '';
+		}
+
+		if (function_exists('mb_strlen') && function_exists('mb_substr')) {
+			if (mb_strlen($keywords) > $this->keywords_max_length) {
+				$keywords=mb_substr($keywords, 0, $this->keywords_max_length);
+			}
+		} elseif (strlen($keywords) > $this->keywords_max_length) {
+			$keywords=substr($keywords, 0, $this->keywords_max_length);
+		}
+
+		return trim($keywords);
+	}
+
+	/**
+	 * Escape a value for use inside SQL LIKE patterns on title/idno fields.
+	 *
+	 * @param string $keywords
+	 * @return string Quoted, escaped LIKE operand (includes % wildcards)
+	 */
+	function escape_keywords_like_pattern($keywords)
+	{
+		return $this->ci->db->escape(
+			'%'.$this->ci->db->escape_like_str($keywords).'%'
+		);
 	}
 
 	/**
@@ -402,8 +462,13 @@ class Project_search
 	 */
 	function build_keywords_fulltext_query($keywords)
 	{
+		$keywords=$this->normalize_search_keywords($keywords);
+		if ($keywords === '') {
+			return null;
+		}
+
 		//remove characters that are not allowed in fulltext search
-		$keywords=preg_replace('/[@+\-&|!(){}[\]^"~*?:\/\\\]/','',$keywords);
+		$keywords=preg_replace('/[@+\-&|!(){}[\]^"~*?:\/\\\\<>]/','',$keywords);
 		$keywords=trim(preg_replace('/\s+/',' ',$keywords));
 
 		if ($keywords === '')
