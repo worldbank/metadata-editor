@@ -363,10 +363,11 @@ class Project_search
 		if ($keywords !== '') {
 			$keywords_query=$this->build_keywords_fulltext_query($keywords);
 			$like_pattern=$this->escape_keywords_like_pattern($keywords);
+			$like_escape=$this->keywords_like_escape_clause();
 
-			$where='(title like '.$like_pattern
-				.' OR idno like '.$like_pattern
-				.' OR study_idno like '.$like_pattern;
+			$where='(title like '.$like_pattern.$like_escape
+				.' OR idno like '.$like_pattern.$like_escape
+				.' OR study_idno like '.$like_pattern.$like_escape;
 			if ($keywords_query !== null) {
 				$where .= ' OR '.$keywords_query;
 			}
@@ -390,9 +391,10 @@ class Project_search
 		//split keywords
 		$keywords_list=explode(" ",$keywords);
 		
+		$like_escape=$this->keywords_like_escape_clause();
 		$keyword_query=array();
 		foreach($keywords_list as $idx=>$keyword){
-			$keyword_query[]='title like '.$this->escape_keywords_like_pattern($keyword);
+			$keyword_query[]='title like '.$this->escape_keywords_like_pattern($keyword).$like_escape;
 		}
 
 		$keyword_query=implode(" OR ",$keyword_query);		
@@ -452,6 +454,17 @@ class Project_search
 		return $this->ci->db->escape(
 			'%'.$this->ci->db->escape_like_str($keywords).'%'
 		);
+	}
+
+	/**
+	 * SQL suffix required when using escape_like_str in raw LIKE clauses.
+	 * Must match CodeIgniter's default _like_escape_chr ('!').
+	 *
+	 * @return string
+	 */
+	private function keywords_like_escape_clause()
+	{
+		return " ESCAPE '!'";
 	}
 
 	/**
