@@ -446,6 +446,7 @@ class Jobs extends MY_REST_Controller
 	 *     "publish_metadata": true,
 	 *     "publish_thumbnail": true,
 	 *     "publish_resources": true,
+	 *     "delete_nada_resources": false,
 	 *     "options": {},
 	 *     "priority": 0,
 	 *     "max_attempts": 3
@@ -486,6 +487,7 @@ class Jobs extends MY_REST_Controller
 				'publish_dsd' => !empty($input['publish_dsd']),
 				'dsd_overwrite' => !empty($input['dsd_overwrite']),
 				'publish_indicator_data' => !empty($input['publish_indicator_data']),
+				'delete_nada_resources' => !empty($input['delete_nada_resources']),
 			);
 			
 			// Add options if provided

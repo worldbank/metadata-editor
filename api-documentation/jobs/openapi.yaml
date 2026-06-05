@@ -317,6 +317,12 @@ paths:
                     For indicator/timeseries projects, export DuckDB timeseries CSV and import
                     observations to NADA after metadata (resumable upload; may take several minutes).
                   default: false
+                delete_nada_resources:
+                  type: boolean
+                  description: >
+                    Remove all existing external resources for this study on NADA before publishing
+                    resources. Requires study_idno to be set on the project.
+                  default: false
                 options:
                   type: object
                   description: Additional options (e.g. overwrite)
@@ -1027,6 +1033,12 @@ components:
           description: >
             Whether to publish external resources: metadata to NADA, and attached files when stored locally.
           default: true
+        delete_nada_resources:
+          type: boolean
+          description: >
+            Remove all existing external resources for this study on NADA before publishing resources.
+            Requires study_idno.
+          default: false
         overwrite:
           type: string
           enum: ["yes", "no"]

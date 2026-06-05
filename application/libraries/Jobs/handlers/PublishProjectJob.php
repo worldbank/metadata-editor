@@ -71,6 +71,7 @@ class PublishProjectJob implements JobHandlerInterface
             'publish_dsd' => !empty($payload['publish_dsd']) ? 1 : 0,
             'dsd_overwrite' => !empty($payload['dsd_overwrite']) ? 1 : 0,
             'publish_indicator_data' => !empty($payload['publish_indicator_data']) ? 1 : 0,
+            'delete_nada_resources' => !empty($payload['delete_nada_resources']) ? 1 : 0,
         );
         
         ksort($hash_data);
@@ -102,6 +103,7 @@ class PublishProjectJob implements JobHandlerInterface
         $publish_dsd = !empty($payload['publish_dsd']);
         $dsd_overwrite = !empty($payload['dsd_overwrite']);
         $publish_indicator_data = !empty($payload['publish_indicator_data']);
+        $delete_nada_resources = !empty($payload['delete_nada_resources']);
 
         $results = array();
         $errors = array();
@@ -188,6 +190,18 @@ class PublishProjectJob implements JobHandlerInterface
                 );
             } catch (Exception $e) {
                 $errors['thumbnail'] = $e->getMessage();
+            }
+        }
+
+        if ($delete_nada_resources) {
+            try {
+                $results['nada_resources_delete'] = $this->ci->Editor_publish_model->delete_all_nada_study_resources(
+                    $project_id,
+                    $user_id,
+                    $catalog_connection_id
+                );
+            } catch (Exception $e) {
+                $errors['nada_resources_delete'] = $e->getMessage();
             }
         }
 
