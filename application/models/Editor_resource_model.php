@@ -644,7 +644,7 @@ class Editor_resource_model extends ci_model {
 			'dcdate',
 			'country',
 			'language',
-			//'id_number',
+			'id_number',
 			'contributor',
 			'publisher',
 			'rights',
@@ -654,6 +654,8 @@ class Editor_resource_model extends ci_model {
 			'subjects',
 			'filename',
 			'dcformat',
+			'source_type',
+			'bundle_type',
 			'changed');
 
 		//add date modified
@@ -661,6 +663,17 @@ class Editor_resource_model extends ci_model {
 					
 		if (isset($options['filename'])){
 			$options['filename']=$this->normalize_filename($options['filename']);
+		}
+
+		if (isset($options['dctype'])){
+			$dctype_code=$this->get_dctype_code_from_string($options['dctype']);
+			$options['dctype']=$this->get_dctype_label_by_code($dctype_code);
+		}
+		if (isset($options['format'])){
+			$options['dcformat']=$options['format'];
+		}
+		if (isset($options['dcformat']) && strpos((string) $options['dcformat'], '[') === false) {
+			$options['dcformat'] = $this->get_dcformat_label_by_code($options['dcformat']);
 		}
 		
 		$update_arr=array();
@@ -699,7 +712,7 @@ class Editor_resource_model extends ci_model {
 			'dcdate',
 			'country',
 			'language',
-			//'id_number',
+			'id_number',
 			'contributor',
 			'publisher',
 			'rights',
@@ -709,6 +722,8 @@ class Editor_resource_model extends ci_model {
 			'subjects',
 			'filename',
 			'dcformat',
+			'source_type',
+			'bundle_type',
 			'changed');
 
 		$options['changed']=date("U");
@@ -726,6 +741,9 @@ class Editor_resource_model extends ci_model {
 		}
 		if (isset($options['format'])){
 			$options['dcformat']=$options['format'];
+		}
+		if (isset($options['dcformat']) && strpos((string) $options['dcformat'], '[') === false) {
+			$options['dcformat'] = $this->get_dcformat_label_by_code($options['dcformat']);
 		}
 		
 		if (isset($options['filename'])){

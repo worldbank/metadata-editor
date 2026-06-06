@@ -279,6 +279,77 @@ class DataUtils
 	}
 
 	/**
+	 * Poll a FastAPI background job until done, failed, or timeout.
+	 *
+	 * @param string $job_id
+	 * @param int $max_wait_seconds
+	 * @param int $poll_interval_seconds
+	 * @return array status done|failed|timeout, response (last job body), message
+	 */
+	public function poll_fastapi_job($job_id, $max_wait_seconds = 600, $poll_interval_seconds = 3)
+	{
+		$job_id = trim((string) $job_id);
+		if ($job_id === '') {
+			throw new Exception('job_id is required');
+		}
+
+		$max_wait_seconds = (int) $max_wait_seconds;
+		if ($max_wait_seconds < 1) {
+			$max_wait_seconds = 600;
+		}
+		$poll_interval_seconds = (int) $poll_interval_seconds;
+		if ($poll_interval_seconds < 1) {
+			$poll_interval_seconds = 3;
+		}
+
+		$start = time();
+		$last_body = array();
+
+		while ((time() - $start) < $max_wait_seconds) {
+			$status_response = $this->get_job_status($job_id);
+			$http = isset($status_response['status_code']) ? (int) $status_response['status_code'] : 500;
+			$body = isset($status_response['response']) && is_array($status_response['response'])
+				? $status_response['response']
+				: array();
+			$last_body = $body;
+
+			if ($http !== 200) {
+				return array(
+					'status' => 'failed',
+					'response' => $body,
+					'message' => 'Failed to get job status (HTTP ' . $http . ')',
+				);
+			}
+
+			$job_status = isset($body['status']) ? strtolower((string) $body['status']) : '';
+			if ($job_status === 'done' || $job_status === 'completed') {
+				return array(
+					'status' => 'done',
+					'response' => $body,
+					'message' => null,
+				);
+			}
+
+			if ($job_status === 'failed' || $job_status === 'error') {
+				$message = isset($body['message']) ? $body['message'] : 'Export job failed';
+				return array(
+					'status' => 'failed',
+					'response' => $body,
+					'message' => $message,
+				);
+			}
+
+			sleep($poll_interval_seconds);
+		}
+
+		return array(
+			'status' => 'timeout',
+			'response' => $last_body,
+			'message' => 'Job did not finish within ' . $max_wait_seconds . ' seconds',
+		);
+	}
+
+	/**
 	 * FastAPI may return error-shaped JSON (e.g. {"detail":"..."}) with HTTP 200 instead of a job envelope with "status".
 	 * Normalize so PHP callers always get a usable $response['status'] (e.g. failed) and $response['message'] when possible.
 	 *

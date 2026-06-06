@@ -474,9 +474,33 @@ CREATE TABLE `editor_resources` (
   `subjects` varchar(45) DEFAULT NULL,
   `filename` varchar(255) DEFAULT NULL,
   `dcformat` varchar(255) DEFAULT NULL,
+  `source_type` varchar(20) DEFAULT 'manual',
+  `bundle_type` varchar(10) DEFAULT NULL,
   `changed` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
+) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE `editor_resource_data_files` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `sid` int NOT NULL,
+  `resource_id` int NOT NULL,
+  `file_id` varchar(100) NOT NULL,
+  `export_format` varchar(20) DEFAULT NULL,
+  `export_version` varchar(20) DEFAULT NULL,
+  `zip_entry_name` varchar(255) DEFAULT NULL,
+  `link_type` varchar(20) DEFAULT NULL,
+  `data_file_changed` int DEFAULT NULL,
+  `source_csv_mtime` int DEFAULT NULL,
+  `generated_at` int DEFAULT NULL,
+  `created` int DEFAULT NULL,
+  `created_by` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_resource_file` (`resource_id`, `file_id`),
+  KEY `idx_erdf_sid_resource` (`sid`, `resource_id`),
+  KEY `idx_erdf_sid_file` (`sid`, `file_id`),
+  KEY `idx_erdf_resource` (`resource_id`)
 ) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 
