@@ -275,8 +275,7 @@
           return this.$store.state.project_isloading;
         },
         hideProjectSaveOnRoute(){
-          return this.$route.path.startsWith("/datafile/") 
-            || this.$route.path.startsWith("/external-resources/") ;
+          return this.$route.path.startsWith("/datafile/");
         },
         form_template(){
           return this.$store.state.formTemplate;
@@ -421,29 +420,7 @@
           return [];          
         },
         ExternalResourcesTreeNodes(){
-          let resources=this.$store.state.external_resources;
-          if (resources.length==0){
-            return [];
-          }
-
-          let resources_nodes=[];
-
-          i=0;
-          for (let resource of resources) {
-            resources_nodes.push(
-              {
-                title: resource.title,
-                type:'resource',
-                index:resource.id,
-                file: 'file',
-                key:'resource-'+resource.id,
-                resource:  resource
-              }
-            );
-            i++;
-          }
-          console.log("resources nodes:",resources_nodes);
-          return resources_nodes;
+          return ResourceDctypeUtils.groupResourcesForTree(this.$store.state.external_resources);
         },
         TreeItems:
         {
@@ -682,12 +659,38 @@
                 }
             }
         },
+        applyExternalResourcesTreeState: function(path) {
+          if (!this.initiallyOpen.includes('external-resources')) {
+            this.initiallyOpen.push('external-resources');
+          }
+
+          const resourceMatch = path.match(/^\/external-resources\/(\d+)\/?$/);
+          if (resourceMatch) {
+            const resource = ResourceDctypeUtils.findResourceById(this.ExternalResources, resourceMatch[1]);
+            if (resource) {
+              const groupKey = ResourceDctypeUtils.dctypeGroupKey(ResourceDctypeUtils.dctypeCode(resource.dctype));
+              if (!this.initiallyOpen.includes(groupKey)) {
+                this.initiallyOpen.push(groupKey);
+              }
+              this.tree_active_items = ['resource-' + resource.id];
+              return;
+            }
+          }
+
+          this.tree_active_items = ['external-resources'];
+        },
         setTreeActiveNode: function(path)
         {
           console.log("setTreeActiveNode called with path:", path);
           this.tree_active_items=[];
-          this.tree_active_items.push(path);
           let path_arr=path.split("/");
+
+          if (path.startsWith('/external-resources')) {
+            this.applyExternalResourcesTreeState(path);
+            return;
+          }
+
+          this.tree_active_items.push(path);
 
           //expand datafile
           if(path.startsWith("/datafile/")){
@@ -1040,8 +1043,7 @@
             }
           }
           else if (this.$route.path.startsWith("/external-resources")){
-            this.initiallyOpen=["external-resources"];
-            this.setTreeActiveNode("external-resources");
+            this.applyExternalResourcesTreeState(this.$route.path);
           }
           else if (this.$route.path.startsWith("/geospatial-features")){
             // Handle geospatial features initialization on page load
@@ -1170,6 +1172,10 @@
 
           if (node.type=='resources'){
             router.push('/external-resources');
+            return;
+          }
+
+          if (node.type=='resource-dctype-group'){
             return;
           }
 

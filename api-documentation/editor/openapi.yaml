@@ -2434,6 +2434,228 @@ paths:
           description: successful operation
       security:
         - ApiKeyAuth: []
+  "/resources/generate_microdata/{projectId}":
+    post:
+      tags:
+        - External resources
+      summary: Generate microdata resource
+      description: >
+        Export project data files to the chosen format, copy the artifact into
+        documentation/, and create a dat/micro external resource with optional
+        data-file links. May take several minutes while FastAPI export jobs complete.
+      operationId: generateMicrodataResource
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                export_format:
+                  type: string
+                  description: csv, dta, sav, xpt, or json
+                export_version:
+                  type: string
+                  description: Stata version when export_format is dta (default 14)
+                file_ids:
+                  type: array
+                  items:
+                    type: string
+                  description: Data file IDs (F1, F2, …); all files when omitted
+                zip:
+                  type: boolean
+                  description: Bundle exports into one ZIP (default true)
+                overwrite:
+                  type: boolean
+                  description: Replace existing generated resource for this format
+                max_wait_seconds:
+                  type: integer
+                  description: Max seconds to wait per export job (default 900)
+              required:
+                - export_format
+      responses:
+        "200":
+          description: Resource created, or already exists when overwrite is false
+      security:
+        - ApiKeyAuth: []
+  "/resources/regenerate/{projectId}/{resourceId}":
+    post:
+      tags:
+        - External resources
+      summary: Regenerate microdata resource
+      description: >
+        Re-export and update an existing generated dat/micro resource. Export format,
+        version, and file selection default from existing link rows when omitted.
+      operationId: regenerateMicrodataResource
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: resourceId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                export_format:
+                  type: string
+                export_version:
+                  type: string
+                file_ids:
+                  type: array
+                  items:
+                    type: string
+                zip:
+                  type: boolean
+                refresh_description:
+                  type: boolean
+                max_wait_seconds:
+                  type: integer
+      responses:
+        "200":
+          description: Resource regenerated
+      security:
+        - ApiKeyAuth: []
+  "/resources/microdata_status/{projectId}":
+    get:
+      tags:
+        - External resources
+      summary: Microdata publish status
+      description: >
+        Summary counts, per-resource staleness, and data-file link details for
+        dat/micro external resources.
+      operationId: microdataStatus
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: successful operation
+      security:
+        - ApiKeyAuth: []
+  "/resources/datafile_links/{projectId}/{resourceId}":
+    get:
+      tags:
+        - External resources
+      summary: List data file links
+      description: List optional data-file links for a dat/micro resource
+      operationId: listResourceDatafileLinks
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: resourceId
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: successful operation
+      security:
+        - ApiKeyAuth: []
+    put:
+      tags:
+        - External resources
+      summary: Replace data file links
+      description: >
+        Replace manual or associated links for a non-generated microdata resource.
+        Generated resources must use regenerate instead.
+      operationId: replaceResourceDatafileLinks
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: resourceId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                links:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      file_id:
+                        type: string
+                      link_type:
+                        type: string
+                        description: manual or associated
+                    required:
+                      - file_id
+              required:
+                - links
+      responses:
+        "200":
+          description: successful operation
+      security:
+        - ApiKeyAuth: []
+    post:
+      tags:
+        - External resources
+      summary: Replace data file links (POST)
+      description: Same as PUT; provided for clients that cannot send PUT requests
+      operationId: replaceResourceDatafileLinksPost
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: resourceId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                links:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      file_id:
+                        type: string
+                      link_type:
+                        type: string
+                    required:
+                      - file_id
+              required:
+                - links
+      responses:
+        "200":
+          description: successful operation
+      security:
+        - ApiKeyAuth: []
   /templates:
     get:
       tags:

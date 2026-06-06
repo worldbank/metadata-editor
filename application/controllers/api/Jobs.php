@@ -432,6 +432,103 @@ class Jobs extends MY_REST_Controller
 	}
 
 	/**
+	 * Create a microdata resource generation job (convenience endpoint)
+	 *
+	 * POST /api/jobs/generate_microdata_resource
+	 */
+	function generate_microdata_resource_post()
+	{
+		try {
+			$input = json_decode($this->input->raw_input_stream, true);
+
+			if (!$input) {
+				$input = $this->input->post();
+			}
+
+			if (empty($input)) {
+				throw new Exception('Request body is required');
+			}
+
+			if (empty($input['project_id'])) {
+				throw new Exception('project_id is required');
+			}
+
+			if (empty($input['export_format'])) {
+				throw new Exception('export_format is required');
+			}
+
+			$resolved_sid = $this->get_sid((string) $input['project_id']);
+			$this->editor_acl->user_has_project_access($resolved_sid, 'edit', $this->api_user);
+
+			$payload = array(
+				'project_id' => (int) $resolved_sid,
+				'export_format' => strtolower(trim((string) $input['export_format'])),
+			);
+
+			if (isset($input['export_version'])) {
+				$payload['export_version'] = $input['export_version'];
+			}
+			if (!empty($input['file_ids']) && is_array($input['file_ids'])) {
+				$payload['file_ids'] = $input['file_ids'];
+			}
+			if (array_key_exists('zip', $input)) {
+				$payload['zip'] = $input['zip'];
+			}
+			if (!empty($input['overwrite'])) {
+				$payload['overwrite'] = true;
+			}
+			if (!empty($input['resource_id'])) {
+				$payload['resource_id'] = (int) $input['resource_id'];
+			}
+			if (!empty($input['refresh_description'])) {
+				$payload['refresh_description'] = true;
+			}
+			if (!empty($input['max_wait_seconds'])) {
+				$payload['max_wait_seconds'] = (int) $input['max_wait_seconds'];
+			}
+
+			$job_type = 'generate_microdata_resource';
+			$priority = isset($input['priority']) ? (int) $input['priority'] : 0;
+			$max_attempts = isset($input['max_attempts']) ? (int) $input['max_attempts'] : 2;
+
+			if (!$this->Job_queue_model->is_valid_job_type($job_type)) {
+				$available_types = $this->Job_queue_model->get_job_types();
+				throw new Exception("Invalid job_type: {$job_type}. Available types: " . implode(', ', $available_types));
+			}
+
+			$handler = JobRegistry::getHandler($job_type);
+			if ($handler) {
+				$handler->validatePayload($payload);
+			}
+
+			$job_id = $this->Job_queue_model->enqueue(
+				$job_type,
+				$payload,
+				$this->user_id,
+				$priority,
+				$max_attempts
+			);
+
+			$job = $this->Job_queue_model->get($job_id);
+			$job_response = $this->sanitize_job_for_api($job);
+			$job_uuid = isset($job['uuid']) ? $job['uuid'] : null;
+
+			$this->set_response(array(
+				'status' => 'success',
+				'message' => 'Job created successfully. Poll GET /api/jobs/' . $job_uuid . ' for status.',
+				'uuid' => $job_uuid,
+				'job' => $job_response,
+			), REST_Controller::HTTP_CREATED);
+
+		} catch (Exception $e) {
+			$this->set_response(array(
+				'status' => 'failed',
+				'message' => $e->getMessage(),
+			), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
 	 * Create a publish to NADA job (convenience endpoint)
 	 * 
 	 * POST /api/jobs/publish_to_nada

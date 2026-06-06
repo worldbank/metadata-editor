@@ -93,23 +93,91 @@ if ( ! function_exists('is_url'))
 	}
 }
 /**
+ * is_deletable_filename
+ *
+ * True when a basename is safe to pass to file deletion (not empty, not a path segment).
+ */
+if ( ! function_exists('is_deletable_filename'))
+{
+	function is_deletable_filename($filename)
+	{
+		$filename = trim((string) $filename);
+
+		if ($filename === '' || $filename === '.' || $filename === '..') {
+			return false;
+		}
+
+		if (strpos($filename, '/') !== false || strpos($filename, '\\') !== false) {
+			return false;
+		}
+
+		if (strpos($filename, "\0") !== false) {
+			return false;
+		}
+
+		return true;
+	}
+}
+
+
+/**
+ * safe_unlink_file
+ *
+ * Delete a regular file only. Never deletes directories, symlinks to directories, or empty paths.
+ *
+ * @return bool True when a file was deleted, false when skipped or failed
+ */
+if ( ! function_exists('safe_unlink_file'))
+{
+	function safe_unlink_file($file_path)
+	{
+		if ($file_path === null || trim((string) $file_path) === '') {
+			return false;
+		}
+
+		if (!file_exists($file_path)) {
+			return false;
+		}
+
+		if (is_dir($file_path)) {
+			log_message('error', 'safe_unlink_file: refused to delete directory: ' . $file_path);
+			return false;
+		}
+
+		$resolved = realpath($file_path);
+		if ($resolved === false) {
+			return false;
+		}
+
+		if (is_dir($resolved)) {
+			log_message('error', 'safe_unlink_file: refused to delete directory: ' . $resolved);
+			return false;
+		}
+
+		if (!is_file($resolved)) {
+			log_message('error', 'safe_unlink_file: not a regular file: ' . $resolved);
+			return false;
+		}
+
+		if (!is_deletable_filename(basename($resolved))) {
+			return false;
+		}
+
+		return @unlink($resolved);
+	}
+}
+
+
+/**
  * silent_unlink
  *
- * Deletes a file silently without throwing any warnings if the file was not found
- *
- * @access	public
- * @param	string	the language line
- * @param	string	the id of the form element
- * @return	string
- */	
+ * Deletes a file silently without throwing warnings. Delegates to safe_unlink_file.
+ */
 if ( ! function_exists('silent_unlink'))
 {
 	function silent_unlink($file_path)
 	{
-		$error_reporting=error_reporting();
-		error_reporting(E_ERROR);
-		return unlink($file_path);
-		error_reporting($error_reporting);
+		return safe_unlink_file($file_path);
 	}
 }
 

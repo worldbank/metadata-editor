@@ -86,7 +86,7 @@
                             <v-icon v-if="item.type=='section_container'">
                                 {{ open ? 'mdi-dresser' : 'mdi-dresser' }}
                             </v-icon>
-                            <v-icon v-else-if="item.type=='section'">
+                            <v-icon v-else-if="item.type=='section' || item.type=='resource-dctype-group'">
                                 {{ open ? 'mdi-folder-open' : 'mdi-folder' }}
                             </v-icon>
                             <v-icon v-else-if="item.type=='date' || item.display_type=='date'">

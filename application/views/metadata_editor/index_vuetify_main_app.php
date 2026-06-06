@@ -153,6 +153,7 @@
             echo $this->load->view("metadata_editor/vue-nested-section-preview-component.js",null,true);
             
             echo $this->load->view("metadata_editor/vue-files-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-resource-dctype-utils.js",null,true);
             echo $this->load->view("metadata_editor/vue-external-resources-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-external-resources-edit-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-resumable-chunk-uploader.js",null,true);
@@ -168,6 +169,9 @@
             echo $this->load->view("metadata_editor/vue-data-explorer-host-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-dialog-datafile-export-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-dialog-batch-export-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-microdata-resource-datafile-links-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-microdata-resource-details-component.js",null,true);
+            echo $this->load->view("metadata_editor/vue-external-resources-generate-microdata-component.js",null,true);
             echo $this->load->view("metadata_editor/vue-dialog-batch-sum-stats-options-component.js",null,true);
 
             echo $this->load->view("metadata_editor/vue-variable-edit-documentation-component.js",null,true);
@@ -304,6 +308,7 @@
         //const ResourcesEditComp ={props: ['index'],template: '<div><external-resources-edit /></div>'}
         const ResourcesEditComp =VueExternalResourcesEdit;
         const ResourcesCreateComp =VueExternalResourcesCreate;
+        const ResourcesGenerateMicrodataComp = VueExternalResourcesGenerateMicrodata;
         const GeoFeatures ={props: ['index'],template: '<div><geospatial-features/></div>'}
         const GeoFeaturesImport ={props: ['index'],template: '<div><geospatial-feature-import/></div>'}
         const GeoFeature ={props: ['id'],template: '<div><geospatial-feature-edit :feature_id="id"/></div>'}
@@ -344,6 +349,8 @@
             { path: '/external-resources', component: ResourcesComp, props: true, name: 'external-resources'},
             { path: '/external-resources/create', component: ResourcesCreateComp, props: true, name: 'external-resources-create'},
             { path: '/external-resources/import', component: ResourcesImport},
+            { path: '/external-resources/generate-microdata', component: ResourcesGenerateMicrodataComp, name: 'external-resources-generate-microdata'},
+            { path: '/external-resources/regenerate/:resource_id', component: ResourcesGenerateMicrodataComp, props: true, name: 'external-resources-regenerate-microdata'},
             { path: '/external-resources/:index', component: ResourcesEditComp, props: true, name: 'external-resources-edit'},            
             { path: '/files', component: FileManager, props: true},
             { path: '/geospatial-features', component: GeoFeatures, props: true},

@@ -50,11 +50,23 @@ class Editor_resource_model extends ci_model {
 
     function delete($sid,$resource_id)
 	{
-		$this->delete_file_by_resource($sid,$resource_id);
+		$resource = $this->select_single($sid, $resource_id);
+		if (!$resource) {
+			throw new Exception('Resource not found: ' . $resource_id);
+		}
 
-		$this->db->where('sid',$sid);
-        $this->db->where('id',$resource_id);
-		return $this->db->delete('editor_resources');
+		$this->load->model('Editor_resource_datafile_model');
+		$this->Editor_resource_datafile_model->delete_by_resource($sid, $resource_id);
+
+		$this->delete_file_by_resource($sid, $resource_id);
+
+		$this->db->where('sid', $sid);
+		$this->db->where('id', $resource_id);
+		if (!$this->db->delete('editor_resources')) {
+			throw new Exception('Failed to delete resource: ' . $resource_id);
+		}
+
+		return $this->select_all($sid);
 	}
 
 
@@ -395,11 +407,9 @@ class Editor_resource_model extends ci_model {
 	 */
 	function delete_thumbnail($sid)
 	{
+		$this->load->helper('file');
 		$thumbnail_path=$this->Editor_model->get_thumbnail_file($sid);
-
-		if (file_exists($thumbnail_path)){
-			unlink($thumbnail_path);
-		}
+		safe_unlink_file($thumbnail_path);
 
 		$this->Editor_model->set_project_options($sid,$options=array('thumbnail'=>null));
 
@@ -644,7 +654,7 @@ class Editor_resource_model extends ci_model {
 			'dcdate',
 			'country',
 			'language',
-			//'id_number',
+			'id_number',
 			'contributor',
 			'publisher',
 			'rights',
@@ -654,6 +664,8 @@ class Editor_resource_model extends ci_model {
 			'subjects',
 			'filename',
 			'dcformat',
+			'source_type',
+			'bundle_type',
 			'changed');
 
 		//add date modified
@@ -661,6 +673,17 @@ class Editor_resource_model extends ci_model {
 					
 		if (isset($options['filename'])){
 			$options['filename']=$this->normalize_filename($options['filename']);
+		}
+
+		if (isset($options['dctype'])){
+			$dctype_code=$this->get_dctype_code_from_string($options['dctype']);
+			$options['dctype']=$this->get_dctype_label_by_code($dctype_code);
+		}
+		if (isset($options['format'])){
+			$options['dcformat']=$options['format'];
+		}
+		if (isset($options['dcformat']) && strpos((string) $options['dcformat'], '[') === false) {
+			$options['dcformat'] = $this->get_dcformat_label_by_code($options['dcformat']);
 		}
 		
 		$update_arr=array();
@@ -699,7 +722,7 @@ class Editor_resource_model extends ci_model {
 			'dcdate',
 			'country',
 			'language',
-			//'id_number',
+			'id_number',
 			'contributor',
 			'publisher',
 			'rights',
@@ -709,6 +732,8 @@ class Editor_resource_model extends ci_model {
 			'subjects',
 			'filename',
 			'dcformat',
+			'source_type',
+			'bundle_type',
 			'changed');
 
 		$options['changed']=date("U");
@@ -726,6 +751,9 @@ class Editor_resource_model extends ci_model {
 		}
 		if (isset($options['format'])){
 			$options['dcformat']=$options['format'];
+		}
+		if (isset($options['dcformat']) && strpos((string) $options['dcformat'], '[') === false) {
+			$options['dcformat'] = $this->get_dcformat_label_by_code($options['dcformat']);
 		}
 		
 		if (isset($options['filename'])){
@@ -1090,9 +1118,8 @@ class Editor_resource_model extends ci_model {
 		$path = $this->Editor_model->get_project_folder($sid);
 		$resource_file=$path.'/'.$filename;
 
-		if (file_exists($resource_file)){
-			unlink($resource_file);
-		}
+		$this->load->helper('file');
+		safe_unlink_file($resource_file);
 
 		file_put_contents($resource_file,json_encode($resources,JSON_PRETTY_PRINT));		
 		return $resource_file;
@@ -1112,9 +1139,8 @@ class Editor_resource_model extends ci_model {
 		$filename.='.rdf';
 		$resource_file=$path.'/'.$filename;
 
-        if (file_exists($resource_file)){
-            unlink($resource_file);
-        }
+        $this->load->helper('file');
+        safe_unlink_file($resource_file);
 
         $rdf_xml=$this->generate_rdf($sid);
 		file_put_contents($resource_file,$rdf_xml);
@@ -1215,11 +1241,39 @@ class Editor_resource_model extends ci_model {
 	 */
 	function delete_file($sid,$documentation_type,$filename)
 	{
-		$project_folder=$this->Editor_model->get_project_folder($sid);
-		$resource_file=$project_folder.'/'.$documentation_type.'/'. $this->normalize_filename($filename);
+		$this->load->helper('file');
 
-		if (file_exists($resource_file)){
-			unlink($resource_file);
+		if ($filename === null || trim((string) $filename) === '') {
+			return false;
+		}
+
+		if (is_url($filename)) {
+			return false;
+		}
+
+		$normalized = $this->normalize_filename($filename);
+		if (!is_deletable_filename($normalized)) {
+			log_message('error', 'delete_file: unsafe or empty filename sid=' . $sid);
+			return false;
+		}
+
+		$documentation_type = trim(unix_path((string) $documentation_type), '/');
+		$allowed_folders = array('documentation', 'data');
+		if (!in_array($documentation_type, $allowed_folders, true)) {
+			log_message('error', 'delete_file: invalid folder type: ' . $documentation_type);
+			return false;
+		}
+
+		$this->load->model('Editor_files_model');
+		try {
+			return $this->Editor_files_model->delete_by_path($sid, $documentation_type . '/' . $normalized);
+		} catch (Exception $e) {
+			$msg = $e->getMessage();
+			if ($msg === 'File not found' || $msg === 'Invalid file_path') {
+				return false;
+			}
+			log_message('error', 'delete_file: ' . $msg . ' sid=' . $sid);
+			return false;
 		}
 	}
 

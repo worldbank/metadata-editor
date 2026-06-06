@@ -9,6 +9,7 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
             is_dirty:false,
             is_saving:false,
             is_uploading:false,
+            is_deleting:false,
             attachment_type:'',
             attachment_url:'',
             resource_template:'',
@@ -16,6 +17,7 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
             file_exists:null,
             file_info:null,
             upload_file_exists:false,
+            selected_datafile_ids:[],
             dc_types:{                
                 "doc/adm":"Document, Administrative [doc/adm]",
                 "doc/anl":"Document, Analytical [doc/anl]",
@@ -38,12 +40,14 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
     },
     mounted: function(){
         this.loadResourceTemplate();
+        this.loadDatafileLinks();
     }, 
     watch: {
         Resource: {
             handler: function (val, oldVal) {
                 if (!oldVal){
                     this.checkExistingResourceFile();
+                    this.loadDatafileLinks();
                     return;
                 }
                 this.is_dirty=true;
@@ -122,61 +126,116 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
                 alert(vm.$t("failed_to_load_template"));
             });
         },
-        saveResource: function()
-        {
-            this.errors='';
-            let formData = new FormData();
-
-            if (this.attachment_type=='url'){
-                this.Resource.filename=this.attachment_url;
-            }else if (this.attachment_type=='file'){
-                // Validate that file was actually uploaded before saving
-                // Check that file is actually a File object, not just a truthy value
-                if (this.file && this.file instanceof File && !this.uploadedFileName){
-                    this.errors = this.$t("file_must_be_uploaded_before_saving");
-                    this.is_saving = false;
-                    alert(this.$t("Please upload the file first") || "Please upload the file first. Click the 'Upload' button in the file upload component.");
+        validateFormThen: function(callback) {
+            const vm = this;
+            const form = vm.$root.$refs.form;
+            if (!form || typeof form.validate !== 'function') {
+                callback();
+                return;
+            }
+            form.validate().then(function(isValid) {
+                if (!isValid) {
+                    vm.is_saving = false;
+                    vm.is_uploading = false;
+                    alert(vm.$t('validation_errors') || 'Validation errors');
                     return;
                 }
-                // Use uploaded filename (or existing filename if no new file uploaded)
-                this.Resource.filename = this.uploadedFileName || (this.Resource.filename || '');
+                callback();
+            });
+        },
+        saveResource: function()
+        {
+            const vm = this;
+            vm.errors = '';
+
+            if (vm.attachment_type == 'url') {
+                vm.Resource.filename = vm.attachment_url;
+            } else if (vm.attachment_type == 'file') {
+                if (vm.file && vm.file instanceof File && !vm.uploadedFileName) {
+                    vm.errors = vm.$t('file_must_be_uploaded_before_saving');
+                    vm.is_saving = false;
+                    alert(vm.$t('Please upload the file first') || 'Please upload the file first. Click the Upload button in the file upload component.');
+                    return;
+                }
+                vm.Resource.filename = vm.uploadedFileName || (vm.Resource.filename || '');
             } else {
-                // No attachment type selected or URL attachment - allow saving without file
-                this.Resource.filename = this.attachment_type == 'url' ? this.attachment_url : (this.Resource.filename || '');
+                vm.Resource.filename = vm.attachment_type == 'url' ? vm.attachment_url : (vm.Resource.filename || '');
             }
 
-            formData=this.Resource;
-
-            if (this.errors!=''){
+            if (vm.errors != '') {
                 return false;
-            }            
+            }
 
-            vm=this;
-            let url=CI.base_url + '/api/resources/'+ this.ProjectID + '/' + this.Resource['id'];
+            vm.validateFormThen(function() {
+                const url = CI.base_url + '/api/resources/' + vm.ProjectID + '/' + vm.Resource['id'];
 
-            axios.post( url,
-                formData,
-                {
+                axios.post(url, vm.Resource, {
                     headers: {
                         'Content-Type': 'multipart/form-data'
                     }
-                }
-            ).then(function(response){
-                vm.$store.dispatch('loadExternalResources',{dataset_id:vm.ProjectID});
-                vm.is_dirty=false;
-                vm.is_saving=false;
-                vm.is_uploading=false;
-                router.push('/external-resources/');
-            })
-            .catch(function(response){
-                vm.errors=response;
-                vm.is_saving=false;
-                vm.is_uploading=false;
-            });    
+                }).then(function(response) {
+                    const resourceId = vm.Resource['id'];
+                    const done = function() {
+                        vm.$store.dispatch('loadExternalResources', { dataset_id: vm.ProjectID });
+                        vm.is_dirty = false;
+                        vm.is_saving = false;
+                        vm.is_uploading = false;
+                        router.push('/external-resources');
+                    };
+                    if (vm.isMicrodataResource && !vm.isGeneratedResource) {
+                        vm.saveDatafileLinks(resourceId).then(done).catch(function(err) {
+                            vm.is_saving = false;
+                            vm.is_uploading = false;
+                            alert(vm.$t('microdata_links_save_failed') || 'Resource saved but data file links failed: ' + (err.message || err));
+                            done();
+                        });
+                    } else {
+                        done();
+                    }
+                }).catch(function(response) {
+                    vm.errors = response;
+                    vm.is_saving = false;
+                    vm.is_uploading = false;
+                });
+            });
         },
         cancelSave: function(){
             this.$store.dispatch('loadExternalResources',{dataset_id:this.ProjectID});
-            router.push('/external-resources/');
+            router.push('/external-resources');
+        },
+        deleteResource: function() {
+            if (!this.Resource || !this.Resource.id) {
+                return;
+            }
+            if (!confirm(this.$t('confirm_delete'))) {
+                return;
+            }
+            const vm = this;
+            vm.is_deleting = true;
+            const url = CI.base_url + '/api/resources/delete/' + this.ProjectID + '/' + this.Resource.id;
+            axios.post(url)
+                .then(function() {
+                    vm.is_dirty = false;
+                    vm.$store.dispatch('loadExternalResources', { dataset_id: vm.ProjectID });
+                    router.push('/external-resources');
+                })
+                .catch(function(response) {
+                    vm.is_deleting = false;
+                    alert(vm.$t('failed_operation') + ': ' + vm.errorMessageToText(response));
+                });
+        },
+        errorMessageToText: function(error) {
+            if (!error || !error.response || !error.response.data) {
+                return error && error.message ? error.message : '';
+            }
+            if (error.response.data.errors) {
+                let error_text = '';
+                for (let key in error.response.data.errors) {
+                    error_text += error.response.data.errors[key] + '\n';
+                }
+                return error_text;
+            }
+            return error.response.data.message || '';
         },
         uploadFile: function ()
         {
@@ -384,6 +443,48 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
             const i = Math.floor(Math.log(bytes) / Math.log(k));
             return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
         },
+        isMicrodataDctype: function(dctype) {
+            return dctype && String(dctype).indexOf('dat/micro') !== -1;
+        },
+        loadDatafileLinks: function() {
+            if (!this.Resource || !this.isMicrodataDctype(this.Resource.dctype)) {
+                this.selected_datafile_ids = [];
+                return;
+            }
+            const vm = this;
+            const url = CI.base_url + '/api/resources/datafile_links/' + this.ProjectID + '/' + this.Resource.id;
+            axios.get(url)
+                .then(function(response) {
+                    if (response.data && response.data.links) {
+                        vm.selected_datafile_ids = response.data.links.map(function(link) {
+                            return link.file_id;
+                        });
+                    }
+                })
+                .catch(function() {
+                    vm.selected_datafile_ids = [];
+                });
+        },
+        saveDatafileLinks: function(resourceId) {
+            const links = this.selected_datafile_ids.map(function(fileId) {
+                return { file_id: fileId, link_type: 'associated' };
+            });
+            const url = CI.base_url + '/api/resources/datafile_links/' + this.ProjectID + '/' + resourceId;
+            return axios.post(url, { links: links });
+        },
+        excludeRecursiveResourceTemplateFields: function (items, keys_remove){
+            let new_items=[];
+            let vm=this;
+            items.forEach(function(item){
+                if (!keys_remove.includes(item.key)){
+                    if (item.items){
+                        item.items=vm.excludeRecursiveResourceTemplateFields(item.items,keys_remove);
+                    }
+                    new_items.push(item);
+                }
+            });
+            return new_items;
+        },
     },
     computed: {
         isProjectEditable(){
@@ -414,38 +515,73 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
         ResourceFileExists(){
             return this.resourceFileExists();
         },
+        isMicrodataResource(){
+            return this.Resource && this.isMicrodataDctype(this.Resource.dctype);
+        },
+        isGeneratedResource(){
+            return this.Resource && this.Resource.source_type === 'generated';
+        },
         ResourceTemplate(){
-            let key='resource_container';                
-            //let items=this.$store.state.formTemplate.template.items;
+            let vm=this;
+            let key='resource_container';
+            let excluded_field_keys=['filename'];
             let items=[]
             if (this.resource_template && this.resource_template.template && this.resource_template.template.items){
                 items= this.resource_template.template.items;
             }
             
             let item=this.findTemplateByItemKey(items,key);
+
+            if (item && item.items && this.isMicrodataResource){
+                item.items=vm.excludeRecursiveResourceTemplateFields(item.items,excluded_field_keys);
+            }
+
             return item;        
+        },
+        microdataEditSubtitle(){
+            if (!this.isMicrodataResource){
+                return null;
+            }
+            if (this.isGeneratedResource){
+                return this.$t('generated_microdata_resource') || 'Generated microdata resource';
+            }
+            return this.$t('manual_microdata_resource') || 'Manual microdata resource';
         },
 
     },
     template: `
-        <div class="container-fluid edit-resource-container">
+        <div class="container-fluid edit-resource-container metadata-form">
 
             <section style="display: flex; flex-flow: column;height: calc(100vh - 140px);" v-if="Resource">
 
             <v-card class="mt-4 mb-2">                    
                     <v-card-title class="d-flex justify-space-between">
-                        <div style="font-weight:normal">{{$t("edit_resource")}}</div>
+                        <div style="font-weight:normal">
+                            {{$t("edit_resource")}}
+                            <div v-if="microdataEditSubtitle" class="text-caption text--secondary mt-1">{{ microdataEditSubtitle }}</div>
+                        </div>
 
-                        <div>
+                        <div class="d-flex align-center" style="gap: 8px;">
+                            <v-btn
+                                v-if="isProjectEditable"
+                                color="error"
+                                small
+                                outlined
+                                @click="deleteResource"
+                                :disabled="is_saving || is_uploading || is_deleting"
+                                :loading="is_deleting"
+                            >
+                                <v-icon small left>mdi-delete-outline</v-icon>{{ $t('delete') }}
+                            </v-btn>
                             <v-btn 
                                 color="primary" 
                                 small 
                                 @click="uploadFile" 
-                                :disabled="!isProjectEditable || is_saving || is_uploading || (attachment_type=='file' && file && file instanceof File && !uploadedFileName)"
+                                :disabled="!isProjectEditable || is_saving || is_uploading || is_deleting || (attachment_type=='file' && file && file instanceof File && !uploadedFileName)"
                                 :loading="is_saving || is_uploading">
                                 {{$t("Save")}} <span v-if="is_dirty || (attachment_type=='file' && file && file instanceof File && !uploadedFileName)">*</span>
                             </v-btn>
-                            <v-btn @click="cancelSave" small :disabled="is_saving">{{$t("cancel")}}</v-btn>
+                            <v-btn @click="cancelSave" small :disabled="is_saving || is_deleting">{{$t("cancel")}}</v-btn>
                         </div>
                     </v-card-title>
 
@@ -485,7 +621,6 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
                     
                 </template>
                 <template v-else>
-                                          {{column.key}}      
                     <form-input
                         :value="localValue(column.key)"
                         :field="column"
@@ -497,9 +632,22 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
             
             
 
-            <v-card class="mt-2">
+            <microdata-resource-details
+                v-if="isMicrodataResource"
+                :resource-id="Resource.id"
+                :source-type="Resource.source_type"
+                :bundle-type="Resource.bundle_type"
+                :filename="Resource.filename"
+                :editable-links="!isGeneratedResource"
+                :selected-file-ids.sync="selected_datafile_ids"
+                :can-edit="isProjectEditable"
+            ></microdata-resource-details>
+
+            <v-card v-if="!isMicrodataResource || !isGeneratedResource" class="mt-2">
                 <v-card-title class="d-flex justify-space-between">
-                    <div style="font-weight:normal">{{$t("resource_attachment")}}</div>
+                    <div style="font-weight:normal">
+                        {{ $t('resource_attachment') }}
+                    </div>
                 </v-card-title>
 
             <v-card-text>
@@ -579,20 +727,28 @@ const VueExternalResourcesEdit= Vue.component('external-resources-edit', {
                     </label>
                 </div>
 
-                <div class="form-group form-field  m-1 p-3 ">
-                    <span><input type="text" id="url" class="form-control" v-model="attachment_url" @click="attachment_type='url'"/></span> 
+                <div class="form-group form-field m-1 p-3">
+                    <v-text-field
+                        v-model="attachment_url"
+                        outlined
+                        dense
+                        hide-details
+                        prepend-inner-icon="mdi-link"
+                        :label="$t('url')"
+                        @focus="attachment_type='url'"
+                        @click="attachment_type='url'"
+                        :disabled="!isProjectEditable || is_saving"
+                    ></v-text-field>
                 </div>
 
             </div>
             </v-card-text>
             </v-card>
 
-            
-
             </v-card-text>
 
             </v-card>
-            
+
         </section>
         </div>
     `
