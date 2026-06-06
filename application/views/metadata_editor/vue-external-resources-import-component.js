@@ -28,7 +28,7 @@ Vue.component('external-resources-import', {
                 }
             ).then(function(response){
                 vm.$store.dispatch('loadExternalResources',{dataset_id:vm.ProjectID});
-                router.push('/external-resources/');
+                router.push('/external-resources');
             })
             .catch(function(err){
                 if (err.response.data && err.response.data.message){

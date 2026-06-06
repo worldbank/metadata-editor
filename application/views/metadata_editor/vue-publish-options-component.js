@@ -6,7 +6,6 @@ Vue.component('publish-options', {
             field_data: this.value,
             project_info: {},//study_metadata_idno
             resources_selected:[],
-            toggle_resources_selected:false,
             resources_overwrite:"yes",
             delete_nada_resources_before_publish:false,
             publish_selection_snapshot:null,
@@ -89,12 +88,14 @@ Vue.component('publish-options', {
             collections_linked:[],
             data_access_list:[],
             study_info: null,
-            publish_responses:{}//all publish responses                        
+            publish_responses:{},//all publish responses
+            microdata_status: null
         }
     },
     mounted: async function(){
         this.loadCatalogConnections();
         this.getProjectBasicInfo();
+        this.loadMicrodataStatus();
         var vm = this;
         this.$nextTick(function () {
             vm.panels = vm.getDefaultExpandedPanels();
@@ -121,7 +122,6 @@ Vue.component('publish-options', {
             if (!resources || resources.length === 0) {
                 this.publish_resources = false;
                 this.resources_selected = [];
-                this.toggle_resources_selected = false;
             } else {
                 this.publish_resources = true;
                 var selected = [];
@@ -129,7 +129,6 @@ Vue.component('publish-options', {
                     selected.push(i);
                 }
                 this.resources_selected = selected;
-                this.toggle_resources_selected = true;
             }
 
             if (!this.isIndicatorProject) {
@@ -432,14 +431,81 @@ Vue.component('publish-options', {
             }
             return out;
         },
-        toggleSelectedResources: function()
+        toggleSelectedResources: function(event)
         {
-            this.resources_selected = [];
-            if (this.toggle_resources_selected == true) {                
-                for (let i = 0; i < this.ExternalResources.length; i++) {
-                this.resources_selected.push(i);
-                }
+            const checked = event && event.target ? event.target.checked : !this.allOthersSelected;
+            const vm = this;
+            const otherSet = new Set(this.otherResourceIndices);
+            this.resources_selected = this.resources_selected.filter(function(i) {
+                return !otherSet.has(i);
+            });
+            if (checked) {
+                this.otherResourceIndices.forEach(function(i) {
+                    vm.resources_selected.push(i);
+                });
             }
+        },
+        toggleSelectedMicrodataResources: function(event)
+        {
+            const checked = event && event.target ? event.target.checked : !this.allMicrodataSelected;
+            const vm = this;
+            const microdataSet = new Set(this.microdataResourceIndices);
+            this.resources_selected = this.resources_selected.filter(function(i) {
+                return !microdataSet.has(i);
+            });
+            if (checked) {
+                this.microdataResourceIndices.forEach(function(i) {
+                    vm.resources_selected.push(i);
+                });
+            }
+        },
+        isMicrodataDctype: function(dctype) {
+            return dctype && String(dctype).indexOf('dat/micro') !== -1;
+        },
+        loadMicrodataStatus: function() {
+            if (!this.isMicrodataProject) {
+                this.microdata_status = null;
+                return;
+            }
+            const vm = this;
+            const url = CI.site_url + '/api/resources/microdata_status/' + this.ProjectID;
+            axios.get(url)
+                .then(function(response) {
+                    if (response.data && response.data.status === 'success') {
+                        vm.microdata_status = response.data;
+                    }
+                })
+                .catch(function() {
+                    vm.microdata_status = null;
+                });
+        },
+        goGenerateMicrodata: function() {
+            router.push('/external-resources/generate-microdata');
+        },
+        stalenessEntryForResource: function(resourceId) {
+            if (!this.microdata_status || !this.microdata_status.microdata_resources) {
+                return null;
+            }
+            return this.microdata_status.microdata_resources.find(function(entry) {
+                return entry.resource && String(entry.resource.id) === String(resourceId);
+            }) || null;
+        },
+        stalenessLabel: function(resourceId) {
+            const entry = this.stalenessEntryForResource(resourceId);
+            if (!entry || !entry.staleness) {
+                return null;
+            }
+            const status = entry.staleness.status;
+            if (status === 'current') {
+                return { text: this.$t('microdata_status_current') || 'Current', color: 'success' };
+            }
+            if (status === 'stale') {
+                return { text: this.$t('microdata_status_stale') || 'Stale', color: 'warning' };
+            }
+            if (status === 'missing_file') {
+                return { text: this.$t('microdata_status_missing_file') || 'Missing file', color: 'error' };
+            }
+            return { text: status, color: 'grey' };
         },
         publishToCatalog: async function()
         {            
@@ -1246,6 +1312,53 @@ Vue.component('publish-options', {
             } catch (e) {
                 return String(this.indicator_publish);
             }
+        },
+        isMicrodataProject(){
+            const t = this.ProjectType;
+            return t === 'survey' || t === 'microdata';
+        },
+        microdataResourceIndices(){
+            const vm = this;
+            const indices = [];
+            this.ExternalResources.forEach(function(resource, index) {
+                if (vm.isMicrodataDctype(resource.dctype)) {
+                    indices.push(index);
+                }
+            });
+            return indices;
+        },
+        otherResourceIndices(){
+            const vm = this;
+            const indices = [];
+            this.ExternalResources.forEach(function(resource, index) {
+                if (!vm.isMicrodataDctype(resource.dctype)) {
+                    indices.push(index);
+                }
+            });
+            return indices;
+        },
+        allMicrodataSelected(){
+            const microdata = this.microdataResourceIndices;
+            if (microdata.length === 0) {
+                return false;
+            }
+            const vm = this;
+            return microdata.every(function(i) {
+                return vm.resources_selected.includes(i);
+            });
+        },
+        allOthersSelected(){
+            const others = this.otherResourceIndices;
+            if (others.length === 0) {
+                return false;
+            }
+            const vm = this;
+            return others.every(function(i) {
+                return vm.resources_selected.includes(i);
+            });
+        },
+        canGenerateMicrodata(){
+            return this.isMicrodataProject && (this.Datafiles && this.Datafiles.length > 0);
         }
     },  
     template: `
@@ -1485,33 +1598,90 @@ Vue.component('publish-options', {
                                     ></v-switch>
                                 </div>
                                 
-                                <div v-if="ExternalResources.length>0" >
-                                    <div>
-                                        <strong>{{ExternalResources.length}}</strong> {{$t("n_resources_found")}}
-                                        <span class="ml-2"><strong>{{resources_selected.length}}</strong> {{$t("n_selected")}}</span>
+                                <div v-if="isMicrodataProject" class="mb-4">
+                                    <div class="d-flex align-center mb-2">
+                                        <strong>{{ $t('microdata_resources') }}</strong>
+                                        <span class="ml-2 text-small text-muted">({{ microdataResourceIndices.length }})</span>
                                     </div>
-                                    <div class="border" style="max-height:300px;overflow:auto;">                    
-                                        <table class="table table-sm table-striped">
+                                    <div
+                                        v-if="microdataResourceIndices.length === 0 && canGenerateMicrodata"
+                                        class="grey lighten-4 border rounded pa-4 mb-6 d-flex align-start"
+                                    >
+                                        <v-icon color="primary" class="mr-3 mt-1">mdi-database-export</v-icon>
+                                        <div>
+                                            <div class="text-body-1">{{ $t('microdata_publish_empty_hint') }}</div>
+                                            <v-btn color="primary" outlined small class="mt-3" @click="goGenerateMicrodata">
+                                                {{ $t('generate_microdata_resource') }}
+                                            </v-btn>
+                                        </div>
+                                    </div>
+                                    <div v-if="microdataResourceIndices.length > 0" class="border mb-3" style="max-height:220px;overflow:auto;">
+                                        <table class="table table-sm table-striped mb-0">
                                             <thead>
-                                            <tr class="bg-light">
-                                                <th><input type="checkbox" v-model="toggle_resources_selected" @change="toggleSelectedResources"></th>
-                                                <th>{{$t("title")}}</th>
-                                                <th>{{$t("type")}}</th>
-                                            </tr>
+                                                <tr class="bg-light">
+                                                    <th><input type="checkbox" :checked="allMicrodataSelected" @change="toggleSelectedMicrodataResources"></th>
+                                                    <th>{{$t("title")}}</th>
+                                                    <th>{{$t("type")}}</th>
+                                                </tr>
                                             </thead>
-                                            <tr v-for="(resource,resource_index) in ExternalResources" :key="resource.id">
-                                                <td><input type="checkbox" :value="resource_index" v-model="resources_selected"></td>
-                                                <td>
-                                                    <div>{{resource.title}}</div>
-                                                    <div class="text-secondary text-small">{{resource.filename}}</div>
-                                                </td>
-                                                <td>{{resource.dctype}}</td>
-                                            </tr>
+                                            <tbody>
+                                                <tr v-for="resource_index in microdataResourceIndices" :key="'pub-micro-' + ExternalResources[resource_index].id">
+                                                    <td><input type="checkbox" :value="resource_index" v-model="resources_selected"></td>
+                                                    <td>
+                                                        <div>
+                                                            {{ ExternalResources[resource_index].title }}
+                                                            <v-chip
+                                                                v-if="stalenessLabel(ExternalResources[resource_index].id)"
+                                                                x-small
+                                                                :color="stalenessLabel(ExternalResources[resource_index].id).color"
+                                                                text-color="white"
+                                                                class="ml-1"
+                                                            >{{ stalenessLabel(ExternalResources[resource_index].id).text }}</v-chip>
+                                                        </div>
+                                                        <div class="text-secondary text-small">{{ ExternalResources[resource_index].filename }}</div>
+                                                    </td>
+                                                    <td>{{ ExternalResources[resource_index].dctype }}</td>
+                                                </tr>
+                                            </tbody>
                                         </table>
                                     </div>
                                 </div>
-                                <div v-else class="alert alert-warning">
-                                {{$t("no_external_resources_found")}}
+
+                                <div>
+                                    <div class="d-flex align-center mb-2">
+                                        <strong>{{ $t('external_resources') }}</strong>
+                                        <span class="ml-2 text-small text-muted">({{ otherResourceIndices.length }})</span>
+                                        <span v-if="ExternalResources.length > 0" class="ml-3 text-small">
+                                            <strong>{{resources_selected.length}}</strong> {{$t("n_selected")}}
+                                        </span>
+                                    </div>
+                                    <div v-if="ExternalResources.length > 0" class="border" style="max-height:300px;overflow:auto;">
+                                        <table class="table table-sm table-striped mb-0">
+                                            <thead>
+                                                <tr class="bg-light">
+                                                    <th><input type="checkbox" :checked="allOthersSelected" @change="toggleSelectedResources"></th>
+                                                    <th>{{$t("title")}}</th>
+                                                    <th>{{$t("type")}}</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr v-if="otherResourceIndices.length === 0">
+                                                    <td colspan="3" class="text-muted">{{ $t('no_external_resources_found') }}</td>
+                                                </tr>
+                                                <tr v-for="resource_index in otherResourceIndices" :key="'pub-other-' + ExternalResources[resource_index].id">
+                                                    <td><input type="checkbox" :value="resource_index" v-model="resources_selected"></td>
+                                                    <td>
+                                                        <div>{{ ExternalResources[resource_index].title }}</div>
+                                                        <div class="text-secondary text-small">{{ ExternalResources[resource_index].filename }}</div>
+                                                    </td>
+                                                    <td>{{ ExternalResources[resource_index].dctype }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div v-else class="alert alert-warning">
+                                        {{$t("no_external_resources_found")}}
+                                    </div>
                                 </div>
                             </v-expansion-panel-content>
                         </v-expansion-panel>
@@ -1767,9 +1937,6 @@ Vue.component('publish-options', {
                 </v-dialog>
                 <!-- end dialog -->
 
-
-
-                
             </div>          
             `    
 });

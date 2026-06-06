@@ -439,22 +439,99 @@ class Project_versions
 	function copy_external_resources($source_sid, $target_sid)
 	{
 		$columns = $this->get_table_columns('editor_resources');
+		$columns = array_values(array_diff($columns, array('sid', 'id')));
 
-		//remove sid and pk columns
-		$columns = array_diff($columns, array('sid', 'id'));
+		$source_resources = $this->ci->db
+			->where('sid', (int) $source_sid)
+			->order_by('id', 'ASC')
+			->get('editor_resources')
+			->result_array();
 
-		//create sql
-		$sql = 'INSERT INTO editor_resources (sid,' . implode(",", $columns) 
-				. ') SELECT ' . $target_sid . ',' . implode(",", $columns) . ' FROM editor_resources WHERE sid=?';
-		
-		$result = $this->ci->db->query($sql, array($source_sid));
-		
-		if (!$result) {
-			$db_error = $this->ci->db->error();
-			throw new Exception("FAILED_TO_COPY_EXTERNAL_RESOURCES: " . $db_error['message']);
+		$resource_id_map = array();
+		foreach ($source_resources as $resource) {
+			$old_id = (int) $resource['id'];
+			$row = array('sid' => (int) $target_sid);
+			foreach ($columns as $col) {
+				if (array_key_exists($col, $resource)) {
+					$row[$col] = $resource[$col];
+				}
+			}
+
+			if (!$this->ci->db->insert('editor_resources', $row)) {
+				$db_error = $this->ci->db->error();
+				throw new Exception("FAILED_TO_COPY_EXTERNAL_RESOURCES: " . $db_error['message']);
+			}
+
+			$resource_id_map[$old_id] = (int) $this->ci->db->insert_id();
 		}
-		
-		return $result;
+
+		$links_copied = $this->copy_resource_datafile_links($source_sid, $target_sid, $resource_id_map);
+
+		return array(
+			'resources_copied' => count($resource_id_map),
+			'links_copied' => $links_copied,
+		);
+	}
+
+	/**
+	 * Copy optional dat/micro data-file link rows, remapping resource_id to the target project.
+	 *
+	 * @param int $source_sid
+	 * @param int $target_sid
+	 * @param array $resource_id_map old resource id => new resource id
+	 * @return int
+	 */
+	function copy_resource_datafile_links($source_sid, $target_sid, array $resource_id_map)
+	{
+		if (!$this->ci->db->table_exists('editor_resource_data_files') || empty($resource_id_map)) {
+			return 0;
+		}
+
+		$source_links = $this->ci->db
+			->where('sid', (int) $source_sid)
+			->order_by('id', 'ASC')
+			->get('editor_resource_data_files')
+			->result_array();
+
+		$link_columns = array(
+			'file_id',
+			'export_format',
+			'export_version',
+			'zip_entry_name',
+			'link_type',
+			'data_file_changed',
+			'source_csv_mtime',
+			'generated_at',
+			'created',
+			'created_by',
+		);
+
+		$count = 0;
+		foreach ($source_links as $link) {
+			$old_resource_id = (int) $link['resource_id'];
+			if (!isset($resource_id_map[$old_resource_id])) {
+				continue;
+			}
+
+			$row = array(
+				'sid' => (int) $target_sid,
+				'resource_id' => (int) $resource_id_map[$old_resource_id],
+			);
+			foreach ($link_columns as $col) {
+				if (array_key_exists($col, $link)) {
+					$row[$col] = $link[$col];
+				}
+			}
+
+			if (!$this->ci->db->insert('editor_resource_data_files', $row)) {
+				$db_error = $this->ci->db->error();
+				throw new Exception("FAILED_TO_COPY_RESOURCE_DATAFILE_LINKS: " . $db_error['message']);
+			}
+
+			$count++;
+		}
+
+		return $count;
 	}
 
 	/**

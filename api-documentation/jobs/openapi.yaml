@@ -5,6 +5,20 @@ info:
 
     Background job queue management API for processing asynchronous tasks.
 
+    **Registered job types** (create via `POST /jobs` with `job_type` + `payload`, or use a
+    convenience endpoint where listed):
+
+    | job_type | Convenience endpoint | Payload schema | Result schema |
+    | --- | --- | --- | --- |
+    | `generate_pdf` | `POST /jobs/generate_pdf` | GeneratePdfJobPayload | GeneratePdfJobResult |
+    | `generate_microdata_resource` | `POST /jobs/generate_microdata_resource` | GenerateMicrodataResourceJobPayload | GenerateMicrodataResourceJobResult |
+    | `import_microdata` | `POST /jobs/import_microdata/{project_id}` (multipart upload) | ImportMicrodataJobPayload | ImportMicrodataJobResult |
+    | `import_indicator_data` | `POST /jobs/import_indicator_data` | ImportIndicatorDataJobPayload | ImportIndicatorDataJobResult |
+    | `publish_project` | `POST /jobs/publish_to_nada` | PublishProjectJobPayload | PublishProjectJobResult |
+    | `hello_world` | _(generic `POST /jobs` only — testing)_ | HelloWorldJobPayload | HelloWorldJobResult |
+
+    Use `GET /jobs/types` for the live handler list. Alias `pdf_generation` is accepted and maps to `generate_pdf`.
+
     Find out more about Editor at
     [https://github.com/worldbank/metadata-editor](https://github.com/worldbank/metadata-editor).
 
@@ -51,7 +65,7 @@ paths:
           in: query
           description: Filter by job type
           schema:
-            type: string
+            $ref: "#/components/schemas/RegisteredJobType"
         - name: user_id
           in: query
           description: Filter by user ID (admin only, or own jobs for regular users)
@@ -180,12 +194,46 @@ paths:
       security:
         - ApiKeyAuth: []
 
+  /jobs/generate_microdata_resource:
+    post:
+      tags:
+        - Job Types
+      summary: Create microdata resource generation job
+      description: >
+        Export project data files and create a dat/micro external resource in the background.
+        Equivalent to POST /jobs with job_type generate_microdata_resource.
+      operationId: createGenerateMicrodataResourceJob
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GenerateMicrodataResourceJobRequest"
+      responses:
+        "201":
+          description: Job created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobCreateResponse"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+      security:
+        - ApiKeyAuth: []
+
   /jobs/import_microdata/{project_id}:
     post:
       tags:
         - Job Types
       summary: Import Microdata files
-      description: Upload and import data file in one step. Accepts multipart/form-data with file upload.
+      description: >
+        Upload and import a data file in one step (multipart/form-data). Creates an import_microdata
+        background job after upload. Equivalent to uploading separately then POST /jobs with
+        job_type import_microdata and payload file_id + project_id.
       operationId: createImportMicrodataJob
       parameters:
         - name: project_id
@@ -261,12 +309,46 @@ paths:
       security:
         - ApiKeyAuth: []
 
+  /jobs/import_indicator_data:
+    post:
+      tags:
+        - Job Types
+      summary: Import indicator timeseries data from CSV
+      description: >
+        Import rows for one indicator value from a completed resumable CSV upload into an
+        indicator/timeseries project. Upload the CSV first via POST /api/uploads/* to obtain
+        upload_id. Equivalent to POST /jobs with job_type import_indicator_data.
+      operationId: createImportIndicatorDataJob
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ImportIndicatorDataJobRequest"
+      responses:
+        "201":
+          description: Job created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobCreateResponse"
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+      security:
+        - ApiKeyAuth: []
+
   /jobs/publish_to_nada:
     post:
       tags:
         - Job Types
       summary: Publish project to NADA
-      description: Publishing project to a NADA catalog
+      description: >
+        Publish a project to a NADA catalog in the background. Sets job_type to publish_project.
+        Equivalent to POST /jobs with job_type publish_project (user_id is set automatically).
       operationId: createNadaPublishJob
       requestBody:
         required: true
@@ -274,68 +356,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - project_id
-                - catalog_connection_id
-              properties:
-                project_id:
-                  type: string
-                  description: Project ID (sid) to publish
-                  example: "123"
-                catalog_connection_id:
-                  type: integer
-                  description: ID of the NADA catalog connection
-                  example: 1
-                publish_metadata:
-                  type: boolean
-                  description: Whether to publish project metadata
-                  default: true
-                publish_thumbnail:
-                  type: boolean
-                  description: Whether to publish the project thumbnail
-                  default: true
-                publish_resources:
-                  type: boolean
-                  description: >
-                    Whether to publish external resources: metadata to the NADA resources API, and
-                    any attached project files to the study files API (skipped when filename is an external URL).
-                  default: true
-                publish_dsd:
-                  type: boolean
-                  description: >
-                    For indicator/timeseries projects, publish the bound DSD to NADA before metadata.
-                  default: false
-                dsd_overwrite:
-                  type: boolean
-                  description: >
-                    When publishing DSD, replace an existing structure on NADA (otherwise skip if present).
-                  default: false
-                publish_indicator_data:
-                  type: boolean
-                  description: >
-                    For indicator/timeseries projects, export DuckDB timeseries CSV and import
-                    observations to NADA after metadata (resumable upload; may take several minutes).
-                  default: false
-                delete_nada_resources:
-                  type: boolean
-                  description: >
-                    Remove all existing external resources for this study on NADA before publishing
-                    resources. Requires study_idno to be set on the project.
-                  default: false
-                options:
-                  type: object
-                  description: Additional options (e.g. overwrite)
-                  additionalProperties: true
-                  example: {"overwrite": "yes"}
-                priority:
-                  type: integer
-                  description: Job priority
-                  default: 0
-                max_attempts:
-                  type: integer
-                  description: Maximum retry attempts
-                  default: 3
+              $ref: "#/components/schemas/PublishProjectJobRequest"
       responses:
         "201":
           description: Publish job created successfully
@@ -357,7 +378,10 @@ paths:
       tags:
         - Jobs
       summary: Get available job types
-      description: Returns a list of all registered job types that can be created via the jobs API
+      description: >
+        Returns all registered job types that can be created via POST /jobs or a convenience endpoint.
+        Payload and result shapes are documented in component schemas *JobPayload and *JobResult; see also
+        RegisteredJobType enum and the job types table in the API info description.
       operationId: getJobTypes
       responses:
         "200":
@@ -563,6 +587,72 @@ paths:
 
 components:
   schemas:
+    RegisteredJobType:
+      type: string
+      description: Registered background job type identifier
+      enum:
+        - generate_pdf
+        - generate_microdata_resource
+        - import_microdata
+        - import_indicator_data
+        - publish_project
+        - hello_world
+
+    JobTypesCatalog:
+      type: array
+      description: Static reference of all registered job types and their payload/result schemas
+      items:
+        $ref: "#/components/schemas/JobTypeCatalogEntry"
+      example:
+        - job_type: generate_pdf
+          description: Generate project PDF
+          convenience_endpoint: POST /jobs/generate_pdf
+          payload_schema: GeneratePdfJobPayload
+          result_schema: GeneratePdfJobResult
+        - job_type: generate_microdata_resource
+          description: Export data files and create dat/micro external resource
+          convenience_endpoint: POST /jobs/generate_microdata_resource
+          payload_schema: GenerateMicrodataResourceJobPayload
+          result_schema: GenerateMicrodataResourceJobResult
+        - job_type: import_microdata
+          description: Process uploaded microdata file (dictionary, CSV export)
+          convenience_endpoint: POST /jobs/import_microdata/{project_id}
+          payload_schema: ImportMicrodataJobPayload
+          result_schema: ImportMicrodataJobResult
+        - job_type: import_indicator_data
+          description: Import timeseries CSV for one indicator value
+          convenience_endpoint: POST /jobs/import_indicator_data
+          payload_schema: ImportIndicatorDataJobPayload
+          result_schema: ImportIndicatorDataJobResult
+        - job_type: publish_project
+          description: Publish project metadata, resources, and optional DSD/data to NADA
+          convenience_endpoint: POST /jobs/publish_to_nada
+          payload_schema: PublishProjectJobPayload
+          result_schema: PublishProjectJobResult
+        - job_type: hello_world
+          description: Test/demo job handler
+          convenience_endpoint: null
+          payload_schema: HelloWorldJobPayload
+          result_schema: HelloWorldJobResult
+
+    JobTypeCatalogEntry:
+      type: object
+      properties:
+        job_type:
+          $ref: "#/components/schemas/RegisteredJobType"
+        description:
+          type: string
+        convenience_endpoint:
+          type: string
+          nullable: true
+          description: Dedicated POST path when available; otherwise use POST /jobs
+        payload_schema:
+          type: string
+          description: Component schema name for the job payload
+        result_schema:
+          type: string
+          description: Component schema name for the completed job result
+
     Job:
       type: object
       description: Job object
@@ -570,9 +660,7 @@ components:
         uuid:
           type: string
         job_type:
-          type: string
-          description: Type of job
-          example: "generate_pdf"
+          $ref: "#/components/schemas/RegisteredJobType"
         status:
           type: string
           enum:
@@ -589,13 +677,23 @@ components:
           type: integer
           description: User who initiated the job (NULL for system jobs)
         payload:
-          type: object
-          description: Job-specific parameters (JSON object)
-          additionalProperties: {}
+          description: Job-specific parameters; shape depends on job_type (see *JobPayload schemas)
+          oneOf:
+            - $ref: "#/components/schemas/GeneratePdfJobPayload"
+            - $ref: "#/components/schemas/GenerateMicrodataResourceJobPayload"
+            - $ref: "#/components/schemas/ImportMicrodataJobPayload"
+            - $ref: "#/components/schemas/ImportIndicatorDataJobPayload"
+            - $ref: "#/components/schemas/PublishProjectJobPayload"
+            - $ref: "#/components/schemas/HelloWorldJobPayload"
         result:
-          type: object
-          description: Job result/output (JSON object, null until completed)
-          additionalProperties: {}
+          description: Job result when completed; shape depends on job_type (see *JobResult schemas)
+          oneOf:
+            - $ref: "#/components/schemas/GeneratePdfJobResult"
+            - $ref: "#/components/schemas/GenerateMicrodataResourceJobResult"
+            - $ref: "#/components/schemas/ImportMicrodataJobResult"
+            - $ref: "#/components/schemas/ImportIndicatorDataJobResult"
+            - $ref: "#/components/schemas/PublishProjectJobResult"
+            - $ref: "#/components/schemas/HelloWorldJobResult"
         error_message:
           type: string
           description: Error details if job failed
@@ -628,8 +726,7 @@ components:
         uuid:
           type: string
         job_type:
-          type: string
-          description: Type of job
+          $ref: "#/components/schemas/RegisteredJobType"
         status:
           type: string
           enum:
@@ -669,13 +766,16 @@ components:
         - payload
       properties:
         job_type:
-          type: string
-          description: Type of job to create
-          example: "generate_pdf"
+          $ref: "#/components/schemas/RegisteredJobType"
         payload:
-          type: object
-          description: Job-specific parameters (validated by the job handler). Structure depends on job_type. See Job Types section for details.
-          additionalProperties: {}
+          description: Job-specific parameters validated by the handler for job_type
+          oneOf:
+            - $ref: "#/components/schemas/GeneratePdfJobPayload"
+            - $ref: "#/components/schemas/GenerateMicrodataResourceJobPayload"
+            - $ref: "#/components/schemas/ImportMicrodataJobPayload"
+            - $ref: "#/components/schemas/ImportIndicatorDataJobPayload"
+            - $ref: "#/components/schemas/PublishProjectJobPayload"
+            - $ref: "#/components/schemas/HelloWorldJobPayload"
           example:
             project_id: 123
             options: {}
@@ -850,17 +950,37 @@ components:
           description: Total number of available job types
         job_types:
           type: array
-          description: List of available job types
+          description: List of available job types (live from JobRegistry)
           items:
             $ref: "#/components/schemas/JobTypeInfo"
+      example:
+        status: success
+        total: 6
+        job_types:
+          - job_type: generate_pdf
+            available: true
+            description: PDF Generation Job Handler
+          - job_type: generate_microdata_resource
+            available: true
+            description: Generate a dat/micro external resource from project data files (background job).
+          - job_type: import_microdata
+            available: true
+            description: Microdata Import Job Handler
+          - job_type: import_indicator_data
+            available: true
+            description: Import Indicator Data Job Handler
+          - job_type: publish_project
+            available: true
+            description: Publish Project Job Handler
+          - job_type: hello_world
+            available: true
+            description: Hello World Job Handler
 
     JobTypeInfo:
       type: object
       properties:
         job_type:
-          type: string
-          description: Job type identifier
-          example: "generate_pdf"
+          $ref: "#/components/schemas/RegisteredJobType"
         available:
           type: boolean
           description: Whether this job type is available
@@ -879,6 +999,47 @@ components:
         message:
           type: string
           description: Error message
+
+    GenerateMicrodataResourceJobRequest:
+      type: object
+      required:
+        - project_id
+        - export_format
+      properties:
+        project_id:
+          type: integer
+          description: Project ID (sid)
+        export_format:
+          type: string
+          description: csv, dta, sav, xpt, or json
+        export_version:
+          type: string
+          description: Stata version when export_format is dta
+        file_ids:
+          type: array
+          items:
+            type: string
+          description: Data file IDs; all files when omitted
+        zip:
+          type: boolean
+          default: true
+        overwrite:
+          type: boolean
+          default: false
+        resource_id:
+          type: integer
+          description: Regenerate an existing generated resource
+        refresh_description:
+          type: boolean
+        max_wait_seconds:
+          type: integer
+          default: 900
+        priority:
+          type: integer
+          default: 0
+        max_attempts:
+          type: integer
+          default: 2
 
     GeneratePdfJobRequest:
       type: object
@@ -952,6 +1113,62 @@ components:
           description: Timestamp when PDF was generated
           example: "2025-01-11 16:30:45"
 
+    GenerateMicrodataResourceJobPayload:
+      type: object
+      required:
+        - project_id
+        - export_format
+      description: Payload for generate_microdata_resource job (used in generic /jobs endpoint)
+      properties:
+        project_id:
+          type: integer
+          description: Project ID (sid)
+        export_format:
+          type: string
+          description: csv, dta, sav, xpt, or json
+        export_version:
+          type: string
+          description: Stata version when export_format is dta
+        file_ids:
+          type: array
+          items:
+            type: string
+        zip:
+          type: boolean
+          default: true
+        overwrite:
+          type: boolean
+          default: false
+        resource_id:
+          type: integer
+          description: Regenerate an existing generated resource
+        refresh_description:
+          type: boolean
+        max_wait_seconds:
+          type: integer
+          default: 900
+
+    GenerateMicrodataResourceJobResult:
+      type: object
+      description: Result returned when microdata resource generation job completes
+      properties:
+        status:
+          type: string
+          enum: [success, skipped]
+        project_id:
+          type: integer
+        export_format:
+          type: string
+        resource_id:
+          type: integer
+        filename:
+          type: string
+        links_count:
+          type: integer
+        message:
+          type: string
+          description: Present when status is skipped (resource already exists)
+
     ImportMicrodataJobPayload:
       type: object
       required:
@@ -972,16 +1189,132 @@ components:
       type: object
       description: Result returned when microdata import job completes successfully
       properties:
+        fastapi_job_id:
+          type: string
+          description: FastAPI processing job ID
         file_id:
           type: string
           description: File ID that was imported
         project_id:
-          type: string
+          oneOf:
+            - type: string
+            - type: integer
           description: Project ID where data was imported
-        imported_at:
+        datafile_path:
+          type: string
+          description: Path to the processed data file
+        variables_imported:
+          type: integer
+          description: Number of variables imported from the data dictionary
+        case_count:
+          type: integer
+          nullable: true
+          description: Row count from the data dictionary
+        csv_file:
+          type: string
+          nullable: true
+          description: Basename of the CSV file after cleanup
+        fastapi_status:
+          type: string
+          example: done
+        message:
+          type: string
+          example: Microdata import completed successfully
+
+    ImportIndicatorDataJobRequest:
+      type: object
+      required:
+        - project_id
+        - upload_id
+        - indicator_value
+      description: Request body for import_indicator_data convenience endpoint
+      properties:
+        project_id:
+          oneOf:
+            - type: integer
+            - type: string
+          description: Project sid or idno (indicator/timeseries project)
+        upload_id:
+          type: string
+          description: Completed resumable upload ID from POST /api/uploads/*
+        indicator_value:
+          type: string
+          description: Import only rows whose indicator_id column matches this value
+          example: NY.GDP.PCAP.CD
+        delimiter:
+          type: string
+          description: CSV field delimiter (default comma)
+          default: ","
+          example: ","
+        keep_extra_csv_columns:
+          type: boolean
+          description: Keep CSV columns beyond the bound DSD when importing
+          default: false
+        priority:
+          type: integer
+          default: 0
+        max_attempts:
+          type: integer
+          description: Default 1 to avoid duplicate rows on retry
+          default: 1
+
+    ImportIndicatorDataJobPayload:
+      type: object
+      required:
+        - project_id
+        - upload_id
+        - indicator_value
+      description: Payload for import_indicator_data job (used in generic /jobs endpoint)
+      properties:
+        project_id:
+          type: integer
+          description: Project sid
+        upload_id:
+          type: string
+          description: Completed resumable upload ID
+        indicator_value:
+          type: string
+        delimiter:
+          type: string
+          default: ","
+        keep_extra_csv_columns:
+          type: boolean
+          default: false
+
+    ImportIndicatorDataJobResult:
+      type: object
+      description: Result returned when indicator data import job completes successfully
+      properties:
+        status:
+          type: string
+          example: success
+        indicator_value:
+          type: string
+        job_id:
+          type: string
+          description: FastAPI replace-from-csv job ID
+
+    HelloWorldJobPayload:
+      type: object
+      description: Payload for hello_world job (testing/demo; POST /jobs only)
+      properties:
+        message:
+          type: string
+          description: Optional greeting message
+          example: Hello, World!
+
+    HelloWorldJobResult:
+      type: object
+      description: Result returned when hello_world job completes
+      properties:
+        message:
+          type: string
+        processed_at:
           type: string
           format: date-time
-          description: Timestamp when import completed
+        job_id:
+          type: integer
+          description: Internal job queue ID
 
     ImportMicrodataJobResponse:
       type: object
@@ -1018,32 +1351,124 @@ components:
 
     PublishProjectJobRequest:
       type: object
-      description: Options for publishing a project
+      required:
+        - project_id
+        - catalog_connection_id
+      description: Request body for publish_to_nada convenience endpoint
       properties:
+        project_id:
+          oneOf:
+            - type: integer
+            - type: string
+          description: Project sid or idno to publish
+          example: "123"
+        catalog_connection_id:
+          type: integer
+          description: NADA catalog connection ID
+          example: 1
         publish_metadata:
           type: boolean
-          description: Whether to publish project metadata
           default: true
         publish_thumbnail:
           type: boolean
-          description: Whether to publish the project thumbnail
           default: true
         publish_resources:
           type: boolean
           description: >
-            Whether to publish external resources: metadata to NADA, and attached files when stored locally.
+            Publish external resources metadata to NADA and upload attached local files to the study files API.
           default: true
+        publish_dsd:
+          type: boolean
+          description: For indicator/timeseries projects, publish bound DSD to NADA
+          default: false
+        dsd_overwrite:
+          type: boolean
+          description: Replace existing DSD on NADA when publishing DSD
+          default: false
+        publish_indicator_data:
+          type: boolean
+          description: For indicator/timeseries projects, export and import observations to NADA
+          default: false
         delete_nada_resources:
           type: boolean
-          description: >
-            Remove all existing external resources for this study on NADA before publishing resources.
-            Requires study_idno.
+          description: Remove existing NADA study resources before publishing (requires study_idno)
           default: false
-        overwrite:
+        options:
+          type: object
+          description: Additional publish options (e.g. overwrite)
+          additionalProperties: true
+          example:
+            overwrite: "yes"
+        priority:
+          type: integer
+          default: 0
+        max_attempts:
+          type: integer
+          default: 3
+
+    PublishProjectJobPayload:
+      type: object
+      required:
+        - project_id
+        - catalog_connection_id
+        - user_id
+      description: Payload for publish_project job (used in generic /jobs endpoint)
+      properties:
+        project_id:
+          oneOf:
+            - type: integer
+            - type: string
+        catalog_connection_id:
+          type: integer
+        user_id:
+          type: integer
+          description: User performing the publish (set automatically by convenience endpoint)
+        publish_metadata:
+          type: boolean
+          default: true
+        publish_thumbnail:
+          type: boolean
+          default: true
+        publish_resources:
+          type: boolean
+          default: true
+        publish_dsd:
+          type: boolean
+          default: false
+        dsd_overwrite:
+          type: boolean
+          default: false
+        publish_indicator_data:
+          type: boolean
+          default: false
+        delete_nada_resources:
+          type: boolean
+          default: false
+        options:
+          type: object
+          additionalProperties: true
+
+    PublishProjectJobResult:
+      type: object
+      description: Result returned when publish_project job completes
+      properties:
+        results:
+          type: object
+          additionalProperties: true
+          description: Per-step publish outcomes (metadata, thumbnail, resources, dsd, etc.)
+        errors:
+          type: object
+          additionalProperties: true
+          description: Non-fatal step errors keyed by step name
+        project_id:
+          oneOf:
+            - type: integer
+            - type: string
+        catalog_connection_id:
+          type: integer
+        published_at:
           type: string
-          enum: ["yes", "no"]
-          description: Whether to overwrite existing metadata/resources in the catalog
-          default: "yes"
+          format: date-time
 
     PublishProjectJobResponse:
       type: object
