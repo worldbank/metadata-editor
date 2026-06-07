@@ -6,7 +6,7 @@ MySQL, Mailpit, and the companion FastAPI data-processing service.
 ## Prerequisites
 
 - Docker Compose v2.
-- The FastAPI service checked out next to this repository at
+- The FastAPI service (https://github.com/worldbank/metadata-editor-fastapi) checked out next to this repository at
   `../metadata-editor-fastapi`, or set `FASTAPI_CONTEXT` in `.env`.
 
 ## FastAPI Build Note
