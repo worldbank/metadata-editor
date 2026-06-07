@@ -1,0 +1,109 @@
+x-app-environment: &app-environment
+  CI_ENV: development
+  DB_HOST: db
+  DB_PORT: 3306
+  DB_DATABASE: ${DB_DATABASE:-metadata_editor}
+  DB_USERNAME: ${DB_USERNAME:-metadata_editor}
+  DB_PASSWORD: ${DB_PASSWORD:-metadata_editor}
+  DB_DEBUG: ${DB_DEBUG:-false}
+  EDITOR_DATA_API_URL: http://fastapi:8000/
+  EDITOR_STORAGE_PATH: datafiles/editor
+  SMTP_HOST: mailpit
+  SMTP_PORT: 1025
+  SMTP_FROM_EMAIL: noreply@localhost.local
+
+x-app-volumes: &app-volumes
+  - .:/var/www/html
+  - ./docker/config/database.php:/var/www/html/application/config/database.php:ro
+  - ./docker/config/editor.php:/var/www/html/application/config/editor.php:ro
+  - ./docker/config/email.php:/var/www/html/application/config/email.php:ro
+  - app-cache:/var/www/html/cache
+  - app-datafiles:/var/www/html/datafiles
+  - app-files:/var/www/html/files
+  - app-imports:/var/www/html/imports
+  - app-logs:/var/www/html/logs
+
+services:
+  web:
+    image: metadata-editor-php:local
+    build:
+      context: .
+    init: true
+    environment:
+      <<: *app-environment
+    ports:
+      - "${APP_PORT:-8080}:80"
+    volumes: *app-volumes
+    depends_on:
+      db:
+        condition: service_healthy
+      fastapi:
+        condition: service_started
+
+  worker:
+    image: metadata-editor-php:local
+    build:
+      context: .
+    init: true
+    command: php index.php cli/worker/run --poll-interval=5
+    environment:
+      <<: *app-environment
+    volumes: *app-volumes
+    depends_on:
+      db:
+        condition: service_healthy
+      fastapi:
+        condition: service_started
+
+  fastapi:
+    image: metadata-editor-fastapi:local
+    build:
+      context: ${FASTAPI_CONTEXT:-../metadata-editor-fastapi}
+      dockerfile_inline: |
+        FROM python:3.11-slim
+        WORKDIR /app
+        COPY requirements.txt ./
+        RUN pip install --no-cache-dir -r requirements.txt
+        COPY . .
+        EXPOSE 8000
+        CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+    environment:
+      STORAGE_PATH: /var/www/html/datafiles
+    ports:
+      - "${FASTAPI_PORT:-8000}:8000"
+    volumes:
+      - app-datafiles:/var/www/html/datafiles
+
+  db:
+    image: mysql:8.0
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-metadata_editor}
+      MYSQL_USER: ${DB_USERNAME:-metadata_editor}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-metadata_editor}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-metadata_editor_root}
+    ports:
+      - "${DB_HOST_PORT:-3307}:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "${MAILPIT_SMTP_PORT:-1025}:1025"
+      - "${MAILPIT_WEB_PORT:-8025}:8025"
+
+volumes:
+  app-cache:
+  app-datafiles:
+  app-files:
+  app-imports:
+  app-logs:
+  db-data:

@@ -1,0 +1,28 @@
+<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+
+$config['useragent'] = 'PHPMailer';
+$config['protocol'] = getenv('MAIL_PROTOCOL') ?: 'smtp';
+$config['mailpath'] = '/usr/sbin/sendmail';
+$config['smtp_host'] = getenv('SMTP_HOST') ?: 'mailpit';
+$config['smtp_auth'] = filter_var(getenv('SMTP_AUTH') ?: false, FILTER_VALIDATE_BOOLEAN);
+$config['smtp_user'] = getenv('SMTP_USER') ?: '';
+$config['smtp_pass'] = getenv('SMTP_PASS') ?: '';
+$config['smtp_port'] = (int) (getenv('SMTP_PORT') ?: 1025);
+$config['smtp_timeout'] = (int) (getenv('SMTP_TIMEOUT') ?: 30);
+$config['smtp_crypto'] = getenv('SMTP_CRYPTO') ?: '';
+$config['smtp_debug'] = (int) (getenv('SMTP_DEBUG') ?: 0);
+$config['debug_output'] = 'error_log';
+$config['smtp_auto_tls'] = filter_var(getenv('SMTP_AUTO_TLS') ?: false, FILTER_VALIDATE_BOOLEAN);
+$config['smtp_conn_options'] = array();
+$config['smtp_email'] = getenv('SMTP_FROM_EMAIL') ?: 'noreply@localhost.local';
+$config['wordwrap'] = true;
+$config['wrapchars'] = 76;
+$config['mailtype'] = 'html';
+$config['charset'] = null;
+$config['validate'] = true;
+$config['priority'] = 3;
+$config['crlf'] = "\n";
+$config['newline'] = "\n";
+$config['bcc_batch_mode'] = false;
+$config['bcc_batch_size'] = 200;
+$config['encoding'] = '8bit';

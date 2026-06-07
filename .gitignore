@@ -1,4 +1,7 @@
 *.cache
+.env
+.env.*
+!.env.docker.example
 trash
 /trash
 .settings
