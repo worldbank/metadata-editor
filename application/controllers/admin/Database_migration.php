@@ -131,46 +131,183 @@ class Database_migration extends MY_Controller {
         $this->template->render();
     }
     
+    /**
+     * Mark migrations as applied through the given version without running SQL.
+     * Use when upgrades were applied manually outside this tool.
+     */
+    function mark_applied($version = null)
+    {
+        if (!$version) {
+            $this->session->set_flashdata('error', 'Version number required');
+            redirect('admin/database_migration');
+        }
+
+        if (!$this->is_valid_migration_version($version)) {
+            $this->session->set_flashdata('error', 'Invalid version format. Expected 14-digit timestamp (e.g., 20251022000001)');
+            redirect('admin/database_migration');
+        }
+
+        if (!$this->migration_version_exists($version)) {
+            $this->session->set_flashdata('error', 'Migration version not found: ' . $version);
+            redirect('admin/database_migration');
+        }
+
+        $current_version = $this->get_current_version();
+
+        if ((int)$version <= (int)$current_version) {
+            $this->session->set_flashdata('error', 'Version ' . $version . ' is already marked as applied (current: ' . $current_version . ')');
+            redirect('admin/database_migration');
+        }
+
+        $this->change_stored_version('mark_applied', $version, $version);
+        redirect('admin/database_migration');
+    }
+
+    /**
+     * Unmark a migration and all later migrations by lowering the stored version
+     * to the migration immediately before the target.
+     */
+    function unmark($version = null)
+    {
+        if (!$version) {
+            $this->session->set_flashdata('error', 'Version number required');
+            redirect('admin/database_migration');
+        }
+
+        if (!$this->is_valid_migration_version($version)) {
+            $this->session->set_flashdata('error', 'Invalid version format. Expected 14-digit timestamp (e.g., 20251022000001)');
+            redirect('admin/database_migration');
+        }
+
+        if (!$this->migration_version_exists($version)) {
+            $this->session->set_flashdata('error', 'Migration version not found: ' . $version);
+            redirect('admin/database_migration');
+        }
+
+        $current_version = $this->get_current_version();
+
+        if ((int)$version > (int)$current_version) {
+            $this->session->set_flashdata('error', 'Version ' . $version . ' is not marked as applied (current: ' . $current_version . ')');
+            redirect('admin/database_migration');
+        }
+
+        $previous_version = $this->get_previous_version($version);
+        $this->change_stored_version('unmark', $version, $previous_version);
+        redirect('admin/database_migration');
+    }
+
+    /**
+     * Directly set the stored migration version (CLI parity / advanced use).
+     */
     function set_version($version = null)
     {
         if (!$version) {
             $this->session->set_flashdata('error', 'Version number required');
             redirect('admin/database_migration');
         }
-        
-        // Validate version format (timestamp: 14 digits)
-        if (!preg_match('/^\d{14}$/', $version)) {
+
+        if (!$this->is_valid_migration_version($version)) {
             $this->session->set_flashdata('error', 'Invalid version format. Expected 14-digit timestamp (e.g., 20251022000001)');
             redirect('admin/database_migration');
         }
-        
-        try {
-            // Ensure migrations table exists
-            if (!$this->db->table_exists('migrations')) {
-                $this->load->dbforge();
-                $this->dbforge->add_field(array(
-                    'version' => array('type' => 'BIGINT', 'constraint' => 20, 'unsigned' => TRUE),
-                ));
-                $this->dbforge->add_key('version', TRUE);
-                $this->dbforge->create_table('migrations', TRUE);
-            }
-            
-            // Clear and set new version
-            $this->db->truncate('migrations');
-            $result = $this->db->insert('migrations', array('version' => $version));
-            
-            if ($result) {
-                $this->session->set_flashdata('message', 'Migration version manually set to: ' . $version);
-            } else {
-                $this->session->set_flashdata('error', 'Failed to set migration version');
-            }
-        } catch (Exception $e) {
-            $this->session->set_flashdata('error', 'Error setting version: ' . $e->getMessage());
-        }
-        
+
+        $this->change_stored_version('set_version', $version, $version);
         redirect('admin/database_migration');
     }
-    
+
+    private function change_stored_version($action, $target_version, $new_version)
+    {
+        try {
+            $this->ensure_migrations_table();
+
+            $before_version = $this->get_current_version();
+
+            $this->db->truncate('migrations');
+            $result = $this->db->insert('migrations', array('version' => $new_version));
+
+            if (!$result) {
+                $this->session->set_flashdata('error', 'Failed to update migration version');
+                return;
+            }
+
+            $this->log_version_change($action, $target_version, $before_version, (string)$new_version);
+
+            if ($action === 'mark_applied') {
+                $message = 'Marked migrations as applied through version ' . $target_version
+                    . ' (previous: ' . $before_version . ', now: ' . $new_version . ')';
+            } elseif ($action === 'unmark') {
+                $message = 'Unmarked from version ' . $target_version
+                    . '. Migrations after ' . ($new_version === '0' ? 'none' : $new_version)
+                    . ' are pending again (previous: ' . $before_version . ', now: ' . $new_version . ')';
+            } else {
+                $message = 'Migration version set to ' . $new_version . ' (previous: ' . $before_version . ')';
+            }
+
+            $this->session->set_flashdata('message', $message);
+        } catch (Exception $e) {
+            $this->session->set_flashdata('error', 'Error updating migration version: ' . $e->getMessage());
+        }
+    }
+
+    private function ensure_migrations_table()
+    {
+        if (!$this->db->table_exists('migrations')) {
+            $this->load->dbforge();
+            $this->dbforge->add_field(array(
+                'version' => array('type' => 'BIGINT', 'constraint' => 20, 'unsigned' => TRUE),
+            ));
+            $this->dbforge->add_key('version', TRUE);
+            $this->dbforge->create_table('migrations', TRUE);
+        }
+    }
+
+    private function log_version_change($action, $target_version, $before_version, $after_version)
+    {
+        $user = $this->ion_auth->current_user();
+        $user_label = $user ? ($user->email ? $user->email : 'user#' . $user->id) : 'unknown';
+
+        log_message(
+            'info',
+            'Database migration version ' . $action
+            . ' by ' . $user_label
+            . ' target=' . $target_version
+            . ' before=' . $before_version
+            . ' after=' . $after_version
+        );
+    }
+
+    private function is_valid_migration_version($version)
+    {
+        return (bool)preg_match('/^\d{14}$/', $version);
+    }
+
+    private function migration_version_exists($version)
+    {
+        foreach ($this->get_available_migrations() as $migration) {
+            if ($migration['version'] === $version) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function get_previous_version($version)
+    {
+        $versions = array();
+        foreach ($this->get_available_migrations() as $migration) {
+            $versions[] = $migration['version'];
+        }
+
+        $index = array_search($version, $versions, true);
+
+        if ($index === false || $index === 0) {
+            return '0';
+        }
+
+        return $versions[$index - 1];
+    }
+
     private function get_current_version()
     {
         if (!$this->db->table_exists('migrations')) {
@@ -207,6 +344,10 @@ class Database_migration extends MY_Controller {
                 );
             }
         }
+
+        usort($migrations, function ($a, $b) {
+            return strcmp($a['version'], $b['version']);
+        });
         
         return $migrations;
     }
