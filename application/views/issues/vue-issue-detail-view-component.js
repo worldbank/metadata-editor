@@ -1,12 +1,15 @@
 /**
  * Issue Detail View Component
  *
- * Full-page view of a single issue. Edit controls shown only when canEdit is true.
- * Fetches issue by ID from API.
+ * Full-page view of a single issue using the two-column layout from the project editor dialog.
+ * Main (md=8): title, description, field reference (collapsible), resolution
+ * Sidebar (md=4): status badge, severity, category, project, activity
+ *
+ * Auto-saves title, description, severity, category on change.
+ * Resolution notes + status action buttons mirror the dialog component.
  *
  * Props:
- *   - issueId: Number (required) - Issue ID to load and display
- *   - canEdit: Boolean - Whether the user can edit (status, description, apply, etc.)
+ *   - issueId: Number (required) - Issue ID to load
  *
  * Used on: issues/edit/{id} page
  */
@@ -15,43 +18,31 @@ Vue.component('issue-detail-view', {
         issueId: {
             type: Number,
             required: true
-        },
-        canEdit: {
-            type: Boolean,
-            default: false
         }
     },
     data() {
         return {
-            issue: null,
-            editedIssue: null,
-            editMode: false,
+            localIssue: null,
             loading: true,
             saving: false,
             loadError: null,
-            statusOptions: [
-                { text: 'Open', value: 'open' },
-                { text: 'Accepted', value: 'accepted' },
-                { text: 'Fixed', value: 'fixed' },
-                { text: 'Rejected', value: 'rejected' },
-                { text: 'Dismissed', value: 'dismissed' },
-                { text: 'False Positive', value: 'false_positive' }
-            ],
+            resolutionNotes: '',
+            advancedPanel: undefined,
+            diffRoot: null,
             severityOptions: [
-                { text: 'Low', value: 'low' },
-                { text: 'Medium', value: 'medium' },
-                { text: 'High', value: 'high' },
+                { text: 'Low',      value: 'low' },
+                { text: 'Medium',   value: 'medium' },
+                { text: 'High',     value: 'high' },
                 { text: 'Critical', value: 'critical' }
             ],
             categoryOptions: [
-                'Typo / Wording',
-                'Inconsistency',
-                'Missing Data',
-                'Format Issue',
-                'Completeness',
-                'Other'
-            ],
-            diffRoot: null
+                { text: 'Typo / Wording', value: 'typo_wording' },
+                { text: 'Inconsistency',   value: 'inconsistency' },
+                { text: 'Missing Data',    value: 'missing_data' },
+                { text: 'Format Issue',    value: 'format_issue' },
+                { text: 'Completeness',    value: 'completeness' },
+                { text: 'Other',           value: 'other' }
+            ]
         };
     },
     computed: {
@@ -65,129 +56,183 @@ Vue.component('issue-detail-view', {
             return this.baseUrl + '/issues';
         },
         projectUrl() {
-            if (!this.issue || !this.issue.project_id) return '#';
-            return this.baseUrl + '/editor/edit/' + this.issue.project_id;
+            if (!this.localIssue || !this.localIssue.project_id) return '#';
+            return this.baseUrl + '/editor/edit/' + this.localIssue.project_id;
         },
-        currentIssue() {
-            return this.editMode ? this.editedIssue : this.issue;
+        isEditable() {
+            return this.localIssue &&
+                (this.localIssue.status === 'open' || this.localIssue.status === 'accepted');
         },
         hasCurrentMetadata() {
-            return this.currentIssue && this.currentIssue.current_metadata && Object.keys(this.currentIssue.current_metadata).length > 0;
+            return this.localIssue && this.localIssue.current_metadata != null &&
+                   typeof this.localIssue.current_metadata === 'object' &&
+                   Object.keys(this.localIssue.current_metadata).length > 0;
         },
         hasSuggestedMetadata() {
-            return this.currentIssue && this.currentIssue.suggested_metadata && Object.keys(this.currentIssue.suggested_metadata).length > 0;
+            return this.localIssue && this.localIssue.suggested_metadata != null &&
+                   typeof this.localIssue.suggested_metadata === 'object' &&
+                   Object.keys(this.localIssue.suggested_metadata).length > 0;
         },
-        canApply() {
-            return this.canEdit && this.hasSuggestedMetadata && this.currentIssue && !this.currentIssue.applied;
-        },
-        canShowMetadataDiff() {
-            return typeof JsonDiffKit !== 'undefined';
+        hasAnyMetadata() {
+            return this.localIssue &&
+                (this.localIssue.current_metadata != null || this.localIssue.suggested_metadata != null);
         }
     },
     watch: {
         issueId: {
             immediate: true,
-            handler(id) {
-                if (id) this.fetchIssue();
-            }
+            handler(id) { if (id) this.fetchIssue(); }
         },
-        issue(val) {
-            if (val) {
-                this.editedIssue = JSON.parse(JSON.stringify(val));
-                this.editMode = true;
+        advancedPanel(val) {
+            if (val !== undefined) {
+                this.$nextTick(() => {
+                    setTimeout(() => this.$nextTick(() => this.renderMetadataDiff()), 200);
+                });
             }
         }
     },
-    updated() {
-        this.$nextTick(() => this.renderMetadataDiff());
-    },
     beforeDestroy() {
         if (this.diffRoot && this.diffRoot.unmount) {
-            this.diffRoot.unmount();
+            try { this.diffRoot.unmount(); } catch (e) {}
             this.diffRoot = null;
         }
     },
     methods: {
+        getCategoryLabel(code) {
+            const opt = this.categoryOptions.find(o => o.value === code);
+            return opt ? opt.text : (code || '');
+        },
+        showAlert(message, type) {
+            if (typeof EventBus !== 'undefined') {
+                EventBus.$emit(type === 'error' ? 'onFail' : 'onSuccess', message);
+            }
+        },
         fetchIssue() {
             this.loading = true;
             this.loadError = null;
-            this.issue = null;
-            this.editedIssue = null;
-            this.editMode = true;
-            const url = this.apiBase + '/' + this.issueId;
-            axios.get(url)
+            this.localIssue = null;
+            axios.get(this.apiBase + '/' + this.issueId)
                 .then(res => {
                     if (res.data && res.data.status === 'success' && res.data.issue) {
-                        this.issue = res.data.issue;
-                        this.editedIssue = JSON.parse(JSON.stringify(res.data.issue));
+                        this.localIssue = res.data.issue;
+                        this.$nextTick(() => this.renderMetadataDiff());
                     } else {
-                        this.loadError = res.data && res.data.message ? res.data.message : 'Failed to load issue';
+                        this.loadError = (res.data && res.data.message) || 'Failed to load issue';
                     }
                 })
                 .catch(err => {
-                    const msg = err.response && err.response.data && err.response.data.message
-                        ? err.response.data.message
-                        : (err.message || 'Failed to load issue');
-                    this.loadError = msg;
-                    if (err.response && err.response.status === 404) {
-                        this.loadError = 'Issue not found';
-                    }
+                    this.loadError = (err.response && err.response.status === 404)
+                        ? 'Issue not found'
+                        : ((err.response && err.response.data && err.response.data.message) || err.message || 'Failed to load issue');
                 })
                 .finally(() => { this.loading = false; });
         },
-        showAlert(message, type) {
-            if (typeof EventBus !== 'undefined' && EventBus.$emit) {
-                EventBus.$emit('alert', { message: message });
-            } else {
-                alert(message);
+        async saveField(field, value) {
+            if (!this.localIssue) return;
+            try {
+                const payload = {};
+                payload[field] = value;
+                const res = await axios.put(this.apiBase + '/' + this.localIssue.id, payload);
+                if (res.data && res.data.status === 'success') {
+                    Vue.set(this.localIssue, field, value);
+                    this.showAlert('Saved', 'success');
+                } else {
+                    throw new Error((res.data && res.data.message) || 'Failed to save');
+                }
+            } catch (err) {
+                this.showAlert(
+                    (err.response && err.response.data && err.response.data.message) || err.message || 'Failed to save',
+                    'error'
+                );
+            }
+        },
+        async resolve(newStatus) {
+            if (!this.localIssue) return;
+            this.saving = true;
+            try {
+                if (this.resolutionNotes.trim()) {
+                    await axios.put(this.apiBase + '/' + this.localIssue.id, { notes: this.resolutionNotes });
+                    Vue.set(this.localIssue, 'notes', this.resolutionNotes);
+                }
+                const res = await axios.post(this.baseUrl + '/api/issues/status/' + this.localIssue.id, { status: newStatus });
+                if (res.data && res.data.status === 'success') {
+                    if (res.data.issue) {
+                        this.localIssue = res.data.issue;
+                    } else {
+                        Vue.set(this.localIssue, 'status', newStatus);
+                    }
+                    this.resolutionNotes = '';
+                    this.showAlert('Issue updated', 'success');
+                } else {
+                    throw new Error((res.data && res.data.message) || 'Failed to update status');
+                }
+            } catch (err) {
+                this.showAlert(
+                    (err.response && err.response.data && err.response.data.message) || err.message || 'Failed to update issue',
+                    'error'
+                );
+            } finally {
+                this.saving = false;
             }
         },
         formatDate(timestamp) {
             if (!timestamp) return '-';
-            return typeof moment !== 'undefined' ? moment.unix(timestamp).format('YYYY-MM-DD HH:mm') : new Date(timestamp * 1000).toLocaleString();
+            return typeof moment !== 'undefined'
+                ? moment.unix(timestamp).format('MMM D, YYYY')
+                : new Date(timestamp * 1000).toLocaleString();
         },
         formatMetadata(metadata) {
             if (metadata == null || metadata === '') return '';
             if (typeof metadata === 'string') return metadata;
-            if (typeof metadata === 'object') return JSON.stringify(metadata, null, 2);
+            if (typeof metadata === 'object') {
+                const fieldPath = this.localIssue && this.localIssue.field_path;
+                if (fieldPath && !Array.isArray(metadata) && Object.prototype.hasOwnProperty.call(metadata, fieldPath)) {
+                    const val = metadata[fieldPath];
+                    if (val == null) return '';
+                    if (typeof val === 'object') return JSON.stringify(val, null, 2);
+                    return String(val);
+                }
+                return JSON.stringify(metadata, null, 2);
+            }
             return String(metadata);
         },
         parseMetadataForDiff(val) {
             if (val == null) return null;
-            if (typeof val === 'object') return val;
-            if (typeof val === 'string') {
-                try { return JSON.parse(val); } catch (e) { return { value: val }; }
+            const fieldPath = this.localIssue && this.localIssue.field_path;
+            let value = val;
+            if (fieldPath && typeof val === 'object' && !Array.isArray(val) &&
+                Object.prototype.hasOwnProperty.call(val, fieldPath)) {
+                value = val[fieldPath];
             }
-            return { value: String(val) };
+            if (value == null) return null;
+            if (typeof value === 'object') return value;
+            if (typeof value === 'string') {
+                try { return JSON.parse(value); } catch (e) { return { value: value }; }
+            }
+            return { value: String(value) };
         },
         renderMetadataDiff() {
-            if (!this.issue || !this.currentIssue) return;
-            const container = this.$refs.metadataDiffContainer;
-            if (!container) return;
+            if (!this.localIssue) return;
+            const container = this.$refs && this.$refs.metadataDiffContainer;
+            if (!container || !document.contains(container)) return;
             if (typeof JsonDiffKit === 'undefined') return;
-            const current = this.parseMetadataForDiff(this.currentIssue.current_metadata);
-            const suggested = this.parseMetadataForDiff(this.currentIssue.suggested_metadata);
-            if (current === null && suggested === null) return;
+            const current = this.parseMetadataForDiff(this.localIssue.current_metadata);
+            const suggested = this.parseMetadataForDiff(this.localIssue.suggested_metadata);
             const before = current !== null ? current : {};
             const after = suggested !== null ? suggested : {};
             try {
                 if (this.diffRoot) {
-                    this.diffRoot.unmount();
+                    try { this.diffRoot.unmount(); } catch (e) {}
                     this.diffRoot = null;
                 }
+                container.innerHTML = '';
                 const differ = new JsonDiffKit.Differ({
-                    detectCircular: true,
-                    showModifications: true,
-                    arrayDiffMethod: 'lcs'
+                    detectCircular: true, showModifications: true, arrayDiffMethod: 'lcs'
                 });
                 const diff = differ.diff(before, after);
                 const viewer = new JsonDiffKit.Viewer({
-                    diff: diff,
-                    indent: 2,
-                    lineNumbers: true,
-                    highlightInlineDiff: true,
-                    inlineDiffOptions: { mode: 'word', wordSeparator: ' ' },
-                    syntaxHighlight: true
+                    diff, indent: 2, lineNumbers: true, highlightInlineDiff: true,
+                    inlineDiffOptions: { mode: 'word', wordSeparator: ' ' }, syntaxHighlight: true
                 });
                 this.diffRoot = JsonDiffKit.ReactDOM.createRoot(container);
                 this.diffRoot.render(JsonDiffKit.React.createElement(viewer.render));
@@ -208,274 +253,244 @@ Vue.component('issue-detail-view', {
                 rejected: 'error', dismissed: 'grey', false_positive: 'warning'
             };
             return colors[status] || 'grey';
-        },
-        saveChanges() {
-            const title = (this.editedIssue.title || '').trim();
-            if (!title) {
-                this.showAlert('Title is required');
-                return;
-            }
-            this.saving = true;
-            const url = this.apiBase + '/' + this.editedIssue.id;
-            axios.put(url, {
-                title: this.editedIssue.title,
-                description: this.editedIssue.description,
-                category: this.editedIssue.category,
-                severity: this.editedIssue.severity,
-                status: this.editedIssue.status,
-                notes: this.editedIssue.notes
-            })
-                .then(res => {
-                    if (res.data && res.data.status === 'success' && res.data.issue) {
-                        this.issue = res.data.issue;
-                        this.editedIssue = JSON.parse(JSON.stringify(res.data.issue));
-                        this.editMode = true;
-                        this.showAlert('Issue updated successfully');
-                    } else {
-                        throw new Error(res.data && res.data.message ? res.data.message : 'Failed to update');
-                    }
-                })
-                .catch(err => {
-                    const msg = err.response && err.response.data && err.response.data.message
-                        ? err.response.data.message
-                        : (err.message || 'Failed to update issue');
-                    this.showAlert(msg);
-                })
-                .finally(() => { this.saving = false; });
-        },
-        applyChanges() {
-            if (!confirm('Apply the suggested changes to the project metadata?')) return;
-            this.saving = true;
-            const url = this.apiBase + '/' + this.currentIssue.id + '/apply';
-            axios.post(url)
-                .then(res => {
-                    if (res.data && res.data.status === 'success' && res.data.issue) {
-                        this.issue = res.data.issue;
-                        this.editedIssue = JSON.parse(JSON.stringify(res.data.issue));
-                        this.showAlert('Changes applied successfully');
-                    } else {
-                        throw new Error(res.data && res.data.message ? res.data.message : 'Failed to apply');
-                    }
-                })
-                .catch(err => {
-                    const msg = err.response && err.response.data && err.response.data.message
-                        ? err.response.data.message
-                        : (err.message || 'Failed to apply changes');
-                    this.showAlert(msg);
-                })
-                .finally(() => { this.saving = false; });
-        },
-        updateStatus(status) {
-            this.saving = true;
-            const url = this.apiBase + '/' + this.currentIssue.id + '/status';
-            axios.post(url, { status: status })
-                .then(res => {
-                    if (res.data && res.data.status === 'success' && res.data.issue) {
-                        this.issue = res.data.issue;
-                        this.editedIssue = JSON.parse(JSON.stringify(res.data.issue));
-                        this.showAlert('Status updated successfully');
-                    } else {
-                        throw new Error(res.data && res.data.message ? res.data.message : 'Failed to update status');
-                    }
-                })
-                .catch(err => {
-                    const msg = err.response && err.response.data && err.response.data.message
-                        ? err.response.data.message
-                        : (err.message || 'Failed to update status');
-                    this.showAlert(msg);
-                })
-                .finally(() => { this.saving = false; });
         }
     },
     template: `
-        <div class="issue-detail-view container ml-0">
-            <v-progress-linear v-if="loading" indeterminate color="primary" class="mb-4"></v-progress-linear>
+        <v-card>
+            <v-progress-linear v-if="loading" indeterminate color="primary"></v-progress-linear>
 
-            <template v-else-if="loadError">
-                <v-alert type="error" dismissible class="mb-4">
-                    {{ loadError }}
-                </v-alert>
+            <v-card-text v-else-if="loadError" class="pa-6">
+                <v-alert type="error" class="mb-4">{{ loadError }}</v-alert>
                 <v-btn :href="issuesListUrl" outlined>
                     <v-icon left>mdi-arrow-left</v-icon>
                     Back to Issues
                 </v-btn>
-            </template>
+            </v-card-text>
 
-            <v-card v-else-if="issue">
-                <v-card-title class="grey lighten-2 d-flex align-center flex-wrap">
-                    [#{{ issue.id }}]
-                    {{ issue.title || 'No title' }}                                        
-                </v-card-title>
-                <v-card-subtitle class="pl-4 pt-2 pb-0">
-                    
-                </v-card-subtitle>
+            <v-card-text v-else-if="localIssue" class="pa-6">
 
-                <v-card-text class="pt-4">
-                    <v-container>
-                        <v-row>
-                            <!-- Single Column Layout -->
-                            <v-col cols="12">
-                                <!-- Title and Description -->
-                                <div class="text-caption text--secondary mb-1">Title</div>
-                                <v-text-field
-                                    v-if="canEdit"
-                                    v-model="editedIssue.title"
-                                    label=""
-                                    outlined
-                                    dense
-                                    class="mb-3"
-                                    hint="Required"
-                                    persistent-hint
-                                ></v-text-field>
-                                <div v-else class="mb-3 text-body-1 font-weight-medium">{{ currentIssue.title || '-' }}</div>
+                <!-- Breadcrumb -->
+                <div class="d-flex align-center mb-4">
+                    <v-btn text small :href="issuesListUrl" class="pl-0">
+                        <v-icon left small>mdi-arrow-left</v-icon>
+                        Issues
+                    </v-btn>
+                    <v-icon small class="mx-1 text--disabled">mdi-chevron-right</v-icon>
+                    <span class="text-caption text--secondary">#{{ localIssue.id }}</span>
+                </div>
+
+                <!-- Title -->
+                <h2 class="text-h6 font-weight-medium mb-4">#{{ localIssue.id }} — {{ localIssue.title }}</h2>
+
+                <!-- Two-column layout -->
+                <v-row>
+
+                    <!-- Main content -->
+                    <v-col cols="12" md="8">
+
+                        <!-- Description + Field Reference card -->
+                        <v-card outlined class="mb-4">
+                            <v-card-text class="pa-5">
 
                                 <div class="text-caption text--secondary mb-1">Description</div>
-                                <v-textarea
-                                    v-if="canEdit"
-                                    v-model="editedIssue.description"
-                                    label=""
-                                    outlined
-                                    rows="8"
-                                    hide-details
-                                    class="flex-grow-1"
-                                ></v-textarea>
-                                <div v-else class="pa-3 grey lighten-4 rounded text-body-1" style="min-height: 120px;">{{ currentIssue.description || '-' }}</div>
+                                <div class="body-2 mb-2" style="white-space: pre-wrap;">{{ localIssue.description || '—' }}</div>
 
-                                <!-- Notes -->
-                                <div class="text-caption text--secondary mb-1 mt-2">Notes</div>
+                                <!-- Field Reference collapsible -->
+                                <template v-if="localIssue.field_path || hasAnyMetadata">
+                                    <v-divider class="my-4"></v-divider>
+                                    <v-expansion-panels v-model="advancedPanel" elevation-1>
+                                        <v-expansion-panel>
+                                            <v-expansion-panel-header>
+                                                <div style="width: 100%; text-align: left;">
+                                                    <v-icon left small>mdi-code-tags</v-icon>
+                                                    <span class="text-subtitle-2">Field Reference</span>
+                                                    <code v-if="localIssue.field_path" class="ml-2 text-caption">{{ localIssue.field_path }}</code>
+                                                </div>
+                                            </v-expansion-panel-header>
+                                            <v-expansion-panel-content>
+
+                                                <v-row v-if="hasAnyMetadata" class="mt-1">
+                                                    <v-col cols="12" md="6">
+                                                        <div class="text-subtitle-2 mb-2">
+                                                            <v-icon left small>mdi-file-document-outline</v-icon>
+                                                            Current Value
+                                                        </div>
+                                                        <pre style="background-color:#f5f5f5;padding:10px;border-radius:4px;overflow:auto;font-size:12px;line-height:1.5;max-height:220px;white-space:pre-wrap;word-wrap:break-word;">{{ formatMetadata(localIssue.current_metadata) }}</pre>
+                                                    </v-col>
+                                                    <v-col cols="12" md="6">
+                                                        <div class="text-subtitle-2 mb-2">
+                                                            <v-icon left small color="primary">mdi-file-document-edit-outline</v-icon>
+                                                            Suggested Value
+                                                            <v-chip v-if="localIssue.applied" x-small color="success" class="ml-1">Applied</v-chip>
+                                                        </div>
+                                                        <pre style="background-color:#f5f5f5;padding:10px;border-radius:4px;overflow:auto;font-size:12px;line-height:1.5;max-height:220px;white-space:pre-wrap;word-wrap:break-word;">{{ formatMetadata(localIssue.suggested_metadata) }}</pre>
+                                                    </v-col>
+                                                </v-row>
+
+                                                <v-row v-if="hasAnyMetadata" class="mt-3">
+                                                    <v-col cols="12">
+                                                        <div class="text-subtitle-2 mb-2">
+                                                            <v-icon left small>mdi-compare</v-icon>
+                                                            Diff
+                                                        </div>
+                                                        <div ref="metadataDiffContainer" style="min-height:100px;max-height:350px;overflow:auto;background-color:#fafafa;border-radius:4px;padding:8px;"></div>
+                                                    </v-col>
+                                                </v-row>
+
+                                            </v-expansion-panel-content>
+                                        </v-expansion-panel>
+                                    </v-expansion-panels>
+                                </template>
+
+                            </v-card-text>
+                        </v-card>
+
+                        <!-- Resolution card -->
+                        <v-card outlined>
+                            <v-card-title class="text-subtitle-1 pb-0">Resolution</v-card-title>
+                            <v-card-text class="pt-3">
+
+                                <div class="body-2 mb-1">Notes</div>
                                 <v-textarea
-                                    v-if="canEdit"
-                                    v-model="editedIssue.notes"
-                                    label=""
+                                    v-model="resolutionNotes"
                                     outlined
                                     rows="2"
+                                    placeholder="Notes or comments..."
                                     hide-details
-                                    class="mb-3"
+                                    class="mb-4"
                                 ></v-textarea>
-                                <div v-else-if="currentIssue.notes" class="mb-3">{{ currentIssue.notes }}</div>
-                                <div v-else class="text--disabled mb-3">-</div>
 
-                                <!-- Field Path -->
-                                <div class="text-caption text--secondary mb-1 mt-3">Field path</div>
-                                <code class="pa-2 grey lighten-3 d-inline-block mb-3">{{ currentIssue.field_path || '-' }}</code>
+                                <!-- Open -->
+                                <template v-if="localIssue.status === 'open'">
+                                    <v-btn outlined small color="success" class="mr-2 mb-2" @click="resolve('accepted')" :loading="saving">
+                                        <v-icon left small>mdi-check</v-icon>Accept
+                                    </v-btn>
+                                    <v-btn outlined small color="success" class="mr-2 mb-2" @click="resolve('fixed')" :loading="saving">
+                                        <v-icon left small>mdi-wrench</v-icon>Mark Fixed
+                                    </v-btn>
+                                    <v-btn outlined small color="error" class="mr-2 mb-2" @click="resolve('rejected')" :loading="saving">
+                                        <v-icon left small>mdi-close</v-icon>Reject
+                                    </v-btn>
+                                    <v-btn outlined small class="mr-2 mb-2" @click="resolve('dismissed')" :loading="saving">
+                                        <v-icon left small>mdi-minus-circle</v-icon>Dismiss
+                                    </v-btn>
+                                    <v-btn outlined small class="mr-2 mb-2" @click="resolve('false_positive')" :loading="saving">
+                                        <v-icon left small>mdi-alert-remove</v-icon>False Positive
+                                    </v-btn>
+                                </template>
 
-                                <!-- Current vs Suggested Metadata -->
-                                <div class="text-caption text--secondary mb-1 mt-2">Current vs suggested metadata</div>
-                                <v-card outlined class="mb-3">
-                                    <v-card-text class="py-2">
-                                        <div ref="metadataDiffContainer" class="metadata-diff-container" style="min-height: 120px; max-height: 400px; overflow: auto;"></div>
-                                        <div v-if="!canShowMetadataDiff" class="text-caption pa-2 grey lighten-4 rounded">
-                                            <div class="mb-2"><strong>Current:</strong></div>
-                                            <pre class="ma-0" style="white-space: pre-wrap; word-wrap: break-word;">{{ formatMetadata(currentIssue.current_metadata) || '-' }}</pre>
-                                            <div class="mb-2 mt-3"><strong>Suggested:</strong></div>
-                                            <pre class="ma-0" style="white-space: pre-wrap; word-wrap: break-word;">{{ formatMetadata(currentIssue.suggested_metadata) || '-' }}</pre>
-                                        </div>
-                                    </v-card-text>
-                                </v-card>
+                                <!-- Accepted -->
+                                <template v-else-if="localIssue.status === 'accepted'">
+                                    <v-btn outlined small color="success" class="mr-2 mb-2" @click="resolve('fixed')" :loading="saving">
+                                        <v-icon left small>mdi-wrench</v-icon>Mark Fixed
+                                    </v-btn>
+                                    <v-btn outlined small color="error" class="mr-2 mb-2" @click="resolve('rejected')" :loading="saving">
+                                        <v-icon left small>mdi-close</v-icon>Reject
+                                    </v-btn>
+                                    <v-btn outlined small class="mr-2 mb-2" @click="resolve('dismissed')" :loading="saving">
+                                        <v-icon left small>mdi-minus-circle</v-icon>Dismiss
+                                    </v-btn>
+                                    <v-btn outlined small class="mr-2 mb-2" @click="resolve('open')" :loading="saving">
+                                        <v-icon left small>mdi-refresh</v-icon>Reopen
+                                    </v-btn>
+                                </template>
 
-                                <!-- Project and Status Information -->
-                                <div class="text-caption text--secondary mb-1 mt-3">Project</div>
-                                <a :href="projectUrl" target="_blank" class="text-body-1 d-block mb-3">{{ currentIssue.project_title || ('Project ' + currentIssue.project_id) }}</a>
+                                <!-- Closed -->
+                                <template v-else>
+                                    <div class="text-caption text--secondary mb-3">This issue is closed.</div>
+                                    <v-btn outlined small class="mr-2 mb-2" @click="resolve('open')" :loading="saving">
+                                        <v-icon left small>mdi-refresh</v-icon>Reopen
+                                    </v-btn>
+                                </template>
 
-                                <!-- Status, Severity, and Category in One Row -->
-                                <v-row>
-                                    <v-col cols="12" md="4">
-                                        <div class="text-caption text--secondary mb-1">Status</div>
-                                        <v-select
-                                            v-if="canEdit"
-                                            v-model="editedIssue.status"
-                                            :items="statusOptions"
-                                            label=""
-                                            outlined
-                                            dense
-                                            hide-details
-                                            class="mb-3"
-                                        ></v-select>
-                                        <template v-else>
-                                            <v-chip small :color="getStatusColor(currentIssue.status)" :outlined="currentIssue.status === 'open'" class="text-capitalize mb-3">{{ formatStatus(currentIssue.status) }}</v-chip>
-                                        </template>
-                                    </v-col>
+                            </v-card-text>
+                        </v-card>
 
-                                    <v-col cols="12" md="4">
-                                        <div class="text-caption text--secondary mb-1">Severity</div>
-                                        <v-select
-                                            v-if="canEdit"
-                                            v-model="editedIssue.severity"
-                                            :items="severityOptions"
-                                            label=""
-                                            outlined
-                                            dense
-                                            hide-details
-                                            clearable
-                                            class="mb-3"
-                                        ></v-select>
-                                        <template v-else>
-                                            <v-chip v-if="currentIssue.severity" small :color="getSeverityColor(currentIssue.severity)" outlined class="text-capitalize mb-3">{{ currentIssue.severity }}</v-chip>
-                                            <span v-else class="text--disabled d-block mb-3">-</span>
-                                        </template>
-                                    </v-col>
+                    </v-col>
 
-                                    <v-col cols="12" md="4">
-                                        <div class="text-caption text--secondary mb-1">Category</div>
-                                        <v-combobox
-                                            v-if="canEdit"
-                                            v-model="editedIssue.category"
-                                            :items="categoryOptions"
-                                            label=""
-                                            outlined
-                                            dense
-                                            hide-details
-                                            class="mb-3"
-                                        ></v-combobox>
-                                        <template v-else>
-                                            <v-chip v-if="currentIssue.category" small outlined class="mb-3">{{ currentIssue.category }}</v-chip>
-                                            <span v-else class="text--disabled d-block mb-3">-</span>
-                                        </template>
-                                    </v-col>
-                                </v-row>
+                    <!-- Sidebar -->
+                    <v-col cols="12" md="4">
+                        <v-card outlined>
+                            <v-card-text class="pa-3">
 
-                                <!-- Additional Info -->
-                                <div class="text-caption text--secondary mb-1">Created</div>
-                                <div class="mb-3">{{ formatDate(currentIssue.created) }}</div>
+                                <!-- Status -->
+                                <div class="text-caption text--secondary mb-1">Status</div>
+                                <div class="mb-3">
+                                    <issue-status-badge :status="localIssue.status" small></issue-status-badge>
+                                </div>
 
-                                <div class="text-caption text--secondary mb-1">Applied</div>
-                                <v-chip small :color="currentIssue.applied ? 'success' : 'grey'" outlined class="mb-3">{{ currentIssue.applied ? 'Yes' : 'No' }}</v-chip>
+                                <v-divider class="mb-3"></v-divider>
 
-                                <div v-if="currentIssue.source" class="text-caption text--secondary mb-2">Source: <span class="text-capitalize">{{ currentIssue.source }}</span></div>
-                            </v-col>
-                        </v-row>
-                    </v-container>
-                </v-card-text>
+                                <!-- Severity -->
+                                <div class="text-caption text--secondary mb-1">Severity</div>
+                                <div class="mb-3">
+                                    <v-select
+                                        :value="localIssue.severity"
+                                        :items="severityOptions"
+                                        outlined dense hide-details clearable
+                                        placeholder="Not set"
+                                        :disabled="!isEditable"
+                                        style="font-size: 13px;"
+                                        @change="saveField('severity', $event)"
+                                    ></v-select>
+                                </div>
 
-                <!-- Actions (only when canEdit) -->
-                <v-divider v-if="canEdit"></v-divider>
-                <v-card-actions v-if="canEdit" class="pa-4">
-                    <v-btn v-if="canApply" color="primary" @click="applyChanges" :loading="saving">
-                        <v-icon left>mdi-check</v-icon>
-                        Apply changes
-                    </v-btn>
-                    <v-menu offset-y>
-                        <template v-slot:activator="{ on, attrs }">
-                            <v-btn outlined v-bind="attrs" v-on="on">
-                                Quick actions
-                                <v-icon right>mdi-menu-down</v-icon>
-                            </v-btn>
-                        </template>
-                        <v-list dense>
-                            <v-list-item @click="updateStatus('false_positive')"><v-list-item-title>Mark as False Positive</v-list-item-title></v-list-item>
-                            <v-list-item @click="updateStatus('accepted')"><v-list-item-title>Accept</v-list-item-title></v-list-item>
-                            <v-list-item @click="updateStatus('rejected')"><v-list-item-title>Reject</v-list-item-title></v-list-item>
-                            <v-list-item @click="updateStatus('dismissed')"><v-list-item-title>Dismiss</v-list-item-title></v-list-item>
-                        </v-list>
-                    </v-menu>
-                    <v-spacer></v-spacer>
-                    <v-btn :href="issuesListUrl" outlined>
-                        <v-icon left>mdi-arrow-left</v-icon>
-                        Back to Issues
-                    </v-btn>
-                    <v-btn color="primary" @click="saveChanges" :loading="saving">Save changes</v-btn>
-                </v-card-actions>
-            </v-card>
-        </div>
+                                <v-divider class="mb-3"></v-divider>
+
+                                <!-- Category -->
+                                <div class="text-caption text--secondary mb-1">Category</div>
+                                <div class="mb-3">
+                                    <v-select
+                                        :value="localIssue.category"
+                                        :items="categoryOptions"
+                                        item-text="text"
+                                        item-value="value"
+                                        outlined dense hide-details clearable
+                                        placeholder="Not set"
+                                        :disabled="!isEditable"
+                                        style="font-size: 13px;"
+                                        @change="saveField('category', $event)"
+                                    ></v-select>
+                                </div>
+
+                                <v-divider class="mb-3"></v-divider>
+
+                                <!-- Project -->
+                                <div class="text-caption text--secondary mb-1">Project</div>
+                                <div class="mb-3">
+                                    <a :href="projectUrl" target="_blank" class="body-2 d-flex align-center text-decoration-none">
+                                        <v-icon x-small class="mr-1">mdi-open-in-new</v-icon>
+                                        {{ localIssue.project_title || ('Project ' + localIssue.project_id) }}
+                                    </a>
+                                </div>
+
+                                <v-divider class="mb-3"></v-divider>
+
+                                <!-- Activity -->
+                                <div class="text-caption text--secondary">
+                                    <div v-if="localIssue.created" class="mb-1">
+                                        Created {{ formatDate(localIssue.created) }}<span v-if="localIssue.created_by_username"> by {{ localIssue.created_by_username }}</span>
+                                    </div>
+                                    <div v-if="localIssue.assigned_to_username" class="mb-1">
+                                        Assigned to {{ localIssue.assigned_to_username }}
+                                    </div>
+                                    <div v-if="localIssue.resolved" class="mb-1">
+                                        Resolved {{ formatDate(localIssue.resolved) }}<span v-if="localIssue.resolved_by_username"> by {{ localIssue.resolved_by_username }}</span>
+                                    </div>
+                                    <div v-if="localIssue.applied_on" class="mb-1">
+                                        Applied {{ formatDate(localIssue.applied_on) }}<span v-if="localIssue.applied_by_username"> by {{ localIssue.applied_by_username }}</span>
+                                    </div>
+                                    <div v-if="localIssue.source" class="mt-2">
+                                        Source: <span class="text-capitalize">{{ localIssue.source }}</span>
+                                    </div>
+                                </div>
+
+                            </v-card-text>
+                        </v-card>
+                    </v-col>
+
+                </v-row>
+            </v-card-text>
+        </v-card>
     `
 });

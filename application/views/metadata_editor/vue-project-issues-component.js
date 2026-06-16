@@ -22,17 +22,42 @@ Vue.component('project-issues', {
     data() {
         return {
             issueListKey: 0, // For forcing list refresh
+            activeTab: 0,
             assessmentSubmitting: false,
             assessmentPhase: 'idle', // 'idle' | 'submitting' | 'running'
-            assessmentPollIntervalMs: 2500,
+            assessmentJobUuid: null,
+            assessmentJobStatus: null,
+            assessmentJobError: null,
+            assessmentWorkerStatus: null,
+            assessmentPollIntervalMs: 5000,
             assessmentPollMaxWaitMs: 600000, // 10 minutes
-            showAssessConfirm: false
+            showAssessConfirm: false,
+            showAssessmentStatusDialog: false,
+            assessmentStatusLoading: false,
+            assessmentCancelLoading: false,
+            assessmentLastCheckedAt: null,
+            assessmentStatusTimer: null
         };
     },
     mounted() {
         this.checkAssessmentStatus();
     },
+    beforeDestroy() {
+        this.stopAssessmentStatusAutoRefresh();
+    },
+    watch: {
+        showAssessmentStatusDialog(isOpen) {
+            if (isOpen) {
+                this.startAssessmentStatusAutoRefresh();
+            } else {
+                this.stopAssessmentStatusAutoRefresh();
+            }
+        }
+    },
     methods: {
+        isRunningStatus(status) {
+            return status === 'pending' || status === 'processing';
+        },
         async checkAssessmentStatus() {
             if (!this.projectId) return;
             try {
@@ -40,7 +65,13 @@ Vue.component('project-issues', {
                 const response = await axios.get(url);
                 if (response.data.status !== 'success' || !response.data.assessment_job) return;
                 const job = response.data.assessment_job;
-                if (job.status !== 'pending' && job.status !== 'processing') return;
+                if (!this.isRunningStatus(job.status)) return;
+                this.assessmentJobUuid = job.uuid;
+                this.assessmentJobStatus = job.status;
+                this.assessmentJobError = job.error_message || null;
+                this.assessmentWorkerStatus = response.data.worker_status && response.data.worker_status.status
+                    ? response.data.worker_status.status
+                    : null;
                 this.assessmentSubmitting = true;
                 this.assessmentPhase = 'running';
                 const result = await this.pollJobUntilDone(job.uuid);
@@ -51,17 +82,26 @@ Vue.component('project-issues', {
                     }
                     EventBus.$emit('onSuccess', 'Assessment complete. Result logged to console and log file.');
                     this.refreshIssueList();
+                    this.assessmentSubmitting = false;
+                    this.assessmentPhase = 'idle';
+                    this.assessmentJobStatus = 'completed';
+                    this.assessmentJobError = null;
+                    this.assessmentWorkerStatus = result.workerStatus || this.assessmentWorkerStatus;
                 } else if (result.status === 'failed') {
                     const msg = (result.job && result.job.error_message) ? result.job.error_message : 'Assessment failed';
                     EventBus.$emit('onFail', msg);
+                    this.assessmentSubmitting = false;
+                    this.assessmentPhase = 'idle';
+                    this.assessmentJobStatus = 'failed';
+                    this.assessmentJobError = msg;
+                    this.assessmentWorkerStatus = result.workerStatus || this.assessmentWorkerStatus;
                 } else if (result.status === 'timeout') {
                     EventBus.$emit('onFail', 'Assessment is taking longer than expected. Check job status later.');
+                    this.assessmentSubmitting = true;
+                    this.assessmentPhase = 'running';
                 }
             } catch (err) {
                 console.error('Check assessment status:', err);
-            } finally {
-                this.assessmentSubmitting = false;
-                this.assessmentPhase = 'idle';
             }
         },
         createIssue() {
@@ -80,14 +120,25 @@ Vue.component('project-issues', {
             }
         },
         openAssessConfirm() {
-            if (this.assessmentSubmitting) return;
+            if (this.assessmentSubmitting && this.assessmentPhase === 'running') {
+                this.openAssessmentStatusDialog();
+                return;
+            }
             this.showAssessConfirm = true;
+        },
+        onAssessButtonClick() {
+            if (this.assessmentSubmitting && this.assessmentPhase === 'running') {
+                this.openAssessmentStatusDialog();
+                return;
+            }
+            this.openAssessConfirm();
         },
         async submitForReview() {
             this.showAssessConfirm = false;
             if (this.assessmentSubmitting) return;
             this.assessmentSubmitting = true;
             this.assessmentPhase = 'submitting';
+            this.assessmentJobError = null;
             try {
                 const url = (CI && CI.base_url ? CI.base_url : '') + '/api/jobs/metadata_assessment';
                 const response = await axios.post(url, { project_id: this.projectId });
@@ -95,6 +146,8 @@ Vue.component('project-issues', {
                     throw new Error(response.data.message || 'Failed to submit for assessment');
                 }
                 const uuid = response.data.uuid;
+                this.assessmentJobUuid = uuid;
+                this.assessmentJobStatus = 'pending';
                 this.assessmentPhase = 'running';
                 const result = await this.pollJobUntilDone(uuid);
                 if (result.status === 'completed' && result.job && result.job.result) {
@@ -104,11 +157,21 @@ Vue.component('project-issues', {
                     }
                     EventBus.$emit('onSuccess', 'Assessment complete. Result logged to console and log file.');
                     this.refreshIssueList();
+                    this.assessmentSubmitting = false;
+                    this.assessmentPhase = 'idle';
+                    this.assessmentJobStatus = 'completed';
+                    this.assessmentJobError = null;
                 } else if (result.status === 'failed') {
                     const msg = (result.job && result.job.error_message) ? result.job.error_message : 'Assessment failed';
                     EventBus.$emit('onFail', msg);
+                    this.assessmentSubmitting = false;
+                    this.assessmentPhase = 'idle';
+                    this.assessmentJobStatus = 'failed';
+                    this.assessmentJobError = msg;
                 } else if (result.status === 'timeout') {
                     EventBus.$emit('onFail', 'Assessment is taking longer than expected. Check job status later.');
+                    this.assessmentSubmitting = true;
+                    this.assessmentPhase = 'running';
                 }
             } catch (error) {
                 console.error('Assess metadata error:', error);
@@ -118,9 +181,10 @@ Vue.component('project-issues', {
                         ? error.response.data.message
                         : (error.message || 'Failed to assess metadata')
                 );
-            } finally {
                 this.assessmentSubmitting = false;
                 this.assessmentPhase = 'idle';
+                this.assessmentJobStatus = 'failed';
+                this.assessmentJobError = error && error.message ? error.message : 'Failed to assess metadata';
             }
         },
         pollJobUntilDone(uuid) {
@@ -133,8 +197,15 @@ Vue.component('project-issues', {
                 return axios.get(url).then((response) => {
                     const job = response.data.job;
                     const status = job ? job.status : response.data.status;
+                    const workerStatus = response.data.worker_status && response.data.worker_status.status
+                        ? response.data.worker_status.status
+                        : null;
+                    this.assessmentJobStatus = status;
+                    this.assessmentWorkerStatus = workerStatus;
+                    this.assessmentLastCheckedAt = new Date().toISOString();
+                    this.assessmentJobError = job && job.error_message ? job.error_message : null;
                     if (status === 'completed' || status === 'failed') {
-                        return { status: status, job: job };
+                        return { status: status, job: job, workerStatus: workerStatus };
                     }
                     return new Promise((resolve) => {
                         setTimeout(() => poll().then(resolve), this.assessmentPollIntervalMs);
@@ -142,6 +213,85 @@ Vue.component('project-issues', {
                 });
             };
             return poll();
+        },
+        async refreshAssessmentStatus() {
+            if (!this.assessmentJobUuid) return;
+            if (this.assessmentStatusLoading) return;
+            this.assessmentStatusLoading = true;
+            try {
+                const url = (CI && CI.base_url ? CI.base_url : '') + '/api/jobs/' + this.assessmentJobUuid;
+                const response = await axios.get(url);
+                const job = response.data.job || {};
+                const status = job.status || response.data.status || this.assessmentJobStatus;
+                const workerStatus = response.data.worker_status && response.data.worker_status.status
+                    ? response.data.worker_status.status
+                    : null;
+                this.assessmentJobStatus = status;
+                this.assessmentWorkerStatus = workerStatus;
+                this.assessmentJobError = job.error_message || null;
+                this.assessmentLastCheckedAt = new Date().toISOString();
+
+                if (status === 'completed' || status === 'failed' || status === 'cancelled') {
+                    this.assessmentSubmitting = false;
+                    this.assessmentPhase = 'idle';
+                } else if (this.isRunningStatus(status)) {
+                    this.assessmentSubmitting = true;
+                    this.assessmentPhase = 'running';
+                }
+            } catch (error) {
+                console.error('Refresh assessment status failed:', error);
+                EventBus.$emit('onFail', 'Failed to refresh assessment status');
+            } finally {
+                this.assessmentStatusLoading = false;
+            }
+        },
+        async openAssessmentStatusDialog() {
+            if (!this.assessmentJobUuid) return;
+            this.showAssessmentStatusDialog = true;
+            await this.refreshAssessmentStatus();
+        },
+        startAssessmentStatusAutoRefresh() {
+            this.stopAssessmentStatusAutoRefresh();
+            this.assessmentStatusTimer = setInterval(() => {
+                if (!this.showAssessmentStatusDialog || !this.assessmentJobUuid) {
+                    return;
+                }
+                this.refreshAssessmentStatus();
+            }, this.assessmentPollIntervalMs);
+        },
+        stopAssessmentStatusAutoRefresh() {
+            if (this.assessmentStatusTimer) {
+                clearInterval(this.assessmentStatusTimer);
+                this.assessmentStatusTimer = null;
+            }
+        },
+        async cancelAssessmentJob() {
+            if (!this.assessmentJobUuid || this.assessmentCancelLoading) return;
+            this.assessmentCancelLoading = true;
+            try {
+                const url = (CI && CI.base_url ? CI.base_url : '') + '/api/jobs/cancel/' + this.assessmentJobUuid;
+                const response = await axios.post(url, {});
+                if (response.data.status !== 'success') {
+                    throw new Error(response.data.message || 'Failed to cancel assessment job');
+                }
+                this.assessmentSubmitting = false;
+                this.assessmentPhase = 'idle';
+                this.assessmentJobStatus = 'cancelled';
+                this.assessmentJobError = null;
+                this.assessmentWorkerStatus = this.assessmentWorkerStatus || null;
+                this.showAssessmentStatusDialog = false;
+                EventBus.$emit('onSuccess', 'Assessment job cancelled');
+            } catch (error) {
+                console.error('Cancel assessment job failed:', error);
+                EventBus.$emit(
+                    'onFail',
+                    error.response && error.response.data && error.response.data.message
+                        ? error.response.data.message
+                        : (error.message || 'Failed to cancel assessment job')
+                );
+            } finally {
+                this.assessmentCancelLoading = false;
+            }
         }
     },
     template: `
@@ -157,26 +307,39 @@ Vue.component('project-issues', {
                                 </h2>                                
                             </div>
                             <v-spacer></v-spacer>
-                            <v-btn
-                                color="primary"
-                                :disabled="assessmentSubmitting"
-                                :loading="assessmentSubmitting && assessmentPhase === 'submitting'"
-                                @click="openAssessConfirm"
-                                class="mr-2"
-                            >
-                                <v-progress-circular
-                                    v-if="assessmentSubmitting && assessmentPhase === 'running'"
-                                    indeterminate
-                                    size="20"
-                                    width="2"
-                                    class="mr-2"
-                                ></v-progress-circular>
-                                <v-icon v-else left>mdi-auto-fix</v-icon>
-                                {{ assessmentSubmitting && assessmentPhase === 'running' ? 'Assessment running' : (assessmentSubmitting ? 'Submitting…' : 'Assess metadata') }}
-                            </v-btn>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-btn
+                                        color="primary"
+                                        small
+                                        :loading="assessmentSubmitting && assessmentPhase === 'submitting'"
+                                        @click="onAssessButtonClick"
+                                        class="mr-2"
+                                        v-bind="attrs"
+                                        v-on="on"
+                                    >
+                                        <v-progress-circular
+                                            v-if="assessmentSubmitting && assessmentPhase === 'running'"
+                                            indeterminate
+                                            size="20"
+                                            width="2"
+                                            class="mr-2"
+                                        ></v-progress-circular>
+                                        <v-icon v-else left>mdi-auto-fix</v-icon>
+                                        {{ assessmentSubmitting && assessmentPhase === 'running' ? 'Assessment running - View status' : (assessmentSubmitting ? 'Submitting…' : 'Assess metadata') }}
+                                        <v-icon v-if="assessmentSubmitting && assessmentPhase === 'running'" right small>mdi-chevron-right</v-icon>
+                                    </v-btn>
+                                </template>
+                                <span>
+                                    {{ assessmentSubmitting && assessmentPhase === 'running'
+                                        ? 'Click to view live status and cancel the job'
+                                        : 'Run metadata assessment' }}
+                                </span>
+                            </v-tooltip>
                             <v-btn
                                 v-if="canEdit"
                                 color="primary"
+                                small
                                 @click="createIssue"
                             >
                                 <v-icon left>mdi-plus</v-icon>
@@ -184,12 +347,30 @@ Vue.component('project-issues', {
                             </v-btn>
                         </div>
 
-                        <!-- Issue List -->
-                        <issue-list
-                            :key="issueListKey"
-                            :project-id="projectId"
-                            :can-edit="canEdit"
-                        ></issue-list>
+                        <!-- Issue Tabs -->
+                        <v-tabs v-model="activeTab" class="mb-2">
+                            <v-tab>Open</v-tab>
+                            <v-tab>Closed</v-tab>
+                        </v-tabs>
+
+                        <v-tabs-items v-model="activeTab">
+                            <v-tab-item>
+                                <issue-list
+                                    :key="'open-' + issueListKey"
+                                    :project-id="projectId"
+                                    :can-edit="canEdit"
+                                    status-scope="open"
+                                ></issue-list>
+                            </v-tab-item>
+                            <v-tab-item>
+                                <issue-list
+                                    :key="'closed-' + issueListKey"
+                                    :project-id="projectId"
+                                    :can-edit="canEdit"
+                                    status-scope="closed"
+                                ></issue-list>
+                            </v-tab-item>
+                        </v-tabs-items>
                     </v-col>
                 </v-row>
             </div>
@@ -211,6 +392,45 @@ Vue.component('project-issues', {
                         <v-btn color="primary" @click="submitForReview">
                             Assess metadata
                         </v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
+
+            <v-dialog v-model="showAssessmentStatusDialog" max-width="600">
+                <v-card>
+                    <v-card-title class="text-h6">
+                        <v-icon left color="primary">mdi-progress-clock</v-icon>
+                        Assessment status
+                    </v-card-title>
+                    <v-card-text>
+                        <div><strong>Job UUID:</strong> {{ assessmentJobUuid || 'N/A' }}</div>
+                        <div class="mt-2"><strong>Status:</strong> {{ assessmentJobStatus || 'unknown' }}</div>
+                        <div class="mt-2"><strong>Worker:</strong> {{ assessmentWorkerStatus || 'unknown' }}</div>
+                        <div
+                            v-if="isRunningStatus(assessmentJobStatus) && assessmentWorkerStatus && assessmentWorkerStatus !== 'running'"
+                            class="mt-3 orange--text text--darken-2"
+                        >
+                            Worker is not running. The assessment job may not progress until worker starts.
+                        </div>
+                        <div v-if="assessmentLastCheckedAt" class="mt-2"><strong>Last checked:</strong> {{ assessmentLastCheckedAt }}</div>
+                        <div v-if="assessmentJobError" class="mt-3 red--text text--darken-2">
+                            <strong>Error:</strong> {{ assessmentJobError }}
+                        </div>
+                    </v-card-text>
+                    <v-card-actions>
+                        <span class="text-caption grey--text">
+                            Auto-refreshing every {{ Math.round(assessmentPollIntervalMs / 1000) }}s
+                        </span>
+                        <v-spacer></v-spacer>
+                        <v-btn
+                            v-if="isRunningStatus(assessmentJobStatus)"
+                            color="error"
+                            :loading="assessmentCancelLoading"
+                            @click="cancelAssessmentJob"
+                        >
+                            Cancel job
+                        </v-btn>
+                        <v-btn text @click="showAssessmentStatusDialog = false">Close</v-btn>
                     </v-card-actions>
                 </v-card>
             </v-dialog>

@@ -40,19 +40,18 @@ Vue.component('create-issue-dialog', {
                 severity: 'medium',
                 current_metadata: {},
                 suggested_metadata: {},
-                source: 'manual',
-                notes: ''
+                source: 'manual'
             },
             currentMetadataText: '',
             suggestedMetadataText: '',
             errors: {},
             categoryOptions: [
-                'Typo / Wording',
-                'Inconsistency',
-                'Missing Data',
-                'Format Issue',
-                'Completeness',
-                'Other'
+                { text: 'Typo / Wording', value: 'typo_wording' },
+                { text: 'Inconsistency',   value: 'inconsistency' },
+                { text: 'Missing Data',    value: 'missing_data' },
+                { text: 'Format Issue',    value: 'format_issue' },
+                { text: 'Completeness',    value: 'completeness' },
+                { text: 'Other',           value: 'other' }
             ],
             severityOptions: [
                 { text: 'Low', value: 'low' },
@@ -165,8 +164,7 @@ Vue.component('create-issue-dialog', {
                 severity: 'medium',
                 current_metadata: {},
                 suggested_metadata: {},
-                source: 'manual',
-                notes: ''
+                source: 'manual'
             };
             this.currentMetadataText = '';
             this.suggestedMetadataText = '';
@@ -243,103 +241,108 @@ Vue.component('create-issue-dialog', {
                     </v-btn>
                 </v-card-title>
 
-                <v-card-text class="pt-4 flex-grow-1 overflow-auto dialog-content-resizable" style="min-height: 320px; resize: both;">
+                <v-card-text class="pt-4 flex-grow-1 overflow-auto" style="min-height: 320px;">
+
                     <!-- Title -->
                     <v-row dense>
                         <v-col cols="12">
+                            <div class="body-2 mb-1">Title <span class="error--text">*</span></div>
                             <v-text-field
                                 v-model="newIssue.title"
-                                label="Title *"
                                 outlined
                                 dense
                                 placeholder="Short title for the issue"
-                                hint="Required"
-                                persistent-hint
+                                hide-details="auto"
+                                counter="255"
                             ></v-text-field>
                         </v-col>
                     </v-row>
 
                     <!-- Description -->
-                    <v-row dense>
+                    <v-row dense class="mt-4">
                         <v-col cols="12">
+                            <div class="body-2 mb-1">Description <span class="error--text">*</span></div>
                             <v-textarea
                                 v-model="newIssue.description"
-                                label="Description *"
                                 outlined
                                 rows="3"
-                                placeholder="Describe the issue..."
+                                placeholder="Describe the issue in detail..."
+                                hide-details="auto"
                             ></v-textarea>
                         </v-col>
                     </v-row>
 
+                    <!-- Category and Severity -->
+                    <v-row dense class="mt-4">
+                        <v-col cols="12" md="6">
+                            <div class="body-2 mb-1">Category</div>
+                            <v-select
+                                v-model="newIssue.category"
+                                :items="categoryOptions"
+                                item-text="text"
+                                item-value="value"
+                                outlined
+                                dense
+                                placeholder="Select a category"
+                                hide-details="auto"
+                                clearable
+                            ></v-select>
+                        </v-col>
+                        <v-col cols="12" md="6">
+                            <div class="body-2 mb-1">Severity</div>
+                            <v-select
+                                v-model="newIssue.severity"
+                                :items="severityOptions"
+                                outlined
+                                dense
+                                hide-details="auto"
+                            ></v-select>
+                        </v-col>
+                    </v-row>
+
                     <!-- Field Path -->
-                    <v-row dense>
+                    <v-row dense class="mt-4">
                         <v-col cols="12">
+                            <div class="body-2 mb-1">Field Path</div>
                             <v-text-field
                                 v-model="newIssue.field_path"
-                                label="Field Path"
                                 outlined
                                 dense
                                 placeholder="e.g., series_description.methodology"
-                                hint="Dot-separated path to the metadata field"
+                                hint="Identifies the specific metadata field this issue refers to"
                                 persistent-hint
                             ></v-text-field>
                         </v-col>
                     </v-row>
 
+                    <!-- Current and Suggested Values (shown when field path is set) -->
+                    <template v-if="newIssue.field_path">
+                        <v-row dense class="mt-4">
+                            <v-col cols="12" md="6">
+                                <div class="body-2 mb-1">Current Value</div>
+                                <v-textarea
+                                    v-model="currentMetadataText"
+                                    outlined
+                                    rows="4"
+                                    placeholder="Current value of the field"
+                                    hide-details="auto"
+                                    :error-messages="errors.current_metadata"
+                                ></v-textarea>
+                            </v-col>
+                            <v-col cols="12" md="6">
+                                <div class="body-2 mb-1">Suggested Value</div>
+                                <v-textarea
+                                    v-model="suggestedMetadataText"
+                                    outlined
+                                    rows="4"
+                                    placeholder="What it should be changed to"
+                                    hide-details="auto"
+                                    :error-messages="errors.suggested_metadata"
+                                ></v-textarea>
+                            </v-col>
+                        </v-row>
+                    </template>
 
-                    <!-- Current Metadata -->
-                    <v-row dense>
-                        <v-col cols="12">
-                            <v-textarea
-                                v-model="currentMetadataText"
-                                label="Current Metadata"
-                                outlined
-                                rows="5"
-                                placeholder="Current field value"
-                                :error-messages="errors.current_metadata"
-                                style="max-height: 250px; overflow-y: auto;"
-                            ></v-textarea>
-                        </v-col>
-                    </v-row>
-
-                    <!-- Suggested Metadata -->
-                    <v-row dense class="mt-2">
-                        <v-col cols="12">
-                            <v-textarea
-                                v-model="suggestedMetadataText"
-                                label="Suggested Metadata"
-                                outlined
-                                rows="5"
-                                placeholder="Suggested field value or JSON"
-                                :error-messages="errors.suggested_metadata"
-                                style="max-height: 250px; overflow-y: auto;"
-                            ></v-textarea>
-                        </v-col>
-                    </v-row>
-
-                    <!-- Category and Severity (at bottom) -->
-                    <v-row dense class="mt-2">
-                        <v-col cols="12" md="6">
-                            <v-combobox
-                                v-model="newIssue.category"
-                                :items="categoryOptions"
-                                label="Category"
-                                outlined
-                                dense
-                                placeholder="Select or type category"
-                            ></v-combobox>
-                        </v-col>
-                        <v-col cols="12" md="6">
-                            <v-select
-                                v-model="newIssue.severity"
-                                :items="severityOptions"
-                                label="Severity"
-                                outlined
-                                dense
-                            ></v-select>
-                        </v-col>
-                    </v-row>
                 </v-card-text>
 
                 <v-divider></v-divider>

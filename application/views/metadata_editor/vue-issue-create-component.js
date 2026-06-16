@@ -23,19 +23,18 @@ const VueIssueCreate = Vue.component('issue-create', {
                 severity: 'medium',
                 current_metadata: {},
                 suggested_metadata: {},
-                source: 'manual',
-                notes: ''
+                source: 'manual'
             },
             currentMetadataText: '',
             suggestedMetadataText: '',
             errors: {},
             categoryOptions: [
-                'Typo / Wording',
-                'Inconsistency',
-                'Missing Data',
-                'Format Issue',
-                'Completeness',
-                'Other'
+                { text: 'Typo / Wording', value: 'typo_wording' },
+                { text: 'Inconsistency',   value: 'inconsistency' },
+                { text: 'Missing Data',    value: 'missing_data' },
+                { text: 'Format Issue',    value: 'format_issue' },
+                { text: 'Completeness',    value: 'completeness' },
+                { text: 'Other',           value: 'other' }
             ],
             severityOptions: [
                 { text: 'Low', value: 'low' },
@@ -256,12 +255,10 @@ const VueIssueCreate = Vue.component('issue-create', {
                             <v-btn icon @click="cancel" class="mr-3">
                                 <v-icon>mdi-arrow-left</v-icon>
                             </v-btn>
-                            <div>
-                                <h2 class="text-h5">
-                                    <v-icon left color="primary">mdi-plus-circle</v-icon>
-                                    Create New Issue
-                                </h2>                                
-                            </div>
+                            <h2 class="text-h5">
+                                <v-icon left color="primary">mdi-plus-circle</v-icon>
+                                Create New Issue
+                            </h2>
                             <v-spacer></v-spacer>
                             <v-btn
                                 color="primary"
@@ -277,153 +274,135 @@ const VueIssueCreate = Vue.component('issue-create', {
                         <!-- Form Card -->
                         <v-card>
                             <v-card-text class="pa-6">
+
                                 <!-- Title -->
                                 <v-row dense>
                                     <v-col cols="12">
+                                        <div class="body-2 mb-1">Title <span class="error--text">*</span></div>
                                         <v-text-field
                                             v-model="newIssue.title"
-                                            label="Title *"
                                             outlined
                                             dense
                                             placeholder="Short title for the issue"
-                                            hint="Required"
-                                            persistent-hint
+                                            hide-details="auto"
+                                            counter="255"
                                         ></v-text-field>
                                     </v-col>
                                 </v-row>
 
                                 <!-- Description -->
-                                <v-row dense>
+                                <v-row dense class="mt-4">
                                     <v-col cols="12">
+                                        <div class="body-2 mb-1">Description <span class="error--text">*</span></div>
                                         <v-textarea
                                             v-model="newIssue.description"
-                                            label="Description *"
                                             outlined
                                             rows="3"
-                                            placeholder="Describe the issue..."
-                                            hint="Required"
-                                            persistent-hint
+                                            placeholder="Describe the issue in detail..."
+                                            hide-details="auto"
                                         ></v-textarea>
                                     </v-col>
                                 </v-row>
 
                                 <!-- Category and Severity -->
-                                <v-row dense>
+                                <v-row dense class="mt-4">
                                     <v-col cols="12" md="6">
-                                        <v-combobox
+                                        <div class="body-2 mb-1">Category</div>
+                                        <v-select
                                             v-model="newIssue.category"
                                             :items="categoryOptions"
-                                            label="Category"
+                                            item-text="text"
+                                            item-value="value"
                                             outlined
                                             dense
-                                            placeholder="Select or type category"
-                                        ></v-combobox>
+                                            placeholder="Select a category"
+                                            hide-details="auto"
+                                            clearable
+                                        ></v-select>
                                     </v-col>
                                     <v-col cols="12" md="6">
+                                        <div class="body-2 mb-1">Severity</div>
                                         <v-select
                                             v-model="newIssue.severity"
                                             :items="severityOptions"
-                                            label="Severity"
                                             outlined
                                             dense
+                                            hide-details="auto"
                                         ></v-select>
                                     </v-col>
                                 </v-row>
 
-                                <!-- Notes -->
-                                <v-row dense>
+                                <!-- Field Path -->
+                                <v-row dense class="mt-4">
                                     <v-col cols="12">
-                                        <v-textarea
-                                            v-model="newIssue.notes"
-                                            label="Notes (optional)"
+                                        <div class="body-2 mb-1">Field Path</div>
+                                        <v-autocomplete
+                                            v-model="newIssue.field_path"
+                                            :items="fieldPathOptions"
+                                            item-text="text"
+                                            item-value="value"
                                             outlined
-                                            rows="2"
-                                            placeholder="Additional notes or context..."
-                                        ></v-textarea>
+                                            dense
+                                            clearable
+                                            placeholder="Select a field or type to search"
+                                            hint="Identifies the specific metadata field this issue refers to"
+                                            persistent-hint
+                                        >
+                                            <template v-slot:item="{ item }">
+                                                <v-list-item-content>
+                                                    <v-list-item-title>
+                                                        <code style="font-size: 12px;">{{ item.value }}</code>
+                                                    </v-list-item-title>
+                                                </v-list-item-content>
+                                            </template>
+                                        </v-autocomplete>
                                     </v-col>
                                 </v-row>
 
-                                <!-- Advanced Fields -->
-                                <v-row dense class="mt-2">
-                                    <v-col cols="12">
-                                        <v-expansion-panels  elevation-2>
-                                            <v-expansion-panel>
-                                                <v-expansion-panel-header>
-                                                    <div>
-                                                        <v-icon left small>mdi-cog</v-icon>
-                                                        <span class="text-subtitle-2">Advanced Fields</span>
-                                                        <span class="text-caption text--secondary ml-2">(Field Path & Metadata Values)</span>
-                                                    </div>
-                                                </v-expansion-panel-header>
-                                                <v-expansion-panel-content>
-                                                    <!-- Field Path -->
-                                                    <v-row dense class="mt-2">
-                                                        <v-col cols="12">
-                                                            <v-autocomplete
-                                                                v-model="newIssue.field_path"
-                                                                :items="fieldPathOptions"
-                                                                item-text="text"
-                                                                item-value="value"
-                                                                label="Field Path"
-                                                                outlined
-                                                                dense
-                                                                clearable
-                                                                placeholder="Select a field or type to search"
-                                                                hint="Select from project metadata or type custom path"
-                                                                persistent-hint
-                                                            >
-                                                                <template v-slot:item="{ item }">
-                                                                    <v-list-item-content>
-                                                                        <v-list-item-title>
-                                                                            <code style="font-size: 12px;">{{ item.value }}</code>
-                                                                        </v-list-item-title>
-                                                                    </v-list-item-content>
-                                                                </template>
-                                                            </v-autocomplete>
-                                                        </v-col>
-                                                    </v-row>
+                                <!-- Current & Suggested Values (shown when field path is set) -->
+                                <template v-if="newIssue.field_path">
+                                    <v-row dense class="mt-4">
+                                        <v-col cols="12" md="6">
+                                            <div class="body-2 mb-1">Current Value</div>
+                                            <v-textarea
+                                                v-model="currentMetadataText"
+                                                outlined
+                                                rows="4"
+                                                placeholder="Current value of the field"
+                                                hide-details="auto"
+                                                :error-messages="errors.current_metadata"
+                                            ></v-textarea>
+                                        </v-col>
+                                        <v-col cols="12" md="6">
+                                            <div class="body-2 mb-1">Suggested Value</div>
+                                            <v-textarea
+                                                v-model="suggestedMetadataText"
+                                                outlined
+                                                rows="4"
+                                                placeholder="What it should be changed to"
+                                                hide-details="auto"
+                                                :error-messages="errors.suggested_metadata"
+                                            ></v-textarea>
+                                        </v-col>
+                                    </v-row>
+                                </template>
 
-                                                    <v-row dense class="mt-3">
-                                                        <v-col cols="12">
-                                                            <v-divider></v-divider>
-                                                            <div class="text-subtitle-2 mt-3 mb-2">
-                                                                Metadata Values
-                                                            </div>
-                                                            <div class="text-caption text--secondary mb-3">
-                                                                Enter values as JSON objects, arrays, or plain text
-                                                            </div>
-                                                        </v-col>
-                                                    </v-row>
 
-                                                    <!-- Current Metadata -->
-                                                    <v-row dense>
-                                                        <v-col cols="12" md="6">
-                                                            <v-textarea
-                                                                v-model="currentMetadataText"
-                                                                label="Current Metadata"
-                                                                outlined
-                                                                rows="5"
-                                                                placeholder='Current value of the field'
-                                                                :error-messages="errors.current_metadata"
-                                                            ></v-textarea>
-                                                        </v-col>
-                                                        <v-col cols="12" md="6">
-                                                            <v-textarea
-                                                                v-model="suggestedMetadataText"
-                                                                label="Suggested Metadata"
-                                                                outlined
-                                                                rows="5"
-                                                                placeholder='Suggested value for the field'
-                                                                :error-messages="errors.suggested_metadata"
-                                                            ></v-textarea>
-                                                        </v-col>
-                                                    </v-row>
-                                                </v-expansion-panel-content>
-                                            </v-expansion-panel>
-                                        </v-expansion-panels>
-                                    </v-col>
-                                </v-row>
                             </v-card-text>
+
+                            <v-card-actions class="pa-6 pt-2">
+                                <v-spacer></v-spacer>
+                                <v-btn text @click="cancel" class="mr-2">Cancel</v-btn>
+                                <v-btn
+                                    color="primary"
+                                    @click="createIssue"
+                                    :loading="saving"
+                                    :disabled="!isValid"
+                                >
+                                    <v-icon left>mdi-content-save</v-icon>
+                                    Create Issue
+                                </v-btn>
+                            </v-card-actions>
                         </v-card>
                     </v-col>
                 </v-row>

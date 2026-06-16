@@ -55,15 +55,7 @@
         <vue-global-site-header></vue-global-site-header>
         <div class="content-wrapperx" v-cloak>
           <section class="content">
-            <div class="container-fluid">
-              <div class="row">
-                <div class="col-12">
-                  <div class="mt-5 mb-4">
-                    <main-navigation-tabs active-tab="issues" v-model="navTabsModel"></main-navigation-tabs>
-                  </div>
-                </div>
-              </div>
-
+            <div class="container">
               <div class="row">
                 <div class="col-12">
                   <div class="mt-2 mb-4">
@@ -121,7 +113,6 @@
         vuetify,
         data() {
           return {
-            navTabsModel: 0,
             issueId: <?php echo (int) isset($issue_id) ? $issue_id : 0; ?>,
             canEdit: <?php echo !empty($can_edit_issues) ? 'true' : 'false'; ?>
           };

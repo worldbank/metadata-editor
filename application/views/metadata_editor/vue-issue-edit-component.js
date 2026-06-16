@@ -22,16 +22,17 @@ const VueIssueEdit = Vue.component('issue-edit', {
             issue: null,
             editedIssue: {},
             editMode: false,
+            resolutionNotes: '',
             currentMetadataText: '',
             suggestedMetadataText: '',
             errors: {},
             categoryOptions: [
-                'Typo / Wording',
-                'Inconsistency',
-                'Missing Data',
-                'Format Issue',
-                'Completeness',
-                'Other'
+                { text: 'Typo / Wording', value: 'typo_wording' },
+                { text: 'Inconsistency',   value: 'inconsistency' },
+                { text: 'Missing Data',    value: 'missing_data' },
+                { text: 'Format Issue',    value: 'format_issue' },
+                { text: 'Completeness',    value: 'completeness' },
+                { text: 'Other',           value: 'other' }
             ],
             severityOptions: [
                 { text: 'Low', value: 'low' },
@@ -66,6 +67,9 @@ const VueIssueEdit = Vue.component('issue-edit', {
         },
         canApply() {
             return this.hasSuggestedMetadata && !this.issue.is_applied;
+        },
+        isEditable() {
+            return this.issue && (this.issue.status === 'open' || this.issue.status === 'accepted');
         },
         UserHasEditAccess() {
             return this.$root.UserHasEditAccess;
@@ -128,6 +132,10 @@ const VueIssueEdit = Vue.component('issue-edit', {
         }
     },
     methods: {
+        getCategoryLabel(code) {
+            const opt = this.categoryOptions.find(o => o.value === code);
+            return opt ? opt.text : (code || '');
+        },
         async loadIssue() {
             this.loading = true;
             try {
@@ -300,6 +308,54 @@ const VueIssueEdit = Vue.component('issue-edit', {
                     'onFail',
                     error.response?.data?.message || error.message || 'Failed to update status'
                 );
+            }
+        },
+        async resolve(newStatus) {
+            this.saving = true;
+            try {
+                if (this.resolutionNotes.trim()) {
+                    await axios.put(CI.base_url + '/api/issues/' + this.issueId, { notes: this.resolutionNotes });
+                }
+                const response = await axios.post(CI.base_url + '/api/issues/status/' + this.issueId, { status: newStatus });
+                if (response.data.status === 'success') {
+                    EventBus.$emit('onSuccess', 'Issue updated');
+                    this.issue.status = newStatus;
+                    this.editedIssue.status = newStatus;
+                    if (this.resolutionNotes.trim()) {
+                        this.issue.notes = this.resolutionNotes;
+                        this.editedIssue.notes = this.resolutionNotes;
+                    }
+                    this.resolutionNotes = '';
+                } else {
+                    throw new Error(response.data.message || 'Failed to update status');
+                }
+            } catch (error) {
+                EventBus.$emit('onFail', error.response?.data?.message || error.message || 'Failed to update issue');
+            } finally {
+                this.saving = false;
+            }
+        },
+        async applyWithNotes() {
+            if (!confirm('Apply the suggested metadata changes to the project?')) {
+                return;
+            }
+            this.applying = true;
+            try {
+                if (this.resolutionNotes.trim()) {
+                    await axios.put(CI.base_url + '/api/issues/' + this.issueId, { notes: this.resolutionNotes });
+                }
+                const response = await axios.post(CI.base_url + '/api/issues/apply/' + this.issueId);
+                if (response.data.status === 'success') {
+                    EventBus.$emit('onSuccess', 'Changes applied successfully');
+                    this.resolutionNotes = '';
+                    this.loadIssue();
+                } else {
+                    throw new Error(response.data.message || 'Failed to apply changes');
+                }
+            } catch (error) {
+                EventBus.$emit('onFail', error.response?.data?.message || error.message || 'Failed to apply changes');
+            } finally {
+                this.applying = false;
             }
         },
         async deleteIssue() {
@@ -530,23 +586,18 @@ const VueIssueEdit = Vue.component('issue-edit', {
             </v-container>
 
             <v-container fluid v-else-if="issue" style="max-width: 100% !important;" class="mt-4">
+
+                <!-- Page Header -->
                 <v-row>
                     <v-col cols="12">
-                        <!-- Page Header -->
                         <div class="d-flex align-center mb-4">
                             <v-btn icon @click="cancel" class="mr-3">
                                 <v-icon>mdi-arrow-left</v-icon>
                             </v-btn>
-                            <div>
-                                <h2 class="text-h5">
-                                    [#{{ issue.id }}] - {{ issue.title }}
-                                </h2>
-                            </div>
+                            <h2 class="text-h5">#{{ issue.id }} &mdash; {{ issue.title }}</h2>
                             <v-spacer></v-spacer>
-                            
-                            <!-- Action Buttons -->
                             <v-btn
-                                v-if="!editMode && UserHasEditAccess"
+                                v-if="!editMode && UserHasEditAccess && isEditable"
                                 color="primary"
                                 outlined
                                 @click="toggleEditMode"
@@ -565,271 +616,321 @@ const VueIssueEdit = Vue.component('issue-edit', {
                                 <v-icon left>mdi-content-save</v-icon>
                                 Save
                             </v-btn>
-                            <v-btn
-                                v-if="editMode"
-                                text
-                                @click="cancel"
-                            >
-                                Cancel
+                            <v-btn v-if="editMode" text @click="cancel" class="mr-2">Cancel</v-btn>
+                            <v-btn v-if="UserHasEditAccess && !editMode" icon @click="deleteIssue">
+                                <v-icon color="error">mdi-delete</v-icon>
                             </v-btn>
-                            <v-menu v-if="!editMode && UserHasEditAccess">
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-btn
-                                        icon
-                                        v-bind="attrs"
-                                        v-on="on"
-                                    >
-                                        <v-icon>mdi-dots-vertical</v-icon>
-                                    </v-btn>
-                                </template>
-                                <v-list>
-                                    <v-list-item v-if="canApply" @click="applyChanges">
-                                        <v-list-item-icon>
-                                            <v-icon>mdi-check-circle</v-icon>
-                                        </v-list-item-icon>
-                                        <v-list-item-title>Apply Changes</v-list-item-title>
-                                    </v-list-item>
-                                    <v-list-item @click="deleteIssue">
-                                        <v-list-item-icon>
-                                            <v-icon color="error">mdi-delete</v-icon>
-                                        </v-list-item-icon>
-                                        <v-list-item-title>Delete</v-list-item-title>
-                                    </v-list-item>
-                                </v-list>
-                            </v-menu>
                         </div>
+                    </v-col>
+                </v-row>
 
-                        <!-- Issue Details Card -->
+                <!-- Two-column layout -->
+                <v-row>
+
+                    <!-- Main content -->
+                    <v-col cols="12" md="8">
+
+                        <!-- Content card -->
                         <v-card class="mb-4">
                             <v-card-text class="pa-6">
-                                <!-- Status and Severity Row -->
-                                <v-row dense class="mb-3">
-                                    <v-col cols="12" md="3">
-                                        <v-select
-                                            v-if="editMode"
-                                            v-model="editedIssue.status"
-                                            :items="statusOptions"
-                                            label="Status"
-                                            outlined
-                                            dense
-                                        ></v-select>
-                                        <div v-else>
-                                            <div class="text-caption text--secondary">Status</div>
-                                            <issue-status-badge :status="issue.status"></issue-status-badge>
-                                        </div>
-                                    </v-col>
-                                    <v-col cols="12" md="3">
-                                        <v-select
-                                            v-if="editMode"
-                                            v-model="editedIssue.severity"
-                                            :items="severityOptions"
-                                            label="Severity"
-                                            outlined
-                                            dense
-                                            clearable
-                                        ></v-select>
-                                        <div v-else>
-                                            <div class="text-caption text--secondary">Severity</div>
-                                            <v-chip v-if="issue.severity" small :color="issue.severity === 'critical' ? 'error' : issue.severity === 'high' ? 'warning' : 'default'">
-                                                {{ issue.severity }}
-                                            </v-chip>
-                                            <span v-else class="text--secondary">-</span>
-                                        </div>
-                                    </v-col>
-                                    <v-col cols="12" md="3">
-                                        <div class="text-caption text--secondary">Category</div>
-                                        <v-combobox
-                                            v-if="editMode"
-                                            v-model="editedIssue.category"
-                                            :items="categoryOptions"
-                                            outlined
-                                            dense
-                                            clearable
-                                        ></v-combobox>
-                                        <div v-else>{{ issue.category || '-' }}</div>
-                                    </v-col>
-                                    <v-col cols="12" md="3">
-                                        <div class="text-caption text--secondary">Created</div>
-                                        <div>{{ formatDate(issue.created) }}</div>
-                                    </v-col>
-                                </v-row>
-
-                                <v-divider class="my-4"></v-divider>
 
                                 <!-- Title -->
-                                <v-row dense>
-                                    <v-col cols="12">
-                                        <v-text-field
-                                            v-if="editMode"
-                                            v-model="editedIssue.title"
-                                            label="Title *"
-                                            outlined
-                                            dense
-                                            hint="Required"
-                                            persistent-hint
-                                        ></v-text-field>
-                                        <div v-else>
-                                            <div class="text-caption text--secondary">Title</div>
-                                            <div class="mt-1">{{ issue.title || '-' }}</div>
-                                        </div>
-                                    </v-col>
-                                </v-row>
+                                <div class="body-2 mb-1">Title <span v-if="editMode" class="error--text">*</span></div>
+                                <v-text-field
+                                    v-if="editMode"
+                                    v-model="editedIssue.title"
+                                    outlined
+                                    dense
+                                    hide-details="auto"
+                                    class="mb-4"
+                                ></v-text-field>
+                                <div v-else class="body-1 mb-4">{{ issue.title }}</div>
 
                                 <!-- Description -->
-                                <v-row dense>
-                                    <v-col cols="12">
-                                        <v-textarea
-                                            v-if="editMode"
-                                            v-model="editedIssue.description"
-                                            label="Description"
-                                            outlined
-                                            rows="3"
-                                        ></v-textarea>
-                                        <div v-else>
-                                            <div class="text-caption text--secondary">Description</div>
-                                            <div class="mt-1">{{ issue.description }}</div>
-                                        </div>
-                                    </v-col>
-                                </v-row>
+                                <div class="body-2 mb-1">Description</div>
+                                <v-textarea
+                                    v-if="editMode"
+                                    v-model="editedIssue.description"
+                                    outlined
+                                    rows="4"
+                                    hide-details="auto"
+                                    class="mb-4"
+                                ></v-textarea>
+                                <div v-else class="body-2 mb-4" style="white-space: pre-wrap;">{{ issue.description }}</div>
 
-                                <!-- Notes -->
-                                <v-row dense v-if="issue.notes || editMode">
-                                    <v-col cols="12">
-                                        <v-textarea
-                                            v-if="editMode"
-                                            v-model="editedIssue.notes"
-                                            label="Notes"
-                                            outlined
-                                            rows="2"
-                                        ></v-textarea>
-                                        <div v-else>
-                                            <div class="text-caption text--secondary">Notes</div>
-                                            <div class="mt-1">{{ issue.notes }}</div>
-                                        </div>
-                                    </v-col>
-                                </v-row>
+                                <!-- Field Reference -->
+                                <template v-if="issue.field_path || hasAnyMetadata || editMode">
+                                    <v-divider class="mb-4"></v-divider>
+                                    <v-expansion-panels v-model="advancedPanel" elevation-1>
+                                        <v-expansion-panel>
+                                            <v-expansion-panel-header>
+                                                <div>
+                                                    <v-icon left small>mdi-code-tags</v-icon>
+                                                    <span class="text-subtitle-2">Field Reference</span>
+                                                    <code v-if="issue.field_path && !editMode" class="ml-2 text-caption">{{ issue.field_path }}</code>
+                                                </div>
+                                            </v-expansion-panel-header>
+                                            <v-expansion-panel-content>
+                                                <!-- Field Path -->
+                                                <v-row dense v-if="issue.field_path || editMode" class="mt-2">
+                                                    <v-col cols="12">
+                                                        <v-autocomplete
+                                                            v-if="editMode"
+                                                            v-model="editedIssue.field_path"
+                                                            :items="fieldPathOptions"
+                                                            item-text="text"
+                                                            item-value="value"
+                                                            label="Field Path"
+                                                            outlined
+                                                            dense
+                                                            clearable
+                                                            placeholder="Select a field or type to search"
+                                                            hint="Select from project metadata or type custom path"
+                                                            persistent-hint
+                                                        >
+                                                            <template v-slot:item="{ item }">
+                                                                <v-list-item-content>
+                                                                    <v-list-item-title>
+                                                                        <code style="font-size: 12px;">{{ item.value }}</code>
+                                                                    </v-list-item-title>
+                                                                </v-list-item-content>
+                                                            </template>
+                                                        </v-autocomplete>
+                                                        <div v-else>
+                                                            <div class="text-caption text--secondary mb-1">Field Path</div>
+                                                            <code>{{ issue.field_path }}</code>
+                                                        </div>
+                                                    </v-col>
+                                                </v-row>
 
-                                <!-- Advanced Fields -->
-                                <v-row dense class="mt-2">
-                                    <v-col cols="12">
-                                        <v-expansion-panels v-model="advancedPanel" elevation-1>
-                                            <v-expansion-panel>
-                                                <v-expansion-panel-header>
-                                                    <div>
-                                                        <v-icon left small>mdi-cog</v-icon>
-                                                        <span class="text-subtitle-2">Advanced Fields</span>
-                                                        <span class="text-caption text--secondary ml-2">(Field Path & Metadata Values)</span>
-                                                    </div>
-                                                </v-expansion-panel-header>
-                                                <v-expansion-panel-content>
-                                                    <!-- Field Path -->
-                                                    <v-row dense v-if="issue.field_path || editMode" class="mt-2">
-                                                        <v-col cols="12">
-                                                            <v-autocomplete
-                                                                v-if="editMode"
-                                                                v-model="editedIssue.field_path"
-                                                                :items="fieldPathOptions"
-                                                                item-text="text"
-                                                                item-value="value"
-                                                                label="Field Path"
-                                                                outlined
-                                                                dense
-                                                                clearable
-                                                                placeholder="Select a field or type to search"
-                                                                hint="Select from project metadata or type custom path"
-                                                                persistent-hint
-                                                            >
-                                                                <template v-slot:item="{ item }">
-                                                                    <v-list-item-content>
-                                                                        <v-list-item-title>
-                                                                            <code style="font-size: 12px;">{{ item.value }}</code>
-                                                                        </v-list-item-title>
-                                                                    </v-list-item-content>
-                                                                </template>
-                                                            </v-autocomplete>
-                                                            <div v-else>
-                                                                <div class="text-caption text--secondary">Field Path</div>
-                                                                <code class="mt-1">{{ issue.field_path }}</code>
-                                                            </div>
-                                                        </v-col>
-                                                    </v-row>
+                                                <!-- Current / Suggested -->
+                                                <v-row v-if="hasAnyMetadata || editMode" class="mt-3">
+                                                    <v-col cols="12" md="6">
+                                                        <div class="text-subtitle-2 mb-2">
+                                                            <v-icon left small>mdi-file-document-outline</v-icon>
+                                                            Current Value
+                                                        </div>
+                                                        <v-textarea
+                                                            v-if="editMode"
+                                                            v-model="currentMetadataText"
+                                                            outlined
+                                                            rows="8"
+                                                            :error-messages="errors.current_metadata"
+                                                            style="max-height: 250px; overflow-y: auto;"
+                                                        ></v-textarea>
+                                                        <pre v-else style="background-color: #f5f5f5; padding: 12px; border-radius: 4px; overflow: auto; font-size: 12px; line-height: 1.5; max-height: 250px;">{{ formatMetadata(issue.current_metadata) }}</pre>
+                                                    </v-col>
+                                                    <v-col cols="12" md="6">
+                                                        <div class="text-subtitle-2 mb-2">
+                                                            <v-icon left small color="primary">mdi-file-document-edit-outline</v-icon>
+                                                            Suggested Value
+                                                        </div>
+                                                        <v-textarea
+                                                            v-if="editMode"
+                                                            v-model="suggestedMetadataText"
+                                                            outlined
+                                                            rows="8"
+                                                            :error-messages="errors.suggested_metadata"
+                                                            style="max-height: 250px; overflow-y: auto;"
+                                                        ></v-textarea>
+                                                        <pre v-else style="background-color: #f5f5f5; padding: 12px; border-radius: 4px; overflow: auto; font-size: 12px; line-height: 1.5; max-height: 250px;">{{ formatMetadata(issue.suggested_metadata) }}</pre>
+                                                    </v-col>
+                                                </v-row>
 
-                                                    <!-- Metadata Comparison (show in both view and edit when issue has any metadata) -->
-                                                    <v-row v-if="hasAnyMetadata || editMode" class="mt-3">
-                                                        <v-col cols="12" md="6">
-                                                            <div class="text-subtitle-2 mb-2">
-                                                                <v-icon left small>mdi-file-document-outline</v-icon>
-                                                                Current Metadata
-                                                            </div>
-                                                            <v-textarea
-                                                                v-if="editMode"
-                                                                v-model="currentMetadataText"
-                                                                outlined
-                                                                rows="8"
-                                                                :error-messages="errors.current_metadata"
-                                                                style="max-height: 250px; overflow-y: auto;"
-                                                            ></v-textarea>
-                                                            <pre v-else style="background-color: #f5f5f5; padding: 12px; border-radius: 4px; overflow: auto; font-size: 12px; line-height: 1.5; max-height: 250px;">{{ formatMetadata(issue.current_metadata) }}</pre>
-                                                        </v-col>
-                                                        <v-col cols="12" md="6">
-                                                            <div class="text-subtitle-2 mb-2">
-                                                                <v-icon left small color="primary">mdi-file-document-edit-outline</v-icon>
-                                                                Suggested Metadata
-                                                            </div>
-                                                            <v-textarea
-                                                                v-if="editMode"
-                                                                v-model="suggestedMetadataText"
-                                                                outlined
-                                                                rows="8"
-                                                                :error-messages="errors.suggested_metadata"
-                                                                style="max-height: 250px; overflow-y: auto;"
-                                                            ></v-textarea>
-                                                            <pre v-else style="background-color: #f5f5f5; padding: 12px; border-radius: 4px; overflow: auto; font-size: 12px; line-height: 1.5; max-height: 250px;">{{ formatMetadata(issue.suggested_metadata) }}</pre>
-                                                        </v-col>
-                                                    </v-row>
-                                                    <!-- JSON Diff preview (below current/suggested; show in both view and edit) -->
-                                                    <v-row v-if="hasAnyMetadata || editMode" class="mt-3">
-                                                        <v-col cols="12">
-                                                            <div class="text-subtitle-2 mb-2">
-                                                                <v-icon left small>mdi-compare</v-icon>
-                                                                Diff preview
-                                                            </div>
-                                                            <div ref="metadataDiffContainer" class="metadata-diff-container" style="min-height: 120px; max-height: 400px; overflow: auto; background-color: #fafafa; border-radius: 4px; padding: 8px;"></div>
-                                                        </v-col>
-                                                    </v-row>
-                                                </v-expansion-panel-content>
-                                            </v-expansion-panel>
-                                        </v-expansion-panels>
-                                    </v-col>
-                                </v-row>
+                                                <!-- Diff -->
+                                                <v-row v-if="hasAnyMetadata || editMode" class="mt-3">
+                                                    <v-col cols="12">
+                                                        <div class="text-subtitle-2 mb-2">
+                                                            <v-icon left small>mdi-compare</v-icon>
+                                                            Diff
+                                                        </div>
+                                                        <div ref="metadataDiffContainer" style="min-height: 120px; max-height: 400px; overflow: auto; background-color: #fafafa; border-radius: 4px; padding: 8px;"></div>
+                                                    </v-col>
+                                                </v-row>
+                                            </v-expansion-panel-content>
+                                        </v-expansion-panel>
+                                    </v-expansion-panels>
+                                </template>
+
                             </v-card-text>
                         </v-card>
 
-                        <!-- Quick Actions (when not editing) -->
-                        <v-card v-if="!editMode && UserHasEditAccess" class="mt-4">
-                            <v-card-title class="text-subtitle-1">Quick Actions</v-card-title>
+                        <!-- Resolution -->
+                        <v-card v-if="!editMode && UserHasEditAccess">
+                            <v-card-title class="text-subtitle-1">Resolution</v-card-title>
                             <v-card-text>
-                                <v-chip-group>
-                                    <v-chip @click="updateStatus('accepted')" :outlined="issue.status !== 'accepted'">
+                                <div class="body-2 mb-1">Notes</div>
+                                <v-textarea
+                                    v-model="resolutionNotes"
+                                    outlined
+                                    rows="2"
+                                    placeholder="Notes or comments..."
+                                    hide-details
+                                    class="mb-4"
+                                ></v-textarea>
+
+                                <!-- Open -->
+                                <template v-if="issue.status === 'open'">
+                                    <v-btn v-if="canApply" color="success" class="mr-2 mb-2" @click="applyWithNotes" :loading="applying">
+                                        <v-icon left small>mdi-check-circle</v-icon>
+                                        Apply Changes
+                                    </v-btn>
+                                    <v-btn outlined color="success" class="mr-2 mb-2" @click="resolve('accepted')" :loading="saving">
                                         <v-icon left small>mdi-check</v-icon>
                                         Accept
-                                    </v-chip>
-                                    <v-chip @click="updateStatus('fixed')" :outlined="issue.status !== 'fixed'">
-                                        <v-icon left small>mdi-check-circle</v-icon>
+                                    </v-btn>
+                                    <v-btn outlined color="success" class="mr-2 mb-2" @click="resolve('fixed')" :loading="saving">
+                                        <v-icon left small>mdi-wrench</v-icon>
                                         Mark Fixed
-                                    </v-chip>
-                                    <v-chip @click="updateStatus('rejected')" :outlined="issue.status !== 'rejected'">
+                                    </v-btn>
+                                    <v-btn outlined color="error" class="mr-2 mb-2" @click="resolve('rejected')" :loading="saving">
                                         <v-icon left small>mdi-close</v-icon>
                                         Reject
-                                    </v-chip>
-                                    <v-chip @click="updateStatus('false_positive')" :outlined="issue.status !== 'false_positive'">
+                                    </v-btn>
+                                    <v-btn outlined class="mr-2 mb-2" @click="resolve('dismissed')" :loading="saving">
+                                        <v-icon left small>mdi-minus-circle</v-icon>
+                                        Dismiss
+                                    </v-btn>
+                                    <v-btn outlined class="mr-2 mb-2" @click="resolve('false_positive')" :loading="saving">
                                         <v-icon left small>mdi-alert-remove</v-icon>
                                         False Positive
-                                    </v-chip>
-                                </v-chip-group>
+                                    </v-btn>
+                                </template>
+
+                                <!-- Accepted -->
+                                <template v-else-if="issue.status === 'accepted'">
+                                    <v-btn v-if="canApply" color="success" class="mr-2 mb-2" @click="applyWithNotes" :loading="applying">
+                                        <v-icon left small>mdi-check-circle</v-icon>
+                                        Apply Changes
+                                    </v-btn>
+                                    <v-btn outlined color="success" class="mr-2 mb-2" @click="resolve('fixed')" :loading="saving">
+                                        <v-icon left small>mdi-wrench</v-icon>
+                                        Mark Fixed
+                                    </v-btn>
+                                    <v-btn outlined color="error" class="mr-2 mb-2" @click="resolve('rejected')" :loading="saving">
+                                        <v-icon left small>mdi-close</v-icon>
+                                        Reject
+                                    </v-btn>
+                                    <v-btn outlined class="mr-2 mb-2" @click="resolve('dismissed')" :loading="saving">
+                                        <v-icon left small>mdi-minus-circle</v-icon>
+                                        Dismiss
+                                    </v-btn>
+                                    <v-btn outlined class="mr-2 mb-2" @click="resolve('open')" :loading="saving">
+                                        <v-icon left small>mdi-refresh</v-icon>
+                                        Reopen
+                                    </v-btn>
+                                </template>
+
+                                <!-- Closed -->
+                                <template v-else>
+                                    <v-btn outlined class="mr-2 mb-2" @click="resolve('open')" :loading="saving">
+                                        <v-icon left small>mdi-refresh</v-icon>
+                                        Reopen
+                                    </v-btn>
+                                </template>
+                            </v-card-text>
+                        </v-card>
+
+                    </v-col>
+
+                    <!-- Sidebar -->
+                    <v-col cols="12" md="4">
+                        <v-card>
+                            <v-card-text class="pa-4">
+
+                                <!-- Status -->
+                                <div class="text-caption text--secondary mb-1">Status</div>
+                                <div class="mb-4">
+                                    <v-select
+                                        v-if="editMode"
+                                        v-model="editedIssue.status"
+                                        :items="statusOptions"
+                                        outlined
+                                        dense
+                                        hide-details
+                                    ></v-select>
+                                    <issue-status-badge v-else :status="issue.status"></issue-status-badge>
+                                </div>
+
+                                <v-divider class="mb-4"></v-divider>
+
+                                <!-- Severity -->
+                                <div class="text-caption text--secondary mb-1">Severity</div>
+                                <div class="mb-4">
+                                    <v-select
+                                        v-if="editMode"
+                                        v-model="editedIssue.severity"
+                                        :items="severityOptions"
+                                        outlined
+                                        dense
+                                        hide-details
+                                        clearable
+                                    ></v-select>
+                                    <div v-else>
+                                        <v-chip v-if="issue.severity" small :color="issue.severity === 'critical' ? 'error' : issue.severity === 'high' ? 'warning' : 'default'">
+                                            {{ issue.severity }}
+                                        </v-chip>
+                                        <span v-else class="text--secondary text-caption">—</span>
+                                    </div>
+                                </div>
+
+                                <v-divider class="mb-4"></v-divider>
+
+                                <!-- Category -->
+                                <div class="text-caption text--secondary mb-1">Category</div>
+                                <div class="mb-4">
+                                    <v-select
+                                        v-if="editMode"
+                                        v-model="editedIssue.category"
+                                        :items="categoryOptions"
+                                        item-text="text"
+                                        item-value="value"
+                                        outlined
+                                        dense
+                                        hide-details
+                                        clearable
+                                    ></v-select>
+                                    <span v-else class="body-2">{{ getCategoryLabel(issue.category) || '—' }}</span>
+                                </div>
+
+                                <v-divider class="mb-4"></v-divider>
+
+                                <!-- Notes -->
+                                <div class="text-caption text--secondary mb-1">Notes</div>
+                                <div class="mb-4">
+                                    <v-textarea
+                                        v-if="editMode"
+                                        v-model="editedIssue.notes"
+                                        outlined
+                                        rows="3"
+                                        hide-details
+                                    ></v-textarea>
+                                    <div v-else-if="issue.notes" class="body-2" style="white-space: pre-wrap;">{{ issue.notes }}</div>
+                                    <span v-else class="text--secondary text-caption">—</span>
+                                </div>
+
+                                <v-divider class="mb-3"></v-divider>
+
+                                <!-- Activity -->
+                                <div class="text-caption text--secondary">
+                                    <div v-if="issue.created" class="mb-1">
+                                        Created {{ formatDate(issue.created) }}<span v-if="issue.created_by_username"> by {{ issue.created_by_username }}</span>
+                                    </div>
+                                    <div v-if="issue.assigned_to_username" class="mb-1">
+                                        Assigned to {{ issue.assigned_to_username }}
+                                    </div>
+                                    <div v-if="issue.resolved" class="mb-1">
+                                        Resolved {{ formatDate(issue.resolved) }}<span v-if="issue.resolved_by_username"> by {{ issue.resolved_by_username }}</span>
+                                    </div>
+                                    <div v-if="issue.applied_on" class="mb-1">
+                                        Applied {{ formatDate(issue.applied_on) }}<span v-if="issue.applied_by_username"> by {{ issue.applied_by_username }}</span>
+                                    </div>
+                                </div>
+
                             </v-card-text>
                         </v-card>
                     </v-col>
+
                 </v-row>
             </v-container>
         </div>

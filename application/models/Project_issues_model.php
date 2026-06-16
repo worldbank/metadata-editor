@@ -43,8 +43,16 @@ class Project_issues_model extends CI_Model {
      */
     public function get_by_id($id)
     {
-        $this->db->select('project_issues.*, editor_projects.title as project_title');
+        $this->db->select('project_issues.*, editor_projects.title as project_title,
+            u_created.username as created_by_username,
+            u_assigned.username as assigned_to_username,
+            u_resolved.username as resolved_by_username,
+            u_applied.username as applied_by_username');
         $this->db->join('editor_projects', 'editor_projects.id = project_issues.project_id', 'left');
+        $this->db->join('users as u_created', 'u_created.id = project_issues.created_by', 'left');
+        $this->db->join('users as u_assigned', 'u_assigned.id = project_issues.assigned_to', 'left');
+        $this->db->join('users as u_resolved', 'u_resolved.id = project_issues.resolved_by', 'left');
+        $this->db->join('users as u_applied', 'u_applied.id = project_issues.applied_by', 'left');
         $this->db->where('project_issues.id', (int) $id);
 
         $query = $this->db->get('project_issues');
@@ -515,26 +523,72 @@ class Project_issues_model extends CI_Model {
     }
 
     /**
+     * Bulk delete issues
+     *
+     * @param array $ids Issue IDs
+     * @return int Number of rows affected
+     */
+    public function bulk_delete($ids)
+    {
+        if (empty($ids) || !is_array($ids)) {
+            return 0;
+        }
+
+        $ids = array_map('intval', $ids);
+        $ids = array_filter($ids);
+
+        if (empty($ids)) {
+            return 0;
+        }
+
+        $this->db->where_in('id', $ids);
+        $this->db->delete('project_issues');
+
+        return $this->db->affected_rows();
+    }
+
+    /**
      * Apply filters to query
      *
      * @param array $filters
      */
     private function _apply_filters($filters)
     {
-        if (isset($filters['status']) && !empty($filters['status'])) {
-            if (is_array($filters['status'])) {
-                $this->db->where_in('status', $filters['status']);
+        // Scope restricts the status set; an explicit status filter further narrows within the scope
+        if (isset($filters['scope']) && !empty($filters['scope'])) {
+            if ($filters['scope'] === 'open') {
+                $this->db->where_in('status', array('open', 'accepted'));
+            } elseif ($filters['scope'] === 'closed') {
+                $this->db->where_in('status', array('fixed', 'rejected', 'dismissed', 'false_positive'));
+            }
+        } elseif (isset($filters['status']) && !empty($filters['status'])) {
+            $vals = is_array($filters['status']) ? $filters['status'] : explode(',', $filters['status']);
+            $vals = array_filter(array_map('trim', $vals));
+            if (count($vals) > 1) {
+                $this->db->where_in('status', $vals);
             } else {
-                $this->db->where('status', $filters['status']);
+                $this->db->where('status', reset($vals));
             }
         }
 
         if (isset($filters['category']) && !empty($filters['category'])) {
-            $this->db->where('category', $filters['category']);
+            $vals = is_array($filters['category']) ? $filters['category'] : explode(',', $filters['category']);
+            $vals = array_filter(array_map('trim', $vals));
+            if (count($vals) > 1) {
+                $this->db->where_in('category', $vals);
+            } else {
+                $this->db->where('category', reset($vals));
+            }
         }
 
         if (isset($filters['severity']) && !empty($filters['severity'])) {
-            $this->db->where('severity', $filters['severity']);
+            $vals = is_array($filters['severity']) ? $filters['severity'] : explode(',', $filters['severity']);
+            $vals = array_filter(array_map('trim', $vals));
+            if (count($vals) > 1) {
+                $this->db->where_in('severity', $vals);
+            } else {
+                $this->db->where('severity', reset($vals));
+            }
         }
 
         if (isset($filters['applied']) && $filters['applied'] !== null && $filters['applied'] !== '') {

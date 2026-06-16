@@ -20,6 +20,10 @@ Vue.component('issue-list', {
         refreshTrigger: {
             type: Number,
             default: 0
+        },
+        statusScope: {
+            type: String,
+            default: 'all' // 'open' | 'closed' | 'all'
         }
     },
     data() {
@@ -60,10 +64,13 @@ Vue.component('issue-list', {
                 { text: 'False Positive', value: 'false_positive' }
             ],
             categoryOptions: [
-                { text: 'All', value: '' },
-                { text: 'Typo / Wording', value: 'Typo / Wording' },
-                { text: 'Inconsistency', value: 'Inconsistency' },
-                { text: 'Missing Data', value: 'Missing Data' }
+                { text: 'All',             value: '' },
+                { text: 'Typo / Wording', value: 'typo_wording' },
+                { text: 'Inconsistency',   value: 'inconsistency' },
+                { text: 'Missing Data',    value: 'missing_data' },
+                { text: 'Format Issue',    value: 'format_issue' },
+                { text: 'Completeness',    value: 'completeness' },
+                { text: 'Other',           value: 'other' }
             ],
             severityOptions: [
                 { text: 'All', value: '' },
@@ -82,6 +89,25 @@ Vue.component('issue-list', {
     computed: {
         hasSelected() {
             return this.selected.length > 0;
+        },
+        scopedStatusOptions() {
+            if (this.statusScope === 'open') {
+                return [
+                    { text: 'All open', value: '' },
+                    { text: 'Open', value: 'open' },
+                    { text: 'Accepted', value: 'accepted' }
+                ];
+            }
+            if (this.statusScope === 'closed') {
+                return [
+                    { text: 'All closed', value: '' },
+                    { text: 'Fixed', value: 'fixed' },
+                    { text: 'Rejected', value: 'rejected' },
+                    { text: 'Dismissed', value: 'dismissed' },
+                    { text: 'False Positive', value: 'false_positive' }
+                ];
+            }
+            return this.statusOptions;
         }
     },
     watch: {
@@ -106,6 +132,14 @@ Vue.component('issue-list', {
         this.loadIssues();
     },
     methods: {
+        refreshIssueSummary() {
+            if (this.$store && this.projectId) {
+                this.$store.dispatch('fetchOpenIssuesSummary', { projectId: this.projectId });
+            }
+            if (typeof EventBus !== 'undefined') {
+                EventBus.$emit('project-issues-refreshed', this.projectId);
+            }
+        },
         async loadIssues() {
             this.loading = true;
             try {
@@ -124,6 +158,7 @@ Vue.component('issue-list', {
                 }
 
                 // Add filters
+                if (this.statusScope !== 'all') params.scope = this.statusScope;
                 if (this.filters.status) params.status = this.filters.status;
                 if (this.filters.category) params.category = this.filters.category;
                 if (this.filters.severity) params.severity = this.filters.severity;
@@ -135,6 +170,7 @@ Vue.component('issue-list', {
                 if (response.data.status === 'success') {
                     this.issues = response.data.issues || [];
                     this.total = response.data.total || 0;
+                    this.selected = [];
                 } else {
                     throw new Error(response.data.message || 'Failed to load issues');
                 }
@@ -181,6 +217,7 @@ Vue.component('issue-list', {
                     EventBus.$emit('onSuccess', 'Issue deleted successfully');
                     this.$emit('issue-deleted', issue);
                     this.loadIssues();
+                    this.refreshIssueSummary();
                 } else {
                     throw new Error(response.data.message || 'Failed to delete issue');
                 }
@@ -214,6 +251,7 @@ Vue.component('issue-list', {
                     );
                     this.selected = [];
                     this.loadIssues();
+                    this.refreshIssueSummary();
                 } else {
                     throw new Error(response.data.message || 'Failed to update issues');
                 }
@@ -225,6 +263,43 @@ Vue.component('issue-list', {
                 );
             }
         },
+        async bulkDeleteIssues() {
+            if (this.selected.length === 0) {
+                EventBus.$emit('onFail', 'Please select issues first');
+                return;
+            }
+
+            const issueIds = this.selected.map(issue => issue.id);
+            const shouldDelete = confirm(
+                'Are you sure you want to delete ' + issueIds.length + ' selected issue(s)? This action cannot be undone.'
+            );
+            if (!shouldDelete) {
+                return;
+            }
+
+            try {
+                const url = CI.base_url + '/api/issues/bulk_delete';
+                const response = await axios.post(url, { ids: issueIds });
+
+                if (response.data.status === 'success') {
+                    EventBus.$emit(
+                        'onSuccess',
+                        response.data.affected + ' issue(s) deleted'
+                    );
+                    this.selected = [];
+                    this.loadIssues();
+                    this.refreshIssueSummary();
+                } else {
+                    throw new Error(response.data.message || 'Failed to delete issues');
+                }
+            } catch (error) {
+                console.error('Error deleting issues:', error);
+                EventBus.$emit(
+                    'onFail',
+                    error.response?.data?.message || error.message || 'Failed to delete issues'
+                );
+            }
+        },
         clearFilters() {
             this.filters = {
                 status: '',
@@ -232,52 +307,60 @@ Vue.component('issue-list', {
                 severity: '',
                 applied: ''
             };
+        },
+        getCategoryLabel(code) {
+            const opt = this.categoryOptions.find(o => o.value === code);
+            return opt ? opt.text : (code || '');
         }
     },
     template: `
         <div class="issue-list mt-4">
             <!-- Filters -->
-            <v-card flat class="mb-3" v-if="false">
-                <v-card-text>
-                    <v-row dense>
-                        <v-col cols="12" sm="3">
+            <v-card flat class="mb-3">
+                <v-card-text class="py-2">
+                    <v-row dense align="center">
+                        <v-col cols="auto">
                             <v-select
                                 v-model="filters.status"
-                                :items="statusOptions"
-                                label="Status"
+                                :items="scopedStatusOptions"
+                                placeholder="Status"
                                 outlined
                                 dense
                                 hide-details
+                                style="min-width: 130px;"
                             ></v-select>
                         </v-col>
-                        <v-col cols="12" sm="3">
+                        <v-col cols="auto">
                             <v-select
                                 v-model="filters.category"
                                 :items="categoryOptions"
-                                label="Category"
+                                placeholder="Category"
                                 outlined
                                 dense
                                 hide-details
+                                style="min-width: 150px;"
                             ></v-select>
                         </v-col>
-                        <v-col cols="12" sm="2">
+                        <v-col cols="auto">
                             <v-select
                                 v-model="filters.severity"
                                 :items="severityOptions"
-                                label="Severity"
+                                placeholder="Severity"
                                 outlined
                                 dense
                                 hide-details
+                                style="min-width: 120px;"
                             ></v-select>
                         </v-col>
-                        <v-col cols="12" sm="2">
+                        <v-col cols="auto">
                             <v-select
                                 v-model="filters.applied"
                                 :items="appliedOptions"
-                                label="Applied"
+                                placeholder="Applied"
                                 outlined
                                 dense
                                 hide-details
+                                style="min-width: 120px;"
                             ></v-select>
                         </v-col>
                         <v-col cols="12" sm="2" class="d-flex align-center">
@@ -325,6 +408,13 @@ Vue.component('issue-list', {
                                 <v-list-item @click="bulkUpdateStatus('rejected')">
                                     <v-list-item-title>Reject</v-list-item-title>
                                 </v-list-item>
+                                <v-divider class="my-1"></v-divider>
+                                <v-list-item @click="bulkDeleteIssues()">
+                                    <v-list-item-icon class="mr-2">
+                                        <v-icon small color="error">mdi-delete</v-icon>
+                                    </v-list-item-icon>
+                                    <v-list-item-title class="error--text">Delete selected</v-list-item-title>
+                                </v-list-item>
                             </v-list>
                         </v-menu>
                     </div>
@@ -358,7 +448,7 @@ Vue.component('issue-list', {
                 </template>
 
                 <template v-slot:item.category="{ item }">
-                    <v-chip small outlined v-if="item.category">{{ item.category }}</v-chip>
+                    <v-chip small outlined v-if="item.category">{{ getCategoryLabel(item.category) }}</v-chip>
                     <span v-else class="text--disabled">-</span>
                 </template>
 
