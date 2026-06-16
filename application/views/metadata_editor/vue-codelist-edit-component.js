@@ -1386,6 +1386,7 @@ Vue.component('codelist-edit', {
                     </v-card-actions>
                 </v-card>
             </v-dialog>
+
         </div>
     `
 });

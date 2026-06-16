@@ -539,8 +539,9 @@ class Job_queue_model extends CI_Model {
 
 	/**
 	 * Get all jobs with optional filters
-	 * 
-	 * @param array $filters Filter options (status, job_type, user_id)
+	 *
+	 * @param array $filters Filter options (status, job_type, user_id, project_id).
+	 *   project_id filters by payload.project_id (JSON); when set, a larger set is fetched then filtered in PHP.
 	 * @param int $limit Number of jobs to return
 	 * @param int $offset Offset for pagination
 	 * @return array Array of jobs
@@ -550,13 +551,14 @@ class Job_queue_model extends CI_Model {
 		$status = isset($filters['status']) ? $filters['status'] : null;
 		$job_type = isset($filters['job_type']) ? $filters['job_type'] : null;
 		$user_id = isset($filters['user_id']) ? $filters['user_id'] : null;
+		$project_id = isset($filters['project_id']) ? (int) $filters['project_id'] : null;
 		$active_only = !empty($filters['active']);
 		$stale_only = !empty($filters['stale']);
 		$history_only = !empty($filters['history']);
-		
+
 		$this->db->select('*');
 		$this->db->from('job_queue');
-		
+
 		if ($stale_only) {
 			$this->apply_stale_filter_sql($this->get_stale_config());
 		} elseif ($active_only) {
@@ -566,25 +568,39 @@ class Job_queue_model extends CI_Model {
 		} elseif ($status !== null) {
 			$this->db->where('status', $status);
 		}
-		
+
 		if ($job_type !== null) {
 			$this->db->where('job_type', $job_type);
 		}
-		
+
 		if ($user_id !== null) {
 			$this->db->where('user_id', $user_id);
 		}
-		
+
 		$this->db->order_by('created_at', 'DESC');
-		$this->db->limit($limit);
-		
-		if ($offset > 0) {
-			$this->db->offset($offset);
+
+		if ($project_id !== null) {
+			// project_id is inside payload JSON: fetch more rows then filter in PHP
+			$this->db->limit(500);
+			$query = $this->db->get();
+			$jobs = $query->result_array();
+			$filtered = array();
+			foreach ($jobs as $job) {
+				$payload = !empty($job['payload']) ? json_decode($job['payload'], true) : null;
+				if (is_array($payload) && isset($payload['project_id']) && (int) $payload['project_id'] === $project_id) {
+					$filtered[] = $job;
+				}
+			}
+			$jobs = array_slice($filtered, $offset, $limit);
+		} else {
+			$this->db->limit($limit);
+			if ($offset > 0) {
+				$this->db->offset($offset);
+			}
+			$query = $this->db->get();
+			$jobs = $query->result_array();
 		}
-		
-		$query = $this->db->get();
-		$jobs = $query->result_array();
-		
+
 		// Decode JSON fields
 		foreach ($jobs as &$job) {
 			if (!empty($job['payload'])) {
@@ -594,7 +610,7 @@ class Job_queue_model extends CI_Model {
 				$job['result'] = json_decode($job['result'], true);
 			}
 		}
-		
+
 		return $jobs;
 	}
 

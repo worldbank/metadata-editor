@@ -196,6 +196,14 @@
                                     {{$t('Change log')}}
                                 </v-list-item-title>
                             </v-list-item>
+                            <v-list-item @click="onRouterLinkClick('/issues')">
+                                <v-list-item-icon>
+                                    <v-icon>mdi-alert-circle-outline</v-icon>
+                                </v-list-item-icon>
+                                <v-list-item-title>
+                                    {{$t('Issues')}}
+                                </v-list-item-title>
+                            </v-list-item>
                             <v-list-item @click="onRouterLinkClick('/files')">
                                 <v-list-item-icon>
                                     <v-icon>mdi-folder-open</v-icon>

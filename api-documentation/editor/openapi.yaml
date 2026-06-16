@@ -63,6 +63,8 @@ tags:
     description: Publish projects to NADA catalogs
   - name: Catalog connections
     description: Manage catalog connections
+  - name: Issues
+    description: Manage project metadata issues
   - name: Jobs
     description: Background jobs
   - name: Codelists
@@ -124,6 +126,9 @@ x-tagGroups:
   - name: Catalog connections
     tags:
       - Catalog connections
+  - name: Issues
+    tags:
+      - Issues
   - name: Jobs
     tags:
       - Jobs
@@ -135,6 +140,386 @@ x-tagGroups:
     tags:
       - Indicator DSD
 paths:
+  /issues:
+    get:
+      tags:
+        - Issues
+      summary: List all issues
+      description: List all issues (filtered by user permissions)
+      operationId: listIssues
+      parameters:
+        - name: status
+          in: query
+          description: Status filter (can be comma-separated)
+          schema:
+            type: string
+        - name: category
+          in: query
+          description: Category filter
+          schema:
+            type: string
+        - name: severity
+          in: query
+          description: Severity filter
+          schema:
+            type: string
+        - name: applied
+          in: query
+          description: Applied filter
+          schema:
+            type: integer
+        - name: field_path
+          in: query
+          description: Field path filter
+          schema:
+            type: string
+        - name: id
+          in: query
+          description: Issue ID filter (exact match)
+          schema:
+            type: integer
+        - name: project_id
+          in: query
+          description: Project ID filter (exact match)
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          description: Page size
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          description: Offset for pagination
+          schema:
+            type: integer
+            default: 0
+        - name: sort_by
+          in: query
+          description: Sort field
+          schema:
+            type: string
+            default: created
+        - name: sort_order
+          in: query
+          description: Sort order
+          schema:
+            type: string
+            default: DESC
+      responses:
+        "200":
+          description: successful operation
+        "400":
+          description: Bad request
+      security:
+        - ApiKeyAuth: []
+    post:
+      tags:
+        - Issues
+      summary: Create new issue
+      description: Create a new issue for a project
+      operationId: createIssue
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - project_id
+                - title
+              properties:
+                project_id:
+                  type: integer
+                title:
+                  type: string
+                description:
+                  type: string
+                category:
+                  type: string
+                field_path:
+                  type: string
+                severity:
+                  type: string
+                current_metadata:
+                  type: object
+                suggested_metadata:
+                  type: object
+                source:
+                  type: string
+      responses:
+        "201":
+          description: Issue created successfully
+        "400":
+          description: Bad request
+      security:
+        - ApiKeyAuth: []
+  "/issues/{id}":
+    get:
+      tags:
+        - Issues
+      summary: Get single issue
+      description: Get issue details by ID
+      operationId: getIssue
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: successful operation
+        "400":
+          description: Issue not found
+      security:
+        - ApiKeyAuth: []
+    put:
+      tags:
+        - Issues
+      summary: Update issue
+      description: Update an existing issue
+      operationId: updateIssue
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                category:
+                  type: string
+                severity:
+                  type: string
+                assigned_to:
+                  type: integer
+                notes:
+                  type: string
+      responses:
+        "200":
+          description: Issue updated successfully
+        "400":
+          description: Bad request
+      security:
+        - ApiKeyAuth: []
+    delete:
+      tags:
+        - Issues
+      summary: Delete issue
+      description: Delete an issue by ID
+      operationId: deleteIssue
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Issue deleted successfully
+        "400":
+          description: Bad request
+      security:
+        - ApiKeyAuth: []
+  "/issues/delete/{id}":
+    post:
+      tags:
+        - Issues
+      summary: Delete issue (POST alias)
+      description: Delete an issue by ID (POST alias for DELETE)
+      operationId: deleteIssuePost
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Issue deleted successfully
+        "400":
+          description: Bad request
+      security:
+        - ApiKeyAuth: []
+  "/issues/project/{sid}":
+    get:
+      tags:
+        - Issues
+      summary: List issues for a project
+      description: Get all issues for a specific project
+      operationId: listProjectIssues
+      parameters:
+        - name: sid
+          in: path
+          required: true
+          description: Project SID
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: Status filter (can be comma-separated)
+          schema:
+            type: string
+        - name: category
+          in: query
+          description: Category filter
+          schema:
+            type: string
+        - name: severity
+          in: query
+          description: Severity filter
+          schema:
+            type: string
+        - name: applied
+          in: query
+          description: Applied filter
+          schema:
+            type: integer
+        - name: field_path
+          in: query
+          description: Field path filter
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: Page size
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          description: Offset for pagination
+          schema:
+            type: integer
+            default: 0
+        - name: sort_by
+          in: query
+          description: Sort field
+          schema:
+            type: string
+            default: created
+        - name: sort_order
+          in: query
+          description: Sort order
+          schema:
+            type: string
+            default: DESC
+      responses:
+        "200":
+          description: successful operation
+        "400":
+          description: Bad request
+      security:
+        - ApiKeyAuth: []
+  "/issues/project/{sid}/stats":
+    get:
+      tags:
+        - Issues
+      summary: Get issue statistics
+      description: Get issue statistics for a specific project
+      operationId: getProjectIssueStats
+      parameters:
+        - name: sid
+          in: path
+          required: true
+          description: Project SID
+          schema:
+            type: string
+      responses:
+        "200":
+          description: successful operation
+        "400":
+          description: Bad request
+      security:
+        - ApiKeyAuth: []
+  "/issues/apply/{id}":
+    post:
+      tags:
+        - Issues
+      summary: Apply suggested changes
+      description: Apply suggested metadata changes for an issue
+      operationId: applyIssueChanges
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Changes applied successfully
+        "400":
+          description: Bad request
+      security:
+        - ApiKeyAuth: []
+  "/issues/status/{id}":
+    post:
+      tags:
+        - Issues
+      summary: Update status
+      description: Update issue status
+      operationId: updateIssueStatus
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+      responses:
+        "200":
+          description: Status updated successfully
+        "400":
+          description: Bad request
+      security:
+        - ApiKeyAuth: []
+  "/issues/bulk_status":
+    post:
+      tags:
+        - Issues
+      summary: Bulk update status
+      description: Bulk update status for multiple issues
+      operationId: bulkUpdateIssueStatus
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - ids
+                - status
+              properties:
+                ids:
+                  type: array
+                  items:
+                    type: integer
+                status:
+                  type: string
+      responses:
+        "200":
+          description: Statuses updated successfully
+        "400":
+          description: Bad request
+      security:
+        - ApiKeyAuth: []
   /editor:
     get:
       tags:

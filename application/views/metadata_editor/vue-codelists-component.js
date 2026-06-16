@@ -811,6 +811,7 @@ Vue.component('codelists', {
                     </v-card-actions>
                 </v-card>
             </v-dialog>
+
         </div>
     `
 });

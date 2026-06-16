@@ -13,7 +13,7 @@ Vue.component('main-navigation-tabs', {
             type: String,
             default: null,
             validator: function(value) {
-                return value === null || ['projects', 'collections', 'templates', 'schemas', 'tags', 'codelists', 'data_structures'].includes(value);
+                return value === null || ['projects', 'collections', 'templates', 'schemas', 'tags', 'codelists', 'data_structures', 'issues'].includes(value);
             }
         },
         value: {
@@ -80,7 +80,8 @@ Vue.component('main-navigation-tabs', {
                     'schemas': 3,
                     'tags': 4,
                     'codelists': 5,
-                    'data_structures': 6
+                    'data_structures': 6,
+                    'issues': 7
                 };
                 this.internalValue = tabMap[newVal] !== undefined ? tabMap[newVal] : null;
             }
@@ -96,7 +97,8 @@ Vue.component('main-navigation-tabs', {
                 'schemas': 3,
                 'tags': 4,
                 'codelists': 5,
-                'data_structures': 6
+                'data_structures': 6,
+                'issues': 7
             };
             this.internalValue = tabMap[this.activeTab] !== undefined ? tabMap[this.activeTab] : null;
         }
@@ -146,6 +148,10 @@ Vue.component('main-navigation-tabs', {
                 <v-tab v-if="hasDataStructurePermission" :value="6" @click="pageLink('data_structures')">
                     <v-icon>mdi-sitemap</v-icon>
                     <span class="ml-2">Data structures</span>
+                </v-tab>
+                <v-tab :value="7" @click="pageLink('issues')">
+                    <v-icon>mdi-alert-circle-outline</v-icon>
+                    <span class="ml-2">{{$t('Issues')}}</span>
                 </v-tab>
             </v-tabs>
         </div>

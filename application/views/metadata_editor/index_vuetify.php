@@ -123,6 +123,10 @@
   <script src="<?php echo base_url();?>vue-app/assets/chart.min.js"></script>
   <link href="<?php echo base_url();?>vue-app/assets/styles.css" rel="stylesheet">
 
+  <script src="<?php echo base_url();?>vue-app/assets/json-diff-kit/json-diff-kit.umd.min.js"></script>
+  <link href="<?php echo base_url();?>vue-app/assets/json-diff-kit/viewer.css" rel="stylesheet">
+
+
 
 
   <?php echo $this->load->view("metadata_editor/index_vuetify_main_app",null,true);?>

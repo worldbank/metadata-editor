@@ -401,6 +401,79 @@ class DataUtils
 		return 'Job failed';
 	}
 
+	/**
+	 * Submit metadata review job to FastAPI.
+	 * POST /review/jobs
+	 *
+	 * @param array $metadata Project metadata JSON object
+	 * @param array $options Optional keys: manifest_file, team_preset
+	 * @return array response, status_code
+	 */
+	public function submit_metadata_review($metadata, $options = array())
+	{
+		$client = new Client([
+			'base_uri' => $this->DataApiUrl . 'review/jobs'
+		]);
+
+		$request_body = array(
+			'metadata' => $metadata
+		);
+
+		if (!empty($options['manifest_file'])) {
+			$request_body['manifest_file'] = $options['manifest_file'];
+		}
+		if (!empty($options['team_preset'])) {
+			$request_body['team_preset'] = $options['team_preset'];
+		}
+
+		$api_response = $client->request('POST', '', [
+			'json' => $request_body,
+			'debug' => false,
+			'http_errors' => false
+		]);
+
+		$body_raw = $api_response->getBody()->getContents();
+		$response = json_decode($body_raw, true);
+		if ($response === null && $body_raw !== '') {
+			$response = array('detail' => $body_raw);
+		}
+
+		return array(
+			'response' => $response,
+			'status_code' => $api_response->getStatusCode()
+		);
+	}
+
+	/**
+	 * Cancel FastAPI job by ID.
+	 * DELETE /jobs/{job_id}
+	 *
+	 * @param string $job_id FastAPI job id
+	 * @return array response, status_code
+	 */
+	public function cancel_job($job_id)
+	{
+		$client = new Client([
+			'base_uri' => $this->DataApiUrl . 'jobs/' . $job_id
+		]);
+
+		$api_response = $client->request('DELETE', '', [
+			'debug' => false,
+			'http_errors' => false
+		]);
+
+		$body_raw = $api_response->getBody()->getContents();
+		$response = json_decode($body_raw, true);
+		if ($response === null && $body_raw !== '') {
+			$response = array('detail' => $body_raw);
+		}
+
+		return array(
+			'response' => $response,
+			'status_code' => $api_response->getStatusCode()
+		);
+	}
+
 
 	public function generate_csv($datafile_path)
 	{

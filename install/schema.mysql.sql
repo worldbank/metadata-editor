@@ -1075,6 +1075,7 @@ CREATE TABLE `editor_project_dsd` (
 CREATE TABLE `project_issues` (
   `id` int NOT NULL AUTO_INCREMENT,
   `project_id` int NOT NULL,
+  `title` varchar(255) DEFAULT NULL,
   `description` text NOT NULL,
   `category` varchar(100) DEFAULT NULL,  
   `severity` enum('low','medium','high','critical') DEFAULT NULL,
