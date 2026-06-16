@@ -23,6 +23,7 @@ require(APPPATH . '/libraries/MY_REST_Controller.php');
  * - POST   /api/issues/{id}/apply          - Apply suggested changes
  * - POST   /api/issues/{id}/status         - Update status
  * - POST   /api/issues/bulk_status         - Bulk update status
+ * - POST   /api/issues/bulk_delete         - Bulk delete issues
  */
 class Issues extends MY_REST_Controller {
 
@@ -100,6 +101,11 @@ class Issues extends MY_REST_Controller {
             // Applied filter
             if ($this->input->get('applied') !== null && $this->input->get('applied') !== '') {
                 $filters['applied'] = (int) $this->input->get('applied');
+            }
+
+            // Scope filter (open | closed)
+            if ($this->input->get('scope')) {
+                $filters['scope'] = $this->input->get('scope');
             }
 
             // Field path filter
@@ -220,6 +226,11 @@ class Issues extends MY_REST_Controller {
             // Applied filter
             if ($this->input->get('applied') !== null && $this->input->get('applied') !== '') {
                 $filters['applied'] = (int) $this->input->get('applied');
+            }
+
+            // Scope filter (open | closed)
+            if ($this->input->get('scope')) {
+                $filters['scope'] = $this->input->get('scope');
             }
 
             // Field path filter
@@ -438,6 +449,12 @@ class Issues extends MY_REST_Controller {
 
             // Check edit access
             $this->editor_acl->user_has_project_access($issue['project_id'], 'edit', $this->api_user);
+
+            // Closed issues are read-only
+            $closed_statuses = array('fixed', 'rejected', 'dismissed', 'false_positive');
+            if (in_array($issue['status'], $closed_statuses)) {
+                throw new Exception('This issue is closed and cannot be edited');
+            }
 
             $input = $this->raw_json_input();
             if (empty($input)) {
@@ -680,6 +697,45 @@ class Issues extends MY_REST_Controller {
             $response = array(
                 'status'  => 'success',
                 'message' => $affected . ' issue(s) updated',
+                'affected' => $affected,
+            );
+            $this->set_response($response, REST_Controller::HTTP_OK);
+        } catch (Exception $e) {
+            $this->set_response(array(
+                'status'  => 'failed',
+                'message' => $e->getMessage(),
+            ), REST_Controller::HTTP_BAD_REQUEST);
+        }
+    }
+
+    /**
+     * Bulk delete multiple issues
+     * POST /api/issues/bulk_delete
+     * Body: { "ids": [1, 2, 3] }
+     */
+    public function bulk_delete_post()
+    {
+        try {
+            $input = $this->raw_json_input();
+
+            if (empty($input['ids']) || !is_array($input['ids'])) {
+                throw new Exception('ids array is required');
+            }
+
+            // Get first issue to check project access (assuming all belong to same project)
+            $first_issue = $this->Project_issues_model->get_by_id($input['ids'][0]);
+            if (!$first_issue) {
+                throw new Exception('Issue not found');
+            }
+
+            // Check edit access
+            $this->editor_acl->user_has_project_access($first_issue['project_id'], 'edit', $this->api_user);
+
+            $affected = $this->Project_issues_model->bulk_delete($input['ids']);
+
+            $response = array(
+                'status'   => 'success',
+                'message'  => $affected . ' issue(s) deleted',
                 'affected' => $affected,
             );
             $this->set_response($response, REST_Controller::HTTP_OK);

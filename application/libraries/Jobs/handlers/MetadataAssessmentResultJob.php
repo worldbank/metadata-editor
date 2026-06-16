@@ -35,14 +35,14 @@ class MetadataAssessmentResultJob implements JobHandlerInterface
 	/**
 	 * Validate the job payload
 	 *
-	 * @param array $payload Job payload data (event_id, project_id)
+	 * @param array $payload Job payload data (fastapi_job_id, project_id)
 	 * @throws Exception If validation fails
 	 * @return bool True if valid
 	 */
 	public function validatePayload($payload)
 	{
-		if (empty($payload['event_id']) || !is_string($payload['event_id'])) {
-			throw new Exception("Missing or invalid required parameter: event_id");
+		if (empty($payload['fastapi_job_id']) || !is_string($payload['fastapi_job_id'])) {
+			throw new Exception("Missing or invalid required parameter: fastapi_job_id");
 		}
 		if (isset($payload['project_id']) && !is_numeric($payload['project_id'])) {
 			throw new Exception("Invalid project_id: must be numeric");
@@ -60,7 +60,7 @@ class MetadataAssessmentResultJob implements JobHandlerInterface
 	{
 		$hash_data = array(
 			'job_type'   => $this->getJobType(),
-			'event_id'   => isset($payload['event_id']) ? $payload['event_id'] : '',
+			'fastapi_job_id'   => isset($payload['fastapi_job_id']) ? $payload['fastapi_job_id'] : '',
 		);
 		ksort($hash_data);
 		return hash('sha256', json_encode($hash_data));
@@ -70,8 +70,8 @@ class MetadataAssessmentResultJob implements JobHandlerInterface
 	 * Process the job: fetch assessment result stream, parse SSE, return issues
 	 *
 	 * @param array $job Full job data from database
-	 * @param array $payload Decoded payload data (event_id, project_id)
-	 * @return array Result data (event_id, issues, raw_data)
+	 * @param array $payload Decoded payload data (fastapi_job_id, project_id)
+	 * @return array Result data (fastapi_job_id, issues, raw_data)
 	 * @throws Exception If processing fails
 	 */
 	public function process($job, $payload)
@@ -79,21 +79,8 @@ class MetadataAssessmentResultJob implements JobHandlerInterface
 		$this->logSyncToFile('process() started (handler with sync loaded)');
 		$this->validatePayload($payload);
 
-		$this->ci->load->config('metadata_assessment');
-		$base_url = $this->ci->config->item('base_url', 'metadata_assessment');
-		if (empty($base_url)) {
-			throw new Exception("Metadata assessment API is not configured (base_url is empty)");
-		}
-
-		$stream_timeout = (int) $this->ci->config->item('stream_read_timeout', 'metadata_assessment');
-		if ($stream_timeout <= 0) {
-			$stream_timeout = 600;
-		}
-
-		$event_id = $payload['event_id'];
-		$result_url = rtrim($base_url, '/') . '/' . $event_id;
-
-		$result_data = $this->fetchResultStream($result_url, $stream_timeout);
+		$fastapi_job_id = $payload['fastapi_job_id'];
+		$result_data = $this->pollFastApiReviewResult($job, $fastapi_job_id);
 
 		$project_id = isset($payload['project_id']) ? (int) $payload['project_id'] : null;
 		$issues_raw = isset($result_data['issues']) ? $result_data['issues'] : array();
@@ -101,7 +88,7 @@ class MetadataAssessmentResultJob implements JobHandlerInterface
 		$sync = $this->syncAssessmentIssuesToProject($project_id, $issues_raw, $job);
 
 		$output = array(
-			'event_id'     => $event_id,
+			'fastapi_job_id' => $fastapi_job_id,
 			'project_id'   => $project_id,
 			'issues'       => $issues_raw,
 			'raw_data'     => isset($result_data['raw_data']) ? $result_data['raw_data'] : null,
@@ -116,6 +103,75 @@ class MetadataAssessmentResultJob implements JobHandlerInterface
 	}
 
 	/**
+	 * Poll FastAPI /jobs/{job_id} until completion/error/cancelled.
+	 *
+	 * @param array $job Full internal queue job row
+	 * @param string $fastapi_job_id FastAPI job identifier
+	 * @return array Normalized result [issues => [], raw_data => mixed]
+	 * @throws Exception
+	 */
+	private function pollFastApiReviewResult($job, $fastapi_job_id)
+	{
+		$this->ci->load->library('DataUtils');
+		$this->ci->load->model('Job_queue_model');
+
+		$poll_interval_ms = 2500;
+		$max_wait_ms = 10 * 60 * 1000; // 10 minutes
+		$start_at = (int) round(microtime(true) * 1000);
+
+		while (true) {
+			// User cancelled from UI/internal API
+			if ($this->isLocalJobCancelled($job['id'])) {
+				$this->tryCancelFastApiJob($fastapi_job_id);
+				throw new Exception('Assessment cancelled by user');
+			}
+
+			$status_response = $this->ci->datautils->get_job_status($fastapi_job_id);
+			$status_code = isset($status_response['status_code']) ? (int)$status_response['status_code'] : 0;
+			$body = isset($status_response['response']) ? $status_response['response'] : array();
+			$status = strtolower((string)(is_array($body) && isset($body['status']) ? $body['status'] : ''));
+
+			if ($status_code >= 400) {
+				throw new Exception(
+					"FastAPI review status failed ({$status_code}): " . $this->stringifyErrorDetail($body)
+				);
+			}
+
+			if ($status === 'done' || $status === 'completed') {
+				$issues = array();
+				if (is_array($body) && isset($body['data']) && is_array($body['data'])) {
+					$issues = $body['data'];
+				}
+				return array(
+					'issues' => $issues,
+					'raw_data' => $body
+				);
+			}
+
+			if ($status === 'error' || $status === 'failed') {
+				$error_message = is_array($body) && isset($body['error'])
+					? $body['error']
+					: $this->stringifyErrorDetail($body);
+				throw new Exception("FastAPI review job failed: " . $error_message);
+			}
+
+			if ($status === 'cancelled' || $status === 'canceled') {
+				throw new Exception("FastAPI review job was cancelled");
+			}
+
+			$now = (int) round(microtime(true) * 1000);
+			if (($now - $start_at) > $max_wait_ms) {
+				throw new Exception("FastAPI review job timed out after " . (int)($max_wait_ms / 1000) . " seconds");
+			}
+
+			$this->ci->load->library('Worker_heartbeat');
+			Worker_heartbeat::touch();
+
+			usleep($poll_interval_ms * 1000);
+		}
+	}
+
+	/**
 	 * Map assessment API severity (numeric) to project_issues severity (string)
 	 *
 	 * @param int|null $severity
@@ -123,7 +179,7 @@ class MetadataAssessmentResultJob implements JobHandlerInterface
 	 */
 	private function mapSeverity($severity)
 	{
-		$map = array(1 => 'low', 2 => 'medium', 3 => 'high', 4 => 'critical');
+		$map = array(1 => 'low', 2 => 'medium', 3 => 'high', 4 => 'critical', 5 => 'critical');
 		if ($severity !== null && isset($map[(int) $severity])) {
 			return $map[(int) $severity];
 		}
@@ -298,11 +354,60 @@ class MetadataAssessmentResultJob implements JobHandlerInterface
 			}
 		}
 		$log_file = rtrim($logs_dir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'metadata_assessment.log';
-		$line = date('Y-m-d H:i:s') . ' event_id=' . $output['event_id']
+		$line = date('Y-m-d H:i:s') . ' fastapi_job_id=' . (isset($output['fastapi_job_id']) ? $output['fastapi_job_id'] : '')
 			. ' project_id=' . (isset($output['project_id']) ? $output['project_id'] : '')
 			. "\n" . json_encode($output, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT) . "\n"
 			. str_repeat('-', 80) . "\n";
 		@file_put_contents($log_file, $line, FILE_APPEND | LOCK_EX);
+	}
+
+	/**
+	 * Check whether the local queue job has been cancelled by user.
+	 *
+	 * @param int $job_id
+	 * @return bool
+	 */
+	private function isLocalJobCancelled($job_id)
+	{
+		$latest = $this->ci->Job_queue_model->get_by_id($job_id);
+		return (is_array($latest) && isset($latest['status']) && $latest['status'] === 'cancelled');
+	}
+
+	/**
+	 * Best-effort cancellation for FastAPI job.
+	 *
+	 * @param string $fastapi_job_id
+	 */
+	private function tryCancelFastApiJob($fastapi_job_id)
+	{
+		try {
+			$this->ci->datautils->cancel_job($fastapi_job_id);
+		} catch (Exception $e) {
+			log_message('debug', 'MetadataAssessmentResultJob: FastAPI cancel failed: ' . $e->getMessage());
+		}
+	}
+
+	/**
+	 * Convert response body into a concise error string.
+	 *
+	 * @param mixed $body
+	 * @return string
+	 */
+	private function stringifyErrorDetail($body)
+	{
+		if (is_array($body)) {
+			if (isset($body['detail']) && is_string($body['detail'])) {
+				return $body['detail'];
+			}
+			if (isset($body['error']) && is_string($body['error'])) {
+				return $body['error'];
+			}
+			return json_encode($body, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+		}
+		if (is_string($body) && trim($body) !== '') {
+			return $body;
+		}
+		return 'Unknown error';
 	}
 
 	/**

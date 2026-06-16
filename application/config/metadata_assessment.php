@@ -19,7 +19,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 // Submit and result URLs are: base_url (POST) and base_url/event_id (GET).
 $config['metadata_assessment']['base_url'] = getenv('METADATA_ASSESSMENT_API_URL')
 	? rtrim(getenv('METADATA_ASSESSMENT_API_URL'), '/')
-	: '';
+	: 'https://w1lxscirender02.worldbank.org:8080/ai_for_data_playground/gradio_api/call/error_scanner__run_with_default_options';
 
 // Connect timeout in seconds for the submit request
 $config['metadata_assessment']['submit_connect_timeout'] = (int) (getenv('METADATA_ASSESSMENT_SUBMIT_CONNECT_TIMEOUT') ?: 30);

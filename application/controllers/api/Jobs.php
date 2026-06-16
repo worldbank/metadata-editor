@@ -603,12 +603,6 @@ class Jobs extends MY_REST_Controller
 
 			$project_id = (int) $input['project_id'];
 
-			$this->load->config('metadata_assessment');
-			$base_url = $this->config->item('base_url', 'metadata_assessment');
-			if (empty($base_url)) {
-				throw new Exception("Metadata assessment API is not configured");
-			}
-
 			$this->load->model('Editor_model');
 			$this->load->library('Editor_acl');
 			$this->editor_acl->user_has_project_access($project_id, 'view', $this->api_user);
@@ -618,9 +612,29 @@ class Jobs extends MY_REST_Controller
 				throw new Exception("Project not found or has no metadata");
 			}
 
-			$event_id = $this->submitToAssessmentApi($base_url, $project['metadata']);
-			if (empty($event_id)) {
-				throw new Exception("Assessment API did not return an event_id");
+			$this->load->library('DataUtils');
+			$review_options = array();
+			if (!empty($input['manifest_file'])) {
+				$review_options['manifest_file'] = $input['manifest_file'];
+			}
+			if (!empty($input['team_preset'])) {
+				$review_options['team_preset'] = $input['team_preset'];
+			}
+
+			$submit_response = $this->datautils->submit_metadata_review($project['metadata'], $review_options);
+			if (!isset($submit_response['status_code']) || (int)$submit_response['status_code'] !== 202) {
+				$error_detail = isset($submit_response['response']) ? $submit_response['response'] : 'Unknown FastAPI error';
+				if (is_array($error_detail)) {
+					$error_detail = json_encode($error_detail, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+				}
+				throw new Exception("FastAPI review submission failed: " . $error_detail);
+			}
+
+			$fastapi_job_id = isset($submit_response['response']['job_id'])
+				? $submit_response['response']['job_id']
+				: null;
+			if (empty($fastapi_job_id)) {
+				throw new Exception("FastAPI review submission did not return job_id");
 			}
 
 			$job_type = 'metadata_assessment_result';
@@ -629,7 +643,7 @@ class Jobs extends MY_REST_Controller
 			}
 
 			$payload = array(
-				'event_id' => $event_id,
+				'fastapi_job_id' => $fastapi_job_id,
 				'project_id' => $project_id,
 			);
 			$handler = JobRegistry::getHandler($job_type);
@@ -655,7 +669,7 @@ class Jobs extends MY_REST_Controller
 				'status' => 'success',
 				'message' => 'Metadata assessment submitted; poll job for result',
 				'uuid' => $job_uuid,
-				'event_id' => $event_id,
+				'fastapi_job_id' => $fastapi_job_id,
 				'job' => $job_response,
 			);
 			$this->set_response($response, REST_Controller::HTTP_CREATED);
@@ -664,6 +678,72 @@ class Jobs extends MY_REST_Controller
 			$this->set_response(array(
 				'status' => 'failed',
 				'message' => $e->getMessage(),
+			), REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+	/**
+	 * Cancel a job by UUID or numeric ID.
+	 *
+	 * POST /api/jobs/cancel/{job_uuid}
+	 */
+	function cancel_post($job_identifier = null)
+	{
+		try {
+			if (!$job_identifier) {
+				$job_identifier = $this->uri->segment(4);
+			}
+			if (!$job_identifier) {
+				throw new Exception("Invalid or missing job identifier");
+			}
+
+			$job = $this->Job_queue_model->get_by_uuid_or_id($job_identifier);
+			if (!$job) {
+				$this->set_response(array(
+					'status' => 'failed',
+					'message' => 'Job not found'
+				), REST_Controller::HTTP_NOT_FOUND);
+				return;
+			}
+
+			$is_admin = $this->is_admin();
+			if (!$is_admin && (int)$job['user_id'] !== (int)$this->user_id) {
+				$this->set_response(array(
+					'status' => 'failed',
+					'message' => 'Access denied'
+				), REST_Controller::HTTP_FORBIDDEN);
+				return;
+			}
+
+			if (in_array($job['status'], array('completed', 'failed', 'cancelled'), true)) {
+				throw new Exception("Cannot cancel job with status '{$job['status']}'");
+			}
+
+			$fastapi_cancel = null;
+			if (
+				$job['job_type'] === 'metadata_assessment_result'
+				&& is_array($job['payload'])
+				&& !empty($job['payload']['fastapi_job_id'])
+			) {
+				$this->load->library('DataUtils');
+				$fastapi_cancel = $this->datautils->cancel_job($job['payload']['fastapi_job_id']);
+			}
+
+			$updated = $this->Job_queue_model->mark_cancelled($job['id'], 'Cancelled by user');
+			if (!$updated) {
+				throw new Exception("Job could not be cancelled (it may have already finished)");
+			}
+
+			$this->set_response(array(
+				'status' => 'success',
+				'message' => 'Job cancelled successfully',
+				'uuid' => isset($job['uuid']) ? $job['uuid'] : null,
+				'fastapi_cancel' => $fastapi_cancel
+			), REST_Controller::HTTP_OK);
+		} catch (Exception $e) {
+			$this->set_response(array(
+				'status' => 'failed',
+				'message' => $e->getMessage()
 			), REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
@@ -884,12 +964,12 @@ class Jobs extends MY_REST_Controller
 		$worker_status = $this->_get_worker_status();
 		$worker_status_response = array();
 
-		if (isset($worker_status['is_running']) && $worker_status['is_alive']) {
+		// Process liveness is authoritative. Heartbeat can lag during long blocking jobs
+		// because the React event loop does not run while a handler is processing.
+		if (!empty($worker_status['is_running'])) {
 			$worker_status_response['status'] = 'running';
-		} else if (isset($worker_status['is_running']) && !$worker_status['is_alive']) {
-			$worker_status_response['status'] = 'stopped';
 		} else {
-			$worker_status_response['status'] = 'unknown';
+			$worker_status_response['status'] = 'stopped';
 		}
 
 		return $worker_status_response;
