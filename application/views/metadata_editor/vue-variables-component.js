@@ -51,6 +51,7 @@ Vue.component('variables', {
                     "freq": true,
                     "missing": true,
                     "vald": true,
+                    "invd": true,
                     "min": true,
                     "max": true,
                     "mean": true,
@@ -476,6 +477,29 @@ Vue.component('variables', {
                 console.log("error deleting variables",error);
             });
         },
+        /** True when var_wgt_id refers to a real variable UID (not 0 / "0" / empty). */
+        variableHasValidWeightId: function(v) {
+            if (v === undefined || v === null || v === '') {
+                return false;
+            }
+            var n = Number(v);
+            return !isNaN(n) && n > 0;
+        },
+        /** Remove invalid weight refs; character variables may never reference a weight. */
+        sanitizeVariableWeightFields: function(variable_) {
+            var vf = variable_.var_format;
+            if (vf && vf.type === 'character') {
+                if (Object.prototype.hasOwnProperty.call(variable_, 'var_wgt_id')) {
+                    Vue.delete(variable_, 'var_wgt_id');
+                }
+                return;
+            }
+            if (!this.variableHasValidWeightId(variable_.var_wgt_id)) {
+                if (Object.prototype.hasOwnProperty.call(variable_, 'var_wgt_id')) {
+                    Vue.delete(variable_, 'var_wgt_id');
+                }
+            }
+        },
         saveMultiSelectedVariables: function()
         {
             if(this.edit_items.length<=1){
@@ -520,10 +544,20 @@ Vue.component('variables', {
                         else{
 
                             //don't apply weights to string variables
-                            if (variable_.var_format.type=='character'){
+                            if (variable_.var_format && variable_.var_format.type=='character'){
                                 if (field_name=='var_wgt' || field_name=='var_wgt_id'){
                                     continue;
                                 }
+                            }
+
+                            if (field_name === 'var_wgt_id') {
+                                var rawWgt = this.variableMultiple[field_name];
+                                if (this.variableHasValidWeightId(rawWgt)) {
+                                    Vue.set(variable_, 'var_wgt_id', JSON.parse(JSON.stringify(rawWgt)));
+                                } else if (Object.prototype.hasOwnProperty.call(variable_, 'var_wgt_id')) {
+                                    Vue.delete(variable_, 'var_wgt_id');
+                                }
+                                continue;
                             }
 
                             //variable_[field_name]=JSON.parse(JSON.stringify(this.variableMultiple[field_name]));
@@ -531,6 +565,8 @@ Vue.component('variables', {
                         }
                     }
                 }
+
+                this.sanitizeVariableWeightFields(variable_);
 
                 //skip if no changes
                 if (JSON.stringify(variable_copy)==JSON.stringify(variable_)){                    
@@ -554,6 +590,9 @@ Vue.component('variables', {
         }, 500),
         saveVariable: function(data){///_.debounce(function(data) {
             vm=this;
+            if (data && typeof data === 'object') {
+                vm.sanitizeVariableWeightFields(data);
+            }
             let url=CI.base_url + '/api/variables/'+vm.dataset_id;
             axios.post(url, 
                 data
@@ -681,6 +720,18 @@ Vue.component('variables', {
             for(i=0;i<fields.length;i++){
 
                 let field=fields[i];
+                if (field === 'var_wgt_id') {
+                    let wid = first_variable.var_wgt_id;
+                    if (wid !== undefined && wid !== null && wid !== '' && Number(wid) > 0) {
+                        this.variableMultiple.var_wgt_id = wid;
+                    }
+                    continue;
+                }
+                if (field === 'var_wgt') {
+                    let vw = first_variable.var_wgt;
+                    this.variableMultiple.var_wgt = (vw === 1 || vw === true || vw === '1');
+                    continue;
+                }
                 //check if property is set for the first variable
                 if (first_variable[field]){
                     if (field === "sum_stats_options") {
@@ -808,7 +859,13 @@ Vue.component('variables', {
                 await this.sleep(5000);
                 let result=await this.$store.dispatch('importDataFileSummaryStatisticsQueueStatusCheck',{file_id:file_id, job_id:job_id});
                 console.log("job updated",result);
-                                
+
+                if (result.data.job_status === 'failed' || result.data.job_status === 'error') {
+                    const msg = result.data.message || (typeof result.data.detail === 'string' ? result.data.detail : '') || 'Job failed';
+                    this.summaryStatsDialog.is_loading = false;
+                    this.summaryStatsDialog.message_error = msg;
+                    return;
+                }
                 if (result.data.job_status!=='done'){
                     this.importSummaryStatisticsQueueStatusCheck(file_id,job_id);
                 }else if (result.data.job_status==='done'){
@@ -1209,11 +1266,14 @@ Vue.component('variables', {
                                                 </span>                                                
 
                                             </span>
-                                            <span v-if="variable.var_catgry && variable.var_catgry.length>0" :title="variable.var_catgry.length">
+                                            <span v-if="variable.var_catgry && variable.var_catgry.length>0" :title="$t('frequencies') + ' (' + variable.var_catgry.length + ')'">
+                                                <v-icon aria-hidden="false" class="vdar-icon">mdi-chart-bar</v-icon>
+                                            </span>
+                                            <span v-if="variable.var_catgry_labels && variable.var_catgry_labels.length>0" :title="$t('categories') + ' (' + variable.var_catgry_labels.length + ')'">
                                                 <v-icon aria-hidden="false" class="vdar-icon">mdi-format-list-numbered</v-icon>
                                             </span>
                                             <v-icon :title="$t('weight_variable')" v-if="Number(variable.var_wgt)===1" aria-hidden="false" class="vdar-icon">mdi-alpha-w</v-icon>
-                                            <v-icon :title="$t('weighted')" v-if="variable.var_wgt_id && String(variable.var_wgt_id).length>0" aria-hidden="false" class="vdar-icon">mdi-scale-balance</v-icon>
+                                            <v-icon :title="$t('weighted')" v-if="variable.var_wgt_id != null && variable.var_wgt_id !== '' && Number(variable.var_wgt_id) > 0" aria-hidden="false" class="vdar-icon">mdi-scale-balance</v-icon>
                                             <v-icon :title="$t('require_stats_update')" v-if="variable.update_required" aria-hidden="false" class="vdar-icon text-danger">mdi-sync-alert</v-icon>
                                             <v-icon :title="$t('variable_is_a_key')" class="vdar-cion" v-if="variable.is_key && variable.is_key==1">mdi-key-outline</v-icon>
                                         </td>                                        

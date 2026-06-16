@@ -20,6 +20,51 @@ class Project_validation
     }
 
     /**
+     * Root-level metadata keys managed by the application (not part of type JSON Schema).
+     *
+     * @return array
+     */
+    public static function application_managed_metadata_keys()
+    {
+        return array(
+            'schema',
+            'schema_version',
+            'type',
+            'changed',
+            'changed_utc',
+            'created',
+            'created_utc',
+            'created_by',
+            'changed_by',
+            'user_id',
+        );
+    }
+
+    /**
+     * Copy of root metadata with application-managed keys removed (for JSON Schema validation).
+     *
+     * @param array|object|null $metadata
+     * @return array|object|null
+     */
+    public static function strip_application_managed_metadata_for_schema($metadata)
+    {
+        if ($metadata === null) {
+            return null;
+        }
+        if (is_object($metadata)) {
+            $metadata = json_decode(json_encode($metadata), true);
+        }
+        if (!is_array($metadata)) {
+            return $metadata;
+        }
+        $out = $metadata;
+        foreach (self::application_managed_metadata_keys() as $key) {
+            unset($out[$key]);
+        }
+        return $out;
+    }
+
+    /**
      * Validate project metadata against schema
      * 
      * @param array $metadata Project metadata
@@ -30,6 +75,8 @@ class Project_validation
      */
     public function validate_schema($metadata, $type, $schema_file, $compiled_schema = null)
     {
+        $metadata = self::strip_application_managed_metadata_for_schema($metadata);
+
         $canonical_type = $type;
         
         // Get canonical type from schema registry
@@ -69,10 +116,9 @@ class Project_validation
         // Validate using JSON Schema validator (handles union types, constraints, etc.)
         $validator = new Validator;
         $validator->validate(
-            $metadata, 
+            $metadata,
             (object)['$ref' => 'file://' . unix_path(realpath($schema_file))],
-            Constraint::CHECK_MODE_TYPE_CAST 
-            + Constraint::CHECK_MODE_COERCE_TYPES 
+            Constraint::CHECK_MODE_TYPE_CAST
             + Constraint::CHECK_MODE_APPLY_DEFAULTS
         );
 
@@ -302,10 +348,21 @@ class Project_validation
                 continue;
             }
 
+            // Extension bucket: do not list or traverse (user-defined / overflow metadata)
+            if ($key === 'additional') {
+                continue;
+            }
+
+            // Application-managed root keys (not schema content)
+            if ($base_path === '' && in_array($key, self::application_managed_metadata_keys(), true)) {
+                continue;
+            }
+
             if (!isset($schema_properties[$key])) {
                 $extra_fields[] = array(
                     'field' => $key,
                     'path' => $field_path,
+                    'type' => $this->get_php_type($value),
                     'value_preview' => $this->get_value_preview($value)
                 );
             } elseif (is_array($value) || is_object($value)) {
@@ -379,6 +436,10 @@ class Project_validation
             $field_path = $base_path ? $base_path . '/' . $key : '/' . $key;
 
             if (in_array($key, array('$schema', '$id', '$ref'))) {
+                continue;
+            }
+
+            if ($base_path === '' && in_array($key, self::application_managed_metadata_keys(), true)) {
                 continue;
             }
 

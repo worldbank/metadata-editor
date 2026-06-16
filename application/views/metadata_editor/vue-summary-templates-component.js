@@ -61,6 +61,9 @@ Vue.component('summary-templates-component', {
         },
         AdminMetadataTemplates(){
             return this.$store.getters.getAdminMetadataTemplates;   
+        },
+        templateStructureInvalid(){
+            return !this.$store.state.template_structure_valid;
         }
     },
     methods:{
@@ -95,7 +98,12 @@ Vue.component('summary-templates-component', {
                     console.log("template updated",response);
                     vm.dialog_template=false;
                     vm.template_updating=false;
-                    return false;
+                    return store.dispatch('initTreeItems');
+                })
+                .then(function(){
+                    if (typeof vue_app !== 'undefined' && vue_app.init_tree_data) {
+                        vue_app.init_tree_data();
+                    }
                 })
                 .catch(function(response){
                     vm.errors=response;
@@ -125,10 +133,15 @@ Vue.component('summary-templates-component', {
                     </v-card-title>
 
                     <v-card-text>
+                        <v-alert v-if="templateStructureInvalid" type="error" dense outlined class="mb-3">
+                            {{ $t('template_structure_invalid') }}
+                        </v-alert>
+
                         <div class="font-weight-bold">{{$t('project_template')}}:</div>
                                                 
                         <div class="m-0 p-1 rounded text-link" text  color="primary" @click="selectProjectTemplate" :disabled="!isProjectEditable" >
-                             <span class="plx-2">  {{ProjectTemplate.name}} - {{ProjectTemplate.version}}</span>
+                             <span class="plx-2" v-if="ProjectTemplate && ProjectTemplate.name">{{ProjectTemplate.name}} - {{ProjectTemplate.version}}</span>
+                             <span class="plx-2" v-else>—</span>
                         </div>
 
                         <v-divider></v-divider>

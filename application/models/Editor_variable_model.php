@@ -121,24 +121,40 @@ class Editor_variable_model extends ci_model {
     }
 
     /**
-     * Parse sum_stats_options based on variable data type.
-     * Defaults: freq only true for discrete variables; false for continuous numeric,
-     * string (character/fixed), and non-discrete date. User choices in the UI are
-     * always preserved (not overwritten on re-import).
+     * Parse sum_stats_options based on variable data type and interval type.
+     *
+     * Key rule (takes precedence over everything else): if a variable has
+     * value/labels (var_catgry_labels, or var_catgry entries that carry a
+     * non-empty labl), frequencies are enabled regardless of the variable's
+     * data type (numeric, character, fixed, date) or interval type (discrete
+     * or continuous). This covers Stata, SPSS and similar imports where any
+     * variable with attached value labels should default to showing
+     * frequencies in the UI.
+     *
+     * As a secondary signal, frequencies are also enabled when the variable's
+     * interval type is 'discrete'. Otherwise frequencies default to false.
+     * The data type still controls defaults for the other options (wgt, mean,
+     * stdev, etc.) because those are not meaningful for non-numeric data.
+     *
+     * User choices in the UI are always preserved (not overwritten on
+     * re-import) by bulk_upsert_dictionary().
      */
     private function parse_sum_stats_options($variable)
     {
         $data_type = isset($variable['var_format']['type']) ? $variable['var_format']['type'] : '';
         $var_intrvl = isset($variable['var_intrvl']) ? $variable['var_intrvl'] : (isset($variable['metadata']['var_intrvl']) ? $variable['metadata']['var_intrvl'] : null);
         $is_discrete = ($var_intrvl === 'discrete');
+        $has_value_labels = $this->variable_has_value_labels($variable);
+        $enable_freq = $has_value_labels || $is_discrete;
 
         switch ($data_type) {
             case 'numeric':
                 return array(
                     'wgt' => true,
-                    'freq' => $is_discrete,
+                    'freq' => $enable_freq,
                     'missing' => true,
                     'vald' => true,
+                    'invd' => true,
                     'min' => true,
                     'max' => true,
                     'mean' => true,
@@ -151,9 +167,10 @@ class Editor_variable_model extends ci_model {
             case 'fixed':
                 return array(
                     'wgt' => false,
-                    'freq' => false,
+                    'freq' => $enable_freq,
                     'missing' => true,
                     'vald' => true,
+                    'invd' => true,
                     'min' => false,
                     'max' => false,
                     'mean' => false,
@@ -165,9 +182,10 @@ class Editor_variable_model extends ci_model {
             case 'date':
                 return array(
                     'wgt' => false,
-                    'freq' => $is_discrete,
+                    'freq' => $enable_freq,
                     'missing' => true,
                     'vald' => true,
+                    'invd' => true,
                     'min' => true,
                     'max' => true,
                     'mean' => false,
@@ -179,9 +197,10 @@ class Editor_variable_model extends ci_model {
             default:
                 return array(
                     'wgt' => false,
-                    'freq' => $is_discrete ? true : false,
+                    'freq' => $enable_freq,
                     'missing' => true,
                     'vald' => true,
+                    'invd' => true,
                     'min' => false,
                     'max' => false,
                     'mean' => false,
@@ -192,6 +211,42 @@ class Editor_variable_model extends ci_model {
         }
     }
 
+    /**
+     * Detect whether a variable carries value/labels.
+     *
+     * Returns true when var_catgry_labels contains at least one entry with a
+     * non-empty labl, or when var_catgry contains at least one entry with a
+     * non-empty labl. Checks both the top-level keys and the nested metadata
+     * payload so it works in every code path that calls parse_sum_stats_options.
+     *
+     * @param array $variable
+     * @return bool
+     */
+    private function variable_has_value_labels($variable)
+    {
+        $candidates = array();
+
+        foreach (array('var_catgry_labels', 'var_catgry') as $key) {
+            if (isset($variable[$key]) && is_array($variable[$key])) {
+                $candidates[] = $variable[$key];
+            }
+            if (isset($variable['metadata'][$key]) && is_array($variable['metadata'][$key])) {
+                $candidates[] = $variable['metadata'][$key];
+            }
+        }
+
+        foreach ($candidates as $entries) {
+            foreach ($entries as $entry) {
+                $entry = is_array($entry) ? $entry : (array)$entry;
+                if (isset($entry['labl']) && trim((string)$entry['labl']) !== '') {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     function bulk_upsert_dictionary($sid,$fileid,$variables)
     {
         $valid_data_files=$this->Editor_datafile_model->list($sid);
@@ -199,7 +254,6 @@ class Editor_variable_model extends ci_model {
 			
 		foreach($variables as $idx=>$variable)
         {
-            set_time_limit(30);            
 			$max_variable_id=$max_variable_id+1;
 			$variable['file_id']=$fileid;
 			$variable['vid']= 'V'.$max_variable_id;
@@ -628,15 +682,15 @@ class Editor_variable_model extends ci_model {
 			}
 		}
 
-		// var_wgt_id in metadata: must be integer UID; if non-numeric (e.g. VID string), unset so DB column is used on merge
+		// var_wgt_id in metadata: positive integer UID only; 0/"0" mean no weight (omit from metadata)
 		if (array_key_exists('var_wgt_id', $var_metadata)) {
 			$v = $var_metadata['var_wgt_id'];
-			if (is_numeric($v) && (int)$v >= 0) {
+			if (is_numeric($v) && (int)$v > 0) {
 				$var_metadata['var_wgt_id'] = (int)$v;
 			} else {
 				unset($var_metadata['var_wgt_id']);
 			}
-		}		
+		}
 	}
 
 	/**
@@ -890,13 +944,33 @@ class Editor_variable_model extends ci_model {
     }
 
 
-    function get_variable_core_fields($variable)
+    /**
+     * Extract core DB columns from variable metadata. Mutates $variable to keep var_wgt_id in metadata
+     * aligned with the editor rules: character variables cannot reference a weight; 0 / empty / "0" mean none.
+     *
+     * @param array $variable Metadata array (by reference)
+     * @return array Core fields for editor_variables row
+     */
+    function get_variable_core_fields(&$variable)
     {
         //fid,vid,name,labl,sort_order,user_missings,is_weight,field_dtype, field_format
         $missings=(array)array_data_get($variable,'var_invalrng.values','');
         $missings=implode(",",$missings);
         $dtype=array_data_get($variable,'var_format.type','');
         $interval_type=array_data_get($variable,'var_intrvl','');
+
+        $var_wgt_id_out = 0;
+        if ($dtype === 'character') {
+            unset($variable['var_wgt_id']);
+        } elseif (isset($variable['var_wgt_id'])) {
+            $raw = $variable['var_wgt_id'];
+            if ($raw !== '' && $raw !== null && is_numeric($raw) && (int)$raw > 0) {
+                $var_wgt_id_out = (int)$raw;
+                $variable['var_wgt_id'] = $var_wgt_id_out;
+            } else {
+                unset($variable['var_wgt_id']);
+            }
+        }
 
         $core_fields=array(
             'fid'=>$variable['fid'],
@@ -907,8 +981,8 @@ class Editor_variable_model extends ci_model {
             'is_weight'=> isset($variable['var_wgt']) ? (int)$variable['var_wgt'] : 0,
             'is_key'=> isset($variable['is_key']) ? (int)$variable['is_key'] : 0,
             'field_dtype'=>$dtype,
-            'interval_type'=>$interval_type
-            //'field_format'=>$variable['field_format'],
+            'interval_type'=>$interval_type,
+            'var_wgt_id'=>$var_wgt_id_out,
         );
 
         return $core_fields;
@@ -919,7 +993,7 @@ class Editor_variable_model extends ci_model {
      * Sync var_invalrng.values and is_missing on categories
      *      
      * 1. var_invalrng.values is populated from categories with is_missing=1
-     * 2. is_missing on categories is set based on var_invalrng.values
+     * 2. is_missing on each category is set from var_invalrng.values (omitted when not missing)
      * 
      * @param array $variable Variable metadata array
      * @return array Variable with synced var_invalrng.values and is_missing
@@ -943,7 +1017,7 @@ class Editor_variable_model extends ci_model {
             $missing_from_categories = array();
             foreach($variable['var_catgry'] as $cat) {
                 if (isset($cat['is_missing']) && 
-                    ($cat['is_missing'] == '1' || $cat['is_missing'] == 'Y' || $cat['is_missing'] == 1)) {
+                    ($cat['is_missing'] == '1' || $cat['is_missing'] == 'Y' || $cat['is_missing'] == 1 || $cat['is_missing'] === true)) {
                     if (isset($cat['value']) && $cat['value'] !== null && $cat['value'] !== '') {
                         $missing_from_categories[] = (string)$cat['value'];
                     }
@@ -955,10 +1029,20 @@ class Editor_variable_model extends ci_model {
             }
         }
 
-        // Step 2: Remove is_missing from all categories
+        // Step 2: Set is_missing on each category from var_invalrng.values (omit key when not missing)
         if (isset($variable['var_catgry']) && is_array($variable['var_catgry'])) {
+            $missing_vals = array();
+            if (isset($variable['var_invalrng']['values']) && is_array($variable['var_invalrng']['values'])) {
+                $missing_vals = array_map('strval', $variable['var_invalrng']['values']);
+            }
             foreach($variable['var_catgry'] as &$cat) {
-                if (isset($cat['is_missing'])) {
+                if (!isset($cat['value'])) {
+                    continue;
+                }
+                $cv = (string)$cat['value'];
+                if (in_array($cv, $missing_vals, true)) {
+                    $cat['is_missing'] = '1';
+                } else {
                     unset($cat['is_missing']);
                 }
             }

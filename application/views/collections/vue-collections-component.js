@@ -14,7 +14,8 @@ Vue.component('vue-collections-component', {
             action_menu: false,        
             action_menu_x: 0,
             action_menu_y: 0,
-            action_menu_id: 0
+            action_menu_id: 0,
+            searchQuery: ''
         }
     },
     
@@ -26,6 +27,25 @@ Vue.component('vue-collections-component', {
         Collections() {
             console.log("Collections computed property called, collections:", this.collections);
             return this.collections;
+        },
+        effectiveSearchQuery() {
+            const q = (this.searchQuery || '').trim();
+            return q.length >= 2 ? q : '';
+        },
+        displayCollections() {
+            if (!this.effectiveSearchQuery) {
+                return this.collections;
+            }
+            return this.filterCollectionsTree(this.collections, this.effectiveSearchQuery.toLowerCase());
+        },
+        isSearchActive() {
+            return this.effectiveSearchQuery.length >= 2;
+        },
+        displayCollectionCount() {
+            return this.countTreeNodes(this.displayCollections);
+        },
+        totalCollectionCount() {
+            return this.countTreeNodes(this.collections);
         },
         canCreateCollections() {
             // Only allow creation if user has admin permissions
@@ -251,6 +271,46 @@ Vue.component('vue-collections-component', {
         },
         ManageCollectionAccess: function(id) {
             this.$router.push('/manage-users/' + id);
+        },
+        filterCollectionsTree: function(items, query) {
+            if (!items || !Array.isArray(items)) {
+                return [];
+            }
+            const result = [];
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i];
+                const titleMatch = item.title && item.title.toLowerCase().includes(query);
+                const descMatch = item.description && item.description.toLowerCase().includes(query);
+                const idMatch = String(item.id).includes(query);
+                const selfMatch = titleMatch || descMatch || idMatch;
+                let filteredChildren = [];
+                if (item.items && item.items.length) {
+                    filteredChildren = selfMatch
+                        ? item.items
+                        : this.filterCollectionsTree(item.items, query);
+                }
+                if (selfMatch || filteredChildren.length > 0) {
+                    const copy = Object.assign({}, item);
+                    if (item.items) {
+                        copy.items = selfMatch ? item.items : filteredChildren;
+                    }
+                    result.push(copy);
+                }
+            }
+            return result;
+        },
+        countTreeNodes: function(items) {
+            if (!items || !Array.isArray(items)) {
+                return 0;
+            }
+            let count = 0;
+            for (let i = 0; i < items.length; i++) {
+                count += 1;
+                if (items[i].items && items[i].items.length) {
+                    count += this.countTreeNodes(items[i].items);
+                }
+            }
+            return count;
         }
     },
     template: `
@@ -276,14 +336,26 @@ Vue.component('vue-collections-component', {
                             <div class="bg-light p-3 shadow mt-2" >
                                 <div class="p-3 border text-center text-danger" v-if="!collections || collections.length<1"> {{$t('No collections found')}}!</div>
 
+                                <template v-else>
+                                <div class="row border-bottom collections-grid-search-header align-items-center">
+                                    <div class="col">
+                                        <v-text-field
+                                            v-model="searchQuery"
+                                            :placeholder="$t('search_collections_placeholder') || 'Search collections...'"
+                                            dense
+                                            solo
+                                            flat
+                                            hide-details
+                                            clearable
+                                            class="collections-grid-search"
+                                            prepend-inner-icon="mdi-magnify"
+                                        ></v-text-field>
+                                    </div>
+                                </div>
 
-
-
-
-                                <template v-if="collections && collections.length>0">
-                                <div class="row border-bottom">
+                                <div class="row border-bottom collections-grid-header align-items-center">
                                     <div class="col-1">
-                                        #
+                                        <strong>#</strong>
                                     </div>
                                     <div class="col">
                                         <strong>{{$t('Collection')}}</strong>
@@ -320,12 +392,14 @@ Vue.component('vue-collections-component', {
                                     </div>
                                 </div>
 
+                                <div class="p-3 border text-center text-muted" v-if="isSearchActive && (!displayCollections || displayCollections.length<1)"> {{$t('No collections found')}}!</div>
 
-                                <div v-for="(collection,index) in collections" >
+                                <div v-for="(collection,index) in displayCollections" :key="collection.id">
                                     <vue-tree-list 
                                         :value="collection" 
                                         :permissions="getCollectionPermissions(collection.id)"
                                         :getPermissionsFunction="getCollectionPermissions"
+                                        :expand-all="isSearchActive"
                                         v-on:show-menu="showMenu"
                                     ></vue-tree-list>
                                 </div>
@@ -370,7 +444,8 @@ Vue.component('vue-collections-component', {
 
             <!-- Collections count at bottom -->
             <div v-if="collections && collections.length > 0" class="mt-4 p-3 text-center text-muted">
-                <small>{{collections.length}} {{$t('collections')}}</small>
+                <small v-if="isSearchActive">{{displayCollectionCount}} / {{totalCollectionCount}} {{$t('collections')}}</small>
+                <small v-else>{{totalCollectionCount}} {{$t('collections')}}</small>
             </div>
 
         </div>

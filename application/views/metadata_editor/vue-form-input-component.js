@@ -120,6 +120,9 @@ Vue.component("form-input", {
     projectId() {
       return this.$store.state.project_id || null;
     },
+    isRequired() {
+      return !!(this.field && (this.field.is_required || this.field.required));
+    },
   },
   template: `
             <div class="form-input-field mt-3" :class="'form-input-' + field.type"  >
@@ -203,7 +206,7 @@ Vue.component("form-input", {
                         <div class="d-flex align-center flex-nowrap">
                             <label :for="'field-' + normalizeClassID(field.key)">{{field.title}}
                                 <span class="small" v-if="field.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(field.key)" ><i class="far fa-question-circle"></i></span>
-                                <span v-if="field.required==true" class="required-label"> * </span>
+                                <span v-if="isRequired" class="required-label"> * </span>
                             </label>
                         </div>
 
@@ -237,7 +240,7 @@ Vue.component("form-input", {
                         <div class="d-flex align-center flex-nowrap">
                             <label :for="'field-' + normalizeClassID(field.key)">{{field.title}}
                                 <span class="small" v-if="field.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(field.key)" ><i class="far fa-question-circle"></i></span>
-                                <span v-if="field.required==true" class="required-label"> * </span>
+                                <span v-if="isRequired" class="required-label"> * </span>
                             </label>
                         </div>
 
@@ -269,7 +272,9 @@ Vue.component("form-input", {
 
                 <div v-else-if="fieldDisplayType(field)=='textarea'">
                     <div class="form-field-textarea"">
-                        <label :for="'field-' + normalizeClassID(field.key)">{{field.title}}</label>                
+                        <label :for="'field-' + normalizeClassID(field.key)">{{field.title}}
+                            <span v-if="isRequired" class="required-label"> * </span>
+                        </label>                
                         <span class="small" v-if="field.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(field.key)" ><i class="far fa-question-circle"></i></span>
 
                         <validation-provider 
@@ -316,14 +321,14 @@ Vue.component("form-input", {
                     <div class="form-field-dropdown-custom">
                         <div class="d-flex align-center flex-nowrap">
                             <label :for="'field-' + normalizeClassID(field.key)">{{field.title}}
-                                <span v-if="field.required==true" class="required-label"> * </span>
+                                <span v-if="isRequired" class="required-label"> * </span>
                             </label>
                         </div>
                         <span class="small" v-if="field.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(field.key)" ><i class="far fa-question-circle"></i></span>
                         <small :id="'field-toggle-' + normalizeClassID(field.key)" class="collapse help-text form-text text-muted mb-2">{{field.help_text}}</small>
                         
                         <validation-provider 
-                            :rules="field.rules || ''" 
+                            :rules="getValidationRules(field)" 
                             :debounce=500
                             immediate
                             v-slot="{ errors }"
@@ -357,19 +362,20 @@ Vue.component("form-input", {
                     <div class="form-field-dropdown">
                         <div class="d-flex align-center flex-nowrap">
                             <label :for="'field-' + normalizeClassID(field.key)">{{field.title}}
-                                <span v-if="field.required==true" class="required-label"> * </span>
+                                <span v-if="isRequired" class="required-label"> * </span>
                             </label>
                         </div>
                         <span class="small" v-if="field.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(field.key)" ><i class="far fa-question-circle"></i></span>
                         <small :id="'field-toggle-' + normalizeClassID(field.key)" class="collapse help-text form-text text-muted mb-2">{{field.help_text}}</small>                        
                         
                         <validation-provider 
-                            :rules="field.rules || ''" 
+                            :rules="getValidationRules(field)" 
                             :debounce=500
                             immediate
                             v-slot="{ errors }"                            
                             :name="field.title"
                             >
+                            <input type="hidden" v-model="local" />
                             <v-select
                                 v-model="fieldEnumByCode"
                                 :items="field.enum"  
@@ -396,10 +402,21 @@ Vue.component("form-input", {
                 <div v-else-if="fieldDisplayType(field)=='date'">
                     <div class="form-field-date">
                         <div class="d-flex align-center flex-nowrap">
-                            <label :for="'field-' + normalizeClassID(field.key)">{{field.title}}</label>
+                            <label :for="'field-' + normalizeClassID(field.key)">{{field.title}}
+                                <span v-if="isRequired" class="required-label"> * </span>
+                            </label>
                             <field-issues v-if="projectId && field.key" :field-path="field.key" :project-id="projectId"></field-issues>
                         </div>
-                        <editor-date-field v-model="local" :field="field"></editor-date-field>
+                        <validation-provider 
+                            :rules="getValidationRules(field)" 
+                            :debounce=500
+                            immediate
+                            v-slot="{ errors }"                            
+                            :name="field.title"
+                            >
+                            <editor-date-field v-model="local" :field="field"></editor-date-field>
+                            <span v-if="errors[0]" class="field-error">{{errors[0]}}</span>
+                        </validation-provider>
                         <small class="help-text form-text text-muted">{{field.help_text}}</small>                            
                     </div>
                 </div>
@@ -409,7 +426,7 @@ Vue.component("form-input", {
                         <div class="d-flex align-center flex-nowrap">
                             <label :for="'field-' + normalizeClassID(field.key)">{{field.title}}
                                 <span class="small" v-if="field.help_text" role="button" data-toggle="collapse" :data-target="'#field-toggle-' + normalizeClassID(field.key)" ><i class="far fa-question-circle"></i></span>
-                                <span v-if="field.required==true" class="required-label"> * </span>
+                                <span v-if="isRequired" class="required-label"> * </span>
                             </label>
                             <field-issues v-if="projectId && field.key" :field-path="field.key" :project-id="projectId"></field-issues>
                         </div>
@@ -469,8 +486,7 @@ Vue.component("form-input", {
     getValidationRules(field) {
       let rules = field.rules || '';
 
-      //if field.is_required is true, add required rule
-      if (field.is_required) {
+      if (field.is_required || field.required) {
         rules = rules ? `${rules}|required` : 'required';
       }
       

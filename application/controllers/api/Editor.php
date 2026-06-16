@@ -2,6 +2,9 @@
 
 require(APPPATH.'/libraries/MY_REST_Controller.php');
 
+use Swaggest\JsonDiff\JsonPointer;
+use Swaggest\JsonDiff\JsonPointerException;
+
 class Editor extends MY_REST_Controller
 {
 	private $api_user;
@@ -188,6 +191,8 @@ class Editor extends MY_REST_Controller
 				throw new Exception("DATASET_NOT_FOUND");
 			}
 
+			$result['has_thumbnail'] = (bool) $this->Editor_model->get_thumbnail_file($sid);
+
 			$response=array(
 				'status'=>'success',
 				'project'=>$result
@@ -246,11 +251,23 @@ class Editor extends MY_REST_Controller
 		$options['changed_by'] = $user_id;
 		$options['changed'] = date("U");
 		
-		// Indicator/timeseries: import data_structure into DSD table and remove from metadata
-		if (in_array($type, array('indicator', 'timeseries')) && isset($options['data_structure']) && is_array($options['data_structure'])) {
-			$this->load->library('Indicator_util');
-			$this->indicator_util->import_data_structure_for_project($id, $options['data_structure'], $user_id);
+		// Indicator/timeseries: bind global DSD reference only (no inline data_structure).
+		if (in_array($type, array('indicator', 'timeseries'))) {
+			if (isset($options['data_structure']) && is_array($options['data_structure']) && count($options['data_structure']) > 0) {
+				throw new Exception(
+					'Inline data_structure is no longer supported. Attach a global data structure via data_structure_reference or the project DSD UI.'
+				);
+			}
 			unset($options['data_structure']);
+
+			if (isset($options['data_structure_reference']) && is_array($options['data_structure_reference'])) {
+				$this->load->library('Data_structure_util');
+				$this->data_structure_util->bind_project_by_reference(
+					$id,
+					$options['data_structure_reference'],
+					$user_id
+				);
+			}
 		}
 		
 		$this->load->library('ImportJsonMetadata');
@@ -286,12 +303,11 @@ class Editor extends MY_REST_Controller
 				$idno=$this->Editor_model->generate_uuid();
 			}
 
-			// check if project already exists
-			$sid=$this->Editor_model->get_project_id_by_idno($idno);
-			
-			if ($sid){
-				throw new Exception("Project with this IDNO already exists: ".$idno);
-			}
+			$overwrite_raw = $project_options['overwrite'] ?? false;
+			$overwrite = is_string($overwrite_raw)
+				? in_array(strtolower(trim($overwrite_raw)), ['true', 'yes'], true)
+				: (bool) $overwrite_raw;
+			unset($project_options['overwrite']);
 
 			//collection IDs
 			$collection_ids = null;
@@ -301,6 +317,31 @@ class Editor extends MY_REST_Controller
 			}
 
 			$this->_batch_validate_collection_access($collection_ids);
+
+			// check if project already exists
+			$sid=$this->Editor_model->get_project_id_by_idno($idno);
+
+			if ($sid && $overwrite) {
+				// Verify the existing project is the same type before overwriting
+				if (!$this->Editor_model->check_id_exists($sid, $type)) {
+					throw new Exception("Cannot overwrite: existing project with IDNO [".$idno."] is a different type");
+				}
+
+				if (!empty($project_options)) {
+					$this->_update_project_metadata($type, $sid, $project_options, false, $this->api_user(), $user_id);
+				}
+
+				$this->_add_project_to_collections($sid, $collection_ids, $user_id);
+				$this->audit_log->log_event('project', $sid, 'update', null, $user_id, null);
+
+				$this->set_response(array('status' => 'success', 'id' => $sid), REST_Controller::HTTP_OK);
+				return;
+			}
+
+			if ($sid){
+				throw new Exception("Project with this IDNO already exists: ".$idno);
+			}
+
 			$this->validate_project_idno($idno);
 						
 			$options=array(
@@ -480,25 +521,33 @@ class Editor extends MY_REST_Controller
 	 * 
 	 * 
 	 * Update project options
+	 *
 	 * set:
 	 * 	- template
 	 * 	- thumbnail
-	 * 	- created_by
-	 * 	- changed_by
-	 * 	- created
-	 * 	- changed
 	 * 	- idno
+	 *
 	 * 
 	 */
 	function options_post($sid=null)
 	{
 		try{
 			$options=$this->raw_json_input();
+			if (!is_array($options)){
+				$options=array();
+			}
 			$user_id=$this->get_api_user_id();
 			$sid=$this->get_sid($sid);
 
-			$options['created_by']=$user_id;
+			if (isset($options['created_by'])){
+				unset($options['created_by']);
+			}
+			if (isset($options['created'])){
+				unset($options['created']);
+			}
+
 			$options['changed_by']=$user_id;
+			$options['changed']=date("U");
 			$options['sid']=$sid;
 
 			// ADMIN access is required to set project template, other options require edit access
@@ -673,6 +722,12 @@ class Editor extends MY_REST_Controller
 				'status'=>'success'
 			);
 
+			//Surface any non-fatal warnings raised during DDI parsing/import
+			//(e.g. <var @files="H P"> fan-out across hierarchical files).
+			if (is_array($result) && !empty($result['variable_warnings'])){
+				$output['variable_warnings']=$result['variable_warnings'];
+			}
+
 			$this->set_response($output, REST_Controller::HTTP_OK);			
 		}
 		catch(Exception $e){
@@ -832,6 +887,117 @@ class Editor extends MY_REST_Controller
 
 
 	/**
+	 * Get a single value from project export JSON by JSON Pointer (RFC 6901), same document shape as GET /editor/json/{id}.
+	 *
+	 * Query: path (required) — e.g. /idno or /identification/title
+	 */
+	function json_field_get($sid=null)
+	{
+		try{
+			$sid=$this->get_sid($sid);
+			$exists=$this->Editor_model->check_id_exists($sid);
+
+			if(!$exists){
+				throw new Exception("Project not found");
+			}
+
+			$path=$this->input->get('path');
+			if ($path===null || $path===''){
+				throw new Exception("Query parameter `path` is required (JSON Pointer, e.g. /identification/title)");
+			}
+
+			$version_id=$this->input->get("version");
+			if ($version_id){
+				$version_sid=$this->Editor_model->find_version_by_number($sid, $version_id);
+				if ($version_sid){
+					$sid=$version_sid;
+				}
+				else{
+					throw new Exception("VERSION_NOT_FOUND");
+				}
+			}
+
+			$exclude_private_fields=0;
+			if ((int)$this->input->get("exclude_private_fields")===1){
+				$exclude_private_fields=1;
+			}
+			elseif ((int)$this->input->get("exc_private")===1){
+				$exclude_private_fields=1;
+			}
+
+			$inc_ext_resources=0;
+			if ((int)$this->input->get("external_resources")===1){
+				$inc_ext_resources=1;
+			}
+
+			$inc_adm_meta=0;
+			if ((int)$this->input->get("admin_metadata")===1){
+				$inc_adm_meta=1;
+			}
+
+			$exclude_variables=0;
+			if ((int)$this->input->get("exclude_variables")===1){
+				$exclude_variables=1;
+			}
+
+			$options=array(
+				'exclude_private_fields'=>$exclude_private_fields,
+				'external_resources'=>$inc_ext_resources,
+				'admin_metadata'=>$inc_adm_meta,
+				'exclude_variables'=>$exclude_variables,
+				'user_id'=>$this->get_api_user_id()
+			);
+
+			$this->editor_acl->user_has_project_access($sid,$permission='view',$this->api_user);
+
+			$json_file=$this->project_json_writer->generate_project_json($sid,$options);
+			if (!is_readable($json_file)){
+				throw new Exception("Failed to read project JSON export");
+			}
+
+			$json_raw=file_get_contents($json_file);
+			$doc=json_decode($json_raw,true);
+			if ($doc===null && json_last_error()!==JSON_ERROR_NONE){
+				throw new Exception("Invalid JSON export for project");
+			}
+
+			try{
+				$value=JsonPointer::getByPointer($doc,$path);
+				$response=array(
+					'status'=>'success',
+					'path'=>$path,
+					'found'=>true,
+					'value'=>$value
+				);
+			}
+			catch(JsonPointerException $e){
+				$msg=$e->getMessage();
+				if (strpos($msg,'Key not found')!==false){
+					$response=array(
+						'status'=>'success',
+						'path'=>$path,
+						'found'=>false,
+						'value'=>null
+					);
+				}
+				else{
+					throw new Exception("INVALID_JSON_POINTER: ".$msg);
+				}
+			}
+
+			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(Exception $e){
+			$output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage()
+			);
+			$this->set_response($output, REST_Controller::HTTP_BAD_REQUEST);
+		}
+	}
+
+
+	/**
 	 * 
 	 * Generate project metadata as JSON
 	 * 
@@ -848,7 +1014,8 @@ class Editor extends MY_REST_Controller
 			}
 
 			$this->editor_acl->user_has_project_access($sid,$permission='view');
-			$this->project_json_writer->generate_project_json($sid);
+			$this->load->library('ProjectPackage');
+			$this->projectpackage->run_stage($sid, 'json');
 
 			$output=array(
 				'status'=>'success'
@@ -903,7 +1070,8 @@ class Editor extends MY_REST_Controller
 			}
 
 			$this->editor_acl->user_has_project_access($sid,$permission='view');
-			$this->Editor_model->generate_project_ddi($sid);
+			$this->load->library('ProjectPackage');
+			$this->projectpackage->run_stage($sid, 'ddi');
 
 			$output=array(
 				'status'=>'success'
@@ -1108,6 +1276,14 @@ class Editor extends MY_REST_Controller
 
 			$response=$this->Editor_publish_model->publish_to_catalog($sid,$user_id,$catalog_connection_id,$options);			
 			$this->set_response($response, REST_Controller::HTTP_OK);
+		}
+		catch(ApiRequestException $e){
+			$error_output=array(
+				'status'=>'failed',
+				'message'=>$e->getMessage(),
+				'response'=>$e->getDetails()
+			);
+			$this->set_response($error_output, REST_Controller::HTTP_BAD_REQUEST);
 		}
 		catch(Exception $e){
 			$error_output=array(

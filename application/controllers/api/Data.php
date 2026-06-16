@@ -42,6 +42,23 @@ class Data extends MY_REST_Controller
 		}
 		parent::_auth_override_check();
 	}
+
+	/**
+	 * Optional multipart fields for datafile uploads (see datafile-schema.json).
+	 *
+	 * @return array Only keys present in the request body are included.
+	 */
+	private function collect_datafile_upload_metadata()
+	{
+		$fields = array('description', 'producer', 'data_checks', 'missing_data', 'version', 'notes');
+		$out = array();
+		foreach ($fields as $f) {
+			if (array_key_exists($f, $_POST)) {
+				$out[$f] = $this->input->post($f, true);
+			}
+		}
+		return $out;
+	}
 	
 	/**
 	 * 
@@ -65,10 +82,15 @@ class Data extends MY_REST_Controller
 
 
 	/**
-	 * 
-	 * upload data file
-	 * @file_type data
-	 * 
+	 * Upload data file (microdata).
+	 *
+	 * multipart/form-data:
+	 * - file: single-file upload (legacy), or
+	 * - upload_id: completed resumable upload from /api/uploads/* (with store_data, optional overwrite)
+	 * Do not send both file and upload_id.
+	 * Optional metadata (same as datafile-schema.json): description, producer, data_checks,
+	 * missing_data, version, notes.
+	 *
 	 **/ 
 	function datafile_post($sid=null)
 	{		
@@ -81,9 +103,16 @@ class Data extends MY_REST_Controller
 
 			$overwrite=$this->input->post("overwrite") ? (int)$this->input->post("overwrite") : 0;
 			$store_data=$this->input->post("store_data");
+			$upload_id_raw = $this->input->post("upload_id");
+			$upload_id = is_string($upload_id_raw) ? trim($upload_id_raw) : '';
 
 			if ($store_data !== "store" && $store_data !== "remove") {
 				throw new Exception("Invalid value for store_data. Valid values are 'store', 'remove'");
+			}
+
+			$has_file = isset($_FILES['file']['tmp_name']) && is_uploaded_file($_FILES['file']['tmp_name']);
+			if ($upload_id !== '' && $has_file) {
+				throw new Exception("Provide either a file upload or upload_id, not both.");
 			}
 
 			$this->editor_acl->user_has_project_access($sid,$permission='edit',$this->api_user());
@@ -91,7 +120,9 @@ class Data extends MY_REST_Controller
 				$sid,
 				$overwrite,
 				$store_data,
-				$this->get_api_user_id()
+				$this->get_api_user_id(),
+				$upload_id === '' ? null : $upload_id,
+				$this->collect_datafile_upload_metadata()
 			);
 
 			$output=array(
@@ -119,9 +150,12 @@ class Data extends MY_REST_Controller
 	 * POST /api/data/import_microdata/{sid}
 	 * 
 	 * Accepts multipart/form-data with:
-	 *   - file: The data file to upload
+	 *   - file: The data file to upload, or
+	 *   - upload_id: completed resumable upload (do not send both)
 	 *   - overwrite: (optional) 0 or 1, default 0
 	 *   - store_data: (optional) "store" or "remove", default "store"
+	 *   - priority: (optional) Job queue priority; higher values run before lower (default: 0)
+	 *   - description, producer, data_checks, missing_data, version, notes: (optional) datafile metadata
 	 * 
 	 * Returns:
 	 *   - file_id: The uploaded file ID
@@ -138,12 +172,21 @@ class Data extends MY_REST_Controller
 				throw new Exception("Project not found");
 			}
 
-			// Validate file upload exists
-			if (!isset($_FILES['file']) || !is_uploaded_file($_FILES['file']['tmp_name'])) {
-				throw new Exception("File upload is required");
+			$upload_id_raw = $this->input->post("upload_id");
+			$upload_id = is_string($upload_id_raw) ? trim($upload_id_raw) : '';
+			$has_file = isset($_FILES['file']['tmp_name']) && is_uploaded_file($_FILES['file']['tmp_name']);
+			if ($upload_id !== '' && $has_file) {
+				throw new Exception("Provide either a file upload or upload_id, not both.");
+			}
+			if ($upload_id === '' && !$has_file) {
+				throw new Exception("File upload is required, or provide upload_id after completing a chunked upload.");
 			}
 
 			$overwrite=$this->input->post("overwrite") ? (int)$this->input->post("overwrite") : 0;
+			$priority_post = $this->input->post('priority');
+			$priority = ($priority_post !== false && $priority_post !== null && $priority_post !== '')
+				? (int) $priority_post
+				: 0;
 			$store_data=$this->input->post("store_data");
 
 			if (empty($store_data)) {
@@ -156,12 +199,14 @@ class Data extends MY_REST_Controller
 
 			$this->editor_acl->user_has_project_access($sid,$permission='edit',$this->api_user());
 			
-			// Step 1: Upload file
+			// Step 1: Upload file (multipart or completed resumable upload)
 			$upload_result=$this->Editor_datafile_model->upload_create(
 				$sid,
 				$overwrite,
 				$store_data,
-				$this->get_api_user_id()
+				$this->get_api_user_id(),
+				$upload_id === '' ? null : $upload_id,
+				$this->collect_datafile_upload_metadata()
 			);
 
 			if (empty($upload_result['file_id'])) {
@@ -199,7 +244,7 @@ class Data extends MY_REST_Controller
 				$job_type,
 				$payload,
 				$this->get_api_user_id(),
-				0, // priority
+				$priority,
 				3  // max_attempts
 			);
 			
@@ -369,10 +414,35 @@ class Data extends MY_REST_Controller
 			$api_response=$this->datautils->get_job_status($job_id);
 
 			$api_http_status=isset($api_response['status_code']) ? $api_response['status_code'] : REST_Controller::HTTP_BAD_REQUEST;
-			$job_status=isset($api_response['response']['status']) ? $api_response['response']['status'] : '';
+			$upstream = isset($api_response['response']) && is_array($api_response['response']) ? $api_response['response'] : array();
+			$job_status = isset($upstream['status']) ? $upstream['status'] : '';
 
-			if (!$api_http_status==REST_Controller::HTTP_OK){
-				throw new Exception("Job failed");
+			if ($api_http_status !== REST_Controller::HTTP_OK) {
+				$msg = $this->_fastapi_job_error_message($upstream);
+				$this->set_response(array(
+					'status' => 'failed',
+					'job_status' => 'failed',
+					'message' => $msg,
+					'variables_imported' => 0,
+					'api_response' => $api_response,
+				), $api_http_status >= 400 ? $api_http_status : REST_Controller::HTTP_BAD_GATEWAY);
+				return;
+			}
+
+			if ($job_status === 'failed' || $job_status === 'error') {
+				$msg = $this->_fastapi_job_error_message($upstream);
+				$out = array(
+					'status' => 'failed',
+					'job_status' => $job_status,
+					'message' => $msg,
+					'variables_imported' => 0,
+					'api_response' => $api_response,
+				);
+				if (isset($upstream['detail'])) {
+					$out['detail'] = $upstream['detail'];
+				}
+				$this->set_response($out, REST_Controller::HTTP_BAD_REQUEST);
+				return;
 			}
 
 			$variable_import_result=[];
@@ -601,10 +671,33 @@ class Data extends MY_REST_Controller
 			$api_response=$this->datautils->get_job_status($job_id);
 
 			$api_http_status=isset($api_response['status_code']) ? $api_response['status_code'] : REST_Controller::HTTP_BAD_REQUEST;
-			$job_status=isset($api_response['response']['status']) ? $api_response['response']['status'] : '';
+			$upstream = isset($api_response['response']) && is_array($api_response['response']) ? $api_response['response'] : array();
+			$job_status = isset($upstream['status']) ? $upstream['status'] : '';
 
-			if (!$api_http_status==REST_Controller::HTTP_OK){
-				throw new Exception("Job failed");
+			if ($api_http_status !== REST_Controller::HTTP_OK) {
+				$msg = $this->_fastapi_job_error_message($upstream);
+				$this->set_response(array(
+					'status' => 'failed',
+					'job_status' => 'failed',
+					'message' => $msg,
+					'api_response' => $api_response,
+				), $api_http_status >= 400 ? $api_http_status : REST_Controller::HTTP_BAD_GATEWAY);
+				return;
+			}
+
+			if ($job_status === 'failed' || $job_status === 'error') {
+				$msg = $this->_fastapi_job_error_message($upstream);
+				$out = array(
+					'status' => 'failed',
+					'job_status' => $job_status,
+					'message' => $msg,
+					'api_response' => $api_response,
+				);
+				if (isset($upstream['detail'])) {
+					$out['detail'] = $upstream['detail'];
+				}
+				$this->set_response($out, REST_Controller::HTTP_BAD_REQUEST);
+				return;
 			}
 
 			$csv_file_path=$this->Editor_datafile_model->check_csv_exists($sid, $file_id);
@@ -811,6 +904,20 @@ class Data extends MY_REST_Controller
 		$job_status = isset($upstream['status']) ? $upstream['status'] : '';
 
 		if ($api_http_status === REST_Controller::HTTP_OK) {
+			if ($job_status === 'failed' || $job_status === 'error') {
+				$msg = $this->_fastapi_job_error_message($upstream);
+				$out = [
+					'status' => 'failed',
+					'job_status' => $job_status,
+					'message' => $msg,
+					'api_response' => $api_response,
+				];
+				if (isset($upstream['detail'])) {
+					$out['detail'] = $upstream['detail'];
+				}
+				$this->set_response($out, REST_Controller::HTTP_BAD_REQUEST);
+				return;
+			}
 			$this->set_response([
 				'status' => 'success',
 				'api_response' => $api_response,
@@ -1083,6 +1190,30 @@ class Data extends MY_REST_Controller
 		}
 	}
 
+	/**
+	 * User-facing message from FastAPI job body (after DataUtils normalization).
+	 *
+	 * @param array $body
+	 * @return string
+	 */
+	private function _fastapi_job_error_message($body)
+	{
+		if (!is_array($body)) {
+			return 'Job failed';
+		}
+		if (isset($body['message']) && $body['message'] !== '') {
+			return $body['message'];
+		}
+		if (isset($body['detail'])) {
+			if (is_string($body['detail'])) {
+				return $body['detail'];
+			}
+			if (is_array($body['detail'])) {
+				return json_encode($body['detail']);
+			}
+		}
+		return 'Job failed';
+	}
 
 
 }

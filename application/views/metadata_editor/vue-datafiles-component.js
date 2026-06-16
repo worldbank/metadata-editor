@@ -400,6 +400,12 @@ Vue.component('datafiles', {
                 console.log("job updated",result);
                 this.dialog.is_loading=true;
                 this.dialog.loading_message="Job status: " + result.data.job_status;
+                if (result.data.job_status === 'failed' || result.data.job_status === 'error') {
+                    const msg = result.data.message || (typeof result.data.detail === 'string' ? result.data.detail : '') || 'Job failed';
+                    this.dialog.is_loading = false;
+                    this.dialog.message_error = msg;
+                    return;
+                }
                 if (result.data.job_status!=='done'){
                     this.importSummaryStatisticsQueueStatusCheck(file_id,job_id);
                 }else if (result.data.job_status==='done'){
@@ -465,6 +471,12 @@ Vue.component('datafiles', {
                 console.log("csv updated",result);
                 this.dialog.is_loading=true;
                 this.dialog.loading_message="Job status: " + result.data.job_status;
+                if (result.data.job_status === 'failed' || result.data.job_status === 'error') {
+                    const msg = result.data.message || (typeof result.data.detail === 'string' ? result.data.detail : '') || 'Job failed';
+                    this.dialog.is_loading = false;
+                    this.dialog.message_error = msg;
+                    return;
+                }
                 if (result.data.job_status!=='done'){
                     this.generateCsvQueueStatusCheck(file_id,job_id);
                 }else if (result.data.job_status==='done'){

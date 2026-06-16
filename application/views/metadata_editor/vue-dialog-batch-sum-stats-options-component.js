@@ -17,6 +17,7 @@ Vue.component('dialog-batch-sum-stats-options', {
                 freq: true,
                 missing: true,
                 vald: true,
+                invd: true,
                 min: true,
                 max: true,
                 mean: false,
@@ -47,7 +48,7 @@ Vue.component('dialog-batch-sum-stats-options', {
             return this.matchCount > 0 && !this.applying;
         },
         optionKeys() {
-            return ['wgt', 'freq', 'missing', 'vald', 'min', 'max', 'mean', 'mean_wgt', 'stdev', 'stdev_wgt'];
+            return ['wgt', 'freq', 'missing', 'vald', 'invd', 'min', 'max', 'mean', 'mean_wgt', 'stdev', 'stdev_wgt'];
         },
         optionLabels() {
             return {
@@ -55,6 +56,7 @@ Vue.component('dialog-batch-sum-stats-options', {
                 freq: this.$t('frequencies'),
                 missing: this.$t('list_missings'),
                 vald: this.$t('valid'),
+                invd: this.$t('invalid'),
                 min: this.$t('min'),
                 max: this.$t('max'),
                 mean: this.$t('mean'),
@@ -78,10 +80,10 @@ Vue.component('dialog-batch-sum-stats-options', {
     },
     methods: {
         _defaultOptionsForIntervalType(intervalType) {
-            const keys = ['wgt', 'freq', 'missing', 'vald', 'min', 'max', 'mean', 'mean_wgt', 'stdev', 'stdev_wgt'];
+            const keys = ['wgt', 'freq', 'missing', 'vald', 'invd', 'min', 'max', 'mean', 'mean_wgt', 'stdev', 'stdev_wgt'];
             if (intervalType === 'discrete') {
                 const opts = {};
-                keys.forEach(k => { opts[k] = ['freq', 'missing', 'vald', 'min', 'max'].indexOf(k) >= 0; });
+                keys.forEach(k => { opts[k] = ['freq', 'missing', 'vald', 'invd', 'min', 'max'].indexOf(k) >= 0; });
                 return opts;
             }
             // contin: only min, max selected

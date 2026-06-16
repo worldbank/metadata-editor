@@ -171,12 +171,14 @@ class Editor_partial_import
 		// - if exists: update variable metadata based on import options
 		// - if not exists: create new variable entry (only if $import_new_data is true)
 		// - "variable_info", "variable_categories", "variable_questions", "variable_weights"
-        
+
 		//list with file name as key and fid as value
 		$db_datafiles_names_map=$this->ci->Editor_datafile_model->file_id_name_list($sid);
-		
 
+
+		$this->ci->load->library('DDI_Utils');
 		$variable_iterator=$parser->get_variable_iterator();
+		$variable_warnings=array();
 
 		foreach($variable_iterator as $var_obj)
         {
@@ -184,124 +186,169 @@ class Editor_partial_import
 				continue;
 			}
 
-            $variable=$var_obj->get_metadata_array();
-            $variable['fid']=$variable['file_id'];
-
-			//skip
-			if (!isset($data_files[$variable['fid']])){
-				continue;
-			}
-
-			//update variable info
-			// - match by variable name
-			// - match by data file name [ db requires fid, get fid from db using data_file_name]
-
-			//data file name
-			$data_file_name=$data_files[$variable['fid']]['file_name'];
-
-			//get variable from db
-			$variable_db=$this->ci->Editor_variable_model->get_variable_by_filename($sid,$data_file_name,$variable['name']);
+            $base_variable=$var_obj->get_metadata_array();
 
 			// Skip if variable name is empty
-			if (empty($variable['name'])) {
+			if (empty($base_variable['name'])) {
 				continue;
 			}
 
-            $variable['var_catgry_labels']=$this->get_variable_category_value_labels($variable);
-            
-            // Populate var_invalrng.values from categories with is_missing=1 or missing='Y'
-            if (isset($variable['var_catgry']) && is_array($variable['var_catgry'])) {
-                $missing_values = array();
-                foreach($variable['var_catgry'] as $cat) {
-                    if (isset($cat['is_missing']) && 
-                        ($cat['is_missing'] == '1' || $cat['is_missing'] == 'Y' || $cat['is_missing'] == 1)) {
-                        if (isset($cat['value']) && $cat['value'] !== null && $cat['value'] !== '') {
-                            $missing_values[] = (string)$cat['value'];
-                        }
-                    }
-                }
-                if (!empty($missing_values)) {
-                    $variable['var_invalrng'] = array('values' => array_values(array_unique($missing_values)));
-                } else if (!isset($variable['var_invalrng'])) {
-                    $variable['var_invalrng'] = array('values' => array());
-                }
+			// DDI 2.x @files is IDREFS (whitespace-separated list). Fan out one
+			// variable row per referenced file so per-file lookups continue to work.
+			$file_id_tokens=DDI_Utils::split_file_ids($base_variable['file_id']);
 
-                // Remove is_missing from categories
-                foreach($variable['var_catgry'] as &$cat) {
-                    if (isset($cat['is_missing'])) {
-                        unset($cat['is_missing']);
-                    }
-                }
-                unset($cat);
-            }
-            
-			if ($variable_db) {
-				// Update existing variable metadata
-				$variable_db['metadata']=$this->update_variable_metadata($variable_db['metadata'], $variable, $import_options);
+			if (empty($file_id_tokens)){
+				$variable_warnings[]=array(
+					'vid'   => isset($base_variable['vid']) ? $base_variable['vid'] : '',
+					'name'  => $base_variable['name'],
+					'files' => $base_variable['file_id'],
+					'message' => 'Variable has no @files attribute; not imported.'
+				);
+				continue;
+			}
 
-				// Resolve weight variable reference (VID -> UID) when importing variable_weights
-				if (in_array("variable_weights", $import_options)) {
-					$ref = isset($variable['var_wgt_ref']) ? trim($variable['var_wgt_ref']) : '';
-					if ($ref !== '') {
-						$wgt_uid = $this->ci->Editor_variable_model->uid_by_vid($sid, $ref);
-						$variable_db['var_wgt_id'] = ($wgt_uid !== false) ? $wgt_uid : 0;
-					} else {
-						$variable_db['var_wgt_id'] = 0;
+			$inserted_tokens=array();
+			$unknown_tokens=array();
+
+			foreach($file_id_tokens as $fid_token){
+				if (!isset($data_files[$fid_token])){
+					$unknown_tokens[]=$fid_token;
+					continue;
+				}
+
+				$variable=$base_variable;
+				$variable['file_id']=$fid_token;
+				$variable['fid']=$fid_token;
+
+				$this->ci->load->library('ImportJsonMetadata');
+				$this->ci->importjsonmetadata->sanitize_variable_categories_for_import($variable);
+
+				//update variable info
+				// - match by variable name
+				// - match by data file name [ db requires fid, get fid from db using data_file_name]
+
+				//data file name
+				$data_file_name=$data_files[$fid_token]['file_name'];
+
+				//get variable from db
+				$variable_db=$this->ci->Editor_variable_model->get_variable_by_filename($sid,$data_file_name,$variable['name']);
+
+				$variable['var_catgry_labels']=$this->get_variable_category_value_labels($variable);
+
+				// Populate var_invalrng.values from categories with is_missing=1 or missing='Y'
+				if (isset($variable['var_catgry']) && is_array($variable['var_catgry'])) {
+					$missing_values = array();
+					foreach($variable['var_catgry'] as $cat) {
+						if (isset($cat['is_missing']) &&
+							($cat['is_missing'] == '1' || $cat['is_missing'] == 'Y' || $cat['is_missing'] == 1)) {
+							if (isset($cat['value']) && $cat['value'] !== null && $cat['value'] !== '') {
+								$missing_values[] = (string)$cat['value'];
+							}
+						}
 					}
+					if (!empty($missing_values)) {
+						$variable['var_invalrng'] = array('values' => array_values(array_unique($missing_values)));
+					} else if (!isset($variable['var_invalrng'])) {
+						$variable['var_invalrng'] = array('values' => array());
+					}
+
+					// Remove is_missing from categories
+					foreach($variable['var_catgry'] as &$cat) {
+						if (isset($cat['is_missing'])) {
+							unset($cat['is_missing']);
+						}
+					}
+					unset($cat);
 				}
 
-				//update db
-				try {
-					$this->ci->Editor_variable_model->update($sid,$variable_db['uid'],$variable_db);
-				} catch (Exception $e) {
-					log_message('error', "Failed to update variable '{$variable['name']}': " . $e->getMessage());
-					throw new Exception("Failed to update variable '{$variable['name']}': " . $e->getMessage());
-				}
+				if ($variable_db) {
+					// Update existing variable metadata
+					$variable_db['metadata']=$this->update_variable_metadata($variable_db['metadata'], $variable, $import_options);
+
+					// Resolve weight variable reference (VID -> UID) when importing variable_weights
+					if (in_array("variable_weights", $import_options)) {
+						$ref = isset($variable['var_wgt_ref']) ? trim($variable['var_wgt_ref']) : '';
+						if ($ref !== '') {
+							$wgt_uid = $this->ci->Editor_variable_model->uid_by_vid($sid, $ref);
+							$variable_db['var_wgt_id'] = ($wgt_uid !== false) ? $wgt_uid : 0;
+						} else {
+							$variable_db['var_wgt_id'] = 0;
+						}
+					}
+
+					//update db
+					try {
+						$this->ci->Editor_variable_model->update($sid,$variable_db['uid'],$variable_db);
+						$inserted_tokens[]=$fid_token;
+					} catch (Exception $e) {
+						log_message('error', "Failed to update variable '{$variable['name']}': " . $e->getMessage());
+						throw new Exception("Failed to update variable '{$variable['name']}': " . $e->getMessage());
+					}
 				} else {
 					// Only create new variable if $import_new_data is true
 					if ($import_new_data) {
-					// Create new variable
-					$fid = $db_datafiles_names_map[$data_file_name];
-					if (!$fid) {
-						log_message('error', "Data file '{$data_file_name}' not found in database for variable '{$variable['name']}'");
-						continue;
-					}
-
-					// Generate new variable ID
-					$max_vid = $this->ci->Editor_variable_model->get_max_vid($sid);
-					$new_vid = 'V' . ($max_vid + 1);
-
-					$var_wgt_ref = isset($variable['var_wgt_ref']) ? trim($variable['var_wgt_ref']) : '';
-					unset($variable['var_wgt_ref']);
-
-					$new_variable = array(
-						'fid' => $fid,
-						'vid' => $new_vid,
-						'name' => $variable['name'],
-						'labl' => isset($variable['labl']) ? $variable['labl'] : '',
-						'field_dtype' => isset($variable['field_dtype']) ? $variable['field_dtype'] : 'numeric',
-						'sort_order' => 0,
-						'metadata' => $variable,
-						'created_by' => isset($options['changed_by']) ? $options['changed_by'] : null,
-						'changed_by' => isset($options['changed_by']) ? $options['changed_by'] : null,
-					);
-
-					try {
-						$new_uid = $this->ci->Editor_variable_model->insert($sid, $new_variable);
-						if ($var_wgt_ref !== '' && $new_uid) {
-							$wgt_uid = $this->ci->Editor_variable_model->uid_by_vid($sid, $var_wgt_ref);
-							if ($wgt_uid !== false) {
-								$this->ci->Editor_variable_model->update($sid, $new_uid, array('var_wgt_id' => $wgt_uid));
-							}
+						// Create new variable
+						$fid = isset($db_datafiles_names_map[$data_file_name]) ? $db_datafiles_names_map[$data_file_name] : null;
+						if (!$fid) {
+							log_message('error', "Data file '{$data_file_name}' not found in database for variable '{$variable['name']}'");
+							continue;
 						}
-					} catch (Exception $e) {
-						log_message('error', "Failed to create variable '{$variable['name']}': " . $e->getMessage());
-						throw new Exception("Failed to create variable '{$variable['name']}': " . $e->getMessage());
+
+						// Generate new variable ID
+						$max_vid = $this->ci->Editor_variable_model->get_max_vid($sid);
+						$new_vid = 'V' . ($max_vid + 1);
+
+						$var_wgt_ref = isset($variable['var_wgt_ref']) ? trim($variable['var_wgt_ref']) : '';
+						unset($variable['var_wgt_ref']);
+
+						$new_variable = array(
+							'fid' => $fid,
+							'vid' => $new_vid,
+							'name' => $variable['name'],
+							'labl' => isset($variable['labl']) ? $variable['labl'] : '',
+							'field_dtype' => isset($variable['field_dtype']) ? $variable['field_dtype'] : 'numeric',
+							'sort_order' => 0,
+							'metadata' => $variable,
+							'created_by' => isset($options['changed_by']) ? $options['changed_by'] : null,
+							'changed_by' => isset($options['changed_by']) ? $options['changed_by'] : null,
+						);
+
+						try {
+							$new_uid = $this->ci->Editor_variable_model->insert($sid, $new_variable);
+							if ($var_wgt_ref !== '' && $new_uid) {
+								$wgt_uid = $this->ci->Editor_variable_model->uid_by_vid($sid, $var_wgt_ref);
+								if ($wgt_uid !== false) {
+									$this->ci->Editor_variable_model->update($sid, $new_uid, array('var_wgt_id' => $wgt_uid));
+								}
+							}
+							$inserted_tokens[]=$fid_token;
+						} catch (Exception $e) {
+							log_message('error', "Failed to create variable '{$variable['name']}': " . $e->getMessage());
+							throw new Exception("Failed to create variable '{$variable['name']}': " . $e->getMessage());
+						}
+					} else {
+						// Skip creating new variable when $import_new_data is false
+						log_message('debug', "Skipping creation of new variable '{$variable['name']}' - import_new_data is false");
 					}
-				} else {
-					// Skip creating new variable when $import_new_data is false
-					log_message('debug', "Skipping creation of new variable '{$variable['name']}' - import_new_data is false");
 				}
+			}
+
+			if (count($file_id_tokens) > 1 && !empty($inserted_tokens)){
+				$variable_warnings[]=array(
+					'vid'   => isset($base_variable['vid']) ? $base_variable['vid'] : '',
+					'name'  => $base_variable['name'],
+					'files' => $base_variable['file_id'],
+					'message' => 'Variable referenced multiple files; applied to: '.implode(', ', $inserted_tokens).'.'
+				);
+			}
+
+			if (!empty($unknown_tokens)){
+				$variable_warnings[]=array(
+					'vid'   => isset($base_variable['vid']) ? $base_variable['vid'] : '',
+					'name'  => $base_variable['name'],
+					'files' => $base_variable['file_id'],
+					'message' => 'Variable referenced unknown data file(s): '.implode(', ', $unknown_tokens).' (skipped for those files).'
+				);
 			}
 		}
 
@@ -309,7 +356,13 @@ class Editor_partial_import
 		/*
         //import variable groups
         $this->create_update_variable_groups($sid,$parser->get_variable_groups());
-		*/	
+		*/
+
+		$result=array();
+		if (!empty($variable_warnings)){
+			$result['variable_warnings']=$variable_warnings;
+		}
+		return $result;
 	}
 
 	/**

@@ -16,6 +16,7 @@ class PublishProjectJob implements JobHandlerInterface
         // Get CodeIgniter instance
         $this->ci =& get_instance();
         $this->ci->load->model('Editor_publish_model');
+        $this->ci->load->model('Editor_model');
     }
 
     /**
@@ -63,8 +64,14 @@ class PublishProjectJob implements JobHandlerInterface
         $hash_data = array(
             'job_type' => $this->getJobType(),
             'project_id' => $payload['project_id'],
-            'catalog_connection_id' => $payload['catalog_connection_id']
-            // We omit timestamp so that duplicate requests for same project+catalog concurrently are prevented
+            'catalog_connection_id' => $payload['catalog_connection_id'],
+            'publish_metadata' => !empty($payload['publish_metadata']) ? 1 : 0,
+            'publish_thumbnail' => !empty($payload['publish_thumbnail']) ? 1 : 0,
+            'publish_resources' => !empty($payload['publish_resources']) ? 1 : 0,
+            'publish_dsd' => !empty($payload['publish_dsd']) ? 1 : 0,
+            'dsd_overwrite' => !empty($payload['dsd_overwrite']) ? 1 : 0,
+            'publish_indicator_data' => !empty($payload['publish_indicator_data']) ? 1 : 0,
+            'delete_nada_resources' => !empty($payload['delete_nada_resources']) ? 1 : 0,
         );
         
         ksort($hash_data);
@@ -93,6 +100,10 @@ class PublishProjectJob implements JobHandlerInterface
         $publish_metadata = isset($payload['publish_metadata']) ? $payload['publish_metadata'] : true;
         $publish_thumbnail = isset($payload['publish_thumbnail']) ? $payload['publish_thumbnail'] : true;
         $publish_resources = isset($payload['publish_resources']) ? $payload['publish_resources'] : true;
+        $publish_dsd = !empty($payload['publish_dsd']);
+        $dsd_overwrite = !empty($payload['dsd_overwrite']);
+        $publish_indicator_data = !empty($payload['publish_indicator_data']);
+        $delete_nada_resources = !empty($payload['delete_nada_resources']);
 
         $results = array();
         $errors = array();
@@ -108,7 +119,21 @@ class PublishProjectJob implements JobHandlerInterface
             throw new Exception("Failed to prepare project for publishing (JSON generation): " . $e->getMessage());
         }
 
-        if ($publish_metadata) {
+        // DDI used when JSON publish fails and NADA falls back to import_ddi (survey/microdata only).
+        $proj_row = $this->ci->Editor_model->get_basic_info($project_id);
+        if ($proj_row && ($proj_row['type'] === 'microdata' || $proj_row['type'] === 'survey')) {
+            try {
+                $this->ci->Editor_model->generate_project_ddi($project_id);
+                $results['export_ddi'] = 'Project DDI generated for publish fallback';
+            } catch (Exception $e) {
+                $results['export_ddi_warning'] = $e->getMessage();
+            }
+        }
+
+        $this->ci->load->library('Editor_nada_indicator_publish');
+        $is_indicator = $proj_row && $this->ci->editor_nada_indicator_publish->is_indicator_project_type($proj_row['type']);
+
+            if ($publish_metadata) {
             try {
                 $results['metadata'] = $this->ci->Editor_publish_model->publish_to_catalog(
                     $project_id, 
@@ -118,6 +143,40 @@ class PublishProjectJob implements JobHandlerInterface
                 );
             } catch (Exception $e) {
                 $errors['metadata'] = $e->getMessage();
+            }
+        }
+
+        if ($is_indicator && $publish_dsd) {
+            try {
+                $results['dsd'] = $this->ci->Editor_publish_model->publish_indicator_extras(
+                    $project_id,
+                    $user_id,
+                    $catalog_connection_id,
+                    array(
+                        'publish_dsd' => true,
+                        'dsd_overwrite' => $dsd_overwrite,
+                        'publish_indicator_data' => false,
+                    )
+                )['dsd'];
+            } catch (Exception $e) {
+                $errors['dsd'] = $e->getMessage();
+            }
+        }
+
+        if ($is_indicator && $publish_indicator_data) {
+            try {
+                $dataResult = $this->ci->Editor_publish_model->publish_indicator_extras(
+                    $project_id,
+                    $user_id,
+                    $catalog_connection_id,
+                    array(
+                        'publish_dsd' => false,
+                        'publish_indicator_data' => true,
+                    )
+                );
+                $results['indicator_data'] = $dataResult['data'];
+            } catch (Exception $e) {
+                $errors['indicator_data'] = $e->getMessage();
             }
         }
 
@@ -131,6 +190,18 @@ class PublishProjectJob implements JobHandlerInterface
                 );
             } catch (Exception $e) {
                 $errors['thumbnail'] = $e->getMessage();
+            }
+        }
+
+        if ($delete_nada_resources) {
+            try {
+                $results['nada_resources_delete'] = $this->ci->Editor_publish_model->delete_all_nada_study_resources(
+                    $project_id,
+                    $user_id,
+                    $catalog_connection_id
+                );
+            } catch (Exception $e) {
+                $errors['nada_resources_delete'] = $e->getMessage();
             }
         }
 
@@ -148,9 +219,25 @@ class PublishProjectJob implements JobHandlerInterface
         }
 
         if (!empty($errors)) {
-            // Throw exception if all requested operations failed, or maybe just return errors in the result
-            if (($publish_metadata && isset($errors['metadata'])) && 
-                ($publish_resources && isset($errors['resources']))) {
+            $critical_failures = 0;
+            $critical_attempts = 0;
+            foreach (array('metadata', 'dsd', 'indicator_data') as $key) {
+                $attempted = false;
+                if ($key === 'metadata' && $publish_metadata) {
+                    $attempted = true;
+                } elseif ($key === 'dsd' && $publish_dsd) {
+                    $attempted = true;
+                } elseif ($key === 'indicator_data' && $publish_indicator_data) {
+                    $attempted = true;
+                }
+                if ($attempted) {
+                    $critical_attempts++;
+                    if (isset($errors[$key])) {
+                        $critical_failures++;
+                    }
+                }
+            }
+            if ($critical_attempts > 0 && $critical_failures === $critical_attempts) {
                 throw new Exception("Publishing failed: " . json_encode($errors));
             }
         }

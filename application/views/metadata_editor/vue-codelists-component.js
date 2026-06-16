@@ -1,585 +1,817 @@
-// Global Codelists Listing Component
+// Global codelists listing (used by codelists/index.php). Remove uses POST /api/codelists/delete/{id} (not HTTP DELETE).
 Vue.component('codelists', {
     props: [],
-    data() {
+    data: function () {
         return {
-            codelists: [],
             loading: false,
+            deletingId: null,
+            codelists: [],
+            total: 0,
             search: '',
-            filters: {
-                agency: '',
-                lifecycle_state: '',
-                source_type: '',
-                is_hierarchical: null
-            },
-            pagination: {
-                page: 1,
-                itemsPerPage: 25,
-                total: 0,
-                offset: 0
-            },
-            sortBy: 'created_at',
-            sortDesc: true,
-            selectedCodelists: [],
-            showFilters: false,
-            page_action: 'list',
-            edit_item: null
+            selected: [],
+            expanded: [],
+            versionsByHead: {},
+            versionsLoading: {},
+            batchDeleting: false,
+            importDialog: false,
+            importFormat: 'sdmx',
+            importSource: 'file',
+            importFile: null,
+            importUrl: '',
+            importDryRun: false,
+            importReplace: false,
+            importing: false,
+            headers: [
+                { text: '', value: 'data-table-expand', sortable: false, width: '52px' },
+                { text: 'Title', value: 'title', sortable: false },
+                { text: 'Name', value: 'name', sortable: false, width: '140px' },
+                { text: 'Agency', value: 'agency', sortable: false, width: '110px' },
+                { text: 'Version', value: 'version', sortable: false, width: '100px' },
+                { text: 'Versions', value: 'versions_count', sortable: false, align: 'center', width: '120px' },
+                { text: 'Items', value: 'item_count', sortable: false, align: 'end', width: '88px' },
+                { text: 'DSD', value: 'dsd_component_count', sortable: false, align: 'end', width: '80px' },
+                { text: 'Status', value: 'status', sortable: false, width: '110px' },
+                { text: '', value: 'actions', sortable: false, align: 'end', width: '52px' }
+            ],
+            statusUpdatingId: null
+        };
+    },
+    watch: {
+        expanded: function (ids) {
+            this.onExpand(ids);
         }
     },
-    created: async function() {
-        await this.loadCodelists();
+    mounted: function () {
+        var vm = this;
+        this.loadCodelists();
+        if (typeof EventBus !== 'undefined') {
+            EventBus.$on('codelist-sdmx-open', vm.openImportDialog);
+        }
     },
-    methods: {
-        loadCodelists: async function() {
-            this.loading = true;
-            const vm = this;
-            
-            try {
-                // Build query parameters
-                let params = {
-                    offset: this.pagination.offset,
-                    limit: this.pagination.itemsPerPage,
-                    order_by: this.sortBy,
-                    order_dir: this.sortDesc ? 'DESC' : 'ASC'
-                };
-
-                // Add filters
-                if (this.filters.agency) {
-                    params.agency = this.filters.agency;
-                }
-                if (this.filters.lifecycle_state) {
-                    params.lifecycle_state = this.filters.lifecycle_state;
-                }
-                if (this.filters.source_type) {
-                    params.source_type = this.filters.source_type;
-                }
-                if (this.filters.is_hierarchical !== null) {
-                    params.is_hierarchical = this.filters.is_hierarchical ? '1' : '0';
-                }
-                if (this.search) {
-                    params.search = this.search;
-                }
-
-                let url = CI.site_url + '/api/codelists?' + new URLSearchParams(params).toString();
-                let response = await axios.get(url);
-                
-                if (response.data && response.data.codelists) {
-                    vm.codelists = response.data.codelists;
-                    vm.pagination.total = response.data.total || 0;
-                }
-            } catch (error) {
-                console.log("Error loading codelists", error);
-                EventBus.$emit('onFail', 'Failed to load codelists');
-            } finally {
-                this.loading = false;
-            }
-        },
-        clearSearch: function() {
-            this.search = '';
-            this.loadCodelists();
-        },
-        clearFilters: function() {
-            this.filters = {
-                agency: '',
-                lifecycle_state: '',
-                source_type: '',
-                is_hierarchical: null
-            };
-            this.loadCodelists();
-        },
-        applyFilters: function() {
-            this.pagination.page = 1;
-            this.pagination.offset = 0;
-            this.loadCodelists();
-        },
-        onPageChange: function(page) {
-            this.pagination.page = page;
-            this.pagination.offset = (page - 1) * this.pagination.itemsPerPage;
-            this.loadCodelists();
-        },
-        onSortChange: function(options) {
-            if (options.length > 0) {
-                this.sortBy = options[0].key;
-                this.sortDesc = options[0].order === 'desc';
-                this.loadCodelists();
-            }
-        },
-        getLifecycleStateColor: function(state) {
-            const colors = {
-                'draft': 'grey',
-                'published': 'success',
-                'deprecated': 'warning',
-                'superseded': 'info'
-            };
-            return colors[state] || 'grey';
-        },
-        getLifecycleStateIcon: function(state) {
-            const icons = {
-                'draft': 'mdi-file-document-edit-outline',
-                'published': 'mdi-check-circle',
-                'deprecated': 'mdi-alert',
-                'superseded': 'mdi-information'
-            };
-            return icons[state] || 'mdi-file-document';
-        },
-        getSourceTypeColor: function(type) {
-            const colors = {
-                'sdmx': 'primary',
-                'iso': 'info',
-                'classification': 'purple',
-                'geography': 'teal',
-                'external_registry': 'orange',
-                'internal': 'grey'
-            };
-            return colors[type] || 'grey';
-        },
-        formatDate: function(dateString) {
-            if (!dateString) return '';
-            const date = new Date(dateString);
-            return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        },
-        editCodelist: function(codelist) {
-            // Navigate to edit page
-            if (this.$router) {
-                this.$router.push('/edit/' + codelist.id);
-            } else {
-                EventBus.$emit('codelist-edit', codelist);
-            }
-        },
-        viewCodelist: function(codelist) {
-            // Navigate to view page
-            if (this.$router) {
-                this.$router.push('/edit/' + codelist.id);
-            } else {
-                EventBus.$emit('codelist-view', codelist);
-            }
-        },
-        deleteCodelist: async function(codelist) {
-            if (!confirm(`Are you sure you want to delete "${codelist.name}"? This action cannot be undone.`)) {
-                return;
-            }
-
-            try {
-                let url = CI.site_url + '/api/codelists/' + codelist.id + '/delete';
-                await axios.post(url);
-                
-                EventBus.$emit('onSuccess', 'Codelist deleted successfully');
-                this.loadCodelists();
-            } catch (error) {
-                console.log("Error deleting codelist", error);
-                EventBus.$emit('onFail', 'Failed to delete codelist');
-            }
-        },
-        viewCodes: function(codelist) {
-            if (this.$router) {
-                this.$router.push('/edit/' + codelist.id + '#codes');
-            } else {
-                EventBus.$emit('codelist-codes', codelist);
-            }
-        },
-        createCodelist: function() {
-            if (this.$router) {
-                this.$router.push('/edit');
-            } else {
-                EventBus.$emit('codelist-create');
-            }
-        },
-        importCodelist: function() {
-            EventBus.$emit('codelist-import');
-        },
-        exportCodelist: function(codelist) {
-            EventBus.$emit('codelist-export', codelist);
-        },
-        toggleSelection: function(codelist) {
-            const index = this.selectedCodelists.findIndex(c => c.id === codelist.id);
-            if (index > -1) {
-                this.selectedCodelists.splice(index, 1);
-            } else {
-                this.selectedCodelists.push(codelist);
-            }
-        },
-        toggleSelectAll: function() {
-            if (this.selectedCodelists.length === this.codelists.length) {
-                this.selectedCodelists = [];
-            } else {
-                this.selectedCodelists = [...this.codelists];
-            }
-        },
-        batchDelete: async function() {
-            if (this.selectedCodelists.length === 0) {
-                return;
-            }
-
-            if (!confirm(`Are you sure you want to delete ${this.selectedCodelists.length} codelist(s)? This action cannot be undone.`)) {
-                return;
-            }
-
-            try {
-                const deletePromises = this.selectedCodelists.map(codelist => {
-                    let url = CI.base_url + '/api/codelists/' + codelist.id + '/delete';
-                    return axios.post(url);
-                });
-
-                await Promise.all(deletePromises);
-                
-                EventBus.$emit('onSuccess', `${this.selectedCodelists.length} codelist(s) deleted successfully`);
-                this.selectedCodelists = [];
-                this.loadCodelists();
-            } catch (error) {
-                console.log("Error deleting codelists", error);
-                EventBus.$emit('onFail', 'Failed to delete some codelists');
-            }
+    beforeDestroy: function () {
+        if (typeof EventBus !== 'undefined') {
+            EventBus.$off('codelist-sdmx-open', this.openImportDialog);
         }
     },
     computed: {
-        filteredCodelists: function() {
-            // Client-side filtering if needed (though we're doing server-side)
-            return this.codelists;
+        importCanSubmit: function () {
+            if (this.importFormat === 'json') {
+                return !!this.importFile;
+            }
+            if (this.importSource === 'url') {
+                return (this.importUrl || '').trim().length > 0;
+            }
+            return !!this.importFile;
         },
-        totalPages: function() {
-            return Math.ceil(this.pagination.total / this.pagination.itemsPerPage);
+        isAdmin: function () {
+            return CI && CI.user_info && CI.user_info.is_admin === true;
         },
-        allSelected: function() {
-            return this.codelists.length > 0 && 
-                   this.codelists.every(c => this.selectedCodelists.findIndex(s => s.id === c.id) > -1);
+        canEditCodelist: function () {
+            return CI && CI.user_info && CI.user_info.can_edit_codelist === true;
         },
-        someSelected: function() {
-            return this.selectedCodelists.length > 0 && !this.allSelected;
+        canImportCodelist: function () {
+            return CI && CI.user_info && CI.user_info.can_import_codelist === true;
+        },
+        canDeleteCodelist: function () {
+            return CI && CI.user_info && CI.user_info.can_delete_codelist === true;
+        },
+        tableCodelists: function () {
+            var vm = this;
+            return (this.codelists || []).map(function (row) {
+                return Object.assign({}, row, {
+                    isSelectable: vm.isRowSelectable(row)
+                });
+            });
+        },
+        selectedBlockedCount: function () {
+            var vm = this;
+            return (this.selected || []).filter(function (item) {
+                return !vm.isRowSelectable(item);
+            }).length;
         }
     },
-    watch: {
-        search: function() {
-            // Debounce search
-            clearTimeout(this.searchTimeout);
-            this.searchTimeout = setTimeout(() => {
-                this.pagination.page = 1;
-                this.pagination.offset = 0;
-                this.loadCodelists();
-            }, 500);
+    methods: {
+        apiBase: function () {
+            var base = (typeof CI !== 'undefined' && CI.site_url) ? CI.site_url.replace(/\/$/, '') : '';
+            return base + '/api/codelists';
+        },
+        notifyFail: function (err) {
+            var m = 'Request failed';
+            if (err.response && err.response.data && err.response.data.message) {
+                m = err.response.data.message;
+            }
+            if (typeof EventBus !== 'undefined') {
+                EventBus.$emit('onFail', m);
+            } else {
+                alert(m);
+            }
+        },
+        notifySuccess: function (msg) {
+            if (typeof EventBus !== 'undefined') {
+                EventBus.$emit('onSuccess', msg);
+            }
+        },
+        loadCodelists: function () {
+            var vm = this;
+            vm.loading = true;
+            vm.expanded = [];
+            vm.versionsByHead = {};
+            vm.selected = [];
+            var url = vm.apiBase() + '?with_counts=1';
+            if (vm.search) {
+                url += '&search=' + encodeURIComponent(vm.search);
+            }
+            axios.get(url)
+                .then(function (res) {
+                    vm.loading = false;
+                    if (res.data && res.data.status === 'success') {
+                        vm.codelists = res.data.codelists || [];
+                        vm.total = res.data.total != null ? res.data.total : vm.codelists.length;
+                    } else {
+                        vm.codelists = [];
+                        vm.total = 0;
+                    }
+                })
+                .catch(function (err) {
+                    vm.loading = false;
+                    vm.notifyFail(err);
+                });
+        },
+        onExpand: function (rows) {
+            var vm = this;
+            vm.expanded = rows || [];
+            (rows || []).forEach(function (id) {
+                var head = vm.codelists.find(function (c) { return c.id === id; });
+                if (head && (!head.versions_count || head.versions_count <= 1)) {
+                    return;
+                }
+                if (!vm.versionsByHead[id] && !vm.versionsLoading[id]) {
+                    vm.loadVersions(head);
+                }
+            });
+        },
+        loadVersions: function (head) {
+            var vm = this;
+            if (!head || !head.name) {
+                return;
+            }
+            var headId = head.id;
+            vm.$set(vm.versionsLoading, headId, true);
+            var url = vm.apiBase() + '/versions/' + encodeURIComponent(head.name) + '?with_counts=1';
+            if (head.agency) {
+                url += '&agency=' + encodeURIComponent(head.agency);
+            }
+            axios.get(url)
+                .then(function (res) {
+                    vm.$set(vm.versionsLoading, headId, false);
+                    if (res.data && res.data.status === 'success') {
+                        vm.$set(vm.versionsByHead, headId, res.data.codelists || []);
+                    }
+                })
+                .catch(function (err) {
+                    vm.$set(vm.versionsLoading, headId, false);
+                    vm.notifyFail(err);
+                });
+        },
+        versionRowsFor: function (head) {
+            if (!head) {
+                return [];
+            }
+            var loaded = this.versionsByHead[head.id];
+            if (loaded && loaded.length) {
+                return loaded;
+            }
+            return [head];
+        },
+        showExpand: function (item) {
+            return item && (item.versions_count == null || item.versions_count > 1);
+        },
+        goCreate: function () {
+            this.$router.push('/edit');
+        },
+        goView: function (row) {
+            this.$router.push('/view/' + row.id);
+        },
+        exportJsonUrl: function (row) {
+            return this.apiBase() + '/export_json/' + row.id + '?download=1';
+        },
+        sdmxExportUrl: function (row, version) {
+            return this.apiBase() + '/export_sdmx/' + row.id + '?version=' + version;
+        },
+        goEdit: function (row) {
+            this.$router.push('/edit/' + row.id);
+        },
+        deleteCodelist: function (row) {
+            var vm = this;
+            var label = (row.title && String(row.title).trim()) || row.name || row.idno || row.id;
+            if (!confirm('Delete codelist "' + label + '" and all its items? This cannot be undone.')) {
+                return;
+            }
+            vm.deletingId = row.id;
+            axios.post(vm.apiBase() + '/delete/' + row.id)
+                .then(function () {
+                    vm.deletingId = null;
+                    vm.notifySuccess('Codelist deleted');
+                    vm.loadCodelists();
+                })
+                .catch(function (err) {
+                    vm.deletingId = null;
+                    vm.notifyFail(err);
+                });
+        },
+        openImportDialog: function (format) {
+            this.importFormat = format === 'json' ? 'json' : 'sdmx';
+            this.importSource = 'file';
+            this.importFile = null;
+            this.importUrl = '';
+            this.importDryRun = false;
+            this.importReplace = false;
+            this.importDialog = true;
+        },
+        closeImportDialog: function () {
+            if (this.importing) {
+                return;
+            }
+            this.importDialog = false;
+            this.importFile = null;
+            this.importUrl = '';
+        },
+        submitImport: function () {
+            if (this.importFormat === 'json') {
+                this.submitJsonImport();
+            } else {
+                this.submitSdmxImport();
+            }
+        },
+        submitJsonImport: function () {
+            var vm = this;
+            if (!vm.importFile) {
+                vm.notifyFail({
+                    response: { data: { message: 'Choose a .json file' } }
+                });
+                return;
+            }
+            var url = vm.apiBase() + '/import_json';
+            var q = [];
+            if (vm.importDryRun) {
+                q.push('dry_run=1');
+            }
+            if (vm.importReplace) {
+                q.push('replace=1');
+            }
+            if (q.length) {
+                url += '?' + q.join('&');
+            }
+            var fd = new FormData();
+            fd.append('file', vm.importFile);
+            vm.importing = true;
+            axios.post(url, fd)
+                .then(function (res) {
+                    vm.importing = false;
+                    var d = res.data || {};
+                    var msg = vm._formatJsonImportSummary(d);
+                    if (d.warnings && d.warnings.length) {
+                        msg += ' — ' + d.warnings.slice(0, 4).join(' · ');
+                    }
+                    if (d.status === 'failed') {
+                        vm.notifyFail({ response: { data: { message: msg || 'Import failed' } } });
+                        return;
+                    }
+                    vm.notifySuccess(msg || 'Import finished');
+                    if (!vm.importDryRun) {
+                        vm.loadCodelists();
+                    }
+                    vm.closeImportDialog();
+                })
+                .catch(function (err) {
+                    vm.importing = false;
+                    vm.notifyFail(err);
+                });
+        },
+        submitSdmxImport: function () {
+            var vm = this;
+            if (!vm.importCanSubmit) {
+                vm.notifyFail({
+                    response: {
+                        data: {
+                            message: vm.importSource === 'url'
+                                ? 'Enter a URL to SDMX-ML (https://…)'
+                                : 'Choose an SDMX-ML (.xml) file'
+                        }
+                    }
+                });
+                return;
+            }
+            var url = vm.apiBase() + '/import_sdmx';
+            var q = [];
+            if (vm.importDryRun) {
+                q.push('dry_run=1');
+            }
+            if (vm.importReplace) {
+                q.push('replace=1');
+            }
+            if (q.length) {
+                url += '?' + q.join('&');
+            }
+            vm.importing = true;
+            var req;
+            if (vm.importSource === 'url') {
+                req = axios.post(url, { url: (vm.importUrl || '').trim() }, {
+                    headers: { 'Content-Type': 'application/json' }
+                });
+            } else {
+                var fd = new FormData();
+                fd.append('file', vm.importFile);
+                req = axios.post(url, fd);
+            }
+            req
+                .then(function (res) {
+                    vm.importing = false;
+                    var d = res.data || {};
+                    var msg = vm._formatImportSummary(d);
+                    if (d.warnings && d.warnings.length) {
+                        msg += ' — ' + d.warnings.slice(0, 4).join(' · ');
+                        if (d.warnings.length > 4) {
+                            msg += '…';
+                        }
+                    }
+                    if (d.status === 'failed') {
+                        vm.notifyFail({ response: { data: { message: msg || 'Import failed' } } });
+                        return;
+                    }
+                    vm.notifySuccess(msg || 'Import finished');
+                    if (!vm.importDryRun) {
+                        vm.loadCodelists();
+                    }
+                    vm.closeImportDialog();
+                })
+                .catch(function (err) {
+                    vm.importing = false;
+                    vm.notifyFail(err);
+                });
+        },
+        _formatJsonImportSummary: function (d) {
+            if (!d || typeof d !== 'object') {
+                return '';
+            }
+            var row = (d.imported && d.imported[0]) ? d.imported[0] : null;
+            if (d.dry_run && row) {
+                return 'Preview: ' + (row.planned_action || row.action || 'ok')
+                    + ' — ' + (row.codes_count != null ? row.codes_count : 0) + ' codes (nothing saved)';
+            }
+            if (!row) {
+                return 'Done';
+            }
+            if (row.action === 'skipped') {
+                return 'Skipped (already exists; enable Replace to overwrite items)';
+            }
+            if (row.action === 'created') {
+                return 'Created codelist ' + (row.name || row.id)
+                    + ' with ' + (row.codes_imported != null ? row.codes_imported : 0) + ' codes';
+            }
+            if (row.action === 'updated') {
+                return 'Updated codelist ' + (row.name || row.id)
+                    + ' — ' + (row.codes_imported != null ? row.codes_imported : 0) + ' codes';
+            }
+            return 'Import finished';
+        },
+        _formatImportSummary: function (d) {
+            if (!d || typeof d !== 'object') {
+                return '';
+            }
+            if (d.dry_run) {
+                var n = 0;
+                (d.imported || []).forEach(function (x) {
+                    n += x.codes_count != null ? x.codes_count : 0;
+                });
+                return 'Preview: ' + (d.imported || []).length + ' codelist(s), ~' + n + ' codes (nothing saved)';
+            }
+            var parts = [];
+            if ((d.imported || []).length) {
+                parts.push('Imported ' + d.imported.length + ' list(s)');
+            }
+            if ((d.skipped || []).length) {
+                parts.push('Skipped ' + d.skipped.length + ' (already exist)');
+            }
+            if ((d.failed || []).length) {
+                parts.push('Failed ' + d.failed.length);
+            }
+            if (d.sdmx_version) {
+                parts.push('SDMX ' + d.sdmx_version);
+            }
+            var s = parts.join(' · ') || 'Done';
+            if (d.status === 'partial') {
+                s = 'Partial: ' + s;
+            }
+            return s;
+        },
+        statusLabel: function (status) {
+            var s = (status || 'active').toLowerCase();
+            var key = 'codelist_status_' + s;
+            var t = this.$t(key);
+            if (t && t !== key) {
+                return t;
+            }
+            return s.charAt(0).toUpperCase() + s.slice(1);
+        },
+        statusColor: function (status) {
+            var s = (status || 'active').toLowerCase();
+            if (s === 'draft') return 'grey';
+            if (s === 'locked') return 'orange darken-2';
+            if (s === 'archived') return 'blue-grey';
+            return 'green';
+        },
+        isContentMutable: function (item) {
+            var s = (item && item.status) ? String(item.status).toLowerCase() : 'active';
+            return s === 'draft' || s === 'active';
+        },
+        codelistLabel: function (row) {
+            return (row.title && String(row.title).trim()) || row.name || row.idno || row.id;
+        },
+        deleteBlockedReason: function (item) {
+            if (!item || !item.id) {
+                return 'invalid row';
+            }
+            if (!this.isContentMutable(item)) {
+                return 'status is ' + (item.status || 'locked') + ' (only draft/active can be deleted)';
+            }
+            if (item.dsd_component_count != null && Number(item.dsd_component_count) > 0) {
+                var n = Number(item.dsd_component_count);
+                return 'in use by ' + n + ' data structure component' + (n === 1 ? '' : 's');
+            }
+            return null;
+        },
+        isRowSelectable: function (item) {
+            return !this.deleteBlockedReason(item);
+        },
+        formatBlockedDeleteMessage: function (rows) {
+            var vm = this;
+            var lines = (rows || []).slice(0, 5).map(function (r) {
+                return '• ' + vm.codelistLabel(r) + ': ' + vm.deleteBlockedReason(r);
+            });
+            if ((rows || []).length > 5) {
+                lines.push('• …and ' + (rows.length - 5) + ' more');
+            }
+            return lines.join('\n');
+        },
+        clearSelection: function () {
+            this.selected = [];
+        },
+        deleteSelectedCodelists: function () {
+            var vm = this;
+            var selected = vm.selected || [];
+            if (!selected.length) {
+                return;
+            }
+            var deletable = [];
+            var blocked = [];
+            selected.forEach(function (item) {
+                if (vm.isRowSelectable(item)) {
+                    deletable.push(item);
+                } else {
+                    blocked.push(item);
+                }
+            });
+            if (!deletable.length) {
+                vm.notifyFail({
+                    response: {
+                        data: {
+                            message: 'None of the selected codelists can be deleted:\n\n'
+                                + vm.formatBlockedDeleteMessage(blocked)
+                        }
+                    }
+                });
+                return;
+            }
+            var confirmMsg;
+            if (blocked.length) {
+                confirmMsg = 'Delete ' + deletable.length + ' codelist(s)? '
+                    + blocked.length + ' selected codelist(s) cannot be deleted and will be skipped:\n\n'
+                    + vm.formatBlockedDeleteMessage(blocked)
+                    + '\n\nContinue with deletable codelist(s) only?';
+            } else {
+                var labels = deletable.map(function (r) {
+                    return vm.codelistLabel(r);
+                });
+                var preview = labels.slice(0, 3).join(', ');
+                if (labels.length > 3) {
+                    preview += '…';
+                }
+                confirmMsg = 'Delete ' + deletable.length + ' codelist(s)?\n\n' + preview + '\n\nThis cannot be undone.';
+            }
+            if (!confirm(confirmMsg)) {
+                return;
+            }
+            vm.batchDeleting = true;
+            var chain = Promise.resolve();
+            var failed = 0;
+            var lastErrorMessage = '';
+            deletable.forEach(function (row) {
+                chain = chain.then(function () {
+                    return axios.post(vm.apiBase() + '/delete/' + row.id).catch(function (err) {
+                        failed++;
+                        if (err.response && err.response.data && err.response.data.message) {
+                            lastErrorMessage = err.response.data.message;
+                        }
+                    });
+                });
+            });
+            chain.then(function () {
+                vm.batchDeleting = false;
+                vm.clearSelection();
+                if (failed) {
+                    var message = failed + ' of ' + deletable.length + ' could not be deleted.';
+                    if (lastErrorMessage) {
+                        message += ' ' + lastErrorMessage;
+                    } else {
+                        message += ' The codelist may be in use by a data structure or locked.';
+                    }
+                    vm.notifyFail({
+                        response: {
+                            data: {
+                                message: message
+                            }
+                        }
+                    });
+                } else {
+                    var successMsg = 'Deleted ' + deletable.length + ' codelist(s)';
+                    if (blocked.length) {
+                        successMsg += ' (' + blocked.length + ' skipped — in use or locked)';
+                    }
+                    vm.notifySuccess(successMsg);
+                }
+                vm.loadCodelists();
+            });
+        },
+        setCodelistStatus: function (item, newStatus) {
+            var vm = this;
+            if (!item || !item.id) return;
+            vm.statusUpdatingId = item.id;
+            axios.post(vm.apiBase() + '/update/' + item.id, { status: newStatus })
+                .then(function () {
+                    vm.statusUpdatingId = null;
+                    vm.notifySuccess('Status updated');
+                    vm.loadCodelists();
+                })
+                .catch(function (err) {
+                    vm.statusUpdatingId = null;
+                    vm.notifyFail(err);
+                });
         }
     },
     template: `
-        <div class="codelists-component">
-            <v-card class="mb-2 m-2" flat>
-                <v-card-title class="d-flex justify-space-between align-center">
-                    <div>
-                        <h4 class="mb-0 d-inline">{{$t("codelists")}}</h4>
-                        <small class="text-muted ml-2" v-if="pagination.total > 0">
-                            {{pagination.total}} {{$t("codelists") || "codelists"}}
-                        </small>
-                    </div>
-                    <div>
-                        <v-btn 
-                            color="secondary" 
-                            outlined 
-                            class="mr-2" 
-                            @click="importCodelist"
-                            small
-                        >
-                            <v-icon left small>mdi-upload</v-icon>
-                            {{$t("import") || "Import"}}
-                        </v-btn>
-                        <v-btn 
-                            color="primary" 
-                            @click="createCodelist"
-                            small
-                        >
-                            <v-icon left small>mdi-plus</v-icon>
-                            {{$t("create_new") || "Create New"}}
-                        </v-btn>
-                    </div>
+        <div>
+            <v-card class="mb-4">
+                <v-card-title class="d-flex flex-wrap align-center">
+                    <span class="text-h6">{{ $t('codelists') || 'Codelists' }}</span>
+                    <v-spacer></v-spacer>
+                    <v-btn v-if="canImportCodelist" color="primary" outlined class="mr-2" @click="openImportDialog('json')">Import JSON</v-btn>
+                    <v-btn v-if="canImportCodelist" color="primary" outlined class="mr-2" @click="openImportDialog('sdmx')">Import SDMX</v-btn>
+                    <v-btn v-if="canEditCodelist" color="primary" outlined @click="goCreate">New codelist</v-btn>
                 </v-card-title>
-
-                <v-card-text>
-                    <!-- Search and Filters -->
-                    <v-row class="mb-2">
-                        <v-col cols="12" md="6">
-                            <v-text-field
-                                v-model="search"
-                                :placeholder="$t('search_codelists') || 'Search codelists...'"
-                                prepend-inner-icon="mdi-magnify"
-                                clearable
-                                @click:clear="clearSearch"
-                                outlined
-                                dense
-                                hide-details
-                            ></v-text-field>
-                        </v-col>
-                        <v-col cols="12" md="6" class="text-right">
-                            <v-btn 
-                                text 
-                                small 
-                                @click="showFilters = !showFilters"
-                            >
-                                <v-icon left small>mdi-filter</v-icon>
-                                {{$t("filters") || "Filters"}}
-                                <v-icon right small>{{showFilters ? 'mdi-chevron-up' : 'mdi-chevron-down'}}</v-icon>
-                            </v-btn>
-                            <v-btn 
-                                text 
-                                small 
-                                @click="clearFilters"
-                                v-if="filters.agency || filters.lifecycle_state || filters.source_type || filters.is_hierarchical !== null"
-                            >
-                                <v-icon left small>mdi-close</v-icon>
-                                {{$t("clear") || "Clear"}}
-                            </v-btn>
-                        </v-col>
-                    </v-row>
-
-                    <!-- Filter Panel -->
-                    <v-expand-transition>
-                        <v-row v-show="showFilters" class="mb-2">
-                            <v-col cols="12" md="3">
-                                <v-text-field
-                                    v-model="filters.agency"
-                                    label="Agency"
-                                    outlined
-                                    dense
-                                    hide-details
-                                ></v-text-field>
-                            </v-col>
-                            <v-col cols="12" md="3">
-                                <v-select
-                                    v-model="filters.lifecycle_state"
-                                    :items="[
-                                        {text: 'Draft', value: 'draft'},
-                                        {text: 'Published', value: 'published'},
-                                        {text: 'Deprecated', value: 'deprecated'},
-                                        {text: 'Superseded', value: 'superseded'}
-                                    ]"
-                                    label="Lifecycle State"
-                                    outlined
-                                    dense
-                                    hide-details
-                                    clearable
-                                ></v-select>
-                            </v-col>
-                            <v-col cols="12" md="3">
-                                <v-select
-                                    v-model="filters.source_type"
-                                    :items="[
-                                        {text: 'SDMX', value: 'sdmx'},
-                                        {text: 'ISO', value: 'iso'},
-                                        {text: 'Classification', value: 'classification'},
-                                        {text: 'Geography', value: 'geography'},
-                                        {text: 'External Registry', value: 'external_registry'},
-                                        {text: 'Internal', value: 'internal'}
-                                    ]"
-                                    label="Source Type"
-                                    outlined
-                                    dense
-                                    hide-details
-                                    clearable
-                                ></v-select>
-                            </v-col>
-                            <v-col cols="12" md="3">
-                                <v-select
-                                    v-model="filters.is_hierarchical"
-                                    :items="[
-                                        {text: 'All', value: null},
-                                        {text: 'Hierarchical', value: true},
-                                        {text: 'Non-hierarchical', value: false}
-                                    ]"
-                                    label="Hierarchical"
-                                    outlined
-                                    dense
-                                    hide-details
-                                ></v-select>
-                            </v-col>
-                            <v-col cols="12" class="text-right">
-                                <v-btn 
-                                    color="primary" 
-                                    @click="applyFilters"
-                                    small
-                                >
-                                    {{$t("apply_filters") || "Apply Filters"}}
-                                </v-btn>
-                            </v-col>
-                        </v-row>
-                    </v-expand-transition>
-
-                    <!-- Batch Actions -->
-                    <v-row v-if="selectedCodelists.length > 0" class="mb-2">
-                        <v-col cols="12">
-                            <v-alert type="info" outlined dense>
-                                <div class="d-flex justify-space-between align-center">
-                                    <span>{{selectedCodelists.length}} {{$t("selected") || "selected"}}</span>
-                                    <v-btn 
-                                        color="error" 
-                                        outlined 
-                                        small 
-                                        @click="batchDelete"
-                                    >
-                                        <v-icon left small>mdi-delete</v-icon>
-                                        {{$t("delete_selected") || "Delete Selected"}}
-                                    </v-btn>
-                                </div>
-                            </v-alert>
-                        </v-col>
-                    </v-row>
-
-                    <!-- Codelists Table -->
-                    <v-data-table
-                        :headers="[
-                            {text: '', value: 'checkbox', sortable: false, width: '50px'},
-                            {text: $t('name') || 'Name', value: 'name', sortable: true},
-                            {text: $t('agency') || 'Agency', value: 'agency', sortable: true},
-                            {text: $t('codelist_id') || 'Codelist ID', value: 'codelist_id', sortable: true},
-                            {text: $t('version') || 'Version', value: 'version', sortable: true},
-                            {text: $t('lifecycle_state') || 'State', value: 'lifecycle_state', sortable: true},
-                            {text: $t('source_type') || 'Source', value: 'source_type', sortable: true},
-                            {text: $t('codes') || 'Codes', value: 'code_count', sortable: true},
-                            {text: $t('created') || 'Created', value: 'created_at', sortable: true},
-                            {text: $t('actions') || 'Actions', value: 'actions', sortable: false, width: '100px'}
-                        ]"
-                        :items="codelists"
-                        :loading="loading"
-                        :server-items-length="pagination.total"
-                        :items-per-page="pagination.itemsPerPage"
-                        :page="pagination.page"
-                        @update:page="onPageChange"
-                        @update:sort-by="onSortChange"
-                        class="elevation-1"
+                <v-card-text class="pt-0 pb-2">
+                    <v-text-field
+                        v-model="search"
+                        label="Search codelists"
+                        single-line
+                        hide-details
                         dense
-                        :hide-default-footer="false"
+                        outlined
+                        clearable
+                        class="mr-4"
+                        style="max-width: 480px;"
+                        @keyup.enter="loadCodelists"
+                        @click:clear="search = ''; loadCodelists()"
                     >
-                        <!-- Checkbox column -->
-                        <template v-slot:item.checkbox="{ item }">
-                            <v-checkbox
-                                :value="selectedCodelists.findIndex(c => c.id === item.id) > -1"
-                                @change="toggleSelection(item)"
-                                hide-details
-                                dense
-                            ></v-checkbox>
+                        <template v-slot:append>
+                            <v-btn icon small :loading="loading" @click="loadCodelists" title="Search">
+                                <v-icon small>mdi-magnify</v-icon>
+                            </v-btn>
                         </template>
-
-                        <!-- Name column -->
-                        <template v-slot:item.name="{ item }">
-                            <div>
-                                <div class="font-weight-medium" style="cursor: pointer; color: #1976D2;" @click="viewCodelist(item)">
-                                    {{item.name}}
-                                </div>
-                                <div class="text-caption text--secondary" v-if="item.description">
-                                    {{item.description.substring(0, 60)}}{{item.description.length > 60 ? '...' : ''}}
-                                </div>
-                            </div>
-                        </template>
-
-                        <!-- Lifecycle State column -->
-                        <template v-slot:item.lifecycle_state="{ item }">
-                            <v-chip 
-                                :color="getLifecycleStateColor(item.lifecycle_state)" 
-                                small 
-                                outlined
-                            >
-                                <v-icon left small>{{getLifecycleStateIcon(item.lifecycle_state)}}</v-icon>
-                                {{item.lifecycle_state}}
-                            </v-chip>
-                        </template>
-
-                        <!-- Source Type column -->
-                        <template v-slot:item.source_type="{ item }">
-                            <v-chip 
-                                :color="getSourceTypeColor(item.source_type)" 
-                                small 
-                                outlined
-                            >
-                                {{item.source_type}}
-                            </v-chip>
-                        </template>
-
-                        <!-- Hierarchical indicator -->
-                        <template v-slot:item.code_count="{ item }">
-                            <div>
-                                <span>{{item.code_count || 0}}</span>
-                                <v-icon 
-                                    v-if="item.is_hierarchical" 
-                                    small 
-                                    color="primary" 
-                                    class="ml-1"
-                                    title="Hierarchical"
-                                >
-                                    mdi-file-tree
-                                </v-icon>
-                            </div>
-                        </template>
-
-                        <!-- Created date -->
-                        <template v-slot:item.created_at="{ item }">
-                            <span class="text-caption">{{formatDate(item.created_at)}}</span>
-                        </template>
-
-                        <!-- Actions column -->
-                        <template v-slot:item.actions="{ item }">
-                            <v-menu offset-y>
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-btn 
-                                        small 
-                                        icon 
-                                        v-on="on" 
-                                        v-bind="attrs"
-                                        :title="$t('More options')"
-                                    >
-                                        <v-icon>mdi-dots-vertical</v-icon>
-                                    </v-btn>
-                                </template>
-                                <v-list dense>
-                                    <v-list-item @click="viewCodelist(item)">
-                                        <v-list-item-icon>
-                                            <v-icon>mdi-eye</v-icon>
-                                        </v-list-item-icon>
-                                        <v-list-item-title>{{$t("view") || "View"}}</v-list-item-title>
-                                    </v-list-item>
-                                    <v-list-item @click="viewCodes(item)">
-                                        <v-list-item-icon>
-                                            <v-icon>mdi-code-tags</v-icon>
-                                        </v-list-item-icon>
-                                        <v-list-item-title>{{$t("view_codes") || "View Codes"}}</v-list-item-title>
-                                    </v-list-item>
-                                    <v-divider></v-divider>
-                                    <v-list-item @click="editCodelist(item)">
-                                        <v-list-item-icon>
-                                            <v-icon>mdi-pencil</v-icon>
-                                        </v-list-item-icon>
-                                        <v-list-item-title>{{$t("edit") || "Edit"}}</v-list-item-title>
-                                    </v-list-item>
-                                    <v-list-item @click="exportCodelist(item)">
-                                        <v-list-item-icon>
-                                            <v-icon>mdi-file-export</v-icon>
-                                        </v-list-item-icon>
-                                        <v-list-item-title>{{$t("export") || "Export"}}</v-list-item-title>
-                                    </v-list-item>
-                                    <v-divider></v-divider>
-                                    <v-list-item @click="deleteCodelist(item)" class="red--text">
-                                        <v-list-item-icon>
-                                            <v-icon color="red">mdi-delete-outline</v-icon>
-                                        </v-list-item-icon>
-                                        <v-list-item-title class="red--text">{{$t("Delete") || "Delete"}}</v-list-item-title>
-                                    </v-list-item>
-                                </v-list>
-                            </v-menu>
-                        </template>
-
-                        <!-- Empty state -->
-                        <template v-slot:no-data>
-                            <div class="text-center pa-4">
-                                <v-icon large color="grey">mdi-file-document-outline</v-icon>
-                                <div class="mt-2">{{$t("no_codelists") || "No codelists found"}}</div>
-                                <v-btn 
-                                    color="primary" 
-                                    small 
-                                    class="mt-2" 
-                                    @click="createCodelist"
-                                >
-                                    <v-icon left small>mdi-plus</v-icon>
-                                    {{$t("create_first_codelist") || "Create First Codelist"}}
+                    </v-text-field>
+                    <div v-if="canDeleteCodelist && selected.length > 0" class="d-flex align-center flex-wrap mt-2 py-2 px-3 grey lighten-4 rounded">
+                        <span class="text-body-2 font-weight-medium mr-3">{{ selected.length }} selected</span>
+                        <span v-if="selectedBlockedCount > 0" class="text-caption orange--text text--darken-2 mr-3">
+                            {{ selectedBlockedCount }} cannot be deleted (in use or locked)
+                        </span>
+                        <v-btn
+                            color="error"
+                            small
+                            depressed
+                            class="mr-2"
+                            :loading="batchDeleting"
+                            :disabled="batchDeleting"
+                            @click="deleteSelectedCodelists"
+                        >
+                            <v-icon small left>mdi-delete</v-icon>
+                            Delete selected
+                        </v-btn>
+                        <v-btn text small :disabled="batchDeleting" @click="clearSelection">Clear</v-btn>
+                    </div>
+                </v-card-text>
+                <v-data-table
+                    v-model="selected"
+                    :headers="headers"
+                    :items="tableCodelists"
+                    :loading="loading"
+                    loading-text="Loading..."
+                    hide-default-footer
+                    disable-sort
+                    class="elevation-0"
+                    :show-select="canDeleteCodelist"
+                    show-expand
+                    :expanded.sync="expanded"
+                    item-key="id"
+                    single-expand
+                >
+                    <template v-slot:item.data-table-expand="{ item, expand, isExpanded }">
+                        <v-btn v-if="showExpand(item)" icon small @click="expand(!isExpanded)">
+                            <v-icon small>{{ isExpanded ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+                        </v-btn>
+                    </template>
+                    <template v-slot:item.versions_count="{ item }">
+                        <span v-if="item.versions_count > 1">{{ item.versions_count }}</span>
+                        <span v-else class="grey--text">—</span>
+                    </template>
+                    <template v-slot:item.item_count="{ item }">
+                        {{ item.item_count != null ? item.item_count : '—' }}
+                    </template>
+                    <template v-slot:item.dsd_component_count="{ item }">
+                        <span :class="item.dsd_component_count > 0 ? 'orange--text text--darken-2' : ''">
+                            {{ item.dsd_component_count != null ? item.dsd_component_count : '—' }}
+                        </span>
+                    </template>
+                    <template v-slot:expanded-item="{ headers, item }">
+                        <td :colspan="headers.length" class="pa-0 grey lighten-5">
+                            <v-progress-linear v-if="versionsLoading[item.id]" indeterminate></v-progress-linear>
+                            <v-simple-table v-else dense class="elevation-0 transparent">
+                                <thead>
+                                    <tr>
+                                        <th class="text-left">Version</th>
+                                        <th class="text-left">Status</th>
+                                        <th class="text-left">Title</th>
+                                        <th class="text-end">Items</th>
+                                        <th class="text-end">DSD</th>
+                                        <th class="text-end"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="ver in versionRowsFor(item)" :key="ver.id">
+                                        <td>{{ ver.version }}</td>
+                                        <td>
+                                            <v-chip x-small :color="statusColor(ver.status)" dark class="text-capitalize">
+                                                {{ statusLabel(ver.status) }}
+                                            </v-chip>
+                                        </td>
+                                        <td>{{ ver.title || ver.name }}</td>
+                                        <td class="text-end">{{ ver.item_count != null ? ver.item_count : '—' }}</td>
+                                        <td class="text-end">{{ ver.dsd_component_count != null ? ver.dsd_component_count : '—' }}</td>
+                                        <td class="text-end">
+                                            <v-btn x-small text color="primary" @click="goEdit(ver)">Open</v-btn>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </v-simple-table>
+                        </td>
+                    </template>
+                    <template v-slot:item.title="{ item }">
+                        <a href="#" class="text-decoration-none d-inline-flex align-center" @click.prevent="canEditCodelist && isContentMutable(item) ? goEdit(item) : goView(item)">
+                            <v-icon small class="mr-2 grey--text text--darken-1">mdi-format-list-bulleted-type</v-icon>
+                            <span>{{ item.title || item.name }}</span>
+                        </a>
+                    </template>
+                    <template v-slot:item.status="{ item }">
+                        <v-chip x-small :color="statusColor(item.status)" dark class="text-capitalize">
+                            {{ statusLabel(item.status) }}
+                        </v-chip>
+                    </template>
+                    <template v-slot:item.actions="{ item }">
+                        <v-menu offset-y left>
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-btn icon small v-bind="attrs" v-on="on" :loading="deletingId === item.id">
+                                    <v-icon small>mdi-dots-vertical</v-icon>
                                 </v-btn>
-                            </div>
-                        </template>
-                    </v-data-table>
+                            </template>
+                            <v-list dense>
+                                <v-list-item @click="goView(item)">
+                                    <v-list-item-icon class="mr-2"><v-icon small>mdi-eye-outline</v-icon></v-list-item-icon>
+                                    <v-list-item-title>View</v-list-item-title>
+                                </v-list-item>
+                                <v-list-item v-if="canEditCodelist && isContentMutable(item)" @click="goEdit(item)">
+                                    <v-list-item-icon class="mr-2"><v-icon small>mdi-pencil-outline</v-icon></v-list-item-icon>
+                                    <v-list-item-title>Edit</v-list-item-title>
+                                </v-list-item>
+                                <template v-if="isAdmin">
+                                    <v-divider></v-divider>
+                                    <v-list-item v-if="isContentMutable(item)" @click="setCodelistStatus(item, 'locked')" :disabled="statusUpdatingId === item.id">
+                                        <v-list-item-icon class="mr-2"><v-icon small>mdi-lock-outline</v-icon></v-list-item-icon>
+                                        <v-list-item-title>{{ $t('codelist_lock') || 'Lock' }}</v-list-item-title>
+                                    </v-list-item>
+                                    <v-list-item v-if="item.status === 'locked'" @click="setCodelistStatus(item, 'active')" :disabled="statusUpdatingId === item.id">
+                                        <v-list-item-icon class="mr-2"><v-icon small>mdi-lock-open-outline</v-icon></v-list-item-icon>
+                                        <v-list-item-title>{{ $t('codelist_unlock') || 'Unlock' }}</v-list-item-title>
+                                    </v-list-item>
+                                    <v-list-item v-if="item.status !== 'archived'" @click="setCodelistStatus(item, 'archived')" :disabled="statusUpdatingId === item.id">
+                                        <v-list-item-icon class="mr-2"><v-icon small>mdi-archive-outline</v-icon></v-list-item-icon>
+                                        <v-list-item-title>{{ $t('codelist_archive') || 'Archive' }}</v-list-item-title>
+                                    </v-list-item>
+                                    <v-list-item v-if="item.status === 'archived'" @click="setCodelistStatus(item, 'active')" :disabled="statusUpdatingId === item.id">
+                                        <v-list-item-icon class="mr-2"><v-icon small>mdi-archive-arrow-up-outline</v-icon></v-list-item-icon>
+                                        <v-list-item-title>Restore</v-list-item-title>
+                                    </v-list-item>
+                                </template>
+                                <v-divider></v-divider>
+                                <v-list-item :href="exportJsonUrl(item)" target="_blank" rel="noopener noreferrer">
+                                    <v-list-item-icon class="mr-2"><v-icon small>mdi-code-json</v-icon></v-list-item-icon>
+                                    <v-list-item-title>Export JSON</v-list-item-title>
+                                </v-list-item>
+                                <v-list-item :href="sdmxExportUrl(item, '2.1')">
+                                    <v-list-item-icon class="mr-2"><v-icon small>mdi-download-outline</v-icon></v-list-item-icon>
+                                    <v-list-item-title>SDMX 2.1</v-list-item-title>
+                                </v-list-item>
+                                <v-list-item :href="sdmxExportUrl(item, '3.0')">
+                                    <v-list-item-icon class="mr-2"><v-icon small>mdi-download-outline</v-icon></v-list-item-icon>
+                                    <v-list-item-title>SDMX 3.0</v-list-item-title>
+                                </v-list-item>
+                                <v-divider v-if="canDeleteCodelist"></v-divider>
+                                <v-list-item v-if="canDeleteCodelist && isContentMutable(item) && isRowSelectable(item)" @click="deleteCodelist(item)" :disabled="deletingId != null && deletingId !== item.id">
+                                    <v-list-item-icon class="mr-2"><v-icon small color="error">mdi-delete-outline</v-icon></v-list-item-icon>
+                                    <v-list-item-title class="error--text">Delete</v-list-item-title>
+                                </v-list-item>
+                                <v-list-item v-else-if="canDeleteCodelist && isContentMutable(item) && !isRowSelectable(item)" disabled>
+                                    <v-list-item-icon class="mr-2"><v-icon small>mdi-delete-off-outline</v-icon></v-list-item-icon>
+                                    <v-list-item-title>{{ deleteBlockedReason(item) }}</v-list-item-title>
+                                </v-list-item>
+                            </v-list>
+                        </v-menu>
+                    </template>
+                </v-data-table>
+                <v-card-text v-if="!loading && total > codelists.length" class="text-caption grey--text">
+                    Total: {{ total }} (showing {{ codelists.length }} — use API pagination for more)
                 </v-card-text>
             </v-card>
+
+            <v-dialog v-model="importDialog" max-width="560" @click:outside="closeImportDialog">
+                <v-card>
+                    <v-card-title>{{ importFormat === 'json' ? 'Import codelist (JSON)' : 'Import codelists (SDMX-ML)' }}</v-card-title>
+                    <v-card-text>
+                        <template v-if="importFormat === 'json'">
+                            <v-file-input
+                                v-model="importFile"
+                                dense
+                                outlined
+                                accept=".json,application/json"
+                                label="JSON file"
+                                prepend-icon="mdi-code-json"
+                                :disabled="importing"
+                                show-size
+                            ></v-file-input>
+                        </template>
+                        <template v-else>
+                            <p class="text-body-2 grey--text text--darken-1 mb-2">
+                                SDMX structure message (2.1 or 3.0) with <code>Codelist</code> or <code>HierarchicalCodelist</code> elements.
+                            </p>
+                            <v-radio-group v-model="importSource" row hide-details dense class="mt-0 mb-3">
+                                <v-radio label="Upload file" value="file" :disabled="importing"></v-radio>
+                                <v-radio label="From URL" value="url" :disabled="importing"></v-radio>
+                            </v-radio-group>
+                            <v-file-input
+                                v-show="importSource === 'file'"
+                                v-model="importFile"
+                                dense
+                                outlined
+                                accept=".xml,text/xml,application/xml"
+                                label="SDMX-ML file"
+                                prepend-icon="mdi-file-xml-box"
+                                :disabled="importing"
+                                show-size
+                            ></v-file-input>
+                            <v-text-field
+                                v-show="importSource === 'url'"
+                                v-model="importUrl"
+                                dense
+                                outlined
+                                clearable
+                                label="URL to SDMX-ML"
+                                placeholder="https://example.org/structure.xml"
+                                prepend-inner-icon="mdi-link"
+                                :disabled="importing"
+                                hint="Server fetches this URL (http/https only; private networks blocked)."
+                                persistent-hint
+                            ></v-text-field>
+                        </template>
+                        <v-checkbox v-if="importFormat !== 'json'" v-model="importDryRun" hide-details dense class="mt-0" label="Preview only (dry run — do not save)" :disabled="importing"></v-checkbox>
+                        <v-checkbox v-model="importReplace" hide-details dense class="mt-0"
+                            :label="importFormat === 'json' ? 'Overwrite if already exists?' : 'Replace existing lists with the same agency, id, and version'" :disabled="importing"></v-checkbox>
+                    </v-card-text>
+                    <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn text :disabled="importing" @click="closeImportDialog">Cancel</v-btn>
+                        <v-btn color="primary" :loading="importing" :disabled="!importCanSubmit" @click="submitImport">Import</v-btn>
+                    </v-card-actions>
+                </v-card>
+            </v-dialog>
+
         </div>
     `
 });

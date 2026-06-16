@@ -1171,7 +1171,7 @@ class Analytics_model extends CI_Model
             
             // Verify we wrote all expected rows
             if ($total_written !== $total_count) {
-                log_message('warning', "Analytics: Archive mismatch for {$month} - expected {$total_count}, wrote {$total_written}");
+                log_message('info', "Analytics: Archive mismatch for {$month} - expected {$total_count}, wrote {$total_written}");
             }
             
             fclose($fp);

@@ -101,6 +101,8 @@ class ImportPackage
             throw new Exception("Project folder not found: " . $project_folder_path);
         }
 
+        $this->validate_zip_entries($zip_path);
+
         // Extract ZIP using PhpZip
         $zipFile = new \PhpZip\ZipFile();
         try {
@@ -116,6 +118,39 @@ class ImportPackage
         }
 
         return $project_folder_path;
+    }
+
+
+    /**
+     * Reject unsafe ZIP entry paths before extraction.
+     *
+     * @param string $zip_path
+     */
+    private function validate_zip_entries($zip_path)
+    {
+        $zipFile = new \PhpZip\ZipFile();
+        try {
+            $zipFile->openFile($zip_path);
+            $entries = $zipFile->getListFiles();
+
+            foreach ($entries as $entry_name) {
+                $entry_name = str_replace('\\', '/', (string) $entry_name);
+
+                if ($entry_name === '' || $entry_name[0] === '/' || preg_match('/^[A-Za-z]:\\//', $entry_name)) {
+                    throw new Exception("Unsafe path in package archive: " . $entry_name);
+                }
+
+                if (strpos($entry_name, '../') !== false || substr($entry_name, -3) === '/..') {
+                    throw new Exception("Unsafe path in package archive: " . $entry_name);
+                }
+            }
+        }
+        catch (\PhpZip\Exception\ZipException $e) {
+            throw new Exception("Failed to read ZIP file: " . $e->getMessage());
+        }
+        finally {
+            $zipFile->close();
+        }
     }
 
 

@@ -218,43 +218,71 @@ const VueResumableFileUpload = Vue.component('resumable-file-upload', {
             if (!this.file || this.isUploading || this.disabled) {
                 return;
             }
-            
-            // Recalculate chunks in case chunk size changed
+            if (typeof ResumableChunkUploader === 'undefined') {
+                this.uploadStatus = 'error';
+                this.error = 'ResumableChunkUploader is not loaded';
+                return;
+            }
+
             this.calculateChunks();
-            
-            // Reset upload state (but preserve totalChunks as it's file-related)
             const savedTotalChunks = this.totalChunks;
             this.resetUploadState();
             this.totalChunks = savedTotalChunks;
-            
+
             this.isUploading = true;
             this.uploadStatus = 'initializing';
             this.error = null;
             this.cancelRequested = false;
-            
+
+            const vm = this;
             try {
-                // Initialize upload
-                await this.initializeUpload();
-                
-                // Upload chunks sequentially
-                await this.uploadChunks();
-                
-                // Move file to final location
+                const result = await ResumableChunkUploader.uploadFileChunks(this.file, {
+                    projectId: this.projectId,
+                    fileType: this.fileType,
+                    chunkSize: this.chunkSize,
+                    maxChunkSize: this.maxChunkSize,
+                    maxRetries: this.maxRetries,
+                    retryDelay: this.retryDelay,
+                    exponentialBackoff: this.exponentialBackoff,
+                    cancelRequested: function () {
+                        return vm.cancelRequested;
+                    },
+                    onUploadInitialized: function (id) {
+                        vm.uploadId = id;
+                        vm.uploadStatus = 'uploading';
+                    },
+                    onInitializing: function (v) {
+                        vm.isInitializing = v;
+                    },
+                    onProgress: function (p) {
+                        vm.uploadedChunks = p.uploaded_chunks;
+                        vm.uploadProgress = p.progress;
+                        vm.$emit('upload-progress', {
+                            progress: p.progress,
+                            uploaded_chunks: p.uploaded_chunks,
+                            total_chunks: p.total_chunks,
+                            status: 'uploading'
+                        });
+                    }
+                });
+
+                if (result.serverFilename) {
+                    vm.serverFilename = result.serverFilename;
+                }
+
                 await this.finalizeUpload();
-                
+
                 this.uploadStatus = 'completed';
                 this.uploadProgress = 100;
-                
+
                 this.$emit('upload-complete', {
                     upload_id: this.uploadId,
-                    filename: this.serverFilename || this.file.name, // Use sanitized filename from server, fallback to original
-                    file_path: null, // Will be set after finalization
+                    filename: this.serverFilename || this.file.name,
+                    file_path: null,
                     file_size: this.file.size
                 });
-                
             } catch (error) {
                 if (!this.cancelRequested) {
-                    // Check if this is a retryable error (chunk upload failure after all retries)
                     if (error.error === 'CHUNK_UPLOAD_FAILED' || error.error === 'CHUNK_READ_FAILED') {
                         this.uploadStatus = 'retryable_error';
                     } else {
@@ -271,189 +299,7 @@ const VueResumableFileUpload = Vue.component('resumable-file-upload', {
                 this.isUploading = false;
             }
         },
-        
-        /**
-         * Initialize upload session
-         */
-        initializeUpload() {
-            const vm = this;
-            this.isInitializing = true;
-            
-            return new Promise((resolve, reject) => {
-                const metadata = {
-                    project_id: this.projectId,
-                    file_type: this.fileType
-                };
-                
-                axios.post(CI.base_url + '/api/uploads/init', {
-                    filename: this.file.name,
-                    total_size: this.file.size,
-                    total_chunks: this.totalChunks,
-                    chunk_size: this.chunkSize,
-                    metadata: metadata
-                })
-                .then(function(response) {
-                    if (response.data.status === 'success') {
-                        vm.uploadId = response.data.upload_id;
-                        vm.uploadStatus = 'uploading';
-                        vm.isInitializing = false;
-                        resolve();
-                    } else {
-                        vm.isInitializing = false;
-                        reject(new Error(response.data.message || 'Failed to initialize upload'));
-                    }
-                })
-                .catch(function(error) {
-                    vm.isInitializing = false;
-                    const errorMsg = error.response?.data?.message || error.message || 'Failed to initialize upload';
-                    reject({ error: 'INIT_FAILED', message: errorMsg });
-                });
-            });
-        },
-        
-        /**
-         * Upload all chunks sequentially
-         */
-        async uploadChunks() {
-            for (let chunkNumber = 0; chunkNumber < this.totalChunks; chunkNumber++) {
-                if (this.cancelRequested) {
-                    throw { error: 'UPLOAD_CANCELLED', message: 'Upload cancelled by user' };
-                }
-                
-                await this.uploadChunk(chunkNumber);
-                
-                // Update progress
-                this.uploadedChunks = chunkNumber + 1;
-                this.uploadProgress = Math.round(((chunkNumber + 1) / this.totalChunks) * 100);
-                
-                // Emit progress event
-                this.$emit('upload-progress', {
-                    progress: this.uploadProgress,
-                    uploaded_chunks: this.uploadedChunks,
-                    total_chunks: this.totalChunks,
-                    status: 'uploading'
-                });
-            }
-        },
-        
-        /**
-         * Upload a single chunk with retry logic
-         */
-        async uploadChunk(chunkNumber) {
-            const vm = this;
-            const maxAttempts = this.maxRetries + 1; // Include initial attempt
-            
-            // Initialize retry count for this chunk
-            if (!this.retryAttempts[chunkNumber]) {
-                this.retryAttempts[chunkNumber] = 0;
-            }
-            
-            for (let attempt = 0; attempt < maxAttempts; attempt++) {
-                if (this.cancelRequested) {
-                    throw { error: 'UPLOAD_CANCELLED', message: 'Upload cancelled by user' };
-                }
-                
-                try {
-                    const result = await this.performChunkUpload(chunkNumber);
-                    // Success - reset retry count and return
-                    this.retryAttempts[chunkNumber] = 0;
-                    return result;
-                } catch (error) {
-                    this.retryAttempts[chunkNumber] = attempt + 1;
-                    
-                    // If this was the last attempt, throw the error
-                    if (attempt === maxAttempts - 1) {
-                        throw error;
-                    }
-                    
-                    // Calculate delay for next retry
-                    let delay = this.retryDelay;
-                    if (this.exponentialBackoff) {
-                        delay = this.retryDelay * Math.pow(2, attempt);
-                    }
-                    
-                    // Emit retry event
-                    this.$emit('chunk-retry', {
-                        chunkNumber: chunkNumber,
-                        attempt: attempt + 1,
-                        maxAttempts: maxAttempts,
-                        delay: delay,
-                        error: error.message || 'Chunk upload failed'
-                    });
-                    
-                    // Wait before retrying
-                    await this.delay(delay);
-                }
-            }
-        },
-        
-        /**
-         * Perform the actual chunk upload
-         */
-        performChunkUpload(chunkNumber) {
-            const vm = this;
-            
-            return new Promise((resolve, reject) => {
-                // Calculate chunk start and end positions
-                const start = chunkNumber * this.chunkSize;
-                const end = Math.min(start + this.chunkSize, this.file.size);
-                const chunk = this.file.slice(start, end);
-                
-                // Read chunk as ArrayBuffer
-                const reader = new FileReader();
-                reader.onload = function() {
-                    const chunkData = reader.result;
-                    const actualChunkSize = chunkData.byteLength;
-                    
-                    // Upload chunk as binary data
-                    axios.post(
-                        CI.base_url + '/api/uploads/chunk/' + vm.uploadId,
-                        chunkData,
-                        {
-                            headers: {
-                                'Content-Type': 'application/octet-stream',
-                                'X-Upload-Chunk-Number': chunkNumber,
-                                'X-Upload-Chunk-Size': actualChunkSize
-                            },
-                            timeout: 30000 // 30 second timeout
-                        }
-                    )
-                    .then(function(response) {
-                        if (response.data.status === 'success') {
-                            // Check if upload is complete
-                            if (response.data.upload_status === 'complete') {
-                                vm.uploadProgress = 100;
-                                // Store the sanitized filename from server if provided
-                                if (response.data.filename) {
-                                    vm.serverFilename = response.data.filename;
-                                }
-                            }
-                            resolve(response.data);
-                        } else {
-                            reject(new Error(response.data.message || 'Chunk upload failed'));
-                        }
-                    })
-                    .catch(function(error) {
-                        const errorMsg = error.response?.data?.message || error.message || 'Chunk upload failed';
-                        reject({ error: 'CHUNK_UPLOAD_FAILED', message: errorMsg });
-                    });
-                };
-                
-                reader.onerror = function() {
-                    reject({ error: 'CHUNK_READ_FAILED', message: 'Failed to read chunk data' });
-                };
-                
-                reader.readAsArrayBuffer(chunk);
-            });
-        },
-        
-        /**
-         * Utility method to create a delay
-         */
-        delay(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        },
-        
+
         /**
          * Finalize upload by moving file to final location
          */

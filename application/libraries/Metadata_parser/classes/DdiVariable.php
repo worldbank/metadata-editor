@@ -165,6 +165,8 @@ class DdiVariable
         $output["var_sumstat"]=$sum_stats;
         $output["var_txt"] = $this->get_element_value('txt');
 
+        $has_positive_invd = $this->sumstat_has_positive_invd($sum_stats);
+
         //Category repeated field
         $categories=[];
         $category_list=(array)$this->get_repeatable_element('catgry');
@@ -181,21 +183,31 @@ class DdiVariable
                 }
             }
 
-            $categories[]=array(
-                'value'=>$this->get_element_text($this->get_simple_element('catValu',$item)),
+            $cat_value = $this->get_element_text($this->get_simple_element('catValu',$item));
+            $missing_attr = $this->get_attribute_value($item,'missing');
+            // System missing: use sumStat invd in the editor; skip catgry even when @missing is absent (some DDI files omit it on Sysmiss)
+            if ($this->is_sysmiss_category_value($cat_value)
+                && ($this->ddi_catgry_marked_missing($missing_attr) || $has_positive_invd)) {
+                continue;
+            }
+
+            $row = array(
+                'value'=>$cat_value,
                 'labl'=>$this->get_element_text($this->get_simple_element('labl',$item)),
-                'is_missing'=>$this->get_attribute_value($item,'missing'),
                 'stats'=>$category_stats
             );
+            if ($this->ddi_catgry_marked_missing($missing_attr)) {
+                $row['is_missing'] = ($missing_attr === 'Y' || $missing_attr === 'y' || $missing_attr === '1' || $missing_attr === 1) ? 'Y' : (string)$missing_attr;
+            }
+            $categories[] = $row;
         }
         $output['var_catgry']=$categories;
 
         // Populate var_invalrng.values from categories with is_missing=1 or missing='Y'
-        // Extract is_missing information before removing it
         $missing_values = array();
         foreach($categories as $cat) {
             if (isset($cat['is_missing']) && 
-                ($cat['is_missing'] == '1' || $cat['is_missing'] == 'Y' || $cat['is_missing'] == 1)) {
+                ($cat['is_missing'] == '1' || $cat['is_missing'] == 'Y' || $cat['is_missing'] == 1 || $cat['is_missing'] === true)) {
                 if (isset($cat['value']) && $cat['value'] !== null && $cat['value'] !== '') {
                     $missing_values[] = (string)$cat['value'];
                 }
@@ -206,14 +218,6 @@ class DdiVariable
         } else {
             $output['var_invalrng'] = array('values' => array());
         }
-
-        // Remove is_missing from categories (single source of truth is var_invalrng.values)
-        foreach($output['var_catgry'] as &$cat) {
-            if (isset($cat['is_missing'])) {
-                unset($cat['is_missing']);
-            }
-        }
-        unset($cat);
 
         $output["var_codinstr"] = $this->get_element_value('codInstr');
         
@@ -301,6 +305,39 @@ class DdiVariable
         $categories=array_unique(explode(" ",implode(" ",$categories)));
 
         return implode(" ",$categories);
+    }
+
+    /**
+     * DDI catgry @missing is truthy (Y / 1).
+     */
+    private function ddi_catgry_marked_missing($missing_attr)
+    {
+        if ($missing_attr === null || $missing_attr === '') {
+            return false;
+        }
+        return $missing_attr === 'Y' || $missing_attr === 'y' || $missing_attr === '1' || $missing_attr === 1;
+    }
+
+    private function is_sysmiss_category_value($value)
+    {
+        return strcasecmp(trim((string)$value), 'Sysmiss') === 0;
+    }
+
+    private function sumstat_has_positive_invd(array $sum_stats)
+    {
+        foreach ($sum_stats as $ss) {
+            if (!isset($ss['type']) || $ss['type'] !== 'invd' || !isset($ss['value'])) {
+                continue;
+            }
+            $v = $ss['value'];
+            if ($v === '' || $v === null) {
+                continue;
+            }
+            if (is_numeric($v) && (float)$v > 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public function get_metadata_array(){

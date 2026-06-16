@@ -151,7 +151,7 @@ class ISO19110Writer
             "city": "string",
             "postalCode": "string",
             "country": "string",
-            "elctronicMailAddress": "string"
+            "electronicMailAddress": "string"
             },
             "onlineResource": {
             "linkage": "string",

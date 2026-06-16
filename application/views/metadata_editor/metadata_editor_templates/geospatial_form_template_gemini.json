@@ -2225,7 +2225,7 @@
                                         },
                                         {
                                             "key": "value",
-                                            "type": "string",
+                                            "type": "number",
                                             "title": "Value",
                                             "prop_key": "description.identificationInfo.spatialResolution.value",
                                             "help_text": "This is the numerical value of the resolution, usually representing the smallest distance that can be reliably distinguished in the dataset. For example: a raster dataset with 30-meter resolution would have a spatial resolution value of 30. \n\nNOTES:\n- For services, it is not possible to express the restriction of a service concerning the spatial resolution in the current version of ISO 19119. While the problem is addressed by the standardization community, spatial resolution restrictions for services shall be expressed in the Abstract.\n- When two equivalent scales or two ground sample distances are expressed, the spatial resolution is an interval bounded by these two values."
@@ -3281,10 +3281,10 @@
                                         {
                                             "key": "dataQualityElement.conformanceResult",
                                             "title": "Conformance result",
-                                            "type": "nested_array",
+                                            "type": "section",
                                             "props": [
                                                 {
-                                                    "key": "specification.title",
+                                                    "key": "dataQualityElement.conformanceResult.specification.title",
                                                     "title": "Title",
                                                     "type": "string",
                                                     "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.title",
@@ -3292,7 +3292,7 @@
                                                     "help_text": "The title of the consistency check performed. This could describe the specific test or procedure used to verify the data’s quality or conformity. Example: \"Positional Accuracy Consistency Check\"; \"Attribute Consistency Test\"."
                                                 },
                                                 {
-                                                    "key": "specification.date",
+                                                    "key": "dataQualityElement.conformanceResult.specification.date",
                                                     "title": "Dates",
                                                     "type": "array",
                                                     "props": [
@@ -3316,21 +3316,21 @@
                                                     "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.date"
                                                 },
                                                 {
-                                                    "key": "specification.identifier.authority",
+                                                    "key": "dataQualityElement.conformanceResult.specification.identifier.authority",
                                                     "title": "Identifier authority",
                                                     "type": "string",
                                                     "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.identifier.authority",
                                                     "display_type": "text"
                                                 },
                                                 {
-                                                    "key": "specification.identifier.code",
+                                                    "key": "dataQualityElement.conformanceResult.specification.identifier.code",
                                                     "title": "Identifier code",
                                                     "type": "string",
                                                     "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.specification.identifier.code",
                                                     "display_type": "text"
                                                 },
                                                 {
-                                                    "key": "specification.citedResponsibleParty",
+                                                    "key": "dataQualityElement.conformanceResult.specification.citedResponsibleParty",
                                                     "type": "nested_array",
                                                     "title": "Responsible party",
                                                     "props": [
@@ -3527,7 +3527,7 @@
                                                     "help_text": "The party responsible for carrying out the consistency check or for ensuring the data's consistency. This typically refers to an individual, organization, or group that conducted the check or is accountable for the quality and validity of the data."
                                                 },
                                                 {
-                                                    "key": "specification.presentationForm",
+                                                    "key": "dataQualityElement.conformanceResult.specification.presentationForm",
                                                     "title": "Resource presentation",
                                                     "type": "string",
                                                     "enum": [
@@ -3622,7 +3622,7 @@
                                                     "enum_store_column": "code"
                                                 },
                                                 {
-                                                    "key": "explanation",
+                                                    "key": "dataQualityElement.conformanceResult.explanation",
                                                     "title": "Explanation",
                                                     "type": "string",
                                                     "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.explanation",
@@ -3630,7 +3630,7 @@
                                                     "help_text": "The Explanation element provides additional context or a more detailed description about a specific process, measurement, or result related to the resource. It can include clarification about how a result was obtained, how a test was performed, or why a certain decision was made. This is important for transparency, providing users with the rationale or detailed information behind the data, quality assessments, or any checks that have been carried out. Example: \"The resource was assessed using a positional accuracy check, and the dataset passed the consistency check due to correct geospatial coordinates within the acceptable range.\" This field is used to give further details and clarification on why a result or value was recorded in the metadata."
                                                 },
                                                 {
-                                                    "key": "pass",
+                                                    "key": "dataQualityElement.conformanceResult.pass",
                                                     "title": "Pass",
                                                     "type": "boolean",
                                                     "prop_key": "description.dataQualityInfo.report.dataQualityElement.conformanceResult.pass",

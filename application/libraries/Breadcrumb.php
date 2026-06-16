@@ -384,7 +384,7 @@ class Breadcrumb
 		}
 		
 		//section to hide the collection link
-		$excluded_sections=array('users','repositories','citations','reports','configurations','countries','regions','terms','vocabularies','menu');
+		$excluded_sections=array('users','repositories','citations','configurations','countries','regions','terms','vocabularies','menu');
 		
 		/*if (!in_array($segments[2],$excluded_sections))
 		{
@@ -425,10 +425,6 @@ class Breadcrumb
 				$breadcrumbs['admin/menu']=t('menu');
 			break;
 			
-			case 'reports':
-				$breadcrumbs['admin/reports']=t('reports');
-			break;
-
 			case 'configurations':
 				$breadcrumbs['admin/configurations']=t('settings');
 			break;

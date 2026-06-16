@@ -182,6 +182,58 @@ $config['acl_permissions'] = [
             ]
         ]
     ],
+
+    "codelist"=>[
+        "title" => "Codelists",
+        "description"=> "Manage the site-wide codelist registry",
+        "permissions"=>[
+            [
+                "permission" => "view"
+            ],
+            [
+                "permission" => "edit",
+                "sub_permissions"=>["view"]
+            ],
+            [
+                "permission" => "delete",
+                "sub_permissions"=>["view"]
+            ],
+            [
+                "permission" => "import",
+                "sub_permissions"=>["edit","view"]
+            ],
+            [
+                "permission" => "admin",
+                "sub_permissions"=>["view","edit","delete","import"]
+            ]
+        ]
+    ],
+
+    "data_structure"=>[
+        "title" => "Data structures",
+        "description"=> "Manage the site-wide DSD / data structure catalogue",
+        "permissions"=>[
+            [
+                "permission" => "view"
+            ],
+            [
+                "permission" => "edit",
+                "sub_permissions"=>["view"]
+            ],
+            [
+                "permission" => "delete",
+                "sub_permissions"=>["view"]
+            ],
+            [
+                "permission" => "import",
+                "sub_permissions"=>["edit","view"]
+            ],
+            [
+                "permission" => "admin",
+                "sub_permissions"=>["view","edit","delete","import"]
+            ]
+        ]
+    ],
     
     "configurations"=>[ 
         "title" => "Site configurations",

@@ -726,7 +726,7 @@
                         {
                             "key": "video_description.relations",
                             "title": "Relations",
-                            "type": "string",
+                            "type": "simple_array",
                             "enum": [],
                             "help_text": "Defines the relation between the video being documented and other resources.",
                             "display_type": "textarea"
@@ -2111,7 +2111,7 @@
                         {
                             "key": "video_description.media",
                             "title": "Media",
-                            "type": "string",
+                            "type": "simple_array",
                             "enum": [],
                             "help_text": "A description of the media on which the recording is stored (other than the online file format); e.g., “DVD”.",
                             "display_type": "text"

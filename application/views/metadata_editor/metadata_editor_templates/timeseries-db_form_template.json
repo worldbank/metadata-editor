@@ -499,6 +499,92 @@
                             ]
                         },
                         {
+                            "key": "database_description.indicators",
+                            "title": "Indicators",
+                            "type": "array",
+                            "help_text": "The indicators included in the database.",
+                            "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "string",
+                                    "prop_key": "database_description.indicators.id",
+                                    "help_text": "The identifier of the indicator.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "prop_key": "database_description.indicators.name",
+                                    "help_text": "The name of the indicator.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "database_description.indicators.uri",
+                                    "help_text": "A URL to a page describing or exposing the indicator.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "note",
+                                    "title": "Note",
+                                    "type": "string",
+                                    "prop_key": "database_description.indicators.note",
+                                    "help_text": "Additional information about the indicator.",
+                                    "display_type": "textarea"
+                                }
+                            ]
+                        },
+                        {
+                            "key": "database_description.tabulations",
+                            "title": "Tabulations",
+                            "type": "array",
+                            "help_text": "The cross-tabulations available in the database.",
+                            "props": [
+                                {
+                                    "key": "id",
+                                    "title": "ID",
+                                    "type": "string",
+                                    "prop_key": "database_description.tabulations.id",
+                                    "help_text": "The identifier of the tabulation.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "name",
+                                    "title": "Name",
+                                    "type": "string",
+                                    "prop_key": "database_description.tabulations.name",
+                                    "help_text": "The name of the tabulation.",
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "uri",
+                                    "title": "URL",
+                                    "type": "string",
+                                    "prop_key": "database_description.tabulations.uri",
+                                    "help_text": "A URL to a page describing or exposing the tabulation.",
+                                    "rules": {
+                                        "is_uri": true
+                                    },
+                                    "display_type": "text"
+                                },
+                                {
+                                    "key": "note",
+                                    "title": "Note",
+                                    "type": "string",
+                                    "prop_key": "database_description.tabulations.note",
+                                    "help_text": "Additional information about the tabulation.",
+                                    "display_type": "textarea"
+                                }
+                            ]
+                        },
+                        {
                             "key": "database_description.sponsors",
                             "title": "Sponsors",
                             "help_text": "The source(s) of funds for the production and maintenance of the database. If different funding agencies sponsored different stages of the database development, use the role attribute to distinguish their respective contributions.",

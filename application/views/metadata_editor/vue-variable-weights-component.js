@@ -14,12 +14,21 @@ Vue.component('variable-weights-component', {
     },
     computed: {
         Variables(){
-            return variables;
+            return Array.isArray(this.variables) ? this.variables : [];
+        },
+        /** Only treat positive UIDs as an assigned weight (not 0 / "0"). */
+        hasAssignedWeight(){
+            var v = this.value;
+            if (v === null || v === undefined || v === '') {
+                return false;
+            }
+            var n = Number(v);
+            return !isNaN(n) && n > 0;
         },
         var_wgt_id:
         {
             get(){
-                if (!this.value){
+                if (!this.hasAssignedWeight){
                     return '';
                 }
                 return this.value;
@@ -29,24 +38,26 @@ Vue.component('variable-weights-component', {
             }
         },
         VariablesForWeight(){
-            let variables = [];
-         
-             for (var variable in this.Variables){
-                 if (this.Variables[variable].uid==this.var_wgt_id){
-                     variables.push(this.Variables[variable]);
-                 }
-             }
-             
-             return variables;
+            let list = this.Variables;
+            let out = [];
+            if (!this.hasAssignedWeight) {
+                return out;
+            }
+            for (var i = 0; i < list.length; i++) {
+                if (list[i].uid == this.value) {
+                    out.push(list[i]);
+                }
+            }
+            return out;
          }
     },
     methods:{
         OnWeightVariableSelection: function(e)
         {
-            if (e && e.length>0){
-                this.var_wgt_id=e;
+            var n = (e === null || e === undefined || e === '') ? 0 : Number(e);
+            if (n > 0 && !isNaN(n)) {
+                this.var_wgt_id = e;
             }
-            
         },
         RemoveWeightVariable: function(){
             this.var_wgt_id='';            
@@ -64,7 +75,7 @@ Vue.component('variable-weights-component', {
 
                         
                 <div>
-                    <table class="table table-sm table-bordered" v-if="var_wgt_id" :key="var_wgt_id">
+                    <table class="table table-sm table-bordered" v-if="hasAssignedWeight" :key="var_wgt_id || 'none'">
                         <tr>
                             <th>{{$t('name')}}</th>
                             <th>{{$t('label')}}</th>
@@ -79,7 +90,7 @@ Vue.component('variable-weights-component', {
                             </td>
                         </tr>
                         <tr v-if="VariablesForWeight.length<1">
-                            <td>{{var_wgt_id}}</td>
+                            <td>{{value}}</td>
                             <td>{{$t('na')}}</td>
                             <td>
                                 <button class="btn btn-sm btn-xs btn-link" @click="RemoveWeightVariable">{{$t('remove')}}</button>

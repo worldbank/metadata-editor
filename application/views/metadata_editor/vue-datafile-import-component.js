@@ -22,8 +22,17 @@ Vue.component('datafile-import', {
                 "CSV": this.$t("CSV")
             },
             allowed_file_types:["dta","sav","csv"],
+            /** Cleared after each pick so the list below is the source of truth */
+            filePickerModel: null,
             dialog_process:false,
-            keep_data:'' //store, remove
+            keep_data:'store', // store | remove — default store
+            /** Resumable upload: determinate bar during chunks; otherwise indeterminate */
+            show_upload_chunk_progress:false,
+            upload_chunk_percent:0,
+            current_upload_filename:'',
+            import_dialog_phase:'idle',
+            current_import_file_index:0,
+            total_import_files:0
         }
     },
     watch: { 
@@ -67,15 +76,78 @@ Vue.component('datafile-import', {
             }
 
             return false;
+        },
+        topLevelErrorText: function () {
+            if (!this.errors) {
+                return '';
+            }
+            var e = this.errors;
+            if (e instanceof Error) {
+                return e.message || String(e);
+            }
+            if (typeof e === 'string') {
+                return e;
+            }
+            return String(e);
         }
     },
     methods:{
 
         dialogClose: function(){
             this.dialog_process = false;
+            this.import_dialog_phase = 'idle';
 
             if (this.has_errors==false){
                 this.$router.push('/datafiles');
+            }
+        },
+
+        importReportStatusBadgeStyle: function (report) {
+            var ok = report && report.status === 'success';
+            return {
+                backgroundColor: ok ? '#2E7D32' : '#C62828',
+                color: '#FFFFFF',
+                borderRadius: '4px',
+                fontSize: '11px',
+                fontWeight: '600',
+                padding: '2px 8px',
+                lineHeight: '18px',
+                textTransform: 'uppercase',
+                display: 'inline-flex',
+                alignItems: 'center',
+                flexShrink: '0'
+            };
+        },
+
+        getReportErrorDetail: function (report) {
+            if (!report || !report.error) {
+                return '';
+            }
+            var e = report.error;
+            if (e.response && e.response.data) {
+                var d = e.response.data;
+                if (d && typeof d.message === 'string') {
+                    return d.message;
+                }
+                if (typeof d === 'string') {
+                    return d;
+                }
+                try {
+                    return JSON.stringify(d);
+                } catch (err) {
+                    return String(d);
+                }
+            }
+            if (e.message) {
+                return e.message;
+            }
+            if (typeof e === 'string') {
+                return e;
+            }
+            try {
+                return JSON.stringify(e);
+            } catch (err2) {
+                return String(e);
             }
         },
 
@@ -86,14 +158,24 @@ Vue.component('datafile-import', {
             this.is_processing=true;
             this.upload_report=[];            
             this.dialog_process=true;
+            this.show_upload_chunk_progress=false;
+            this.upload_chunk_percent=0;
+            this.current_upload_filename='';
+            this.import_dialog_phase='working';
+            this.total_import_files=this.files.length;
+            this.current_import_file_index=0;
+            this.update_status='';
 
             try{
                 let service_status=await this.pingDataService();
             }
             catch (error) {
                 this.is_processing=false;                
-                this.errors=error;
+                this.errors = error instanceof Error ? error.message : (error && error.message) ? error.message : String(error);
                 this.has_errors=true;
+                this.import_dialog_phase='error';
+                this.show_upload_chunk_progress=false;
+                this.upload_chunk_percent=0;
 
                 this.upload_report.push({
                     'file_name': this.$t("Data service error"),
@@ -105,7 +187,8 @@ Vue.component('datafile-import', {
 
             let csvJobs = [];
 
-            for(i=0;i<this.files.length;){                
+            for(i=0;i<this.files.length;){
+                this.current_import_file_index = i + 1;
                 let result = await this.processFile(i);
                 if (result && result.csvJob) {
                     csvJobs.push(result.csvJob);
@@ -120,6 +203,10 @@ Vue.component('datafile-import', {
 
             this.update_status="completed";
             this.is_processing=false;
+            this.show_upload_chunk_progress=false;
+            this.upload_chunk_percent=0;
+            this.current_upload_filename='';
+            this.import_dialog_phase = this.has_errors ? 'partial' : 'success';
             await this.$store.dispatch('loadDataFiles',{dataset_id:this.ProjectID});
             this.$store.dispatch('loadAllVariables',{dataset_id:this.ProjectID});
             this.$store.dispatch('loadVariableGroups',{dataset_id:this.ProjectID}); 
@@ -189,7 +276,8 @@ Vue.component('datafile-import', {
 
             } catch (error) {
                 this.has_errors=true;
-                this.errors=this.$t("failed uploading file") + " " + fileIdx + ' with error: ' + JSON.stringify(error) ;
+                this.show_upload_chunk_progress=false;
+                this.upload_chunk_percent=0;
                 this.upload_report.push({
                         'file_name':this.files[fileIdx].name,
                         'status': 'error',
@@ -204,26 +292,83 @@ Vue.component('datafile-import', {
             }
         },
         uploadFile: async function (fileIdx)
-        {            
-            let formData = new FormData();
-            formData.append('file', this.files[fileIdx]);
-            formData.append('store_data', this.keep_data);
+        {
+            const file = this.files[fileIdx];
+            if (typeof ResumableChunkUploader === 'undefined') {
+                throw new Error('ResumableChunkUploader is not loaded');
+            }
 
-            if (this.overwrite_if_exists){
-                formData.append("overwrite", "1");
-            }                           
+            const vm = this;
+            this.current_upload_filename = file.name;
+            this.show_upload_chunk_progress = false;
+            this.upload_chunk_percent = 0;
+            this.update_status =
+                this.$t('import') +
+                ': ' +
+                file.name +
+                ' — ' +
+                this.$t('data_import_preparing_upload');
 
-            let vm=this;
-            let url=CI.base_url + '/api/data/datafile/'+ this.ProjectID;
-
-            const resp=await axios.post( url,
-                formData,
-                {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
+            const chunkResult = await ResumableChunkUploader.uploadFileChunks(file, {
+                projectId: this.ProjectID,
+                fileType: 'data',
+                maxRetries: 3,
+                retryDelay: 1000,
+                exponentialBackoff: true,
+                onInitializing: function (isInit) {
+                    vm.show_upload_chunk_progress = false;
+                    if (isInit) {
+                        vm.upload_chunk_percent = 0;
+                        vm.update_status =
+                            vm.$t('import') +
+                            ': ' +
+                            file.name +
+                            ' — ' +
+                            vm.$t('data_import_preparing_upload');
                     }
+                },
+                onProgress: function (p) {
+                    vm.show_upload_chunk_progress = true;
+                    vm.upload_chunk_percent = p.progress;
+                    vm.update_status =
+                        vm.$t('import') +
+                        ': ' +
+                        file.name +
+                        ' — ' +
+                        p.uploaded_chunks +
+                        '/' +
+                        p.total_chunks +
+                        ' (' +
+                        p.progress +
+                        '%)';
                 }
-            );
+            });
+
+            this.show_upload_chunk_progress = true;
+            this.upload_chunk_percent = 100;
+            this.update_status =
+                this.$t('import') +
+                ': ' +
+                file.name +
+                ' — ' +
+                this.$t('data_import_saving_file');
+
+            const formData = new FormData();
+            formData.append('upload_id', chunkResult.upload_id);
+            formData.append('store_data', this.keep_data);
+            if (this.overwrite_if_exists) {
+                formData.append('overwrite', '1');
+            }
+
+            const url = CI.base_url + '/api/data/datafile/' + this.ProjectID;
+            const resp = await axios.post(url, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+
+            this.show_upload_chunk_progress = false;
+            this.upload_chunk_percent = 0;
 
             return resp.data;
         },        
@@ -234,8 +379,12 @@ Vue.component('datafile-import', {
         },
         importSummaryStatisticsQueueStatusCheck: async function(file_id,job_id){
             await this.sleep(this.sleep_time);
-            let result=await this.$store.dispatch('importDataFileSummaryStatisticsQueueStatusCheck',{file_id:file_id, job_id:job_id});            
-                                
+            let result=await this.$store.dispatch('importDataFileSummaryStatisticsQueueStatusCheck',{file_id:file_id, job_id:job_id});
+
+            if (result.data.job_status === 'failed' || result.data.job_status === 'error') {
+                const msg = result.data.message || (typeof result.data.detail === 'string' ? result.data.detail : '') || 'Job failed';
+                throw new Error(msg);
+            }
             if (result.data.job_status!=='done'){
                 return await this.importSummaryStatisticsQueueStatusCheck(file_id,job_id);
             }else if (result.data.job_status==='done'){
@@ -257,8 +406,12 @@ Vue.component('datafile-import', {
         },         
         generateCsvQueueStatusCheck: async function(file_id,job_id){
             await this.sleep(this.sleep_time);
-            let result=await this.$store.dispatch('generateCsvQueueStatusCheck',{file_id:file_id, job_id:job_id});            
+            let result=await this.$store.dispatch('generateCsvQueueStatusCheck',{file_id:file_id, job_id:job_id});
 
+            if (result.data.job_status === 'failed' || result.data.job_status === 'error') {
+                const msg = result.data.message || (typeof result.data.detail === 'string' ? result.data.detail : '') || 'Job failed';
+                throw new Error(msg);
+            }
             if (result.data.job_status!=='done'){
                 return await this.generateCsvQueueStatusCheck(file_id,job_id);
             }else if (result.data.job_status==='done'){
@@ -311,8 +464,7 @@ Vue.component('datafile-import', {
             return false;
         },
         removeFile(file_idx){
-            Vue.delete(this.files,file_idx);      
-            this.files.splice(file_idx, 0);
+            this.files.splice(file_idx, 1);
         },        
         handleFileUpload(event)
         {
@@ -320,15 +472,29 @@ Vue.component('datafile-import', {
             this.errors='';
             this.checkFileExists();
         },
-        handleMultiFileUpload(event)
-        {
-            let files = event.target.files;
-            for(let i = 0; i<files.length; i++)
-            {
-                if (!this.checkFileDuplicate(files[i].name) && this.isAllowedFileType(files[i].name)){
-                    this.files.push(files[i]);
+        handleMultiFileUpload: function (picked) {
+            var source = picked !== undefined && picked !== null ? picked : this.filePickerModel;
+            var list = [];
+            if (!source) {
+                return;
+            }
+            if (Array.isArray(source)) {
+                list = source;
+            } else if (source.target && source.target.files) {
+                list = Array.prototype.slice.call(source.target.files);
+            } else if (source instanceof File) {
+                list = [source];
+            }
+            for (var i = 0; i < list.length; i++) {
+                var f = list[i];
+                if (f && !this.checkFileDuplicate(f.name) && this.isAllowedFileType(f.name)) {
+                    this.files.push(f);
                 }
             }
+            var vm = this;
+            this.$nextTick(function () {
+                vm.filePickerModel = null;
+            });
         },
         checkFileExists: async function()
         {
@@ -350,187 +516,217 @@ Vue.component('datafile-import', {
         }
     },
     template: `
-            <div class="datafile-import-component container-fluid mt-5 p-3">
+            <div class="datafile-import-component mt-3" style="width:100%;max-width:100%;box-sizing:border-box;">
+                <v-container fluid class="container-fluid pa-0 pt-4 pb-6 px-4" style="width:100%;max-width:100%;">
 
-                <v-card>
+                <v-card class="elevation-1" style="width:100%;max-width:100%;">
                     <v-card-title>{{$t("import_data_files")}}</v-card-title>
-                    <v-card-text>                
+                    <v-card-text>
 
-                    <div class="form-container-x" >
+                    <div class="form-container-x" style="width:100%;max-width:100%;">
 
-                        <p>{{$t("upload_one_or_more_data_files")}}</p>
-                        
-                        <v-card @drop.prevent="addFile" @dragover.prevent class="elevation-2 border p-2 mb-2 bg-light text-center">
-                            <div class="p-2">
-                                    <v-icon x-large>mdi-upload</v-icon>
-                                    <strong>{{$t("drag_drop_data_files")}}</strong>
-                            </div>
-                            
-                            <div class="custom-file" style="max-width:300px;">
-                                <input type="file" class="custom-file-input" id="customFile" multiple @change="handleMultiFileUpload( $event )" >
-                                <label class="custom-file-label" for="customFile">{{$t("choose_files")}}</label>
-                            </div>
+                        <p class="text-body-1">{{$t("upload_one_or_more_data_files")}}</p>
 
+                        <v-card @drop.prevent="addFile" @dragover.prevent outlined class="pa-4 mb-4 grey lighten-5" style="width:100%;max-width:100%;">
+                            <v-row align="center" justify="center" no-gutters>
+                                <v-col cols="12" class="text-center mb-3">
+                                    <v-icon size="48" color="primary">mdi-upload</v-icon>
+                                    <div class="text-subtitle-1 font-weight-medium mt-2">{{$t("drag_drop_data_files")}}</div>
+                                </v-col>
+                                <v-col cols="8">
+                                    <v-file-input
+                                        v-model="filePickerModel"
+                                        multiple
+                                        show-size
+                                        prepend-icon="mdi-paperclip"
+                                        :label="$t('choose_files')"
+                                        @change="handleMultiFileUpload"
+                                        hide-details="auto"
+                                        outlined
+                                        dense
+                                        clearable
+                                    ></v-file-input>
+                                </v-col>
+                            </v-row>
                         </v-card>
 
-                        <v-card class="files-container mt-3 mb-3 elevation-2" v-if="files.length>0" >
-                            <h5 class="mb-1 pt-2 pl-3">{{files.length}} {{$t("selected")}}</h5>
-                            <v-simple-table class="table-striped">
+                        <v-card v-if="files.length>0" outlined class="mb-4" style="width:100%;max-width:100%;">
+                            <v-card-subtitle class="pb-0">{{files.length}} {{$t("selected")}}</v-card-subtitle>
+                            <v-simple-table dense>
                             <template v-slot:default>
                                 <thead>
                                     <tr>
-                                    <th class="text-left">
-                                        {{$t("File")}}
-                                    </th>
-                                    <th class="text-left">
-                                        {{$t("Size")}}
-                                    </th>
-                                    <th>
-                                    </th>
+                                    <th class="text-left">{{$t("File")}}</th>
+                                    <th class="text-left">{{$t("Size")}}</th>
+                                    <th class="text-right" style="width:1%">{{$t("Remove")}}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="(file,file_index) in files" :key="file.name">
+                                    <tr v-for="(file,file_index) in files" :key="file.name + '-' + file_index">
                                     <td>{{ file.name }}</td>
                                     <td>{{ file.size | kbmb }}</td>
-                                    <td><button class="float-right" @click="removeFile(file_index)" :title="$t('Remove')"><i class="fas fa-trash"></i></button></td>
+                                    <td class="text-right">
+                                        <v-btn icon small :aria-label="$t('Remove')" @click="removeFile(file_index)">
+                                            <v-icon small color="error">mdi-delete-outline</v-icon>
+                                        </v-btn>
+                                    </td>
                                     </tr>
                                 </tbody>
-                                </template>
-                            
+                            </template>
                             </v-simple-table>
-
                         </v-card>
 
-
-                        <div class="mt-5 mb-3" v-if="files && files.length>0">
+                        <div class="mb-4" v-if="files && files.length>0">
                             <v-alert
                                 border="left"
-                                colored-border                                
+                                colored-border
                                 type="warning"
-                                elevation="2"                                
+                                elevation="1"
+                                prominent
                                 >
                                     <div v-html='$t("data_upload_notice")'></div>
-                                    
-                                    <template>
-                                                                                    
-                                            <v-radio-group
-                                            v-model="keep_data"
-                                            
-                                            >
-                                            <v-radio
-                                                value="store"
-                                            >
+                                    <v-radio-group v-model="keep_data" class="mt-2">
+                                            <v-radio value="store">
                                                 <template v-slot:label>
-                                                <div class="font-weight-regular">{{$t("Store data")}}</div>
+                                                <span class="text-body-2">{{$t("Store data")}}</span>
                                                 </template>
                                             </v-radio>
-                                            <v-radio                                                
-                                                value="remove"
-                                            >
+                                            <v-radio value="remove">
                                             <template v-slot:label>
-                                                <div class="font-weight-regular">{{$t("Do not store data")}}</div>
+                                                <span class="text-body-2">{{$t("Do not store data")}}</span>
                                                 </template>
                                             </v-radio>
-                                            </v-radio-group>
-                                        
-                                        </template>
-
+                                    </v-radio-group>
                             </v-alert>
-                           
                         </div>
 
-                        <div>                        
-                            <v-checkbox v-model="overwrite_if_exists">
-                                <template v-slot:label>
-                                <div class="font-weight-regular">{{$t('Overwrite (if file already exists)')}}</div>
-                                </template>
-                            </v-checkbox>
+                        <v-checkbox v-model="overwrite_if_exists" hide-details class="mt-0">
+                            <template v-slot:label>
+                                <span class="text-body-2">{{$t('Overwrite (if file already exists)')}}</span>
+                            </template>
+                        </v-checkbox>
+
+                        <div class="mt-4">
+                            <v-btn color="primary" :disabled="isImportDisabled" @click="processImport">{{$t("import")}}</v-btn>
                         </div>
-                                                
-                        <div xv-if="update_status==''">
-                            <v-btn color="primary" :disabled="isImportDisabled"  @click="processImport">{{$t("import")}}</v-btn>
-                        </div>
-                        
+
                     </div>
-
 
                     </v-card-text>
                 </v-card>
 
-
-
-            <v-dialog v-model="dialog_process" width="700" height="600" persistent style="z-index:5000">
+            <v-dialog
+                v-model="dialog_process"
+                max-width="880"
+                persistent
+                scrollable
+                content-class="datafile-import-dialog"
+            >
                 <v-card>
-                    <v-card-title class="text-h5 grey lighten-2">
-                    {{$t("import_data_files")}}
+                    <v-card-title class="text-h6 font-weight-medium">
+                        {{$t("import_data_files")}}
                     </v-card-title>
 
-                    <v-card-text>
-                    <div>
-                        <!-- card text -->
+                    <v-card-text class="pt-4">
+                        <div role="status" aria-live="polite">
 
-                        <v-row class="mt-3 text-center" v-if="update_status=='completed' && errors==''">
-                            <v-col class="text-center" >
-                                <i class="far fa-check-circle" style="font-size:24px;color:green;"></i> {{$t("import_completed")}}                               
-                            </v-col>
-                        </v-row>
-                
-                        <v-container v-if="update_status!='completed' && errors=='' ">                    
-                            <v-row v-if="is_processing"                            
-                            align-content="center"
-                            justify="center"
-                            >
-                            <v-col
-                                class="text-subtitle-1 text-center"
-                                cols="12"
-                            >
-                            {{update_status}}
-                            </v-col>
-                            <v-col cols="12">
-                                <v-app class="border">
-                                <v-progress-linear 
-                                color="deep-purple accent-4"
-                                indeterminate
-                                rounded
-                                height="6"
-                                ></v-progress-linear>
-                                </v-app>
-                            </v-col>
-                            </v-row>
-                        </v-container>
+                        <v-alert
+                            v-if="import_dialog_phase === 'error' && topLevelErrorText"
+                            type="error"
+                            dense
+                            outlined
+                            prominent
+                            class="mb-4"
+                        >
+                            {{ topLevelErrorText }}
+                        </v-alert>
 
-                        <div v-if="upload_report">
-                            <div v-for="report in upload_report" class="row border-top">
-                                <div class="col-md-3">{{report.file_name}}</div>
-                                <div class="col-md-2">{{report.status}}</div>
-                                <div class="col">
-                                    <div style="color:red;" v-if="report.error && report.error.response && report.error.response.data">
-                                        <div v-if="report.error.response.data.message">{{report.error.response.data.message}}</div>
-                                        <div v-else>{{report.error.response.data}}</div>
-                                    </div>
-                                    <div style="color:red;" v-else-if="report.error">{{report.error}}</div>
-                                </div>                                
-                                <hr/>
+                        <template v-if="import_dialog_phase === 'working' && is_processing">
+                            <div class="text-subtitle-1 text-center px-2">{{ update_status }}</div>
+                            <div
+                                v-if="total_import_files > 1"
+                                class="text-caption text-center grey--text text--darken-1 mt-1"
+                            >
+                                {{ $t('data_import_file_progress', { current: current_import_file_index, total: total_import_files }) }}
                             </div>
+                            <v-progress-linear
+                                class="mt-4 rounded"
+                                color="primary"
+                                :indeterminate="is_processing && !show_upload_chunk_progress"
+                                :value="show_upload_chunk_progress ? upload_chunk_percent : 0"
+                                height="10"
+                            >
+                                <template v-if="show_upload_chunk_progress" v-slot:default="{ value }">
+                                    <strong class="text-caption">{{ Math.ceil(value) }}%</strong>
+                                </template>
+                            </v-progress-linear>
+                            <div
+                                v-if="show_upload_chunk_progress && current_upload_filename"
+                                class="text-caption text-center grey--text text--darken-1 mt-2 text-truncate"
+                            >
+                                {{ current_upload_filename }}
+                            </div>
+                        </template>
+
+                        <div v-if="import_dialog_phase === 'success'" class="text-center py-2">
+                            <v-icon
+                                size="56"
+                                aria-hidden="true"
+                                style="color: #2E7D32 !important;"
+                            >mdi-check-circle</v-icon>
+                            <div class="text-h6 mt-3">{{ $t('import_completed') }}</div>
                         </div>
 
-                        <!-- end card text -->
+                        <div v-if="import_dialog_phase === 'partial'" class="text-center py-2">
+                            <v-icon
+                                size="56"
+                                aria-hidden="true"
+                                style="color: #EF6C00 !important;"
+                            >mdi-alert-circle</v-icon>
+                            <div class="text-h6 mt-3">{{ $t('import_completed') }}</div>
+                        </div>
 
-                    </div>
+                        <div v-if="upload_report.length > 0" class="mt-2">
+                            <v-card
+                                v-for="(report, ridx) in upload_report"
+                                :key="'r-' + ridx"
+                                outlined
+                                class="mb-2"
+                            >
+                                <div
+                                    class="d-flex flex-wrap align-center py-1 px-2"
+                                    style="column-gap:6px;row-gap:2px;"
+                                >
+                                    <span
+                                        class="ma-0"
+                                        :style="importReportStatusBadgeStyle(report)"
+                                    >{{ report.status }}</span>
+                                    <span class="text-body-2">{{ report.file_name }}</span>                                    
+                                </div>
+                                <template v-if="report.status === 'error'">
+                                    <v-divider v-if="getReportErrorDetail(report)" class="my-0"></v-divider>
+                                    <div class="px-2 py-1 error--text text-body-2" style="color: red;">
+                                        {{ getReportErrorDetail(report) }}
+                                    </div>
+                                </template>
+                            </v-card>
+                        </div>
+
+                        </div>
                     </v-card-text>
 
                     <v-divider></v-divider>
 
                     <v-card-actions>
                     <v-spacer></v-spacer>
-                    <v-btn color="primary" text @click="dialogClose()">
+                    <v-btn color="primary" text :disabled="is_processing" @click="dialogClose()">
                     {{$t("close")}}
                     </v-btn>
                     </v-card-actions>
                 </v-card>
                 </v-dialog>
 
-            </div>          
+                </v-container>
+            </div>
             `    
 })

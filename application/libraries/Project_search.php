@@ -2,6 +2,12 @@
 
 class Project_search
 {
+	// limit for listing versions to avoid huge query load
+	private $versions_max_page_size = 100;
+
+	/** @var int Maximum length for project list keyword search */
+	private $keywords_max_length = 256;
+
 	private $listing_fields=array(
 		'id',
 		'pid',
@@ -99,10 +105,20 @@ class Project_search
 				}
 			}
 
-			//add versions info
-			foreach($result as $idx=>$row){
-				$versions=$this->ci->project_versions->get_versions($row['id']);
-				$result[$idx]['versions']=$versions;				
+			// add versions: batch when page size is small; skip entirely for large pages
+			if ($limit > $this->versions_max_page_size || $limit <= 0) {
+				foreach ($result as $idx => $row) {
+					$result[$idx]['versions'] = array();
+				}
+			} else {
+				$main_ids = array_map('intval', array_column($result, 'id'));
+				$versions_by_parent = $this->ci->project_versions->get_versions_batch_for_main_projects($main_ids);
+				foreach ($result as $idx => $row) {
+					$sid = (int) $row['id'];
+					$result[$idx]['versions'] = isset($versions_by_parent[$sid])
+						? $versions_by_parent[$sid]
+						: array();
+				}
 			}
 
 		}
@@ -110,7 +126,6 @@ class Project_search
 
 		return array(
 			'result'=>$result,
-			//'db_query'=>$this->ci->db->last_query(),
 			'filters'=>$search_filters
 		);
 	}
@@ -342,18 +357,24 @@ class Project_search
 		}
 
 		//keywords
-		if (isset($search_options['keywords']) && !empty($search_options['keywords'])) {
-			$keywords_query=$this->build_keywords_fulltext_query($search_options['keywords']);
+		$keywords=$this->normalize_search_keywords(
+			isset($search_options['keywords']) ? $search_options['keywords'] : ''
+		);
+		if ($keywords !== '') {
+			$keywords_query=$this->build_keywords_fulltext_query($keywords);
+			$like_pattern=$this->escape_keywords_like_pattern($keywords);
+			$like_escape=$this->keywords_like_escape_clause();
 
-			$escaped_keywords=$this->ci->db->escape('%'.trim($search_options['keywords']).'%');
-			$where = sprintf('(title like %s OR idno like %s OR study_idno like %s OR %s)',
-                        $escaped_keywords,
-                        $escaped_keywords,
-						$escaped_keywords,
-						$keywords_query
-                    );
-            $this->ci->db->where($where,NULL,FALSE);			
-			$applied_filters['keywords']=$search_options['keywords'];
+			$where='(title like '.$like_pattern.$like_escape
+				.' OR idno like '.$like_pattern.$like_escape
+				.' OR study_idno like '.$like_pattern.$like_escape;
+			if ($keywords_query !== null) {
+				$where .= ' OR '.$keywords_query;
+			}
+			$where .= ')';
+
+			$this->ci->db->where($where,NULL,FALSE);
+			$applied_filters['keywords']=$keywords;
 		}
 		
 		return $applied_filters;		
@@ -362,31 +383,130 @@ class Project_search
 
 	function build_keywords_like_query($keywords)
 	{
+		$keywords=$this->normalize_search_keywords($keywords);
+		if ($keywords === '') {
+			return '';
+		}
+
 		//split keywords
 		$keywords_list=explode(" ",$keywords);
 		
+		$like_escape=$this->keywords_like_escape_clause();
 		$keyword_query=array();
 		foreach($keywords_list as $idx=>$keyword){
-			$keyword_query[]='title like ' .$this->ci->db->escape('%'.$keyword.'%');
+			$keyword_query[]='title like '.$this->escape_keywords_like_pattern($keyword).$like_escape;
 		}
 
 		$keyword_query=implode(" OR ",$keyword_query);		
 		return '('.$keyword_query.')';
 	}
 
+	/**
+	 * Sanitize keyword input for project list search.
+	 *
+	 * @param mixed $keywords Raw value from request
+	 * @return string Normalized keywords, or empty string if unusable
+	 */
+	function normalize_search_keywords($keywords)
+	{
+		if (is_array($keywords)) {
+			$keywords=reset($keywords);
+		}
+
+		if (!is_string($keywords)) {
+			if (!is_scalar($keywords)) {
+				return '';
+			}
+			$keywords=(string)$keywords;
+		}
+
+		$keywords=trim($keywords);
+		if ($keywords === '') {
+			return '';
+		}
+
+		// Remove control characters (e.g. pasted script blobs, null bytes).
+		$keywords=preg_replace('/[\x00-\x1F\x7F]/u', '', $keywords);
+		$keywords=trim($keywords);
+		if ($keywords === '') {
+			return '';
+		}
+
+		if (function_exists('mb_strlen') && function_exists('mb_substr')) {
+			if (mb_strlen($keywords) > $this->keywords_max_length) {
+				$keywords=mb_substr($keywords, 0, $this->keywords_max_length);
+			}
+		} elseif (strlen($keywords) > $this->keywords_max_length) {
+			$keywords=substr($keywords, 0, $this->keywords_max_length);
+		}
+
+		return trim($keywords);
+	}
+
+	/**
+	 * Escape a value for use inside SQL LIKE patterns on title/idno fields.
+	 *
+	 * @param string $keywords
+	 * @return string Quoted, escaped LIKE operand (includes % wildcards)
+	 */
+	function escape_keywords_like_pattern($keywords)
+	{
+		return $this->ci->db->escape(
+			'%'.$this->ci->db->escape_like_str($keywords).'%'
+		);
+	}
+
+	/**
+	 * SQL suffix required when using escape_like_str in raw LIKE clauses.
+	 * Must match CodeIgniter's default _like_escape_chr ('!').
+	 *
+	 * @return string
+	 */
+	private function keywords_like_escape_clause()
+	{
+		return " ESCAPE '!'";
+	}
+
+	/**
+	 * Build MATCH(title) AGAINST(...) for boolean fulltext search.
+	 *
+	 * @param string $keywords Raw search string
+	 * @return string|null SQL expression, or null if no valid terms (caller should use LIKE only)
+	 */
 	function build_keywords_fulltext_query($keywords)
 	{
-		//remove characters that are not allowed in fulltext search
-		$keywords=preg_replace('/[@+\-&|!(){}[\]^"~*?:\/\\\]/','',$keywords);
-		$keywords=trim($keywords);		
+		$keywords=$this->normalize_search_keywords($keywords);
+		if ($keywords === '') {
+			return null;
+		}
 
-		$keywords_list=explode(" ",$keywords);
+		//remove characters that are not allowed in fulltext search
+		$keywords=preg_replace('/[@+\-&|!(){}[\]^"~*?:\/\\\\<>]/','',$keywords);
+		$keywords=trim(preg_replace('/\s+/',' ',$keywords));
+
+		if ($keywords === '')
+		{
+			return null;
+		}
+
+		$keywords_list=explode(' ',$keywords);
 		$keyword_query=array();
-		foreach($keywords_list as $idx=>$keyword){
+		foreach($keywords_list as $keyword)
+		{
+			$keyword=trim($keyword);
+			if ($keyword === '')
+			{
+				continue;
+			}
 			$keyword_query[]='+'.$keyword.'*';
 		}
 
-		return 'MATCH(title) AGAINST('.$this->ci->db->escape( implode(" ", $keyword_query) ).' IN BOOLEAN MODE)';
+		if (empty($keyword_query))
+		{
+			return null;
+		}
+
+		return 'MATCH(title) AGAINST('.$this->ci->db->escape(implode(' ',$keyword_query)).' IN BOOLEAN MODE)';
 	}
 
 	function parse_filter_values_as_int($values)

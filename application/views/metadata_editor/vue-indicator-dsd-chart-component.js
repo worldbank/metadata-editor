@@ -1,4 +1,6 @@
 // Indicator DSD Chart Visualization Component
+var INDICATOR_CHART_LINE_COLORS = ['#1976D2', '#4CAF50', '#FF9800', '#9C27B0', '#F44336', '#00BCD4', '#FFC107', '#795548'];
+
 Vue.component('indicator-dsd-chart', {
     props: [],
     data() {
@@ -8,6 +10,7 @@ Vue.component('indicator-dsd-chart', {
             dataset_type: project_type,
             loading: false,
             chart: null,
+            chartLegendItems: [],
             rawData: null, // Raw records from API
             filterOptions: {
                 geography: [],
@@ -17,18 +20,46 @@ Vue.component('indicator-dsd-chart', {
                     values: []
                 }
             },
+            /** SDMX core: FREQ column when periodicity exists and has a resolved codelist */
+            coreFacetFreq: null,
+            /** column_type === dimension or measure — facets like SDMX slice dimensions; items may be empty (combobox) */
+            facetDimensions: [],
+            /** column_type === attribute, only if codelist */
+            facetAttributes: [],
+            /** column_type === annotation, only if codelist */
+            facetAnnotations: [],
+            /** Slice filters except geography (keys: FREQ + dimensions/measures + attributes + annotations) */
+            dimensionFilters: {},
+            filterOptionsError: null,
+            /** DSD column name for geography (facet count merge); null if no geography codelist */
+            geographyColumnName: null,
             filters: {
                 geography: [],
                 time_period_start: null,
                 time_period_end: null
             },
             error: null,
-            activeTab: 0 // 0 = chart, 1 = table
+            activeTab: 0, // 0 = chart, 1 = table
+            suppressFilterAutoApply: false,
+            _filterApplyTimer: null
+        }
+    },
+    watch: {
+        filters: {
+            deep: true,
+            handler: function() {
+                this.scheduleAutoApplyFilters();
+            }
+        },
+        dimensionFilters: {
+            deep: true,
+            handler: function() {
+                this.scheduleAutoApplyFilters();
+            }
         }
     },
     created: async function() {
-        await this.loadFilterOptions();
-        // Do not load chart data until user selects at least one geography
+        await this.loadChartFilterOptions();
     },
     mounted: function() {
         // Watch for tab changes and resize chart when the chart tab becomes visible
@@ -103,15 +134,73 @@ Vue.component('indicator-dsd-chart', {
             .indicator-dsd-chart-component .tab-pane--scroll {
                 overflow: auto;
             }
-            .indicator-dsd-chart-component .chart-area {
-                position: relative;
-                width: 100%;
+            .indicator-dsd-chart-component .tab-pane--chart {
+                display: flex;
+                flex-direction: column;
                 height: 100%;
+                min-height: 0;
+                padding: 8px 16px 16px;
+                box-sizing: border-box;
+                overflow-y: auto;
             }
-            .indicator-dsd-chart-component .chart-area canvas {
+            .indicator-dsd-chart-component .chart-series-summary {
+                flex: 0 0 auto;
+                font-size: 0.8125rem;
+                color: rgba(0, 0, 0, 0.6);
+                margin-bottom: 8px;
+            }
+            .indicator-dsd-chart-component .chart-plot-area {
+                position: relative;
+                flex: 0 0 auto;
+                width: 100%;
+                min-height: 480px;
+                height: 480px;
+            }
+            .indicator-dsd-chart-component .chart-plot-area canvas {
                 width: 100% !important;
                 height: 100% !important;
                 display: block;
+            }
+            .indicator-dsd-chart-component .chart-legend-panel {
+                flex: 0 0 auto;
+                display: flex;
+                flex-wrap: wrap;
+                align-content: flex-start;
+                gap: 10px 18px;
+                margin-top: 12px;
+                padding-top: 12px;
+                border-top: 1px solid rgba(0, 0, 0, 0.08);
+            }
+            .indicator-dsd-chart-component .chart-legend-item {
+                display: inline-flex;
+                align-items: flex-start;
+                gap: 8px;
+                max-width: 100%;
+            }
+            .indicator-dsd-chart-component .chart-legend-swatch {
+                width: 16px;
+                height: 4px;
+                border-radius: 2px;
+                margin-top: 7px;
+                flex-shrink: 0;
+            }
+            .indicator-dsd-chart-component .chart-legend-label {
+                font-size: 0.8125rem;
+                line-height: 1.35;
+                color: rgba(0, 0, 0, 0.87);
+                word-break: break-word;
+            }
+            .indicator-dsd-chart-component .facet-group-title {
+                font-size: 0.75rem;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.04em;
+                color: rgba(0,0,0,0.55);
+                margin-top: 12px;
+                margin-bottom: 8px;
+            }
+            .indicator-dsd-chart-component .facet-group-title:first-of-type {
+                margin-top: 0;
             }
         `;
         document.head.appendChild(style);
@@ -128,64 +217,129 @@ Vue.component('indicator-dsd-chart', {
         if (this._customStyle && this._customStyle.parentNode) {
             this._customStyle.parentNode.removeChild(this._customStyle);
         }
+        if (this._filterApplyTimer) {
+            clearTimeout(this._filterApplyTimer);
+            this._filterApplyTimer = null;
+        }
     },
     methods: {
-        loadFilterOptions: async function() {
+        loadChartFilterOptions: async function() {
+            const vm = this;
+            vm.suppressFilterAutoApply = true;
             try {
-                // Load DSD columns to get geography code_list for filter options
                 const response = await axios.get(
-                    CI.base_url + '/api/indicator_dsd/' + this.dataset_id + '?detailed=1'
+                    CI.base_url + '/api/indicator_dsd/chart_filter_options/' + vm.dataset_id
                 );
-                if (response.data && response.data.columns && Array.isArray(response.data.columns)) {
-                    const geoCol = response.data.columns.find(c => c.column_type === 'geography');
-                    if (geoCol && geoCol.code_list && Array.isArray(geoCol.code_list)) {
-                        this.filterOptions.geography = geoCol.code_list.map(item => ({
-                            code: item.code != null ? String(item.code) : '',
-                            label: item.label != null ? String(item.label) : (item.code != null ? String(item.code) : '')
-                        })).filter(item => item.code !== '');
-                    } else {
-                        this.filterOptions.geography = [];
-                    }
+                const data = (response.data && response.data.data) ? response.data.data : {};
+                const dimFilters = {};
+
+                vm.geographyColumnName = data.geography_column || null;
+                vm.filterOptions.geography = Array.isArray(data.geography_options) ? data.geography_options : [];
+
+                vm.coreFacetFreq = data.periodicity_facet || null;
+                if (vm.coreFacetFreq && vm.coreFacetFreq.name) {
+                    dimFilters[vm.coreFacetFreq.name] = [];
                 }
+
+                vm.facetDimensions = Array.isArray(data.dimension_facets) ? data.dimension_facets : [];
+                vm.facetDimensions.forEach(function(col) {
+                    if (col && col.name) {
+                        dimFilters[col.name] = [];
+                    }
+                });
+
+                vm.facetAttributes = Array.isArray(data.attribute_facets) ? data.attribute_facets : [];
+                vm.facetAttributes.forEach(function(col) {
+                    if (col && col.name) {
+                        dimFilters[col.name] = [];
+                    }
+                });
+
+                vm.facetAnnotations = Array.isArray(data.annotation_facets) ? data.annotation_facets : [];
+                vm.facetAnnotations.forEach(function(col) {
+                    if (col && col.name) {
+                        dimFilters[col.name] = [];
+                    }
+                });
+
+                vm.dimensionFilters = dimFilters;
+                vm.filterOptionsError = null;
             } catch (error) {
-                console.error('Error loading filter options:', error);
-                this.filterOptions.geography = [];
+                console.error('Error loading chart filter options:', error);
+                vm.filterOptionsError = (error.response && error.response.data && error.response.data.message)
+                    || error.message
+                    || 'Could not load filter options';
+                vm.filterOptions.geography = [];
+                vm.geographyColumnName = null;
+                vm.coreFacetFreq = null;
+                vm.facetDimensions = [];
+                vm.facetAttributes = [];
+                vm.facetAnnotations = [];
+                vm.dimensionFilters = {};
+            } finally {
+                vm.suppressFilterAutoApply = false;
             }
+        },
+        scheduleAutoApplyFilters: function() {
+            if (this.suppressFilterAutoApply) {
+                return;
+            }
+            if (this._filterApplyTimer) {
+                clearTimeout(this._filterApplyTimer);
+            }
+            const vm = this;
+            this._filterApplyTimer = setTimeout(function() {
+                vm._filterApplyTimer = null;
+                vm.autoApplyFilters();
+            }, 350);
+        },
+        clearChartData: function() {
+            this.rawData = null;
+            this.chartLegendItems = [];
+            this.error = null;
+            if (this.chart) {
+                this.chart.destroy();
+                this.chart = null;
+            }
+        },
+        autoApplyFilters: function() {
+            if (!this.hasDimensionFilterSelection) {
+                this.clearChartData();
+                return;
+            }
+            this.loadChartData();
         },
         loadChartData: async function() {
             this.loading = true;
             this.error = null;
             const vm = this;
-            
+
             try {
-                let url = CI.base_url + '/api/indicator_dsd/chart_data/' + vm.dataset_id;
-                
-                // Add filter parameters
-                const params = new URLSearchParams();
-                if (vm.filters.geography && vm.filters.geography.length > 0) {
-                    params.append('geography', vm.filters.geography.join(','));
-                }
-                if (vm.filters.time_period_start) {
-                    params.append('time_period_start', vm.filters.time_period_start);
-                }
-                if (vm.filters.time_period_end) {
-                    params.append('time_period_end', vm.filters.time_period_end);
-                }
-                
-                if (params.toString()) {
-                    url += '?' + params.toString();
-                }
-                
-                const response = await axios.get(url);
-                
+                const url = CI.base_url + '/api/indicator_dsd/chart_data/' + vm.dataset_id;
+                const dimensions = {};
+                Object.keys(vm.dimensionFilters || {}).forEach(k => {
+                    const arr = vm.dimensionFilters[k];
+                    if (Array.isArray(arr) && arr.length > 0) {
+                        dimensions[k] = arr.slice();
+                    }
+                });
+                const body = {
+                    geography: vm.filters.geography && vm.filters.geography.length > 0 ? vm.filters.geography.slice() : [],
+                    dimensions,
+                    time_period_start: vm.filters.time_period_start || null,
+                    time_period_end: vm.filters.time_period_end || null
+                };
+
+                const response = await axios.post(url, body, {
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
                 if (response.data && response.data.status === 'success' && response.data.data) {
                     vm.rawData = response.data.data;
-                    // Ensure records is an array
                     if (vm.rawData && !Array.isArray(vm.rawData.records)) {
                         console.warn('Records is not an array:', vm.rawData.records);
                         vm.rawData.records = [];
                     }
-                    // Update time_period filter options from response (keep geography from DSD code_list)
                     if (response.data.data.filter_options && response.data.data.filter_options.time_period) {
                         vm.filterOptions.time_period = response.data.data.filter_options.time_period;
                     }
@@ -203,96 +357,134 @@ Vue.component('indicator-dsd-chart', {
                 this.loading = false;
             }
         },
+        /** Stable series identity (codes); matches API series_key. */
+        chartSeriesId: function(record) {
+            if (!record) {
+                return '';
+            }
+            if (record.series_key != null && record.series_key !== '') {
+                return String(record.series_key);
+            }
+            return record.geography != null && record.geography !== '' ? String(record.geography) : '';
+        },
+        /** Legend / table header text (labels when API provides series_key_label). */
+        chartSeriesDisplay: function(record) {
+            if (!record) {
+                return '';
+            }
+            if (record.series_key_label != null && String(record.series_key_label).trim() !== '') {
+                return String(record.series_key_label);
+            }
+            return this.chartSeriesId(record);
+        },
         transformToChartData: function(records) {
             if (!records || !Array.isArray(records) || records.length === 0) {
-                return { labels: [], datasets: [] };
+                return { labels: [], datasets: [], legendItems: [] };
             }
 
-            // Group records by geography
             const seriesData = {};
+            const seriesDisplay = {};
             const timePeriods = new Set();
 
             records.forEach(record => {
-                const geo = record.geography;
+                const sid = this.chartSeriesId(record);
                 const timePeriod = record.time_period;
                 const value = record.observation_value;
 
-                if (!seriesData[geo]) {
-                    seriesData[geo] = {};
+                if (!sid) {
+                    return;
                 }
-                seriesData[geo][timePeriod] = value;
+                if (!seriesData[sid]) {
+                    seriesData[sid] = {};
+                    seriesDisplay[sid] = this.chartSeriesDisplay(record);
+                }
+                seriesData[sid][timePeriod] = value;
                 timePeriods.add(timePeriod);
             });
 
-            // Get sorted time periods for labels
             const labels = Array.from(timePeriods).sort();
 
-            // Create Chart.js datasets
             const datasets = [];
-            const colors = ['#1976D2', '#4CAF50', '#FF9800', '#9C27B0', '#F44336', '#00BCD4', '#FFC107', '#795548'];
             let colorIdx = 0;
 
-            Object.keys(seriesData).sort().forEach(geo => {
+            Object.keys(seriesData).sort((a, b) =>
+                String(seriesDisplay[a] || a).localeCompare(String(seriesDisplay[b] || b), undefined, { sensitivity: 'base' })
+            ).forEach(sid => {
                 const data = labels.map(timePeriod => ({
                     x: timePeriod,
-                    y: seriesData[geo][timePeriod] !== undefined ? seriesData[geo][timePeriod] : null
+                    y: seriesData[sid][timePeriod] !== undefined ? seriesData[sid][timePeriod] : null
                 }));
+                const color = INDICATOR_CHART_LINE_COLORS[colorIdx % INDICATOR_CHART_LINE_COLORS.length];
 
                 datasets.push({
-                    label: geo,
+                    label: seriesDisplay[sid] || sid,
                     data: data,
-                    borderColor: colors[colorIdx % colors.length],
-                    backgroundColor: colors[colorIdx % colors.length].replace(')', ', 0.1)'),
-                    tension: 0.4,
+                    borderColor: color,
+                    backgroundColor: color,
+                    borderWidth: 2,
+                    tension: 0,
                     fill: false
                 });
                 colorIdx++;
             });
 
-            return { labels, datasets };
+            const legendItems = datasets.map(function(ds, idx) {
+                return {
+                    id: idx + '-' + String(ds.label || ''),
+                    label: ds.label || '',
+                    color: ds.borderColor || INDICATOR_CHART_LINE_COLORS[idx % INDICATOR_CHART_LINE_COLORS.length]
+                };
+            });
+
+            return { labels: labels, datasets: datasets, legendItems: legendItems };
         },
         transformToTableData: function(records) {
             if (!records || !Array.isArray(records) || records.length === 0) {
                 return [];
             }
 
-            // Get unique geographies and time periods
-            const geographies = new Set();
+            const seriesIds = new Set();
             const timePeriods = new Set();
-            const dataMap = {}; // time_period -> geography -> value
+            const dataMap = {};
+            const idToDisplay = {};
 
             records.forEach(record => {
-                const geo = record.geography;
+                const sid = this.chartSeriesId(record);
                 const timePeriod = record.time_period;
                 const value = record.observation_value;
 
-                geographies.add(geo);
+                if (!sid) {
+                    return;
+                }
+                seriesIds.add(sid);
+                if (!idToDisplay[sid]) {
+                    idToDisplay[sid] = this.chartSeriesDisplay(record);
+                }
                 timePeriods.add(timePeriod);
 
                 if (!dataMap[timePeriod]) {
                     dataMap[timePeriod] = {};
                 }
-                dataMap[timePeriod][geo] = value;
+                dataMap[timePeriod][sid] = value;
             });
 
-            // Sort time periods and geographies
             const sortedTimePeriods = Array.from(timePeriods).sort();
-            const sortedGeographies = Array.from(geographies).sort();
+            const sortedSeriesIds = Array.from(seriesIds).sort((a, b) =>
+                String(idToDisplay[a] || a).localeCompare(String(idToDisplay[b] || b), undefined, { sensitivity: 'base' })
+            );
 
-            // Create table rows
             return sortedTimePeriods.map(timePeriod => {
                 const row = {
                     time_period: timePeriod
                 };
-                sortedGeographies.forEach(geo => {
-                    const value = dataMap[timePeriod] && dataMap[timePeriod][geo] !== undefined 
-                        ? dataMap[timePeriod][geo] 
+                sortedSeriesIds.forEach(sid => {
+                    const value = dataMap[timePeriod] && dataMap[timePeriod][sid] !== undefined
+                        ? dataMap[timePeriod][sid]
                         : null;
-                    // Format numeric values for display
                     if (value !== null && typeof value === 'number') {
-                        row[geo] = value.toLocaleString(undefined, {maximumFractionDigits: 2});
+                        row[sid] = value.toLocaleString(undefined, {maximumFractionDigits: 2});
                     } else {
-                        row[geo] = value !== null ? String(value) : '-';
+                        row[sid] = value !== null ? String(value) : '-';
                     }
                 });
                 return row;
@@ -303,6 +495,7 @@ Vue.component('indicator-dsd-chart', {
                 return;
             }
 
+            const vm = this;
             const canvas = this.$refs.chartCanvas;
             if (!canvas) {
                 return;
@@ -321,6 +514,7 @@ Vue.component('indicator-dsd-chart', {
 
             // Transform raw data to Chart.js format
             const chartData = this.transformToChartData(this.rawData.records);
+            this.chartLegendItems = chartData.legendItems || [];
 
             const ctx = canvas.getContext('2d');
             
@@ -341,14 +535,18 @@ Vue.component('indicator-dsd-chart', {
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    layout: {
+                        padding: {
+                            bottom: 4
+                        }
+                    },
                     interaction: {
                         intersect: false,
                         mode: 'index'
                     },
                     plugins: {
                         legend: {
-                            display: true,
-                            position: 'top'
+                            display: false
                         },
                         tooltip: {
                             enabled: true,
@@ -362,7 +560,7 @@ Vue.component('indicator-dsd-chart', {
                         x: {
                             title: {
                                 display: true,
-                                text: 'Time Period'
+                                text: vm.$t('field_time_period') || 'Time period'
                             },
                             grid: {
                                 display: false
@@ -371,7 +569,7 @@ Vue.component('indicator-dsd-chart', {
                         y: {
                             title: {
                                 display: true,
-                                text: 'Observation Value'
+                                text: vm.$t('dsd_role_measure') || 'Observation value'
                             },
                             beginAtZero: false,
                             grid: {
@@ -390,24 +588,24 @@ Vue.component('indicator-dsd-chart', {
             });
         },
         applyFilters: function() {
-            if (!this.filters.geography || this.filters.geography.length === 0) {
-                EventBus.$emit('onFail', this.$t('select_at_least_one_geography') || 'Select at least one geography to view the chart.');
-                return;
+            if (this._filterApplyTimer) {
+                clearTimeout(this._filterApplyTimer);
+                this._filterApplyTimer = null;
             }
-            this.loadChartData();
+            this.autoApplyFilters();
         },
         resetFilters: function() {
+            this.suppressFilterAutoApply = true;
+            const dim = {};
+            Object.keys(this.dimensionFilters || {}).forEach(k => { dim[k] = []; });
+            this.dimensionFilters = dim;
             this.filters = {
                 geography: [],
                 time_period_start: null,
                 time_period_end: null
             };
-            this.rawData = null;
-            this.error = null;
-            if (this.chart) {
-                this.chart.destroy();
-                this.chart = null;
-            }
+            this.clearChartData();
+            this.suppressFilterAutoApply = false;
         },
         exportChart: function() {
             if (!this.chart) {
@@ -427,10 +625,39 @@ Vue.component('indicator-dsd-chart', {
         hasData: function() {
             return this.rawData && this.rawData.records && Array.isArray(this.rawData.records) && this.rawData.records.length > 0;
         },
+        seriesCount: function() {
+            if (!this.rawData || !Array.isArray(this.rawData.records) || this.rawData.records.length === 0) {
+                return 0;
+            }
+            const seriesIds = new Set();
+            this.rawData.records.forEach(record => {
+                const sid = this.chartSeriesId(record);
+                if (sid) {
+                    seriesIds.add(sid);
+                }
+            });
+            return seriesIds.size;
+        },
         hasFilters: function() {
+            const dimAny = this.dimensionFilters && Object.keys(this.dimensionFilters).some(k =>
+                Array.isArray(this.dimensionFilters[k]) && this.dimensionFilters[k].length > 0
+            );
             return (this.filters.geography && this.filters.geography.length > 0) ||
+                   dimAny ||
                    this.filters.time_period_start ||
                    this.filters.time_period_end;
+        },
+        /** At least one geography or slice facet (FREQ, dimension/measure, attribute, annotation) selection. */
+        hasDimensionFilterSelection: function() {
+            if (this.filters.geography && this.filters.geography.length > 0) {
+                return true;
+            }
+            if (!this.dimensionFilters) {
+                return false;
+            }
+            return Object.keys(this.dimensionFilters).some(k =>
+                Array.isArray(this.dimensionFilters[k]) && this.dimensionFilters[k].length > 0
+            );
         },
         tableData: function() {
             if (!this.rawData || !this.rawData.records) {
@@ -443,24 +670,34 @@ Vue.component('indicator-dsd-chart', {
                 return [];
             }
 
-            // Get unique geographies from records
-            const geographies = new Set();
+            const seriesIds = new Set();
+            const idToDisplay = {};
             this.rawData.records.forEach(record => {
-                if (record && record.geography) {
-                    geographies.add(record.geography);
+                if (!record) {
+                    return;
+                }
+                const sid = this.chartSeriesId(record);
+                if (!sid) {
+                    return;
+                }
+                seriesIds.add(sid);
+                if (!idToDisplay[sid]) {
+                    idToDisplay[sid] = this.chartSeriesDisplay(record);
                 }
             });
 
-            const sortedGeographies = Array.from(geographies).sort();
+            const sortedIds = Array.from(seriesIds).sort((a, b) =>
+                String(idToDisplay[a] || a).localeCompare(String(idToDisplay[b] || b), undefined, { sensitivity: 'base' })
+            );
 
             const headers = [
                 { text: this.$t('time_period') || 'Time Period', value: 'time_period', sortable: true }
             ];
 
-            sortedGeographies.forEach(geo => {
+            sortedIds.forEach(sid => {
                 headers.push({
-                    text: geo,
-                    value: geo,
+                    text: idToDisplay[sid] || sid,
+                    value: sid,
                     sortable: true,
                     align: 'right'
                 });
@@ -470,12 +707,15 @@ Vue.component('indicator-dsd-chart', {
         }
     },
     template: `
-        <div class="indicator-dsd-chart-component" style="display: flex; flex-direction: column; height: calc(100vh - 120px);">
+        <div class="indicator-dsd-chart-component" style="display: flex; flex-direction: column; height: calc(100vh - 72px); min-height: 640px;">
             <!-- Page Title -->
             <v-card class="mb-2 m-2 p-2" flat>
                 <v-card-title class="d-flex justify-space-between align-center">
                     <div>
                         <h4 class="mb-0">{{$t("timeseries_visualization") || "Timeseries Visualization"}}</h4>
+                        <div v-if="hasData" class="caption grey--text mt-1">
+                            {{ seriesCount }} {{ $t('series') || 'series' }}
+                        </div>
                     </div>
                     <div>
                         <v-btn 
@@ -506,10 +746,28 @@ Vue.component('indicator-dsd-chart', {
                     </div>
                     
                     <div style="flex: 1; overflow-y: auto; padding: 16px;">
-                        <!-- Geography Filter (from DSD code_list, typeahead) -->
+                        <v-alert v-if="filterOptionsError" type="error" dense text class="mb-3">
+                            {{ filterOptionsError }}
+                        </v-alert>
+                        <div class="facet-group-title">{{$t("viz_facets_core_sdmx") || "Core"}}</div>
+
                         <div class="mb-4">
                             <label class="font-weight-bold mb-2">{{$t("field_geography") || "Geography"}}</label>
+                            <v-combobox
+                                v-if="!(filterOptions.geography && filterOptions.geography.length)"
+                                v-model="filters.geography"
+                                multiple
+                                chips
+                                small-chips
+                                deletable-chips
+                                dense
+                                outlined
+                                hide-details
+                                clearable
+                                :placeholder="$t('geography_codes_combobox') || 'Enter geography codes (no values in published data yet)'"
+                            ></v-combobox>
                             <v-autocomplete
+                                v-else
                                 v-model="filters.geography"
                                 :items="filterOptions.geography || []"
                                 item-value="code"
@@ -521,14 +779,30 @@ Vue.component('indicator-dsd-chart', {
                                 hide-details
                                 clearable
                                 :placeholder="$t('select_geography') || 'Select geography'"
-                                :no-data-text="$t('no_geography_options') || 'No geography options. Populate code lists from CSV first.'"
+                                :no-data-text="$t('no_geography_options') || 'No geography options.'"
                             ></v-autocomplete>
-                            <small class="text-muted">{{$t("select_one_or_more_geography") || "Select one or more to load chart"}}</small>
                         </div>
 
-                        <!-- Time Period Filter -->
+                        <div class="mb-4" v-if="coreFacetFreq">
+                            <label class="font-weight-bold mb-2">{{$t("field_freq") || "Periodicity"}}</label>
+                            <v-autocomplete
+                                v-model="dimensionFilters[coreFacetFreq.name]"
+                                :items="coreFacetFreq.items"
+                                item-value="code"
+                                item-text="label"
+                                multiple
+                                chips
+                                dense
+                                outlined
+                                hide-details
+                                clearable
+                                :placeholder="$t('select_freq_codes') || 'Select frequency codes'"
+                                :no-data-text="$t('no_options') || 'No options'"
+                            ></v-autocomplete>
+                        </div>
+
                         <div class="mb-4">
-                            <label class="font-weight-bold mb-2">{{$t("field_time_period") || "Time Period"}}</label>
+                            <label class="font-weight-bold mb-2">{{$t("field_time_period") || "Time period"}}</label>
                             <div class="mb-2">
                                 <label class="text-caption">{{$t("from") || "From"}}</label>
                                 <v-text-field
@@ -550,7 +824,7 @@ Vue.component('indicator-dsd-chart', {
                                 ></v-text-field>
                             </div>
                             <small class="text-muted">
-                                {{$t("available_range") || "Available range"}}: 
+                                {{$t("available_range") || "Available range"}}:
                                 <span v-if="filterOptions.time_period?.min && filterOptions.time_period?.max">
                                     {{filterOptions.time_period.min}} - {{filterOptions.time_period.max}}
                                 </span>
@@ -558,22 +832,93 @@ Vue.component('indicator-dsd-chart', {
                             </small>
                         </div>
 
+                        <div class="facet-group-title" v-if="facetDimensions.length">{{$t("viz_facets_dimensions_and_measures") || "Dimensions"}}</div>
+                        <div class="mb-4" v-for="col in facetDimensions" :key="'dim-' + col.name">
+                            <label class="font-weight-bold mb-2">{{ col.label }}</label>
+                            <v-combobox
+                                v-if="!col.items.length"
+                                v-model="dimensionFilters[col.name]"
+                                multiple
+                                chips
+                                small-chips
+                                deletable-chips
+                                dense
+                                outlined
+                                hide-details
+                                clearable
+                                :placeholder="$t('dimension_codes_combobox') || 'Type codes (none observed in published data yet)'"
+                            ></v-combobox>
+                            <v-autocomplete
+                                v-else
+                                v-model="dimensionFilters[col.name]"
+                                :items="col.items"
+                                item-value="code"
+                                item-text="label"
+                                multiple
+                                chips
+                                dense
+                                outlined
+                                hide-details
+                                clearable
+                                :placeholder="$t('select_codes') || 'Select codes'"
+                                :no-data-text="$t('no_options') || 'No options'"
+                            ></v-autocomplete>
+                        </div>
+
+                        <div class="facet-group-title" v-if="facetAttributes.length">{{$t("viz_facets_attributes") || "Attributes"}}</div>
+                        <div class="mb-4" v-for="col in facetAttributes" :key="'attr-' + col.name">
+                            <label class="font-weight-bold mb-2">{{ col.label }}</label>
+                            <v-autocomplete
+                                v-model="dimensionFilters[col.name]"
+                                :items="col.items"
+                                item-value="code"
+                                item-text="label"
+                                multiple
+                                chips
+                                dense
+                                outlined
+                                hide-details
+                                clearable
+                                :placeholder="$t('select_codes') || 'Select codes'"
+                                :no-data-text="$t('no_options') || 'No options'"
+                            ></v-autocomplete>
+                        </div>
+
+                        <div class="facet-group-title" v-if="facetAnnotations.length">{{$t("viz_facets_annotations") || "Annotations"}}</div>
+                        <div class="mb-4" v-for="col in facetAnnotations" :key="'ann-' + col.name">
+                            <label class="font-weight-bold mb-2">{{ col.label }}</label>
+                            <v-autocomplete
+                                v-model="dimensionFilters[col.name]"
+                                :items="col.items"
+                                item-value="code"
+                                item-text="label"
+                                multiple
+                                chips
+                                dense
+                                outlined
+                                hide-details
+                                clearable
+                                :placeholder="$t('select_codes') || 'Select codes'"
+                                :no-data-text="$t('no_options') || 'No options'"
+                            ></v-autocomplete>
+                        </div>
+
                         <!-- Action Buttons -->
-                        <div class="d-flex gap-2">
-                            <v-btn 
-                                color="primary" 
-                                block
+                        <div class="d-flex align-center" style="gap: 8px;">
+                            <v-btn
+                                color="primary"
+                                depressed
+                                small
                                 @click="applyFilters"
                                 :loading="loading"
                             >
                                 <v-icon left small>mdi-filter</v-icon>
-                                {{$t("apply_filters") || "Apply Filters"}}
+                                {{$t("apply_filters") || "Apply"}}
                             </v-btn>
-                            <v-btn 
+                            <v-btn
                                 v-if="hasFilters"
-                                color="secondary" 
-                                outlined
-                                block
+                                text
+                                small
                                 @click="resetFilters"
                             >
                                 <v-icon left small>mdi-refresh</v-icon>
@@ -618,15 +963,29 @@ Vue.component('indicator-dsd-chart', {
                             </div>
                             <div v-else-if="!hasData" class="tab-pane tab-pane--center pa-8 text-muted">
                                 <v-icon size="64" color="grey lighten-1">mdi-chart-line</v-icon>
-                                <div v-if="!filters.geography || filters.geography.length === 0" class="mt-4">
-                                    {{$t("select_geography_to_view_chart") || "Select at least one geography to view the chart"}}
+                                <div class="mt-4">
+                                    {{ hasDimensionFilterSelection ? ($t("no_data_available") || "No data available") : ($t("select_dimension_filters_to_view_chart") || "Select at least one geography or dimension filter to view the chart") }}
                                 </div>
-                                <div v-else class="mt-4">{{$t("no_data_available") || "No data available"}}</div>
-                                <div class="text-caption">{{$t("apply_filters_or_import_data") || "Apply filters or import data"}}</div>
                             </div>
-                            <div v-else class="tab-pane">
-                                <div class="chart-area">
+                            <div v-else class="tab-pane tab-pane--chart">
+                                <div class="chart-series-summary">
+                                    {{ seriesCount }} {{ $t('series') || 'series' }}
+                                </div>
+                                <div class="chart-plot-area">
                                     <canvas ref="chartCanvas"></canvas>
+                                </div>
+                                <div v-if="chartLegendItems.length" class="chart-legend-panel">
+                                    <div
+                                        v-for="item in chartLegendItems"
+                                        :key="item.id"
+                                        class="chart-legend-item"
+                                    >
+                                        <span
+                                            class="chart-legend-swatch"
+                                            :style="{ backgroundColor: item.color }"
+                                        ></span>
+                                        <span class="chart-legend-label">{{ item.label }}</span>
+                                    </div>
                                 </div>
                             </div>
                         </v-tab-item>
@@ -640,11 +999,9 @@ Vue.component('indicator-dsd-chart', {
                                 </div>
                                 <div v-else-if="!hasData" class="text-center pa-8 text-muted">
                                     <v-icon size="64" color="grey lighten-1">mdi-table</v-icon>
-                                    <div v-if="!filters.geography || filters.geography.length === 0" class="mt-4">
-                                        {{$t("select_geography_to_view_chart") || "Select at least one geography to view the chart"}}
+                                    <div class="mt-4">
+                                        {{ hasDimensionFilterSelection ? ($t("no_data_available") || "No data available") : ($t("select_dimension_filters_to_view_chart") || "Select at least one geography or dimension filter to view the chart") }}
                                     </div>
-                                    <div v-else class="mt-4">{{$t("no_data_available") || "No data available"}}</div>
-                                    <div class="text-caption">{{$t("apply_filters_or_import_data") || "Apply filters or import data"}}</div>
                                 </div>
                                 <div v-else>
                                     <v-data-table

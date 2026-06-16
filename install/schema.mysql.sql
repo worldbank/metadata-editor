@@ -2,7 +2,6 @@
 -- Table structure for table `meta`
 --
 
-DROP TABLE IF EXISTS `meta`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `meta` (
@@ -22,7 +21,6 @@ CREATE TABLE `meta` (
 -- Table structure for table `login_attempts`
 --
 
-DROP TABLE IF EXISTS `login_attempts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `login_attempts` (
@@ -41,7 +39,6 @@ CREATE TABLE `login_attempts` (
 -- Table structure for table `dcformats`
 --
 
-DROP TABLE IF EXISTS `dcformats`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `dcformats` (
@@ -66,7 +63,6 @@ UNLOCK TABLES;
 -- Table structure for table `dctypes`
 --
 
-DROP TABLE IF EXISTS `dctypes`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `dctypes` (
@@ -112,7 +108,6 @@ INSERT INTO `dctypes` (`title`) VALUES ('Data, Document [dat/doc]');
 -- Table structure for table `users`
 --
 
-DROP TABLE IF EXISTS `users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `users` (
@@ -140,7 +135,6 @@ CREATE TABLE `users` (
 -- Table structure for table `ci_sessions`
 --
 
-DROP TABLE IF EXISTS `ci_sessions`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `ci_sessions` (
@@ -160,7 +154,6 @@ CREATE TABLE `ci_sessions` (
 -- Table structure for table `sitelogs`
 --
 
-DROP TABLE IF EXISTS `sitelogs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `sitelogs` (
@@ -185,7 +178,6 @@ CREATE TABLE `sitelogs` (
 -- Table structure for table `configurations`
 --
 
-DROP TABLE IF EXISTS `configurations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `configurations` (
@@ -482,9 +474,33 @@ CREATE TABLE `editor_resources` (
   `subjects` varchar(45) DEFAULT NULL,
   `filename` varchar(255) DEFAULT NULL,
   `dcformat` varchar(255) DEFAULT NULL,
+  `source_type` varchar(20) DEFAULT 'manual',
+  `bundle_type` varchar(10) DEFAULT NULL,
   `changed` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
+) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+
+
+CREATE TABLE `editor_resource_data_files` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `sid` int NOT NULL,
+  `resource_id` int NOT NULL,
+  `file_id` varchar(100) NOT NULL,
+  `export_format` varchar(20) DEFAULT NULL,
+  `export_version` varchar(20) DEFAULT NULL,
+  `zip_entry_name` varchar(255) DEFAULT NULL,
+  `link_type` varchar(20) DEFAULT NULL,
+  `data_file_changed` int DEFAULT NULL,
+  `source_csv_mtime` int DEFAULT NULL,
+  `generated_at` int DEFAULT NULL,
+  `created` int DEFAULT NULL,
+  `created_by` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_resource_file` (`resource_id`, `file_id`),
+  KEY `idx_erdf_sid_resource` (`sid`, `resource_id`),
+  KEY `idx_erdf_sid_file` (`sid`, `file_id`),
+  KEY `idx_erdf_resource` (`resource_id`)
 ) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 
@@ -875,7 +891,7 @@ CREATE TABLE `job_queue` (
   `uuid` char(36) NOT NULL,
   `job_type` varchar(50) NOT NULL,
   `job_hash` varchar(64) DEFAULT NULL,
-  `status` enum('pending','processing','completed','failed') DEFAULT 'pending',
+  `status` enum('pending','held','processing','completed','failed') DEFAULT 'pending',
   `priority` int DEFAULT 0,
   `user_id` int DEFAULT NULL,
   `payload` json DEFAULT NULL,
@@ -915,27 +931,145 @@ CREATE TABLE `project_tags` (
   KEY `idx_tag_id` (`tag_id`)
 ) DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE `indicator_dsd` (
+
+-- Global codelists registry (see install/schema-codelists.sql)
+CREATE TABLE `codelists` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `pid` bigint DEFAULT NULL COMMENT 'Family head row id (latest version for agency+name); set on create',
+  `idno` varchar(191) NOT NULL,
+  `agency` varchar(64) NOT NULL,
+  `name` varchar(64) NOT NULL COMMENT 'SDMX maintainable id (NADA codelists.name)',
+  `version` varchar(32) NOT NULL,
+  `version_seq` int NOT NULL COMMENT 'Monotonic sequence within (agency, name)',
+  `title` varchar(255) NOT NULL COMMENT 'Human-readable list title',
+  `description` text DEFAULT NULL,
+  `uri` varchar(500) DEFAULT NULL,
+  `status` enum('draft','active','locked','archived') NOT NULL DEFAULT 'active',
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `changed_at` timestamp NULL DEFAULT NULL,
+  `created_by` int DEFAULT NULL,
+  `changed_by` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_codelists_idno` (`idno`),
+  UNIQUE KEY `uq_codelist_identity` (`agency`,`name`,`version`),
+  UNIQUE KEY `uq_codelists_family_seq` (`agency`,`name`,`version_seq`),
+  KEY `idx_codelists_agency` (`agency`),
+  KEY `idx_codelists_pid` (`pid`),
+  KEY `idx_codelists_status` (`status`),
+  KEY `idx_codelists_created` (`created_at`),
+  CONSTRAINT `fk_codelists_pid` FOREIGN KEY (`pid`) REFERENCES `codelists` (`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+CREATE TABLE `codelist_labels` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `codelist_id` bigint NOT NULL COMMENT 'FK -> codelists.id',
+  `language` varchar(10) NOT NULL,
+  `label` varchar(500) NOT NULL,
+  `description` text DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_codelist_language` (`codelist_id`,`language`),
+  KEY `idx_language` (`language`),
+  CONSTRAINT `fk_codelist_labels_codelist` FOREIGN KEY (`codelist_id`) REFERENCES `codelists` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+CREATE TABLE `codelist_items` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `codelist_id` bigint NOT NULL COMMENT 'FK -> codelists.id',
+  `code` varchar(150) NOT NULL,
+  `parent_id` bigint DEFAULT NULL,
+  `sort_order` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_item_per_list` (`codelist_id`,`code`),
+  KEY `idx_parent_id` (`parent_id`),
+  KEY `idx_sort` (`codelist_id`,`sort_order`),
+  CONSTRAINT `fk_codelist_items_codelist` FOREIGN KEY (`codelist_id`) REFERENCES `codelists` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_codelist_items_parent` FOREIGN KEY (`parent_id`) REFERENCES `codelist_items` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+CREATE TABLE `codelist_items_labels` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `codelist_item_id` bigint NOT NULL,
+  `language` varchar(10) NOT NULL,
+  `label` varchar(500) NOT NULL,
+  `description` text DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_codelist_item_language` (`codelist_item_id`,`language`),
+  KEY `idx_language` (`language`),
+  CONSTRAINT `fk_codelist_items_labels_item` FOREIGN KEY (`codelist_item_id`) REFERENCES `codelist_items` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- Global data structure registry + project binding (see install/schema-data-structures.sql)
+CREATE TABLE `data_structures` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `sid` int NOT NULL,
+  `pid` int DEFAULT NULL,
+  `agency` varchar(64) NOT NULL DEFAULT 'NADA',
+  `name` varchar(64) NOT NULL COMMENT 'SDMX maintainable id',
+  `version` varchar(32) NOT NULL,
+  `version_seq` int NOT NULL,
+  `idno` varchar(191) DEFAULT NULL,
+  `status` smallint NOT NULL DEFAULT 0,
+  `title` varchar(255) DEFAULT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `notes` text,
+  `content_hash` char(64) DEFAULT NULL,
+  `metadata` json DEFAULT NULL,
+  `created` int DEFAULT NULL,
+  `updated` int DEFAULT NULL,
+  `created_by` int DEFAULT NULL,
+  `updated_by` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unq_data_structures_identity` (`agency`,`name`,`version`),
+  UNIQUE KEY `unq_data_structures_family_seq` (`agency`,`name`,`version_seq`),
+  UNIQUE KEY `unq_data_structures_idno` (`idno`),
+  KEY `idx_data_structures_agency_name` (`agency`,`name`),
+  KEY `idx_data_structures_pid` (`pid`),
+  CONSTRAINT `fk_data_structures_pid` FOREIGN KEY (`pid`) REFERENCES `data_structures` (`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+CREATE TABLE `data_structure_components` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `data_structure_id` int NOT NULL,
+  `sort_order` int NOT NULL DEFAULT 0,
   `name` varchar(100) NOT NULL,
   `label` varchar(255) DEFAULT NULL,
   `description` text,
-  `data_type` enum('string','integer','float','double','date','boolean') NULL,
-  `column_type` enum('dimension','time_period','measure','attribute','indicator_id','indicator_name','annotation','geography','observation_value','periodicity')  NULL,
-  `time_period_format` varchar(30) DEFAULT NULL,
-  `code_list` json DEFAULT NULL,
-  `code_list_reference` json DEFAULT NULL,
+  `data_type` enum('string','integer','float','double','date','boolean') DEFAULT NULL,
+  `column_type` enum('dimension','time_period','measure','attribute','indicator_id','indicator_name','annotation','geography','observation_value','periodicity') NOT NULL,
+  `codelist_id` bigint DEFAULT NULL COMMENT 'FK -> codelists.id',
   `metadata` json DEFAULT NULL,
-  `sort_order` int DEFAULT '0',
   `created` int DEFAULT NULL,
-  `changed` int DEFAULT NULL,
+  `updated` int DEFAULT NULL,
   `created_by` int DEFAULT NULL,
-  `changed_by` int DEFAULT NULL,
-  PRIMARY KEY (`id`),  
-  KEY `idx_sid_column_type` (`sid`, `column_type`),
-  KEY `idx_sid_sort_order` (`sid`, `sort_order`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
+  `updated_by` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unq_dsc_structure_name` (`data_structure_id`,`name`),
+  KEY `idx_dsc_structure_sort` (`data_structure_id`,`sort_order`),
+  KEY `idx_dsc_codelist` (`codelist_id`),
+  CONSTRAINT `fk_dsc_data_structure` FOREIGN KEY (`data_structure_id`) REFERENCES `data_structures` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_dsc_codelist` FOREIGN KEY (`codelist_id`) REFERENCES `codelists` (`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+CREATE TABLE `editor_project_dsd` (
+  `sid` int NOT NULL,
+  `data_structure_id` int NOT NULL,
+  `indicator_id_value` varchar(191) DEFAULT NULL COMMENT 'Value written to indicator_id column on CSV import',
+  `implied_freq_code` varchar(16) DEFAULT NULL COMMENT 'SDMX FREQ when structure has no periodicity column',
+  `has_published_data` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 after successful timeseries import',
+  `published_row_count` int DEFAULT NULL,
+  `data_imported_at` int DEFAULT NULL,
+  `created` int DEFAULT NULL,
+  `updated` int DEFAULT NULL,
+  PRIMARY KEY (`sid`),
+  KEY `idx_editor_project_dsd_structure` (`data_structure_id`),
+  CONSTRAINT `fk_editor_project_dsd_project` FOREIGN KEY (`sid`) REFERENCES `editor_projects` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_editor_project_dsd_structure` FOREIGN KEY (`data_structure_id`) REFERENCES `data_structures` (`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 CREATE TABLE `project_issues` (
@@ -967,3 +1101,13 @@ CREATE TABLE `project_issues` (
   KEY `idx_created` (`created`),
   CONSTRAINT `fk_project_issues_project` FOREIGN KEY (`project_id`) REFERENCES `editor_projects` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- CodeIgniter migration ledger (fresh installs: schema already includes all migration SQL;
+-- bump version when adding application/migrations/*.php)
+CREATE TABLE `migrations` (
+  `version` bigint unsigned NOT NULL,
+  PRIMARY KEY (`version`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT INTO `migrations` (`version`) VALUES (20260520000001);

@@ -35,9 +35,13 @@
       }
     }
   } 
-  
-  
-  get_template_keys($metadata_template_arr['items'],$template_keys);
+
+  $template_keys = array();
+  if (is_array($metadata_template_arr)
+    && isset($metadata_template_arr['items'])
+    && is_array($metadata_template_arr['items'])) {
+    get_template_keys($metadata_template_arr['items'],$template_keys);
+  }
   function get_template_keys($items,&$output)
   {
     foreach($items as $item){
@@ -65,6 +69,7 @@
         'username'=> $user,
         'is_logged_in'=> !empty($user),
         'is_admin'=> $this->ion_auth->is_admin(),
+        'can_access_site_admin'=> $this->ion_auth->can_access_site_admin(),
       ];
       
     ?>
@@ -79,6 +84,7 @@
         let sid='<?php echo $sid;?>';
         let form_template=<?php echo $metadata_template;?>;
         let form_template_parts= <?php echo json_encode($template_parts,JSON_PRETTY_PRINT); ?>;
+        var template_structure_valid=<?php echo (!isset($template_structure_valid) || $template_structure_valid) ? 'true' : 'false'; ?>;
     </script>
 
   <div id="app" data-app>
@@ -273,8 +279,7 @@
           return this.$store.state.project_isloading;
         },
         hideProjectSaveOnRoute(){
-          return this.$route.path.startsWith("/datafile/") 
-            || this.$route.path.startsWith("/external-resources/") ;
+          return this.$route.path.startsWith("/datafile/");
         },
         form_template(){
           return this.$store.state.formTemplate;
@@ -419,29 +424,7 @@
           return [];          
         },
         ExternalResourcesTreeNodes(){
-          let resources=this.$store.state.external_resources;
-          if (resources.length==0){
-            return [];
-          }
-
-          let resources_nodes=[];
-
-          i=0;
-          for (let resource of resources) {
-            resources_nodes.push(
-              {
-                title: resource.title,
-                type:'resource',
-                index:resource.id,
-                file: 'file',
-                key:'resource-'+resource.id,
-                resource:  resource
-              }
-            );
-            i++;
-          }
-          console.log("resources nodes:",resources_nodes);
-          return resources_nodes;
+          return ResourceDctypeUtils.groupResourcesForTree(this.$store.state.external_resources);
         },
         TreeItems:
         {
@@ -680,12 +663,38 @@
                 }
             }
         },
+        applyExternalResourcesTreeState: function(path) {
+          if (!this.initiallyOpen.includes('external-resources')) {
+            this.initiallyOpen.push('external-resources');
+          }
+
+          const resourceMatch = path.match(/^\/external-resources\/(\d+)\/?$/);
+          if (resourceMatch) {
+            const resource = ResourceDctypeUtils.findResourceById(this.ExternalResources, resourceMatch[1]);
+            if (resource) {
+              const groupKey = ResourceDctypeUtils.dctypeGroupKey(ResourceDctypeUtils.dctypeCode(resource.dctype));
+              if (!this.initiallyOpen.includes(groupKey)) {
+                this.initiallyOpen.push(groupKey);
+              }
+              this.tree_active_items = ['resource-' + resource.id];
+              return;
+            }
+          }
+
+          this.tree_active_items = ['external-resources'];
+        },
         setTreeActiveNode: function(path)
         {
           console.log("setTreeActiveNode called with path:", path);
           this.tree_active_items=[];
-          this.tree_active_items.push(path);
           let path_arr=path.split("/");
+
+          if (path.startsWith('/external-resources')) {
+            this.applyExternalResourcesTreeState(path);
+            return;
+          }
+
+          this.tree_active_items.push(path);
 
           //expand datafile
           if(path.startsWith("/datafile/")){
@@ -881,20 +890,26 @@
         },
         init_tree_data: function() {
           this.items=[];
-          let tree_data=this.filterRecursiveSearch(this.cloneObject(this.form_template.template.items),'');
+          let tree_data=[];
 
-          if (this.show_fields_recommended){
-            tree_data=this.filterRecursiveSearch(tree_data,'recommended');
-          }
-          if (this.show_fields_mandatory && this.show_fields_recommended==false){
-            tree_data=this.filterRecursiveSearch(tree_data,'mandatory');
-          }
-          
-          if (this.show_fields_empty){
-            tree_data=this.filterRecursiveSearch(tree_data,'empty');
-          }
-          if (this.show_fields_nonempty){
-            tree_data=this.filterRecursiveSearch(tree_data,'nonempty');
+          if (this.$store.state.template_structure_valid
+              && this.form_template && this.form_template.template
+              && Array.isArray(this.form_template.template.items)) {
+            tree_data=this.filterRecursiveSearch(this.cloneObject(this.form_template.template.items),'');
+
+            if (this.show_fields_recommended){
+              tree_data=this.filterRecursiveSearch(tree_data,'recommended');
+            }
+            if (this.show_fields_mandatory && this.show_fields_recommended==false){
+              tree_data=this.filterRecursiveSearch(tree_data,'mandatory');
+            }
+            
+            if (this.show_fields_empty){
+              tree_data=this.filterRecursiveSearch(tree_data,'empty');
+            }
+            if (this.show_fields_nonempty){
+              tree_data=this.filterRecursiveSearch(tree_data,'nonempty');
+            }
           }
 
           tree_data.unshift({
@@ -911,6 +926,13 @@
                 }
               ]
             });
+
+          if (!this.$store.state.template_structure_valid) {
+            this.initiallyOpen=['home'];
+            this.tree_active_items=['home'];
+            this.items=tree_data;
+            return;
+          }
 
           if (this.dataset_type=='survey' || this.dataset_type=='microdata'){
             tree_data.push({
@@ -954,32 +976,21 @@
               type: 'indicator-dsd-container',
               file: 'database',
               key:'indicator-dsd-container',
-              items:(() => {
-                const items = [
-                  {
-                    title: this.$t('data_structure_definition'),
-                    type: 'indicator-dsd',
-                    file: 'database',
-                    key:'indicator-dsd'
-                  }
-                ];
-                if (typeof dsd_temporary_features_enabled !== 'undefined' && dsd_temporary_features_enabled) {
-                  items.push({
-                    title: this.$t('data_preview'),
-                    type: 'data-preview',
-                    file: 'txt',
-                    key:'data-preview',
-                    datafile: this.IndicatorDataFile // Attach datafile for routing
-                  });
-                  items.push({
-                    title: this.$t('chart_visualization'),
-                    type: 'indicator-dsd-chart',
-                    file: 'chart',
-                    key:'indicator-dsd-chart'
-                  });
+              items:[
+                {
+                  title: this.$t('indicator_data') || 'Data',
+                  type: 'data-preview',
+                  file: 'txt',
+                  key:'data-preview',
+                  datafile: this.IndicatorDataFile
+                },
+                {
+                  title: this.$t('chart_visualization'),
+                  type: 'indicator-dsd-chart',
+                  file: 'chart',
+                  key:'indicator-dsd-chart'
                 }
-                return items;
-              })()
+              ]
             });
           }
           
@@ -1036,18 +1047,18 @@
             }
           }
           else if (this.$route.path.startsWith("/external-resources")){
-            this.initiallyOpen=["external-resources"];
-            this.setTreeActiveNode("external-resources");
+            this.applyExternalResourcesTreeState(this.$route.path);
           }
           else if (this.$route.path.startsWith("/geospatial-features")){
             // Handle geospatial features initialization on page load
             this.setTreeActiveNode(this.$route.path);
           }
           else if (this.$route.path.startsWith("/indicator-dsd")){
+            this.initiallyOpen.push("indicator-dsd-container");
             if (this.$route.path.startsWith("/indicator-dsd-chart")){
               this.setTreeActiveNode("indicator-dsd-chart");
             } else {
-              this.setTreeActiveNode("indicator-dsd");
+              this.setTreeActiveNode("indicator-dsd-container");
             }
           }
           else{
@@ -1168,6 +1179,10 @@
             return;
           }
 
+          if (node.type=='resource-dctype-group'){
+            return;
+          }
+
           if (node.type=='metadata-types'){
             router.push('/metadata-types');
             return;
@@ -1205,8 +1220,8 @@
             return;
           }
 
-          if (node.type=='indicator-dsd'){
-            router.push('/indicator-dsd');
+          if (node.type=='indicator-dsd-container'){
+            router.push('/indicator-dsd-overview');
             return;
           }
 

@@ -65,6 +65,14 @@ tags:
     description: Manage catalog connections
   - name: Issues
     description: Manage project metadata issues
+  - name: Jobs
+    description: Background jobs
+  - name: Codelists
+    description: Global codelist catalogue (registry)
+  - name: Data Structures
+    description: Global DSD catalogue (registry)
+  - name: Indicator DSD
+    description: Project-level DSD binding, validation, and data import
 x-tagGroups:
   - name: Projects
     tags:
@@ -121,6 +129,16 @@ x-tagGroups:
   - name: Issues
     tags:
       - Issues
+  - name: Jobs
+    tags:
+      - Jobs
+  - name: Registry
+    tags:
+      - Codelists
+      - Data Structures
+  - name: Indicator DSD
+    tags:
+      - Indicator DSD
 paths:
   /issues:
     get:
@@ -705,6 +723,88 @@ paths:
           description: successful operation
         "400":
           description: Bad request - project not found or access denied
+  "/editor/json-field/{id}":
+    get:
+      tags:
+        - Projects
+      summary: Get project JSON field by JSON Pointer
+      description: >
+        Returns a single value from the same project JSON document produced by
+        Get project JSON (`/editor/json/{id}`), addressed by a JSON Pointer (RFC 6901).
+        Examples: `/idno`, `/type`, `/identification/title`, `/variables/0/name` (when
+        variables are included in the export).
+      operationId: projectJsonField
+      parameters:
+        - name: id
+          in: path
+          description: Project ID or IDNO
+          required: true
+          schema:
+            type: string
+        - name: path
+          in: query
+          description: >
+            JSON Pointer (RFC 6901) to the value, starting with `/`. Must be URL-encoded
+            if it contains reserved characters (e.g. `~0`, `~1` for `~` and `/` in keys).
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: query
+          description: Use metadata for a specific version number (e.g. 1.0.0)
+          required: false
+          schema:
+            type: string
+        - name: exclude_variables
+          in: query
+          description: Same as Get project JSON; when `1`, `/variables/...` is not available.
+          required: false
+          schema:
+            type: integer
+            enum: [0, 1]
+            default: 0
+        - name: exclude_private_fields
+          in: query
+          required: false
+          schema:
+            type: integer
+            enum: [0, 1]
+            default: 0
+        - name: external_resources
+          in: query
+          required: false
+          schema:
+            type: integer
+            enum: [0, 1]
+            default: 0
+        - name: admin_metadata
+          in: query
+          required: false
+          schema:
+            type: integer
+            enum: [0, 1]
+            default: 0
+      responses:
+        "200":
+          description: Value resolved or path missing in document
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [success]
+                  path:
+                    type: string
+                  found:
+                    type: boolean
+                  value:
+                    description: Present when found is true; null when found is false
+        "400":
+          description: Bad request — missing path, invalid pointer syntax, project not found, or access denied
+      security:
+        - ApiKeyAuth: []
   "/editor/generate_pdf/{id}":
     get:
       tags:
@@ -949,7 +1049,13 @@ paths:
       description: Create a new microdata project
       operationId: createSurvey
       requestBody:
-        $ref: "#/components/requestBodies/survey-schema.json"
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: survey-schema.json
+                - $ref: "#/components/schemas/CreateProjectOverwrite"
       responses:
         "200":
           description: successful operation
@@ -1045,7 +1151,13 @@ paths:
       description: Create a new timeseries project
       operationId: createTimeseries
       requestBody:
-        $ref: "#/components/requestBodies/timeseries-schema.json"
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: timeseries-schema.json
+                - $ref: "#/components/schemas/CreateProjectOverwrite"
       responses:
         "200":
           description: successful operation
@@ -1089,7 +1201,13 @@ paths:
       description: Create a new timeseries database project
       operationId: createTimeseriesDb
       requestBody:
-        $ref: "#/components/requestBodies/timeseries-db-schema.json"
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: timeseries-db-schema.json
+                - $ref: "#/components/schemas/CreateProjectOverwrite"
       responses:
         "200":
           description: successful operation
@@ -1133,7 +1251,13 @@ paths:
       description: Create a new geospatial project
       operationId: createGeoSpatial
       requestBody:
-        $ref: "#/components/requestBodies/geospatial-schema.json"
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: geospatial-schema.json
+                - $ref: "#/components/schemas/CreateProjectOverwrite"
       responses:
         "200":
           description: successful operation
@@ -1177,7 +1301,13 @@ paths:
       description: Create a new document project
       operationId: createDocument
       requestBody:
-        $ref: "#/components/requestBodies/document-schema.json"
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: document-schema.json
+                - $ref: "#/components/schemas/CreateProjectOverwrite"
       responses:
         "200":
           description: successful operation
@@ -1221,7 +1351,13 @@ paths:
       description: Create a new table project
       operationId: createTable
       requestBody:
-        $ref: "#/components/requestBodies/table-schema.json"
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: table-schema.json
+                - $ref: "#/components/schemas/CreateProjectOverwrite"
       responses:
         "200":
           description: successful operation
@@ -1265,7 +1401,13 @@ paths:
       description: Create a new image project
       operationId: createImage
       requestBody:
-        $ref: "#/components/requestBodies/image-schema.json"
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: image-schema.json
+                - $ref: "#/components/schemas/CreateProjectOverwrite"
       responses:
         "200":
           description: successful operation
@@ -1309,7 +1451,13 @@ paths:
       description: Create a new video project
       operationId: createVideo
       requestBody:
-        $ref: "#/components/requestBodies/video-schema.json"
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: video-schema.json
+                - $ref: "#/components/schemas/CreateProjectOverwrite"
       responses:
         "200":
           description: successful operation
@@ -1353,7 +1501,13 @@ paths:
       description: Create a new script type project
       operationId: createScript
       requestBody:
-        $ref: "#/components/requestBodies/script-schema.json"
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: script-schema.json
+                - $ref: "#/components/schemas/CreateProjectOverwrite"
       responses:
         "200":
           description: successful operation
@@ -1430,6 +1584,26 @@ paths:
                   enum:
                     - store
                     - remove
+                description:
+                  type: string
+                  description: File description (datafile-schema.json)
+                producer:
+                  type: string
+                  maxLength: 255
+                  description: File producer
+                data_checks:
+                  type: string
+                  description: Processing / data checks
+                missing_data:
+                  type: string
+                  description: Missing data documentation
+                version:
+                  type: string
+                  maxLength: 255
+                  description: File version
+                notes:
+                  type: string
+                  description: File notes
               required:
                 - file
                 - store_data
@@ -2423,6 +2597,15 @@ paths:
 
                     This is separate from the 'file' parameter - use 'file' to upload a file, or 'filename' to specify a filename/URL.
                   type: string
+                overwrite:
+                  description: >
+                    When creating a resource, if another resource already uses the same
+                    stored filename for this project, set to `true` to replace that row
+                    instead of failing validation. Use `false` or omit to keep the
+                    duplicate-filename error. With `multipart/form-data`, send the literal
+                    strings `true` or `false` if your client cannot encode JSON booleans.
+                  type: boolean
+                  default: false
               required:
                 - dctype
                 - title
@@ -2631,6 +2814,228 @@ paths:
           required: true
           schema:
             type: integer
+      responses:
+        "200":
+          description: successful operation
+      security:
+        - ApiKeyAuth: []
+  "/resources/generate_microdata/{projectId}":
+    post:
+      tags:
+        - External resources
+      summary: Generate microdata resource
+      description: >
+        Export project data files to the chosen format, copy the artifact into
+        documentation/, and create a dat/micro external resource with optional
+        data-file links. May take several minutes while FastAPI export jobs complete.
+      operationId: generateMicrodataResource
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                export_format:
+                  type: string
+                  description: csv, dta, sav, xpt, or json
+                export_version:
+                  type: string
+                  description: Stata version when export_format is dta (default 14)
+                file_ids:
+                  type: array
+                  items:
+                    type: string
+                  description: Data file IDs (F1, F2, …); all files when omitted
+                zip:
+                  type: boolean
+                  description: Bundle exports into one ZIP (default true)
+                overwrite:
+                  type: boolean
+                  description: Replace existing generated resource for this format
+                max_wait_seconds:
+                  type: integer
+                  description: Max seconds to wait per export job (default 900)
+              required:
+                - export_format
+      responses:
+        "200":
+          description: Resource created, or already exists when overwrite is false
+      security:
+        - ApiKeyAuth: []
+  "/resources/regenerate/{projectId}/{resourceId}":
+    post:
+      tags:
+        - External resources
+      summary: Regenerate microdata resource
+      description: >
+        Re-export and update an existing generated dat/micro resource. Export format,
+        version, and file selection default from existing link rows when omitted.
+      operationId: regenerateMicrodataResource
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: resourceId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                export_format:
+                  type: string
+                export_version:
+                  type: string
+                file_ids:
+                  type: array
+                  items:
+                    type: string
+                zip:
+                  type: boolean
+                refresh_description:
+                  type: boolean
+                max_wait_seconds:
+                  type: integer
+      responses:
+        "200":
+          description: Resource regenerated
+      security:
+        - ApiKeyAuth: []
+  "/resources/microdata_status/{projectId}":
+    get:
+      tags:
+        - External resources
+      summary: Microdata publish status
+      description: >
+        Summary counts, per-resource staleness, and data-file link details for
+        dat/micro external resources.
+      operationId: microdataStatus
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: successful operation
+      security:
+        - ApiKeyAuth: []
+  "/resources/datafile_links/{projectId}/{resourceId}":
+    get:
+      tags:
+        - External resources
+      summary: List data file links
+      description: List optional data-file links for a dat/micro resource
+      operationId: listResourceDatafileLinks
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: resourceId
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: successful operation
+      security:
+        - ApiKeyAuth: []
+    put:
+      tags:
+        - External resources
+      summary: Replace data file links
+      description: >
+        Replace manual or associated links for a non-generated microdata resource.
+        Generated resources must use regenerate instead.
+      operationId: replaceResourceDatafileLinks
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: resourceId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                links:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      file_id:
+                        type: string
+                      link_type:
+                        type: string
+                        description: manual or associated
+                    required:
+                      - file_id
+              required:
+                - links
+      responses:
+        "200":
+          description: successful operation
+      security:
+        - ApiKeyAuth: []
+    post:
+      tags:
+        - External resources
+      summary: Replace data file links (POST)
+      description: Same as PUT; provided for clients that cannot send PUT requests
+      operationId: replaceResourceDatafileLinksPost
+      parameters:
+        - in: path
+          name: projectId
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: resourceId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                links:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      file_id:
+                        type: string
+                      link_type:
+                        type: string
+                    required:
+                      - file_id
+              required:
+                - links
       responses:
         "200":
           description: successful operation
@@ -3095,13 +3500,218 @@ paths:
           description: Bad request
       security:
         - ApiKeyAuth: []
+  "/publish/catalog_info/{sid}/{catalog_connection_id}":
+    get:
+      tags:
+        - Publish projects
+      summary: Get NADA catalog info for publish form
+      description: >
+        Fetches data used to populate the publish UI: study record from the target NADA
+        catalog (if the study IDNO exists), list of collections, allowed data-access
+        codes, and collections already linked to the study. Calls the configured catalog
+        base URL with the stored API key — e.g. `GET .../index.php/api/collections`,
+        `GET .../index.php/api/catalog/data_access_codes`, `GET .../api/datasets/{idno}`,
+        `GET .../api/datasets/collections/{idno}`.
+      operationId: getNadaCatalogInfoForPublish
+      parameters:
+        - in: path
+          name: sid
+          description: Project ID (internal Metadata Editor project id)
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: catalog_connection_id
+          description: Catalog connection ID (from list catalog connections)
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Catalog information for the publish form
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NadaCatalogInfoResponse"
+        "400":
+          description: Bad request — user not logged in, missing parameters, or project not found
+      security:
+        - ApiKeyAuth: []
+  "/publish/indicator/{sid}/{catalog_connection_id}":
+    post:
+      tags:
+        - Publish projects
+      summary: Publish indicator DSD and/or data to NADA
+      description: >
+        For indicator/timeseries projects only. Optionally publishes the bound data structure
+        definition (DSD) via NADA `POST .../api/admin/data_structures/import_json`, and/or
+        exports published DuckDB timeseries rows to CSV, resumable-uploads to NADA, and imports
+        observations via `POST .../api/admin/timeseries/data/{study_idno}/import` (or `.../data/import`) with `upload_id`.
+        DSD publish skips when the structure already exists on NADA unless `dsd_overwrite` is true.
+        Indicator data always replaces existing observations for the study on NADA.
+      operationId: publishIndicatorExtrasToNada
+      parameters:
+        - in: path
+          name: sid
+          description: Project ID (internal Metadata Editor project id)
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: catalog_connection_id
+          description: Catalog connection ID
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IndicatorPublishOptions"
+      responses:
+        "200":
+          description: DSD and/or data publish result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IndicatorPublishResponse"
+        "400":
+          description: Bad request — not an indicator project, missing binding, or NADA error
+      security:
+        - ApiKeyAuth: []
+  "/publish/nada_upload_limits/{catalog_connection_id}":
+    get:
+      tags:
+        - Publish projects
+      summary: NADA resumable upload limits (proxy)
+      operationId: getNadaUploadLimitsForPublish
+      parameters:
+        - in: path
+          name: catalog_connection_id
+          required: true
+          schema:
+            type: integer
+        - in: query
+          name: project_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Chunk size limits from target NADA catalog
+      security:
+        - ApiKeyAuth: []
+  "/publish/nada_upload_init/{catalog_connection_id}":
+    post:
+      tags:
+        - Publish projects
+      summary: Initialize NADA resumable upload (proxy)
+      operationId: initNadaUploadForPublish
+      parameters:
+        - in: path
+          name: catalog_connection_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [project_id, filename, total_size, total_chunks, chunk_size]
+              properties:
+                project_id:
+                  type: string
+                filename:
+                  type: string
+                total_size:
+                  type: integer
+                total_chunks:
+                  type: integer
+                chunk_size:
+                  type: integer
+      responses:
+        "200":
+          description: NADA upload_id for subsequent chunk posts
+      security:
+        - ApiKeyAuth: []
+  "/publish/nada_upload_chunk/{catalog_connection_id}/{upload_id}":
+    post:
+      tags:
+        - Publish projects
+      summary: Upload one chunk to NADA (proxy)
+      operationId: uploadNadaChunkForPublish
+      parameters:
+        - in: path
+          name: catalog_connection_id
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: upload_id
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: project_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      responses:
+        "200":
+          description: Chunk accepted
+      security:
+        - ApiKeyAuth: []
+  "/publish/nada_upload_status/{catalog_connection_id}/{upload_id}":
+    get:
+      tags:
+        - Publish projects
+      summary: NADA resumable upload status (proxy)
+      operationId: getNadaUploadStatusForPublish
+      parameters:
+        - in: path
+          name: catalog_connection_id
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: upload_id
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: project_id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Upload status from NADA
+      security:
+        - ApiKeyAuth: []
   "/publish/{sid}/{catalog_connection_id}":
     post:
       tags:
         - Publish projects
       summary: Publish project metadata
-      description: Publish project metadata to a NADA catalog. This sends the complete
-        project JSON metadata to the target catalog.
+      description: >
+        Publishes project metadata to a NADA catalog. The server loads the exported
+        project JSON (generated for the project), then **merges** each property from the
+        request body into that object as top-level keys. The combined JSON is sent to the
+        catalog as `POST {catalog_url}/index.php/api/datasets/create/{type}` with header
+        `x-api-key`, where `{type}` is derived from the project (e.g. `survey`, `timeseries`,
+        `timeseries-db`). Typical merge fields from the Metadata Editor UI are
+        `overwrite`, `published`, `access_policy`, `data_remote_url`, and `repositoryid`
+        (see schema). Omit the body or send `{}` to publish without overriding those fields.
       operationId: publishProjectMetadata
       parameters:
         - in: path
@@ -3117,14 +3727,26 @@ paths:
           schema:
             type: integer
       requestBody:
+        required: false
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/PublishOptions"
-        description: Publishing options (repositoryid, access_policy, data_remote_url, etc.)
+            examples:
+              full:
+                summary: Typical UI payload
+                value:
+                  overwrite: "yes"
+                  published: 1
+                  access_policy: licensed
+                  data_remote_url: ""
+                  repositoryid: MY_COLLECTION
+        description: >
+          NADA publish options merged into the project metadata JSON before POST to the
+          catalog. All properties are optional; only supplied keys are merged.
       responses:
         "200":
-          description: Project metadata published successfully
+          description: Project metadata published successfully (response shape follows NADA API)
         "400":
           description: Bad request - project not found, catalog connection not found, or
             publishing failed
@@ -3150,6 +3772,13 @@ paths:
           required: true
           schema:
             type: integer
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Optional JSON body; Metadata Editor sends `{}`
       responses:
         "200":
           description: Thumbnail published successfully
@@ -3168,12 +3797,16 @@ paths:
             failed
       security:
         - ApiKeyAuth: []
-  "/publish/external_resource/{sid}":
+  "/publish/external_resource/{sid}/{catalog_connection_id}":
     post:
       tags:
         - Publish projects
       summary: Publish single external resource
-      description: Publish a single external resource (documentation file) to a NADA catalog
+      description: >
+        Publish a single external resource (documentation file) to a NADA catalog.
+        `catalog_id` in the body must match the catalog connection used for publishing.
+        The optional trailing path segment matches the client URL pattern; the catalog is
+        taken from the JSON body (`catalog_id`).
       operationId: publishSingleExternalResource
       parameters:
         - in: path
@@ -3182,6 +3815,12 @@ paths:
           required: true
           schema:
             type: string
+        - in: path
+          name: catalog_connection_id
+          description: Catalog connection ID (same as `catalog_id` in body; echoed in URL by clients)
+          required: true
+          schema:
+            type: integer
       requestBody:
         content:
           application/json:
@@ -3196,14 +3835,19 @@ paths:
                   description: Resource ID to publish
                 catalog_id:
                   type: integer
-                  description: Catalog connection ID
+                  description: Catalog connection ID (must match path `catalog_connection_id` when both are used)
+                sid:
+                  type: string
+                  description: Project ID (optional; echoed by some clients; path `sid` is authoritative)
                 overwrite:
                   type: string
                   enum:
                     - yes
                     - no
                   default: no
-                  description: Whether to overwrite existing resource in catalog
+                  description: >
+                    Sent to NADA on the resource payload as `overwrite`. When `yes`, replaces an
+                    existing resource with the same identity in the catalog.
         required: true
       responses:
         "200":
@@ -3228,8 +3872,12 @@ paths:
       tags:
         - Publish projects
       summary: Publish all external resources
-      description: Publish all external resources (documentation files) for a project
-        to a NADA catalog
+      description: >
+        Publishes every external resource for the project to NADA. For each resource, metadata is
+        POSTed to `{catalog}/index.php/api/resources/{study_idno}` with `overwrite` set to `yes`.
+        If the resource has a stored file (`filename` is set and not an external URL), the file is
+        then uploaded to `{catalog}/index.php/api/datasets/{study_idno}/files`, matching the
+        single-resource publish behavior. Request body JSON (if any) is accepted but not applied.
       operationId: publishAllExternalResources
       parameters:
         - in: path
@@ -3244,6 +3892,13 @@ paths:
           required: true
           schema:
             type: integer
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Optional; unused by the server today
       responses:
         "200":
           description: Resources published successfully
@@ -3253,6 +3908,13 @@ paths:
                 type: array
                 items:
                   type: object
+                  properties:
+                    resource:
+                      type: object
+                      description: NADA response for the resource metadata POST
+                    resource_upload:
+                      type: object
+                      description: NADA response for the file upload (only when a local file was attached)
         "400":
           description: Bad request - project not found or publishing failed
       security:
@@ -3409,6 +4071,1646 @@ paths:
       responses:
         "200":
           description: successful operation
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Codelists (global catalogue)
+  # ─────────────────────────────────────────────────────────────────────────
+
+  /codelists:
+    get:
+      tags:
+        - Codelists
+      summary: List codelists
+      description: >-
+        List global codelists. Default: one row per family (collapsed). Use `flat=1` for all
+        version rows. Requires `codelist:browse` (registry view) permission.
+      operationId: codelistsList
+      parameters:
+        - name: flat
+          in: query
+          schema:
+            type: boolean
+          description: When true, return one row per version instead of collapsed families.
+        - name: collapsed
+          in: query
+          schema:
+            type: boolean
+          description: '`1` forces collapsed; `0` forces flat (overrides default).'
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+          description: 1-based page number (max 200 per page).
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: q
+          in: query
+          schema:
+            type: string
+          description: Alias for `search`.
+        - name: agency
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/CodelistStatusCode'
+        - name: exclude_archived
+          in: query
+          schema:
+            type: boolean
+        - name: with_counts
+          in: query
+          schema:
+            type: boolean
+            default: true
+          description: Include `item_count` and `dsd_component_count` when true (default).
+        - name: offset
+          in: query
+          schema:
+            type: integer
+          description: Legacy pagination offset (used when `page` is omitted).
+        - name: limit
+          in: query
+          schema:
+            type: integer
+          description: Legacy page size (used when `page` is omitted).
+      responses:
+        '200':
+          description: Codelist catalogue rows
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CodelistListResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiStatusFailed'
+        '403':
+          description: Registry access denied
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiStatusFailed'
+    post:
+      tags:
+        - Codelists
+      summary: Create codelist
+      description: Create a new global codelist header. Requires `codelist:edit`.
+      operationId: codelistsCreate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CodelistCreateRequest'
+      responses:
+        '200':
+          description: Codelist created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CodelistCreateResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiStatusFailed'
+
+  "/codelists/versions/{name}":
+    get:
+      tags:
+        - Codelists
+      summary: List versions for a codelist family
+      operationId: codelistsVersions
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+          description: SDMX maintainable id (codelist name).
+        - name: agency
+          in: query
+          schema:
+            type: string
+        - name: with_counts
+          in: query
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: Version rows
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CodelistVersionsResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiStatusFailed'
+
+  "/codelists/single/{id}":
+    get:
+      tags:
+        - Codelists
+      summary: Get codelist by id
+      operationId: codelistsSingle
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Codelist row
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CodelistSingleResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiStatusFailed'
+
+  "/codelists/lookup_by_identity":
+    get:
+      tags:
+        - Codelists
+      summary: Get codelist by SDMX identity (query params)
+      description: >-
+        Resolve by `agency`, `name`, and optional `version` query parameters (preferred when
+        identity values contain special characters).
+      operationId: codelistsLookupByIdentity
+      parameters:
+        - name: agency
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: query
+          schema:
+            type: string
+          description: Optional; empty string matches blank version in the database.
+      responses:
+        '200':
+          description: Codelist row
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CodelistSingleResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiStatusFailed'
+
+  "/codelists/by-identity/{agency}/{name}/{version}":
+    get:
+      tags:
+        - Codelists
+      summary: Get codelist by SDMX identity (path)
+      operationId: codelistsByIdentity
+      parameters:
+        - name: agency
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: path
+          required: true
+          schema:
+            type: string
+          description: May be empty for blank DB version.
+      responses:
+        '200':
+          description: Codelist row
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CodelistSingleResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiStatusFailed'
+
+  "/codelists/update/{id}":
+    post:
+      tags:
+        - Codelists
+      summary: Update codelist
+      description: >-
+        Update catalogue metadata (not agency/name/version identity). Requires `codelist:edit`.
+      operationId: codelistsUpdate
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CodelistMutationResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiStatusFailed'
+
+  "/codelists/delete/{id}":
+    post:
+      tags:
+        - Codelists
+      summary: Delete codelist
+      description: Requires `codelist:delete`. Locked or archived codelists cannot be deleted.
+      operationId: codelistsDelete
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CodelistMutationResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiStatusFailed'
+
+  "/codelists/codes/{id}":
+    get:
+      tags:
+        - Codelists
+      summary: List codes in a codelist
+      operationId: codelistsCodesList
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Codelist id
+        - name: language
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+          description: Pass `0` to return all codes (no limit).
+        - name: compact
+          in: query
+          schema:
+            type: boolean
+          description: When true, flatten labels to code/label/description per row.
+      responses:
+        '200':
+          description: Code rows
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CodelistCodesResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiStatusFailed'
+
+  "/codelists/import_json":
+    post:
+      tags:
+        - Codelists
+      summary: Import codelist JSON
+      description: >-
+        Import one codelist from NADA-compatible JSON (body or multipart `file`). Requires
+        `codelist:import`. Supports `dry_run` and `replace`/`overwrite` on the JSON body or
+        query string.
+      operationId: codelistsImportJson
+      parameters:
+        - name: dry_run
+          in: query
+          schema:
+            type: boolean
+        - name: replace
+          in: query
+          schema:
+            type: boolean
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Import result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CodelistImportResponse'
+        '400':
+          description: Validation or import failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiStatusFailed'
+
+  "/codelists/import_sdmx":
+    post:
+      tags:
+        - Codelists
+      summary: Import codelists from SDMX XML
+      description: >-
+        Import from raw XML body, multipart `file`, or JSON `{"url":"https://..."}`. Requires
+        `codelist:import`.
+      operationId: codelistsImportSdmx
+      parameters:
+        - name: dry_run
+          in: query
+          schema:
+            type: boolean
+        - name: replace
+          in: query
+          schema:
+            type: boolean
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+          application/json:
+            schema:
+              type: object
+              properties:
+                url:
+                  type: string
+                  format: uri
+          application/xml:
+            schema:
+              type: string
+          text/xml:
+            schema:
+              type: string
+      responses:
+        '200':
+          description: Import summary
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiStatusFailed'
+
+  "/codelists/export_json/{id}":
+    get:
+      tags:
+        - Codelists
+      summary: Export codelist JSON
+      operationId: codelistsExportJson
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: download
+          in: query
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: JSON document or attachment
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiStatusFailed'
+
+  "/codelists/export_csv/{id}":
+    get:
+      tags:
+        - Codelists
+      summary: Export codelist items CSV
+      description: >-
+        All items as UTF-8 CSV with BOM (Excel-compatible). Columns:
+        sort, parent_code, language, code, label, description.
+      operationId: codelistsExportCsv
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: download
+          in: query
+          schema:
+            type: boolean
+            default: true
+      responses:
+        '200':
+          description: CSV attachment or JSON wrapper with csv field
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiStatusFailed'
+
+  "/codelists/import_csv/{id}":
+    post:
+      tags:
+        - Codelists
+      summary: Import codelist items from CSV
+      description: >-
+        Requires `codelist:edit`. Replaces all existing items when replace=1 (default).
+        Multipart file field or raw CSV body. dry_run=1 validates without saving.
+      operationId: codelistsImportCsv
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: dry_run
+          in: query
+          schema:
+            type: boolean
+            default: false
+        - name: replace
+          in: query
+          schema:
+            type: boolean
+            default: true
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+          text/csv:
+            schema:
+              type: string
+      responses:
+        '200':
+          description: Import result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  dry_run:
+                    type: boolean
+                  codes_imported:
+                    type: integer
+                  codes_count:
+                    type: integer
+                  rows_parsed:
+                    type: integer
+                  warnings:
+                    type: array
+                    items:
+                      type: string
+        '400':
+          description: Validation or import failure
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiStatusFailed'
+
+  "/codelists/export_sdmx/{id}":
+    get:
+      tags:
+        - Codelists
+      summary: Export codelist SDMX XML
+      operationId: codelistsExportSdmx
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: version
+          in: query
+          schema:
+            type: string
+            enum: ['2.1', '3.0']
+            default: '2.1'
+      responses:
+        '200':
+          description: SDMX-ML structure message (application/xml)
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiStatusFailed'
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Data structures (global DSD catalogue)
+  # ─────────────────────────────────────────────────────────────────────────
+
+  /data_structures:
+    get:
+      tags:
+        - Data Structures
+      summary: List data structures
+      description: List global DSDs. Supports collapsed or flat list and optional pagination.
+      operationId: dataStructuresList
+      parameters:
+        - name: flat
+          in: query
+          schema:
+            type: boolean
+          description: When true, return one row per version.
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+          description: 1-based page number. When provided, returns paginated payload.
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Search across title/name/agency/idno/version/description/notes.
+        - name: q
+          in: query
+          schema:
+            type: string
+          description: Alias for `search`.
+        - name: status
+          in: query
+          description: Exact status filter (`DataStructureStatusCode`).
+          schema:
+            $ref: '#/components/schemas/DataStructureStatusCode'
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Bad request
+
+  /data_structures/single/{id}:
+    get:
+      tags:
+        - Data Structures
+      summary: Get data structure by id
+      operationId: dataStructuresSingle
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: with_components
+          in: query
+          schema:
+            type: boolean
+          description: When true, include components array.
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Bad request
+
+  /data_structures/lookup/{segment}:
+    get:
+      tags:
+        - Data Structures
+      summary: Get data structure by id or idno
+      operationId: dataStructuresLookup
+      parameters:
+        - name: segment
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: with_components
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Bad request
+
+  /data_structures/by_identity:
+    get:
+      tags:
+        - Data Structures
+      summary: Get data structure by SDMX identity
+      operationId: dataStructuresByIdentity
+      parameters:
+        - name: agency
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Bad request
+
+  /data_structures/validate/{id}:
+    get:
+      tags:
+        - Data Structures
+      summary: Validate persisted data structure
+      operationId: dataStructuresValidate
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Validation report
+        '400':
+          description: Bad request
+
+  /data_structures/export/{segment}:
+    get:
+      tags:
+        - Data Structures
+      summary: Export data structure JSON
+      description: >-
+        Returns import-ready interchange JSON per `data-structure-schema.json`:
+        `data_structure` includes nested `components[]`; dimension/geography
+        components embed inline `codelist` objects with `items` (not
+        `codelist_reference` only). Suitable for `POST .../import_json` on this
+        editor or NADA without a separate codelist export step.
+      operationId: dataStructuresExport
+      parameters:
+        - name: segment
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Numeric id or catalogue idno.
+        - name: download
+          in: query
+          schema:
+            type: boolean
+            default: true
+          description: When true (default), respond as attachment download.
+      responses:
+        '200':
+          description: Export payload or file download
+        '400':
+          description: Bad request
+
+  /data_structures/versions/{segment}:
+    get:
+      tags:
+        - Data Structures
+      summary: List versions for a data structure family
+      operationId: dataStructuresVersions
+      parameters:
+        - name: segment
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Bad request
+
+  /data_structures/projects/{segment}:
+    get:
+      tags:
+        - Data Structures
+      summary: List projects linked to a data structure
+      operationId: dataStructuresProjects
+      parameters:
+        - name: segment
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Bad request
+
+  /data_structures/create:
+    post:
+      tags:
+        - Data Structures
+      summary: Create data structure
+      description: >-
+        Create a global DSD header row (components added separately or via import_json).
+        Request body matches `data-structure-schema.json`.
+      operationId: dataStructuresCreate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: 'data-structure-schema.json'
+      responses:
+        '200':
+          description: Data structure created
+        '400':
+          description: Bad request
+
+  /data_structures/update/{id}:
+    post:
+      tags:
+        - Data Structures
+      summary: Update data structure
+      operationId: dataStructuresUpdate
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: Data structure updated
+        '400':
+          description: Bad request
+
+  /data_structures/import_json:
+    post:
+      tags:
+        - Data Structures
+      summary: Import data structure JSON
+      description: >-
+        Import global DSD, components and codelists from JSON. Body matches
+        `data-structure-schema.json`: root `data_structure` (identity + `components`),
+        optional boolean `overwrite` and `dry_run` on the same JSON object (no query
+        flags).
+      operationId: dataStructuresImportJson
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: 'data-structure-schema.json'
+      responses:
+        '200':
+          description: Validation/dry-run succeeded or import completed
+        '400':
+          description: Validation failed or bad request
+
+  /data_structures/import_components_csv/{id}:
+    post:
+      tags:
+        - Data Structures
+      summary: Import components from CSV mapping
+      description: >-
+        Add components to an existing draft data structure using a CSV file and column
+        mapping. Multipart form with `file` (CSV) and `payload` (JSON string), or JSON body
+        with `upload_id` (completed resumable upload) plus mapping fields. Payload shape:
+        `{ delimiter, dry_run?, overwrite?, components: [{ name, label, column_type,
+        csv_column, codelist?: { mode: global|from_csv, ... } }] }`. Codelists created from
+        CSV use maintainable id `CL_{component_name}` under the structure agency.
+      operationId: dataStructuresImportComponentsCsv
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file, payload]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                payload:
+                  type: string
+                  description: JSON string with delimiter and components array
+          application/json:
+            schema:
+              type: object
+              required: [components]
+              properties:
+                upload_id:
+                  type: string
+                delimiter:
+                  type: string
+                dry_run:
+                  type: boolean
+                overwrite:
+                  type: boolean
+                components:
+                  type: array
+                  items:
+                    type: object
+                    additionalProperties: true
+      responses:
+        '200':
+          description: Import or dry-run summary
+        '400':
+          description: Validation failed or bad request
+
+  /data_structures/import_sdmx:
+    post:
+      tags:
+        - Data Structures
+      summary: Import data structure from SDMX XML
+      description: Import SDMX-ML structure XML from multipart `file` or XML body.
+      operationId: dataStructuresImportSdmx
+      parameters:
+        - name: overwrite_codelists
+          in: query
+          schema:
+            type: boolean
+        - name: dsd_id
+          in: query
+          schema:
+            type: string
+          description: Optional DataStructure @id selector when multiple are present in XML.
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                overwrite_codelists:
+                  type: string
+                dsd_id:
+                  type: string
+          application/xml:
+            schema:
+              type: string
+          text/xml:
+            schema:
+              type: string
+      responses:
+        '201':
+          description: Import completed
+        '400':
+          description: Bad request
+
+  /data_structures/components:
+    get:
+      tags:
+        - Data Structures
+      summary: Search data structure components across all DSDs
+      description: |
+        Paginated catalogue of components with parent DSD context.
+        Requires at least one of `search` (min 2 characters), `name`, or `structure_id`.
+      operationId: dataStructuresComponentsSearch
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+          description: Match component name, label, description, or parent DSD metadata.
+        - name: q
+          in: query
+          schema:
+            type: string
+          description: Alias for `search`.
+        - name: name
+          in: query
+          schema:
+            type: string
+          description: Prefix match on component name (e.g. REF_AREA).
+        - name: column_type
+          in: query
+          schema:
+            type: string
+            enum:
+              - dimension
+              - time_period
+              - measure
+              - attribute
+              - indicator_id
+              - indicator_name
+              - annotation
+              - geography
+              - observation_value
+              - periodicity
+        - name: agency
+          in: query
+          schema:
+            type: string
+          description: Filter by parent DSD agency.
+        - name: structure_id
+          in: query
+          schema:
+            type: integer
+          description: Limit results to one DSD.
+        - name: exclude_structure_id
+          in: query
+          schema:
+            type: integer
+          description: Exclude components from a DSD (e.g. current draft when copying).
+        - name: status
+          in: query
+          schema:
+            $ref: '#/components/schemas/DataStructureStatusCode'
+          description: Filter by parent DSD status.
+        - name: has_codelist
+          in: query
+          schema:
+            type: boolean
+          description: When true, only components with a linked codelist.
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200
+            default: 50
+        - name: order_by
+          in: query
+          schema:
+            type: string
+            enum: [name, structure_title, updated]
+            default: name
+        - name: order_dir
+          in: query
+          schema:
+            type: string
+            enum: [ASC, DESC]
+            default: ASC
+      responses:
+        '200':
+          description: Paginated component search results
+        '400':
+          description: Bad request
+
+  /data_structures/components/{structure_id}:
+    post:
+      tags:
+        - Data Structures
+      summary: Create data structure component
+      operationId: dataStructuresComponentCreate
+      parameters:
+        - name: structure_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: Component created
+        '400':
+          description: Bad request
+
+  /data_structures/component_update/{id}:
+    post:
+      tags:
+        - Data Structures
+      summary: Update data structure component
+      operationId: dataStructuresComponentUpdate
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: Component updated
+        '400':
+          description: Bad request
+
+  /data_structures/component_delete/{id}:
+    post:
+      tags:
+        - Data Structures
+      summary: Delete data structure component
+      operationId: dataStructuresComponentDelete
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Component deleted
+        '400':
+          description: Bad request
+
+  /data_structures/duplicate/{id}:
+    post:
+      tags:
+        - Data Structures
+      summary: Duplicate data structure
+      operationId: dataStructuresDuplicate
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                agency:
+                  type: string
+                version:
+                  type: string
+      responses:
+        '200':
+          description: Duplicate created
+        '400':
+          description: Bad request
+
+  /data_structures/delete/{id}:
+    post:
+      tags:
+        - Data Structures
+      summary: Delete data structure
+      operationId: dataStructuresDelete
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Deleted
+        '400':
+          description: Bad request
+
+  /data_structures/batch_delete:
+    post:
+      tags:
+        - Data Structures
+      summary: Batch delete data structures
+      operationId: dataStructuresBatchDelete
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [ids]
+              properties:
+                ids:
+                  type: array
+                  items:
+                    type: integer
+      responses:
+        '200':
+          description: Batch delete result
+        '400':
+          description: Bad request
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Indicator DSD (project binding and data)
+  # ─────────────────────────────────────────────────────────────────────────
+
+  "/indicator_dsd/{sid}":
+    get:
+      tags:
+        - Indicator DSD
+      summary: List DSD columns for a project
+      description: >-
+        Returns resolved DSD columns for the project. When bound to a global catalogue
+        DSD, columns are read from the registry (read-only). Use `resolve_codelists=1`
+        to expand linked global codelists into each column.
+      operationId: indicatorDsdList
+      parameters:
+        - name: sid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Project id or idno
+        - name: detailed
+          in: query
+          schema:
+            type: integer
+            enum: [0, 1]
+        - name: resolve_codelists
+          in: query
+          schema:
+            type: integer
+            enum: [0, 1]
+        - name: offset
+          in: query
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Column list
+        '400':
+          description: Bad request
+
+  "/indicator_dsd/single/{sid}/{id}":
+    get:
+      tags:
+        - Indicator DSD
+      summary: Get single DSD column
+      operationId: indicatorDsdSingle
+      parameters:
+        - name: sid
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Column detail
+        '400':
+          description: Bad request
+
+  "/indicator_dsd/validate/{sid}":
+    get:
+      tags:
+        - Indicator DSD
+      summary: Validate project DSD structure and data
+      description: >-
+        Validates bound global DSD structure first. Data checks (column presence, codelist
+        allow-lists, observation-key uniqueness) run only when structure is valid and
+        published timeseries data exists in DuckDB. Always returns HTTP 200 with a report
+        when the project exists (use `valid` and nested blocks, not only HTTP status).
+      operationId: indicatorDsdValidate
+      parameters:
+        - name: sid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Project numeric id or idno
+      responses:
+        '200':
+          description: Validation report (HTTP 200 even when validation fails)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IndicatorDsdValidateResponse'
+        '400':
+          description: Bad request (e.g. project not found)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiStatusFailed'
+
+  "/indicator_dsd/binding/{sid}":
+    get:
+      tags:
+        - Indicator DSD
+      summary: Get project DSD binding context
+      description: >-
+        Binding state, metadata `data_structure_reference`, global structure header,
+        import readiness (`import_ready`, `import_blocked_reasons`), and structure validation
+        summary. Use before data upload to confirm `indicator_id_value` and `implied_freq_code`
+        are set.
+      operationId: indicatorDsdBinding
+      parameters:
+        - name: sid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Project numeric id or idno
+      responses:
+        '200':
+          description: Binding context
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IndicatorDsdBindingResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiStatusFailed'
+
+  "/indicator_dsd/bind_global/{sid}":
+    post:
+      tags:
+        - Indicator DSD
+      summary: Bind global catalogue DSD to project
+      description: >-
+        Attach a registry DSD. Supply `data_structure_id` or
+        `data_structure_reference` (see `DataStructureReference`). Optionally set
+        `indicator_id_value` for data import.
+      operationId: indicatorDsdBindGlobal
+      parameters:
+        - name: sid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IndicatorDsdBindRequest'
+      responses:
+        '200':
+          description: Bound
+        '400':
+          description: Bad request
+
+  "/indicator_dsd/update_binding/{sid}":
+    post:
+      tags:
+        - Indicator DSD
+      summary: Update project DSD binding fields
+      operationId: indicatorDsdUpdateBinding
+      parameters:
+        - name: sid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                indicator_id_value:
+                  type: string
+                implied_freq_code:
+                  type: string
+                  description: SDMX FREQ code when structure has no periodicity column
+      responses:
+        '200':
+          description: Updated
+        '400':
+          description: Bad request
+
+  "/indicator_dsd/unbind/{sid}":
+    post:
+      tags:
+        - Indicator DSD
+      summary: Detach global DSD from project
+      description: Removes binding, clears metadata reference, and drops published timeseries data.
+      operationId: indicatorDsdUnbind
+      parameters:
+        - name: sid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Unbound
+        '400':
+          description: Bad request
+
+  "/indicator_dsd/reset/{sid}":
+    post:
+      tags:
+        - Indicator DSD
+      summary: Reset published indicator data
+      description: Drops the DuckDB timeseries table for the project.
+      operationId: indicatorDsdReset
+      parameters:
+        - name: sid
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Reset result
+        '400':
+          description: Bad request
+
+  "/indicator_dsd/data_upload_prepare/{sid}":
+    post:
+      tags:
+        - Indicator DSD
+      summary: Prepare indicator data upload
+      description: >-
+        Upload a CSV (or reference a completed resumable `upload_id`), validate required DSD
+        column headers, stage the file on the project, and return distinct values in the
+        indicator_id column. Does not require `indicator_id_value` or `implied_freq_code`
+        (those are enforced on `data_upload_import`). Provide **either** `file` **or**
+        `upload_id`, not both.
+      operationId: indicatorDsdDataUploadPrepare
+      parameters:
+        - name: sid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Project numeric id or idno
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: CSV file to stage (mutually exclusive with upload_id)
+                upload_id:
+                  type: string
+                  description: >-
+                    Completed resumable upload session id from `POST /upload/{sid}` (mutually
+                    exclusive with file)
+                delimiter:
+                  type: string
+                  maxLength: 1
+                  default: ","
+                  description: CSV field delimiter (single character)
+                keep_extra_csv_columns:
+                  type: string
+                  description: >-
+                    When `true`/`1`/`yes`, extra CSV columns beyond the DSD are kept on import
+              description: Supply `file` or `upload_id` (not both).
+      responses:
+        '200':
+          description: Headers valid; CSV staged for import
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IndicatorDsdDataUploadPrepareResponse'
+        '400':
+          description: Header validation failed or request error
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/IndicatorDsdDataUploadPrepareHeaderError'
+                  - $ref: '#/components/schemas/ApiStatusFailed'
+
+  "/indicator_dsd/data_upload_import/{sid}":
+    post:
+      tags:
+        - Indicator DSD
+      summary: Import prepared indicator data
+      operationId: indicatorDsdDataUploadImport
+      parameters:
+        - name: sid
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '200':
+          description: Import result
+        '400':
+          description: Bad request
+
+  # ─────────────────────────────────────────────────────────────────────────
+  # Jobs
+  # ─────────────────────────────────────────────────────────────────────────
+
+  "/jobs/import_indicator_data":
+    post:
+      tags:
+        - Jobs
+      summary: Import indicator data (full workflow)
+      description: >
+        Submit a single background job that handles the complete indicator data
+        import workflow: copies the uploaded CSV, validates headers against the
+        bound DSD, and publishes rows for the requested `indicator_value` via
+        replace-from-csv.
+
+
+        The CSV must be uploaded first via the resumable upload API
+        `POST /upload/{sid}` (initialize session, send chunks, complete) to obtain an
+        `upload_id`. Poll job status via `GET /jobs/{uuid}`.
+
+
+        For interactive import in the editor, use
+        `POST /api/indicator_dsd/data_upload_prepare/{sid}` and
+        `POST /api/indicator_dsd/data_upload_import/{sid}` instead.
+
+
+        Requires edit access to the target project (same as the indicator DSD import APIs).
+      operationId: importIndicatorDataJob
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - project_id
+                - upload_id
+                - indicator_value
+              properties:
+                project_id:
+                  oneOf:
+                    - type: integer
+                      description: Numeric database project id
+                    - type: string
+                      description: Project idno, or numeric id as a string (same resolution as other editor APIs)
+                  description: Indicator/timeseries project — numeric id or idno
+                upload_id:
+                  type: string
+                  description: Completed upload session ID from `POST /upload/{sid}`
+                indicator_value:
+                  type: string
+                  description: Value in the DSD indicator_id column; only matching rows are imported
+                delimiter:
+                  type: string
+                  default: ","
+                  description: CSV field delimiter character
+                priority:
+                  type: integer
+                  default: 0
+                  description: Job queue priority
+      responses:
+        "201":
+          description: Import job created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  uuid:
+                    type: string
+                    description: Job UUID — use with GET /jobs/{uuid} to poll status
+                  job:
+                    type: object
+                    additionalProperties: true
+      security:
+        - ApiKeyAuth: []
+
 components:
   requestBodies:
     timeseries-db-schema.json:
@@ -3508,6 +5810,16 @@ components:
       name: X-API-Key
       description: API key for authentication
   schemas:
+    CreateProjectOverwrite:
+      type: object
+      properties:
+        overwrite:
+          type: boolean
+          default: false
+          description: >
+            If true and a project with the same idno already exists, overwrite its metadata
+            in place instead of returning an error. The existing project must be the same type.
+            Collection memberships and file attachments are preserved.
     Template:
       type: object
       properties:
@@ -3591,11 +5903,13 @@ components:
           type: integer
           format: int64
         permissions:
-          type: array
-          items:
-            type: string
-            enum:
-              - view
+          type: string
+          description: Single collection ACL role per grant (stored as one value in `editor_collection_acl.permissions`).
+          enum:
+            - view
+            - edit
+            - admin
+          example: admin
     UserCollectionPermissions:
       type: object
       properties:
@@ -4043,39 +6357,602 @@ components:
         name: DeleteProjectVersionById
     PublishOptions:
       type: object
+      description: >
+        Fields merged into the exported project JSON before POST to NADA. Names and values
+        follow the Metadata Editor publish UI and NADA dataset-create expectations. Any
+        additional JSON properties are also merged if supplied.
       properties:
-        repositoryid:
-          type: string
-          description: Target collection/repository ID in the NADA catalog
-        access_policy:
+        overwrite:
           type: string
           enum:
-            - open
+            - "yes"
+            - "no"
+          default: "no"
+          description: >
+            If `yes`, allows replacing an existing study in the catalog with the same IDNO.
+            Merged as top-level `overwrite` on the dataset JSON sent to NADA.
+        published:
+          type: integer
+          format: int32
+          enum:
+            - 0
+            - 1
+          description: Catalog visibility — `0` draft, `1` published (merged as `published`).
+        access_policy:
+          type: string
+          description: >
+            Data access / access policy code merged as `access_policy` on the payload.
+            Allowed values match the Metadata Editor publish form; NADA may validate against
+            codes returned by `GET .../index.php/api/catalog/data_access_codes` on the catalog.
+          enum:
+            - data_na
             - direct
             - public
             - licensed
             - remote
-            - data_na
-            - data_enclave
-          description: Data access policy type
+            - enclave
+            - open
+            - ""
+          default: data_na
         data_remote_url:
           type: string
-          description: URL to remote repository (required when access_policy is 'remote')
-        overwrite:
+          description: >
+            URL for remote / external data access; merged as `data_remote_url`. Used when
+            `access_policy` is `remote` or `enclave` (per catalog configuration).
+        repositoryid:
           type: string
-          enum:
-            - yes
-            - no
-          default: no
-          description: Whether to overwrite existing dataset in catalog
-        published:
-          type: integer
-          enum:
-            - 0
-            - 1
-          description: Publication status (0=draft, 1=published)
+          description: >
+            Target collection (repository) code in NADA; merged as `repositoryid`. Options
+            are typically populated from `GET .../index.php/api/collections` on the catalog
+            (see `/publish/catalog_info/...`).
+      additionalProperties: true
+      example:
+        overwrite: "yes"
+        published: 1
+        access_policy: licensed
+        data_remote_url: ""
+        repositoryid: MY_COLLECTION
       xml:
         name: PublishOptions
+    NadaCatalogInfoResponse:
+      type: object
+      description: Response from prefetching NADA data for the publish form
+      properties:
+        study_info:
+          type: object
+          description: >
+            Outcome of `GET {catalog}/index.php/api/datasets/{study_idno}`. On success,
+            normalized fields from `dataset` (without embedded `metadata`) plus `status:
+            success`. On failure, includes `status` (`error` or `failed`), `error` message,
+            optional `response`, and `api_url`.
+        collections_codes:
+          type: array
+          description: Entries from NADA `GET .../index.php/api/collections` (`collections` array)
+          items:
+            type: object
+            additionalProperties: true
+        data_access_codes:
+          type: array
+          description: >
+            Codes from NADA `GET .../index.php/api/catalog/data_access_codes` (`codes` array);
+            used to populate the data access / access_policy control.
+          items:
+            type: object
+            additionalProperties: true
+        collections_linked:
+          type: array
+          description: >
+            Collections already associated with the study from NADA
+            `GET .../index.php/api/datasets/collections/{study_idno}` (normalized list).
+          items:
+            type: object
+            additionalProperties: true
+        indicator_publish:
+          $ref: "#/components/schemas/IndicatorPublishPrefetch"
+    IndicatorPublishPrefetch:
+      type: object
+      description: >
+        Prefetched indicator DSD/data status for the publish UI (indicator/timeseries projects only).
+      properties:
+        local:
+          type: object
+          additionalProperties: true
+        nada_dsd:
+          type: object
+          nullable: true
+          additionalProperties: true
+        nada_data:
+          type: object
+          nullable: true
+          additionalProperties: true
+        prefetch_error:
+          type: string
+          nullable: true
+    IndicatorPublishOptions:
+      type: object
+      properties:
+        publish_dsd:
+          type: boolean
+          description: Publish bound DSD to NADA
+          default: false
+        dsd_overwrite:
+          type: boolean
+          description: Replace DSD on NADA when it already exists
+          default: false
+        publish_indicator_data:
+          type: boolean
+          description: Export DuckDB timeseries CSV and import observations to NADA
+          default: false
+        nada_upload_id:
+          type: string
+          description: >
+            Completed NADA resumable upload_id from step-by-step publish (skips export and upload;
+            import-only). Requires publish_indicator_data true.
+    IndicatorPublishResponse:
+      type: object
+      properties:
+        dsd:
+          type: object
+          nullable: true
+          additionalProperties: true
+        data:
+          type: object
+          nullable: true
+          additionalProperties: true
+    DataStructureStatusCode:
+      type: string
+      description: >-
+        Catalogue DSD lifecycle slug (persisted as an integer in `data_structures.status`):
+        `draft`, `review`, `published` (locked from destructive edits), `deprecated`,
+        `archived` (locked). Request bodies and import JSON must use these strings.
+      enum: [draft, review, published, deprecated, archived]
+    DataStructureReference:
+      type: object
+      description: >-
+        Canonical link to a global catalogue DSD stored on project/study metadata.
+        Matches `data_structure_reference` in `timeseries-schema.json`.
+      required: [idno, agency, name, version]
+      properties:
+        idno:
+          type: string
+          description: Stable catalogue DSD idno
+        agency:
+          type: string
+        name:
+          type: string
+          description: SDMX maintainable id
+        version:
+          type: string
+        uri:
+          type: string
+          format: uri
+          description: Optional URL for documentation or discovery; not used for import
+        notes:
+          type: string
+          description: Optional free-text notes about this DSD link
+      additionalProperties: false
+    IndicatorDsdBindRequest:
+      type: object
+      description: Bind a global registry DSD to a project
+      properties:
+        data_structure_id:
+          type: integer
+          description: Numeric catalogue data structure id
+        data_structure_reference:
+          $ref: '#/components/schemas/DataStructureReference'
+        indicator_id_value:
+          type: string
+          description: Value for the DSD indicator_id column used during data import
+    ApiStatusFailed:
+      type: object
+      required: [status, message]
+      properties:
+        status:
+          type: string
+          enum: [failed]
+        message:
+          type: string
+        error:
+          type: string
+          description: Present on some ACL denials (`Access denied`)
+    CodelistStatusCode:
+      type: string
+      description: Catalogue codelist lifecycle status
+      enum: [draft, active, locked, archived]
+    CodelistCatalogRow:
+      type: object
+      description: Global codelist header row (list/detail shapes vary slightly by endpoint)
+      properties:
+        id:
+          type: integer
+        idno:
+          type: string
+        agency:
+          type: string
+        name:
+          type: string
+          description: SDMX maintainable id
+        version:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/CodelistStatusCode'
+        item_count:
+          type: integer
+          description: Present when with_counts is enabled
+        dsd_component_count:
+          type: integer
+          description: Present when with_counts is enabled
+        versions_count:
+          type: integer
+          description: Present on collapsed family rows
+      additionalProperties: true
+    CodelistListResponse:
+      type: object
+      required: [status, codelists, total]
+      properties:
+        status:
+          type: string
+          enum: [success]
+        codelists:
+          type: array
+          items:
+            $ref: '#/components/schemas/CodelistCatalogRow'
+        total:
+          type: integer
+        page:
+          type: integer
+        per_page:
+          type: integer
+        collapsed:
+          type: boolean
+        offset:
+          type: integer
+        limit:
+          type: integer
+    CodelistVersionsResponse:
+      type: object
+      required: [status, codelists]
+      properties:
+        status:
+          type: string
+          enum: [success]
+        codelists:
+          type: array
+          items:
+            $ref: '#/components/schemas/CodelistCatalogRow'
+    CodelistSingleResponse:
+      type: object
+      required: [status, codelist]
+      properties:
+        status:
+          type: string
+          enum: [success]
+        codelist:
+          $ref: '#/components/schemas/CodelistCatalogRow'
+    CodelistCreateRequest:
+      type: object
+      required: [agency, name, version, title]
+      properties:
+        agency:
+          type: string
+        name:
+          type: string
+        version:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        status:
+          $ref: '#/components/schemas/CodelistStatusCode'
+      additionalProperties: true
+    CodelistCreateResponse:
+      type: object
+      required: [status, id]
+      properties:
+        status:
+          type: string
+          enum: [success]
+        id:
+          type: integer
+        message:
+          type: string
+    CodelistMutationResponse:
+      type: object
+      required: [status]
+      properties:
+        status:
+          type: string
+          enum: [success]
+        id:
+          type: integer
+        message:
+          type: string
+    CodelistCodesResponse:
+      type: object
+      required: [status, codes, total]
+      properties:
+        status:
+          type: string
+          enum: [success]
+        total:
+          type: integer
+        offset:
+          type: integer
+        limit:
+          type: integer
+          nullable: true
+        codes:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+    CodelistImportResponse:
+      type: object
+      properties:
+        status:
+          type: string
+        dry_run:
+          type: boolean
+        imported:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        warnings:
+          type: array
+          items:
+            type: string
+      additionalProperties: true
+    IndicatorDsdStructureValidationBlock:
+      type: object
+      properties:
+        valid:
+          type: boolean
+        errors:
+          type: array
+          items:
+            type: string
+        warnings:
+          type: array
+          items:
+            type: string
+        summary:
+          type: object
+          additionalProperties: true
+        roles:
+          type: object
+          additionalProperties: true
+          description: Role checklist (required/recommended column counts by column_type)
+    IndicatorDsdDataValidationBlock:
+      type: object
+      properties:
+        skipped:
+          type: boolean
+          description: When true, data checks were not run (see reason)
+        has_data:
+          type: boolean
+        source:
+          type: string
+          nullable: true
+          description: e.g. published timeseries when data was checked
+        valid:
+          type: boolean
+          nullable: true
+          description: Null when data validation was skipped
+        errors:
+          type: array
+          items:
+            type: string
+        warnings:
+          type: array
+          items:
+            type: string
+        reason:
+          type: string
+          nullable: true
+        row_count:
+          type: integer
+          nullable: true
+        observation_key:
+          type: object
+          nullable: true
+          additionalProperties: true
+          description: Observation-key column list and uniqueness stats when applicable
+    IndicatorDsdValidateResponse:
+      type: object
+      required: [status, valid]
+      properties:
+        status:
+          type: string
+          enum: [success, failed]
+          description: Mirrors overall validation outcome
+        valid:
+          type: boolean
+          description: False when structure or data validation has errors
+        errors:
+          type: array
+          items:
+            type: string
+        warnings:
+          type: array
+          items:
+            type: string
+        summary:
+          type: object
+          additionalProperties: true
+        structure:
+          $ref: '#/components/schemas/IndicatorDsdStructureValidationBlock'
+        data_validation:
+          $ref: '#/components/schemas/IndicatorDsdDataValidationBlock'
+    IndicatorDsdBindingResponse:
+      type: object
+      required: [status, bound, import_ready]
+      properties:
+        status:
+          type: string
+          enum: [success]
+        bound:
+          type: boolean
+        read_only:
+          type: boolean
+          description: True when a global DSD is bound (structure is registry-managed)
+        binding:
+          type: object
+          nullable: true
+          additionalProperties: true
+          description: Project DSD binding row from editor_project_dsd
+        data_structure_reference:
+          $ref: '#/components/schemas/DataStructureReference'
+        global_structure:
+          type: object
+          nullable: true
+          additionalProperties: true
+          description: Global data structure header when bound
+        column_count:
+          type: integer
+        indicator_id_value:
+          type: string
+          nullable: true
+        series_idno:
+          type: string
+          nullable: true
+        default_indicator_id_value:
+          type: string
+          nullable: true
+        indicator_id_column:
+          type: string
+          nullable: true
+          description: DSD column name with column_type indicator_id
+        has_periodicity_column:
+          type: boolean
+        needs_implied_freq_code:
+          type: boolean
+        implied_freq_code:
+          type: string
+          nullable: true
+        has_published_data:
+          type: boolean
+        published_row_count:
+          type: integer
+          nullable: true
+        data_imported_at:
+          type: integer
+          nullable: true
+          description: Unix timestamp when data was last imported
+        import_ready:
+          type: boolean
+        import_blocked_reasons:
+          type: array
+          items:
+            type: string
+        structure_validation:
+          $ref: '#/components/schemas/IndicatorDsdStructureValidationBlock'
+        freq_codes:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+              label:
+                type: string
+            additionalProperties: true
+    IndicatorDsdCsvIndicatorValue:
+      type: object
+      properties:
+        value:
+          type: string
+        count:
+          type: integer
+          nullable: true
+    IndicatorDsdDataUploadPrepareResponse:
+      type: object
+      required: [status, headers_valid]
+      properties:
+        status:
+          type: string
+          enum: [success]
+        headers_valid:
+          type: boolean
+          enum: [true]
+        expected_columns:
+          type: array
+          items:
+            type: string
+          description: DSD column names required in the CSV
+        import_columns:
+          type: array
+          items:
+            type: string
+          description: Column names passed to the DuckDB import
+        keep_extra_csv_columns:
+          type: boolean
+        indicator_column:
+          type: string
+          description: DSD column name for indicator_id
+        indicator_id_value:
+          type: string
+          nullable: true
+          description: Bound value on the project (may be empty at prepare time)
+        indicator_values:
+          type: array
+          items:
+            $ref: '#/components/schemas/IndicatorDsdCsvIndicatorValue'
+          description: Distinct indicator_id values found in the CSV
+        indicator_values_truncated:
+          type: boolean
+        indicator_values_limit:
+          type: integer
+        series_idno:
+          type: string
+          nullable: true
+        series_idno_in_csv:
+          type: boolean
+        ignored_columns:
+          type: array
+          items:
+            type: string
+          description: Extra CSV columns not in the DSD
+        extra_in_csv:
+          type: array
+          items:
+            type: string
+        csv_row_count:
+          type: integer
+          nullable: true
+    IndicatorDsdDataUploadPrepareHeaderError:
+      type: object
+      required: [status, headers_valid]
+      properties:
+        status:
+          type: string
+          enum: [failed]
+        headers_valid:
+          type: boolean
+          enum: [false]
+        message:
+          type: string
+        missing_in_csv:
+          type: array
+          items:
+            type: string
+        ignored_columns:
+          type: array
+          items:
+            type: string
+        extra_in_csv:
+          type: array
+          items:
+            type: string
+        expected_columns:
+          type: array
+          items:
+            type: string
     ApiResponse:
       type: object
       properties:

@@ -13,6 +13,7 @@ Vue.component('variable-edit', {
                 'freq':true,
                 'missing':true,
                 'vald':true,
+                'invd':true,
                 'min':true,
                 'max':true,
                 'mean':true,
@@ -53,8 +54,9 @@ Vue.component('variable-edit', {
             };            
         }
 
-        if (!this.variable.var_wgt_id){
-            this.variable.var_wgt_id=''
+        var _wid = this.variable.var_wgt_id;
+        if (_wid === 0 || _wid === '0' || _wid === null || _wid === undefined || _wid === '' || !(Number(_wid) > 0)) {
+            Vue.set(this.variable, 'var_wgt_id', '');
         }
 
         if (this.variable.var_wgt && Array.isArray(this.variable.var_wgt_id)){
@@ -144,12 +146,15 @@ Vue.component('variable-edit', {
                 const value = cat.value;
                 categoryValueSet.add(String(value));
 
-                categories.push({
+                const row = {
                     value: value,
                     labl: cat.labl || null,
-                    stats: cat.stats || null,
-                    is_missing: cat.is_missing || null
-                });
+                    stats: cat.stats || null
+                };
+                if (cat.is_missing !== undefined && cat.is_missing !== null && cat.is_missing !== '') {
+                    row.is_missing = cat.is_missing;
+                }
+                categories.push(row);
             }
 
             // If no labels, return early
@@ -209,11 +214,13 @@ Vue.component('variable-edit', {
             return categoriesCount + labelsCount;
         },
         isWeighted(){
-            if (this.Variable['var_wgt_id']){
-                return true;
-            }
-            return false;
-        },        
+            var w = this.Variable['var_wgt_id'];
+            return w !== undefined && w !== null && w !== '' && Number(w) > 0;
+        },
+        hasAssignedWeightVariable(){
+            var w = this.variable.var_wgt_id;
+            return w !== undefined && w !== null && w !== '' && Number(w) > 0;
+        },
         WeightedValidRangeCount(){
             let count=0;
             if (!this.Variable.var_catgry){
@@ -307,22 +314,19 @@ Vue.component('variable-edit', {
             return value.toFixed(decimals);
         },
         OnVariableWeightChange(e){
-            
-            if (e){
-                //check variable format type e.g. numeric, character
+            var idNum = (e === null || e === undefined || e === '') ? 0 : Number(e);
+            if (idNum > 0 && !isNaN(idNum)) {
                 if (this.variable.var_format && this.variable.var_format.type){
                     if (this.variable.var_format.type=='character'){
                         Vue.delete(this.variable, 'var_wgt_id');
-                        alert(this.$t('character_variable_cannot_be_weighted', {variable_name: this.variable.name}));                        
+                        alert(this.$t('character_variable_cannot_be_weighted', {variable_name: this.variable.name}));
                         return;
                     }
                 }
-
                 Vue.set(this.variable, 'var_wgt_id', e);
                 Vue.set(this.variable, 'update_required', true);
-            }
-            else{
-                Vue.delete(this.variable, 'var_wgt_id');                
+            } else {
+                Vue.delete(this.variable, 'var_wgt_id');
             }
         },
         sectionEnabled: function(section){
@@ -465,11 +469,14 @@ Vue.component('variable-edit', {
             if (option === 'wgt' && !value) {
                 Vue.set(this.Variable.sum_stats_options, 'mean_wgt', false);
                 Vue.set(this.Variable.sum_stats_options, 'stdev_wgt', false);
+                if (Object.prototype.hasOwnProperty.call(this.variable, 'var_wgt_id')) {
+                    Vue.delete(this.variable, 'var_wgt_id');
+                }
             }
             
             // Flag refresh stats only when a change requires re-running the data API:
             // - freq turned from false to true (to get var_catgry again)
-            // Display/export-only options (min, max, mean, stdev, vald, missing, mean_wgt, stdev_wgt, wgt)
+            // Display/export-only options (min, max, mean, stdev, vald, invd, missing, mean_wgt, stdev_wgt, wgt)
             // and freq turned to false do not require refresh.
             if (option === 'freq' && value === true) {
                 Vue.set(this.variable, 'update_required', true);
@@ -483,7 +490,7 @@ Vue.component('variable-edit', {
             <v-tabs v-model="active_tab">
                 <v-tab key="statistics" href="#statistics">{{$t('statistics')}}</v-tab>
                 <v-tab key="weights" href="#weights">
-                    {{$t('weights')}} <span v-if="variable.var_wgt_id"><v-icon style="color:green;">mdi-circle-medium</v-icon></span></v-tab>
+                    {{$t('weights')}} <span v-if="hasAssignedWeightVariable"><v-icon style="color:green;">mdi-circle-medium</v-icon></span></v-tab>
                 <v-tab key="documentation" href="#documentation">{{$t('documentation')}}</v-tab>
                 <v-tab key="json" href="#json">{{$t('json')}}</v-tab>
 
@@ -499,6 +506,7 @@ Vue.component('variable-edit', {
                             <div><v-checkbox @change="(value) => onSumStatsOptionChange('missing', value)" v-model="Variable.sum_stats_options.missing" :indeterminate="Variable.sum_stats_options.missing==null" :label="$t('list_missings')"></v-checkbox></div>
                             <div class="mt-3 mb-2 border-bottom w-50 ">{{$t('summary_stats')}}:</div>
                             <div><v-checkbox @change="(value) => onSumStatsOptionChange('vald', value)" v-model="Variable.sum_stats_options.vald" :indeterminate="Variable.sum_stats_options.vald==null"  :label="$t('valid')"></v-checkbox></div>
+                            <div><v-checkbox @change="(value) => onSumStatsOptionChange('invd', value)" v-model="Variable.sum_stats_options.invd" :indeterminate="Variable.sum_stats_options.invd==null"  :label="$t('invalid')"></v-checkbox></div>
                             <div><v-checkbox @change="(value) => onSumStatsOptionChange('min', value)" v-model="Variable.sum_stats_options.min" :indeterminate="Variable.sum_stats_options.min==null"  :label="$t('min')"></v-checkbox></div>
                             <div><v-checkbox @change="(value) => onSumStatsOptionChange('max', value)" v-model="Variable.sum_stats_options.max" :indeterminate="Variable.sum_stats_options.max==null" :label="$t('max')"></v-checkbox></div>
                             <div><v-checkbox @change="(value) => onSumStatsOptionChange('mean', value)" v-model="Variable.sum_stats_options.mean" :indeterminate="Variable.sum_stats_options.mean==null" :label="$t('mean')"></v-checkbox></div>
@@ -566,7 +574,7 @@ Vue.component('variable-edit', {
                                         </div>
                                     </td>
                                 </tr>
-                                <tr v-if="variableStatsInValidCount(variable)>0 && Variable.sum_stats_options.missing">
+                                <tr v-if="variableStatsInValidCount(variable)>0 && (Variable.sum_stats_options.missing || Variable.sum_stats_options.invd)">
                                     <td>{{$t('system_missing')}}</td>
                                     <td></td>                                    
                                     <td>{{variableStatsInValidCount(variable)}}</td>
@@ -617,7 +625,7 @@ Vue.component('variable-edit', {
                 <v-tab-item key="weights" value="weights">
                     <div class="p-3">
                         <variable-weights-component
-                            :key="variable.var_wgt_id" 
+                            :key="'vw-' + (variable.uid != null ? variable.uid : index_key)" 
                             v-model="variable.var_wgt_id"
                             @input="OnVariableWeightChange"
                             :variables="Variables">

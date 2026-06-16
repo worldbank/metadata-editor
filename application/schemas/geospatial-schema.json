@@ -190,7 +190,7 @@
 									"type": "string",
 									"title": "Country"
 								},
-								"elctronicMailAddress": {
+								"electronicMailAddress": {
 									"type": "string",
 									"title": "Email"
 								}

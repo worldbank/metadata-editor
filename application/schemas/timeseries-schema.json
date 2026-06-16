@@ -62,29 +62,29 @@
 					"title": "Version Statement",
 					"description": "Version Statement",
 					"properties": {
-					  "version": {
-						"title": "Version",
-						"type": "string"						
-					  },
-					  "version_date": {
-						"title": "Version Date",
-						"type": "string"						
-					  },
-					  "version_resp": {
-						"title": "Version Responsibility Statement",
-						"description": "The organization or person responsible for the version of the work",
-						"type": "string"
-					  },
-					  "version_notes": {
-						"title": "Version Notes",
-						"type": "string"
-					  }
+						"version": {
+							"title": "Version",
+							"type": "string"
+						},
+						"version_date": {
+							"title": "Version Date",
+							"type": "string"
+						},
+						"version_resp": {
+							"title": "Version Responsibility Statement",
+							"description": "The organization or person responsible for the version of the work",
+							"type": "string"
+						},
+						"version_notes": {
+							"title": "Version Notes",
+							"type": "string"
+						}
 					}
 				},
-				"checksum":{
-					"title":"Checksum",
-					"description":"Checksum value for the document using SHA-256",
-					"type":"string"
+				"checksum": {
+					"title": "Checksum",
+					"description": "Checksum value for the document using SHA-256",
+					"type": "string"
 				}
 			},
 			"additionalProperties": false
@@ -144,15 +144,39 @@
 						]
 					}
 				},
-				"database_id": {
-					"type": "string",
-					"title": "Database ID",
-					"description": "Series database ID"
-				},
-				"database_name": {
-					"type": "string",
-					"title": "Database name",
-					"description": "Series database name"
+				"databases": {
+					"type": "array",
+					"title": "Databases",
+					"items": {
+						"type": "object",
+						"properties": {
+							"id": {
+								"type": "string",
+								"title": "ID",
+								"description": "Database identifier."
+							},
+							"name": {
+								"type": "string",
+								"title": "Name",
+								"description": "Database name."
+							},
+							"uri": {
+								"type": "string",
+								"title": "URI"
+							},
+							"is_primary": {
+								"type": "boolean",
+								"title": "Primary database"
+							},
+							"note": {
+								"type": "string",
+								"title": "Note"
+							}
+						},
+						"required": [
+							"name"
+						]
+					}
 				},
 				"date_last_update": {
 					"type": "string",
@@ -165,27 +189,27 @@
 				"version_statement": {
 					"type": "object",
 					"title": "Version Statement",
-					"description": "Version Statement",					
+					"description": "Version Statement",
 					"properties": {
-					  "version": {
-						"title": "Version",
-						"type": "string"						
-					  },
-					  "version_date": {
-						"title": "Version Date",
-						"type": "string"
-					  },
-					  "version_resp": {
-						"title": "Version Responsibility Statement",
-						"description": "The organization or person responsible for the version of the work",
-						"type": "string"
-					  },
-					  "version_notes": {
-						"title": "Version Notes",
-						"type": "string"
-					  }
+						"version": {
+							"title": "Version",
+							"type": "string"
+						},
+						"version_date": {
+							"title": "Version Date",
+							"type": "string"
+						},
+						"version_resp": {
+							"title": "Version Responsibility Statement",
+							"description": "The organization or person responsible for the version of the work",
+							"type": "string"
+						},
+						"version_notes": {
+							"title": "Version Notes",
+							"type": "string"
+						}
 					}
-				  },
+				},
 				"aliases": {
 					"type": "array",
 					"title": "Series other names",
@@ -257,7 +281,7 @@
 					"type": "string",
 					"title": "Series unit of measure"
 				},
-				"power_code":{ 
+				"power_code": {
 					"type": "string",
 					"title": "Power code",
 					"description": "Power of 10 by which the reported statistics should be multiplied. e.g. '6' indicating millions of units"
@@ -386,18 +410,16 @@
 						]
 					}
 				},
-				
-				"universe":{
-					"title":"Universe",
-					"description":"Target population (the statistical universe about which information is sought)",
-					"type":"string"
+				"universe": {
+					"title": "Universe",
+					"description": "Target population (the statistical universe about which information is sought)",
+					"type": "string"
 				},
-				
 				"data_collection": {
 					"title": "Data collection",
 					"description": " This description should include, when applicable, the sample frame used, the questions used to collect the data, the type of interview, the dates/duration of fieldwork, the sample size and the response rate. Some additional information on questionnaire design and testing, interviewer training, methods used to monitor non-response etc.",
 					"type": "object",
-					"properties": {												
+					"properties": {
 						"data_source": {
 							"title": "Data source",
 							"type": "string"
@@ -516,7 +538,7 @@
 					"items": {
 						"type": "string"
 					}
-				},				
+				},
 				"missing": {
 					"type": "string",
 					"title": "Treatment of missing values"
@@ -529,7 +551,6 @@
 						"type": "string"
 					}
 				},
-				
 				"quality_checks": {
 					"type": "string",
 					"title": "Quality control methods"
@@ -663,7 +684,7 @@
 					"title": "Mandate",
 					"description": "Mandate",
 					"type": "object",
-					"properties": {												
+					"properties": {
 						"mandate": {
 							"title": "Mandate",
 							"type": "string"
@@ -671,8 +692,9 @@
 						"uri": {
 							"title": "URL",
 							"type": "string"
-						}					}
-				},				
+						}
+					}
+				},
 				"time_periods": {
 					"type": "array",
 					"title": "Series dates",
@@ -838,8 +860,7 @@
 				"citation_requirement": {
 					"type": "string",
 					"description": "Citation requirement (can include a specific recommended citation)"
-				  },
-				
+				},
 				"links": {
 					"type": "array",
 					"title": "Series links",
@@ -880,7 +901,6 @@
 						}
 					}
 				},
-				
 				"sources": {
 					"type": "array",
 					"title": "Sources",
@@ -897,7 +917,7 @@
 								"type": "array",
 								"items": {
 									"type": "object",
-									"properties": {										
+									"properties": {
 										"type": {
 											"title": "Type",
 											"type": "string"
@@ -917,7 +937,7 @@
 								"title": "Name",
 								"description": "Source name",
 								"type": "string"
-							},							
+							},
 							"organization": {
 								"title": "Organization",
 								"type": "string"
@@ -960,7 +980,7 @@
 													}
 												}
 											}
-										}, 
+										},
 										"full_name": {
 											"title": "Full name",
 											"type": "string"
@@ -982,7 +1002,7 @@
 											"title": "Title",
 											"type": "string",
 											"description": "Title of the dataset inluding the country and year if relevant"
-										},										
+										},
 										"uri": {
 											"title": "URI",
 											"type": "string"
@@ -997,11 +1017,11 @@
 							"publication_date": {
 								"title": "Publication date",
 								"type": "string"
-							},							
+							},
 							"uri": {
 								"title": "URI",
 								"type": "string"
-							},							
+							},
 							"access_date": {
 								"title": "Access date",
 								"type": "string"
@@ -1009,7 +1029,7 @@
 							"note": {
 								"title": "Note",
 								"type": "string"
-							}							
+							}
 						}
 					}
 				},
@@ -1017,28 +1037,28 @@
 					"type": "string",
 					"title": "Notes form original sources"
 				},
-				"direct_sources":{
-					"type":"array",
-					"title":"Direct sources",
-					"description":"Refers to the sources from where the data was directly collected",
-					"items":{
-						"type":"object",
-						"properties":{
-							"name":{
-								"title":"Name",
-								"type":"string"
+				"direct_sources": {
+					"type": "array",
+					"title": "Direct sources",
+					"description": "Refers to the sources from where the data was directly collected",
+					"items": {
+						"type": "object",
+						"properties": {
+							"name": {
+								"title": "Name",
+								"type": "string"
 							},
-							"organization":{
-								"title":"Organization",
-								"type":"string"
+							"organization": {
+								"title": "Organization",
+								"type": "string"
 							},
-							"uri":{
-								"title":"URI",
-								"type":"string"
+							"uri": {
+								"title": "URI",
+								"type": "string"
 							},
-							"note":{
-								"title":"Note",
-								"type":"string"
+							"note": {
+								"title": "Note",
+								"type": "string"
 							}
 						}
 					}
@@ -1097,59 +1117,59 @@
 					"title": "Errata",
 					"description": "List of corrected errors in data or metadata",
 					"items": {
-					  "type": "object",
-					  "properties": {
-						"date": {
-						  "title": "Date of erratum",
-						  "description": "Date when the erratum was reported or published",
-						  "type": "string"
-						},
-						"description": {
-						  "title": "Description of the erratum",
-						  "description": "A description of the erratum, with information on which data or metadata were impacted",
-						  "type": "string"
-						},
-						"uri": {
-							"title": "URI",							
-							"type": "string"
-						  }
-					  }
+						"type": "object",
+						"properties": {
+							"date": {
+								"title": "Date of erratum",
+								"description": "Date when the erratum was reported or published",
+								"type": "string"
+							},
+							"description": {
+								"title": "Description of the erratum",
+								"description": "A description of the erratum, with information on which data or metadata were impacted",
+								"type": "string"
+							},
+							"uri": {
+								"title": "URI",
+								"type": "string"
+							}
+						}
 					}
-				  },
-				  "acknowledgements": {
+				},
+				"acknowledgements": {
 					"type": "array",
 					"title": "Other acknowledgments",
 					"description": "Acknowledgments of persons or organizations",
 					"items": {
-					  "type": "object",
-					  "properties": {
-						"name": {
-						  "title": "Name",
-						  "type": "string"
-						},
-						"affiliation": {
-						  "title": "Affiliation",
-						  "type": "string"
-						},
-						"role": {
-						  "title": "Role",
-						  "type": "string"
+						"type": "object",
+						"properties": {
+							"name": {
+								"title": "Name",
+								"type": "string"
+							},
+							"affiliation": {
+								"title": "Affiliation",
+								"type": "string"
+							},
+							"role": {
+								"title": "Role",
+								"type": "string"
+							}
 						}
-					  }
 					},
 					"required": [
-					  "name"
+						"name"
 					]
-				  },
-				  "acknowledgement_statement": {
+				},
+				"acknowledgement_statement": {
 					"title": "Acknowledgement statement",
 					"description": "Acknowledgement statement",
 					"type": "string"
-				  },
-				  "disclaimer": {
+				},
+				"disclaimer": {
 					"title": "Disclaimer",
 					"type": "string"
-				  },
+				},
 				"notes": {
 					"title": "Notes",
 					"description": "Notes",
@@ -1167,12 +1187,12 @@
 								"type": "string"
 							},
 							"uri": {
-								"title": "URI",							
+								"title": "URI",
 								"type": "string"
 							}
 						}
 					}
-				},				
+				},
 				"related_indicators": {
 					"type": "array",
 					"description": "Related indicators",
@@ -1180,10 +1200,10 @@
 						"type": "object",
 						"properties": {
 							"id": {
-									"title": "Identifier",
-									"description": "Indicator unique identifier",
-									"type": "string"
-								},
+								"title": "Identifier",
+								"description": "Indicator unique identifier",
+								"type": "string"
+							},
 							"code": {
 								"title": "Indicator code",
 								"type": "string"
@@ -1381,173 +1401,104 @@
 					"required": [
 						"name"
 					]
-				}				
+				}
 			},
 			"required": [
 				"idno",
 				"name"
 			]
 		},
-		"data_structure": {
-			"type": "array",
-			"description": "Data structure definition",			
-				"items": {
-					"type": "object",
-					"properties": {
-						"name": {
-							"title": "Name",
-							"description": "Name (required)",
-							"type": "string",
-							"minLength": 1,
-							"maxLength": 100,
-							"pattern": "^[a-zA-Z0-9_]*$"
-						},
-						"label": {
-							"title": "Label",
-							"type": "string"
-						},
-						"description": {
-							"title": "Description",
-							"type": "string"
-						},
-						"data_type": {							
-							"title": "Data type",
-							"type": "string",
-							"enum":[
-								"string",
-								"integer",
-								"float",
-								"double",
-								"date",
-								"boolean"
-							]
-						},
-						"column_type": {
-							"title": "Column type",
-							"type": "string",
-							"enum":[
-								"dimension",
-								"time_period",
-								"measure",
-								"attribute",
-								"indicator_id",
-								"indicator_name",
-								"annotation",
-								"geography",
-								"observation_value",
-								"periodicity"
-							]
-						},	
-						"time_period_format": 
-						{
-							"title":"Time period format",
-							"type": "string",
-							"enum":[
-								"YYYY",
-								"YYYY-MM",
-								"YYYY-MM-DD",
-								"YYYY-MM-DDTHH:MM:SS",
-								"YYYY-MM-DDTHH:MM:SSZ"
-							]
-						},
-						"code_list": {
-							"title": "Code list",
-							"type": "array",
-							"items": {
-								"type": "object",
-								"properties": {
-									"code": {
-										"title": "Code",
-										"type": ["string", "number"],
-										"minLength": 1
-									},
-									"label": {
-										"title": "Label",
-										"type": ["string", "number"]
-									},
-									"description": {
-										"title": "Description",
-										"type": "string"
-									}
-								},
-								"required": [
-									"code"
-								],
-								"additionalProperties": false
-							}
-						},
-						"code_list_reference": {
-							"title": "Code list reference",							
-								"type": "object",
-								"properties": {
-									"id": {
-										"title": "Identifier (ID)",
-										"type": "string"
-									},
-									"name": {
-										"title": "Name",
-										"type": "string"
-									},
-									"version": {
-										"title": "Version",
-										"type": "string"
-									},
-									"uri": {
-										"title": "URI",
-										"description": "URI",
-										"type": "string"
-									},
-									"note": {
-										"title": "Note",
-										"description": "Note",
-										"type": "string"
-									}
-								},
-								"required": [
-									"uri"
-								]
-						}
-					},
-					"required": [
-						"name",
-						"data_type",
-						"column_type"
-					],
-					"additionalProperties": false
+		"data_structure_reference": {
+			"type": "object",
+			"title": "Data structure reference",
+			"description": "Canonical link to a global catalogue DSD. This identity must include idno plus SDMX-style maintainable identity (agency, name, version). Optional uri documents where to find the artefact (e.g. external registry or documentation page); not used for import. Optional notes carry free-text context for editors or publication.",
+			"properties": {
+				"idno": {
+					"title": "DSD idno",
+					"type": "string",
+					"minLength": 1,
+					"maxLength": 191
+				},
+				"agency": {
+					"title": "Agency",
+					"type": "string",
+					"minLength": 1,
+					"maxLength": 64
+				},
+				"name": {
+					"title": "Maintainable id",
+					"type": "string",
+					"minLength": 1,
+					"maxLength": 64
+				},
+				"version": {
+					"title": "Version",
+					"type": "string",
+					"minLength": 1,
+					"maxLength": 32
+				},
+				"uri": {
+					"title": "Source URI",
+					"description": "Optional URL to registry page, documentation, or external definition for discoverability.",
+					"type": "string",
+					"format": "uri",
+					"maxLength": 2048
+				},
+				"notes": {
+					"title": "Notes",
+					"description": "Optional free-text notes about this DSD link (e.g. rationale, local usage context).",
+					"type": "string"
 				}
+			},
+			"required": ["idno", "agency", "name", "version"],
+			"additionalProperties": false
 		},
-		"data_notes":{
+		"data_notes": {
 			"type": "array",
 			"title": "Data notes",
 			"description": "Data notes",
 			"items": {
 				"type": "object",
-				"properties": {					
-					  "filters":{
+				"properties": {
+					"filters": {
 						"type": "array",
 						"title": "Filters",
 						"description": "Filters",
 						"items": {
 							"type": "object",
 							"properties": {
-											"field": {
-												"title": "Field",
-												"type": "string"
-											},
-											"operator": {
-												"title": "Operator",												
-												"type": "string",
-												"enum": ["=", "!=", "<", "<=", ">", ">=", "in", "!in"]
-											},
-											"value": {
-												"title": "Value",
-												"type": ["string", "number", "boolean", "array"]
-											}
-										}
-					  	}
-					},					
+								"field": {
+									"title": "Field",
+									"type": "string"
+								},
+								"operator": {
+									"title": "Operator",
+									"type": "string",
+									"enum": [
+										"=",
+										"!=",
+										"<",
+										"<=",
+										">",
+										">=",
+										"in",
+										"!in"
+									]
+								},
+								"value": {
+									"title": "Value",
+									"type": [
+										"string",
+										"number",
+										"boolean",
+										"array"
+									]
+								}
+							}
+						}
+					},
 					"note": {
-						"title": "Note",			
+						"title": "Note",
 						"type": "string"
 					}
 				}
@@ -1555,12 +1506,12 @@
 		},
 		"datacite": {
 			"type": "object",
-			"description": "DataCite metadata for generating DOI",			
-			"$ref": "datacite-schema.json"			
+			"description": "DataCite metadata for generating DOI",
+			"$ref": "datacite-schema.json"
 		},
 		"provenance": {
-          "$ref": "provenance-schema.json"
-        },
+			"$ref": "provenance-schema.json"
+		},
 		"tags": {
 			"type": "array",
 			"title": "Tags (user-defined)",

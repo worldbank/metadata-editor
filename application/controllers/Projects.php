@@ -63,6 +63,8 @@ class Projects extends MY_Controller {
 				$this->lang->load("geospatial");
 			}
 
+			$this->lang->load('indicator_dsd');
+
 			$options['translations']=$this->lang->language;
 
 			$template=$this->get_project_template($project);
@@ -71,8 +73,15 @@ class Projects extends MY_Controller {
 				show_error("Template not found for project");
 			}
 
+			$tpl_body = isset($template['template']) && is_array($template['template'])
+				? $template['template']
+				: null;
+			$options['template_structure_valid'] = $tpl_body !== null
+				&& isset($tpl_body['items'])
+				&& is_array($tpl_body['items']);
+
 			$options['metadata_template']=json_encode($template);
-			$options['metadata_template_arr']=$template['template'];
+			$options['metadata_template_arr']=$tpl_body !== null ? $tpl_body : array();
 			$options['metadata_schema']=file_get_contents($schema_path);
 			$options['post_url']=site_url('api/editor/update/'.$project['type'].'/'.$project['id']);
 			$options['user_has_edit_access']=$this->user_has_edit_access($project['id']);

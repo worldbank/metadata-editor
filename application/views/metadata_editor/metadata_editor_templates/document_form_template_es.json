@@ -1,0 +1,1933 @@
+{
+	"type": "template",
+	"title": "Proyecto de documento",
+	"uid": "document-system-es",
+	"data_type": "document",
+	"lang": "es",
+	"template_type": "custom",
+	"name": "Documento IHSN Esquema 1.0 ES",
+	"version": "1.0",
+	"organization": "IHSN",
+	"author": "MA OD",
+	"description": "",
+	"items": [
+		{
+			"type": "section_container",
+			"key": "metadata_information",
+			"title": "Información de metadatos",
+			"class": "mandatory recommended",
+			"expanded": true,
+			"items": [
+				{
+					"key": "metadata_information1674165212128",
+					"title": "Información sobre metadatos",
+					"type": "section",
+					"items": [
+						{
+							"key": "metadata_information.title",
+							"type": "string",
+							"title": "Título del documento",
+							"help_text": "El título del documento de metadatos (que normalmente será el mismo que el elemento \"Título\" en la sección \"Descripción del documento/Declaración de título\"). El documento de metadatos es el archivo de metadatos (archivo XML o JSON) que se está generando.",
+							"display_type": "text"
+						},
+						{
+							"key": "metadata_information.idno",
+							"type": "string",
+							"class": "idno",
+							"title": "Identificación del documento",
+							"help_text": "Un identificador único para el documento de metadatos. Este identificador debe ser único en el catálogo donde se pretende publicar los metadatos. Idealmente, el identificador también debería ser único a nivel mundial. Esto es diferente del \"ID principal\" en la sección \"Descripción del documento/Declaración del título\", aunque es una buena práctica generar identificadores que establezcan una conexión clara entre estos dos identificadores. El ID del documento también podría incluir el identificador de la versión del documento de metadatos. Por ejemplo, si el \"ID principal\" de la publicación es \"978-1-4648-1342-9\", el ID del documento podría ser \"IHSN_978-1-4648-1342-9_v1.0\" si los metadatos son producidos por la IHSN y si esta es la versión 1.0 de los metadatos. Cada organización debe establecer reglas sistemáticas para generar dichas identificaciones. Se puede establecer una regla de validación (usando una expresión regular) en las plantillas de usuario para aplicar un formato de identificación específico. El identificador no podrá contener espacios en blanco.",
+							"display_type": "text"
+						},
+						{
+							"key": "metadata_information.producers",
+							"class": "required",
+							"title": "Productores de metadatos",
+							"type": "array",
+							"props": [
+								{
+									"key": "name",
+									"title": "Nombre",
+									"type": "string",
+									"help_text": "El nombre de la persona u organización que produjo los metadatos o contribuyó a su producción.",
+									"class": "required",
+									"prop_key": "metadata_information.producers.name",
+									"display_type": "text"
+								},
+								{
+									"key": "abbr",
+									"title": "Abreviatura",
+									"type": "string",
+									"prop_key": "metadata_information.producers.abbr",
+									"help_text": "La abreviatura (o acrónimo) de la organización a la que se hace referencia en \"Nombre\".",
+									"display_type": "text"
+								},
+								{
+									"key": "affiliation",
+									"type": "string",
+									"title": "Afiliación",
+									"prop_key": "metadata_information.producers.affiliation",
+									"help_text": "La afiliación de la persona u organización mencionada en \"Nombre\".",
+									"display_type": "text"
+								},
+								{
+									"key": "role",
+									"title": "Rol",
+									"type": "string",
+									"prop_key": "metadata_information.producers.role",
+									"help_text": "El papel específico de la persona u organización mencionada en \"Nombre\" en la producción de los metadatos.",
+									"display_type": "textarea"
+								}
+							],
+							"help_text": "El productor de metadatos es la persona u organización con la responsabilidad financiera y/o administrativa de los procesos mediante los cuales se creó el documento de metadatos. Este es un elemento \"recomendado\". Para fines de administración del catálogo, es útil la información sobre el productor y la fecha de producción de los metadatos.",
+							"is_recommended": true
+						},
+						{
+							"key": "metadata_information.production_date",
+							"type": "string",
+							"class": "required",
+							"title": "Fecha de producción",
+							"help_text": "La fecha en que se produjeron los metadatos de este documento (no se distribuyeron ni se archivaron), preferiblemente ingresada en formato ISO 8601 (AAAA-MM-DD o AAAA-MM). Se puede establecer una regla de validación en las plantillas de usuario para aplicar un formato de fecha. Este es un elemento \"Recomendado\", ya que la información sobre el productor y la fecha de producción de los metadatos es útil para fines de administración del catálogo.",
+							"is_recommended": true,
+							"display_type": "text"
+						},
+						{
+							"key": "metadata_information.version",
+							"type": "string",
+							"class": "required",
+							"title": "Versión",
+							"help_text": "La versión del documento de metadatos (no la versión de la publicación, informe u otro recurso documentado).",
+							"display_type": "text"
+						}
+					],
+					"help_text": ""
+				}
+			]
+		},
+		{
+			"type": "section_container",
+			"key": "document",
+			"title": "Descripción del documento",
+			"class": "mandatory recommended",
+			"expanded": true,
+			"items": [
+				{
+					"type": "section",
+					"key": "title_statement",
+					"title": "Declaración de título",
+					"class": "recommended",
+					"items": [
+						{
+							"key": "document_description.title_statement.idno",
+							"title": "ID principal",
+							"help_text": "Un identificador único del documento. La \"ID principal\" (también conocida como IDNO) es un número de identificación único que se utiliza para identificar la base de datos. Se requiere un identificador único para fines de catalogación, por lo que este elemento se declara como \"Obligatorio\". El identificador permitirá a los usuarios citar el indicador/serie correctamente. El identificador debe ser único dentro del catálogo. Idealmente, también debería ser único a nivel mundial; la opción recomendada es obtener un Identificador de Objeto Digital (DOI) para el estudio. Alternativamente, una organización puede construir la \"ID principal\" utilizando un esquema consistente. Tenga en cuenta que el esquema le permite proporcionar más de un identificador para un mismo estudio (en el elemento \"Otros identificadores\"); Por lo tanto, un identificador específico de un catálogo no es incompatible con un identificador único global como un DOI. Se puede establecer una regla de validación (usando una expresión regular) en las plantillas de usuario para aplicar un formato de identificación específico. El identificador no podrá contener espacios en blanco.",
+							"type": "string",
+							"class": "required",
+							"_rules": "required|idno|alpha_dash|min:5|max:80",
+							"required": true,
+							"is_required": true,
+							"display_type": "text"
+						},
+						{
+							"key": "document_description.identifiers",
+							"title": "Otros identificadores",
+							"type": "array",
+							"help_text": "Este elemento se utiliza para ingresar identificadores de documentos (ID) distintos del ID del catálogo ingresado en el \"ID principal\" (IDNO). Puede ser, por ejemplo, un identificador de objeto digital (DOI), un número de libro estándar internacional (ISBN) o un número de serie estándar internacional (ISSN). El \"ID principal\" se puede repetir aquí (el \"ID principal\" no proporciona un parámetro de \"Tipo\"; si se utiliza un DOI, ISBN, ISSN u otro ID de referencia estándar como ID principal, se recomienda repetirlo aquí con la identificación de su tipo).",
+							"props": [
+								{
+									"key": "type",
+									"title": "Tipo",
+									"type": "string",
+									"help_text": "El tipo de identificador, por ejemplo \"DOI\", \"ISBN\" o \"ISSN\".",
+									"prop_key": "document_description.identifiers.type",
+									"display_type": "text"
+								},
+								{
+									"key": "identifier",
+									"title": "Identificador",
+									"type": "string",
+									"prop_key": "document_description.identifiers.identifier",
+									"help_text": "El identificador en sí.",
+									"display_type": "text"
+								}
+							]
+						},
+						{
+							"key": "document_description.title_statement.title",
+							"title": "Título",
+							"type": "string",
+							"class": "required",
+							"required": true,
+							"_rules": "required|max:300",
+							"name": "title",
+							"is_required": true,
+							"help_text": "El título del libro, informe, artículo u otro documento. Preste atención al uso de mayúsculas en el título para garantizar la coherencia entre los documentos enumerados en su catálogo. Preste atención al uso constante de mayúsculas en el título. Se recomienda utilizar mayúsculas en las oraciones.",
+							"display_type": "text"
+						},
+						{
+							"key": "document_description.title_statement.sub_title",
+							"title": "Subtitular",
+							"type": "string",
+							"_rules": "max:300",
+							"help_text": "El subtítulo del documento se puede utilizar cuando es necesario distinguir características de un documento. Preste atención al uso constante de mayúsculas en el subtítulo.",
+							"display_type": "text"
+						},
+						{
+							"key": "document_description.title_statement.alternate_title",
+							"title": "Título alternativo",
+							"type": "string",
+							"help_text": "Una versión alternativa del título, posiblemente una versión abreviada. Por ejemplo, el Informe sobre el Desarrollo Mundial del Banco Mundial suele denominarse IDM; El título alternativo del “Informe sobre el desarrollo mundial 2021” podría ser “WDR 2021”.",
+							"display_type": "text"
+						},
+						{
+							"key": "document_description.title_statement.translated_title",
+							"title": "Título traducido",
+							"help_text": "Una traducción del título del documento. Los caracteres especiales deben mostrarse correctamente, como acentos y otras marcas de acento o alfabetos diferentes.",
+							"type": "string",
+							"display_type": "text"
+						}
+					]
+				},
+				{
+					"type": "section",
+					"key": "date_info",
+					"title": "Fechas",
+					"class": "recommended",
+					"items": [
+						{
+							"key": "document_description.date_created",
+							"title": "Fecha de creación",
+							"type": "string",
+							"class": "recommended",
+							"help_text": "La fecha, preferiblemente ingresada en formato ISO 8601 (AAAA-MM-DD o AAAA-MM o AAAA), en la que se produjo el documento. Esto puede ser diferente de la fecha en que el documento fue publicado, puesto a disposición y de la cobertura temporal.",
+							"is_recommended": false,
+							"display_type": "text"
+						},
+						{
+							"key": "document_description.date_published",
+							"title": "Fecha de publicación",
+							"type": "string",
+							"class": "recommended",
+							"help_text": "La fecha, preferiblemente ingresada en formato ISO 8601 (AAAA-MM-DD o AAAA-MM o AAAA), en la que se publicó el documento.",
+							"is_recommended": true,
+							"display_type": "text"
+						},
+						{
+							"key": "document_description.date_modified",
+							"title": "Fecha de última modificación",
+							"type": "string",
+							"class": "recommended",
+							"help_text": "La fecha, preferiblemente ingresada en formato ISO 8601 (AAAA-MM-DD o AAAA-MM o AAAA) de la última modificación del documento.",
+							"display_type": "text"
+						},
+						{
+							"key": "document_description.date_available",
+							"title": "Fecha disponible",
+							"type": "string",
+							"class": "recommended",
+							"help_text": "La fecha, ingresada preferiblemente en formato ISO 8601 (AAAA-MM-DD o AAAA-MM o AAAA), en la que el documento estuvo disponible. Esto es diferente a la fecha en que fue publicado. Este elemento no se utilizará con frecuencia.",
+							"display_type": "text"
+						}
+					]
+				},
+				{
+					"type": "section",
+					"key": "authors",
+					"title": "Autores y colaboradores",
+					"class": "recommended",
+					"items": [
+						{
+							"key": "document_description.authors",
+							"title": "Autores",
+							"help_text": "Los autores deben enumerarse en el mismo orden en que aparecen en la fuente misma, que no es necesariamente alfabético.",
+							"type": "nested_array",
+							"props": [
+								{
+									"key": "first_name",
+									"title": "Nombre de pila",
+									"type": "string",
+									"help_text": "El nombre del autor.",
+									"prop_key": "document_description.authors.first_name",
+									"display_type": "text"
+								},
+								{
+									"key": "initial",
+									"title": "Inicial",
+									"type": "string",
+									"help_text": "Las iniciales del autor.",
+									"prop_key": "document_description.authors.initial",
+									"display_type": "text"
+								},
+								{
+									"key": "last_name",
+									"title": "Apellido",
+									"type": "string",
+									"help_text": "El apellido del autor.",
+									"prop_key": "document_description.authors.last_name",
+									"display_type": "text"
+								},
+								{
+									"key": "full_name",
+									"title": "nombre completo",
+									"type": "string",
+									"prop_key": "document_description.authors.full_name",
+									"help_text": "El nombre completo del autor. Utilice este elemento cuando el nombre no se pueda dividir en nombre y apellido.",
+									"display_type": "text"
+								},
+								{
+									"key": "affiliation",
+									"title": "Afiliación",
+									"type": "string",
+									"prop_key": "document_description.authors.affiliation",
+									"help_text": "La filiación del autor.",
+									"display_type": "text"
+								},
+								{
+									"key": "author_id",
+									"type": "array",
+									"title": "ID de autor",
+									"help_text": "Identificador único de un autor, que puede ser proporcionado por servicios como ORCID u otros",
+									"props": [
+										{
+											"key": "type",
+											"type": "string",
+											"title": "Tipo",
+											"prop_key": "document_description.authors.author_id.type",
+											"help_text": "El tipo de ID, es decir, la identificación del registro que asignó el identificador del autor, por ejemplo \"ORCID\".",
+											"display_type": "text"
+										},
+										{
+											"key": "id",
+											"type": "string",
+											"title": "IDENTIFICACIÓN",
+											"prop_key": "document_description.authors.author_id.id",
+											"help_text": "El ID del autor en el registro mencionado en `tipo`.",
+											"display_type": "text"
+										}
+									],
+									"prop_key": "document_description.authors.author_id"
+								}
+							],
+							"is_recommended": true
+						},
+						{
+							"key": "document_description.editors",
+							"title": "Editores",
+							"help_text": "Si la fuente es un texto dentro de un volumen editado, debe aparecer bajo el nombre del autor del texto utilizado, no bajo el nombre del editor. Sin embargo, en la cita bibliográfica se debe proporcionar el nombre del editor, de acuerdo con el estilo de referencia. El elemento tiene cuatro subelementos: nombre del editor, iniciales del editor, apellido del editor y afiliación del editor.",
+							"type": "array",
+							"props": [
+								{
+									"key": "first_name",
+									"title": "Nombre de pila",
+									"type": "string",
+									"help_text": "El nombre del editor.",
+									"prop_key": "document_description.editors.first_name",
+									"display_type": "text"
+								},
+								{
+									"key": "initial",
+									"title": "Inicial",
+									"type": "string",
+									"help_text": "Las iniciales del editor.",
+									"prop_key": "document_description.editors.initial",
+									"display_type": "text"
+								},
+								{
+									"key": "last_name",
+									"title": "Apellido",
+									"type": "string",
+									"help_text": "El apellido del editor.",
+									"prop_key": "document_description.editors.last_name",
+									"display_type": "text"
+								},
+								{
+									"key": "affiliation",
+									"title": "Afiliación",
+									"type": "string",
+									"prop_key": "document_description.editors.affiliation",
+									"help_text": "La afiliación del editor.",
+									"display_type": "text"
+								}
+							]
+						},
+						{
+							"key": "document_description.translators",
+							"title": "Traductores",
+							"help_text": "Información sobre traductores, para publicaciones que son traducciones de publicaciones creadas originalmente en otro idioma.",
+							"type": "array",
+							"props": [
+								{
+									"key": "first_name",
+									"title": "Nombre de pila",
+									"type": "string",
+									"help_text": "El nombre del traductor.",
+									"prop_key": "document_description.translators.first_name",
+									"display_type": "text"
+								},
+								{
+									"key": "initial",
+									"title": "Inicial",
+									"type": "string",
+									"help_text": "Las iniciales del traductor.",
+									"prop_key": "document_description.translators.initial",
+									"display_type": "text"
+								},
+								{
+									"key": "last_name",
+									"title": "Apellido",
+									"type": "string",
+									"help_text": "El apellido del traductor.",
+									"prop_key": "document_description.translators.last_name",
+									"display_type": "text"
+								},
+								{
+									"key": "affiliation",
+									"title": "Afiliación",
+									"type": "string",
+									"prop_key": "document_description.translators.affiliation",
+									"help_text": "La afiliación del traductor.",
+									"display_type": "text"
+								}
+							]
+						},
+						{
+							"key": "document_description.contributors",
+							"title": "Otros contribuyentes",
+							"help_text": "Estos elementos se utilizan para reconocer las contribuciones a la producción del documento, distintas de aquellas para las que se proporcionan elementos de metadatos específicos (como autores o traductores).",
+							"type": "array",
+							"props": [
+								{
+									"key": "first_name",
+									"title": "Nombre de pila",
+									"type": "string",
+									"help_text": "El nombre del colaborador.",
+									"prop_key": "document_description.contributors.first_name",
+									"display_type": "text"
+								},
+								{
+									"key": "initial",
+									"title": "Inicial",
+									"type": "string",
+									"help_text": "Las iniciales del colaborador.",
+									"prop_key": "document_description.contributors.initial",
+									"display_type": "text"
+								},
+								{
+									"key": "last_name",
+									"title": "Apellido",
+									"type": "string",
+									"help_text": "El apellido del colaborador. Si el contribuyente es una organización, ingrese aquí el nombre de la organización.",
+									"prop_key": "document_description.contributors.last_name",
+									"display_type": "text"
+								},
+								{
+									"key": "affiliation",
+									"title": "Afiliación",
+									"type": "string",
+									"prop_key": "document_description.contributors.affiliation",
+									"help_text": "La afiliación del contribuyente.",
+									"display_type": "text"
+								},
+								{
+									"key": "contribution",
+									"title": "Contribución",
+									"type": "string",
+									"prop_key": "document_description.contributors.contribution",
+									"help_text": "Una breve descripción de la contribución específica de la persona al documento, p.e. “Diseño de portada”, o “Corrección”.",
+									"display_type": "textarea"
+								}
+							]
+						}
+					]
+				},
+				{
+					"key": "document1673376374410",
+					"title": "Información bibliográfica",
+					"type": "section",
+					"items": [
+						{
+							"key": "document_description.bibliographic_citation",
+							"title": "Cita bibliográfica",
+							"type": "array",
+							"props": [
+								{
+									"key": "style",
+									"title": "Estilo",
+									"type": "string",
+									"help_text": "El estilo de cita, p.e. “MLA”, “APA” o “Chicago”.",
+									"prop_key": "document_description.bibliographic_citation.style",
+									"display_type": "text"
+								},
+								{
+									"key": "citation",
+									"title": "Citación",
+									"type": "string",
+									"prop_key": "document_description.bibliographic_citation.citation",
+									"help_text": "La cita ingresada en el estilo mencionado en \"Estilo\". Por ejemplo (con Estilo = MLA): Davidson, Russell y Jean-Yves Duclos. \"Inferencia estadística para la dominancia estocástica y para la medición de la pobreza y la desigualdad\". Econométrica, vol. 68, núm. 6, [Wiley, Econometric Society], 2000, págs. 1435–64, http://www.jstor.org/stable/3003995.",
+									"display_type": "textarea"
+								}
+							],
+							"help_text": "La cita bibliográfica proporciona información relevante sobre el autor y la publicación. Cuando se utiliza el elemento \"Cita bibliográfica\", la cita se proporciona como un solo elemento. Debe proporcionarse en un estilo estándar: Asociación de Lenguas Modernas (MLA), Asociación Estadounidense de Psicología (APA) o Chicago. \nNota: Las plantillas de BibTex (disponibles en https://www.bibtex.com/format/) proporcionan una lista útil de campos obligatorios y opcionales por tipo de documento."
+						},
+						{
+							"key": "document_description.booktitle",
+							"title": "Título del libro",
+							"type": "string",
+							"help_text": "Título de un libro, parte del cual se cita. Si estás documentando el libro en sí, este elemento no se utilizará; sólo se utiliza cuando se está documentando parte de un libro.\nNota: Las plantillas de BibTex (disponibles en https://www.bibtex.com/format/) proporcionan una lista útil de campos obligatorios y opcionales por tipo de documento.",
+							"enum": [],
+							"display_type": "text"
+						},
+						{
+							"key": "document_description.chapter",
+							"title": "Capítulo",
+							"type": "string",
+							"help_text": "Un número de capítulo (o sección). Este elemento sólo se utiliza para documentar un recurso que ha sido extraído de un libro.\nNota: Las plantillas de BibTex (disponibles en https://www.bibtex.com/format/) proporcionan una lista útil de campos obligatorios y opcionales por tipo de documento.",
+							"enum": [],
+							"display_type": "text"
+						},
+						{
+							"key": "document_description.edition",
+							"title": "Edición",
+							"type": "string",
+							"help_text": "La edición de un libro, por ejemplo \"Segundo\". Cuando un libro no tiene número/nombre de edición, se puede asumir que es una primera edición. Si la edición es distinta a la primera, en la cita se debe mencionar información sobre la edición del libro que se documenta. La edición puede identificarse mediante un número, una etiqueta (como “Edición revisada” o “Edición abreviada”) y/o un año. La primera letra de la etiqueta debe estar en mayúscula.\nNota: Las plantillas de BibTex (disponibles en https://www.bibtex.com/format/) proporcionan una lista útil de campos obligatorios y opcionales por tipo de documento.",
+							"enum": [],
+							"display_type": "text"
+						},
+						{
+							"key": "document_description.institution",
+							"title": "Nombre de la institución",
+							"type": "string",
+							"help_text": "La institución patrocinadora de un informe técnico. Para citas de maestría y doctorado. tesis, este será el nombre de la escuela.\nNota: Las plantillas de BibTex (disponibles en https://www.bibtex.com/format/) proporcionan una lista útil de campos obligatorios y opcionales por tipo de documento.",
+							"enum": [],
+							"display_type": "text"
+						},
+						{
+							"key": "document_description.journal",
+							"title": "Nombre de la revista",
+							"type": "string",
+							"help_text": "Un nombre de revista. Se proporcionan abreviaturas para muchas revistas.\nNota: Las plantillas de BibTex (disponibles en https://www.bibtex.com/format/) proporcionan una lista útil de campos obligatorios y opcionales por tipo de documento.",
+							"enum": [],
+							"display_type": "text"
+						},
+						{
+							"key": "document_description.volume",
+							"title": "Volumen",
+							"type": "string",
+							"help_text": "El volumen de una revista o libro de varios volúmenes. Las publicaciones periódicas, como las revistas académicas, se publican periódicamente en entregas denominadas números. Un volumen suele estar formado por los números publicados durante un año.\nNota: Las plantillas de BibTex (disponibles en https://www.bibtex.com/format/) proporcionan una lista útil de campos obligatorios y opcionales por tipo de documento.",
+							"enum": [],
+							"display_type": "text"
+						},
+						{
+							"key": "document_description.number",
+							"title": "Número",
+							"type": "string",
+							"help_text": "El número de una revista, informe técnico o de un trabajo de una serie. Un número de una revista o periódico suele identificarse por su volumen (ver elemento anterior) y número; la organización que emite un informe técnico suele darle un número; y, a veces, a los libros se les asignan números en una serie nombrada.\nNota: Las plantillas de BibTex (disponibles en https://www.bibtex.com/format/) proporcionan una lista útil de campos obligatorios y opcionales por tipo de documento.",
+							"enum": [],
+							"display_type": "text"
+						},
+						{
+							"key": "document_description.pages",
+							"title": "paginas",
+							"type": "string",
+							"help_text": "Uno o más números de página o rango de números, como 42-111 o 7,41,73-97 o 43+ (el \"+\" indica las páginas siguientes que no forman un rango simple).\nNota: Las plantillas de BibTex (disponibles en https://www.bibtex.com/format/) proporcionan una lista útil de campos obligatorios y opcionales por tipo de documento.",
+							"enum": [],
+							"display_type": "text"
+						},
+						{
+							"key": "document_description.publisher",
+							"title": "Nombre del editor",
+							"type": "string",
+							"help_text": "La entidad responsable de poner a disposición el recurso. Para las principales editoriales, la información se puede omitir. Para editoriales pequeñas, se recomienda proporcionar la dirección completa. Si la empresa es una editorial universitaria, se puede utilizar la abreviatura UP (de University Press). No se indica el editor para artículos de revistas, documentos de trabajo y tipos de documentos similares.\nNota: Las plantillas de BibTex (disponibles en https://www.bibtex.com/format/) proporcionan una lista útil de campos obligatorios y opcionales por tipo de documento.",
+							"enum": [],
+							"display_type": "text"
+						},
+						{
+							"key": "document_description.publisher_address",
+							"title": "Dirección del editor",
+							"type": "string",
+							"help_text": "La dirección del editor. Para las principales editoriales, sólo se indica la ciudad. Para editoriales pequeñas, se puede proporcionar la dirección completa.\nNota: Las plantillas de BibTex (disponibles en https://www.bibtex.com/format/) proporcionan una lista útil de campos obligatorios y opcionales por tipo de documento.",
+							"enum": [],
+							"display_type": "text"
+						},
+						{
+							"key": "document_description.series",
+							"title": "Nombre de la serie",
+							"type": "string",
+							"class": "recommended",
+							"help_text": "El nombre de una serie o conjunto de libros. Al citar un libro completo, el campo de título proporciona su título y un campo de serie opcional proporciona el nombre de una serie o conjunto de varios volúmenes en el que se publica el libro.\nNota: Las plantillas de BibTex (disponibles en https://www.bibtex.com/format/) proporcionan una lista útil de campos obligatorios y opcionales por tipo de documento.",
+							"enum": [],
+							"display_type": "text"
+						},
+						{
+							"key": "document_description.crossref",
+							"title": "Referencia cruzada",
+							"type": "string",
+							"help_text": "El identificador del catálogo (“clave de la base de datos”) de otra entrada del catálogo a la que se hace referencia cruzada. Este elemento podrá utilizarse cuando varias entradas hagan referencia a una misma publicación, para evitar duplicaciones.\nNota: Las plantillas de BibTex (disponibles en https://www.bibtex.com/format/) proporcionan una lista útil de campos obligatorios y opcionales por tipo de documento.",
+							"enum": [],
+							"display_type": "text"
+						},
+						{
+							"key": "document_description.key",
+							"title": "Llave",
+							"type": "string",
+							"help_text": "Una clave es un campo que se utiliza para alfabetizar, hacer referencias cruzadas y crear una etiqueta cuando falta la información del \"autor\".\nNota: Las plantillas de BibTex (disponibles en https://www.bibtex.com/format/) proporcionan una lista útil de campos obligatorios y opcionales por tipo de documento.",
+							"enum": [],
+							"display_type": "text"
+						},
+						{
+							"key": "document_description.organization",
+							"title": "Organización",
+							"type": "string",
+							"help_text": "La organización que patrocina una conferencia o que publica un manual.\nNota: Las plantillas de BibTex (disponibles en https://www.bibtex.com/format/) proporcionan una lista útil de campos obligatorios y opcionales por tipo de documento.",
+							"enum": [],
+							"display_type": "text"
+						},
+						{
+							"key": "document_description.annote",
+							"title": "Anotación",
+							"type": "string",
+							"help_text": "Una anotación. Este elemento no será utilizado por estilos de bibliografía estándar como MLA, APA o Chicago, pero puede ser utilizado por otros que produzcan una bibliografía comentada.\nNota: Las plantillas de BibTex (disponibles en https://www.bibtex.com/format/) proporcionan una lista útil de campos obligatorios y opcionales por tipo de documento.",
+							"enum": [],
+							"display_type": "text"
+						},
+						{
+							"key": "document_description.howpublished",
+							"title": "Como publicado",
+							"type": "string",
+							"help_text": "El elemento \"Cómo se publicó\" se utiliza para almacenar el aviso de publicaciones inusuales. La primera palabra debe estar en mayúscula. Por ejemplo, “Página web” o “Distribuido en la oficina de turismo local”.\nNota: Las plantillas de BibTex (disponibles en https://www.bibtex.com/format/) proporcionan una lista útil de campos obligatorios y opcionales por tipo de documento.",
+							"enum": [],
+							"display_type": "text"
+						},
+						{
+							"key": "document_description.url",
+							"title": "URL",
+							"type": "string",
+							"help_text": "La URL del documento, preferiblemente una URL permanente.\nNota: Las plantillas de BibTex (disponibles en https://www.bibtex.com/format/) proporcionan una lista útil de campos obligatorios y opcionales por tipo de documento.",
+							"enum": [],
+							"rules": {
+								"is_uri": true
+							},
+							"display_type": "text"
+						}
+					],
+					"help_text": ""
+				},
+				{
+					"type": "section",
+					"key": "document_description",
+					"title": "Descripción del contenido",
+					"class": "recommended",
+					"items": [
+						{
+							"key": "document_description.type",
+							"title": "Tipo de documento",
+							"type": "string",
+							"enum": [
+								{
+									"code": "article",
+									"label": "Artículo"
+								},
+								{
+									"code": "book",
+									"label": "Libro"
+								},
+								{
+									"code": "booklet",
+									"label": "Folleto"
+								},
+								{
+									"code": "collection",
+									"label": "Recopilación"
+								},
+								{
+									"code": "conference proceedings",
+									"label": "Actas de la conferencia"
+								},
+								{
+									"code": "manual",
+									"label": "Manual"
+								},
+								{
+									"code": "master thesis",
+									"label": "Tesis de maestría"
+								},
+								{
+									"code": "methodology document",
+									"label": "Documento de metodología"
+								},
+								{
+									"code": "patent",
+									"label": "Patentar"
+								},
+								{
+									"code": "PhD thesis",
+									"label": "Tesis doctoral"
+								},
+								{
+									"code": "press release",
+									"label": "presione soltar"
+								},
+								{
+									"code": "proceedings",
+									"label": "Actas"
+								},
+								{
+									"code": "protocol",
+									"label": "Protocolo"
+								},
+								{
+									"code": "technical report",
+									"label": "Informe técnico"
+								},
+								{
+									"code": "working paper",
+									"label": "documento de trabajo"
+								},
+								{
+									"code": "website",
+									"label": "Sitio web"
+								},
+								{
+									"code": "yearbook",
+									"label": "Anuario"
+								},
+								{
+									"code": "other",
+									"label": "Otro"
+								}
+							],
+							"help_text": "Esto describe la naturaleza del recurso. Se recomienda seleccionar un valor de un vocabulario controlado, que podría incluir, por ejemplo, las siguientes opciones: \"artículo\", \"libro\", \"folleto\", \"colección\", \"actas de congresos\", \"manual\", \"tesis de maestría\", \"patente\", \"tesis doctoral\", \"actas\", \"informe técnico\", \"documento de trabajo\", \"sitio web\", \"otro\". Es posible que las agencias especializadas quieran crear sus propios vocabularios controlados; por ejemplo, un organismo nacional de estadística puede necesitar opciones como \"comunicado de prensa\", \"documento de metodología\", \"protocolo\" o \"anuario\".",
+							"is_recommended": true,
+							"display_type": "dropdown-custom"
+						},
+						{
+							"key": "document_description.publication_frequency",
+							"title": "Frecuencia de publicación",
+							"type": "string",
+							"help_text": "Algunos documentos se publican periódicamente. La frecuencia de las publicaciones se puede documentar utilizando este elemento. Se puede proporcionar un vocabulario controlado en plantillas de usuario, por ejemplo, el Vocabulario de frecuencia de publicación PRISM que identifica las frecuencias de publicación estándar para una publicación periódica o en serie con las siguientes opciones:\n- anualmente (publicado una vez al año)\n- semestralmente (publicado dos veces al año)\n- trimestral (publicado cada 3 meses o una vez por trimestre)\n- bimestral (publicado dos veces al mes)\n- mensual (publicado una vez al mes)\n- quincenal (publicado dos veces por semana)\n- semanal (publicado una vez por semana)\n- diario (publicado todos los días)\n- continuamente (publicado continuamente a medida que se agrega contenido nuevo; típico de sitios web y blogs, generalmente varias veces al día)\n- irregularmente (publicado en un horario irregular, como todos los meses excepto julio y agosto)\n- otro (publicado en otro horario no enumerado en este vocabulario controlado)",
+							"enum": [
+								{
+									"code": "annually",
+									"label": "Anual"
+								},
+								{
+									"code": "semiannually",
+									"label": "Semestralmente"
+								},
+								{
+									"code": "quarterly",
+									"label": "Trimestral"
+								},
+								{
+									"code": "bimonthly",
+									"label": "Bimensual"
+								},
+								{
+									"code": "monthly",
+									"label": "Mensual"
+								},
+								{
+									"code": "biweekly",
+									"label": "Quincenal"
+								},
+								{
+									"code": "weekly",
+									"label": "Semanalmente"
+								},
+								{
+									"code": "daily",
+									"label": "A diario"
+								},
+								{
+									"code": "continually",
+									"label": "Continuamente"
+								},
+								{
+									"code": "irregularly",
+									"label": "irregularmente"
+								},
+								{
+									"code": "other",
+									"label": "Otro"
+								}
+							],
+							"display_type": "dropdown-custom"
+						},
+						{
+							"key": "document_description.languages",
+							"title": "Idioma",
+							"help_text": "El idioma(s) en el que está escrito el documento. Para los códigos y nombres de idiomas se recomienda el uso de la norma ISO 639-2.",
+							"type": "array",
+							"props": [
+								{
+									"key": "name",
+									"title": "Nombre",
+									"type": "string",
+									"help_text": "El nombre del idioma.",
+									"prop_key": "document_description.languages.name",
+									"display_type": "text"
+								},
+								{
+									"key": "code",
+									"title": "Código",
+									"type": "string",
+									"help_text": "El código de la lengua. Se recomienda el uso de la norma ISO 639-2 (el código alfa-3 en Códigos para la representación de nombres de idiomas).",
+									"prop_key": "document_description.languages.code",
+									"display_type": "text"
+								}
+							],
+							"is_recommended": true
+						},
+						{
+							"key": "document_description.description",
+							"title": "Descripción",
+							"type": "string",
+							"class": "recommended",
+							"help_text": "Este elemento se utiliza para proporcionar una breve descripción del documento (no un resumen, que se proporcionaría en el campo \"abstract\"). No debe utilizarse para proporcionar contenidos contenidos en otros elementos más específicos. El campo \"Descripción\" es una fuente potencialmente rica de términos indexables; por lo que se debe tener cuidado de proporcionar esta información cuando sea posible. La recomendación de mejores prácticas para este elemento es utilizar oraciones completas, ya que la descripción se utiliza a menudo para presentar información a los usuarios para ayudarles en la selección de recursos apropiados de un conjunto de resultados de búsqueda.",
+							"enum": [],
+							"display_type": "textarea"
+						},
+						{
+							"key": "document_description.abstract",
+							"title": "Abstracto",
+							"type": "string",
+							"help_text": "El resumen es un resumen del documento, generalmente de uno o dos párrafos (alrededor de 150 a 300 palabras).",
+							"is_recommended": true,
+							"enum": [],
+							"display_type": "textarea"
+						},
+						{
+							"key": "document_description.scope",
+							"title": "Alcance",
+							"help_text": "Una descripción textual de los temas tratados en el documento, que complementa (pero no duplica) los elementos \"Descripción\" y \"Temas\" disponibles en la plantilla.",
+							"type": "string",
+							"enum": [],
+							"display_type": "textarea"
+						},
+						{
+							"key": "document_description.keywords",
+							"type": "array",
+							"title": "Palabras clave",
+							"props": [
+								{
+									"key": "name",
+									"title": "Palabra clave",
+									"type": "string",
+									"prop_key": "document_description.keywords.name",
+									"help_text": "La palabra clave (o frase) en sí.",
+									"display_type": "text"
+								},
+								{
+									"key": "vocabulary",
+									"title": "Vocabulario",
+									"type": "string",
+									"prop_key": "document_description.keywords.vocabulary",
+									"help_text": "El vocabulario controlado (incluido el número de versión o la fecha) del que se extrae la palabra clave, si corresponde.",
+									"display_type": "text"
+								},
+								{
+									"key": "uri",
+									"title": "URL",
+									"type": "string",
+									"prop_key": "document_description.keywords.uri",
+									"help_text": "La URL del vocabulario controlado del que se extrae la palabra clave, si corresponde.",
+									"rules": {
+										"is_uri": true
+									},
+									"display_type": "text"
+								}
+							],
+							"help_text": "Una lista de palabras clave que proporcionan información sobre el contenido del documento. Las palabras clave proporcionan una solución conveniente para mejorar la capacidad de descubrimiento del documento, ya que permiten indexar términos y frases que no se encuentran en el documento en sí y hacer que un documento sea reconocible por los motores de búsqueda basados ​​en texto. Se puede utilizar un vocabulario controlado (aunque no es obligatorio), como el Tesauro de la UNESCO (ver http://vocabularies.unesco.org/browser/thesaurus/en/). La lista proporcionada aquí puede combinar palabras clave de múltiples vocabularios controlados y palabras clave definidas por el usuario."
+						},
+						{
+							"key": "document_description.topics",
+							"type": "array",
+							"title": "Temas",
+							"props": [
+								{
+									"key": "id",
+									"title": "IDENTIFICACIÓN",
+									"type": "string",
+									"prop_key": "document_description.topics.id",
+									"help_text": "El identificador único del tema. Puede ser un número secuencial o el ID del tema en un vocabulario controlado.",
+									"display_type": "text"
+								},
+								{
+									"key": "name",
+									"title": "Tema",
+									"type": "string",
+									"prop_key": "document_description.topics.name",
+									"help_text": "La etiqueta del tema.",
+									"display_type": "text"
+								},
+								{
+									"key": "parent_id",
+									"title": "ID de padre",
+									"help_text": "Cuando se utiliza un vocabulario controlado jerárquico (anidado), el campo \"ID de padre\" se puede utilizar para indicar un tema de nivel superior al que pertenece este tema.",
+									"type": "string",
+									"prop_key": "document_description.topics.parent_id",
+									"display_type": "text"
+								},
+								{
+									"key": "vocabulary",
+									"title": "Vocabulario",
+									"type": "string",
+									"prop_key": "document_description.topics.vocabulary",
+									"help_text": "La especificación (nombre que incluye la versión y la fecha) del vocabulario controlado del que se toma el tema.",
+									"display_type": "text"
+								},
+								{
+									"key": "uri",
+									"title": "URL",
+									"type": "string",
+									"prop_key": "document_description.topics.uri",
+									"help_text": "Un enlace (URL) al sitio web de vocabulario controlado.",
+									"rules": {
+										"is_uri": true
+									},
+									"display_type": "text"
+								}
+							],
+							"help_text": "Los \"temas\" indican los temas sustantivos generales que cubre el documento. Una clasificación de temas facilita las referencias y búsquedas en catálogos electrónicos de encuestas; Por lo tanto, los temas deben seleccionarse de un vocabulario controlado estándar, por ejemplo, la clasificación de temas CESSDA (una tipología de temas disponibles en 11 idiomas; consulte https://vocabularies.cessda.eu/vocabulary/TopicClassification) o el sistema de clasificación del Journal of Economic Literature (JEL) (consulte https://en.wikipedia.org/wiki/JEL_classification_codes). La lista proporcionada aquí puede combinar temas de múltiples vocabularios controlados y temas definidos por el usuario."
+						},
+						{
+							"key": "document_description.themes",
+							"type": "array",
+							"title": "Temas",
+							"props": [
+								{
+									"key": "id",
+									"title": "IDENTIFICACIÓN",
+									"type": "string",
+									"prop_key": "document_description.themes.id",
+									"help_text": "El ID del tema, extraído de un vocabulario controlado.",
+									"display_type": "text"
+								},
+								{
+									"key": "name",
+									"title": "Tema",
+									"type": "string",
+									"prop_key": "document_description.themes.name",
+									"help_text": "El nombre (etiqueta) del tema, preferiblemente tomado de un vocabulario controlado.",
+									"display_type": "text"
+								},
+								{
+									"key": "parent_id",
+									"title": "ID de padre",
+									"type": "string",
+									"prop_key": "document_description.themes.parent_id",
+									"help_text": "El ID principal del tema (ID del elemento de un nivel superior en la jerarquía), si se utiliza un vocabulario controlado jerárquico.",
+									"display_type": "text"
+								},
+								{
+									"key": "vocabulary",
+									"title": "Vocabulario",
+									"type": "string",
+									"prop_key": "document_description.themes.vocabulary",
+									"help_text": "El nombre (incluido el número de versión) del vocabulario controlado utilizado, si corresponde.",
+									"display_type": "text"
+								},
+								{
+									"key": "uri",
+									"title": "URL",
+									"type": "string",
+									"prop_key": "document_description.themes.uri",
+									"help_text": "La URL del vocabulario controlado utilizado, si lo hubiera.",
+									"rules": {
+										"is_uri": true
+									},
+									"display_type": "text"
+								}
+							],
+							"help_text": "Una lista de temas cubiertos por el documento. Se utilizará preferentemente un vocabulario controlado. La lista proporcionada aquí puede combinar temas de múltiples vocabularios controlados y temas definidos por el usuario. Tenga en cuenta que rara vez se utilizarán temas, ya que los elementos temas y disciplinas son más apropiados para la mayoría de los usos."
+						},
+						{
+							"key": "document_description.disciplines",
+							"type": "array",
+							"title": "Disciplinas",
+							"props": [
+								{
+									"key": "id",
+									"title": "IDENTIFICACIÓN",
+									"type": "string",
+									"prop_key": "document_description.disciplines.id",
+									"help_text": "El ID de la disciplina, extraído de un vocabulario controlado.",
+									"display_type": "text"
+								},
+								{
+									"key": "name",
+									"title": "Disciplina",
+									"type": "string",
+									"prop_key": "document_description.disciplines.name",
+									"help_text": "El nombre (etiqueta) de la disciplina, preferiblemente tomado de un vocabulario controlado.",
+									"display_type": "text"
+								},
+								{
+									"key": "parent_id",
+									"title": "ID de padre",
+									"type": "string",
+									"prop_key": "document_description.disciplines.parent_id",
+									"help_text": "El ID principal de la disciplina (ID del elemento de un nivel superior en la jerarquía), si se utiliza un vocabulario controlado jerárquico.",
+									"display_type": "text"
+								},
+								{
+									"key": "vocabulary",
+									"title": "Vocabulario",
+									"type": "string",
+									"prop_key": "document_description.disciplines.vocabulary",
+									"help_text": "El nombre (incluido el número de versión) del vocabulario controlado utilizado, si corresponde.",
+									"display_type": "text"
+								},
+								{
+									"key": "uri",
+									"title": "URL",
+									"type": "string",
+									"prop_key": "document_description.disciplines.uri",
+									"help_text": "La URL del vocabulario controlado utilizado, si lo hubiera.",
+									"rules": {
+										"is_uri": true
+									},
+									"display_type": "text"
+								}
+							],
+							"help_text": "Información sobre las disciplinas académicas relacionadas con el contenido del documento. Se utilizará preferentemente un vocabulario controlado, por ejemplo el proporcionado por la lista de campos académicos en Wikipedia (ver https://en.wikipedia.org/wiki/List_of_academic_fields). La lista proporcionada aquí puede combinar disciplinas de múltiples vocabularios controlados y disciplinas definidas por el usuario."
+						},
+						{
+							"key": "document_description.toc",
+							"title": "Tabla de contenido",
+							"type": "string",
+							"help_text": "La tabla de contenido del documento, proporcionada como un elemento de cadena única, es decir, sin estructura (se proporciona una alternativa estructurada con el campo \"Tabla de contenido (estructurado)\". Este elemento también es una rica fuente de términos indexables que pueden contribuir a la capacidad de descubrimiento del documento; por lo tanto, este elemento (o su alternativa \"Tabla de contenido (estructurado)\" debe completarse cuando sea posible.",
+							"display_type": "textarea"
+						},
+						{
+							"key": "document_description.toc_structured",
+							"title": "Tabla de contenidos (estructurada)",
+							"type": "array",
+							"props": [
+								{
+									"key": "id",
+									"title": "IDENTIFICACIÓN",
+									"type": "string",
+									"prop_key": "document_description.toc_structured.id",
+									"help_text": "Un identificador único para el elemento de la tabla de contenido. Por ejemplo, el ID del Capítulo 1 podría ser \"1\", mientras que el ID de la sección 1 del capítulo 1 sería \"11\".",
+									"display_type": "text"
+								},
+								{
+									"key": "parent_id",
+									"title": "ID de padre",
+									"type": "string",
+									"prop_key": "document_description.toc_structured.parent_id",
+									"help_text": "El ID de la sección principal (por ejemplo, si la tabla de contenido está dividida en capítulos, ellos mismos divididos en secciones, el ID principal de una sección sería el ID del capítulo al que pertenece).",
+									"display_type": "text"
+								},
+								{
+									"key": "name",
+									"title": "Nombre",
+									"type": "string",
+									"prop_key": "document_description.toc_structured.name",
+									"help_text": "La etiqueta de este elemento de la tabla de contenido (por ejemplo, el título del capítulo o sección).",
+									"display_type": "text"
+								}
+							],
+							"help_text": "Este elemento se utiliza como alternativa a la \"Tabla de contenido\" para proporcionar una tabla de contenido estructurada. El elemento contiene un bloque repetible de subelementos que brinda la posibilidad de definir una estructura jerárquica."
+						}
+					]
+				},
+				{
+					"key": "document1673376827580",
+					"title": "Cobertura espacial y temporal",
+					"type": "section",
+					"items": [
+						{
+							"key": "document_description.ref_country",
+							"title": "Países",
+							"help_text": "La lista de países (o regiones) cubiertos por el documento, si corresponde. Esta información es muy relevante y a menudo se utilizará como filtro (faceta) en catálogos de datos. Por tanto, es un campo \"Recomendado\". Intente extraer (posiblemente utilizando un script que analice el documento) información sobre los países mencionados en el documento. \n\nCuando un documento está relacionado con una región (no con países específicos), o cuando está relacionado con un tema pero no con un área geográfica específica, el elemento \"Países\" aún puede ser aplicable. Cuando un documento está relacionado solo con una parte de un país, aún queremos capturar esta información en los metadatos. Se puede ingresar “Mundo” (código WLD) si el documento está relacionado pero no es específico de los países (por ejemplo, un documento sobre “Mitigación del cambio climático”). Si un documento no es específico de ningún país, se puede ignorar el elemento \"Países\" (por ejemplo, la guía del usuario de una aplicación informática). Tenga en cuenta que muchas organizaciones tienen sus propias políticas sobre la denominación y la ortografía de países/regiones/economías/territorios, que los curadores de datos deberán cumplir.",
+							"type": "array",
+							"props": [
+								{
+									"key": "name",
+									"title": "Nombre",
+									"type": "string",
+									"help_text": "El nombre del país/región. Tenga en cuenta que muchas organizaciones tienen sus propias políticas sobre la denominación de países/regiones/economías/territorios, que los curadores de datos deberán cumplir.",
+									"_rules": "required",
+									"prop_key": "document_description.ref_country.name",
+									"display_type": "text"
+								},
+								{
+									"key": "code",
+									"title": "Código",
+									"type": "string",
+									"help_text": "El código de país/región. Se recomienda utilizar una lista estándar de códigos de países, como la ISO 3166.",
+									"prop_key": "document_description.ref_country.code",
+									"display_type": "text"
+								}
+							],
+							"is_recommended": true
+						},
+						{
+							"key": "document_description.geographic_units",
+							"title": "Áreas geográficas",
+							"help_text": "Una lista de áreas geográficas cubiertas en el documento, además de los países enumerados en \"Países\".",
+							"type": "array",
+							"props": [
+								{
+									"key": "name",
+									"title": "Nombre",
+									"type": "string",
+									"help_text": "El nombre del área geográfica.",
+									"__rules": "required",
+									"prop_key": "document_description.geographic_units.name",
+									"display_type": "text"
+								},
+								{
+									"key": "code",
+									"title": "Código",
+									"type": "string",
+									"help_text": "El código de la unidad geográfica.",
+									"prop_key": "document_description.geographic_units.code",
+									"display_type": "text"
+								},
+								{
+									"key": "type",
+									"title": "Tipo",
+									"type": "string",
+									"help_text": "El tipo de área geográfica (por ejemplo, “provincia”, “estado”, “distrito” o “ciudad”).",
+									"prop_key": "document_description.geographic_units.type",
+									"display_type": "text"
+								}
+							]
+						},
+						{
+							"key": "document_description.bbox",
+							"title": "cuadro delimitador",
+							"type": "array",
+							"props": [
+								{
+									"key": "west",
+									"title": "Oeste",
+									"type": "string",
+									"prop_key": "document_description.bbox.west",
+									"help_text": "Longitud oeste del cuadro delimitador.",
+									"display_type": "text"
+								},
+								{
+									"key": "east",
+									"title": "Este",
+									"type": "string",
+									"prop_key": "document_description.bbox.east",
+									"help_text": "Longitud este del cuadro delimitador.",
+									"display_type": "text"
+								},
+								{
+									"key": "south",
+									"title": "Sur",
+									"type": "string",
+									"prop_key": "document_description.bbox.south",
+									"help_text": "Latitud sur del cuadro delimitador.",
+									"display_type": "text"
+								},
+								{
+									"key": "north",
+									"title": "Norte",
+									"type": "string",
+									"prop_key": "document_description.bbox.north",
+									"help_text": "Latitud norte del cuadro delimitador.",
+									"display_type": "text"
+								}
+							],
+							"help_text": "Este elemento se utiliza para definir uno o varios cuadros delimitadores geográficos, que son la descripción geométrica fundamental rectangular de la cobertura geográfica de los datos. Un cuadro delimitador está definido por las longitudes oeste y este y las latitudes norte y sur, e incluye la mayor extensión geográfica de la cobertura geográfica del conjunto de datos. El cuadro delimitador proporciona las coordenadas geográficas de las esquinas superior izquierda (noroeste) e inferior derecha (sur/este) de un área rectangular. Este elemento se puede utilizar en catálogos como primer paso de una búsqueda basada en coordenadas. El rango válido de latitud en grados es -90 y +90 para el hemisferio sur y norte, respectivamente. La longitud está en el rango -180 y +180, especificando las coordenadas al oeste y al este del primer meridiano, respectivamente. Este elemento rara vez se utilizará para documentar publicaciones. Los cuadros delimitadores son un elemento opcional, pero cuando se define un cuadro delimitador, se requieren las cuatro coordenadas."
+						},
+						{
+							"key": "document_description.spatial_coverage",
+							"title": "Cobertura espacial",
+							"type": "string",
+							"help_text": "Este elemento proporciona otro campo para capturar información sobre la cobertura espacial de un documento, que complementa los elementos \"Países\", \"Áreas geográficas\" y \"Cuadro delimitador\". Puede utilizarse para calificar la cobertura geográfica del documento, en forma de texto libre. Por ejemplo, un informe sobre los campos de refugiados en el distrito de Cox's Bazar de Bangladesh tendría a Bangladesh como país de referencia, \"Cox's Bazar\" como \"área geográfica\" y \"campamentos de refugiados de rohingya\" como \"cobertura espacial\".",
+							"display_type": "textarea"
+						},
+						{
+							"key": "document_description.temporal_coverage",
+							"title": "Cobertura temporal",
+							"type": "string",
+							"help_text": "No todos los documentos tienen una cobertura temporal específica. Cuando lo hagan, se podrá especificar en este elemento.",
+							"display_type": "textarea"
+						}
+					],
+					"help_text": ""
+				},
+				{
+					"key": "document1673376592167",
+					"title": "Acceso y derechos",
+					"type": "section",
+					"items": [
+						{
+							"key": "document_description.status",
+							"title": "Estado",
+							"type": "string",
+							"class": "recommended",
+							"help_text": "El estado del documento. El estado del documento debe (pero no es obligatorio) proporcionarse utilizando un vocabulario controlado, por ejemplo con las siguientes opciones: \"primer borrador\", \"borrador\", \"borrador revisado\", \"borrador final\", \"final\". La mayoría de los documentos publicados en un catálogo probablemente serán \"definitivos\".",
+							"enum": [
+								{
+									"value": "first draft",
+									"code": "first draft",
+									"label": "Primer borrador"
+								},
+								{
+									"value": "draft",
+									"code": "draft",
+									"label": "Borrador"
+								},
+								{
+									"value": "draft released for comment",
+									"code": "reviewed draft",
+									"label": "Borrador revisado"
+								},
+								{
+									"value": "reviewed draft",
+									"code": "final draft",
+									"label": "borrador final"
+								},
+								{
+									"value": "final draft",
+									"code": "final",
+									"label": "Final"
+								}
+							],
+							"display_type": "dropdown-custom"
+						},
+						{
+							"key": "document_description.rights",
+							"title": "Derechos",
+							"type": "string",
+							"help_text": "Una declaración sobre los derechos asociados al documento (distintos de los derechos de autor, que deben describirse en el elemento \"Copyright\").",
+							"display_type": "text"
+						},
+						{
+							"key": "document_description.copyright",
+							"title": "Derechos de autor",
+							"type": "string",
+							"help_text": "Una declaración y un identificador que indican la propiedad legal y los derechos con respecto al uso y reutilización de todo o parte del recurso. Si el documento está protegido por derechos de autor, ingrese la información de la persona u organización propietaria de los derechos.",
+							"display_type": "text"
+						},
+						{
+							"key": "document_description.license",
+							"title": "Licencia",
+							"help_text": "Información sobre la(s) licencia(s) adjunta(s) al documento, que define las condiciones de uso.",
+							"type": "array",
+							"props": [
+								{
+									"key": "name",
+									"title": "Nombre",
+									"type": "string",
+									"help_text": "El nombre de la licencia (por ejemplo, CC-BY 4.0).",
+									"prop_key": "document_description.license.name",
+									"display_type": "text"
+								},
+								{
+									"key": "uri",
+									"title": "URL",
+									"type": "string",
+									"help_text": "La URL de la licencia, donde se puede obtener información detallada sobre la licencia.",
+									"prop_key": "document_description.license.uri",
+									"rules": {
+										"is_uri": true
+									},
+									"display_type": "text"
+								}
+							]
+						},
+						{
+							"key": "document_description.usage_terms",
+							"title": "Términos de uso",
+							"type": "string",
+							"help_text": "Este elemento se utiliza para proporcionar una descripción de los términos legales u otras condiciones que debe cumplir una persona u organización que quiera utilizar o reproducir el documento.",
+							"display_type": "textarea"
+						},
+						{
+							"key": "document_description.disclaimer",
+							"title": "Descargo de responsabilidad",
+							"type": "string",
+							"help_text": "Una exención de responsabilidad limita la responsabilidad del autor(es) y/o editor(es) del documento. Se debe utilizar una declaración legal estándar para todos los documentos de una misma agencia. Por ejemplo (de los documentos de trabajo de investigación de políticas del Banco Mundial): \"Este trabajo es producto del personal del Banco Mundial con contribuciones externas. Los hallazgos, interpretaciones y conclusiones expresados en este trabajo no reflejan necesariamente los puntos de vista del Banco Mundial, su Junta de Directores Ejecutivos o los gobiernos que representan. El Banco Mundial no garantiza la exactitud de los datos incluidos en este trabajo. Los límites, colores, denominaciones y otra información mostrada en cualquier mapa de este trabajo no implican ningún juicio por parte del Banco Mundial con respecto a la legalidad. estatus de cualquier territorio o la aprobación o aceptación de tales fronteras.\"",
+							"display_type": "textarea"
+						},
+						{
+							"key": "document_description.security_classification",
+							"title": "Clasificación de seguridad",
+							"type": "string",
+							"help_text": "Información sobre la clasificación de seguridad adjunta al documento. Los diferentes niveles de clasificación indican el grado de sensibilidad del contenido del documento. Se recomienda el uso del vocabulario controlado (el vocabulario controlado debe ser específico de la organización que cura o difunde el documento), por ejemplo con las modalidades \"público\", \"solo interno\", \"restringido\", \"confidencial\", \"estrictamente confidencial\".",
+							"enum": [
+								{
+									"value": "public",
+									"code": "public",
+									"label": "Público"
+								},
+								{
+									"value": "internal-only",
+									"code": "internal only",
+									"label": "Solo interno"
+								},
+								{
+									"value": "restricted",
+									"code": "restricted",
+									"label": "Restringido"
+								},
+								{
+									"value": "confidential",
+									"code": "confidential",
+									"label": "Confidencial"
+								},
+								{
+									"code": "strictly confidential",
+									"label": "Estrictamente confidencial"
+								}
+							],
+							"display_type": "dropdown-custom"
+						},
+						{
+							"key": "document_description.access_restrictions",
+							"title": "Restricciones de acceso",
+							"type": "string",
+							"help_text": "Una descripción textual de las restricciones de acceso que se aplican al documento.",
+							"display_type": "textarea"
+						},
+						{
+							"key": "document_description.pricing",
+							"title": "Precios",
+							"type": "string",
+							"help_text": "El precio actual del documento en cualquier moneda definida. Como esta información está sujeta a cambios periódicos, a menudo no se incluirá en los metadatos del documento.",
+							"display_type": "textarea"
+						}
+					],
+					"help_text": ""
+				},
+				{
+					"key": "document1673377443704",
+					"title": "Otra información",
+					"type": "section",
+					"items": [
+						{
+							"key": "document_description.contacts",
+							"title": "Contactos",
+							"help_text": "Información de contacto de una persona u organización con la que se puede contactar para consultas relacionadas con el documento.",
+							"type": "array",
+							"props": [
+								{
+									"key": "name",
+									"title": "Nombre",
+									"type": "string",
+									"help_text": "nombre",
+									"prop_key": "document_description.contacts.name",
+									"display_type": "text"
+								},
+								{
+									"key": "role",
+									"title": "Rol",
+									"type": "string",
+									"help_text": "Función o papel del contacto.",
+									"prop_key": "document_description.contacts.role",
+									"display_type": "textarea"
+								},
+								{
+									"key": "affiliation",
+									"title": "Afiliación",
+									"type": "string",
+									"prop_key": "document_description.contacts.affiliation",
+									"display_type": "text"
+								},
+								{
+									"key": "email",
+									"title": "Correo electrónico",
+									"type": "string",
+									"help_text": "Correo electrónico",
+									"prop_key": "document_description.contacts.email",
+									"display_type": "text"
+								},
+								{
+									"key": "telephone",
+									"title": "Teléfono",
+									"type": "string",
+									"prop_key": "document_description.contacts.telephone",
+									"display_type": "text"
+								},
+								{
+									"key": "uri",
+									"title": "URL",
+									"type": "string",
+									"prop_key": "document_description.contacts.uri",
+									"rules": {
+										"is_uri": true
+									},
+									"display_type": "text"
+								}
+							]
+						},
+						{
+							"key": "document_description.sources",
+							"type": "array",
+							"title": "Fuentes",
+							"props": [
+								{
+									"key": "source_origin",
+									"title": "Origen",
+									"type": "string",
+									"prop_key": "document_description.sources.source_origin",
+									"help_text": "Para materiales históricos, se debe especificar información sobre el(los) origen(es) de las fuentes y las reglas seguidas para establecer las fuentes.",
+									"display_type": "text"
+								},
+								{
+									"key": "source_char",
+									"title": "Características",
+									"type": "string",
+									"prop_key": "document_description.sources.source_char",
+									"help_text": "Características de la fuente. Evaluación de características y calidad del material fuente.",
+									"display_type": "textarea"
+								},
+								{
+									"key": "source_doc",
+									"title": "Documentación",
+									"type": "string",
+									"prop_key": "document_description.sources.source_doc",
+									"help_text": "Documentación y acceso a la fuente.",
+									"display_type": "textarea"
+								}
+							],
+							"help_text": "Este elemento se utiliza para describir las fuentes de diferentes tipos (excepto las fuentes de datos, que deben enumerarse en el elemento \"Fuentes de datos\") que se utilizaron en la producción del documento."
+						},
+						{
+							"key": "document_description.data_sources",
+							"type": "array",
+							"title": "Fuentes de datos",
+							"props": [
+								{
+									"key": "name",
+									"title": "Conjunto de datos",
+									"type": "string",
+									"prop_key": "document_description.data_sources.name",
+									"help_text": "Nombre (título) del conjunto de datos utilizado como fuente. Por ejemplo: \"Encuesta demográfica y de salud de Bangladesh 2017-18\"",
+									"display_type": "text"
+								},
+								{
+									"key": "uri",
+									"title": "URL",
+									"type": "string",
+									"prop_key": "document_description.data_sources.uri",
+									"help_text": "Enlace (URL) al conjunto de datos o a una página web que describa el conjunto de datos. Por ejemplo: \"https://www.dhsprogram.com/methodology/survey/survey-display-536.cfm\"",
+									"rules": {
+										"is_uri": true
+									},
+									"display_type": "text"
+								},
+								{
+									"key": "note",
+									"title": "Nota",
+									"type": "string",
+									"prop_key": "document_description.data_sources.note",
+									"help_text": "Información adicional sobre la fuente de datos. Por ejemplo: \"Encuesta de hogares realizada por el Instituto Nacional de Investigación y Capacitación en Población, División de Educación Médica y Bienestar Familiar y Ministerio de Salud y Bienestar Familiar. Datos y documentación disponibles en https://dhsprogram.com/)\"",
+									"display_type": "textarea"
+								}
+							],
+							"help_text": "Se utiliza para enumerar los archivos de datos legibles por máquina, si los hay, que sirvieron como fuente de datos."
+						},
+						{
+							"key": "document_description.reproducibility.statement",
+							"title": "Declaración de reproducibilidad",
+							"type": "string",
+							"help_text": "La \"Declaración de reproducibilidad\" es una declaración general sobre la reproducibilidad y replicabilidad del análisis (incluido el procesamiento de datos, la tabulación, la producción de visualizaciones, el modelado, etc.) que se presenta en el documento.",
+							"display_type": "textarea"
+						},
+						{
+							"key": "document_description.reproducibility.links",
+							"type": "array",
+							"title": "Enlaces de reproducibilidad",
+							"props": [
+								{
+									"key": "uri",
+									"title": "URL",
+									"type": "string",
+									"prop_key": "document_description.reproducibility.links.uri",
+									"help_text": "El enlace a una página web.",
+									"rules": {
+										"is_uri": true
+									},
+									"display_type": "text"
+								},
+								{
+									"key": "description",
+									"title": "Descripción",
+									"type": "string",
+									"prop_key": "document_description.reproducibility.links.description",
+									"help_text": "Una breve descripción del contenido de la página web.",
+									"display_type": "textarea"
+								}
+							],
+							"help_text": "Los \"Enlaces de reproducibilidad\" proporcionan enlaces a páginas web donde se pueden encontrar materiales reproducibles y la información relacionada."
+						},
+						{
+							"key": "document_description.audience",
+							"title": "Audiencia",
+							"type": "string",
+							"help_text": "Información sobre el público objetivo del documento, es decir, la categoría o categorías de usuarios a quienes está destinado el recurso en términos de sus intereses, habilidades, estado u otros.",
+							"display_type": "textarea"
+						},
+						{
+							"key": "document_description.mandate",
+							"title": "Mandato",
+							"type": "string",
+							"help_text": "El mandato legislativo o de otro tipo bajo el cual se produjo el recurso.",
+							"display_type": "textarea"
+						},
+						{
+							"key": "document_description.relations",
+							"title": "Recursos relacionados",
+							"help_text": "Referencias a recursos relacionados con especificación del tipo de relación.",
+							"type": "array",
+							"props": [
+								{
+									"key": "name",
+									"title": "Nombre",
+									"type": "string",
+									"prop_key": "document_description.relations.name",
+									"help_text": "El título o nombre del recurso relacionado. La práctica recomendada es identificar el recurso relacionado mediante una URL. Si esto no es posible o factible, se puede proporcionar una cadena conforme a un sistema de identificación formal.",
+									"display_type": "text"
+								},
+								{
+									"key": "type",
+									"title": "Tipo",
+									"type": "string",
+									"enum": [],
+									"prop_key": "document_description.relations.type",
+									"help_text": "El tipo de relación. Se recomienda el uso de un vocabulario controlado. El Dublin Core propone el siguiente vocabulario: \"isPartOf\", \"hasPart\", \"isVersionOf\", \"isFormatOf\", \"hasFormat\", \"references\", \"isReferencedBy\", \"isBasedOn\", \"isBasisFor\", \"replaces\", \"isReplacedBy\", \"requires\", \"isRequiredBy\".",
+									"display_type": "text"
+								}
+							]
+						},
+						{
+							"key": "document_description.notes",
+							"title": "Notas",
+							"type": "array",
+							"props": [
+								{
+									"key": "note",
+									"title": "Nota",
+									"type": "string",
+									"prop_key": "document_description.notes.note",
+									"help_text": "Una nota, ingresada como texto libre.",
+									"display_type": "textarea"
+								}
+							],
+							"help_text": "Este campo se puede utilizar para proporcionar información sobre el documento que no pertenece a otros elementos de metadatos más específicos proporcionados en el esquema."
+						}
+					],
+					"help_text": ""
+				},
+				{
+					"type": "section",
+					"key": "document_tags",
+					"title": "Etiquetas",
+					"class": "recommended",
+					"items": [
+						{
+							"key": "tags",
+							"title": "Etiquetas",
+							"type": "array",
+							"props": [
+								{
+									"key": "tag",
+									"title": "Etiqueta",
+									"type": "string",
+									"prop_key": "tags.tag",
+									"help_text": "Una etiqueta definida por el usuario.",
+									"display_type": "text"
+								},
+								{
+									"key": "tag_group",
+									"title": "grupo de etiquetas",
+									"type": "string",
+									"prop_key": "tags.tag_group",
+									"help_text": "El nombre de un grupo de etiquetas.",
+									"display_type": "text"
+								}
+							],
+							"help_text": "Las etiquetas, especialmente cuando se organizan en grupos de etiquetas, proporcionan una solución potente y flexible para habilitar facetas (filtros) personalizados en catálogos de datos."
+						}
+					]
+				}
+			]
+		},
+		{
+			"type": "section_container",
+			"id": "tags",
+			"key": "tags_container",
+			"title": "Etiquetas",
+			"items": [
+				{
+					"key": "tags",
+					"title": "Etiquetas",
+					"type": "array",
+					"props": [
+						{
+							"key": "tag",
+							"title": "Etiqueta",
+							"type": "string",
+							"prop_key": "tags.tag",
+							"help_text": "Una etiqueta definida por el usuario.",
+							"display_type": "text"
+						},
+						{
+							"key": "tag_group",
+							"title": "grupo de etiquetas",
+							"type": "string",
+							"prop_key": "tags.tag_group",
+							"help_text": "Un grupo definido por el usuario (opcional) al que pertenece la etiqueta. La agrupación de etiquetas permite la implementación de facetas controladas en catálogos de datos.",
+							"display_type": "text"
+						}
+					],
+					"help_text": "Las etiquetas, especialmente cuando se organizan en grupos de etiquetas, proporcionan una solución potente y flexible para habilitar facetas (filtros) personalizados en catálogos de datos. Tenga en cuenta que las etiquetas y los grupos de etiquetas no son elementos del estándar del libro de códigos DDI."
+				}
+			]
+		},
+		{
+			"type": "section_container",
+			"id": "datacite",
+			"key": "datacite_container",
+			"title": "Cita de datos",
+			"items": [
+				{
+					"key": "datacite_section",
+					"title": "Cita de datos",
+					"type": "section",
+					"items": [
+						{
+							"key": "datacite.doi",
+							"title": "DOI",
+							"type": "string",
+							"help_text": "mango DOI",
+							"display_type": "text"
+						},
+						{
+							"key": "datacite.prefix",
+							"title": "Prefijo",
+							"type": "string",
+							"help_text": "prefijo DOI",
+							"display_type": "text"
+						},
+						{
+							"key": "datacite.suffix",
+							"title": "Sufijo",
+							"type": "string",
+							"help_text": "sufijo DOI",
+							"display_type": "text"
+						},
+						{
+							"key": "datacite.creators",
+							"title": "Creadores",
+							"type": "nested_array",
+							"help_text": "Creadores",
+							"props": [
+								{
+									"key": "name",
+									"prop_key": "datacite.creators.name",
+									"title": "Nombre",
+									"type": "string",
+									"help_text": "Nombre",
+									"display_type": "text"
+								},
+								{
+									"key": "nameType",
+									"prop_key": "datacite.creators.nameType",
+									"title": "tipo de nombre",
+									"type": "string",
+									"help_text": "Tipo de nombre. valores válidos: 'Personal', 'Organizacional'",
+									"display_type": "text"
+								},
+								{
+									"key": "givenName",
+									"prop_key": "datacite.creators.givenName",
+									"title": "Nombre de pila",
+									"type": "string",
+									"help_text": "Nombre de pila",
+									"display_type": "text"
+								},
+								{
+									"key": "familyName",
+									"prop_key": "datacite.creators.familyName",
+									"title": "Apellido",
+									"type": "string",
+									"help_text": "Apellido",
+									"display_type": "text"
+								},
+								{
+									"key": "affiliation",
+									"title": "Afiliación",
+									"type": "array",
+									"help_text": "",
+									"props": [
+										{
+											"key": "affiliationIdentifier",
+											"prop_key": "datacite.creators.affiliation.affiliationIdentifier",
+											"title": "Identificador de afiliación",
+											"type": "string",
+											"help_text": "Identifica de forma única la afiliación organizativa del creador.",
+											"display_type": "text",
+											"isProp": true
+										},
+										{
+											"key": "affiliationIdentifierScheme",
+											"prop_key": "datacite.creators.affiliation.affiliationIdentifierScheme",
+											"title": "Esquema de identificador de afiliación",
+											"type": "string",
+											"help_text": "",
+											"display_type": "text",
+											"isProp": true
+										},
+										{
+											"key": "name",
+											"prop_key": "datacite.creators.affiliation.name",
+											"title": "Nombre",
+											"type": "string",
+											"help_text": "",
+											"display_type": "text",
+											"isProp": true
+										},
+										{
+											"key": "schemeUri",
+											"prop_key": "datacite.creators.affiliation.schemeUri",
+											"title": "URI de esquema",
+											"type": "string",
+											"help_text": "El URI del esquema de identificador de nombre. \n\nEjemplos: \n- https://orcid.org/\n- https://ror.org/",
+											"display_type": "text",
+											"isProp": true
+										}
+									],
+									"prop_key": "datacite.creators.affiliation",
+									"isProp": true
+								}
+							]
+						},
+						{
+							"key": "datacite.titles",
+							"title": "Títulos",
+							"type": "array",
+							"help_text": "Títulos",
+							"props": [
+								{
+									"key": "title",
+									"prop_key": "datacite.titles.title",
+									"title": "Título",
+									"type": "string",
+									"help_text": "Título",
+									"display_type": "text"
+								},
+								{
+									"key": "titleType",
+									"prop_key": "datacite.titles.titleType",
+									"title": "Tipo de título",
+									"type": "string",
+									"help_text": "Tipo de título. valores válidos: 'MainTitle', 'Subtitle', 'TranslatedTitle', 'AlternativeTitle'",
+									"display_type": "text"
+								},
+								{
+									"key": "lang",
+									"prop_key": "datacite.titles.lang",
+									"title": "Idioma",
+									"type": "string",
+									"help_text": "Idioma",
+									"display_type": "text"
+								}
+							]
+						},
+						{
+							"key": "datacite.publisher",
+							"title": "Editor",
+							"type": "string",
+							"help_text": "Editor",
+							"display_type": "text"
+						},
+						{
+							"key": "datacite.publicationYear",
+							"title": "Año de publicación",
+							"type": "string",
+							"help_text": "Año de publicación",
+							"display_type": "text"
+						},
+						{
+							"key": "datacite.types.resourceType",
+							"title": "Tipo de recurso",
+							"type": "string",
+							"help_text": "Tipo de recurso",
+							"display_type": "text"
+						},
+						{
+							"key": "datacite.types.resourceTypeGeneral",
+							"title": "Tipo de recurso general",
+							"type": "string",
+							"help_text": "Valores válidos: 'Audiovisual', 'Colección', 'Papel de datos', 'Conjunto de datos', 'Evento', 'Imagen', 'Recurso interactivo', 'Modelo', 'Objeto físico', 'Servicio', 'Software', 'Sonido', 'Texto', 'Flujo de trabajo', 'Otro'",
+							"display_type": "text"
+						},
+						{
+							"key": "datacite.url",
+							"title": "URL",
+							"type": "string",
+							"help_text": "",
+							"display_type": "text"
+						},
+						{
+							"key": "datacite.language",
+							"title": "Idioma",
+							"type": "string",
+							"help_text": "",
+							"display_type": "text"
+						}
+					]
+				}
+			]
+		},
+		{
+			"type": "section_container",
+			"id": "provenance",
+			"key": "provenance_container",
+			"title": "Procedencia",
+			"items": [
+				{
+					"key": "provenance",
+					"title": "Procedencia",
+					"type": "section",
+					"help_text": "La información de procedencia se utiliza para documentar el origen de los metadatos.",
+					"items": [
+						{
+							"key": "provenance.original_repository",
+							"title": "repositorio original",
+							"type": "section",
+							"help_text": "Información sobre el repositorio original donde se crearon los metadatos por primera vez.",
+							"items": [
+								{
+									"key": "provenance.original_repository.repository_name",
+									"title": "Nombre del repositorio",
+									"type": "string",
+									"help_text": "El nombre del repositorio original.",
+									"display_type": "text"
+								},
+								{
+									"key": "provenance.original_repository.url",
+									"title": "URL",
+									"type": "string",
+									"help_text": "La URL del repositorio o conjunto de datos original.",
+									"rules": {
+										"is_uri": true
+									},
+									"display_type": "text"
+								},
+								{
+									"key": "provenance.original_repository.dataset_identifier",
+									"title": "Identificador del conjunto de datos",
+									"type": "string",
+									"help_text": "El identificador del conjunto de datos en el repositorio original.",
+									"display_type": "text"
+								},
+								{
+									"key": "provenance.original_repository.doi",
+									"title": "DOI",
+									"type": "string",
+									"help_text": "El Identificador de objeto digital (DOI) del conjunto de datos en el repositorio original.",
+									"display_type": "text"
+								},
+								{
+									"key": "provenance.original_repository.dataset_title",
+									"title": "Título del conjunto de datos",
+									"type": "string",
+									"help_text": "El título del conjunto de datos en el repositorio original.",
+									"display_type": "text"
+								},
+								{
+									"key": "provenance.original_repository.date_published",
+									"title": "Fecha de publicación del conjunto de datos (AAAA-MM-DD)",
+									"type": "string",
+									"help_text": "La fecha en que se publicó el conjunto de datos en el repositorio original.",
+									"display_type": "text"
+								},
+								{
+									"key": "provenance.original_repository.notes",
+									"title": "Notas",
+									"type": "string",
+									"help_text": "Información adicional sobre el repositorio original.",
+									"display_type": "textarea"
+								}
+							]
+						},
+						{
+							"key": "provenance.source_repository_section",
+							"title": "Repositorio de origen",
+							"type": "section",
+							"help_text": "Información sobre el repositorio de origen del que se recopilaron los metadatos.",
+							"items": [
+								{
+									"key": "provenance.source_repository",
+									"title": "Repositorios de origen",
+									"type": "nested_array",
+									"help_text": "Información sobre el repositorio de origen del que se recopilaron los metadatos.",
+									"props": [
+										{
+											"key": "repository_name",
+											"prop_key": "provenance.source_repository.repository_name",
+											"title": "Nombre del repositorio",
+											"type": "string",
+											"help_text": "El nombre del repositorio de origen.",
+											"display_type": "text"
+										},
+										{
+											"key": "url",
+											"prop_key": "provenance.source_repository.url",
+											"title": "URL",
+											"type": "string",
+											"help_text": "La URL del repositorio o conjunto de datos de origen.",
+											"rules": {
+												"is_uri": true
+											},
+											"display_type": "text"
+										},
+										{
+											"key": "dataset_identifier",
+											"prop_key": "provenance.source_repository.dataset_identifier",
+											"title": "Identificador del conjunto de datos",
+											"type": "string",
+											"help_text": "El identificador del conjunto de datos en el repositorio de origen.",
+											"display_type": "text"
+										},
+										{
+											"key": "dataset_title",
+											"prop_key": "provenance.source_repository.dataset_title",
+											"title": "Título del conjunto de datos",
+											"type": "string",
+											"help_text": "El título del conjunto de datos en el repositorio de origen.",
+											"display_type": "text"
+										},
+										{
+											"key": "date_acquired",
+											"prop_key": "provenance.source_repository.date_acquired",
+											"title": "Fecha de adquisición (AAAA-MM-DD)",
+											"type": "string",
+											"help_text": "La fecha en la que se adquirieron los metadatos del repositorio de origen.",
+											"display_type": "text"
+										},
+										{
+											"key": "acquisition_mode",
+											"prop_key": "provenance.source_repository.acquisition_mode",
+											"title": "Modo de adquisición",
+											"type": "string",
+											"help_text": "El modo de adquisición de los metadatos del repositorio de origen. p.ej. OAI-PMH, API, entrada manual, etc."
+										},
+										{
+											"key": "notes",
+											"prop_key": "provenance.source_repository.notes",
+											"title": "Notas",
+											"type": "string",
+											"help_text": "Información adicional sobre el repositorio de origen."
+										}
+									]
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	]
+}

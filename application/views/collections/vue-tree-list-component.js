@@ -1,8 +1,18 @@
 Vue.component('vue-tree-list', {
-    props: ['value','parent_path','path_level','permissions','getPermissionsFunction'],
+    props: ['value','parent_path','path_level','permissions','getPermissionsFunction','expandAll'],
     data() {
         return {
             toggle_items: false,
+        }
+    },
+    watch: {
+        expandAll: {
+            immediate: true,
+            handler(val) {
+                if (val) {
+                    this.toggle_items = true;
+                }
+            }
         }
     },
     created:function(){
@@ -125,6 +135,7 @@ Vue.component('vue-tree-list', {
                 :path_level="PathLevel"
                 :permissions="getPermissionsFunction ? getPermissionsFunction(item.id) : null"
                 :getPermissionsFunction="getPermissionsFunction"
+                :expand-all="expandAll"
                 v-on:show-menu="onShowMenu"
             >
             </vue-tree-list>

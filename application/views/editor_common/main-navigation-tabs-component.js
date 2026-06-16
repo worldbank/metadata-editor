@@ -3,7 +3,7 @@
  * 
  * 
  * Props:
- *   - activeTab: String - The currently active tab ('projects', 'collections', 'templates', 'schemas')
+ *   - activeTab: String - The currently active tab ('projects', 'collections', 'templates', 'schemas', 'tags', 'codelists')
  *   - value: Number - v-model value for tab selection (optional)
  * 
  */
@@ -13,7 +13,7 @@ Vue.component('main-navigation-tabs', {
             type: String,
             default: null,
             validator: function(value) {
-                return value === null || ['projects', 'collections', 'templates', 'schemas', 'tags', 'issues'].includes(value);
+                return value === null || ['projects', 'collections', 'templates', 'schemas', 'tags', 'codelists', 'data_structures', 'issues'].includes(value);
             }
         },
         value: {
@@ -44,6 +44,24 @@ Vue.component('main-navigation-tabs', {
             }
             return false;
         },
+        hasCodelistPermission() {
+            if (CI && CI.user_info) {
+                if (CI.user_info.has_codelist_permission !== undefined) {
+                    return CI.user_info.has_codelist_permission === true;
+                }
+                return CI.user_info.is_admin === true;
+            }
+            return false;
+        },
+        hasDataStructurePermission() {
+            if (CI && CI.user_info) {
+                if (CI.user_info.has_data_structure_permission !== undefined) {
+                    return CI.user_info.has_data_structure_permission === true;
+                }
+                return CI.user_info.is_admin === true;
+            }
+            return false;
+        },
         siteBaseUrl() {
             return (typeof CI !== 'undefined' && CI.site_url) ? CI.site_url : '';
         }
@@ -61,7 +79,9 @@ Vue.component('main-navigation-tabs', {
                     'templates': 2,
                     'schemas': 3,
                     'tags': 4,
-                    'issues': 5
+                    'codelists': 5,
+                    'data_structures': 6,
+                    'issues': 7
                 };
                 this.internalValue = tabMap[newVal] !== undefined ? tabMap[newVal] : null;
             }
@@ -76,7 +96,9 @@ Vue.component('main-navigation-tabs', {
                 'templates': 2,
                 'schemas': 3,
                 'tags': 4,
-                'issues': 5
+                'codelists': 5,
+                'data_structures': 6,
+                'issues': 7
             };
             this.internalValue = tabMap[this.activeTab] !== undefined ? tabMap[this.activeTab] : null;
         }
@@ -119,7 +141,15 @@ Vue.component('main-navigation-tabs', {
                     <v-icon>mdi-tag-multiple</v-icon>
                     <span class="ml-2">{{$t('Tags')}}</span>
                 </v-tab>
-                <v-tab :value="5" @click="pageLink('issues')">
+                <v-tab v-if="hasCodelistPermission" :value="5" @click="pageLink('codelists')">
+                    <v-icon>mdi-format-list-bulleted-type</v-icon>
+                    <span class="ml-2">{{$t('codelists')}}</span>
+                </v-tab>
+                <v-tab v-if="hasDataStructurePermission" :value="6" @click="pageLink('data_structures')">
+                    <v-icon>mdi-sitemap</v-icon>
+                    <span class="ml-2">Data structures</span>
+                </v-tab>
+                <v-tab :value="7" @click="pageLink('issues')">
                     <v-icon>mdi-alert-circle-outline</v-icon>
                     <span class="ml-2">{{$t('Issues')}}</span>
                 </v-tab>
@@ -127,4 +157,5 @@ Vue.component('main-navigation-tabs', {
         </div>
     `
 });
+
 

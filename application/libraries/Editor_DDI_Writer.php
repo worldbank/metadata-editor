@@ -8,6 +8,9 @@ class Editor_DDI_Writer
     private $sid;
     private $uid_vid_cache = null;
 
+    /** Minimum memory_limit for DDI export when php.ini is lower (bytes). */
+    private const DDI_MIN_MEMORY_BYTES = 268435456; // 256M
+
     public function __construct()
     {
         $this->ci =& get_instance();
@@ -165,6 +168,8 @@ class Editor_DDI_Writer
         $this->ci->load->model('Editor_model');
         $this->ci->load->model("Editor_variable_model");
 
+        $this->ensure_ddi_memory_limit();
+
         $dataset=$this->ci->Editor_model->get_row($id);
         $this->sid=$id;
 
@@ -173,7 +178,9 @@ class Editor_DDI_Writer
         }
 
         $writer = new XMLWriter;
-        $writer->openURI($output);
+        if (!$writer->openURI($output)) {
+            throw new Exception('DDI export: cannot open output ' . $output);
+        }
         $writer->startDocument('1.0', 'UTF-8');
 
         //codeBook start
@@ -188,10 +195,12 @@ class Editor_DDI_Writer
         //document description
         $writer->writeRaw("\n");
         $writer->writeRaw($this->get_doc_desc_xml($dataset['metadata']));
+        $this->flush_xml_writer($writer);
 
         //study description
         $writer->writeRaw("\n");
         $writer->writeRaw($this->get_study_desc_xml($dataset));
+        $this->flush_xml_writer($writer);
 
         //file description
         $files=$this->ci->Editor_datafile_model->select_all($id,$include_file_info=false);
@@ -205,6 +214,7 @@ class Editor_DDI_Writer
 
                 $writer->writeRaw($this->get_file_desc_xml($file, $key_vars));
                 $writer->writeRaw("\n");
+                $this->flush_xml_writer($writer);
             }
         }
 
@@ -224,16 +234,287 @@ class Editor_DDI_Writer
         //pre-load UID->VID mapping
         $this->uid_vid_cache = $this->ci->Editor_variable_model->uid_vid_list($id);
 
-        //variables
+        //variables — stream each <var> directly to XMLWriter (no ArrayToXml per variable)
         foreach($this->ci->Editor_variable_model->chunk_reader_generator($id) as $variable){
-            $variable=$this->ci->project_json_writer->transform_variable($variable);
-            $writer->writeRaw($this->get_var_desc_xml($variable['metadata']));
+            $variable = $this->ci->project_json_writer->transform_variable($variable);
+            $this->write_var_desc_to_writer($writer, $variable['metadata']);
             $writer->writeRaw("\n");
+            $this->flush_xml_writer($writer);
+            unset($variable);
         }     
         
         $writer->endElement();//end-dataDscr
         $writer->endElement();//end-codebook
-        $writer->endDocument();        
+        $writer->endDocument();
+        $this->flush_xml_writer($writer);
+    }
+
+
+    /**
+     * Push buffered XMLWriter output to disk when writing to a file URI.
+     */
+    private function flush_xml_writer(XMLWriter $writer): void
+    {
+        if (method_exists($writer, 'flush')) {
+            $writer->flush();
+        }
+    }
+
+
+    /**
+     * Raise memory_limit to at least 256M for DDI generation when php.ini is lower.
+     */
+    private function ensure_ddi_memory_limit(): void
+    {
+        $current = ini_get('memory_limit');
+        if ($current === false || $current === '') {
+            ini_set('memory_limit', '256M');
+            return;
+        }
+
+        if ($this->parse_memory_limit_bytes($current) < self::DDI_MIN_MEMORY_BYTES) {
+            ini_set('memory_limit', '256M');
+        }
+    }
+
+
+    /**
+     * @param string|int $limit PHP memory_limit value (e.g. 128M, -1)
+     */
+    private function parse_memory_limit_bytes($limit): int
+    {
+        if ($limit === -1 || $limit === '-1') {
+            return PHP_INT_MAX;
+        }
+
+        $limit = trim((string)$limit);
+        if ($limit === '') {
+            return 0;
+        }
+
+        $last = strtolower($limit[strlen($limit) - 1]);
+        $value = (int)$limit;
+
+        switch ($last) {
+            case 'g':
+                $value *= 1024;
+            case 'm':
+                $value *= 1024;
+            case 'k':
+                $value *= 1024;
+        }
+
+        return $value;
+    }
+
+
+    private function var_format_array(array $var): array
+    {
+        if (isset($var['var_format']) && is_array($var['var_format'])) {
+            return $var['var_format'];
+        }
+        return array(
+            'value' => $var['var_format.value'] ?? null,
+            'type' => $var['var_format.type'] ?? null,
+            'name' => $var['var_format.name'] ?? null,
+        );
+    }
+
+
+    private function write_xml_text_element(XMLWriter $writer, string $name, $value): void
+    {
+        if ($value === null || $value === '') {
+            return;
+        }
+        $writer->startElement($name);
+        $writer->text((string)$value);
+        $writer->endElement();
+    }
+
+
+    private function write_xml_attribute_element(XMLWriter $writer, string $name, array $attributes, $text_value = null): void
+    {
+        $has_attr = false;
+        foreach ($attributes as $attr_val) {
+            if ($attr_val !== null && $attr_val !== '') {
+                $has_attr = true;
+                break;
+            }
+        }
+        if (!$has_attr && ($text_value === null || $text_value === '')) {
+            return;
+        }
+        $writer->startElement($name);
+        foreach ($attributes as $attr_name => $attr_val) {
+            if ($attr_val !== null && $attr_val !== '') {
+                $writer->writeAttribute($attr_name, (string)$attr_val);
+            }
+        }
+        if ($text_value !== null && $text_value !== '') {
+            $writer->text((string)$text_value);
+        }
+        $writer->endElement();
+    }
+
+
+    /**
+     * Write a single <var> element directly to XMLWriter (memory-efficient vs ArrayToXml).
+     */
+    function write_var_desc_to_writer(XMLWriter $writer, array $var): void
+    {
+        $writer->startElement('var');
+
+        $attrs = array(
+            'ID' => $var['vid'] ?? '',
+            'name' => $var['name'] ?? '',
+            'files' => $var['fid'] ?? '',
+            'dcml' => $var['var_dcml'] ?? '',
+            'intrvl' => $var['var_intrvl'] ?? '',
+            'wgt' => $this->get_is_var_wgt($var),
+            'wgt-var' => $this->get_var_wgt($var),
+        );
+        foreach ($attrs as $attr_name => $attr_val) {
+            if ($attr_val !== null && $attr_val !== '') {
+                $writer->writeAttribute($attr_name, (string)$attr_val);
+            }
+        }
+
+        $vf = $this->var_format_array($var);
+        $this->write_xml_attribute_element(
+            $writer,
+            'varFormat',
+            array(
+                'type' => $vf['type'] ?? '',
+                'formatname' => $vf['name'] ?? '',
+            ),
+            $vf['value'] ?? ''
+        );
+
+        $this->write_xml_attribute_element(
+            $writer,
+            'location',
+            array(
+                'StartPos' => $var['loc_start_pos'] ?? '',
+                'EndPos' => $var['loc_end_pos'] ?? '',
+                'width' => $var['loc_width'] ?? '',
+                'RecSegNo' => $var['loc_rec_seg_no'] ?? '',
+            )
+        );
+
+        $this->write_xml_text_element($writer, 'labl', $var['labl'] ?? '');
+        $this->write_xml_text_element($writer, 'imputation', $var['var_imputation'] ?? '');
+        $this->write_xml_text_element($writer, 'security', $var['var_security'] ?? '');
+        $this->write_xml_text_element($writer, 'respUnit', $var['var_respunit'] ?? '');
+
+        $qstn_fields = array(
+            'preQTxt' => $var['var_qstn_preqtxt'] ?? '',
+            'qstnLit' => $var['var_qstn_qstnlit'] ?? '',
+            'postQTxt' => $var['var_qstn_postqtxt'] ?? '',
+            'ivuInstr' => $var['var_qstn_ivulnstr'] ?? '',
+        );
+        $has_qstn = false;
+        foreach ($qstn_fields as $qv) {
+            if ($qv !== null && $qv !== '') {
+                $has_qstn = true;
+                break;
+            }
+        }
+        if ($has_qstn) {
+            $writer->startElement('qstn');
+            foreach ($qstn_fields as $el => $qv) {
+                $this->write_xml_text_element($writer, $el, $qv);
+            }
+            $writer->endElement();
+        }
+
+        $this->write_xml_text_element($writer, 'universe', $var['var_universe'] ?? '');
+
+        if (isset($var['var_sumstat']) && is_array($var['var_sumstat'])) {
+            foreach ($var['var_sumstat'] as $sumstat) {
+                if (!is_array($sumstat)) {
+                    continue;
+                }
+                $value = $sumstat['value'] ?? null;
+                if ($value === null || $value === '' || $value === 'None') {
+                    continue;
+                }
+                $this->write_xml_attribute_element(
+                    $writer,
+                    'sumStat',
+                    array(
+                        'type' => $sumstat['type'] ?? '',
+                        'wgtd' => $sumstat['wgtd'] ?? '',
+                    ),
+                    (string)$value
+                );
+            }
+        }
+
+        if (isset($var['var_catgry']) && is_array($var['var_catgry']) && count($var['var_catgry']) > 0) {
+            $missing_values = array();
+            if (isset($var['var_invalrng']['values']) && is_array($var['var_invalrng']['values'])) {
+                $missing_values = array_map('strval', $var['var_invalrng']['values']);
+            }
+
+            foreach ($var['var_catgry'] as $cat) {
+                if (!is_array($cat)) {
+                    continue;
+                }
+                $cat_value = isset($cat['value']) ? (string)$cat['value'] : '';
+                $is_missing = $cat_value !== '' && !empty($missing_values)
+                    && in_array($cat_value, $missing_values, true);
+
+                $writer->startElement('catgry');
+                if ($is_missing) {
+                    $writer->writeAttribute('missing', 'Y');
+                }
+                $this->write_xml_text_element($writer, 'catValu', $cat['value'] ?? '');
+                $this->write_xml_text_element($writer, 'labl', $cat['labl'] ?? '');
+
+                if (isset($cat['stats']) && is_array($cat['stats'])) {
+                    foreach ($cat['stats'] as $stat) {
+                        if (!is_array($stat)) {
+                            continue;
+                        }
+                        $stat_value = $stat['value'] ?? null;
+                        if ($stat_value === null || $stat_value === '' || $stat_value === 'None') {
+                            continue;
+                        }
+                        $this->write_xml_attribute_element(
+                            $writer,
+                            'catStat',
+                            array(
+                                'type' => $stat['type'] ?? '',
+                                'wgtd' => $stat['wgtd'] ?? '',
+                            ),
+                            (string)$stat_value
+                        );
+                    }
+                }
+                $writer->endElement();
+            }
+        }
+
+        $this->write_xml_text_element($writer, 'notes', $var['var_notes'] ?? '');
+        $this->write_xml_text_element($writer, 'txt', $var['var_txt'] ?? '');
+        $this->write_xml_text_element($writer, 'codInstr', $var['var_codinstr'] ?? '');
+
+        $std = $this->transform_std_catgry($var['var_std_catgry'] ?? null);
+        if (is_array($std)) {
+            $writer->startElement('stdCatgry');
+            foreach ($std as $key => $val) {
+                if (is_scalar($val) && $val !== '') {
+                    $this->write_xml_text_element($writer, (string)$key, $val);
+                }
+            }
+            $writer->endElement();
+        }
+
+        if (isset($var['var_concept']) && is_scalar($var['var_concept']) && $var['var_concept'] !== '') {
+            $this->write_xml_text_element($writer, 'concept', $var['var_concept']);
+        }
+
+        $writer->endElement();
     }
 
 
@@ -505,123 +786,10 @@ class Editor_DDI_Writer
 
     function get_var_desc_xml($data)
     {
-        $var = new \Adbar\Dot($data);
-        $output = new \Adbar\Dot();
-
-        //variable description
-        $output->set([
-            '_attributes'=>[
-                'ID'=>$var['vid'],
-                'name'=>$var['name'],
-                'files'=>$var['fid'],
-                'dcml'=>$var['var_dcml'],
-                'intrvl'=>$var['var_intrvl'],
-                'wgt'=> $this->get_is_var_wgt($var),
-                'wgt-var'=>$this->get_var_wgt($var),
-            ],
-
-            'varFormat'=>[
-                '_value'=> (string)$var['var_format.value'],
-                '_attributes'=>[
-                    'type'=>$var['var_format.type'],
-                    //'schema'=>$var['var_format.schema'],//not supported
-                    'formatname'=>$var['var_format.name']
-                ]
-            ],
-
-            'location'=>[
-                '_attributes'=>[
-                    'StartPos'=>$var['loc_start_pos'],
-                    'EndPos'=>$var['loc_end_pos'],
-                    'width'=>$var['loc_width'],
-                    'RecSegNo'=>$var['loc_rec_seg_no'],
-                ]
-            ],
-
-            'labl'=>$var['labl'],
-            'imputation'=>$var['var_imputation'],
-            'security'=>$var['var_security'],
-            'respUnit'=>$var['var_respunit'],            
-            'qstn.preQTxt'=>$var['var_qstn_preqtxt'],
-            'qstn.qstnLit'=>$var['var_qstn_qstnlit'],
-            'qstn.postQTxt'=>$var['var_qstn_postqtxt'],
-            'qstn.ivuInstr'=>$var['var_qstn_ivulnstr'],
-
-            //'valrng'=>$var[''],//repeatable field - not supported
-            'universe'=>$var['var_universe'],
-            'sumStat'=> [], //repeatable
-            
-            'catgry'=>[],
-            'notes'=>$var['var_notes'],
-            'txt'=>$var['var_txt'],
-            'stdCatgry'=>$this->transform_std_catgry($var['var_std_catgry']),
-            'codInstr'=>$var['var_codinstr'],
-            'concept'=>$var['var_concept']            
-        ]);
-
-
-        //sumstats
-        $sumstats=new \Adbar\Dot($var->get('var_sumstat'));
-        foreach($sumstats->all() as $idx=>$sumstat){
-            if ($sumstats[$idx]['value']=='None' || $sumstats[$idx]['value']==''){
-                continue;
-            }
-            $output->set([
-                'sumStat.'.$idx.'._value'=>(string)$sumstats["{$idx}.value"],
-                'sumStat.'.$idx.'._attributes'=>[
-                    'type'=>$sumstats["{$idx}.type"],
-                    'wgtd'=>$sumstats["{$idx}.wgtd"]
-                ],
-            ]);
-        }
-
-        $categories=new \Adbar\Dot($var->get('var_catgry'));
-
-        // Get missing values from var_invalrng.values
-        $missing_values = array();
-        if (isset($var['var_invalrng']['values']) && is_array($var['var_invalrng']['values'])) {
-            $missing_values = array_map('strval', $var['var_invalrng']['values']);
-        }
-
-        foreach($categories->all() as $idx=>$cat){
-            
-            // Get category value
-            $cat_value = isset($categories["{$idx}.value"]) ? (string)$categories["{$idx}.value"] : '';
-            $is_missing = false;
-
-            // Check if value is in var_invalrng.values 
-            if (!empty($cat_value) && !empty($missing_values)) {
-                $is_missing = in_array($cat_value, $missing_values, true);
-            }
-            
-            //get category stats
-            $cat_stats = isset($categories["{$idx}.stats"]) ? $categories["{$idx}.stats"] : [];
-            $cat_stats= new \Adbar\Dot($cat_stats);
-
-            $output->set([
-                'catgry.'.$idx=>[                    
-                    '_attributes'=>[
-                        'missing'=> $is_missing ? 'Y' : ''
-                    ]
-                ],
-                'catgry.'.$idx.'.catValu'=> $categories["{$idx}.value"],
-                'catgry.'.$idx.'.labl'=> $categories["{$idx}.labl"],
-                //catStat for category if stats exist
-                'catgry.'.$idx.'.catStat'=>[                    
-                    '_attributes'=>[
-                        'type'=>$cat_stats["{$idx}.type"],
-                        'wgtd'=>$cat_stats["{$idx}.wgtd"],
-                    ],
-                    '_value'=> (string)$cat_stats["{$idx}.value"]
-                ]
-            ]);
-        }
-        
-        $output = $this->remove_empty($output->all());
-        $result = new Spatie\ArrayToXml\ArrayToXml($output,'var');
-        $result=$result->prettify()->toDom();
-        //$result->formatOutput = true;
-        return ($result->saveXML($result->documentElement));
+        $mem = new XMLWriter();
+        $mem->openMemory();
+        $this->write_var_desc_to_writer($mem, is_array($data) ? $data : array());
+        return $mem->outputMemory();
     }
 
     function get_var_categories_value_labels_indexed($var_catgry_labels)

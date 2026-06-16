@@ -175,6 +175,52 @@ abstract class MY_REST_Controller extends REST_Controller {
 
     }
 
+    /**
+     * Non-fatal ACL check for branching (e.g. registry admin vs super-admin).
+     */
+    function user_has_access($resource, $privilege)
+    {
+        $user = $this->api_user();
+        try {
+            return $this->acl_manager->has_access($resource, $privilege, $user);
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Registry ACL for API (codelist | data_structure).
+     *
+     * @param string $resource codelist|data_structure
+     * @param string $action browse|edit|import|delete|admin
+     */
+    function registry_require_or_die($resource, $action)
+    {
+        if ($this->acl_manager->registry_can($resource, $action, $this->api_user())) {
+            return true;
+        }
+        $this->_registry_access_denied_response();
+    }
+
+    /**
+     * Registry lifecycle admin (locked/archived) or Ion Auth super-admin.
+     */
+    function is_registry_admin($resource)
+    {
+        return $this->acl_manager->registry_can($resource, 'admin', $this->api_user());
+    }
+
+    private function _registry_access_denied_response()
+    {
+        $this->output
+            ->set_status_header(403)
+            ->set_content_type('application/json');
+        die(json_encode(array(
+            'status' => 'failed',
+            'error' => 'Access denied',
+        )));
+    }
+
     function has_access($resource,$privilege)
     {
         $user=$this->api_user();

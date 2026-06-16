@@ -1611,31 +1611,32 @@
                                         {
                                             "key": "contact",
                                             "title": "Contact",
-                                            "type": "nested_array",
+                                            "type": "section",
+                                            "help_text": "Single maintenance contact (object per ISO maintenance info).",
                                             "props": [
                                                 {
-                                                    "key": "individualName",
+                                                    "key": "contact.individualName",
                                                     "title": "Individual name",
                                                     "type": "string",
                                                     "prop_key": "description.identificationInfo.resourceMaintenance.contact.individualName",
                                                     "display_type": "text"
                                                 },
                                                 {
-                                                    "key": "organisationName",
+                                                    "key": "contact.organisationName",
                                                     "title": "Organisation name",
                                                     "type": "string",
                                                     "prop_key": "description.identificationInfo.resourceMaintenance.contact.organisationName",
                                                     "display_type": "text"
                                                 },
                                                 {
-                                                    "key": "positionName",
+                                                    "key": "contact.positionName",
                                                     "title": "Position",
                                                     "type": "string",
                                                     "prop_key": "description.identificationInfo.resourceMaintenance.contact.positionName",
                                                     "display_type": "text"
                                                 },
                                                 {
-                                                    "key": "role",
+                                                    "key": "contact.role",
                                                     "title": "Role",
                                                     "type": "string",
                                                     "prop_key": "description.identificationInfo.resourceMaintenance.contact.role",
@@ -1724,21 +1725,21 @@
                                                     ]
                                                 },
                                                 {
-                                                    "key": "contactInfo.address.electronicMailAddress",
+                                                    "key": "contact.contactInfo.address.electronicMailAddress",
                                                     "title": "Email",
                                                     "type": "string",
                                                     "prop_key": "description.identificationInfo.resourceMaintenance.contact.contactInfo.address.electronicMailAddress",
                                                     "display_type": "text"
                                                 },
                                                 {
-                                                    "key": "contactInfo.phone.voice",
+                                                    "key": "contact.contactInfo.phone.voice",
                                                     "title": "Voice",
                                                     "type": "string",
                                                     "prop_key": "description.identificationInfo.resourceMaintenance.contact.contactInfo.phone.voice",
                                                     "display_type": "text"
                                                 },
                                                 {
-                                                    "key": "contactInfo.phone.facsimile",
+                                                    "key": "contact.contactInfo.phone.facsimile",
                                                     "title": "Facsimile",
                                                     "type": "string",
                                                     "prop_key": "description.identificationInfo.resourceMaintenance.contact.contactInfo.phone.facsimile",
@@ -1751,28 +1752,28 @@
                                                     "type": "section",
                                                     "props": [
                                                         {
-                                                            "key": "contactInfo.address.deliveryPoint",
+                                                            "key": "contact.contactInfo.address.deliveryPoint",
                                                             "title": "Delivery point",
                                                             "type": "string",
                                                             "prop_key": "description.identificationInfo.resourceMaintenance.contact.contactInfo.address.deliveryPoint",
                                                             "display_type": "text"
                                                         },
                                                         {
-                                                            "key": "contactInfo.address.city",
+                                                            "key": "contact.contactInfo.address.city",
                                                             "title": "City",
                                                             "type": "string",
                                                             "prop_key": "description.identificationInfo.resourceMaintenance.contact.contactInfo.address.city",
                                                             "display_type": "text"
                                                         },
                                                         {
-                                                            "key": "contactInfo.address.country",
+                                                            "key": "contact.contactInfo.address.country",
                                                             "title": "Country",
                                                             "type": "string",
                                                             "prop_key": "description.identificationInfo.resourceMaintenance.contact.contactInfo.address.country",
                                                             "display_type": "text"
                                                         },
                                                         {
-                                                            "key": "contactInfo.address.postalCode",
+                                                            "key": "contact.contactInfo.address.postalCode",
                                                             "title": "Postal code",
                                                             "type": "string",
                                                             "prop_key": "description.identificationInfo.resourceMaintenance.contact.contactInfo.address.postalCode",
@@ -1788,21 +1789,21 @@
                                                     "type": "section",
                                                     "props": [
                                                         {
-                                                            "key": "contactInfo.onlineResource.name",
+                                                            "key": "contact.contactInfo.onlineResource.name",
                                                             "title": "Name",
                                                             "type": "string",
                                                             "prop_key": "description.identificationInfo.resourceMaintenance.contact.contactInfo.onlineResource.name",
                                                             "display_type": "text"
                                                         },
                                                         {
-                                                            "key": "contactInfo.onlineResource.description",
+                                                            "key": "contact.contactInfo.onlineResource.description",
                                                             "title": "Description",
                                                             "type": "string",
                                                             "prop_key": "description.identificationInfo.resourceMaintenance.contact.contactInfo.onlineResource.description",
                                                             "display_type": "textarea"
                                                         },
                                                         {
-                                                            "key": "contactInfo.onlineResource.linkage",
+                                                            "key": "contact.contactInfo.onlineResource.linkage",
                                                             "title": "URL",
                                                             "type": "string",
                                                             "prop_key": "description.identificationInfo.resourceMaintenance.contact.contactInfo.onlineResource.linkage",
@@ -1812,14 +1813,14 @@
                                                             "display_type": "text"
                                                         },
                                                         {
-                                                            "key": "contactInfo.onlineResource.protocol",
+                                                            "key": "contact.contactInfo.onlineResource.protocol",
                                                             "title": "Protocol",
                                                             "type": "string",
                                                             "prop_key": "description.identificationInfo.resourceMaintenance.contact.contactInfo.onlineResource.protocol",
                                                             "display_type": "text"
                                                         },
                                                         {
-                                                            "key": "contactInfo.onlineResource.function",
+                                                            "key": "contact.contactInfo.onlineResource.function",
                                                             "title": "Function",
                                                             "type": "string",
                                                             "prop_key": "description.identificationInfo.resourceMaintenance.contact.contactInfo.onlineResource.function",
