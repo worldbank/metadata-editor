@@ -646,7 +646,7 @@
         const router = new VueRouter({ routes });
         const translation_messages = { default: <?php echo isset($translations) ? json_encode($translations, JSON_HEX_APOS) : '{}';?> };
         const i18n = new VueI18n({ locale: 'default', messages: translation_messages });
-        const vuetify = new Vuetify({ theme: { themes: { light: { primary: '#526bc7' } } } });
+        const vuetify = new Vuetify({ theme: { themes: { light: { primary: '#526bc7', "primary-dark": '#0c1a4d' } } } });
         if (typeof GlobalLoginPlugin !== 'undefined') { Vue.use(GlobalLoginPlugin); }
         new Vue({
             el: '#app',

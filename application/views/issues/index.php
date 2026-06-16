@@ -390,7 +390,7 @@
         vuetify,
         data() {
           return {
-            navTabsModel: 5,
+            navTabsModel: 7,
             issues: [],
             totalIssues: 0,
             selected: [],

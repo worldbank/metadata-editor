@@ -765,6 +765,7 @@ class Jobs extends MY_REST_Controller
 		}
 	}
 
+	/**
 	 * Create an indicator data import job (convenience endpoint)
 	 *
 	 * POST /api/jobs/import_indicator_data
@@ -802,7 +803,6 @@ class Jobs extends MY_REST_Controller
 	 * Poll status via GET /api/jobs/{uuid}
 	 */
 	function import_indicator_data_post()
-	{
 	{
 		try {
 			$input = json_decode($this->input->raw_input_stream, true);
@@ -865,8 +865,8 @@ class Jobs extends MY_REST_Controller
 		} catch (Exception $e) {
 			$this->set_response(array(
 				'status'  => 'failed',
-			'message' => \$e->getMessage(),
-		), REST_Controller::HTTP_BAD_REQUEST);
+				'message' => $e->getMessage(),
+			), REST_Controller::HTTP_BAD_REQUEST);
 		}
 	}
 
