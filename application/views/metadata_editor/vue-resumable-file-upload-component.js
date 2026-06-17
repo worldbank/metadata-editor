@@ -455,6 +455,8 @@ const VueResumableFileUpload = Vue.component('resumable-file-upload', {
                     label=""
                     outlined
                     dense
+                    prepend-icon=""
+                    prepend-inner-icon="mdi-paperclip"
                     :disabled="disabled || isUploading"
                     @change="handleFileSelect($event)"
                     :value="file"
