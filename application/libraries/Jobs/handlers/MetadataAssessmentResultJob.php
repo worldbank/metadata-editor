@@ -2,16 +2,11 @@
 
 require_once APPPATH . 'libraries/Jobs/JobHandlerInterface.php';
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\RequestOptions;
-
 /**
  * Metadata Assessment Result Job Handler
  *
- * Fetches the result of a metadata quality assessment from the external API.
- * The API returns a stream (SSE); this job reads the stream until the completion
- * event and returns the decoded result (e.g. issues by field).
+ * Polls the FastAPI review service for a submitted metadata assessment job,
+ * then syncs the returned issues into the project issues table.
  */
 class MetadataAssessmentResultJob implements JobHandlerInterface
 {
@@ -408,119 +403,5 @@ class MetadataAssessmentResultJob implements JobHandlerInterface
 			return $body;
 		}
 		return 'Unknown error';
-	}
-
-	/**
-	 * Open the result URL as a stream, parse SSE events, return the first non-heartbeat result
-	 *
-	 * @param string $url Full URL (base_url/event_id)
-	 * @param int $timeout_seconds Read timeout in seconds
-	 * @return array Parsed result (e.g. ['issues' => [...], 'raw_data' => ...])
-	 * @throws Exception If stream fails or no result event is received
-	 */
-	private function fetchResultStream($url, $timeout_seconds = 600)
-	{
-		$headers = array('Accept' => 'text/event-stream');
-		$api_key = $this->ci->config->item('api_key', 'metadata_assessment');
-		$api_key_header = $this->ci->config->item('api_key_header', 'metadata_assessment');
-		if (!empty($api_key) && !empty($api_key_header)) {
-			$headers[$api_key_header] = $api_key;
-		}
-
-		$client = new Client();
-
-		try {
-			$response = $client->get($url, array(
-				RequestOptions::HEADERS => $headers,
-				RequestOptions::CONNECT_TIMEOUT => 30,
-				RequestOptions::TIMEOUT => $timeout_seconds,
-				RequestOptions::STREAM => true,
-			));
-		} catch (GuzzleException $e) {
-			throw new Exception("Assessment result stream failed: " . $e->getMessage());
-		}
-
-		$buffer = '';
-		$result_data = null;
-		$body = $response->getBody();
-
-		while (!$body->eof()) {
-			$chunk = $body->read(8192);
-			if ($chunk === '') {
-				break;
-			}
-			$buffer .= $chunk;
-			// Parse complete SSE events (delimited by double newline)
-			while (($pos = strpos($buffer, "\n\n")) !== false) {
-				$event_block = substr($buffer, 0, $pos);
-				$buffer = substr($buffer, $pos + 2);
-				$parsed = $this->parseSseEvent($event_block);
-				if ($parsed !== null) {
-					$result_data = $parsed;
-					break 2;
-				}
-			}
-		}
-
-		$body->close();
-
-		if ($result_data === null) {
-			throw new Exception("Assessment result stream ended without a result event");
-		}
-
-		return $result_data;
-	}
-
-	/**
-	 * Parse one SSE event block (event type + data). Returns null for heartbeat or unknown; array for result.
-	 *
-	 * @param string $block One event block (lines of "event: x" and "data: y")
-	 * @return array|null Decoded result or null if heartbeat / skip
-	 */
-	private function parseSseEvent($block)
-	{
-		$event_type = null;
-		$data_line = null;
-
-		foreach (explode("\n", $block) as $line) {
-			$line = trim($line);
-			if ($line === '') {
-				continue;
-			}
-			if (stripos($line, 'event:') === 0) {
-				$event_type = trim(substr($line, 6));
-			}
-			if (stripos($line, 'data:') === 0) {
-				$data_line = trim(substr($line, 5));
-			}
-		}
-
-		// Ignore heartbeat (event: heartbeat, data: null)
-		if (strtolower($event_type) === 'heartbeat' && ($data_line === '' || strtolower($data_line) === 'null')) {
-			return null;
-		}
-
-		// No data to parse
-		if ($data_line === '' || strtolower($data_line) === 'null') {
-			return null;
-		}
-
-		$decoded = json_decode($data_line, true);
-		if (json_last_error() !== JSON_ERROR_NONE) {
-			return array('issues' => array(), 'raw_data' => $data_line);
-		}
-
-		// Normalize: API may return { "data": [ ... issues ... ] } or direct array
-		if (isset($decoded['data']) && is_array($decoded['data'])) {
-			return array('issues' => $decoded['data'], 'raw_data' => $decoded);
-		}
-		if (isset($decoded['issues']) && is_array($decoded['issues'])) {
-			return array('issues' => $decoded['issues'], 'raw_data' => $decoded);
-		}
-		if (is_array($decoded)) {
-			return array('issues' => $decoded, 'raw_data' => $decoded);
-		}
-
-		return array('issues' => array(), 'raw_data' => $decoded);
 	}
 }

@@ -662,9 +662,9 @@ class Jobs extends MY_REST_Controller
 	 * Request body:
 	 *   { "project_id": 123 }
 	 *
-	 * Submits project metadata to the external assessment API, receives an event_id,
-	 * then enqueues a metadata_assessment_result job. The worker will stream the result
-	 * and store it in the job. Client should poll GET /api/jobs/{uuid} for status.
+	 * Submits project metadata to the FastAPI review service, receives a job_id,
+	 * then enqueues a metadata_assessment_result job. The worker polls for the result
+	 * and stores it in the job. Client should poll GET /api/jobs/{uuid} for status.
 	 */
 	function metadata_assessment_post()
 	{
@@ -934,58 +934,6 @@ class Jobs extends MY_REST_Controller
 				'message' => $e->getMessage()
 			), REST_Controller::HTTP_BAD_REQUEST);
 		}
-	}
-
-	/**
-	 * POST project metadata to the assessment API and return the event_id from the response
-	 *
-	 * @param string $base_url Assessment API base URL (no trailing slash)
-	 * @param array $metadata Project metadata array
-	 * @return string|null event_id or null
-	 */
-	private function submitToAssessmentApi($base_url, $metadata)
-	{
-		$this->load->config('metadata_assessment');
-		$connect_timeout = (int) $this->config->item('submit_connect_timeout', 'metadata_assessment') ?: 30;
-		$read_timeout = (int) $this->config->item('submit_read_timeout', 'metadata_assessment') ?: 30;
-		$headers = array('Content-Type' => 'application/json');
-		$api_key = $this->config->item('api_key', 'metadata_assessment');
-		$api_key_header = $this->config->item('api_key_header', 'metadata_assessment');
-		if (!empty($api_key) && !empty($api_key_header)) {
-			$headers[$api_key_header] = $api_key;
-		}
-
-		$body = array(
-			'data' => array(json_encode($metadata, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)),
-		);
-
-		try {
-			$client = new \GuzzleHttp\Client(array(
-				\GuzzleHttp\RequestOptions::CONNECT_TIMEOUT => $connect_timeout,
-				\GuzzleHttp\RequestOptions::TIMEOUT => $read_timeout,
-			));
-			$response = $client->post($base_url, array(
-				\GuzzleHttp\RequestOptions::HEADERS => $headers,
-				\GuzzleHttp\RequestOptions::JSON => $body,
-			));
-		} catch (\GuzzleHttp\Exception\GuzzleException $e) {
-			throw new Exception("Assessment API request failed: " . $e->getMessage());
-		}
-
-		$raw = (string) $response->getBody();
-		$decoded = json_decode($raw, true);
-		if (is_array($decoded)) {
-			if (!empty($decoded['event_id'])) {
-				return $decoded['event_id'];
-			}
-			if (!empty($decoded['event-id'])) {
-				return $decoded['event-id'];
-			}
-		}
-		if (preg_match('/"([a-f0-9]{32})"/', $raw, $m)) {
-			return $m[1];
-		}
-		return null;
 	}
 
 	/**
