@@ -41,6 +41,10 @@ class PublishProjectJob implements JobHandlerInterface
         if (empty($payload['project_id'])) {
             throw new Exception("Missing required parameter: project_id");
         }
+
+        if (!is_numeric($payload['project_id'])) {
+            throw new Exception("project_id must be a numeric project sid");
+        }
         
         if (empty($payload['catalog_connection_id'])) {
             throw new Exception("Missing required parameter: catalog_connection_id");
@@ -63,7 +67,7 @@ class PublishProjectJob implements JobHandlerInterface
     {
         $hash_data = array(
             'job_type' => $this->getJobType(),
-            'project_id' => $payload['project_id'],
+            'project_id' => (int) $payload['project_id'],
             'catalog_connection_id' => $payload['catalog_connection_id'],
             'publish_metadata' => !empty($payload['publish_metadata']) ? 1 : 0,
             'publish_thumbnail' => !empty($payload['publish_thumbnail']) ? 1 : 0,
@@ -91,7 +95,7 @@ class PublishProjectJob implements JobHandlerInterface
         // Validate payload first
         $this->validatePayload($payload);
         
-        $project_id = $payload['project_id'];
+        $project_id = (int) $payload['project_id'];
         $catalog_connection_id = $payload['catalog_connection_id'];
         $user_id = $payload['user_id'];
         

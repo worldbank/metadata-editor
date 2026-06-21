@@ -284,6 +284,11 @@ class Jobs extends MY_REST_Controller
 			$payload = $input['payload'];
 			$priority = isset($input['priority']) ? (int)$input['priority'] : 0;
 			$max_attempts = isset($input['max_attempts']) ? (int)$input['max_attempts'] : 3;
+
+			// Convenience for API clients that omit user_id (same as publish_to_nada_post).
+			if (empty($payload['user_id']) && !empty($this->user_id)) {
+				$payload['user_id'] = $this->user_id;
+			}
 			
 			// Validate job type exists
 			if (!$this->Job_queue_model->is_valid_job_type($job_type)) {
@@ -551,6 +556,8 @@ class Jobs extends MY_REST_Controller
 	 *   {
 	 *     "project_id": 123,
 	 *     "catalog_connection_id": 1,
+	 *
+	 * project_id may be the numeric database id or the project idno (same as get_sid() elsewhere).
 	 *     "publish_metadata": true,
 	 *     "publish_thumbnail": true,
 	 *     "publish_resources": true,
@@ -583,10 +590,13 @@ class Jobs extends MY_REST_Controller
 			if (empty($input['catalog_connection_id'])) {
 				throw new Exception("catalog_connection_id is required");
 			}
+
+			$resolved_sid = $this->get_sid((string) $input['project_id']);
+			$this->editor_acl->user_has_project_access($resolved_sid, 'edit', $this->api_user);
 			
 			// Build payload for generic handler
 			$payload = array(
-				'project_id' => $input['project_id'],
+				'project_id' => (int) $resolved_sid,
 				'catalog_connection_id' => $input['catalog_connection_id'],
 				'user_id' => $this->user_id,
 				'publish_metadata' => isset($input['publish_metadata']) ? $input['publish_metadata'] : true,
