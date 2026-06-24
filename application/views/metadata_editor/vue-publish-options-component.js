@@ -1273,7 +1273,9 @@ Vue.component('publish-options', {
             return this.isIndicatorProject
                 && this.indicator_publish
                 && this.indicator_publish.local
-                && this.indicator_publish.local.bound;
+                && this.indicator_publish.local.bound
+                && this.indicator_publish.local.data_structure_reference
+                && this.indicator_publish.local.data_structure_reference.idno;
         },
         canPublishIndicatorData(){
             return this.isIndicatorProject

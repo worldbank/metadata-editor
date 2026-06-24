@@ -89,6 +89,52 @@ class Data_structure_util {
     }
 
     /**
+     * Effective data_structure_reference for export/publish: metadata when complete,
+     * otherwise from editor_project_dsd + global data_structures row.
+     *
+     * @param int  $sid
+     * @param bool $backfill_metadata When true, persist resolved reference on project metadata
+     * @return array|null
+     */
+    public function resolve_project_reference($sid, $backfill_metadata = false)
+    {
+        $sid = (int) $sid;
+        $ref = $this->get_project_reference($sid);
+        if (is_array($ref) && !empty($ref['idno'])) {
+            return $ref;
+        }
+
+        $binding = $this->ci->Editor_project_dsd_model->get_by_sid($sid);
+        if (!$binding || empty($binding['data_structure_id'])) {
+            return (is_array($ref) && $ref !== array()) ? $ref : null;
+        }
+
+        $structure = $this->ci->Data_structure_model->get_structure_by_id((int) $binding['data_structure_id'], false);
+        if (!$structure) {
+            return (is_array($ref) && $ref !== array()) ? $ref : null;
+        }
+
+        $resolved = $this->build_reference_from_structure($structure);
+        if (empty($resolved['idno'])) {
+            return (is_array($ref) && $ref !== array()) ? $ref : null;
+        }
+
+        if (is_array($ref)) {
+            foreach (array('uri', 'notes') as $k) {
+                if (!empty($ref[$k]) && empty($resolved[$k])) {
+                    $resolved[$k] = (string) $ref[$k];
+                }
+            }
+        }
+
+        if ($backfill_metadata) {
+            $this->set_project_reference($sid, $resolved, null);
+        }
+
+        return $resolved;
+    }
+
+    /**
      * Persist data_structure_reference on project metadata; remove inline data_structure.
      *
      * @param int   $sid

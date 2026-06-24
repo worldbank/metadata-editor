@@ -669,7 +669,7 @@ class Indicator_dsd extends MY_REST_Controller
 			$this->load->model('Data_structure_model');
 
 			$binding = $this->Editor_project_dsd_model->get_by_sid($sid);
-			$reference = $this->data_structure_util->get_project_reference($sid);
+			$reference = $this->data_structure_util->resolve_project_reference($sid);
 			$columns = $this->Indicator_dsd_model->select_all($sid, false);
 			$structure_validation = $this->Indicator_dsd_model->validate_dsd_structure($sid);
 

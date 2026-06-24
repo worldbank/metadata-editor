@@ -41,7 +41,7 @@ class Editor_nada_indicator_publish {
 	{
 		$sid = (int) $sid;
 		$binding = $this->ci->Editor_project_dsd_model->get_by_sid($sid);
-		$reference = $this->ci->data_structure_util->get_project_reference($sid);
+		$reference = $this->ci->data_structure_util->resolve_project_reference($sid);
 		$project = $this->ci->Editor_model->get_basic_info($sid);
 		$study_idno = ($project && !empty($project['study_idno']))
 			? trim((string) $project['study_idno'])
@@ -179,6 +179,8 @@ class Editor_nada_indicator_publish {
 	 */
 	public function publish_dsd($sid, $user_id, $catalog_connection_id, $overwrite = false)
 	{
+		$this->ci->data_structure_util->resolve_project_reference($sid, true);
+
 		$conn = $this->get_connection($user_id, $catalog_connection_id);
 		$client = Nada_catalog_client::from_connection($conn);
 		$context = $this->get_local_indicator_context($sid);
@@ -243,6 +245,8 @@ class Editor_nada_indicator_publish {
 		if ($nada_upload_id === '') {
 			throw new Exception('nada_upload_id is required');
 		}
+
+		$this->ci->data_structure_util->resolve_project_reference($sid, true);
 
 		$conn = $this->get_connection($user_id, $catalog_connection_id);
 		$client = Nada_catalog_client::from_connection($conn);

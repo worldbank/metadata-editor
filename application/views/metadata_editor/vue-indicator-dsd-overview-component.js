@@ -204,6 +204,9 @@ Vue.component('indicator-dsd-overview', {
                     if (typeof EventBus !== 'undefined') {
                         EventBus.$emit('onSuccess', vm.isBound ? 'Data structure updated' : 'Data structure attached');
                     }
+                    if (typeof vm.$store !== 'undefined') {
+                        vm.$store.dispatch('loadProject', { dataset_id: vm.dataset_id });
+                    }
                     return vm.loadAll();
                 })
                 .catch(function(err) {

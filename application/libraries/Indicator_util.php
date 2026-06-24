@@ -25,8 +25,8 @@ class Indicator_util
 	public function get_data_structure_export_fields($sid)
 	{
 		$this->ci->load->library('Data_structure_util');
-		$ref = $this->ci->data_structure_util->get_project_reference($sid);
-		if ($ref) {
+		$ref = $this->ci->data_structure_util->resolve_project_reference($sid);
+		if ($ref && !empty($ref['idno'])) {
 			return array('data_structure_reference' => $ref);
 		}
 

@@ -169,6 +169,9 @@ Vue.component('indicator-dsd', {
                     if (typeof EventBus !== 'undefined') {
                         EventBus.$emit('onSuccess', 'Bound to data structure');
                     }
+                    if (typeof vm.$store !== 'undefined') {
+                        vm.$store.dispatch('loadProject', { dataset_id: vm.dataset_id });
+                    }
                     return vm.loadBinding().then(function() {
                         return vm.loadColumns();
                     });

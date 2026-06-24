@@ -542,6 +542,20 @@ class Editor_model extends CI_Model {
 		// Store original options for idno check
 		$original_options = $options;
 
+		// Indicator/timeseries: preserve DSD reference when form save omits it but binding exists
+		if (in_array($type, array('indicator', 'timeseries'))) {
+			$has_ref_idno = isset($options['data_structure_reference'])
+				&& is_array($options['data_structure_reference'])
+				&& !empty($options['data_structure_reference']['idno']);
+			if (!$has_ref_idno) {
+				$this->load->library('Data_structure_util');
+				$resolved = $this->data_structure_util->resolve_project_reference($id, false);
+				if ($resolved && !empty($resolved['idno'])) {
+					$options['data_structure_reference'] = $resolved;
+				}
+			}
+		}
+
 		$db_options=array(
 			'changed'=>isset($options['changed']) ? $options['changed'] : date("U"),
 			'changed_by'=>isset($options['changed_by']) ? $options['changed_by'] : '',			
