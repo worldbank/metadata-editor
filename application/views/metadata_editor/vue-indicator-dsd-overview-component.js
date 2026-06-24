@@ -15,6 +15,7 @@ Vue.component('indicator-dsd-overview', {
             bindingGlobal: false,
             removeDialog: false,
             removing: false,
+            isValidating: false,
             compHeaders: [
                 { text: 'Order', value: 'sort_order', width: '72px' },
                 { text: 'Name', value: 'name' },
@@ -53,7 +54,28 @@ Vue.component('indicator-dsd-overview', {
             return this.structure ? (this.structure.warnings || []) : [];
         },
         hasValidationIssues() {
-            return this.structureErrors.length > 0 || this.structureWarnings.length > 0;
+            if (this.structureErrors.length > 0 || this.structureWarnings.length > 0) {
+                return true;
+            }
+            var dv = this.dataValidation;
+            if (this.hasPublishedData && dv && !dv.skipped) {
+                if (Array.isArray(dv.errors) && dv.errors.length > 0) {
+                    return true;
+                }
+                if (Array.isArray(dv.warnings) && dv.warnings.length > 0) {
+                    return true;
+                }
+            }
+            return false;
+        },
+        hasPublishedData() {
+            return !!(this.binding && this.binding.has_published_data);
+        },
+        dataValidation() {
+            return (this.report && this.report.data_validation) ? this.report.data_validation : null;
+        },
+        overallValid() {
+            return this.report ? this.report.valid : null;
         },
         isBound() {
             return !!(this.binding && this.binding.bound);
@@ -105,8 +127,28 @@ Vue.component('indicator-dsd-overview', {
         },
 
         async loadReport() {
-            const res = await axios.get(CI.base_url + '/api/indicator_dsd/validate/' + this.dataset_id);
-            this.report = res.data || null;
+            this.isValidating = true;
+            try {
+                const res = await axios.get(CI.base_url + '/api/indicator_dsd/validate/' + this.dataset_id);
+                this.report = res.data || null;
+            } finally {
+                this.isValidating = false;
+            }
+        },
+
+        refreshValidation() {
+            return this.loadReport();
+        },
+
+        formatObservationKeyColumns(cols) {
+            if (!cols || !cols.length) {
+                return '';
+            }
+            return cols.map(function(kc) {
+                var nm = (kc && kc.dsd_name) ? String(kc.dsd_name) : '';
+                var tp = (kc && kc.column_type) ? String(kc.column_type) : '';
+                return tp ? (nm + ' (' + tp + ')') : nm;
+            }).join(', ');
         },
 
         async loadBinding() {
@@ -303,12 +345,16 @@ Vue.component('indicator-dsd-overview', {
                                 <strong>{{ totalColumns }}</strong>
                                 <span class="grey--text">{{ totalColumns === 1 ? ' component' : ' components' }}</span>
                             </span>
-                            <v-chip v-if="structureValid === true && !hasValidationIssues" small color="success" text-color="white" label>
+                            <v-chip v-if="overallValid === true && !hasValidationIssues" small color="success" text-color="white" label>
                                 <v-icon left x-small>mdi-check-circle</v-icon> Valid
                             </v-chip>
-                            <v-chip v-else-if="structureValid === false" small color="error" text-color="white" label>
+                            <v-chip v-else-if="overallValid === false" small color="error" text-color="white" label>
                                 <v-icon left x-small>mdi-alert-circle</v-icon>
-                                {{ structureErrors.length }} {{ structureErrors.length === 1 ? 'error' : 'errors' }}
+                                {{ (report && report.errors ? report.errors.length : structureErrors.length) }}
+                                {{ (report && report.errors && report.errors.length === 1) ? 'error' : 'errors' }}
+                            </v-chip>
+                            <v-chip v-if="hasPublishedData && binding.published_row_count != null" small outlined label class="ml-1">
+                                {{ formatNumber(binding.published_row_count) }} {{ $t('rows') || 'rows' }}
                             </v-chip>
                         </div>
                     </div>
@@ -372,6 +418,117 @@ Vue.component('indicator-dsd-overview', {
                 </v-expansion-panel-content>
             </v-expansion-panel>
         </v-expansion-panels>
+
+        <v-card v-if="hasPublishedData && dataValidation" outlined class="mb-4">
+            <v-card-title class="text-subtitle-1 py-3 d-flex align-center flex-wrap" style="gap: 8px;">
+                <v-icon color="primary" class="mr-1">mdi-database-check-outline</v-icon>
+                {{ $t('dsd_validation_section_data') || 'Data validation' }}
+                <v-spacer></v-spacer>
+                <v-chip
+                    v-if="dataValidation.skipped"
+                    small
+                    label
+                    color="grey"
+                    text-color="white"
+                >
+                    <v-icon left x-small>mdi-minus-circle-outline</v-icon>
+                    {{ $t('skipped') || 'Skipped' }}
+                </v-chip>
+                <v-chip
+                    v-else
+                    small
+                    label
+                    :color="dataValidation.valid ? 'success' : 'error'"
+                    text-color="white"
+                >
+                    <v-icon left x-small>{{ dataValidation.valid ? 'mdi-check-circle' : 'mdi-close-circle' }}</v-icon>
+                    {{ dataValidation.valid ? ($t('validation_passed') || 'Passed') : ($t('validation_failed') || 'Failed') }}
+                </v-chip>
+                <v-btn
+                    small
+                    text
+                    color="primary"
+                    :loading="isValidating"
+                    @click="refreshValidation"
+                >
+                    <v-icon left small>mdi-refresh</v-icon>
+                    {{ $t('validate') || 'Re-run' }}
+                </v-btn>
+            </v-card-title>
+            <v-card-text class="pt-0 pb-3">
+                <div v-if="dataValidation.skipped" class="text-body-2 text--secondary">
+                    {{ dataValidation.reason }}
+                </div>
+                <template v-else>
+                    <div v-if="dataValidation.source || dataValidation.row_count != null" class="text-caption text--secondary mb-3">
+                        <span v-if="dataValidation.source">{{ $t('source') || 'Source' }}: <strong class="text--primary">{{ dataValidation.source }}</strong></span>
+                        <span v-if="dataValidation.row_count != null">
+                            <span v-if="dataValidation.source"> · </span>{{ formatNumber(dataValidation.row_count) }} {{ $t('rows') || 'rows' }}
+                        </span>
+                    </div>
+
+                    <div
+                        v-if="dataValidation.observation_key"
+                        class="pa-3 mb-3 rounded"
+                        style="background: rgba(0,0,0,.03); border: 1px solid rgba(0,0,0,.06);"
+                    >
+                        <div v-if="dataValidation.observation_key.skipped" class="text-body-2 text--secondary">
+                            {{ dataValidation.observation_key.reason }}
+                        </div>
+                        <template v-else>
+                            <div v-if="dataValidation.observation_key.key_columns && dataValidation.observation_key.key_columns.length" class="text-body-2 mb-2">
+                                <span class="text--secondary">{{ $t('key') || 'Key' }}: </span>
+                                <span class="text-wrap">{{ formatObservationKeyColumns(dataValidation.observation_key.key_columns) }}</span>
+                            </div>
+                            <div v-if="dataValidation.observation_key.value_column" class="text-body-2 mb-2">
+                                <span class="text--secondary">{{ $t('value') || 'Value' }}: </span>
+                                {{ dataValidation.observation_key.value_column.dsd_name }}
+                                <span class="text--secondary"> — {{ dataValidation.observation_key.value_column.physical_name }}</span>
+                            </div>
+                            <div class="text-body-2">
+                                <span v-if="dataValidation.observation_key.rows_with_observation_value != null">
+                                    {{ $t('dsd_validation_rows_with_value') || 'Rows with value' }}: <strong>{{ dataValidation.observation_key.rows_with_observation_value }}</strong>
+                                </span>
+                                <span v-if="dataValidation.observation_key.unique_observation_count != null" class="ml-2">
+                                    · {{ $t('dsd_validation_unique_observations') || 'Unique keys' }}: <strong>{{ dataValidation.observation_key.unique_observation_count }}</strong>
+                                </span>
+                                <span v-if="dataValidation.observation_key.table_rows_read != null" class="ml-2 text--secondary">
+                                    · {{ $t('dsd_validation_rows_scanned') || 'Counted' }}: {{ dataValidation.observation_key.table_rows_read }}
+                                </span>
+                            </div>
+                            <div v-if="dataValidation.observation_key.scan_truncated" class="text-caption warning--text mt-2">
+                                {{ $t('dsd_validation_observation_key_truncated') || 'Counts may be incomplete (scan truncated).' }}
+                            </div>
+                        </template>
+                    </div>
+
+                    <template v-if="dataValidation.errors && dataValidation.errors.length">
+                        <div class="text-overline text--secondary mb-2">{{ $t('data_errors') || 'Data errors' }}</div>
+                        <div
+                            v-for="(error, idx) in dataValidation.errors"
+                            :key="'vde-' + idx"
+                            class="d-flex align-start text-body-2 error--text mb-2"
+                            style="gap: 8px;"
+                        >
+                            <v-icon color="error" small class="flex-shrink-0 mt-1">mdi-close-circle</v-icon>
+                            <span class="text-wrap" style="min-width: 0;">{{ error }}</span>
+                        </div>
+                    </template>
+                    <template v-if="dataValidation.warnings && dataValidation.warnings.length">
+                        <div class="text-overline text--secondary mb-2 mt-3">{{ $t('data_warnings') || 'Data warnings' }}</div>
+                        <div
+                            v-for="(warning, idx) in dataValidation.warnings"
+                            :key="'vdw-' + idx"
+                            class="d-flex align-start text-body-2 warning--text mb-2"
+                            style="gap: 8px;"
+                        >
+                            <v-icon color="warning" small class="flex-shrink-0 mt-1">mdi-alert</v-icon>
+                            <span class="text-wrap" style="min-width: 0;">{{ warning }}</span>
+                        </div>
+                    </template>
+                </template>
+            </v-card-text>
+        </v-card>
 
         <v-card outlined class="mb-4">
             <v-card-title class="text-subtitle-1 py-3">
