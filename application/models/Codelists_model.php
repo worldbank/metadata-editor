@@ -1316,6 +1316,173 @@ class Codelists_model extends CI_Model {
     }
 
     /**
+     * True when every non-empty code in $codes exists on the codelist (batched IN queries).
+     *
+     * @param int   $codelist_id
+     * @param array $codes
+     * @param int   $batch_size
+     * @return bool
+     */
+    public function codelist_contains_all_codes($codelist_id, array $codes, $batch_size = 500)
+    {
+        $codelist_id = (int) $codelist_id;
+        if ($codelist_id <= 0) {
+            return false;
+        }
+
+        $unique = $this->_normalize_code_list($codes);
+        if (empty($unique)) {
+            return true;
+        }
+
+        $found = array();
+        $batch_size = max(1, (int) $batch_size);
+        $list = array_keys($unique);
+        for ($i = 0; $i < count($list); $i += $batch_size) {
+            $chunk = array_slice($list, $i, $batch_size);
+            $this->db->reset_query();
+            $this->db->select('code');
+            $this->db->from($this->table_items);
+            $this->db->where('codelist_id', $codelist_id);
+            $this->db->where_in('code', $chunk);
+            $rows = $this->db->get()->result_array();
+            foreach ($rows as $row) {
+                if (isset($row['code'])) {
+                    $found[strtoupper((string) $row['code'])] = true;
+                }
+            }
+        }
+
+        foreach ($list as $code) {
+            if (!isset($found[strtoupper($code)])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Latest family version whose codes are a superset of $codes (newest match wins).
+     *
+     * @param string $agency
+     * @param string $name
+     * @param array  $codes
+     * @return array|false Codelist row
+     */
+    public function find_compatible_codelist_version($agency, $name, array $codes)
+    {
+        $agency = trim((string) $agency);
+        $name = trim((string) $name);
+        if ($agency === '' || $name === '') {
+            return false;
+        }
+
+        $unique = $this->_normalize_code_list($codes);
+        $needed = count($unique);
+        if ($needed === 0) {
+            return false;
+        }
+
+        $versions = $this->get_codelist_versions($name, $agency);
+        if (empty($versions)) {
+            return false;
+        }
+
+        usort($versions, function ($a, $b) {
+            $sa = isset($a['version_seq']) ? (int) $a['version_seq'] : 0;
+            $sb = isset($b['version_seq']) ? (int) $b['version_seq'] : 0;
+            if ($sa !== $sb) {
+                return $sb - $sa;
+            }
+            return (int) $b['id'] - (int) $a['id'];
+        });
+
+        foreach ($versions as $ver) {
+            $cid = isset($ver['id']) ? (int) $ver['id'] : 0;
+            if ($cid <= 0) {
+                continue;
+            }
+            if ($this->count_codes($cid) < $needed) {
+                continue;
+            }
+            if ($this->codelist_contains_all_codes($cid, array_keys($unique))) {
+                return $ver;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Suggest the next SDMX version label for a codelist family.
+     *
+     * @param string $agency
+     * @param string $name
+     * @return string
+     */
+    public function suggest_next_version_string($agency, $name)
+    {
+        $agency = trim((string) $agency);
+        $name = trim((string) $name);
+        if ($agency === '' || $name === '') {
+            return self::NADA_DEFAULT_VERSION;
+        }
+
+        $this->db->reset_query();
+        $row = $this->db->select('version, version_seq')
+            ->from($this->table_codelists)
+            ->where('agency', $agency)
+            ->where('name', $name)
+            ->order_by('version_seq', 'DESC')
+            ->order_by('id', 'DESC')
+            ->limit(1)
+            ->get()
+            ->row_array();
+
+        $candidate = $row
+            ? $this->_bump_version_label(isset($row['version']) ? $row['version'] : self::NADA_DEFAULT_VERSION)
+            : self::NADA_DEFAULT_VERSION;
+
+        $guard = 0;
+        while ($this->get_by_identity($agency, $name, $candidate) && $guard < 100) {
+            $candidate = $this->_bump_version_label($candidate);
+            $guard++;
+        }
+
+        return $candidate;
+    }
+
+    /**
+     * @param string $version
+     * @return string
+     */
+    private function _bump_version_label($version)
+    {
+        $ver = trim((string) $version);
+        if ($ver !== '' && preg_match('/^(\d+)\.(\d+)$/', $ver, $m)) {
+            return $m[1] . '.' . ((int) $m[2] + 1);
+        }
+        return self::NADA_DEFAULT_VERSION;
+    }
+
+    /**
+     * @param array $codes
+     * @return array<string, true> map of trimmed non-empty codes
+     */
+    private function _normalize_code_list(array $codes)
+    {
+        $unique = array();
+        foreach ($codes as $code) {
+            $c = trim((string) $code);
+            if ($c !== '') {
+                $unique[$c] = true;
+            }
+        }
+        return $unique;
+    }
+
+    /**
      * 
      * Get a single code by ID
      * 

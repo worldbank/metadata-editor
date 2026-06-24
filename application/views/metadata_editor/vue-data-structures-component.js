@@ -161,12 +161,19 @@ Vue.component('data-structures', {
         },
         onExpand: function (rows) {
             var vm = this;
-            (rows || []).forEach(function (id) {
-                var head = vm.structures.find(function (s) { return s.id === id; });
-                if (head && (!head.versions_count || head.versions_count <= 1)) {
+            (rows || []).forEach(function (row) {
+                var headId = (row && typeof row === 'object') ? row.id : row;
+                if (headId == null || headId === '') {
                     return;
                 }
-                if (!vm.versionsByHead[id] && !vm.versionsLoading[id]) {
+                var head = vm.structures.find(function (s) { return s.id == headId; });
+                if (!head && row && typeof row === 'object' && row.id != null) {
+                    head = row;
+                }
+                if (!head || !head.versions_count || head.versions_count <= 1) {
+                    return;
+                }
+                if (!vm.versionsByHead[headId] && !vm.versionsLoading[headId]) {
                     vm.loadVersions(head);
                 }
             });

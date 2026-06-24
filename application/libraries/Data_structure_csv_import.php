@@ -54,7 +54,6 @@ class Data_structure_csv_import {
 		}
 
 		$dry_run = !empty($options['dry_run']);
-		$overwrite = !empty($options['overwrite']);
 		$user_id = isset($options['user_id']) ? $options['user_id'] : null;
 
 		$errors = $this->_validate_components($structure_id, $components);
@@ -71,7 +70,6 @@ class Data_structure_csv_import {
 		$agency = isset($structure['agency']) && trim((string) $structure['agency']) !== ''
 			? trim((string) $structure['agency'])
 			: Data_structure_model::DEFAULT_AGENCY;
-		$codelist_version = Codelists_model::NADA_DEFAULT_VERSION;
 
 		$summary = array(
 			'dry_run' => $dry_run,
@@ -80,7 +78,9 @@ class Data_structure_csv_import {
 			'components_preview' => array(),
 			'codelists_created' => array(),
 			'codelists_reused' => array(),
+			'codelists_versioned' => array(),
 			'codelists_updated' => array(),
+			'codelist_resolutions' => array(),
 			'warnings' => array(),
 		);
 
@@ -92,10 +92,9 @@ class Data_structure_csv_import {
 				$delimiter,
 				$parsed['headers'],
 				$agency,
-				$codelist_version,
-				$overwrite,
 				$dry_run,
-				$summary
+				$summary,
+				$user_id
 			);
 		}
 
@@ -254,6 +253,25 @@ class Data_structure_csv_import {
 			$items[] = array('code' => $code, 'label' => $label);
 		}
 		return $items;
+	}
+
+	/**
+	 * @param array[] $items { code, label }
+	 * @return string[]
+	 */
+	public static function extract_code_values(array $items)
+	{
+		$codes = array();
+		foreach ($items as $item) {
+			if (!is_array($item)) {
+				continue;
+			}
+			$code = isset($item['code']) ? trim((string) $item['code']) : '';
+			if ($code !== '') {
+				$codes[] = $code;
+			}
+		}
+		return $codes;
 	}
 
 	/**
@@ -435,10 +453,9 @@ class Data_structure_csv_import {
 	 * @param string $delimiter
 	 * @param array $headers
 	 * @param string $agency
-	 * @param string $codelist_version
-	 * @param bool $overwrite
 	 * @param bool $dry_run
 	 * @param array $summary
+	 * @param int|null $user_id
 	 * @return int|null
 	 * @throws Exception
 	 */
@@ -448,10 +465,9 @@ class Data_structure_csv_import {
 		$delimiter,
 		array $headers,
 		$agency,
-		$codelist_version,
-		$overwrite,
 		$dry_run,
-		array &$summary
+		array &$summary,
+		$user_id = null
 	) {
 		$cl = isset($comp['codelist']) && is_array($comp['codelist']) ? $comp['codelist'] : null;
 		if (!$cl) {
@@ -468,6 +484,15 @@ class Data_structure_csv_import {
 				throw new Exception('Codelist not found.');
 			}
 			$summary['codelists_reused'][] = array('id' => $cid, 'idno' => $row['idno']);
+			$summary['codelist_resolutions'][] = array(
+				'component' => trim((string) $comp['name']),
+				'codelist_name' => isset($row['name']) ? $row['name'] : null,
+				'agency' => isset($row['agency']) ? $row['agency'] : $agency,
+				'mode' => 'global',
+				'action' => 'linked_global',
+				'codelist_id' => $cid,
+				'version' => isset($row['version']) ? $row['version'] : null,
+			);
 			return $cid;
 		}
 		if ($mode !== 'from_csv') {
@@ -488,96 +513,155 @@ class Data_structure_csv_import {
 			throw new Exception("No codes found in CSV column '{$code_col}' for codelist '{$cl_name}'.");
 		}
 
-		$existing = $this->CI->Codelists_model->get_by_identity($agency, $cl_name, $codelist_version);
-		if ($existing) {
-			$cid = (int) $existing['id'];
-			if ($overwrite) {
-				if (!$dry_run) {
-					$this->CI->Codelists_model->delete_all_items_for_codelist($cid);
-					$this->_insert_codelist_items($cid, $items);
-				}
-				$summary['codelists_updated'][] = array(
-					'id' => $cid,
-					'idno' => $existing['idno'],
-					'name' => $cl_name,
-					'item_count' => count($items),
-				);
-			} else {
-				if (count($items) > 0) {
-					$summary['warnings'][] = array(
-						'message' => "Codelist '{$cl_name}' already exists; linked without updating items (set overwrite=true to replace codes).",
-						'codelist_id' => $cid,
-					);
-				}
-				$summary['codelists_reused'][] = array('id' => $cid, 'idno' => $existing['idno'], 'name' => $cl_name);
-			}
+		$code_values = self::extract_code_values($items);
+		$compatible = $this->CI->Codelists_model->find_compatible_codelist_version($agency, $cl_name, $code_values);
+		if ($compatible) {
+			$cid = (int) $compatible['id'];
+			$summary['codelists_reused'][] = array(
+				'id' => $cid,
+				'idno' => isset($compatible['idno']) ? $compatible['idno'] : null,
+				'name' => $cl_name,
+				'version' => isset($compatible['version']) ? $compatible['version'] : null,
+				'item_count' => count($items),
+			);
+			$summary['codelist_resolutions'][] = array(
+				'component' => $component_name,
+				'codelist_name' => $cl_name,
+				'agency' => $agency,
+				'mode' => 'from_csv',
+				'action' => 'reused_compatible',
+				'codelist_id' => $cid,
+				'version' => isset($compatible['version']) ? $compatible['version'] : null,
+				'csv_codes' => $code_values,
+			);
 			return $cid;
 		}
 
+		$family_exists = !empty($this->CI->Codelists_model->get_codelist_versions($cl_name, $agency));
+		$next_version = $this->CI->Codelists_model->suggest_next_version_string($agency, $cl_name);
+
 		if ($dry_run) {
-			$summary['codelists_created'][] = array(
+			$preview = array(
 				'id' => null,
-				'idno' => Codelists_model::make_idno($agency, $cl_name, $codelist_version),
+				'idno' => Codelists_model::make_idno($agency, $cl_name, $next_version),
 				'name' => $cl_name,
 				'title' => $cl_title,
+				'version' => $next_version,
 				'item_count' => count($items),
+			);
+			if ($family_exists) {
+				$summary['codelists_versioned'][] = $preview;
+				$resolution_action = 'create_version';
+			} else {
+				$summary['codelists_created'][] = $preview;
+				$resolution_action = 'create_first';
+			}
+			$summary['codelist_resolutions'][] = array(
+				'component' => $component_name,
+				'codelist_name' => $cl_name,
+				'agency' => $agency,
+				'mode' => 'from_csv',
+				'action' => $resolution_action,
+				'version' => $next_version,
+				'csv_codes' => $code_values,
 			);
 			return null;
 		}
 
-		$payload = array(
-			'name' => $cl_name,
-			'title' => $cl_title,
-			'agency' => $agency,
-			'version' => $codelist_version,
-			'items' => $items,
+		$new_id = $this->_create_codelist_from_csv_items(
+			$agency,
+			$cl_name,
+			$cl_title,
+			$items,
+			$code_values,
+			$user_id
 		);
-		$r = $this->CI->Codelists_model->import_json_codelist($payload, array(
-			'replace_existing' => false,
-		));
-		if (empty($r['ok']) || empty($r['id'])) {
-			throw new Exception(isset($r['message']) ? $r['message'] : 'Failed to create codelist.');
-		}
-		$new_id = (int) $r['id'];
 		$row = $this->CI->Codelists_model->get_by_id($new_id);
-		$summary['codelists_created'][] = array(
+		$entry = array(
 			'id' => $new_id,
 			'idno' => $row ? $row['idno'] : null,
 			'name' => $cl_name,
 			'title' => $cl_title,
+			'version' => $row && isset($row['version']) ? $row['version'] : $next_version,
 			'item_count' => count($items),
+		);
+		if ($family_exists) {
+			$summary['codelists_versioned'][] = $entry;
+			$resolution_action = 'create_version';
+		} else {
+			$summary['codelists_created'][] = $entry;
+			$resolution_action = 'create_first';
+		}
+		$summary['codelist_resolutions'][] = array(
+			'component' => $component_name,
+			'codelist_name' => $cl_name,
+			'agency' => $agency,
+			'mode' => 'from_csv',
+			'action' => $resolution_action,
+			'codelist_id' => $new_id,
+			'version' => $entry['version'],
+			'csv_codes' => $code_values,
 		);
 		return $new_id;
 	}
 
 	/**
-	 * @param int $codelist_id
-	 * @param array $items
+	 * Create (or reuse) a codelist version populated with CSV items.
+	 *
+	 * @param string $agency
+	 * @param string $cl_name
+	 * @param string $cl_title
+	 * @param array  $items
+	 * @param array  $code_values
+	 * @param int|null $user_id
+	 * @return int
+	 * @throws Exception
 	 */
-	protected function _insert_codelist_items($codelist_id, array $items)
-	{
-		foreach ($items as $item) {
-			if (!is_array($item)) {
-				continue;
-			}
-			$code = isset($item['code']) ? trim((string) $item['code']) : '';
-			if ($code === '') {
-				continue;
-			}
-			$label = '';
-			if (isset($item['label']) && $item['label'] !== '' && $item['label'] !== null) {
-				$label = is_string($item['label']) ? trim((string) $item['label']) : (string) $item['label'];
-			} elseif (isset($item['title']) && $item['title'] !== '') {
-				$label = trim((string) $item['title']);
-			}
-			$item_id = $this->CI->Codelists_model->add_code((int) $codelist_id, array(
-				'code' => $code,
-				'sort_order' => 0,
-				'parent_id' => null,
-			));
-			if ($item_id && $label !== '') {
-				$this->CI->Codelists_model->set_code_label((int) $item_id, 'en', $label, null);
-			}
+	protected function _create_codelist_from_csv_items(
+		$agency,
+		$cl_name,
+		$cl_title,
+		array $items,
+		array $code_values,
+		$user_id = null
+	) {
+		$import_opts = array('replace_existing' => false);
+		if ($user_id) {
+			$import_opts['created_by'] = (int) $user_id;
 		}
+
+		for ($attempt = 0; $attempt < 50; $attempt++) {
+			$next_version = $this->CI->Codelists_model->suggest_next_version_string($agency, $cl_name);
+			$payload = array(
+				'name' => $cl_name,
+				'title' => $cl_title,
+				'agency' => $agency,
+				'version' => $next_version,
+				'items' => $items,
+			);
+			$r = $this->CI->Codelists_model->import_json_codelist($payload, $import_opts);
+			if (empty($r['ok']) || empty($r['id'])) {
+				throw new Exception(isset($r['message']) ? $r['message'] : 'Failed to create codelist.');
+			}
+
+			$new_id = (int) $r['id'];
+			$action = isset($r['action']) ? (string) $r['action'] : '';
+
+			if ($action === 'created' || $action === 'updated') {
+				return $new_id;
+			}
+
+			if ($action === 'skipped') {
+				if ($this->CI->Codelists_model->codelist_contains_all_codes($new_id, $code_values)) {
+					return $new_id;
+				}
+				// Target version exists but is incompatible; suggest_next should advance on retry.
+				continue;
+			}
+
+			return $new_id;
+		}
+
+		throw new Exception("Failed to create codelist '{$cl_name}' after multiple version attempts.");
 	}
 }

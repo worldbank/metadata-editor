@@ -1059,9 +1059,25 @@ Vue.component('data-structure-csv-bootstrap', {
             return {
                 delimiter: this.delimiter,
                 dry_run: false,
-                overwrite: false,
                 components: this.applySummary.components
             };
+        },
+        formatCodelistImportSummary: function (summary) {
+            summary = summary || {};
+            var parts = [];
+            var created = (summary.codelists_created || []).length;
+            var reused = (summary.codelists_reused || []).length;
+            var versioned = (summary.codelists_versioned || []).length;
+            if (created > 0) {
+                parts.push(created === 1 ? '1 codelist created' : created + ' codelists created');
+            }
+            if (versioned > 0) {
+                parts.push(versioned === 1 ? '1 new codelist version' : versioned + ' new codelist versions');
+            }
+            if (reused > 0) {
+                parts.push(reused === 1 ? '1 codelist reused' : reused + ' codelists reused');
+            }
+            return parts.join(', ');
         },
         onApplyClick: function () {
             var vm = this;
@@ -1083,6 +1099,13 @@ Vue.component('data-structure-csv-bootstrap', {
                         var msg = created === 1
                             ? '1 component created.'
                             : created + ' components created.';
+                        var clSummary = vm.formatCodelistImportSummary(summary);
+                        if (clSummary) {
+                            msg += ' ' + clSummary + '.';
+                        }
+                        if (summary.codelist_resolutions && summary.codelist_resolutions.length && typeof console !== 'undefined') {
+                            console.info('CSV codelist resolutions', summary.codelist_resolutions);
+                        }
                         if (typeof EventBus !== 'undefined') {
                             EventBus.$emit('onSuccess', msg);
                         }

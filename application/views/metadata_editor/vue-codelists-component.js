@@ -139,13 +139,19 @@ Vue.component('codelists', {
         },
         onExpand: function (rows) {
             var vm = this;
-            vm.expanded = rows || [];
-            (rows || []).forEach(function (id) {
-                var head = vm.codelists.find(function (c) { return c.id === id; });
-                if (head && (!head.versions_count || head.versions_count <= 1)) {
+            (rows || []).forEach(function (row) {
+                var headId = (row && typeof row === 'object') ? row.id : row;
+                if (headId == null || headId === '') {
                     return;
                 }
-                if (!vm.versionsByHead[id] && !vm.versionsLoading[id]) {
+                var head = vm.codelists.find(function (c) { return c.id == headId; });
+                if (!head && row && typeof row === 'object' && row.id != null) {
+                    head = row;
+                }
+                if (!head || !head.versions_count || head.versions_count <= 1) {
+                    return;
+                }
+                if (!vm.versionsByHead[headId] && !vm.versionsLoading[headId]) {
                     vm.loadVersions(head);
                 }
             });
