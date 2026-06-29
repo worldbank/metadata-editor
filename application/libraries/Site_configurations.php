@@ -22,6 +22,7 @@ class Site_configurations {
 			'admin_allowed_ip',
 			'admin_allowed_hosts',
 			'supported_languages',
+			'default_user_roles',
 		);
 
 		if ($settings) {
@@ -37,7 +38,22 @@ class Site_configurations {
 			}
 		}
 
+		$this->normalize_project_sharing_config();
 		$this->build_language_codes();
+	}
+
+	/**
+	 * Cast project_sharing from DB string to boolean for strict checks in API code.
+	 */
+	protected function normalize_project_sharing_config()
+	{
+		$value = $this->ci->config->item('project_sharing');
+		if ($value === null) {
+			return;
+		}
+
+		$enabled = !($value === false || $value === 0 || $value === '0' || $value === 'false');
+		$this->ci->config->set_item('project_sharing', $enabled);
 	}
 
 	/**

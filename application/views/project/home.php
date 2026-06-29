@@ -18,16 +18,7 @@
 
 
 <?php
-  $user=$this->session->userdata('username');
-  $this->load->library('Editor_acl');
-  
-  $user_info=array_merge(array(
-    'username'=> $user,
-    'is_logged_in'=> !empty($user),
-    'is_admin'=> $this->ion_auth->is_admin(),
-    'can_access_site_admin'=> $this->ion_auth->can_access_site_admin(),
-  ), registry_acl_user_info_flags());
-  
+  $user_info = build_editor_user_info();
 ?>
 
 

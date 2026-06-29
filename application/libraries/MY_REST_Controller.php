@@ -292,7 +292,8 @@ abstract class MY_REST_Controller extends REST_Controller {
 	 */
 	protected function is_project_sharing_enabled_or_die()
 	{
-		if ($this->config->item('project_sharing')===false) {
+		$this->load->helper('user_access');
+		if (!project_sharing_enabled()) {
 			$error_output = array(
 				'status' => 'failed',
 				'message' => 'Project sharing is disabled'

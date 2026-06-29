@@ -1,0 +1,111 @@
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+/**
+ * Site user-access settings and editor ACL flags for the web UI.
+ */
+
+if (!function_exists('default_user_role_names')) {
+
+	/** Role names that may be assigned automatically to new users (never managers/admin). */
+	function default_user_role_allowlist()
+	{
+		return array('User', 'Editor');
+	}
+
+	/**
+	 * Role names assigned to newly registered users (from site configurations DB).
+	 *
+	 * @return string[]
+	 */
+	function default_user_role_names()
+	{
+		$ci =& get_instance();
+		$roles = $ci->config->item('default_user_roles');
+
+		if (is_string($roles)) {
+			$decoded = json_decode($roles, true);
+			$roles = (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) ? $decoded : array();
+		}
+
+		if (!is_array($roles) || empty($roles)) {
+			$fallback = $ci->config->item('editor_user_roles');
+			$roles = is_array($fallback) ? $fallback : array();
+		}
+
+		$roles = array_values(array_intersect(default_user_role_allowlist(), array_map('strval', $roles)));
+
+		if (empty($roles)) {
+			return array('User');
+		}
+
+		return $roles;
+	}
+}
+
+if (!function_exists('default_editor_role_enabled')) {
+
+	/**
+	 * Whether new users automatically receive the Editor role.
+	 */
+	function default_editor_role_enabled()
+	{
+		return in_array('Editor', default_user_role_names(), true);
+	}
+}
+
+if (!function_exists('project_sharing_enabled')) {
+
+	/**
+	 * Whether project sharing is enabled (site configuration or editor.php fallback).
+	 */
+	function project_sharing_enabled()
+	{
+		$ci =& get_instance();
+		$value = $ci->config->item('project_sharing');
+
+		if ($value === false || $value === 0 || $value === '0' || $value === 'false') {
+			return false;
+		}
+
+		return true;
+	}
+}
+
+if (!function_exists('build_editor_user_info')) {
+
+	/**
+	 * Standard CI.user_info payload for Vue editor shell pages.
+	 *
+	 * @param object|null $user
+	 * @param bool $show_editor_access_notice When true, UI may show the missing-editor-role notice
+	 * @return array<string, mixed>
+	 */
+	function build_editor_user_info($user = null, $show_editor_access_notice = false)
+	{
+		$ci =& get_instance();
+
+		if (!isset($ci->acl_manager)) {
+			$ci->load->library('Acl_manager', null, 'acl_manager');
+		}
+
+		if ($user === null) {
+			$user = $ci->acl_manager->current_user();
+		}
+
+		$username = $ci->session->userdata('username');
+		$is_admin = $user ? (bool) $ci->acl_manager->user_is_admin($user) : false;
+		$has_editor_access = $user ? $ci->acl_manager->check_access('editor', 'view', $user) : false;
+
+		$info = array_merge(array(
+			'username' => $username,
+			'is_logged_in' => !empty($username),
+			'is_admin' => $is_admin,
+			'can_access_site_admin' => $user ? (bool) $ci->acl_manager->has_site_admin_access($user) : false,
+			'has_editor_access' => $has_editor_access,
+			'show_editor_access_notice' => $show_editor_access_notice && !empty($username) && !$is_admin && !$has_editor_access,
+		), registry_acl_user_info_flags($user));
+
+		return $info;
+	}
+}

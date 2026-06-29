@@ -213,6 +213,11 @@ class Users extends MY_Controller {
         		//get the user data by email
         		$user=$this->ion_auth->get_user_by_email($email);
 
+				if (empty($data['role_id'])) {
+					$this->ion_auth->set_user_default_roles($user->id);
+					unset($data['role_id']);
+				}
+
 				//update user group to ADMIN and ACTIVATE account
         		$this->ion_auth->update_user($user->id, $data);	        	
         	}  
@@ -279,13 +284,20 @@ class Users extends MY_Controller {
                                                      );
             $this->data['active']=$this->form_validation->set_value('active',1);
 			
-			$this->data['roles']=array();
+			$this->data['roles']= $this->acl_manager->roles_for_assigner();
 
 			if($this->input->post('role')){
 				$this->data['user_role']=$this->input->post('role');
+			} else {
+				$this->data['user_role']=array();
+				foreach (default_user_role_names() as $role_name) {
+					$role = $this->acl_manager->get_role_by_name($role_name);
+					if (!empty($role['id'])) {
+						$this->data['user_role'][] = (int) $role['id'];
+					}
+				}
 			}
 			
-			$this->data['roles']= $this->acl_manager->roles_for_assigner();
 			$this->data['options_country']= $this->ion_auth_model->get_all_countries();
 			
             $content=$this->load->view('users/create', $this->data,TRUE);
@@ -1304,6 +1316,7 @@ class Users extends MY_Controller {
 			if (is_numeric($user_id)) {
 				// Activate without code (admin override)
 				if ($this->ion_auth->activate($user_id)) {
+					$this->ion_auth->apply_default_roles_if_none($user_id);
 					$success_count++;
 				} else {
 					$error_count++;

@@ -92,6 +92,10 @@ class Configurations extends MY_Controller {
 		$settings['lang_mapping'] = $lang_mapping;
 		unset($settings['supported_languages'], $settings['language_codes']);
 
+		// Editor user access (stored in configurations table)
+		$settings['grant_editor_default'] = default_editor_role_enabled();
+		$settings['project_sharing_enabled'] = project_sharing_enabled();
+
 		// Add editor config values (read-only, from config/editor.php)
 		$this->config->load('editor');
 		$editor_config = $this->config->item('editor');
@@ -100,7 +104,6 @@ class Configurations extends MY_Controller {
 			$settings['editor_user_schema_path'] = isset($editor_config['user_schema_path']) ? $editor_config['user_schema_path'] : '';
 			$settings['editor_data_api_url']     = isset($editor_config['data_api_url'])     ? $editor_config['data_api_url']     : '';
 		}
-		$settings['editor_project_sharing'] = $this->config->item('project_sharing') ? true : false;
 
 		// Add analytics config values (read-only, from config/analytics.php)
 		$this->config->load('analytics', FALSE, TRUE);
@@ -147,8 +150,20 @@ class Configurations extends MY_Controller {
 			$options['supported_languages'] = json_encode($mapping);
 		}
 
+		// Default roles for new users (Editor toggle only; User is always assigned)
+		$this->load->helper('user_access');
+		$grant_editor = $this->input->post('grant_editor_default') === '1';
+		$default_roles = array('User');
+		if ($grant_editor) {
+			$default_roles[] = 'Editor';
+		}
+		$options['default_user_roles'] = json_encode($default_roles);
+
+		// Project sharing toggle
+		$options['project_sharing'] = $this->input->post('project_sharing') === '1' ? '1' : '0';
+
 		// Remove nested-array keys so the generic loop below doesn't try to process them
-		unset($post['lang_enabled'], $post['lang_code'], $post['submit']);
+		unset($post['lang_enabled'], $post['lang_code'], $post['submit'], $post['grant_editor_default'], $post['project_sharing']);
 
 		foreach($post as $key=>$value)
 		{

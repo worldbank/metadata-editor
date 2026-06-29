@@ -182,8 +182,8 @@
 	|
 	*/
 
-	//Assign default user role for new users
-	$config['editor_user_roles']=['user'];
+	//Assign default user role for new users (fallback if not set in Site configurations)
+	$config['editor_user_roles']=['User','Editor'];
         
         
 	

@@ -76,7 +76,13 @@ $lang['editor_storage_path_inside_app_warning']="The storage path is inside the 
 $lang['editor_user_schema_path']="User schema path";
 $lang['editor_data_api_url']="FAST API URL";
 $lang['editor_project_sharing']="Project sharing";
-$lang['editor_storage_config_file_note']="These settings are read-only and configured in <em>config/editor.php</em>";
+$lang['editor_project_sharing_enable']="Allow project owners to share projects with other users";
+$lang['editor_project_sharing_note']="When disabled, share and collaborator APIs are blocked site-wide.";
+$lang['editor_user_access_settings']="Editor & user access";
+$lang['default_editor_role']="Editor role for new users";
+$lang['default_editor_role_enable']="Automatically assign the Editor role to new users";
+$lang['default_editor_role_note']="The Editor role lets users create and manage their own metadata projects. It does not grant site administration or global manager access (templates, collections, schemas, etc.). Those roles must be assigned individually under Admin → Users. Every new account always receives the base User role.";
+$lang['editor_storage_config_file_note']="Storage paths and API URLs are read-only and configured in <em>config/editor.php</em>";
 
 $lang['builtin_analytics_settings']="Built-in Analytics";
 $lang['analytics_enabled']="Analytics enabled";

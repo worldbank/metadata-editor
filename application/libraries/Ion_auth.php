@@ -241,8 +241,10 @@ class Ion_auth
 		//NO EMAIL verification is required
 		if (!$email_activation)
 		{
-			if ($this->ci->ion_auth_model->register($username, $password, $email, $additional_data, $group_name, $auth_type) )
+			$id = $this->ci->ion_auth_model->register($username, $password, $email, $additional_data, $group_name, $auth_type);
+			if ($id)
 			{
+				$this->set_user_default_roles($id);
 				$this->set_message('account_creation_successful');
 				return TRUE;
 			}
@@ -934,16 +936,16 @@ class Ion_auth
 	 */
 	function set_user_default_roles($user_id)
 	{
-		$user_roles=$this->ci->config->item("editor_user_roles");
+		$this->ci->load->helper('user_access');
+		$user_roles = default_user_role_names();
 	
 		if (!$user_roles){
 			return false;
 		}
 
-		$roles=array();
 		foreach($user_roles as $role_name){
 			
-			if ($role_name=='admin'){
+			if (strtolower($role_name) === 'admin'){
 				continue;
 			}
 
@@ -955,6 +957,19 @@ class Ion_auth
 		}
 
 		return true;	
+	}
+
+	/**
+	 * Apply site default roles when the user has none (e.g. after manual activation).
+	 */
+	function apply_default_roles_if_none($user_id)
+	{
+		$existing = $this->ci->acl_manager->get_user_roles($user_id);
+		if (!empty($existing)) {
+			return false;
+		}
+
+		return $this->set_user_default_roles($user_id);
 	}
 
 	/**

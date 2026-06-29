@@ -31,5 +31,11 @@ $config['supported_languages'] = json_encode(array(
     array('folder' => 'uzbek',   'code' => 'uz', 'display' => 'Uzbek',    'direction' => 'ltr'),
 ));
 
+// Default roles for newly registered / activated users (JSON array of role names)
+$config['default_user_roles'] = json_encode(array('User', 'Editor'));
+
+// Allow project owners to share projects with other users ('1' = enabled, '0' = disabled)
+$config['project_sharing'] = '1';
+
 /* End of file config.php */
 /* Location: ./system/application/config/config.php */

@@ -122,7 +122,7 @@ abstract class OidcAuthBase extends DefaultAuth implements AuthInterface {
             'identity'   => $username
         );
         
-        $this->ci->ion_auth_model->register(
+        $user_id = $this->ci->ion_auth_model->register(
             $username, 
             $password, 
             $email, 
@@ -130,6 +130,10 @@ abstract class OidcAuthBase extends DefaultAuth implements AuthInterface {
             $group_name = 'user', 
             $auth_type = 'OIDC'
         );
+
+        if ($user_id) {
+            $this->ci->ion_auth->set_user_default_roles($user_id);
+        }
     }
 
     /**

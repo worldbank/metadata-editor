@@ -21,8 +21,15 @@ class Projects extends MY_Controller {
 
 	function index()
 	{
-		$this->editor_acl->has_access_or_die($resource_='editor',$privilege='view');
+		$this->lang->load("users");
+		$this->lang->load("general");
 		$this->lang->load("project");
+		if (!$this->acl_manager->check_access('editor', 'view')) {
+			$this->template->set_template('default');
+			$options['translations'] = $this->lang->language;
+			echo $this->load->view('project/no_editor_access', $options, true);
+			return;
+		}
 		$this->template->set_template('default');
 		$options['translations']=$this->lang->language;
 		echo $this->load->view('project/home',$options,true);

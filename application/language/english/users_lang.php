@@ -156,6 +156,9 @@ $lang['roles_removal_failed']="Role removal failed";
 
 // User roles
 $lang['user_roles']="User Roles";
+$lang['editor_access_required_title']="Editor access required";
+$lang['editor_access_required_message']="Your account is active but does not have permission to use the metadata editor. Ask your site administrator to assign the Editor role to your account.";
+$lang['editor_access_required_admin_hint']="You have site administration access. Go to Admin → Users, open this account, and assign the Editor role (and any other roles needed).";
 
 // Pending activation
 $lang['pending_activation']="Pending Activation";

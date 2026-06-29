@@ -128,6 +128,35 @@ h2{font-size:1.2em;font-weight:bold;border-bottom:1px solid gainsboro;padding-bo
 
 
 <fieldset class="field-expanded ">
+	<legend><i class="fas fa-users-cog mr-3" style="color:#007bff;"></i><?php echo t('editor_user_access_settings');?></legend>
+
+	<div class="field">
+		<label><?php echo t('default_editor_role');?></label>
+		<input type="hidden" name="grant_editor_default" value="0">
+		<label style="float:none;display:inline;font-weight:normal;">
+			<input type="checkbox" name="grant_editor_default" value="1"<?php echo !empty($grant_editor_default) ? ' checked' : ''; ?>>
+			<?php echo t('default_editor_role_enable');?>
+		</label>
+		<div class="field-note" style="margin-left:200px;clear:both;padding-top:6px;">
+			<?php echo t('default_editor_role_note');?>
+		</div>
+	</div>
+
+	<div class="field">
+		<label><?php echo t('editor_project_sharing');?></label>
+		<input type="hidden" name="project_sharing" value="0">
+		<label style="float:none;display:inline;font-weight:normal;">
+			<input type="checkbox" name="project_sharing" value="1"<?php echo !empty($project_sharing_enabled) ? ' checked' : ''; ?>>
+			<?php echo t('editor_project_sharing_enable');?>
+		</label>
+		<div class="field-note" style="margin-left:200px;clear:both;padding-top:6px;">
+			<?php echo t('editor_project_sharing_note');?>
+		</div>
+	</div>
+</fieldset>
+
+
+<fieldset class="field-expanded ">
 	<legend><i class="fas fa-folder-open mr-3" style="color:#007bff;"></i><?php echo t('editor_storage_settings');?></legend>
 	<div class="field">
 		<label><?php echo t('editor_storage_path');?></label>
@@ -158,14 +187,6 @@ h2{font-size:1.2em;font-weight:bold;border-bottom:1px solid gainsboro;padding-bo
 	<div class="field">
 		<label><?php echo t('editor_data_api_url');?></label>
 		<code><?php echo isset($editor_data_api_url) ? htmlspecialchars($editor_data_api_url) : ''; ?></code>
-	</div>
-	<div class="field">
-		<label><?php echo t('editor_project_sharing');?></label>
-		<?php if (!empty($editor_project_sharing)): ?>
-			<span class="text-success"><i class="fas fa-check-circle"></i> <?php echo t('yes');?></span>
-		<?php else: ?>
-			<span class="text-muted"><?php echo t('no');?></span>
-		<?php endif; ?>
 	</div>
 	<div class="field">
 		<span class="field-note"><?php echo t('editor_storage_config_file_note');?></span>
