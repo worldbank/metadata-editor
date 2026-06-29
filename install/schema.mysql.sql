@@ -349,7 +349,10 @@ insert into roles(id,name,description, weight, is_admin, is_locked) values
 (3,'Editor','General role required for projects management', 0,0,1),
 (6,'Template manager','Global role for managing templates', 0,0,0),
 (7,'Collection manager','Global role for managing collections', 0,0,0),
-(8,'Schema manager','Global role for managing schemas', 0,0,0);
+(8,'Schema manager','Global role for managing schemas', 0,0,0),
+(9,'Tag manager','Global role for managing tags', 0,0,0),
+(10,'Codelist manager','Global role for managing codelists', 0,0,0),
+(11,'Data structure manager','Global role for managing data structures', 0,0,0);
 /*!40000 ALTER TABLE `roles` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -362,14 +365,20 @@ CREATE TABLE `role_permissions` (
   PRIMARY KEY (`id`)
 ) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
--- Default Role permissions 
+-- Default Role permissions
+-- Editor also gets codelist/data_structure view (migration 20260520000001_registry_acl_view_permissions)
 insert into role_permissions(role_id,resource,permissions) values
 (3,'editor','admin'),
 (3,'collection','view'),
 (3, 'template_manager','view'),
+(3,'codelist','view'),
+(3,'data_structure','view'),
 (6,'template_manager','admin'),
 (7,'collection','admin'),
-(8,'schema','admin');
+(8,'schema','admin'),
+(9,'tag','admin'),
+(10,'codelist','admin'),
+(11,'data_structure','admin');
 
 
 CREATE TABLE `user_roles` (
@@ -1111,4 +1120,4 @@ CREATE TABLE `migrations` (
   PRIMARY KEY (`version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO `migrations` (`version`) VALUES (20260629000001);
+INSERT INTO `migrations` (`version`) VALUES (20260630000001);

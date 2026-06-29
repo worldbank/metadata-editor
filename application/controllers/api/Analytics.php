@@ -152,7 +152,7 @@ class Analytics extends MY_REST_Controller
 	function stats_get()
 	{
 		try {			
-			$this->has_access('admin_dashboard', 'view');
+			$this->has_access('dashboard', 'view');
 			
 			$days = $this->input->get('days');
 			$days = $days ? (int)$days : 30;
@@ -190,7 +190,7 @@ class Analytics extends MY_REST_Controller
 		try {
 			// Require admin access
 			$this->load->library('Editor_acl');
-			$this->has_access('admin_dashboard', 'view');
+			$this->has_access('dashboard', 'view');
 			
 			if (empty($session_id)) {
 				throw new Exception("Session ID required");
@@ -225,7 +225,7 @@ class Analytics extends MY_REST_Controller
 	function chart_get()
 	{
 		try {
-			$this->has_access('admin_dashboard', 'view');
+			$this->has_access('dashboard', 'view');
 			
 			$type = $this->input->get('type');
 			$type = $type ? $type : 'calls';
@@ -261,7 +261,7 @@ class Analytics extends MY_REST_Controller
 	function pages_get()
 	{
 		try {
-			$this->has_access('admin_dashboard', 'view');
+			$this->has_access('dashboard', 'view');
 			
 			$days = $this->input->get('days');
 			$days = $days ? (int)$days : 30;
@@ -296,7 +296,7 @@ class Analytics extends MY_REST_Controller
 	function aggregate_post()
 	{
 		try {
-			$this->has_access('admin_dashboard', 'edit');
+			$this->has_access('dashboard', 'edit');
 			
 			$cleanup = $this->input->get('cleanup');
 			
@@ -330,7 +330,7 @@ class Analytics extends MY_REST_Controller
 	function api_logs_aggregate_post()
 	{
 		try {
-			$this->has_access('admin_dashboard', 'edit');
+			$this->has_access('dashboard', 'edit');
 
 			$result = $this->Analytics_model->aggregate_api_logs();
 
@@ -356,7 +356,7 @@ class Analytics extends MY_REST_Controller
 	function status_get()
 	{
 		try {
-			$this->has_access('admin_dashboard', 'view');
+			$this->has_access('dashboard', 'view');
 			
 			$status = $this->Analytics_model->get_aggregation_status();
 			
@@ -384,7 +384,7 @@ class Analytics extends MY_REST_Controller
 	function api_logs_status_get()
 	{
 		try {
-			$this->has_access('admin_dashboard', 'view');
+			$this->has_access('dashboard', 'view');
 
 			$status = $this->Analytics_model->get_api_logs_aggregation_status();
 

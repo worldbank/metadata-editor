@@ -12,7 +12,7 @@ class Dashboard extends MY_REST_Controller {
         $this->load->model('Dashboard_model');
         $this->load->library('Editor_acl');
         $this->is_authenticated_or_die();
-        $this->editor_acl->has_access_or_die($resource_='admin_dashboard',$privilege='view');
+        $this->editor_acl->has_access_or_die($resource_='dashboard',$privilege='view');
     }
 
     protected function _auth_override_check()

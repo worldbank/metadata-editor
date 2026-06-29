@@ -26,6 +26,11 @@ $config['acl_permissions'] = [
             [
             'permission'=>'view',                
             'description'=>'View site administration dashboard'
+            ],
+            [
+            'permission'=>'edit',
+            'sub_permissions'=>['view'],
+            'description'=>'Run analytics aggregation and dashboard maintenance'
             ]
         ]
     ],
