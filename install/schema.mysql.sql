@@ -352,7 +352,8 @@ insert into roles(id,name,description, weight, is_admin, is_locked) values
 (8,'Schema manager','Global role for managing schemas', 0,0,0),
 (9,'Tag manager','Global role for managing tags', 0,0,0),
 (10,'Codelist manager','Global role for managing codelists', 0,0,0),
-(11,'Data structure manager','Global role for managing data structures', 0,0,0);
+(11,'Data structure manager','Global role for managing data structures', 0,0,0),
+(12,'Project manager','Global access to all projects', 0,0,0);
 /*!40000 ALTER TABLE `roles` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -378,7 +379,9 @@ insert into role_permissions(role_id,resource,permissions) values
 (8,'schema','admin'),
 (9,'tag','admin'),
 (10,'codelist','admin'),
-(11,'data_structure','admin');
+(11,'data_structure','admin'),
+(12,'editor','view'),
+(12,'project_manager','admin');
 
 
 CREATE TABLE `user_roles` (

@@ -417,7 +417,7 @@ class Acl_manager
 	{
 		$resources = array_keys($this->acl_permissions);
 
-		return array_values(array_diff($resources, array('editor')));
+		return array_values(array_diff($resources, array('editor', 'project_manager')));
 	}
 
 	/**

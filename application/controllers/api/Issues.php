@@ -123,8 +123,8 @@ class Issues extends MY_REST_Controller {
                 $filters['project_id'] = (int) $this->input->get('project_id');
             }
 
-            // Get accessible projects for non-admin users
-            if (!$this->editor_acl->user_is_admin($this->api_user)) {
+            // Scope to accessible projects unless user sees all projects
+            if (!$this->editor_acl->user_sees_all_projects($this->api_user)) {
                 $user_id = $this->api_user_id;
                 
                 // Get projects owned by user
@@ -337,7 +337,7 @@ class Issues extends MY_REST_Controller {
                 'job_type'   => 'metadata_assessment_result',
                 'project_id' => (int) $sid,
             );
-            if (!$this->editor_acl->user_is_admin($this->api_user)) {
+            if (!$this->editor_acl->user_sees_all_projects($this->api_user)) {
                 $filters['user_id'] = $this->api_user_id;
             }
             $jobs = $this->Job_queue_model->get_all($filters, 1, 0);

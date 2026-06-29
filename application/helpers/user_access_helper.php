@@ -72,6 +72,61 @@ if (!function_exists('project_sharing_enabled')) {
 	}
 }
 
+if (!function_exists('user_can_access_projects')) {
+
+	/**
+	 * Whether the user may open the projects editor (/projects).
+	 */
+	function user_can_access_projects($user = null)
+	{
+		$ci =& get_instance();
+
+		if (!isset($ci->acl_manager)) {
+			$ci->load->library('Acl_manager', null, 'acl_manager');
+		}
+
+		if ($user === null) {
+			$user = $ci->acl_manager->current_user();
+		}
+
+		if (!$user) {
+			return false;
+		}
+
+		return $ci->acl_manager->check_access('editor', 'view', $user)
+			|| $ci->acl_manager->check_access('project_manager', 'view', $user);
+	}
+}
+
+if (!function_exists('user_has_global_project_access')) {
+
+	/**
+	 * Global access to all projects via the Project manager role (not site Admin).
+	 */
+	function user_has_global_project_access($user = null, $permission = 'view')
+	{
+		$ci =& get_instance();
+
+		if (!isset($ci->acl_manager)) {
+			$ci->load->library('Acl_manager', null, 'acl_manager');
+		}
+
+		if ($user === null) {
+			$user = $ci->acl_manager->current_user();
+		}
+
+		if (!$user) {
+			return false;
+		}
+
+		if ($permission === null || $permission === '') {
+			$permission = 'view';
+		}
+
+		return $ci->acl_manager->check_access('project_manager', $permission, $user);
+	}
+}
+
 if (!function_exists('build_editor_user_info')) {
 
 	/**
@@ -95,7 +150,8 @@ if (!function_exists('build_editor_user_info')) {
 
 		$username = $ci->session->userdata('username');
 		$is_admin = $user ? (bool) $ci->acl_manager->user_is_admin($user) : false;
-		$has_editor_access = $user ? $ci->acl_manager->check_access('editor', 'view', $user) : false;
+		$has_editor_access = $user ? user_can_access_projects($user) : false;
+		$has_global_project_access = $user ? user_has_global_project_access($user, 'view') : false;
 
 		$info = array_merge(array(
 			'username' => $username,
@@ -103,6 +159,7 @@ if (!function_exists('build_editor_user_info')) {
 			'is_admin' => $is_admin,
 			'can_access_site_admin' => $user ? (bool) $ci->acl_manager->has_site_admin_access($user) : false,
 			'has_editor_access' => $has_editor_access,
+			'has_global_project_access' => $has_global_project_access,
 			'show_editor_access_notice' => $show_editor_access_notice && !empty($username) && !$is_admin && !$has_editor_access,
 		), registry_acl_user_info_flags($user));
 

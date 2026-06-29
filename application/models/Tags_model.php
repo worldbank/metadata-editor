@@ -374,7 +374,7 @@ class Tags_model extends CI_Model {
     {
         $this->load->library('Editor_acl');
         $user = $this->ion_auth->get_user($user_id);
-        $is_admin = $user && $this->editor_acl->user_is_admin($user);
+        $is_admin = $user && $this->editor_acl->user_sees_all_projects($user);
 
 
         $this->db->select('t.id, t.tag AS title, COUNT(DISTINCT pt.sid) AS count');

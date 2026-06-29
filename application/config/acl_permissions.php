@@ -56,9 +56,7 @@ $config['acl_permissions'] = [
             ]
         ]
     ],
-    /*     
-    // TODO: implement project manager role
-    "project_manager"=>[ 
+    "project_manager"=>[
         "title" => "Project manager",
         "description"=> "Global access to all projects",
         "permissions"=>[
@@ -66,20 +64,23 @@ $config['acl_permissions'] = [
                 "permission" => "view"
             ],
             [
-                "permission" => "edit"
+                "permission" => "edit",
+                "sub_permissions"=>["view"]
             ],
             [
-                "permission" => "delete"
+                "permission" => "delete",
+                "sub_permissions"=>["view"]
             ],
             [
-                "permission" => "publish"
+                "permission" => "publish",
+                "sub_permissions"=>["view"]
             ],
             [
                 "permission" => "admin",
                 "sub_permissions"=>["view","edit","delete","publish"]
             ]
         ]
-    ],*/
+    ],
 
     "template_manager"=>[ 
         "title" => "Template manager",

@@ -66,8 +66,8 @@ class Project_search
 			$fields[$idx]="editor_projects.".$field;
 		}
 
-		//System Admin?		
-		if ($this->ci->editor_acl->user_is_admin($user)){
+		// Site Admin or global project access
+		if ($this->ci->editor_acl->user_sees_all_projects($user)){
 			$search_options['is_admin']=1;
 		}
 
@@ -133,8 +133,8 @@ class Project_search
 	//returns the total 
 	function get_total_count($search_options=array(), $user=null)
 	{
-		//System Admin?		
-		if ($this->ci->editor_acl->user_is_admin($user)){
+		// Site Admin or global project access
+		if ($this->ci->editor_acl->user_sees_all_projects($user)){
 			$search_options['is_admin']=1;
 		}
 
@@ -676,7 +676,7 @@ class Project_search
 	{
 		// If user is admin, count all projects
 		$user = $this->ci->ion_auth->get_user($user_id);
-		$is_admin = $user && $this->ci->editor_acl->user_is_admin($user);
+		$is_admin = $user && $this->ci->editor_acl->user_sees_all_projects($user);
 
 		if ($is_admin) {
 			// Admin: count all projects by type

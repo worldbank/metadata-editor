@@ -24,7 +24,7 @@ class Projects extends MY_Controller {
 		$this->lang->load("users");
 		$this->lang->load("general");
 		$this->lang->load("project");
-		if (!$this->acl_manager->check_access('editor', 'view')) {
+		if (!user_can_access_projects()) {
 			$this->template->set_template('default');
 			$options['translations'] = $this->lang->language;
 			echo $this->load->view('project/no_editor_access', $options, true);

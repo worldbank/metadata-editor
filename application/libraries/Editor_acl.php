@@ -59,6 +59,49 @@ class Editor_acl
 	}
 
 
+	/**
+	 * Global project access via the Project manager role (not site Admin).
+	 *
+	 * @param object|null $user
+	 * @param string|null $permission view|edit|delete|publish|admin
+	 */
+	function user_has_global_project_access($user=null, $permission='view')
+	{
+		if (!$user) {
+			$user = (object)$this->current_user();
+		}
+
+		if (!$user) {
+			return false;
+		}
+
+		if ($permission === null || $permission === '') {
+			$permission = 'view';
+		}
+
+		return $this->_acl_manager()->check_access('project_manager', $permission, $user);
+	}
+
+	/**
+	 * True when the user should see all projects in listings (site Admin or global project access).
+	 */
+	function user_sees_all_projects($user=null)
+	{
+		if (!$user) {
+			$user = (object)$this->current_user();
+		}
+
+		if (!$user) {
+			return false;
+		}
+
+		if ($this->user_is_admin($user)) {
+			return true;
+		}
+
+		return $this->user_has_global_project_access($user, 'view');
+	}
+
 	function user_has_project_access($project_id,$permission=null,$user=null)
 	{
 		if (!$user){
@@ -71,6 +114,10 @@ class Editor_acl
 		}
 
 		$project_id=$this->get_project_main_id($project_id);
+
+		if ($this->user_has_global_project_access($user, $permission !== null ? $permission : 'view')) {
+			return true;
+		}
 		
 		//check if user is project owner
 		if ($this->is_user_project_owner($project_id,$user)){
