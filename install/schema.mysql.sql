@@ -367,6 +367,7 @@ insert into role_permissions(role_id,resource,permissions) values
 (3,'editor','admin'),
 (3,'collection','view'),
 (3, 'template_manager','view'),
+(6,'template_manager','admin'),
 (7,'collection','admin'),
 (8,'schema','admin');
 
@@ -1110,4 +1111,4 @@ CREATE TABLE `migrations` (
   PRIMARY KEY (`version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO `migrations` (`version`) VALUES (20260520000001);
+INSERT INTO `migrations` (`version`) VALUES (20260629000001);
