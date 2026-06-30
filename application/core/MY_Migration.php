@@ -248,6 +248,7 @@ class MY_Migration extends CI_Migration {
                 1068,  // Multiple primary keys
                 1091,  // Can't DROP - doesn't exist
                 1146,  // Table doesn't exist
+                1826,  // Duplicate foreign key constraint name
             );
             
             // MySQL SQLSTATE codes (fallback)

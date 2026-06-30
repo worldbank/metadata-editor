@@ -826,7 +826,7 @@ class Data_structure_model extends CI_Model {
 		$code = isset($err['code']) ? (int) $err['code'] : 0;
 		if ($code === 1146 || stripos($msg, "doesn't exist") !== false) {
 			throw new Exception(
-				'Data structure tables are missing. Run migration 20260516000001_global_codelists_and_data_structures or apply install/schema-data-structures.sql.'
+				'Data structure tables are missing. Run migration 20260703000001_upgrade_v1_3_0 or apply install/schema-data-structures.sql.'
 			);
 		}
 		$detail = $msg !== '' ? ': ' . $msg : '.';

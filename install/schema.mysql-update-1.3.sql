@@ -1,0 +1,19 @@
+-- Metadata Editor v1.2.x -> v1.3.0 database upgrade
+--
+-- Preferred: Admin > Database Migrations — run 20260703000001 then 20260703000002
+-- (schema upgrade, then indicator_id_value data backfill).
+--
+-- Manual application (after backup), run these files in order:
+--   1. install/schema-project-issues.sql          (if project_issues missing)
+--      install/schema-project-issues-alter.sql     (if project_issues exists)
+--   2. install/schema-codelists.sql          (skip if codelists table exists)
+--   3. install/schema-data-structures.sql     (skip if data_structures table exists)
+--   4. install/schema-codelists-pid-nullable.sql
+--   5. install/schema-resource-datafile-links.sql
+--   6. install/schema-job-queue-cancelled.sql (skip if status enum already has cancelled)
+--
+-- Role/ACL seeds for Tag/Codelist/DSD/Project managers and Editor catalogue view
+-- are applied by migration 20260703000001 (dynamic, idempotent backfill).
+--
+--   7. migration 20260703000002_backfill_indicator_id_values.php
+--      (editor_project_dsd.indicator_id_value from project metadata; run separately)

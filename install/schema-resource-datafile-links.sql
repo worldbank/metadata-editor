@@ -1,6 +1,6 @@
 -- Link optional associations between dat/micro external resources and editor data files.
 --
--- Existing DBs: migration 20260604000001_resource_datafile_links.php (Admin → Database Migration)
+-- Existing DBs: migration 20260703000001_upgrade_v1_3_0.php (Admin → Database Migration)
 -- or run this file manually after backup.
 
 ALTER TABLE `editor_resources`

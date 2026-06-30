@@ -367,7 +367,7 @@ CREATE TABLE `role_permissions` (
 ) AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
 -- Default Role permissions
--- Editor also gets codelist/data_structure view (migration 20260520000001_registry_acl_view_permissions)
+-- Editor also gets codelist/data_structure view (upgrade_v1_3_0 migration backfill)
 insert into role_permissions(role_id,resource,permissions) values
 (3,'editor','admin'),
 (3,'collection','view'),
@@ -1085,6 +1085,7 @@ CREATE TABLE `editor_project_dsd` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
+-- Project metadata issues (see install/schema-project-issues.sql)
 CREATE TABLE `project_issues` (
   `id` int NOT NULL AUTO_INCREMENT,
   `project_id` int NOT NULL,
@@ -1123,4 +1124,4 @@ CREATE TABLE `migrations` (
   PRIMARY KEY (`version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-INSERT INTO `migrations` (`version`) VALUES (20260630000001);
+INSERT INTO `migrations` (`version`) VALUES (20260703000002);

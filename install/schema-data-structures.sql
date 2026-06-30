@@ -2,7 +2,7 @@
 -- Apply after schema-codelists.sql. Reset: schema-data-structures-drop.sql then this file.
 -- SDMX time: components use column_type time_period / periodicity only (no time_period_format).
 -- Constant series FREQ: editor_project_dsd.implied_freq_code (when no periodicity column).
--- Existing DBs: migration 20260516000001_global_codelists_and_data_structures.php
+-- Existing DBs: migration 20260703000001_upgrade_v1_3_0.php
 
 CREATE TABLE `data_structures` (
   `id` int NOT NULL AUTO_INCREMENT,
