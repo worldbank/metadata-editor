@@ -313,6 +313,10 @@ class Job_queue_model extends CI_Model {
 			return false;
 		}
 
+		if ($job['status'] === 'cancelled') {
+			return true;
+		}
+
 		$attempts = $job['attempts'] + 1;
 		$status = ($attempts >= $job['max_attempts']) ? 'failed' : 'pending';
 
@@ -994,6 +998,31 @@ class Job_queue_model extends CI_Model {
 		$this->db->update('job_queue', array('status' => 'pending'));
 
 		return (int) $this->db->affected_rows();
+	}
+
+	/**
+	 * Mark a pending or processing job as cancelled by user.
+	 *
+	 * @param int $job_id Job ID
+	 * @param string $message Cancellation reason
+	 * @return bool Success
+	 */
+	function mark_cancelled($job_id, $message = 'Cancelled by user')
+	{
+		$this->db_keepalive_ping();
+
+		$data = array(
+			'status' => 'cancelled',
+			'completed_at' => date('Y-m-d H:i:s'),
+			'error_message' => $message,
+			'worker_id' => null,
+		);
+
+		$this->db->where('id', $job_id);
+		$this->db->where_in('status', array('pending', 'processing'));
+		$this->db->update('job_queue', $data);
+
+		return $this->db->affected_rows() > 0;
 	}
 
 	/**

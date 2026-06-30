@@ -228,7 +228,7 @@ CREATE TABLE `job_queue` (
   `uuid` char(36) NOT NULL,
   `job_type` varchar(50) NOT NULL,
   `job_hash` varchar(64) DEFAULT NULL,
-  `status` enum('pending','held','processing','completed','failed') DEFAULT 'pending',
+  `status` enum('pending','held','processing','completed','failed','cancelled') DEFAULT 'pending',
   `priority` int DEFAULT 0,
   `user_id` int DEFAULT NULL,
   `payload` json DEFAULT NULL,
