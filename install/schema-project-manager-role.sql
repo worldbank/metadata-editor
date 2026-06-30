@@ -1,3 +1,0 @@
--- Deprecated: Project manager is seeded by install/schema.mysql.sql (fresh install)
--- and application/migrations/20260703000001_upgrade_v1_3_0.php (existing installs).
--- Assign via Admin > Users > Roles. Role grants editor:view + project_manager:admin.

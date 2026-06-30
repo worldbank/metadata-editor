@@ -945,7 +945,7 @@ CREATE TABLE `project_tags` (
 ) DEFAULT CHARSET=utf8mb4;
 
 
--- Global codelists registry (see install/schema-codelists.sql)
+-- Global codelists registry (upgrades: install/schema.mysql-update-1.3.sql)
 CREATE TABLE `codelists` (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `pid` bigint DEFAULT NULL COMMENT 'Family head row id (latest version for agency+name); set on create',
@@ -1015,7 +1015,7 @@ CREATE TABLE `codelist_items_labels` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
--- Global data structure registry + project binding (see install/schema-data-structures.sql)
+-- Global data structure registry + project binding (upgrades: install/schema.mysql-update-1.3.sql)
 CREATE TABLE `data_structures` (
   `id` int NOT NULL AUTO_INCREMENT,
   `pid` int DEFAULT NULL,
@@ -1085,7 +1085,7 @@ CREATE TABLE `editor_project_dsd` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
--- Project metadata issues (see install/schema-project-issues.sql)
+-- Project metadata issues (upgrades: install/schema.mysql-update-1.3.sql)
 CREATE TABLE `project_issues` (
   `id` int NOT NULL AUTO_INCREMENT,
   `project_id` int NOT NULL,
