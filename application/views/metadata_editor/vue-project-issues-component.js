@@ -29,6 +29,9 @@ Vue.component('project-issues', {
             assessmentJobStatus: null,
             assessmentJobError: null,
             assessmentWorkerStatus: null,
+            workerStatus: null,
+            fastapiOnline: null,
+            readinessLoading: false,
             assessmentPollIntervalMs: 5000,
             assessmentPollMaxWaitMs: 600000, // 10 minutes
             showAssessConfirm: false,
@@ -39,7 +42,82 @@ Vue.component('project-issues', {
             assessmentStatusTimer: null
         };
     },
+    computed: {
+        isAdmin: function () {
+            return !!(CI && CI.user_info && CI.user_info.is_admin);
+        },
+        metadataAssessmentEnabled: function () {
+            return !!(CI && CI.user_info && CI.user_info.metadata_assessment_enabled);
+        },
+        hasActiveAssessmentJob: function () {
+            return !!(this.assessmentJobUuid && this.isRunningStatus(this.assessmentJobStatus));
+        },
+        showAssessButton: function () {
+            if (!this.isAdmin) {
+                return false;
+            }
+            if (this.hasActiveAssessmentJob) {
+                return true;
+            }
+            return this.metadataAssessmentEnabled;
+        },
+        workerIsRunning: function () {
+            return this.workerStatus === 'running';
+        },
+        fastApiIsOnline: function () {
+            return this.fastapiOnline === true;
+        },
+        canStartNewAssessment: function () {
+            return this.metadataAssessmentEnabled
+                && this.workerIsRunning
+                && this.fastApiIsOnline
+                && !this.assessmentSubmitting;
+        },
+        assessmentIsQueued: function () {
+            return this.assessmentPhase === 'running'
+                && this.assessmentJobStatus === 'pending'
+                && this.assessmentWorkerStatus
+                && this.assessmentWorkerStatus !== 'running';
+        },
+        assessmentButtonLabel: function () {
+            if (this.assessmentSubmitting && this.assessmentPhase === 'running') {
+                if (this.assessmentIsQueued) {
+                    return this.$t('assessment_queued_view_status') || 'Assessment queued - View status';
+                }
+                return this.$t('assessment_running_view_status') || 'Assessment running - View status';
+            }
+            if (this.assessmentSubmitting && this.assessmentPhase === 'submitting') {
+                return 'Submitting…';
+            }
+            return this.$t('assess_metadata') || 'Assess metadata';
+        },
+        assessButtonTooltip: function () {
+            if (this.assessmentSubmitting && this.assessmentPhase === 'running') {
+                return 'Click to view live status and cancel the job';
+            }
+            if (!this.workerIsRunning) {
+                return this.$t('assessment_worker_offline') || 'Background worker is not running. Start the worker before running an assessment.';
+            }
+            if (!this.fastApiIsOnline) {
+                return this.$t('assessment_fastapi_offline') || 'Assessment service is unavailable. Ensure the FastAPI backend is running.';
+            }
+            return 'Run metadata assessment';
+        },
+        assessConfirmWarnings: function () {
+            var warnings = [];
+            if (!this.fastApiIsOnline) {
+                warnings.push(this.$t('assessment_fastapi_offline') || 'Assessment service is unavailable. Ensure the FastAPI backend is running.');
+            }
+            if (!this.workerIsRunning) {
+                warnings.push(this.$t('assessment_worker_offline') || 'Background worker is not running. Start the worker before running an assessment.');
+            }
+            return warnings;
+        }
+    },
     mounted() {
+        if (this.isAdmin) {
+            this.loadAssessmentReadiness();
+        }
         this.checkAssessmentStatus();
     },
     beforeDestroy() {
@@ -52,11 +130,48 @@ Vue.component('project-issues', {
             } else {
                 this.stopAssessmentStatusAutoRefresh();
             }
+        },
+        showAssessConfirm(isOpen) {
+            if (isOpen) {
+                this.loadAssessmentReadiness();
+            }
         }
     },
     methods: {
         isRunningStatus(status) {
             return status === 'pending' || status === 'processing';
+        },
+        async loadAssessmentReadiness() {
+            if (!this.isAdmin) {
+                return;
+            }
+            this.readinessLoading = true;
+            var baseUrl = CI && CI.base_url ? CI.base_url : '';
+            try {
+                var results = await Promise.all([
+                    axios.get(baseUrl + '/api/jobs/worker_status').catch(function () { return null; }),
+                    axios.get(baseUrl + '/api/data/status/').catch(function () { return null; })
+                ]);
+                var workerResp = results[0];
+                var fastapiResp = results[1];
+                if (workerResp && workerResp.data && workerResp.data.status === 'success' && workerResp.data.worker) {
+                    var worker = workerResp.data.worker;
+                    this.workerStatus = worker.is_running ? 'running' : 'stopped';
+                } else {
+                    this.workerStatus = 'unknown';
+                }
+                if (fastapiResp && fastapiResp.data) {
+                    this.fastapiOnline = fastapiResp.data.status === 'ok';
+                } else {
+                    this.fastapiOnline = false;
+                }
+            } catch (err) {
+                console.error('Load assessment readiness:', err);
+                this.workerStatus = this.workerStatus || 'unknown';
+                this.fastapiOnline = false;
+            } finally {
+                this.readinessLoading = false;
+            }
         },
         async checkAssessmentStatus() {
             if (!this.projectId) return;
@@ -69,9 +184,6 @@ Vue.component('project-issues', {
                 this.assessmentJobUuid = job.uuid;
                 this.assessmentJobStatus = job.status;
                 this.assessmentJobError = job.error_message || null;
-                this.assessmentWorkerStatus = response.data.worker_status && response.data.worker_status.status
-                    ? response.data.worker_status.status
-                    : null;
                 this.assessmentSubmitting = true;
                 this.assessmentPhase = 'running';
                 const result = await this.pollJobUntilDone(job.uuid);
@@ -134,6 +246,14 @@ Vue.component('project-issues', {
             this.openAssessConfirm();
         },
         async submitForReview() {
+            await this.loadAssessmentReadiness();
+            if (!this.canStartNewAssessment) {
+                EventBus.$emit(
+                    'onFail',
+                    this.$t('assessment_submit_blocked') || 'Assessment cannot be started until all required services are available.'
+                );
+                return;
+            }
             this.showAssessConfirm = false;
             if (this.assessmentSubmitting) return;
             this.assessmentSubmitting = true;
@@ -307,12 +427,13 @@ Vue.component('project-issues', {
                                 </h2>                                
                             </div>
                             <v-spacer></v-spacer>
-                            <v-tooltip bottom>
+                            <v-tooltip v-if="showAssessButton" bottom>
                                 <template v-slot:activator="{ on, attrs }">
                                     <v-btn
                                         color="primary"
                                         small
-                                        :loading="assessmentSubmitting && assessmentPhase === 'submitting'"
+                                        :loading="(assessmentSubmitting && assessmentPhase === 'submitting') || readinessLoading"
+                                        :disabled="!hasActiveAssessmentJob && (readinessLoading || !canStartNewAssessment)"
                                         @click="onAssessButtonClick"
                                         class="mr-2"
                                         v-bind="attrs"
@@ -326,15 +447,11 @@ Vue.component('project-issues', {
                                             class="mr-2"
                                         ></v-progress-circular>
                                         <v-icon v-else left>mdi-auto-fix</v-icon>
-                                        {{ assessmentSubmitting && assessmentPhase === 'running' ? 'Assessment running - View status' : (assessmentSubmitting ? 'Submitting…' : 'Assess metadata') }}
+                                        {{ assessmentButtonLabel }}
                                         <v-icon v-if="assessmentSubmitting && assessmentPhase === 'running'" right small>mdi-chevron-right</v-icon>
                                     </v-btn>
                                 </template>
-                                <span>
-                                    {{ assessmentSubmitting && assessmentPhase === 'running'
-                                        ? 'Click to view live status and cancel the job'
-                                        : 'Run metadata assessment' }}
-                                </span>
+                                <span>{{ assessButtonTooltip }}</span>
                             </v-tooltip>
                             <v-btn
                                 v-if="canEdit"
@@ -385,11 +502,26 @@ Vue.component('project-issues', {
                     <v-card-text class="pt-2">
                         This will send the project metadata to the quality assessment service. Detected issues will be added to the Issues list and shown next to the relevant fields.
                         <p class="mt-3 mb-0">You do not have to wait for the assessment to finish. You can leave this page and come back later; the issues will appear when the assessment completes.</p>
+                        <v-alert
+                            v-for="(warning, idx) in assessConfirmWarnings"
+                            :key="'assess-warn-' + idx"
+                            type="warning"
+                            dense
+                            outlined
+                            class="mt-3 mb-0"
+                        >
+                            {{ warning }}
+                        </v-alert>
                     </v-card-text>
                     <v-card-actions>
                         <v-spacer></v-spacer>
                         <v-btn text @click="showAssessConfirm = false">Cancel</v-btn>
-                        <v-btn color="primary" @click="submitForReview">
+                        <v-btn
+                            color="primary"
+                            :disabled="!canStartNewAssessment || readinessLoading"
+                            :loading="readinessLoading"
+                            @click="submitForReview"
+                        >
                             Assess metadata
                         </v-btn>
                     </v-card-actions>
@@ -406,12 +538,15 @@ Vue.component('project-issues', {
                         <div><strong>Job UUID:</strong> {{ assessmentJobUuid || 'N/A' }}</div>
                         <div class="mt-2"><strong>Status:</strong> {{ assessmentJobStatus || 'unknown' }}</div>
                         <div class="mt-2"><strong>Worker:</strong> {{ assessmentWorkerStatus || 'unknown' }}</div>
-                        <div
+                        <v-alert
                             v-if="isRunningStatus(assessmentJobStatus) && assessmentWorkerStatus && assessmentWorkerStatus !== 'running'"
-                            class="mt-3 orange--text text--darken-2"
+                            type="warning"
+                            dense
+                            outlined
+                            class="mt-3 mb-0"
                         >
-                            Worker is not running. The assessment job may not progress until worker starts.
-                        </div>
+                            {{ $t('assessment_worker_warning') || 'Worker is not running. The assessment job may not progress until the worker starts.' }}
+                        </v-alert>
                         <div v-if="assessmentLastCheckedAt" class="mt-2"><strong>Last checked:</strong> {{ assessmentLastCheckedAt }}</div>
                         <div v-if="assessmentJobError" class="mt-3 red--text text--darken-2">
                             <strong>Error:</strong> {{ assessmentJobError }}
@@ -425,10 +560,12 @@ Vue.component('project-issues', {
                         <v-btn
                             v-if="isRunningStatus(assessmentJobStatus)"
                             color="error"
+                            dark
+                            depressed
                             :loading="assessmentCancelLoading"
                             @click="cancelAssessmentJob"
                         >
-                            Cancel job
+                            {{ $t('assessment_cancel') || 'Cancel job' }}
                         </v-btn>
                         <v-btn text @click="showAssessmentStatusDialog = false">Close</v-btn>
                     </v-card-actions>

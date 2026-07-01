@@ -64,12 +64,14 @@
 
   <?php
       $user=$this->session->userdata('username');
+      $this->load->helper('user_access');
 
       $user_info=[
         'username'=> $user,
         'is_logged_in'=> !empty($user),
         'is_admin'=> $this->ion_auth->is_admin(),
         'can_access_site_admin'=> $this->ion_auth->can_access_site_admin(),
+        'metadata_assessment_enabled'=> metadata_assessment_enabled(),
       ];
       
     ?>

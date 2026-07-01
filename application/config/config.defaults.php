@@ -37,5 +37,8 @@ $config['default_user_roles'] = json_encode(array('User', 'Editor'));
 // Allow project owners to share projects with other users ('1' = enabled, '0' = disabled)
 $config['project_sharing'] = '1';
 
+// Metadata assessment (Issues → Assess metadata); requires FastAPI review routes and background worker ('1' = enabled, '0' = disabled)
+$config['metadata_assessment_enabled'] = '0';
+
 /* End of file config.php */
 /* Location: ./system/application/config/config.php */

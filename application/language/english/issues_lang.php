@@ -124,6 +124,12 @@ $lang['assessment_cancel']             = "Cancel job";
 $lang['assessment_description']        = "This will send the project metadata to the quality assessment service. Detected issues will be added to the issues list and shown next to the relevant fields.";
 $lang['assessment_async_note']         = "You do not have to wait for the assessment to finish. You can leave this page and come back later; the issues will appear when the assessment completes.";
 $lang['assessment_worker_warning']     = "Worker is not running. The assessment job may not progress until the worker starts.";
+$lang['assessment_queued']             = "Assessment queued";
+$lang['assessment_queued_view_status'] = "Assessment queued - View status";
+$lang['assessment_running_view_status'] = "Assessment running - View status";
+$lang['assessment_fastapi_offline']    = "Assessment service is unavailable. Ensure the FastAPI backend is running.";
+$lang['assessment_worker_offline']     = "Background worker is not running. Start the worker before running an assessment.";
+$lang['assessment_submit_blocked']     = "Assessment cannot be started until all required services are available.";
 
 // ─── Success messages ─────────────────────────────────────────────────────────
 $lang['issue_created']                 = "Issue created successfully";

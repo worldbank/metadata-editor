@@ -307,4 +307,24 @@ abstract class MY_REST_Controller extends REST_Controller {
 		}
 	}
 
+	/**
+	 * Block metadata assessment when the feature is disabled site-wide.
+	 */
+	protected function is_metadata_assessment_enabled_or_die()
+	{
+		$this->load->helper('user_access');
+		if (!metadata_assessment_enabled()) {
+			$error_output = array(
+				'status' => 'failed',
+				'message' => 'Metadata assessment is disabled'
+			);
+
+			$this->output->set_status_header(403);
+			$this->output->set_content_type('application/json');
+			$this->output->set_output(json_encode($error_output));
+			$this->output->_display();
+			die();
+		}
+	}
+
 }

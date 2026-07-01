@@ -35,6 +35,7 @@ class Issues extends MY_REST_Controller {
         $this->load->model('Project_issues_model');
         $this->load->model('Editor_model');
         $this->load->library('Editor_acl');
+        $this->load->helper('user_access');
         $this->is_authenticated_or_die();
         $this->api_user = $this->api_user();
         $this->api_user_id = $this->get_api_user_id();
@@ -362,6 +363,7 @@ class Issues extends MY_REST_Controller {
             $response = array(
                 'status'         => 'success',
                 'assessment_job' => $assessment_job,
+                'metadata_assessment_enabled' => metadata_assessment_enabled(),
             );
             $this->set_response($response, REST_Controller::HTTP_OK);
         } catch (Exception $e) {

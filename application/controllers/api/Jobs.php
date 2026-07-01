@@ -685,6 +685,7 @@ class Jobs extends MY_REST_Controller
 			), REST_Controller::HTTP_FORBIDDEN);
 			return;
 		}
+		$this->is_metadata_assessment_enabled_or_die();
 		try {
 			$input = json_decode($this->input->raw_input_stream, true);
 			if (!$input) {

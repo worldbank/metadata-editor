@@ -93,8 +93,10 @@ class Configurations extends MY_Controller {
 		unset($settings['supported_languages'], $settings['language_codes']);
 
 		// Editor user access (stored in configurations table)
+		$this->load->helper('user_access');
 		$settings['grant_editor_default'] = default_editor_role_enabled();
 		$settings['project_sharing_enabled'] = project_sharing_enabled();
+		$settings['metadata_assessment_enabled'] = metadata_assessment_enabled();
 
 		// Add editor config values (read-only, from config/editor.php)
 		$this->config->load('editor');
@@ -162,8 +164,11 @@ class Configurations extends MY_Controller {
 		// Project sharing toggle
 		$options['project_sharing'] = $this->input->post('project_sharing') === '1' ? '1' : '0';
 
+		// Metadata assessment toggle
+		$options['metadata_assessment_enabled'] = $this->input->post('metadata_assessment_enabled') === '1' ? '1' : '0';
+
 		// Remove nested-array keys so the generic loop below doesn't try to process them
-		unset($post['lang_enabled'], $post['lang_code'], $post['submit'], $post['grant_editor_default'], $post['project_sharing']);
+		unset($post['lang_enabled'], $post['lang_code'], $post['submit'], $post['grant_editor_default'], $post['project_sharing'], $post['metadata_assessment_enabled']);
 
 		foreach($post as $key=>$value)
 		{

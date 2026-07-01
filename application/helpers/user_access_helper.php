@@ -72,6 +72,24 @@ if (!function_exists('project_sharing_enabled')) {
 	}
 }
 
+if (!function_exists('metadata_assessment_enabled')) {
+
+	/**
+	 * Whether metadata assessment (Issues → Assess metadata) is enabled site-wide.
+	 */
+	function metadata_assessment_enabled()
+	{
+		$ci =& get_instance();
+		$value = $ci->config->item('metadata_assessment_enabled');
+
+		if ($value === false || $value === 0 || $value === '0' || $value === 'false' || $value === null) {
+			return false;
+		}
+
+		return true;
+	}
+}
+
 if (!function_exists('user_can_access_projects')) {
 
 	/**

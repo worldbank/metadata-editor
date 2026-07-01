@@ -153,6 +153,18 @@ h2{font-size:1.2em;font-weight:bold;border-bottom:1px solid gainsboro;padding-bo
 			<?php echo t('editor_project_sharing_note');?>
 		</div>
 	</div>
+
+	<div class="field">
+		<label><?php echo t('metadata_assessment');?></label>
+		<input type="hidden" name="metadata_assessment_enabled" value="0">
+		<label style="float:none;display:inline;font-weight:normal;">
+			<input type="checkbox" name="metadata_assessment_enabled" value="1"<?php echo !empty($metadata_assessment_enabled) ? ' checked' : ''; ?>>
+			<?php echo t('metadata_assessment_enable');?>
+		</label>
+		<div class="field-note" style="margin-left:200px;clear:both;padding-top:6px;">
+			<?php echo t('metadata_assessment_note');?>
+		</div>
+	</div>
 </fieldset>
 
 

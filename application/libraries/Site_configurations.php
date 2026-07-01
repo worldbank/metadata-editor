@@ -38,22 +38,25 @@ class Site_configurations {
 			}
 		}
 
-		$this->normalize_project_sharing_config();
+		$this->normalize_boolean_config('project_sharing');
+		$this->normalize_boolean_config('metadata_assessment_enabled');
 		$this->build_language_codes();
 	}
 
 	/**
-	 * Cast project_sharing from DB string to boolean for strict checks in API code.
+	 * Cast a site config flag from DB string to boolean for strict checks in API code.
+	 *
+	 * @param string $key
 	 */
-	protected function normalize_project_sharing_config()
+	protected function normalize_boolean_config($key)
 	{
-		$value = $this->ci->config->item('project_sharing');
+		$value = $this->ci->config->item($key);
 		if ($value === null) {
 			return;
 		}
 
 		$enabled = !($value === false || $value === 0 || $value === '0' || $value === 'false');
-		$this->ci->config->set_item('project_sharing', $enabled);
+		$this->ci->config->set_item($key, $enabled);
 	}
 
 	/**
