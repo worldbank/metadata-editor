@@ -1,51 +1,10 @@
-# Systemd service for Metadata Editor Worker
+# Deploy: Metadata Editor Worker Service
 
-## Quick setup
+Install the background job-queue worker as a system service on your platform:
 
-1. **Copy the service file**
-   ```bash
-   sudo cp metadata-editor-worker.service /etc/systemd/system/
-   ```
+| Platform | Directory | Installer |
+|---|---|---|
+| Linux (systemd) | [`linux/`](linux/) | `sudo ./install-service.sh` |
+| Windows (NSSM) | [`windows/`](windows/) | `.\install-service.ps1` |
 
-2. **Create an override** so the service uses your app path and user:
-   ```bash
-   sudo mkdir -p /etc/systemd/system/metadata-editor-worker.service.d
-   sudo tee /etc/systemd/system/metadata-editor-worker.service.d/override.conf << 'EOF'
-   [Service]
-   Environment="APP_ROOT=/var/www/metadata-editor"
-   Environment="WORKER_MAX_JOBS=50"
-   User=www-data
-   Group=www-data
-   EOF
-   ```
-   Replace `APP_ROOT` with the real path to your app (where `worker.sh` and `index.php` live).  
-   Replace `User`/`Group` with the user that should run the worker (e.g. your web server user).
-
-3. **Reload and enable**
-   ```bash
-   sudo systemctl daemon-reload
-   sudo systemctl enable --now metadata-editor-worker
-   ```
-
-4. **Check status**
-   ```bash
-   sudo systemctl status metadata-editor-worker
-   journalctl -u metadata-editor-worker -f
-   ```
-
-## Restart after N jobs (memory leak prevention)
-
-The worker is started with `--max-jobs=N` (default 50). After processing that many jobs, it exits with code 0. systemd then restarts it (`Restart=always`), so you get a fresh process and avoid long-lived memory leaks.
-
-- Change the limit: set `WORKER_MAX_JOBS` in the override (e.g. `Environment="WORKER_MAX_JOBS=1000"`).
-- Disable the limit: remove `--max-jobs` from `ExecStart` in an override (worker runs until crash or stop).
-
-## Useful commands
-
-| Command | Description |
-|--------|-------------|
-| `systemctl status metadata-editor-worker` | Show status |
-| `systemctl restart metadata-editor-worker` | Restart now |
-| `systemctl stop metadata-editor-worker` | Stop |
-| `journalctl -u metadata-editor-worker -f` | Follow logs |
-| `journalctl -u metadata-editor-worker -n 100` | Last 100 lines |
+See the README in each directory for prerequisites, parameters, and troubleshooting.
