@@ -54,15 +54,7 @@
           <section class="content">
             <div class="container-fluid">
               <div class="row">
-                <div class="col-12">
-                  <div class="mt-5 mb-4">
-                    <main-navigation-tabs active-tab="issues" v-model="navTabsModel"></main-navigation-tabs>
-                  </div>
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="col-md-3">
+                <div class="sidebar col-md-3 col-sm-4">
                   <div class="mr-4 mt-5">
                     <v-expansion-panels v-model="filterPanel" multiple>
 
@@ -153,9 +145,12 @@
                   </div>
                 </div>
 
-                <div class="col-md-9 mt-4">
+                <div class="col-md-9 col-sm-8">
+                  <div class="mt-5 mb-5">
+                    <div class="mb-5">
+                      <main-navigation-tabs active-tab="issues" v-model="navTabsModel"></main-navigation-tabs>
+                    </div>
 
-                  <div class="mt-3 mb-4">
                     <div class="d-flex">
                       <div class="flex-grow-1 flex-shrink-0 mr-auto">
                         <h3 class="mt-3">Issues</h3>
